@@ -29,7 +29,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -69,12 +68,24 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
    */
   public static final String MARKER = "SelectionLine";
 
+  /**
+   * Constructor.
+   *
+   * @param task Visualization task
+   */
   public SelectionLineVisualization(VisualizationTask task) {
     super(task);
     addCSSClasses(svgp);
     context.addDataStoreListener(this);
     context.addResultListener(this);
     incrementalRedraw();
+  }
+  
+  @Override
+  public void destroy() {
+    context.removeDataStoreListener(this);
+    context.removeResultListener(this);
+    super.destroy();
   }
 
   @Override
@@ -116,12 +127,6 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
-
   }
 
   /**

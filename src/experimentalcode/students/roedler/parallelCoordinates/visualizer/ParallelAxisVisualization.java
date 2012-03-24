@@ -30,6 +30,12 @@ public class ParallelAxisVisualization extends ParallelVisualization<NumberVecto
     incrementalRedraw();
     context.addResultListener(this);
   }
+  
+  @Override
+  public void destroy() {
+    context.removeResultListener(this);
+    super.destroy();
+  }
 
   @Override
   protected void redraw() {

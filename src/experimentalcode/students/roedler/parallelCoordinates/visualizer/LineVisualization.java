@@ -6,7 +6,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -55,6 +54,13 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
     context.addResultListener(this);
     context.addDataStoreListener(this);
     incrementalRedraw();
+  }
+  
+  @Override
+  public void destroy() {
+    context.removeDataStoreListener(this);
+    context.removeResultListener(this);
+    super.destroy();
   }
 
   @Override
@@ -144,11 +150,6 @@ public class LineVisualization extends ParallelVisualization<NumberVector<?, ?>>
         svgp.addCSSClassOrLogError(cls);
       }
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   /**

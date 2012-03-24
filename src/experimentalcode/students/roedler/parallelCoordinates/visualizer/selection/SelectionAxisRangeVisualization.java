@@ -29,8 +29,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -60,7 +58,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has RangeSelection oneway - - visualizes
  */
-public class SelectionAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class SelectionAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -71,12 +69,22 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
    */
   public static final String MARKER = "selectionAxisRange";
 
+  /**
+   * Constructor.
+   *
+   * @param task Visualization task
+   */
   public SelectionAxisRangeVisualization(VisualizationTask task) {
     super(task);
     addCSSClasses(svgp);
-    context.addDataStoreListener(this);
     context.addResultListener(this);
     incrementalRedraw();
+  }
+  
+  @Override
+  public void destroy() {
+    context.removeResultListener(this);
+    super.destroy();
   }
 
   /**
@@ -142,11 +150,6 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
         layer.appendChild(rect);
       }
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   /**

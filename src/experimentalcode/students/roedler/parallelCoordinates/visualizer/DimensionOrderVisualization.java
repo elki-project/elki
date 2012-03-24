@@ -63,6 +63,12 @@ public class DimensionOrderVisualization extends ParallelVisualization<NumberVec
   }
 
   @Override
+  public void destroy() {
+    context.removeResultListener(this);
+    super.destroy();
+  }
+
+  @Override
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = proj.getVisibleDimensions();

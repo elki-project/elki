@@ -28,7 +28,6 @@ import java.awt.image.BufferedImage;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -141,11 +140,6 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       synchronizedRedraw();
     }
     return layer;
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    refreshThumbnail();
   }
 
   /**

@@ -27,7 +27,6 @@ import java.util.Collection;
 
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -108,11 +107,6 @@ public class ClusterOrderVisualization extends P2DVisualization implements DataS
 
       layer.appendChild(arrow);
     }
-  }
-
-  @Override
-  public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
   }
 
   /**
