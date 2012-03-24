@@ -45,13 +45,13 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
  * Tool-Visualization for the tool to select objects
@@ -62,7 +62,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has DBIDSelection oneway - - updates
  * 
  */
-public class SelectionToolLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
+public class SelectionToolLineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -111,7 +111,7 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, -.1 * getMarginX(), -.5 * getMarginY(), getSizeX() + .2 * getMarginX(), getMarginY() * 1.5 + getAxisHeight(), this);
+    DragableArea drag = new DragableArea(svgp, -.1 * getMarginLeft(), -.5 * getMarginTop(), getSizeX() + .2 * getMarginLeft(), getMarginTop() * 1.5 + getSizeY(), this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
@@ -185,7 +185,6 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
    * @param p2 second point of the selected rectangle
    */
   private void updateSelection(Mode mode, SVGPoint p1, SVGPoint p2) {
-    recalcAxisPositions();
     DBIDSelection selContext = context.getSelection();
     // Note: we rely on SET semantics below!
     final HashSetModifiableDBIDs selection;
@@ -226,14 +225,14 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
     boolean maxx = false;
     int count = -1;
     for(int i = 0; i < dim; i++) {
-      if(minx && getAxisX(i) > x1) {
+      if(minx && getVisibleAxisX(i) > x1) {
         minaxis = count;
         minx = false;
         maxx = true;
       }
-      if(maxx && (getAxisX(i) > x2 || i == dim - 1)) {
+      if(maxx && (getVisibleAxisX(i) > x2 || i == dim - 1)) {
         maxaxis = count + 1;
-        if(i == dim - 1 && getAxisX(i) <= x2) {
+        if(i == dim - 1 && getVisibleAxisX(i) <= x2) {
           maxaxis++;
         }
         break;
@@ -256,8 +255,8 @@ public class SelectionToolLineVisualization extends ParallelVisualization<Number
         return true;
       }
     }
-    Line2D.Double idline1 = new Line2D.Double(getAxisX(ar[0]), yPos[ar[0]], getAxisX(ar[0] + 1), yPos[ar[0] + 1]);
-    Line2D.Double idline2 = new Line2D.Double(getAxisX(ar[1] - 1), yPos[ar[1] - 1], getAxisX(ar[1]), yPos[ar[1]]);
+    Line2D.Double idline1 = new Line2D.Double(getVisibleAxisX(ar[0]), yPos[ar[0]], getVisibleAxisX(ar[0] + 1), yPos[ar[0] + 1]);
+    Line2D.Double idline2 = new Line2D.Double(getVisibleAxisX(ar[1] - 1), yPos[ar[1] - 1], getVisibleAxisX(ar[1]), yPos[ar[1]]);
     Line2D.Double rectline1 = new Line2D.Double(x2, y1, x1, y1);
     Line2D.Double rectline2 = new Line2D.Double(x2, y1, x2, y2);
     Line2D.Double rectline3 = new Line2D.Double(x2, y2, x1, y2);

@@ -39,14 +39,14 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 /**
  * Visualizer for generating an SVG-Element representing the selected range for
@@ -57,7 +57,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has RangeSelection oneway - - visualizes
  */
-public class SelectionAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> {
+public class SelectionAxisRangeVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -137,14 +137,14 @@ public class SelectionAxisRangeVisualization extends ParallelVisualization<Numbe
       if(ranges[proj.getDimForVisibleAxis(d)] != null) {
         double amin, amax;
         if(min[d] < max[d]) {
-          amin = min[d] * getAxisHeight();
-          amax = max[d] * getAxisHeight();
+          amin = min[d] * getSizeY();
+          amax = max[d] * getSizeY();
         }
         else {
-          amax = min[d] * getAxisHeight();
-          amin = max[d] * getAxisHeight();
+          amax = min[d] * getSizeY();
+          amin = max[d] * getSizeY();
         }
-        Element rect = svgp.svgRect(getAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
+        Element rect = svgp.svgRect(getVisibleAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
         SVGUtil.addCSSClass(rect, MARKER);
         layer.appendChild(rect);
       }

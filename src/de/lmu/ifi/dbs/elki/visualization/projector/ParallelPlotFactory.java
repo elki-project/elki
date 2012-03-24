@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.projector;
+package de.lmu.ifi.dbs.elki.visualization.projector;
 
 /*
  This file is part of ELKI:
@@ -23,7 +23,7 @@ package experimentalcode.students.roedler.parallelCoordinates.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 
 /**
  * Produce parallel axes projections.
@@ -50,8 +49,10 @@ public class ParallelPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    ArrayList<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
-    for(Relation<?> rel : rels) {
+    Iterator<Relation<?>> rels = ResultUtil.filteredResults(newResult, Relation.class);
+    while (rels.hasNext()) {
+      Relation<?> rel = rels.next();
+      // TODO: multi-relational parallel plots
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;

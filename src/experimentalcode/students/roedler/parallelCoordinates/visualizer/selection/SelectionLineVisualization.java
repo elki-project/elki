@@ -40,15 +40,15 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
 
 /**
  * Visualizer for generating SVG-Elements representing the selected objects
@@ -57,7 +57,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  */
-public class SelectionLineVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class SelectionLineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -92,7 +92,6 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
   protected void redraw() {
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
-      recalcAxisPositions();
       DBIDs selection = selContext.getSelectedIds();
 
       for(DBID objId : selection) {
@@ -100,7 +99,7 @@ public class SelectionLineVisualization extends ParallelVisualization<NumberVect
 
         SVGPath path = new SVGPath();
         for(int i = 0; i < proj.getVisibleDimensions(); i++) {
-          path.drawTo(getAxisX(i), yPos[i]);
+          path.drawTo(getVisibleAxisX(i), yPos[i]);
         }
         Element marker = path.makeElement(svgp);
         SVGUtil.addCSSClass(marker, MARKER);

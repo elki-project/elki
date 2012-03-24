@@ -14,12 +14,13 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
  * interactive SVG-Element for selecting visible axis.
@@ -28,7 +29,7 @@ import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelP
  * 
  * @apiviz.uses SVGSimpleLinearAxis
  */
-public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<?, ?>> {
+public class SelectionAxisVisibility extends AbstractParallelVisualization<NumberVector<?, ?>> {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -65,7 +66,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
 
   double hbs = bhs / 2.;
 
-  double ypos = getAxisHeight() + getMarginY() * 1.5 + hs / 8;
+  double ypos = getSizeY() + getMarginTop() * 1.5 + hs / 8;
 
   /**
    * Constructor.
@@ -88,9 +89,8 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
   protected void redraw() {
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(relation);
-    recalcAxisPositions();
 
-    Element back = svgp.svgRect(0.0, getAxisHeight() + getMarginY() * 1.5, getSizeX(), getSizeY() / 35.);
+    Element back = svgp.svgRect(0.0, getSizeY() + getMarginTop() * 1.5, getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
 
@@ -110,7 +110,7 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
           break;
         }
 
-        double xpos = getAxisX(i) - bhs / 2.;
+        double xpos = getVisibleAxisX(i) - bhs / 2.;
 
         border = svgp.svgRect(xpos, ypos, bhs, bhs);
         SVGUtil.addCSSClass(border, SAV_BORDER);
@@ -146,11 +146,11 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
 
       if(vis == dim) {
         for(int j = 0; j < notvis; j++) {
-          border = svgp.svgRect(getAxisX(last) + dist - hbs, ypos - j * dist, bhs, bhs);
+          border = svgp.svgRect(getVisibleAxisX(last) + dist - hbs, ypos - j * dist, bhs, bhs);
           SVGUtil.addCSSClass(border, SAV_BORDER);
           layer.appendChild(border);
 
-          rect[c] = svgp.svgRect(getAxisX(last) + dist - hbs, ypos - j * dist, bhs, bhs);
+          rect[c] = svgp.svgRect(getVisibleAxisX(last) + dist - hbs, ypos - j * dist, bhs, bhs);
           SVGUtil.addCSSClass(rect[c], SAV_BUTTON);
           addEventListener(rect[c], c);
           layer.appendChild(rect[c]);
@@ -173,16 +173,16 @@ public class SelectionAxisVisibility extends ParallelVisualization<NumberVector<
       }
     }
     else {
-      double xpos = getAxisX(last);
+      double xpos = getVisibleAxisX(last);
       if(xpos < 0.) {
         xpos = 0.;
       }
       double dist;
       if(vis == dim) {
-        dist = getMarginX() / (notvis + 1.);
+        dist = getMarginLeft() / (notvis + 1.);
       }
       else {
-        dist = (getAxisX(vis) - xpos) / (notvis + 1.);
+        dist = (getVisibleAxisX(vis) - xpos) / (notvis + 1.);
       }
 
       for(int j = 0; j < notvis; j++) {

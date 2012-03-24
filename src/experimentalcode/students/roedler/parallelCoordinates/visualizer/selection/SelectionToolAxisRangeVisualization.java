@@ -47,13 +47,13 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.roedler.parallelCoordinates.projector.ParallelPlotProjector;
-import experimentalcode.students.roedler.parallelCoordinates.visualizer.ParallelVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
  * Tool-Visualization for the tool to select axis ranges
@@ -63,7 +63,7 @@ import experimentalcode.students.roedler.parallelCoordinates.visualizer.Parallel
  * @apiviz.has SelectionResult oneway - - updates
  * @apiviz.has RangeSelection oneway - - updates
  */
-public class SelectionToolAxisRangeVisualization extends ParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
+public class SelectionToolAxisRangeVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
   /**
    * The logger for this class.
    */
@@ -114,7 +114,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
     layer.appendChild(rtag);
 
     // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, -.1 * getMarginX(), -.1 * getMarginY(), getSizeX() + getMarginX() * .2, getAxisHeight() + getMarginY() * .2, this);
+    DragableArea drag = new DragableArea(svgp, -.1 * getMarginLeft(), -.1 * getMarginTop(), getSizeX() + getMarginLeft() * .2, getSizeY() + getMarginTop() * .2, this);
     etag = drag.getElement();
     layer.appendChild(etag);
   }
@@ -146,7 +146,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
     {
       int i = 0;
       while(i < dim) {
-        double axx = getAxisX(i);
+        double axx = getVisibleAxisX(i);
         if(x1 < axx || x2 < axx) {
           minaxis = i;
           break;
@@ -154,7 +154,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
         i++;
       }
       while(i < dim) {
-        double axx = getAxisX(i);
+        double axx = getVisibleAxisX(i);
         if(x2 < axx && x1 < axx) {
           maxaxis = i;
           break;
@@ -163,7 +163,7 @@ public class SelectionToolAxisRangeVisualization extends ParallelVisualization<N
       }
     }
     double z1 = Math.max(Math.min(y1, y2), 0) / StyleLibrary.SCALE;
-    double z2 = Math.min(Math.max(y1, y2), getAxisHeight()) / StyleLibrary.SCALE;
+    double z2 = Math.min(Math.max(y1, y2), getSizeY()) / StyleLibrary.SCALE;
     for(int i = minaxis; i < maxaxis; i++) {
       double v1 = proj.fastProjectRenderToDataSpace(z1, i);
       double v2 = proj.fastProjectRenderToDataSpace(z2, i);
