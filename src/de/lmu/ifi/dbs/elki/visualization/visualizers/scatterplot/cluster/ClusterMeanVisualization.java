@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -37,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -221,14 +219,16 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find clusterings we can visualize:
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-      for(Clustering<?> c : clusterings) {
+      Iterator<Clustering<?>> clusterings = ResultUtil.filteredResults(result, Clustering.class);
+      while(clusterings.hasNext()) {
+        Clustering<?> c = clusterings.next();
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
           Clustering<MeanModel<? extends NumberVector<?, ?>>> mcls = findMeanModel(c);
           if(mcls != null) {
-            IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-            for(ScatterPlotProjector<?> p : ps) {
+            Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+            while(ps.hasNext()) {
+              ScatterPlotProjector<?> p = ps.next();
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
               baseResult.getHierarchy().add(c, task);
@@ -246,7 +246,7 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
      * @return the clustering cast to return a mean model, null otherwise.
      */
     @SuppressWarnings("unchecked")
-    private static  Clustering<MeanModel<? extends NumberVector<?, ?>>> findMeanModel(Clustering<?> c) {
+    private static Clustering<MeanModel<? extends NumberVector<?, ?>>> findMeanModel(Clustering<?> c) {
       if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
         return (Clustering<MeanModel<? extends NumberVector<?, ?>>>) c;
       }
