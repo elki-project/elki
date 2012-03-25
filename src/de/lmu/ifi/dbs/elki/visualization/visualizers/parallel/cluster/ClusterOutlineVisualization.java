@@ -1,6 +1,28 @@
-package experimentalcode.students.roedler.parallelCoordinates.visualizer;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
 
-import java.util.Collection;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -23,7 +45,6 @@ import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -32,11 +53,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
- * Generates a SVG-Element that visualizes cluster intervals.
+ * Generates a SVG-Element that visualizes the area covered by a cluster.
  * 
  * @author Robert Rödler
+ * @author Erich Schubert
  */
-public class ClusteringOutlineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class ClusterOutlineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -47,16 +69,17 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
    */
   private Clustering<Model> clustering;
 
-  boolean rounded;
-
-  private static final double KAPPA = SVGHyperSphere.EUCLIDEAN_KAPPA;
+  /**
+   * Flag for using rounded shapes
+   */
+  boolean rounded = true;
 
   /**
    * Constructor.
    * 
    * @param task VisualizationTask
    */
-  public ClusteringOutlineVisualization(VisualizationTask task, boolean rounded) {
+  public ClusterOutlineVisualization(VisualizationTask task, boolean rounded) {
     super(task);
     this.clustering = task.getResult();
     this.rounded = rounded;
@@ -85,14 +108,15 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
       Cluster<?> clus = ci.next();
       for(int i = 0; i < dim; i++) {
         mms[i].reset();
-      }
-      for(int i = 0; i < dim - 1; i++) {
-        midmm[i].reset();
+        if(i < dim - 1) {
+          midmm[i].reset();
+        }
       }
 
+      // Process points
+      // TODO: do this just once, cache the result somewhere appropriately?
       for(DBID objId : clus.getIDs()) {
         double[] yPos = getYPositions(objId);
-
         for(int i = 0; i < dim; i++) {
           mms[i].put(yPos[i]);
           if(i > 0) {
@@ -102,43 +126,8 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
       }
 
       SVGPath path = new SVGPath();
-      boolean first = true;
-      if(rounded) {
-        for(int i = 0; i < dim; i++) {
-          if(first) {
-            path.drawTo(getVisibleAxisX(i), mms[i].getMax());
-            first = false;
-          }
-          else {
-            double lx = getVisibleAxisX(i - 1);
-            double mx = getVisibleAxisX(i - .5);
-            double rx = getVisibleAxisX(i);
-            double lef = mms[i - 1].getMax();
-            double mid = midmm[i - 1].getMax();
-            double rig = mms[i].getMax();
-            path.cubicTo(mx, mid + (mid - lef) * KAPPA, mx - (mx - lx) * KAPPA, mid, mx, mid);
-            path.cubicTo(mx + (rx - mx) * KAPPA, mid, rx, rig - (mid - rig) * KAPPA, rx, rig);
-          }
-        }
-        first = true;
-        for(int i = dim - 1; i > 0; i--) {
-          if(first) {
-            path.drawTo(getVisibleAxisX(i), mms[i].getMin());
-            first = false;
-          }
-          else {
-            double lx = getVisibleAxisX(i - 1);
-            double mx = getVisibleAxisX(i - .5);
-            double rx = getVisibleAxisX(i);
-            double lef = mms[i - 1].getMin();
-            double mid = midmm[i - 1].getMin();
-            double rig = mms[i].getMin();
-            path.cubicTo(rx + (rx - mx) * KAPPA, mid, mx, mid - (mid - rig) * KAPPA, mx, mid);
-            path.cubicTo(mx - (mx - lx) * KAPPA, mid, mx, mid - (mid - lef) * KAPPA, lx, lef);
-          }
-        }
-      }
-      else {
+      if(!rounded) {
+        // Straight lines
         for(int i = 0; i < dim; i++) {
           path.drawTo(getVisibleAxisX(i), mms[i].getMax());
           if(i < dim - 1) {
@@ -151,8 +140,21 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
           }
           path.drawTo(getVisibleAxisX(i), mms[i].getMin());
         }
+        path.close();
       }
-      path.close();
+      else {
+        // Maxima
+        path.drawTo(getVisibleAxisX(0), mms[0].getMax());
+        for(int i = 1; i < dim; i++) {
+          path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMax(), getVisibleAxisX(i), mms[i].getMax());
+        }
+        // Minima
+        path.drawTo(getVisibleAxisX(dim - 1), mms[dim - 1].getMin());
+        for(int i = dim - 1; i > 0; i--) {
+          path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMin(), getVisibleAxisX(i - 1), mms[i - 1].getMin());
+        }
+        path.close();
+      }
 
       Element intervals = path.makeElement(svgp);
       SVGUtil.addCSSClass(intervals, CLUSTERAREA + cnum);
@@ -198,7 +200,7 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
    * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses ClusteringOutlineVisualization oneway - - «create»
+   * @apiviz.uses ClusterOutlineVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -206,8 +208,14 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
      */
     private static final String NAME = "Cluster Outline";
 
-    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
+    /**
+     * Currently unused option to enable/disable rounding
+     */
+    public static final OptionID ROUNDED_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
 
+    /**
+     * Currently, always enabled.
+     */
     private boolean rounded = true;
 
     /**
@@ -220,19 +228,20 @@ public class ClusteringOutlineVisualization extends AbstractParallelVisualizatio
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusteringOutlineVisualization(task, rounded);
+      return new ClusterOutlineVisualization(task, rounded);
     }
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find clusterings we can visualize:
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-      for(Clustering<?> c : clusterings) {
+      Iterator<Clustering<?>> clusterings = ResultUtil.filteredResults(result, Clustering.class);
+      while(clusterings.hasNext()) {
+        Clustering<?> c = clusterings.next();
         if(c.getAllClusters().size() > 0) {
           IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
           for(ParallelPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA -1);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(c, task);
             baseResult.getHierarchy().add(p, task);
