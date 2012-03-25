@@ -1,5 +1,28 @@
 package experimentalcode.students.roedler.parallelCoordinates.visualizer;
 
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2012
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -74,12 +97,12 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
     addCSSClasses(svgp);
     final int dim = proj.getVisibleDimensions();
 
-    double as = getSizeY() / 70.;
-    double bs = as * 1.5;
-    double hbs = bs / 2.;
-    double qas = as / 4.;
-    double ypos = getSizeY() + getMarginTop() * 2.;
-    double dist = 2.5 * as;
+    final double as = getSizeY() / 70.;
+    final double bs = as * 1.5;
+    final double hbs = bs / 2.;
+    final double qas = as / 4.;
+    final double ypos = getSizeY() + getMarginTop() * 2.;
+    final double dist = 2.5 * as;
 
     Element back = svgp.svgRect(0.0, getSizeY() + getMarginTop() * 2., getSizeX(), getSizeY() / 35.);
     SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
@@ -120,27 +143,25 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
       }
     }
     else {
-      double prev = -1.;
       for(int i = 0; i < dim; i++) {
         {
-          Element arrow = makeArrow(Direction.LEFTOF, getVisibleAxisX(i), ypos + as, as);
+          Element arrow = makeArrow(Direction.SWAPWITH, getVisibleAxisX(i), ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
           Element button = svgp.svgRect(getVisibleAxisX(i) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
-          addEventListener(button, i, Direction.LEFTOF);
+          addEventListener(button, i, Direction.SWAPWITH);
           layer.appendChild(button);
         }
         if(i > 0.) {
-          Element arrow = makeArrow(Direction.RIGHTOF, prev + (getVisibleAxisX(i) - prev) / 2., ypos + as, as);
+          Element arrow = makeArrow(Direction.INSERT, getVisibleAxisX(i - .5), ypos + as, as);
           SVGUtil.addCSSClass(arrow, SDO_ARROW);
           layer.appendChild(arrow);
-          Element button = svgp.svgRect(prev + ((getVisibleAxisX(i) - prev) / 2.) - hbs, ypos + qas, bs, bs);
+          Element button = svgp.svgRect(getVisibleAxisX(i - .5) - hbs, ypos + qas, bs, bs);
           SVGUtil.addCSSClass(button, SDO_BUTTON);
-          addEventListener(button, i, Direction.RIGHTOF);
+          addEventListener(button, i, Direction.INSERT);
           layer.appendChild(button);
         }
-        prev = getVisibleAxisX(i);
       }
     }
   }
@@ -160,8 +181,8 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
           selected = true;
           selecteddim = i;
         }
-        if(j == Direction.LEFTOF || j == Direction.RIGHTOF) {
-          if(j == Direction.LEFTOF) {
+        if(j == Direction.SWAPWITH || j == Direction.INSERT) {
+          if(j == Direction.SWAPWITH) {
             proj.swapAxes(selecteddim, i);
           }
           else {
@@ -196,7 +217,7 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
 
   // Constants for arrow directions and insertion positions
   private enum Direction {
-    LEFT, DOWN, RIGHT, UP, LEFTOF, RIGHTOF
+    LEFT, DOWN, RIGHT, UP, SWAPWITH, INSERT
   }
 
   private Element makeArrow(Direction dir, double x, double y, double size) {
@@ -223,8 +244,8 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
       path.drawTo(x - hs, y - hs);
       break;
     case UP:
-    case LEFTOF:
-    case RIGHTOF:
+    case SWAPWITH:
+    case INSERT:
       path.drawTo(x - hs, y + hs);
       path.drawTo(x, y - hs);
       path.drawTo(x + hs, y + hs);
@@ -251,7 +272,7 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
     if(!svgp.getCSSClassManager().contains(SDO_BORDER)) {
       CSSClass cls = new CSSClass(this, SDO_BORDER);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2.0);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 3.0);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
@@ -264,7 +285,7 @@ public class DimensionOrderVisualization extends AbstractParallelVisualization<N
     if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
       CSSClass cls = new CSSClass(this, SDO_ARROW);
       cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 1.5);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2.5);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
       svgp.addCSSClassOrLogError(cls);
     }
