@@ -313,7 +313,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     super.resultChanged(current);
     // Redraw on style result changes.
     if (current == context.getStyleResult()) {
-      synchronizedRedraw();
+      // FIXME: use the usual redrawing function, to allow other tools to change the segment selection?
+      // synchronizedRedraw();
     }
   }
 
