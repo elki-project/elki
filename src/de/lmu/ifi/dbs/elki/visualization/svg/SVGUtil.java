@@ -609,4 +609,49 @@ public final class SVGUtil {
       }
     }
   }
+
+  /**
+   * Create a circle segment.
+   * 
+   * @param svgp Plot to draw to
+   * @param centerx Center X position
+   * @param centery Center Y position
+   * @param angleStart Starting angle
+   * @param angleDelta Angle delta
+   * @param innerRadius inner radius
+   * @param outerRadius outer radius
+   * @return SVG element representing this circle segment
+   */
+  public static Element svgCircleSegment(SVGPlot svgp, double centerx, double centery, double angleStart, double angleDelta, double innerRadius, double outerRadius) {
+    double sin1st = Math.sin(angleStart);
+    double cos1st = Math.cos(angleStart);
+  
+    double sin2nd = Math.sin(angleStart + angleDelta);
+    double cos2nd = Math.cos(angleStart + angleDelta);
+  
+    double inner1stx = centerx + (innerRadius * sin1st);
+    double inner1sty = centery - (innerRadius * cos1st);
+    double outer1stx = centerx + (outerRadius * sin1st);
+    double outer1sty = centery - (outerRadius * cos1st);
+  
+    double inner2ndx = centerx + (innerRadius * sin2nd);
+    double inner2ndy = centery - (innerRadius * cos2nd);
+    double outer2ndx = centerx + (outerRadius * sin2nd);
+    double outer2ndy = centery - (outerRadius * cos2nd);
+  
+    double largeArc = 0;
+    if(angleDelta >= Math.PI) {
+      largeArc = 1;
+    }
+  
+    SVGPath path = new SVGPath(inner1stx, inner1sty);
+    path.lineTo(outer1stx, outer1sty);
+    path.ellipticalArc(outerRadius, outerRadius, 0, largeArc, 1, outer2ndx, outer2ndy);
+    path.lineTo(inner2ndx, inner2ndy);
+    if (innerRadius > 0) {
+      path.ellipticalArc(innerRadius, innerRadius, 0, largeArc, 0, inner1stx, inner1sty);
+    }
+  
+    return path.makeElement(svgp);
+  }
 }
