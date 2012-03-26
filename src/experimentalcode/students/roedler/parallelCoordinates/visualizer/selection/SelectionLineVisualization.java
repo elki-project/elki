@@ -95,7 +95,7 @@ public class SelectionLineVisualization extends AbstractParallelVisualization<Nu
       DBIDs selection = selContext.getSelectedIds();
 
       for(DBID objId : selection) {
-        double[] yPos = getYPositions(objId);
+        double[] yPos = projectToVisibleYPositions(objId);
 
         SVGPath path = new SVGPath();
         for(int i = 0; i < proj.getVisibleDimensions(); i++) {
