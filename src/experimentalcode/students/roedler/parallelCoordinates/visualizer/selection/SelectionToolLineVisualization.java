@@ -196,7 +196,7 @@ public class SelectionToolLineVisualization extends AbstractParallelVisualizatio
     }
     int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
     for(DBID objId : relation.iterDBIDs()) {
-      double[] yPos = projectToVisibleYPositions(objId);
+      double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(objId));
       if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
         if(mode == Mode.INVERT) {
           if(!selection.contains(objId)) {

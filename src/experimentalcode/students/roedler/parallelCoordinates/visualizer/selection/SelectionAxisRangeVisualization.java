@@ -70,7 +70,7 @@ public class SelectionAxisRangeVisualization extends AbstractParallelVisualizati
 
   /**
    * Constructor.
-   *
+   * 
    * @param task Visualization task
    */
   public SelectionAxisRangeVisualization(VisualizationTask task) {
@@ -79,7 +79,7 @@ public class SelectionAxisRangeVisualization extends AbstractParallelVisualizati
     context.addResultListener(this);
     incrementalRedraw();
   }
-  
+
   @Override
   public void destroy() {
     context.removeResultListener(this);
@@ -135,15 +135,8 @@ public class SelectionAxisRangeVisualization extends AbstractParallelVisualizati
     int dim = proj.getVisibleDimensions();
     for(int d = 0; d < dim; d++) {
       if(ranges[proj.getDimForVisibleAxis(d)] != null) {
-        double amin, amax;
-        if(min[d] < max[d]) {
-          amin = min[d] * getSizeY();
-          amax = max[d] * getSizeY();
-        }
-        else {
-          amax = min[d] * getSizeY();
-          amin = max[d] * getSizeY();
-        }
+        double amin = Math.min(min[d], max[d]);
+        double amax = Math.max(min[d], max[d]);
         Element rect = svgp.svgRect(getVisibleAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
         SVGUtil.addCSSClass(rect, MARKER);
         layer.appendChild(rect);

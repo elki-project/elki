@@ -162,8 +162,8 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
         i++;
       }
     }
-    double z1 = Math.max(Math.min(y1, y2), 0) / StyleLibrary.SCALE;
-    double z2 = Math.min(Math.max(y1, y2), getSizeY()) / StyleLibrary.SCALE;
+    double z1 = Math.max(Math.min(y1, y2), 0);
+    double z2 = Math.min(Math.max(y1, y2), getSizeY());
     for(int i = minaxis; i < maxaxis; i++) {
       double v1 = proj.fastProjectRenderToDataSpace(z1, i);
       double v2 = proj.fastProjectRenderToDataSpace(z2, i);

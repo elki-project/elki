@@ -100,7 +100,7 @@ public class ClusterParallelMeanVisualization extends AbstractParallelVisualizat
 
       SVGPath path = new SVGPath();
       for(int i = 0; i < pmean.length; i++) {
-        path.drawTo(getVisibleAxisX(i), pmean[i] * getSizeY());
+        path.drawTo(getVisibleAxisX(i), pmean[i]);
       }
 
       Element meanline = path.makeElement(svgp);

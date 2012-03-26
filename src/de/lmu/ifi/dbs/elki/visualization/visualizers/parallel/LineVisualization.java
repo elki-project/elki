@@ -111,7 +111,7 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
         for(Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext();) {
           DBID id = iter.next();
           SVGPath path = new SVGPath();
-          double[] yPos = projectToVisibleYPositions(id);
+          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
           for(int i = 0; i < yPos.length; i++) {
             path.drawTo(getVisibleAxisX(i), yPos[i]);
           }
@@ -125,7 +125,7 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
       while(ids.hasNext()) {
         DBID id = ids.next();
         SVGPath path = new SVGPath();
-        double[] yPos = projectToVisibleYPositions(id);
+        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
         for(int i = 0; i < yPos.length; i++) {
           path.drawTo(getVisibleAxisX(i), yPos[i]);
         }

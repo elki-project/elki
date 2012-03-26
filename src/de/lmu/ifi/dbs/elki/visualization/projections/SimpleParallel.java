@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Simple parallel projection
@@ -224,6 +225,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
       if(isDimInverted(i)) {
         v[o] = 1 - v[o];
       }
+      v[o] *= StyleLibrary.SCALE;
       o++;
     }
     return v;
@@ -241,6 +243,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
       if(isDimInverted(i)) {
         v[o] = 1 - v[o];
       }
+      v[o] *= StyleLibrary.SCALE;
       o++;
     }
     return v;
@@ -249,6 +252,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public double fastProjectRenderToDataSpace(double v, int projdim) {
     int truedim = dimOrder[projdim];
+    v /= StyleLibrary.SCALE;
     if(isDimInverted(truedim)) {
       v = 1 - v;
     }
@@ -258,6 +262,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public double fastProjectDataToRenderSpace(double value, int dim) {
     double temp = scales[dimOrder[dim]].getScaled(value);
+    temp *= StyleLibrary.SCALE;
     if(isAxisInverted(dimOrder[dim])) {
       return temp;
     }
