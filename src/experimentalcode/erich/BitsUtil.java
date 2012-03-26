@@ -1046,7 +1046,7 @@ public final class BitsUtil {
       if(xp != yp) {
         if(xp < 0) {
           if(yp < 0) {
-            return -Long.compare(xp, yp);
+            return (yp < xp) ? -1 : ((yp == xp) ? 0 : 1);
           }
           else {
             return +1;
@@ -1057,7 +1057,7 @@ public final class BitsUtil {
             return -1;
           }
           else {
-            return Long.compare(xp, yp);
+            return (xp < yp) ? -1 : ((xp == yp) ? 0 : 1);
           }
         }
       }

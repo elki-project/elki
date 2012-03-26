@@ -90,7 +90,7 @@ public class TestBitsUtil {
 
     for(int i = 0; i < cnt; i++) {
       for(int j = 0; j < cnt; j++) {
-        assertEquals(Long.compare(rnds[i], rnds[j]), BitsUtil.compare(bits[i], bits[j]));
+        assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(bits[i], bits[j]));
       }
     }
 
@@ -98,14 +98,14 @@ public class TestBitsUtil {
       long[] btmp = BitsUtil.copy(bits[i], 64 + r.nextInt(500));
       assertEquals(BitsUtil.compare(btmp, bits[i]), 0);
       for(int j = 0; j < cnt; j++) {
-        assertEquals(Long.compare(rnds[i], rnds[j]), BitsUtil.compare(btmp, bits[j]));
+        assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
 
     for(int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.truncateI(BitsUtil.copy(bits[i]), 47);
       for(int j = 0; j < cnt; j++) {
-        assertEquals(Long.compare(rnds[i] & ((1 << 48) - 1), rnds[j]), BitsUtil.compare(btmp, bits[j]));
+        assertEquals(compare(rnds[i] & ((1 << 48) - 1), rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
 
@@ -113,31 +113,58 @@ public class TestBitsUtil {
       long[] btmp = BitsUtil.cycleRightI(BitsUtil.copy(bits[i]), 13, Long.SIZE - 32);
       long ltmp = BitsUtil.cycleRightC(rnds[i], 13, Long.SIZE - 32);
       for(int j = 0; j < cnt; j++) {
-        assertEquals(Long.compare(ltmp, rnds[j]), BitsUtil.compare(btmp, bits[j]));
+        assertEquals(compare(ltmp, rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
+  }
+  
+  /**
+   * Not jet in Java 6. To come in JDK7 as Long.copmare
+   * 
+   * @param x
+   * @param y
+   * @return
+   */
+  public static int compare(long x, long y) {
+    return (x < y) ? -1 : ((x == y) ? 0 : 1);
   }
 
   @Test
   public void testAgainstBitSet() {
     BitSet bitset = new BitSet();
     long[] bituti = BitsUtil.zero(Long.SIZE);
-    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    for (int i = 0; i >= 0;) {
+      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
+      i = bitset.nextSetBit(i);
+    }
+    // Java 7:
+    // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(4);
     BitsUtil.setI(bituti, 4);
-    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    for (int i = 0; i >= 0;) {
+      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
+      i = bitset.nextSetBit(i);
+    }
+    // Java 7:
+    // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(15);
     BitsUtil.setI(bituti, 15);
-    assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    for (int i = 0; i >= 0;) {
+      assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
+      i = bitset.nextSetBit(i);
+    }
+    // Java 7:
+    // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     assertEquals(bitset.nextSetBit(0), BitsUtil.nextSetBit(bituti, 0));
     assertEquals(bitset.nextSetBit(4), BitsUtil.nextSetBit(bituti, 4));
     assertEquals(bitset.nextSetBit(5), BitsUtil.nextSetBit(bituti, 5));
-    assertEquals(bitset.previousSetBit(64), BitsUtil.previousSetBit(bituti, 64));
-    assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti, 15));
-    assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti, 14));
+    // previousSetBit is not in JDK6.
+    // assertEquals(bitset.previousSetBit(64), BitsUtil.previousSetBit(bituti, 64));
+    // assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti, 15));
+    // assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti, 14));
   }
   
   @Test
