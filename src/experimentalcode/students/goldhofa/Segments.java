@@ -63,7 +63,7 @@ public class Segments {
    * Clusterings
    */
   private List<Clustering<?>> clusterings;
-  
+
   /**
    * Clusters
    */
@@ -108,11 +108,10 @@ public class Segments {
   public Segments(List<Clustering<?>> clusterings, HierarchicalResult baseResult) {
     super();
     this.clusterings = clusterings;
-    // DBIDUtil.newArray()
+    this.clusteringsCount = clusterings.size();
     segments = new TreeMap<Segment, Segment>();
     fragmentedSegments = new TreeMap<Segment, SortedSet<Segment>>();
-    
-    clusteringsCount = clusterings.size();
+
     numclusters = new int[clusteringsCount];
     clusters = new ArrayList<List<Cluster<Model>>>(clusteringsCount);
 
@@ -123,7 +122,7 @@ public class Segments {
     for(Clustering<?> clr : clusterings) {
       clusterPaircount.add(new TIntIntHashMap());
 
-      List<Cluster<Model>> curClusters = ((Clustering<Model>)clr).getAllClusters();
+      List<Cluster<Model>> curClusters = ((Clustering<Model>) clr).getAllClusters();
       clusters.add(curClusters);
       numclusters[clusteringIndex] = curClusters.size();
 
@@ -135,6 +134,7 @@ public class Segments {
 
   protected void createSegments(HierarchicalResult baseResult) {
     final Database db = ResultUtil.findDatabase(baseResult);
+    // TODO: Intersect clusters instead?
     for(DBID id : db.getRelation(TypeUtil.DBID).iterDBIDs()) {
       addObject(id);
     }
@@ -147,9 +147,10 @@ public class Segments {
    * @param tag occurrence in clusterings
    */
   protected void addObject(DBID objectID) {
-    Segment temp = findSegmentForObject(objectID);
+    Segment temp = findSegmentIDForObject(objectID);
+    // Do we have this segment already?
     Segment tag = segments.get(temp);
-    if (tag == null) {
+    if(tag == null) {
       tag = temp;
       tag.objIds = DBIDUtil.newHashSet();
       segments.put(tag, tag);
@@ -157,6 +158,51 @@ public class Segments {
 
     tag.segmentObjects += 1;
     tag.objIds.add(objectID);
+  }
+
+  /**
+   * Get the SegmentID of a database object.
+   * 
+   * @param objectID
+   * @return
+   */
+  private Segment findSegmentIDForObject(DBID objectID) {
+    Segment result = new Segment(clusteringsCount);
+    findSegmentIDForObject(objectID, result, 0);
+    return result;
+  }
+
+  /**
+   * Determines the SegmentID of a database object, by iterating through all
+   * clusterings and storing the index of the cluster the object is found in.
+   * 
+   * @param objectID
+   * @param tag
+   * @param clusteringIndex
+   */
+  private void findSegmentIDForObject(DBID objectID, Segment tag, int clusteringIndex) {
+    if(clusteringIndex < clusteringsCount) {
+      // search object in clusters of this clustering
+  
+      int currentCluster = 1;
+      // TODO Abbruch wenn Objekt gefunden (while-Schleife)
+      for(Cluster<?> cluster : clusters.get(clusteringIndex)) {
+        // if object in this cluster
+  
+        if(cluster.getIDs().contains(objectID)) {
+          tag.set(clusteringIndex, currentCluster);
+          findSegmentIDForObject(objectID, tag, clusteringIndex + 1);
+          return;
+        }
+  
+        currentCluster++;
+      }
+  
+      // if object is unclustered in this clustering, tag accordingly and search
+      // in next clusterings
+      tag.set(clusteringIndex, Segment.UNCLUSTERED);
+      findSegmentIDForObject(objectID, tag, clusteringIndex + 1);
+    }
   }
 
   public boolean hasSegmentIDs(Segment id) {
@@ -262,77 +308,12 @@ public class Segments {
   }
 
   /**
-   * Get the SegmentID of a database object.
-   * 
-   * @param objectID
-   * @return
-   */
-  public Segment findSegmentForObject(DBID objectID) {
-    Segment result = new Segment(clusteringsCount);
-    findSegmentForObject(objectID, result, 0);
-    return result;
-  }
-
-  /**
    * @param segmentIDString string representation of the segmentID
    * @return the segmentID given by its string representation
    */
   public Segment uniqueSegmentID(Segment temp) {
-    // get already created segmentID in case any additional info was used
-    // (temp: index)
     Segment found = segments.get(temp);
-    if (found == null) {
-      return temp;
-    }
-    return found;
-  }
-
-  /**
-   * Determines the SegmentID of a database object, by iterating through all
-   * clusterings and storing the index of the cluster the object is found in.
-   * 
-   * @param objectID
-   * @param tag
-   * @param clusteringIndex
-   */
-  private void findSegmentForObject(DBID objectID, Segment tag, int clusteringIndex) {
-    if(clusteringIndex < clusteringsCount) {
-      // search object in clusters of this clustering
-
-      int currentCluster = 1;
-      boolean objectFound = false;
-
-      // TODO Abbruch wenn Objekt gefunden (while-Schleife)
-      for(Cluster<?> cluster : clusters.get(clusteringIndex)) {
-        // if object in this cluster
-
-        if(cluster.getIDs().contains(objectID)) {
-          int index = currentCluster;
-
-          /*
-           * // determine index if (cluster.isNoise()) {
-           * 
-           * index = noiseindex[clusteringIndex]; noiseindex[clusteringIndex]++;
-           * }
-           */
-
-          // search in next clusterings
-
-          objectFound = true;
-          tag.set(clusteringIndex, index);
-          findSegmentForObject(objectID, tag, clusteringIndex + 1);
-        }
-
-        currentCluster++;
-      }
-
-      // if object is unclustered in this clustering, tag accordingly and search
-      // in next clusterings
-      if(!objectFound) {
-        tag.set(clusteringIndex, 0);
-        findSegmentForObject(objectID, tag, clusteringIndex + 1);
-      }
-    }
+    return (found != null) ? found : temp;
   }
 
   /**
@@ -356,8 +337,6 @@ public class Segments {
 
       // FIXME: Ein Objekt geclustered => Fehlende Paarbezüge
       if(pairs != 0) {
-        segment.segmentPairs = pairs;
-
         // cluster pair count
         addPairsToCluster(segment, pairs);
 
@@ -414,8 +393,6 @@ public class Segments {
         }
       }
 
-      segment.segmentPairs = pairs;
-
       // cluster pair count
       addPairsToCluster(segment, pairs);
 
@@ -465,17 +442,17 @@ public class Segments {
     for(Segment segment : segments.keySet()) {
       if(segment.get(firstClustering) != 0) {
         if(segment.get(secondClustering) != 0) {
-          inBoth += segment.segmentPairs;
+          inBoth += segment.getPairCount();
         }
         else {
-          inFirst += segment.segmentPairs;
+          inFirst += segment.getPairCount();
         }
       }
       else if(segment.get(secondClustering) != 0) {
-        inSecond += segment.segmentPairs;
+        inSecond += segment.getPairCount();
       }
     }
-    return new int[]{inBoth, inFirst, inSecond};
+    return new int[] { inBoth, inFirst, inSecond };
   }
 
   /**
@@ -614,7 +591,7 @@ public class Segments {
       // create the SegmentID
       Segment unclusteredPairs = new Segment(clusteringsCount);
       if(segments.containsKey(unclusteredPairs)) {
-        return pairs - segments.get(unclusteredPairs).segmentPairs;
+        return pairs - segments.get(unclusteredPairs).getPairCount();
       }
       else {
         return pairs;
@@ -710,8 +687,8 @@ public class Segments {
       logger.verbose("---");
 
       for(Segment key : segments.keySet()) {
-        totalCount += key.segmentPairs;
-        logger.verbose(key + ": " + key.segmentPairs);
+        totalCount += key.getPairCount();
+        logger.verbose(key + ": " + key.getPairCount());
       }
       logger.verbose("----------------------------------");
       logger.verbose("sum: " + this.pairs + " of " + totalPairs + " pairs");

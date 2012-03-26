@@ -14,6 +14,7 @@ import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -39,7 +40,6 @@ import experimentalcode.students.goldhofa.visualization.batikutil.CheckBox;
 import experimentalcode.students.goldhofa.visualization.batikutil.CheckBoxListener;
 import experimentalcode.students.goldhofa.visualization.batikutil.SwitchEvent;
 import experimentalcode.students.goldhofa.visualization.batikutil.UnorderedList;
-import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
 
 /**
  * Visualizer to draw circle segments of clusterings
@@ -51,6 +51,11 @@ import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
  * @author Sascha Goldhofer
  */
 public class CircleSegmentsVisualizer extends AbstractVisualization implements ResultListener {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(CircleSegmentsVisualizer.class);
+  
   /**
    * CircleSegments visualizer name
    */
@@ -107,8 +112,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   protected EventListener mouseClick;
 
   protected CSSClass[] cssClr;
-
-  protected CSStylingPolicy policy;
 
   /**
    * Segment selection manager
@@ -228,7 +231,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
 
     for(Segment id : pairSegments.descendingKeySet()) {
-      int currentPairCount = id.segmentPairs;
+      int currentPairCount = id.getPairCount();
 
       // resize small segments if below minimum
       double alpha = Properties.CLUSTER_MIN_WIDTH.getValue();
@@ -302,6 +305,15 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
       // calculate angle for next segment
       offsetAngle += alpha + Properties.CLUSTER_DISTANCE.getValue();
+    }
+  }
+  
+  @Override
+  public void resultChanged(Result current) {
+    super.resultChanged(current);
+    // Redraw on style result changes.
+    if (current == context.getStyleResult()) {
+      synchronizedRedraw();
     }
   }
 
@@ -403,7 +415,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     pairSegments = segments.getSegments(showUnclusteredPairs);
 
     clusterSize = segments.getHighestClusterCount();
-    clusterings = this.segments.getClusterings();
+    clusterings = segments.getClusterings();
 
     Properties.ANGLE_PAIR.setValue((MathUtil.TWOPI - (Properties.CLUSTER_DISTANCE.getValue() * pairSegments.size())) / segments.getPairCount(showUnclusteredPairs));
     Properties.PAIR_MIN_COUNT.setValue(Math.ceil(Properties.CLUSTER_MIN_WIDTH.getValue() / Properties.ANGLE_PAIR.getValue()));
@@ -411,7 +423,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // number of segments needed to be resized
     int segMinCount = 0;
     for(Segment segment : pairSegments.values()) {
-      if(segment.segmentPairs <= Properties.PAIR_MIN_COUNT.getValue()) {
+      if(segment.getPairCount() <= Properties.PAIR_MIN_COUNT.getValue()) {
         segMinCount++;
       }
     }
