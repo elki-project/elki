@@ -31,7 +31,7 @@ import experimentalcode.students.goldhofa.CCConstants;
 import experimentalcode.students.goldhofa.ClusteringComparison;
 import experimentalcode.students.goldhofa.ClusteringComparisonResult;
 import experimentalcode.students.goldhofa.Color;
-import experimentalcode.students.goldhofa.SegmentID;
+import experimentalcode.students.goldhofa.Segment;
 import experimentalcode.students.goldhofa.SegmentSelection;
 import experimentalcode.students.goldhofa.Segments;
 import experimentalcode.students.goldhofa.visualization.batikutil.BarChart;
@@ -69,7 +69,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   /**
    * Pairsegments
    */
-  private TreeMap<SegmentID, Integer> pairSegments;
+  private TreeMap<Segment, Segment> pairSegments;
 
   /**
    * Max number of clusters of a clustering
@@ -227,8 +227,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       calculateSegmentProperties();
     }
 
-    for(SegmentID id : pairSegments.descendingKeySet()) {
-      int currentPairCount = pairSegments.get(id);
+    for(Segment id : pairSegments.descendingKeySet()) {
+      int currentPairCount = id.segmentPairs;
 
       // resize small segments if below minimum
       double alpha = Properties.CLUSTER_MIN_WIDTH.getValue();
@@ -305,7 +305,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
   }
 
-  public void connectElementToSegment(SegmentID id, Element segment) {
+  public void connectElementToSegment(Segment id, Element segment) {
     segment.setAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE, id.toString());
   }
 
@@ -410,8 +410,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
     // number of segments needed to be resized
     int segMinCount = 0;
-    for(Integer size : pairSegments.values()) {
-      if(size <= Properties.PAIR_MIN_COUNT.getValue()) {
+    for(Segment segment : pairSegments.values()) {
+      if(segment.segmentPairs <= Properties.PAIR_MIN_COUNT.getValue()) {
         segMinCount++;
       }
     }
@@ -568,9 +568,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     return thumbnail;
   }
 
-  public SegmentID mapElementToSegment(Element segmentElement) {
-    String segmentIDString = segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
-    SegmentID segment = segments.getSegmentID(segmentIDString);
+  public Segment mapElementToSegment(Element segmentElement) {
+    Segment segment = new Segment(segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
+    segment = segments.uniqueSegmentID(segment);
     return segment;
   }
 
@@ -670,7 +670,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       NodeList segmentClusters = thisSegmentCluster.getParentNode().getChildNodes();
 
       // SegmentID
-      SegmentID thisSegmentID = mapElementToSegment(thisSegmentCluster);
+      Segment thisSegmentID = mapElementToSegment(thisSegmentCluster);
 
       // abort if this are the unclustered pairs
       if(thisSegmentID.isNone()) {
@@ -712,14 +712,14 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       //
       else {
         // get the paired segments corresponding to the unpaired segment
-        ArrayList<SegmentID> segments = cs.segments.getPairedSegments(thisSegmentID);
+        ArrayList<Segment> segments = cs.segments.getPairedSegments(thisSegmentID);
 
         // and all corresponding ring Segments
         for(int i = 0; i < segmentClusters.getLength(); i++) {
           Element ringSegment = (Element) segmentClusters.item(i);
           // just segments
           if(ringSegment.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-            SegmentID segment = mapElementToSegment(ringSegment);
+            Segment segment = mapElementToSegment(ringSegment);
             if(segments.contains(segment) && ringSegment.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE).compareTo(String.valueOf(thisClusteringID)) == 0) {
               // mark as selected
               SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
@@ -786,7 +786,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       // clicked segment cluster
       Element thisSegmentElement = (Element) evt.getTarget();
       // get segmentID
-      SegmentID segment = mapElementToSegment(thisSegmentElement);
+      Segment segment = mapElementToSegment(thisSegmentElement);
       selection.select(segment, ctrl);
       // update stylePolicy
       selection.update();

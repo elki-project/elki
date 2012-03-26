@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import experimentalcode.students.goldhofa.SegmentID;
+import experimentalcode.students.goldhofa.Segment;
 import experimentalcode.students.goldhofa.Segments;
 import gnu.trove.list.array.TIntArrayList;
 
@@ -38,9 +38,9 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   Segments segments;
 
   // selection
-  protected ArrayList<SegmentID> selectedSegments;
+  protected ArrayList<Segment> selectedSegments;
 
-  protected ArrayList<SegmentID> unselectedSegments;
+  protected ArrayList<Segment> unselectedSegments;
 
   protected ArrayModifiableDBIDs unselectedObjects;
 
@@ -69,10 +69,10 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     this.segments = segments;
 
     // get all selectable segments
-    TreeMap<SegmentID, Integer> allObjectSegments = segments.getSegments(false);
-    unselectedSegments = new ArrayList<SegmentID>(allObjectSegments.size());
+    TreeMap<Segment, Segment> allObjectSegments = segments.getSegments(false);
+    unselectedSegments = new ArrayList<Segment>(allObjectSegments.size());
     unselectedObjects = DBIDUtil.newArray();
-    for(SegmentID segmentID : allObjectSegments.keySet()) {
+    for(Segment segmentID : allObjectSegments.keySet()) {
       // store segmentID
       if(!segmentID.isUnpaired()) {
         unselectedSegments.add(segmentID);
@@ -81,10 +81,10 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       }
     }
 
-    selectedSegments = new ArrayList<SegmentID>();
+    selectedSegments = new ArrayList<Segment>();
   }
 
-  public void selectObjects(SegmentID segment) {
+  public void selectObjects(Segment segment) {
     if(selectedSegments.contains(segment)) {
       return;
     }
@@ -93,15 +93,15 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     unselectedObjects.removeDBIDs(segments.getSegmentDBIDs(segment));
   }
 
-  public boolean hasSegmentSelected(SegmentID segment) {
+  public boolean hasSegmentSelected(Segment segment) {
     return selectedSegments.contains(segment);
   }
 
-  public ArrayList<SegmentID> getSelectedSegments() {
+  public ArrayList<Segment> getSelectedSegments() {
     return selectedSegments;
   }
 
-  public void deselectObjects(SegmentID segment) {
+  public void deselectObjects(Segment segment) {
     if(unselectedSegments.contains(segment)) {
       return;
     }
@@ -112,7 +112,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
 
   public void deselectAllObjects() {
     for(int i = 0; i < selectedSegments.size(); ++i) {
-      SegmentID id = selectedSegments.get(i);
+      Segment id = selectedSegments.get(i);
       unselectedSegments.add(id);
       unselectedObjects.addDBIDs(segments.getSegmentDBIDs(id));
     }
