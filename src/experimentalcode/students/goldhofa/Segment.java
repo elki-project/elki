@@ -2,6 +2,8 @@ package experimentalcode.students.goldhofa;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+
 
 /**
  * Identifies a CircleSegment by its clusterings and cluster. Can be stored as
@@ -14,12 +16,18 @@ import java.util.Arrays;
  * i.e. clusteringID 0 & clusterID 2, clusteringID 1 & clusterID 0 => segmentID:
  * 2-0
  */
-public class SegmentID implements Comparable<SegmentID> {
+public class Segment implements Comparable<Segment> {
   private static final String SEPARATOR = "-";
 
   // number of segment. if -1 this segment id is a unclustered pair segment,
   // having no corresponding object segment
   private int index = -1;
+  
+  public int segmentObjects = 0;
+  
+  public int segmentPairs = 0;
+  
+  public ModifiableDBIDs objIds = null;
 
   // Cluster ids
   public int[] ids;
@@ -32,7 +40,7 @@ public class SegmentID implements Comparable<SegmentID> {
     return index;
   }
 
-  public SegmentID(int clusterings) {
+  public Segment(int clusterings) {
     ids = new int[clusterings];
   }
 
@@ -42,7 +50,7 @@ public class SegmentID implements Comparable<SegmentID> {
    * 
    * @param segmentID String representation of SegmentID
    */
-  public SegmentID(String segmentID) {
+  public Segment(String segmentID) {
     String[] id = segmentID.split(SEPARATOR);
     ids = new int[id.length];
     for(int i = 0; i < id.length; i++) {
@@ -123,11 +131,11 @@ public class SegmentID implements Comparable<SegmentID> {
 
   @Override
   public boolean equals(Object obj) {
-    if(!(SegmentID.class.isInstance(obj))) {
+    if(!(Segment.class.isInstance(obj))) {
       return false;
     }
 
-    SegmentID other = (SegmentID) obj;
+    Segment other = (Segment) obj;
     return Arrays.equals(ids, other.ids);
   }
 
@@ -137,7 +145,7 @@ public class SegmentID implements Comparable<SegmentID> {
   }
 
   @Override
-  public int compareTo(SegmentID sid) {
+  public int compareTo(Segment sid) {
     if(this.size() < sid.size()) {
       return -1;
     }
