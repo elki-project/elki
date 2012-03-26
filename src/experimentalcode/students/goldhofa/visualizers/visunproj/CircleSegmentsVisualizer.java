@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -253,7 +252,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
         // Add border if the next segment is a different cluster in the
         // reference clustering
         if((refSegment != id.get(refClustering)) && refClustering == i) {
-          Element border = getSegment(offsetAngle - Properties.CLUSTER_DISTANCE.getValue(), centerx, centery, Properties.BORDER_WIDTH.getValue(), currentRadius, Properties.RADIUS_OUTER.getValue() - Properties.CLUSTERING_DISTANCE.getValue()).makeElement(svgp);
+          Element border = SVGUtil.svgCircleSegment(svgp, centerx, centery, offsetAngle - Properties.CLUSTER_DISTANCE.getValue(), Properties.BORDER_WIDTH.getValue(), currentRadius, Properties.RADIUS_OUTER.getValue() - Properties.CLUSTERING_DISTANCE.getValue());
           border.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_BORDER_CLASS);
           visLayer.appendChild(border);
 
@@ -266,7 +265,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
         int cluster = id.get(i);
 
         // create ring segment
-        Element segment = getSegment(offsetAngle, centerx, centery, alpha, currentRadius, currentRadius + Properties.RADIUS_DELTA.getValue()).makeElement(svgp);
+        Element segment = SVGUtil.svgCircleSegment(svgp, centerx, centery, offsetAngle, alpha, currentRadius, currentRadius + Properties.RADIUS_DELTA.getValue());
         segment.setAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE, "" + cluster);
         segment.setAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE, "" + i);
         segment.setAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE, id.toString());
@@ -300,7 +299,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
       int i = id.size();
       double currentRadius = i * (Properties.RADIUS_DELTA.getValue() + Properties.CLUSTERING_DISTANCE.getValue()) + Properties.RADIUS_INNER.getValue();
-      Element extension = getSegment(offsetAngle, centerx, centery, alpha, currentRadius, currentRadius + (Properties.RADIUS_SELECTION.getValue())).makeElement(svgp);
+      Element extension = SVGUtil.svgCircleSegment(svgp, centerx, centery, offsetAngle, alpha, currentRadius, currentRadius + (Properties.RADIUS_SELECTION.getValue()));
       extension.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       extension.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_UNPAIRED_CLASS);
       svgp.putIdElement(CCConstants.SEG_EXTENSION_ID_PREFIX + id.toString(), extension);
@@ -386,13 +385,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // ! TODO VARIABLE LENGTH
     info.addItem(selectionInfo.asElement(), 50);
 
-    ctrlLayer.setAttribute(CCConstants.UI_CONTROL_LAYER, "");
     // FIXME: use SCALE for scaling the circle, too.
     ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.1)");
     ctrlLayer.appendChild(info.asElement());
-
-    visLayer.setAttribute(CCConstants.UI_VISUALIZATION_LAYER, "");
-    SVGUtil.setAtt(visLayer, SVGConstants.SVG_ID_ATTRIBUTE, CCConstants.UI_VISUALIZATION_LAYER);
 
     layer.appendChild(ctrlLayer);
     layer.appendChild(visLayer);
@@ -442,7 +437,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // CLUSTER HOVER
     CSSClass cluster_hover = new CSSClass(this, CCConstants.CLR_HOVER_CLASS);
     cluster_hover.setStatement(SVGConstants.SVG_FILL_OPACITY_ATTRIBUTE, Colors.HOVER_ALPHA.getColor());
-    cluster_hover.setStatement(SVGConstants.SVG_CURSOR_TAG, SVGConstants.SVG_POINTER_VALUE + " !important");
+    cluster_hover.setStatement(SVGConstants.SVG_CURSOR_TAG, SVGConstants.SVG_POINTER_VALUE);
     svgp.addCSSClassOrLogError(cluster_hover);
 
     CSSClass cluster_selection = new CSSClass(this, CCConstants.CLR_HOVER_SELECTION_CLASS);
@@ -451,7 +446,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     svgp.addCSSClassOrLogError(cluster_selection);
 
     CSSClass cluster_identical = new CSSClass(this, CCConstants.CLR_HOVER_INCLUSTER_CLASS);
-    cluster_identical.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_INCLUSTER.getColor() + " !important");
+    cluster_identical.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_INCLUSTER.getColor());
     cluster_identical.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_identical);
 
@@ -479,12 +474,12 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
     // SEGMENT SELECT
     CSSClass segment_selected = new CSSClass(this, CCConstants.SEG_SELECTED_CLASS);
-    segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_SEGMENT.getColor() + " !important");
+    segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_SEGMENT.getColor());
     svgp.addCSSClassOrLogError(segment_selected);
 
     // UNPAIRED SEGMENT SELECT
     CSSClass unpaired_segment_selected = new CSSClass(this, CCConstants.SEG_UNPAIRED_SELECTED_CLASS);
-    unpaired_segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_UNPAIRED_SEGMENT.getColor() + " !important");
+    unpaired_segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_UNPAIRED_SEGMENT.getColor());
     svgp.addCSSClassOrLogError(unpaired_segment_selected);
 
     //
@@ -554,11 +549,11 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     int margin = 4;
     int radius = clusterings * (singleHeight + margin) + startRadius;
 
-    thumbnail.setAttribute("height", "" + radius);
+    SVGUtil.setAtt(thumbnail, SVGConstants.SVG_HEIGHT_ATTRIBUTE, radius);
 
     for(int i = 0; i < clusterings; i++) {
       double innerRadius = i * singleHeight + margin * i + startRadius;
-      Element clr = getSegment(Math.PI * 1.5, radius - startRadius, radius - startRadius, Math.PI * 0.5, innerRadius, innerRadius + singleHeight).makeElement(svgp);
+      Element clr = SVGUtil.svgCircleSegment(svgp, radius - startRadius, radius - startRadius, Math.PI * 1.5, Math.PI * 0.5, innerRadius, innerRadius + singleHeight);
       clr.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
       clr.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
       clr.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "1.0");
@@ -572,37 +567,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
 
     return thumbnail;
-  }
-
-  protected static SVGPath getSegment(double angleOffset, double centerx, double centery, double alpha, double innerRadius, double outerRadius) {
-    double sin1st = Math.sin(angleOffset);
-    double cos1st = Math.cos(angleOffset);
-
-    double sin2nd = Math.sin(angleOffset + alpha);
-    double cos2nd = Math.cos(angleOffset + alpha);
-
-    double inner1stx = centerx + (innerRadius * sin1st);
-    double inner1sty = centery - (innerRadius * cos1st);
-    double outer1stx = centerx + (outerRadius * sin1st);
-    double outer1sty = centery - (outerRadius * cos1st);
-
-    double inner2ndx = centerx + (innerRadius * sin2nd);
-    double inner2ndy = centery - (innerRadius * cos2nd);
-    double outer2ndx = centerx + (outerRadius * sin2nd);
-    double outer2ndy = centery - (outerRadius * cos2nd);
-
-    double largeArc = 0;
-    if(alpha >= Math.PI) {
-      largeArc = 1;
-    }
-
-    SVGPath path = new SVGPath(inner1stx, inner1sty);
-    path.lineTo(outer1stx, outer1sty);
-    path.ellipticalArc(outerRadius, outerRadius, 0, largeArc, 1, outer2ndx, outer2ndy);
-    path.lineTo(inner2ndx, inner2ndy);
-    path.ellipticalArc(innerRadius, innerRadius, 0, largeArc, 0, inner1stx, inner1sty);
-
-    return path;
   }
 
   @Override

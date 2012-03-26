@@ -50,6 +50,14 @@ public class SegmentID implements Comparable<SegmentID> {
     }
   }
 
+  public void set(int i, int currentCluster) {
+    ids[i] = currentCluster;
+  }
+
+  public int get(int idx) {
+    return ids[idx];
+  }
+
   public int size() {
     return ids.length;
   }
@@ -104,10 +112,6 @@ public class SegmentID implements Comparable<SegmentID> {
     return -1;
   }
 
-  public int get(int idx) {
-    return ids[idx];
-  }
-
   @Override
   public String toString() {
     String string = "";
@@ -124,8 +128,7 @@ public class SegmentID implements Comparable<SegmentID> {
     }
 
     SegmentID other = (SegmentID) obj;
-
-    return (this.compareTo(other) == 0);
+    return Arrays.equals(ids, other.ids);
   }
 
   @Override
@@ -151,9 +154,5 @@ public class SegmentID implements Comparable<SegmentID> {
       }
     }
     return 0;
-  }
-
-  public void set(int i, int currentCluster) {
-    ids[i] = currentCluster;
   }
 }
