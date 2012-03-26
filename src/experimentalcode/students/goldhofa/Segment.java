@@ -19,18 +19,21 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 public class Segment implements Comparable<Segment> {
   private static final String SEPARATOR = "-";
 
+  /**
+   * Object is not clustered
+   */
+  public static final int UNCLUSTERED = -1;
+
   // number of segment. if -1 this segment id is a unclustered pair segment,
   // having no corresponding object segment
   private int index = -1;
   
   public int segmentObjects = 0;
   
-  public int segmentPairs = 0;
-  
   public ModifiableDBIDs objIds = null;
 
   // Cluster ids
-  public int[] ids;
+  protected int[] clusterIds;
 
   public void setIndex(int index) {
     this.index = index;
@@ -41,7 +44,11 @@ public class Segment implements Comparable<Segment> {
   }
 
   public Segment(int clusterings) {
-    ids = new int[clusterings];
+    clusterIds = new int[clusterings];
+  }
+  
+  public int getPairCount() {
+    return (segmentObjects * (segmentObjects - 1)) / 2;
   }
 
   /**
@@ -52,22 +59,22 @@ public class Segment implements Comparable<Segment> {
    */
   public Segment(String segmentID) {
     String[] id = segmentID.split(SEPARATOR);
-    ids = new int[id.length];
+    clusterIds = new int[id.length];
     for(int i = 0; i < id.length; i++) {
       set(i, Integer.valueOf(id[i]).intValue());
     }
   }
 
   public void set(int i, int currentCluster) {
-    ids[i] = currentCluster;
+    clusterIds[i] = currentCluster;
   }
 
   public int get(int idx) {
-    return ids[idx];
+    return clusterIds[idx];
   }
 
   public int size() {
-    return ids.length;
+    return clusterIds.length;
   }
 
   /**
@@ -77,8 +84,8 @@ public class Segment implements Comparable<Segment> {
    * @return
    */
   public boolean isUnpaired() {
-    for(int id : ids) {
-      if(id == 0) {
+    for(int id : clusterIds) {
+      if(id == UNCLUSTERED) {
         return true;
       }
     }
@@ -93,8 +100,8 @@ public class Segment implements Comparable<Segment> {
    * @return
    */
   public boolean isNone() {
-    for(int id : ids) {
-      if(id != 0) {
+    for(int id : clusterIds) {
+      if(id != UNCLUSTERED) {
         return false;
       }
     }
@@ -110,8 +117,8 @@ public class Segment implements Comparable<Segment> {
    */
   public int getUnpairedClusteringIndex() {
     int index = 0;
-    for(int id : ids) {
-      if(id == 0) {
+    for(int id : clusterIds) {
+      if(id == UNCLUSTERED) {
         return index;
       }
       index++;
@@ -123,7 +130,7 @@ public class Segment implements Comparable<Segment> {
   @Override
   public String toString() {
     String string = "";
-    for(int id : ids) {
+    for(int id : clusterIds) {
       string += id + SEPARATOR;
     }
     return string.substring(0, string.length() - SEPARATOR.length());
@@ -136,12 +143,12 @@ public class Segment implements Comparable<Segment> {
     }
 
     Segment other = (Segment) obj;
-    return Arrays.equals(ids, other.ids);
+    return Arrays.equals(clusterIds, other.clusterIds);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(ids);
+    return Arrays.hashCode(clusterIds);
   }
 
   @Override
@@ -154,10 +161,10 @@ public class Segment implements Comparable<Segment> {
     }
 
     for(int i = 0; i < this.size(); i++) {
-      if(this.ids[i] < sid.ids[i]) {
+      if(this.clusterIds[i] < sid.clusterIds[i]) {
         return -1;
       }
-      else if(this.ids[i] > sid.ids[i]) {
+      else if(this.clusterIds[i] > sid.clusterIds[i]) {
         return 1;
       }
     }
