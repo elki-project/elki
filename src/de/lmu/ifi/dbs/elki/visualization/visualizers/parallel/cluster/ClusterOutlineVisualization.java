@@ -116,7 +116,7 @@ public class ClusterOutlineVisualization extends AbstractParallelVisualization<N
       // Process points
       // TODO: do this just once, cache the result somewhere appropriately?
       for(DBID objId : clus.getIDs()) {
-        double[] yPos = getYPositions(objId);
+        double[] yPos = projectToVisibleYPositions(objId);
         for(int i = 0; i < dim; i++) {
           mms[i].put(yPos[i]);
           if(i > 0) {
