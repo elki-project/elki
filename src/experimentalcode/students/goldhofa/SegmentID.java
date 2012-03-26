@@ -1,5 +1,7 @@
 package experimentalcode.students.goldhofa;
 
+import java.util.Arrays;
+
 
 /**
  * Identifies a CircleSegment by its clusterings and cluster. Can be stored as
@@ -109,7 +111,7 @@ public class SegmentID implements Comparable<SegmentID> {
   @Override
   public String toString() {
     String string = "";
-    for(Integer id : ids) {
+    for(int id : ids) {
       string += id + SEPARATOR;
     }
     return string.substring(0, string.length() - SEPARATOR.length());
@@ -126,15 +128,9 @@ public class SegmentID implements Comparable<SegmentID> {
     return (this.compareTo(other) == 0);
   }
 
-  // TODO performance?
   @Override
   public int hashCode() {
-    int result = 0;
-    for(Integer id : ids) {
-      result += id.hashCode();
-    }
-
-    return result;
+    return Arrays.hashCode(ids);
   }
 
   @Override
