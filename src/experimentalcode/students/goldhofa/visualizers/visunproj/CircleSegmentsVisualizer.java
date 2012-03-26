@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -231,7 +230,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
       // draw segment for every clustering
       
       for (int i=0; i<id.size(); i++) {
-
         double currentRadius = i*(Properties.RADIUS_DELTA.getValue()+Properties.CLUSTERING_DISTANCE.getValue())+Properties.RADIUS_INNER.getValue();
         
         // Add border if the next segment is a different cluster in the reference clustering
@@ -292,8 +290,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
   public void buildSegments() {
     
     VisualizationTask task = this.task;
-    // FIXME nullp exept. when using context of parent
-    VisualizerContext context = task.getContext();
     
     this.segments   = ccr.getSegments();
 
@@ -413,6 +409,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements /
    * Define and add required CSS classes
    */
   protected void addCSSClasses() {
+    
     // CLUSTER BORDER
     CSSClass cssReferenceBorder = new CSSClass(this, CCConstants.CLR_BORDER_CLASS);
     cssReferenceBorder.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.BORDER.getColor());

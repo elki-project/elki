@@ -1,7 +1,5 @@
 package experimentalcode.students.goldhofa;
 
-import java.util.ArrayList;
-import java.lang.Comparable;
 
 /**
  * Identifies a CircleSegment by its clusterings and cluster. Can be stored as
@@ -21,12 +19,8 @@ public class SegmentID implements Comparable<SegmentID> {
   // having no corresponding object segment
   private int index = -1;
 
-  //
-  public ArrayList<Integer> ids;
-
-  public SegmentID() {
-    ids = new ArrayList<Integer>(2);
-  }
+  // Cluster ids
+  public int[] ids;
 
   public void setIndex(int index) {
     this.index = index;
@@ -37,7 +31,7 @@ public class SegmentID implements Comparable<SegmentID> {
   }
 
   public SegmentID(int clusterings) {
-    ids = new ArrayList<Integer>(clusterings);
+    ids = new int[clusterings];
   }
 
   /**
@@ -48,19 +42,14 @@ public class SegmentID implements Comparable<SegmentID> {
    */
   public SegmentID(String segmentID) {
     String[] id = segmentID.split(SEPARATOR);
-    ids = new ArrayList<Integer>(id.length);
+    ids = new int[id.length];
     for(int i = 0; i < id.length; i++) {
-      add(Integer.valueOf(id[i]).intValue());
+      set(i, Integer.valueOf(id[i]).intValue());
     }
   }
 
-  public SegmentID add(int nextClusteringCluster) {
-    ids.add(nextClusteringCluster);
-    return this;
-  }
-
   public int size() {
-    return ids.size();
+    return ids.length;
   }
 
   /**
@@ -113,31 +102,16 @@ public class SegmentID implements Comparable<SegmentID> {
     return -1;
   }
 
-  /**
-   * Get the cluster IDs of the segment as array. index representing clustering.
-   * 
-   * @return IDs of cluster by clustering
-   */
-  public ArrayList<Integer> getIDs() {
-    return this.ids;
-  }
-
-  public int get(int clusteringsIndex) {
-    return ids.get(clusteringsIndex);
-  }
-
-  public int get(String clusteringsIndex) {
-    return ids.get(Integer.valueOf(clusteringsIndex).intValue());
+  public int get(int idx) {
+    return ids[idx];
   }
 
   @Override
   public String toString() {
     String string = "";
-
     for(Integer id : ids) {
       string += id + SEPARATOR;
     }
-
     return string.substring(0, string.length() - SEPARATOR.length());
   }
 
@@ -149,12 +123,7 @@ public class SegmentID implements Comparable<SegmentID> {
 
     SegmentID other = (SegmentID) obj;
 
-    if(this.compareTo(other) == 0) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return (this.compareTo(other) == 0);
   }
 
   // TODO performance?
@@ -178,13 +147,17 @@ public class SegmentID implements Comparable<SegmentID> {
     }
 
     for(int i = 0; i < this.size(); i++) {
-      if(this.get(i) < sid.ids.get(i)) {
+      if(this.ids[i] < sid.ids[i]) {
         return -1;
       }
-      else if(this.get(i) > sid.ids.get(i)) {
+      else if(this.ids[i] > sid.ids[i]) {
         return 1;
       }
     }
     return 0;
+  }
+
+  public void set(int i, int currentCluster) {
+    ids[i] = currentCluster;
   }
 }
