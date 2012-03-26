@@ -29,6 +29,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
@@ -70,7 +71,8 @@ public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends Abstrac
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
 
-      final PlotItem it = new PlotItem(2, 1., proj);
+      final double width = Math.ceil(Math.log(scales.getScales().length) / MathUtil.LOG2);
+      final PlotItem it = new PlotItem(width, 1., proj);
       it.tasks = tasks;
       col.add(it);
     }

@@ -70,6 +70,11 @@ public final class MathUtil {
   public static final double ONE_BY_SQRTPI = 1 / Math.sqrt(Math.PI);
 
   /**
+   * Logarithm of 2 to the basis e, for logarithm conversion.
+   */
+  public static final double LOG2 = Math.log(2);
+
+  /**
    * Fake constructor for static class.
    */
   private MathUtil() {

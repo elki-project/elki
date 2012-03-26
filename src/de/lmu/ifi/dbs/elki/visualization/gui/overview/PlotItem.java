@@ -126,15 +126,6 @@ public class PlotItem {
   }
 
   /**
-   * Iterate (recursively) over all visualizations.
-   * 
-   * @return Iterator
-   */
-  public Iterator<VisualizationTask> taskIterator() {
-    return new VisItr();
-  }
-
-  /**
    * Number of tasks in this item.
    * 
    * @return Number of tasks.
@@ -150,51 +141,6 @@ public class PlotItem {
    */
   public Iterator<PlotItem> itemIterator() {
     return new ItmItr();
-  }
-
-  /**
-   * Recursive iterator
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class VisItr implements Iterator<VisualizationTask> {
-    Iterator<VisualizationTask> cur;
-
-    Iterator<PlotItem> sub;
-
-    /**
-     * Constructor.
-     */
-    public VisItr() {
-      super();
-      this.cur = tasks.iterator();
-      this.sub = subitems.iterator();
-    }
-
-    @Override
-    public boolean hasNext() {
-      if(cur.hasNext()) {
-        return true;
-      }
-      if(sub.hasNext()) {
-        cur = sub.next().taskIterator();
-        return hasNext();
-      }
-      return false;
-    }
-
-    @Override
-    public VisualizationTask next() {
-      hasNext();
-      return cur.next();
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
   }
 
   /**
