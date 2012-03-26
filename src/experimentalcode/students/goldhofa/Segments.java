@@ -21,7 +21,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
 
 /**
- * <h2>Creates segments of two or more clusterings.</h2>
+ * Creates segments of two or more clusterings.
  * 
  * <p>
  * Segments are the equally paired database objects of all given (2+)
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Triple;
  * <p>
  * Objects are combined by a string (segmentID), so no database objects have to
  * be saved. <br />
- * EDIT: extending the visualization now stores all DBIDs decribed by their
+ * EDIT: extending the visualization now stores all DBIDs described by their
  * objectSegment for a faster selection of objects on the cost of memory.
  * </p>
  * <p>
@@ -211,18 +211,15 @@ public class Segments {
 
     // if this is not an unpairedSegment return an empty list
     // - optional return given segment in list?
-    if(unpairedClusteringIndex <= -1)
+    if(unpairedClusteringIndex <= -1) {
       return pairedSegments;
-
-    // get size of clusterings / indizes in segment / clusters.length /
-    // clusterings.size()
-    int clusteringCount = unpairedSegment.size();
+    }
 
     // search the segments. Index at "unpairedClustering" being the wildcard.
     for(SegmentID segment : pairSegments.keySet()) {
       // if mismatch except at unpaired Clustering index => exclude.
       boolean match = true;
-      for(int i = 0; i < clusteringCount; i++) {
+      for(int i = 0; i < clusteringsCount; i++) {
         if(i != unpairedClusteringIndex) {
           // mismatch
           if(segment.get(i) != unpairedSegment.get(i)) {
@@ -251,11 +248,6 @@ public class Segments {
    * @return DBIDs contained in SegmentID
    */
   public DBIDs getDBIDs(SegmentID id) {
-    // return segmentDBIDs.get(id);
-
-    // *
-    ModifiableDBIDs objectIDs = DBIDUtil.newHashSet();
-    DBIDs currentIDs;
 
     // find first clustering
     int startClustering = 0;
@@ -271,15 +263,11 @@ public class Segments {
 
     // fetch all DB objects of the first clustering and its selected clusterID.
     // This includes the selection to find.
-    currentIDs = clusterings.get(startClustering).getAllClusters().get(id.get(startClustering) - 1).getIDs();
-
-    // convert basic selection to a modifiable set
-    for(DBID dbID : currentIDs) {
-      objectIDs.add(dbID);
-    }
+    DBIDs currentIDs = clusterings.get(startClustering).getAllClusters().get(id.get(startClustering) - 1).getIDs();
+    ModifiableDBIDs objectIDs = DBIDUtil.newHashSet(currentIDs);
 
     // iterate over remaining clusterings and find intersecting objects
-    for(int i = startClustering + 1; i < id.size(); i++) {
+    for(int i = startClustering + 1; i < clusteringsCount; i++) {
       if(id.get(i) != 0) {
         objectIDs = intersect(objectIDs, i, id.get(i) - 1);
       }
@@ -287,7 +275,6 @@ public class Segments {
 
     // and return selection
     return objectIDs;
-    // */
   }
 
   /**
@@ -312,7 +299,7 @@ public class Segments {
    * @return
    */
   public SegmentID getSegmentID(DBID objectID) {
-    SegmentID result = new SegmentID();
+    SegmentID result = new SegmentID(clusteringsCount);
     getSegment(objectID, result, 0);
     return result;
   }
@@ -366,7 +353,8 @@ public class Segments {
           // search in next clusterings
 
           objectFound = true;
-          getSegment(objectID, tag.add(index), clusteringIndex + 1);
+          tag.set(clusteringIndex, index);
+          getSegment(objectID, tag, clusteringIndex + 1);
         }
 
         currentCluster++;
@@ -375,7 +363,8 @@ public class Segments {
       // if object is unclustered in this clustering, tag accordingly and search
       // in next clusterings
       if(!objectFound) {
-        getSegment(objectID, tag.add(0), clusteringIndex + 1);
+        tag.set(clusteringIndex, 0);
+        getSegment(objectID, tag, clusteringIndex + 1);
       }
     }
   }
@@ -470,7 +459,7 @@ public class Segments {
   }
 
   private void addPairsToCluster(SegmentID segment, int pairs) {
-    for(int i = 0; i < segment.size(); i++) {
+    for(int i = 0; i < clusteringsCount; i++) {
       int cluster = segment.get(i);
       if(cluster != 0) {
         if(clusterPaircount.get(i).containsKey(cluster)) {
@@ -585,7 +574,7 @@ public class Segments {
    * @return segment id
    */
   private SegmentID getFragmentedSegment(SortedSet<SegmentID> segments) {
-    SegmentID pairSegment = new SegmentID();
+    SegmentID pairSegment = new SegmentID(clusteringsCount);
 
     for(int i = 0; i < clusteringsCount; i++) {
       int currentCluster = -1;
@@ -600,7 +589,7 @@ public class Segments {
           }
         }
       }
-      pairSegment.add(currentCluster);
+      pairSegment.set(i, currentCluster);
     }
     return pairSegment;
   }
@@ -661,10 +650,6 @@ public class Segments {
     else {
       // create the SegmentID
       SegmentID unclusteredPairs = new SegmentID(clusteringsCount);
-      for(int i = 0; i < clusteringsCount; i++) {
-        unclusteredPairs.add(0);
-      }
-
       if(pairSegments.containsKey(unclusteredPairs)) {
         return pairs - pairSegments.get(unclusteredPairs);
       }
@@ -676,11 +661,6 @@ public class Segments {
 
   public int getPairCount(int clustering, int cluster) {
     return clusterPaircount.get(clustering).get(cluster);
-  }
-
-  public int getPairCount(String segmentID) {
-    SegmentID segment = new SegmentID(segmentID);
-    return pairSegments.get(segment);
   }
 
   /**
@@ -698,9 +678,6 @@ public class Segments {
     else {
       // create the SegmentID
       SegmentID unclusteredPairs = new SegmentID(clusteringsCount);
-      for(int i = 0; i < clusteringsCount; i++) {
-        unclusteredPairs.add(0);
-      }
 
       @SuppressWarnings("unchecked")
       TreeMap<SegmentID, Integer> segments = (TreeMap<SegmentID, Integer>) pairSegments.clone();
@@ -716,16 +693,6 @@ public class Segments {
 
   public int[] getClusters() {
     return clusters;
-  }
-
-  public int getSegmentIndex(String segmentID) {
-    for(SegmentID segment : pairSegments.keySet()) {
-      if(segment.toString().compareTo(segmentID) == 0) {
-        return segment.getIndex();
-      }
-    }
-
-    return -1;
   }
 
   /**
