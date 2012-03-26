@@ -27,9 +27,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
@@ -145,18 +143,6 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector<?, ?
     return d * axsep;
   }
 
-  /**
-   * Project to the visualization scale and visible axes.
-   * 
-   * @param objId Object ID
-   * @return Projected values
-   */
-  protected double[] projectToVisibleYPositions(DBID objId) {
-    double[] v = proj.fastProjectDataToRenderSpace(relation.get(objId));
-    VMath.timesEquals(v, getSizeY());
-    return v;
-  }
-  
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);
