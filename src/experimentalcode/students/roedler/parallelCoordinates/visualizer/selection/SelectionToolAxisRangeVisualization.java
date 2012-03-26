@@ -153,7 +153,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
         }
         i++;
       }
-      while(i < dim) {
+      while(i <= dim) {
         double axx = getVisibleAxisX(i);
         if(x2 < axx && x1 < axx) {
           maxaxis = i;
@@ -276,10 +276,10 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
    * Factory for tool visualizations for selecting ranges and the inclosed
    * objects
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses SelectionToolCubeVisualization oneway - - «create»
+   * @apiviz.uses SelectionToolAxisRangeVisualization oneway - - «create»
    * 
    */
   public static class Factory extends AbstractVisFactory {

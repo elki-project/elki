@@ -148,10 +148,10 @@ public class SelectionAxisRangeVisualization extends AbstractParallelVisualizati
    * Factory for visualizers to generate an SVG-Element containing a cube as
    * marker representing the selected range for each dimension
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses SelectionCubeVisualization oneway - - «create»
+   * @apiviz.uses SelectionAxisVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
