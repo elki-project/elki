@@ -596,4 +596,17 @@ public final class SVGUtil {
       tag.removeChild(last);
     }
   }
+
+  /**
+   * Remove an element from its parent, if defined.
+   * 
+   * @param elem Element to remove
+   */
+  public static void removeFromParent(Element elem) {
+    if(elem != null) {
+      if(elem.getParentNode() != null) {
+        elem.getParentNode().removeChild(elem);
+      }
+    }
+  }
 }

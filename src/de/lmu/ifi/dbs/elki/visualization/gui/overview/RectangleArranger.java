@@ -460,6 +460,15 @@ public class RectangleArranger<T> {
   }
 
   /**
+   * The item keys contained in the map.
+   * 
+   * @return key set
+   */
+  public Set<T> keySet() {
+    return Collections.unmodifiableSet(map.keySet());
+  }
+
+  /**
    * Test method.
    * 
    * @param args

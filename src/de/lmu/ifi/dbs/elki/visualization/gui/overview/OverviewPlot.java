@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -117,7 +116,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Lookup
    */
-  private final HashMap<Pair<PlotItem, VisualizationTask>, Pair<Element, Visualization>> vistoelem = new HashMap<Pair<PlotItem, VisualizationTask>, Pair<Element, Visualization>>();
+  private LayerMap vistoelem = new LayerMap();
 
   /**
    * Layer for plot thumbnail
@@ -232,44 +231,57 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     setupHoverer();
     arrangeVisualizations();
     recalcViewbox();
+    final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
     // TODO: cancel pending thumbnail requests!
 
-    // Clear vistoelem
+    // Detach existing elements:
     for(Pair<Element, Visualization> pair : vistoelem.values()) {
-      if(pair.second != null) {
-        pair.second.destroy();
-      }
+      SVGUtil.removeFromParent(pair.first);
     }
-    vistoelem.clear();
+    // Replace the layer map
+    LayerMap oldlayers = vistoelem;
+    vistoelem = new LayerMap();
 
-    // Layers.
-    tryRemove(plotlayer);
-    tryRemove(hoverlayer);
+    // Redo main layers
+    SVGUtil.removeFromParent(plotlayer);
+    SVGUtil.removeFromParent(hoverlayer);
     plotlayer = this.svgElement(SVGConstants.SVG_G_TAG);
     hoverlayer = this.svgElement(SVGConstants.SVG_G_TAG);
 
-    final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-
-    // TODO: kill all children in document root except style, defs etc?
+    // Redo the layout
     for(Entry<PlotItem, double[]> e : plotmap.entrySet()) {
       final double basex = e.getValue()[0];
       final double basey = e.getValue()[1];
       for(Iterator<PlotItem> iter = e.getKey().itemIterator(); iter.hasNext();) {
         PlotItem it = iter.next();
+
         boolean hasDetails = false;
+        // Container element for main plot item
         Element g = this.svgElement(SVGConstants.SVG_G_TAG);
         SVGUtil.setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + (basex + it.x) + " " + (basey + it.y) + ")");
+        plotlayer.appendChild(g);
+        vistoelem.put(it, null, g, null);
+        // Add the actual tasks:
         for(VisualizationTask task : it.tasks) {
-          Element parent = this.svgElement(SVGConstants.SVG_G_TAG);
-          g.appendChild(parent);
-          Visualization v = visibleInOverview(task) ? embedOrThumbnail(thumbsize, it, task, parent) : null;
-          vistoelem.put(new Pair<PlotItem, VisualizationTask>(it, task), new Pair<Element, Visualization>(parent, v));
+          if(!visibleInOverview(task)) {
+            continue;
+          }
           if(VisualizerUtil.detailsEnabled(task)) {
             hasDetails = true;
             // TODO: not updatable
           }
+          Pair<Element, Visualization> pair = oldlayers.remove(it, task);
+          if(pair == null) {
+            pair = new Pair<Element, Visualization>(null, null);
+            pair.first = svgElement(SVGConstants.SVG_G_TAG);
+          }
+          if(pair.second == null) {
+            pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
+          }
+          g.appendChild(pair.first);
+          vistoelem.put(it, task, pair);
         }
-        plotlayer.appendChild(g);
+        // When needed, add a hover effect
         if(hasDetails && !single) {
           Element hover = this.svgRect(basex + it.x, basey + it.y, it.w, it.h);
           SVGUtil.addCSSClass(hover, selcss.getName());
@@ -284,24 +296,14 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         }
       }
     }
+    for(Pair<Element, Visualization> pair : oldlayers.values()) {
+      if(pair.second != null) {
+        pair.second.destroy();
+      }
+    }
     getRoot().appendChild(plotlayer);
     getRoot().appendChild(hoverlayer);
     updateStyleElement();
-  }
-
-  /**
-   * Remove an element from the plot, if defined and possible.
-   * 
-   * @param elem Element to remove
-   * @return {@code null}
-   */
-  private Element tryRemove(Element elem) {
-    if(elem != null) {
-      if(elem.getParentNode() != null) {
-        elem.getParentNode().removeChild(elem);
-      }
-    }
-    return null;
   }
 
   /**
@@ -353,32 +355,43 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       logger.debug("Incremental refresh");
       boolean refreshcss = false;
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
-      for(Entry<PlotItem, double[]> ent : plotmap.entrySet()) {
-        for(Iterator<PlotItem> iter = ent.getKey().itemIterator(); iter.hasNext();) {
+      for(PlotItem pi : plotmap.keySet()) {
+        for(Iterator<PlotItem> iter = pi.itemIterator(); iter.hasNext();) {
           PlotItem it = iter.next();
 
           for(Iterator<VisualizationTask> tit = it.tasks.iterator(); tit.hasNext();) {
             VisualizationTask task = tit.next();
-            Pair<Element, Visualization> pair = vistoelem.get(new Pair<PlotItem, VisualizationTask>(it, task));
+            Pair<Element, Visualization> pair = vistoelem.get(it, task);
+            // New task?
             if(pair == null) {
-              LoggingUtil.warning("No container element found for " + it + " " + task);
-              continue;
-            }
-            if(visibleInOverview(task)) {
-              // unhide when hidden.
-              if(pair.first.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
-                pair.first.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
-              }
-              // if not yet rendered, add a thumbnail
-              if(!pair.first.hasChildNodes()) {
+              if(visibleInOverview(task)) {
+                pair = new Pair<Element, Visualization>(null, null);
+                pair.first = svgElement(SVGConstants.SVG_G_TAG);
                 pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
+                vistoelem.get(it, null).first.appendChild(pair.first);
+                vistoelem.put(it, task, pair);
                 refreshcss = true;
               }
             }
             else {
-              // hide if there is anything to hide.
-              if(pair.first != null && pair.first.hasChildNodes()) {
-                pair.first.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+              if(visibleInOverview(task)) {
+                // unhide if hidden.
+                if(pair.first.hasAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY)) {
+                  pair.first.removeAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY);
+                }
+                // if not yet rendered, add a thumbnail
+                if(!pair.first.hasChildNodes()) {
+                  logger.warning("This codepath should no longer be needed.");
+                  Visualization visualization = embedOrThumbnail(thumbsize, it, task, pair.first);
+                  vistoelem.put(it, task, pair.first, visualization);
+                  refreshcss = true;
+                }
+              }
+              else {
+                // hide if there is anything to hide.
+                if(pair.first != null && pair.first.hasChildNodes()) {
+                  pair.first.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+                }
               }
               // TODO: unqueue pending thumbnails
             }
@@ -438,6 +451,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     addCSSClassOrLogError(hovcss);
     // Hover listener.
     hoverer = new CSSHoverClass(hovcss.getName(), null, true);
+    updateStyleElement();
   }
 
   /**
