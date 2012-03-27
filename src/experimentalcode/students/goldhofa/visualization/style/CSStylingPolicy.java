@@ -46,7 +46,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       if(!segment.isUnpaired()) {
         unselectedSegments.add(segment);
         // and store their get all objects
-        unselectedObjects.addDBIDs(segment.objIds);
+        unselectedObjects.addDBIDs(segment.firstIDs);
       }
     }
 
@@ -59,7 +59,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.add(segment);
     unselectedSegments.remove(segment);
-    unselectedObjects.removeDBIDs(segment.objIds);
+    unselectedObjects.removeDBIDs(segment.firstIDs);
   }
 
   public boolean hasSegmentSelected(Segment segment) {
@@ -76,13 +76,13 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.remove(segment);
     unselectedSegments.add(segment);
-    unselectedObjects.addDBIDs(segment.objIds);
+    unselectedObjects.addDBIDs(segment.firstIDs);
   }
 
   public void deselectAllObjects() {
     for(Segment segment : selectedSegments) {
       unselectedSegments.add(segment);
-      unselectedObjects.addDBIDs(segment.objIds);
+      unselectedObjects.addDBIDs(segment.firstIDs);
     }
     selectedSegments.clear();
   }
@@ -127,6 +127,6 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       return DBIDUtil.EMPTYDBIDS.iterator();
     }
     // colors
-    return selectedSegments.get(cnum).objIds.iterator();
+    return selectedSegments.get(cnum).firstIDs.iterator();
   }
 }
