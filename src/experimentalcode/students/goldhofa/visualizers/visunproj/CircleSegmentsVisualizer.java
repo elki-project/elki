@@ -478,17 +478,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     clusterUnpaired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
     svgp.addCSSClassOrLogError(clusterUnpaired);
 
-    // CLUSTER SELECT
-    CSSClass cluster_selected = new CSSClass(this, CCConstants.CLR_SELECTED_CLASS);
-    cluster_selected.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, Colors.SELECTED_BORDER.getColor());
-    cluster_selected.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.003");
-    svgp.addCSSClassOrLogError(cluster_selected);
-
-    // SEGMENT SELECT
-    CSSClass segment_selected = new CSSClass(this, CCConstants.SEG_SELECTED_CLASS);
-    segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_SEGMENT.getColor());
-    svgp.addCSSClassOrLogError(segment_selected);
-
     // UNPAIRED SEGMENT SELECT
     CSSClass unpaired_segment_selected = new CSSClass(this, CCConstants.SEG_UNPAIRED_SELECTED_CLASS);
     unpaired_segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_UNPAIRED_SEGMENT.getColor());
