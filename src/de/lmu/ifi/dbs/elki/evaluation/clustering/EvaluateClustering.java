@@ -72,7 +72,7 @@ public class EvaluateClustering implements Evaluator {
   /**
    * Parameter flag to disable self-pairing
    */
-  public static final OptionID NOSELFPAIR_ID = OptionID.getOrCreateOptionID("paircounting.noselfpair", "Disable self-pairing for cluster comparison.");
+  public static final OptionID SELFPAIR_ID = OptionID.getOrCreateOptionID("paircounting.selfpair", "Enable self-pairing for cluster comparison.");
 
   /**
    * Reference algorithm.
@@ -123,7 +123,7 @@ public class EvaluateClustering implements Evaluator {
     Clustering<?> refc = refcrs.get(0);
     for(Clustering<?> c : crs) {
       ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
-      contmat.process(c, refc);
+      contmat.process(refc, c);
 
       db.getHierarchy().add(c, new ScoreResult(contmat));
     }
@@ -215,7 +215,7 @@ public class EvaluateClustering implements Evaluator {
 
     protected boolean noiseSpecialHandling = false;
 
-    protected boolean noSelfPairing = false;
+    protected boolean selfPairing = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -230,15 +230,15 @@ public class EvaluateClustering implements Evaluator {
         noiseSpecialHandling = noiseSpecialHandlingF.getValue();
       }
 
-      Flag noSelfPairingF = new Flag(NOSELFPAIR_ID);
-      if(config.grab(noSelfPairingF)) {
-        noSelfPairing = noSelfPairingF.getValue();
+      Flag selfPairingF = new Flag(SELFPAIR_ID);
+      if(config.grab(selfPairingF)) {
+        selfPairing = selfPairingF.getValue();
       }
     }
 
     @Override
     protected EvaluateClustering makeInstance() {
-      return new EvaluateClustering(referencealg, noiseSpecialHandling, !noSelfPairing);
+      return new EvaluateClustering(referencealg, noiseSpecialHandling, !selfPairing);
     }
   }
 }
