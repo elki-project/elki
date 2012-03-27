@@ -2,7 +2,7 @@ package experimentalcode.students.goldhofa;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 
 /**
@@ -24,7 +24,11 @@ public class Segment implements Comparable<Segment> {
    */
   public static final int UNCLUSTERED = -1;
 
-  public ModifiableDBIDs objIds = null;
+  public DBIDs firstIDs = null;
+
+  public DBIDs secondIDs = null;
+  
+  public long pairsize = 0;
 
   // Cluster ids
   protected int[] clusterIds;
@@ -33,13 +37,8 @@ public class Segment implements Comparable<Segment> {
     clusterIds = new int[clusterings];
   }
   
-  public int getPairCount() {
-    final int objsize = objIds.size();
-    return (objsize * (objsize - 1)) / 2;
-  }
-
-  public int getObjectCount() {
-    return objIds.size();
+  public long getPairCount() {
+    return pairsize;
   }
 
   /**
@@ -56,12 +55,16 @@ public class Segment implements Comparable<Segment> {
     }
   }
 
+  public Segment(int[] clone) {
+    clusterIds = clone;
+  }
+
   public void set(int i, int currentCluster) {
     clusterIds[i] = currentCluster;
   }
 
   public int get(int idx) {
-    return clusterIds[idx];
+    return (clusterIds[idx] > 0) ? (clusterIds[idx] - 1) : UNCLUSTERED;
   }
 
   /**
@@ -72,7 +75,7 @@ public class Segment implements Comparable<Segment> {
    */
   public boolean isUnpaired() {
     for(int id : clusterIds) {
-      if(id == UNCLUSTERED) {
+      if(id < 0) { //== UNCLUSTERED) {
         return true;
       }
     }
@@ -88,7 +91,7 @@ public class Segment implements Comparable<Segment> {
    */
   public boolean isNone() {
     for(int id : clusterIds) {
-      if(id != UNCLUSTERED) {
+      if(id > 0) { // != UNCLUSTERED) {
         return false;
       }
     }
@@ -105,7 +108,7 @@ public class Segment implements Comparable<Segment> {
   public int getUnpairedClusteringIndex() {
     int index = 0;
     for(int id : clusterIds) {
-      if(id == UNCLUSTERED) {
+      if(id < 0) { //== UNCLUSTERED) {
         return index;
       }
       index++;

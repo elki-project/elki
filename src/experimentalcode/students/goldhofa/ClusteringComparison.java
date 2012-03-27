@@ -60,7 +60,7 @@ public class ClusteringComparison implements Evaluator {
     Segments segments = new Segments(clusterings, baseResult);
 
     // log segmentation info
-    segments.print(logger);
+    // segments.print(logger);
 
     // add segmentation to result
     thisResult.add(segments);

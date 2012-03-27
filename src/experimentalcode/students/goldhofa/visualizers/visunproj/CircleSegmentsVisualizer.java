@@ -231,7 +231,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
 
     for(Segment id : pairSegments.descendingKeySet()) {
-      int currentPairCount = id.getPairCount();
+      long currentPairCount = id.getPairCount();
 
       // resize small segments if below minimum
       double alpha = Properties.CLUSTER_MIN_WIDTH.getValue();
@@ -278,8 +278,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, mouseClick, false);
 
         // Coloring based on clusterID
-        if(cluster != 0) {
-          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[id.get(i) - 1].getName());
+        if(cluster >= 0) {
+          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[cluster].getName());
         }
         // if its an unpaired cluster set color to white
         else {
@@ -550,7 +550,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
   public Segment mapElementToSegment(Element segmentElement) {
     Segment segment = new Segment(segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
-    segment = segments.uniqueSegmentID(segment);
+    segment = segments.unifySegment(segment);
     return segment;
   }
 
