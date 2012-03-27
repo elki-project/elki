@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
  * 
  * @author Erich Schubert
  */
-class EmptyDBIDs implements ArrayStaticDBIDs {
+public class EmptyDBIDs implements ArrayStaticDBIDs {
   /**
    * Empty DBID iterator
    */
