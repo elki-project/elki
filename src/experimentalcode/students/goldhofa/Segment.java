@@ -24,24 +24,12 @@ public class Segment implements Comparable<Segment> {
    */
   public static final int UNCLUSTERED = -1;
 
-  // number of segment. if -1 this segment id is a unclustered pair segment,
-  // having no corresponding object segment
-  private int index = -1;
-  
   public int segmentObjects = 0;
   
   public ModifiableDBIDs objIds = null;
 
   // Cluster ids
   protected int[] clusterIds;
-
-  public void setIndex(int index) {
-    this.index = index;
-  }
-
-  public int getIndex() {
-    return index;
-  }
 
   public Segment(int clusterings) {
     clusterIds = new int[clusterings];
