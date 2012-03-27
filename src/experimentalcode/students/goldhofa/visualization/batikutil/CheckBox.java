@@ -8,9 +8,9 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import experimentalcode.students.goldhofa.CCConstants;
 
 public class CheckBox implements UIInterfaceElement, EventListener {
   protected boolean checked;
@@ -32,15 +32,12 @@ public class CheckBox implements UIInterfaceElement, EventListener {
 
     // create Label
     Element label = svgp.svgText(20, 12, labelText);
-    SVGUtil.addCSSClass(label, CCConstants.CSS_TEXT_BOLD);
     checkbox.appendChild(label);
   }
 
   protected void createCheckBox(SVGPlot svgp) {
-    SVGUI.setupCSS(svgp);
-
     // create check
-    checkmark = SVGUI.svgCheckmark(svgp);
+    checkmark = SVGEffects.makeCheckmark(svgp);
     if(!checked) {
       checkmark.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_DISPLAY_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
     }
@@ -52,7 +49,9 @@ public class CheckBox implements UIInterfaceElement, EventListener {
     checkbox_box.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.5");
 
     // create checkbox
-    checkbox = SVGUI.group(svgp, checkbox_box, checkmark);
+    checkbox = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    checkbox.appendChild(checkbox_box);
+    checkbox.appendChild(checkmark);
 
     // add click event
     EventTarget targ = (EventTarget) checkbox;

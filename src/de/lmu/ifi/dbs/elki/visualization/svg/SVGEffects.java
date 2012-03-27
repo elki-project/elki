@@ -125,4 +125,23 @@ public class SVGEffects {
       svgp.putIdElement(LIGHT_GRADIENT_ID, gradient);
     }
   }
+
+  /**
+   * Checkmark path, sized approx. 15x15
+   */
+  public static final String SVG_CHECKMARK_PATH = "M0 6.458 L2.047 4.426 5.442 7.721 12.795 0 15 2.117 5.66 11.922 Z";
+
+  /**
+   * Creates a 15x15 big checkmark
+   * 
+   * @param svgp Plot to create the element for
+   * @return Element
+   */
+  public static Element makeCheckmark(SVGPlot svgp) {
+    Element checkmark = svgp.svgElement(SVGConstants.SVG_PATH_TAG);
+    checkmark.setAttribute(SVGConstants.SVG_D_ATTRIBUTE, SVG_CHECKMARK_PATH);
+    checkmark.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.CSS_BLACK_VALUE);
+    checkmark.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.CSS_NONE_VALUE);
+    return checkmark;
+  }
 }
