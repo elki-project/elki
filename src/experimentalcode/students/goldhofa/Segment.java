@@ -24,8 +24,6 @@ public class Segment implements Comparable<Segment> {
    */
   public static final int UNCLUSTERED = -1;
 
-  public int segmentObjects = 0;
-  
   public ModifiableDBIDs objIds = null;
 
   // Cluster ids
@@ -36,7 +34,12 @@ public class Segment implements Comparable<Segment> {
   }
   
   public int getPairCount() {
-    return (segmentObjects * (segmentObjects - 1)) / 2;
+    final int objsize = objIds.size();
+    return (objsize * (objsize - 1)) / 2;
+  }
+
+  public int getObjectCount() {
+    return objIds.size();
   }
 
   /**
@@ -59,10 +62,6 @@ public class Segment implements Comparable<Segment> {
 
   public int get(int idx) {
     return clusterIds[idx];
-  }
-
-  public int size() {
-    return clusterIds.length;
   }
 
   /**
@@ -141,14 +140,7 @@ public class Segment implements Comparable<Segment> {
 
   @Override
   public int compareTo(Segment sid) {
-    if(this.size() < sid.size()) {
-      return -1;
-    }
-    if(this.size() > sid.size()) {
-      return 1;
-    }
-
-    for(int i = 0; i < this.size(); i++) {
+    for(int i = 0; i < clusterIds.length; i++) {
       if(this.clusterIds[i] < sid.clusterIds[i]) {
         return -1;
       }

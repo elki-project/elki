@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import experimentalcode.students.goldhofa.Segment;
@@ -23,55 +23,26 @@ import gnu.trove.list.array.TIntArrayList;
  * zeichnen neu
  * 
  * @author Sascha Goldhofer
- * 
  */
 public class CSStylingPolicy implements ClassStylingPolicy {
-  // color : integer
-  TreeMap<Integer, Integer> colorToIndex;
-
-  // unselected objects
-  ArrayModifiableDBIDs unselected;
-
-  ArrayList<ArrayModifiableDBIDs> selected;
-
   // all segments
   Segments segments;
 
   // selection
   protected ArrayList<Segment> selectedSegments;
 
-  protected ArrayList<Segment> unselectedSegments;
+  protected TreeSet<Segment> unselectedSegments;
 
-  protected ArrayModifiableDBIDs unselectedObjects;
+  protected ModifiableDBIDs unselectedObjects;
 
-  protected boolean changed = false;
-
-  // unselected segments
-
-  /**
-   * Object IDs
-   */
-  ArrayList<DBIDs> ids;
-
-  /**
-   * Colors
-   */
-  TIntArrayList colors;
-
-  /**
-   * Constructor.
-   * 
-   * @param clustering Clustering to use.
-   */
   public CSStylingPolicy(Segments segments, StyleLibrary style) {
     super();
-
     this.segments = segments;
 
     // get all selectable segments
-    TreeMap<Segment, Segment> allObjectSegments = segments.getSegments(false);
-    unselectedSegments = new ArrayList<Segment>(allObjectSegments.size());
-    unselectedObjects = DBIDUtil.newArray();
+    TreeMap<Segment, Segment> allObjectSegments = segments.getSegments();
+    unselectedSegments = new TreeSet<Segment>();
+    unselectedObjects = DBIDUtil.newHashSet();
     for(Segment segmentID : allObjectSegments.keySet()) {
       // store segmentID
       if(!segmentID.isUnpaired()) {
@@ -111,8 +82,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
   }
 
   public void deselectAllObjects() {
-    for(int i = 0; i < selectedSegments.size(); ++i) {
-      Segment id = selectedSegments.get(i);
+    for(Segment id : selectedSegments) {
       unselectedSegments.add(id);
       unselectedObjects.addDBIDs(segments.getSegmentDBIDs(id));
     }

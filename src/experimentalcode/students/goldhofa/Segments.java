@@ -55,11 +55,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
  */
 public class Segments {
   /**
-   * if segments are converted into pairSegments
-   */
-  private boolean isPairSegments = false;
-
-  /**
    * Clusterings
    */
   private List<Clustering<?>> clusterings;
@@ -80,9 +75,14 @@ public class Segments {
   private int[] numclusters;
 
   /**
+   * Total number of objects
+   */
+  private int totalObjects;
+
+  /**
    * Total number of pairs
    */
-  private int pairs;
+  private int totalPairs;
 
   /**
    * The actual segments
@@ -156,7 +156,6 @@ public class Segments {
       segments.put(tag, tag);
     }
 
-    tag.segmentObjects += 1;
     tag.objIds.add(objectID);
   }
 
@@ -320,10 +319,6 @@ public class Segments {
    * Converts the created objectSegments into pairSegments
    */
   public void convertToPairSegments() {
-    if(isPairSegments) {
-      return;
-    }
-
     // create all pair segments
     createFragmentedSegments();
 
@@ -333,7 +328,7 @@ public class Segments {
 
     // add all objectSegments with their pairs
     for(Segment segment : segments.keySet()) {
-      int pairs = asPairs(segment.segmentObjects);
+      int pairs = segment.getPairCount();
 
       // FIXME: Ein Objekt geclustered => Fehlende Paarbezüge
       if(pairs != 0) {
@@ -341,14 +336,12 @@ public class Segments {
         addPairsToCluster(segment, pairs);
 
         // total pairs count
-        this.pairs += pairs;
+        this.totalPairs += pairs;
       }
     }
 
     // getPaircount of new segments
     calculatePairs();
-
-    isPairSegments = true;
   }
 
   /**
@@ -364,7 +357,7 @@ public class Segments {
       SortedSet<Segment> currentSegments = fragmentedSegments.get(segment);
 
       // Paircount of the segment
-      int pairs = getPaircount(fragmentedSegments.get(segment));
+      int pairs = getMissingPaircount(fragmentedSegments.get(segment));
 
       // as Array
       Segment[] current = new Segment[currentSegments.size()];
@@ -381,10 +374,10 @@ public class Segments {
           String id = current[i].toString() + current[k].toString();
 
           if(processedSegments.contains(id)) {
-            int seg1 = current[i].segmentObjects;
-            int seg2 = current[k].segmentObjects;
+            int seg1 = current[i].getObjectCount();
+            int seg2 = current[k].getObjectCount();
 
-            pairs -= (asPairs(seg1 + seg2) - (asPairs(seg1) + asPairs(seg2)));
+            pairs -= (objectCountToPairCount(seg1 + seg2) - (objectCountToPairCount(seg1) + objectCountToPairCount(seg2)));
           }
           else {
             // Add Segments to processed Segments
@@ -397,7 +390,7 @@ public class Segments {
       addPairsToCluster(segment, pairs);
 
       // total pairs count
-      this.pairs += pairs;
+      this.totalPairs += pairs;
     }
   }
 
@@ -422,16 +415,14 @@ public class Segments {
    * @param segments List of segments to pair
    * @return pair count of segments
    */
-  private int getPaircount(Set<Segment> segments) {
+  private int getMissingPaircount(Set<Segment> segments) {
     int totalObjects = 0;
     int segmentPairs = 0;
     for(Segment segment : segments) {
-      int objects = segment.segmentObjects;
-      totalObjects += objects;
-      segmentPairs += asPairs(objects);
+      totalObjects += segment.getObjectCount();
+      segmentPairs += segment.getPairCount();
     }
-
-    return asPairs(totalObjects) - segmentPairs;
+    return objectCountToPairCount(totalObjects) - segmentPairs;
   }
 
   public int[] getPaircount(int firstClustering, boolean firstClusterNoise, int secondClustering, boolean secondClusterNoise) {
@@ -557,7 +548,7 @@ public class Segments {
    * @param objectCount count of objects
    * @return pair count
    */
-  private int asPairs(int objectCount) {
+  private int objectCountToPairCount(int objectCount) {
     return objectCount * (objectCount - 1) / 2;
   }
 
@@ -567,13 +558,7 @@ public class Segments {
    * @return size of segments
    */
   public int size() {
-    // TODO: difference? Single-element segments?
-    if(isPairSegments) {
-      return segments.size();
-    }
-    else {
-      return segments.size();
-    }
+    return segments.size();
   }
 
   /**
@@ -585,16 +570,16 @@ public class Segments {
    */
   public int getPairCount(boolean withUnclusteredPairs) {
     if(withUnclusteredPairs) {
-      return pairs;
+      return totalPairs;
     }
     else {
       // create the SegmentID
       Segment unclusteredPairs = new Segment(clusteringsCount);
       if(segments.containsKey(unclusteredPairs)) {
-        return pairs - segments.get(unclusteredPairs).getPairCount();
+        return totalPairs - segments.get(unclusteredPairs).getPairCount();
       }
       else {
-        return pairs;
+        return totalPairs;
       }
     }
   }
@@ -607,24 +592,10 @@ public class Segments {
    * Get segments as list with or without the segment representing pairs that
    * are unclustered.
    * 
-   * @param withUnclusteredPairs if false, segment with unclustered pairs is
-   *        removed
    * @return
    */
-  public TreeMap<Segment, Segment> getSegments(boolean withUnclusteredPairs) {
-    if(withUnclusteredPairs) {
-      return segments;
-    }
-    else {
-      // create the SegmentID
-      Segment unclusteredPairs = new Segment(clusteringsCount);
-
-      @SuppressWarnings("unchecked")
-      TreeMap<Segment, Segment> tmp = (TreeMap<Segment, Segment>) segments.clone();
-
-      tmp.remove(unclusteredPairs);
-      return tmp;
-    }
+  public TreeMap<Segment, Segment> getSegments() {
+    return segments;
   }
 
   public int getClusterings() {
@@ -673,15 +644,15 @@ public class Segments {
 
     int totalCount = 0;
     for(Segment key : segments.keySet()) {
-      totalCount += key.segmentObjects;
-      logger.verbose(key.toString() + ": " + key.segmentObjects);
+      totalCount += key.getObjectCount();
+      logger.verbose(key.toString() + ": " + key.getObjectCount());
     }
     logger.verbose("----------------------------------");
     logger.verbose("sum: " + totalCount + " objects");
 
-    int totalPairs = asPairs(totalCount);
+    int totalPairs = objectCountToPairCount(totalCount);
     totalCount = 0;
-    if(isPairSegments) {
+    {
       logger.verbose("");
       logger.verbose("Pair Segments");
       logger.verbose("---");
@@ -691,7 +662,7 @@ public class Segments {
         logger.verbose(key + ": " + key.getPairCount());
       }
       logger.verbose("----------------------------------");
-      logger.verbose("sum: " + this.pairs + " of " + totalPairs + " pairs");
+      logger.verbose("sum: " + this.totalPairs + " of " + totalPairs + " pairs");
     }
   }
 }

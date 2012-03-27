@@ -243,7 +243,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
       // draw segment for every clustering
 
-      for(int i = 0; i < id.size(); i++) {
+      for(int i = 0; i < clusterings; i++) {
         double currentRadius = i * (Properties.RADIUS_DELTA.getValue() + Properties.CLUSTERING_DISTANCE.getValue()) + Properties.RADIUS_INNER.getValue();
 
         // Add border if the next segment is a different cluster in the
@@ -295,8 +295,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       // differentiates them from cluster border lines)
       //
 
-      int i = id.size();
-      double currentRadius = i * (Properties.RADIUS_DELTA.getValue() + Properties.CLUSTERING_DISTANCE.getValue()) + Properties.RADIUS_INNER.getValue();
+      double currentRadius = clusterings * (Properties.RADIUS_DELTA.getValue() + Properties.CLUSTERING_DISTANCE.getValue()) + Properties.RADIUS_INNER.getValue();
       Element extension = SVGUtil.svgCircleSegment(svgp, centerx, centery, offsetAngle, alpha, currentRadius, currentRadius + (Properties.RADIUS_SELECTION.getValue()));
       extension.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       extension.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CCConstants.CLR_UNPAIRED_CLASS);
@@ -413,7 +412,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     if(segments == null) {
       buildSegments();
     }
-    pairSegments = segments.getSegments(showUnclusteredPairs);
+    pairSegments = segments.getSegments();
 
     clusterSize = segments.getHighestClusterCount();
     clusterings = segments.getClusterings();
@@ -541,7 +540,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
       String labelText = segments.getClusteringDescription(i);
       Element label = svgp.svgText(radius + startRadius, radius - innerRadius - startRadius, labelText);
-      SVGUtil.addCSSClass(label, CCConstants.CSS_TEXT);
       thumbnail.appendChild(label);
 
       thumbnail.appendChild(clr);
