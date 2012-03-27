@@ -1,7 +1,6 @@
 package experimentalcode.students.goldhofa.visualization.style;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -13,7 +12,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import experimentalcode.students.goldhofa.Segment;
 import experimentalcode.students.goldhofa.Segments;
-import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Die CS Vis will also eine eigene stylingpolicy basierend auf
@@ -43,12 +41,12 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     TreeMap<Segment, Segment> allObjectSegments = segments.getSegments();
     unselectedSegments = new TreeSet<Segment>();
     unselectedObjects = DBIDUtil.newHashSet();
-    for(Segment segmentID : allObjectSegments.keySet()) {
+    for(Segment segment : allObjectSegments.keySet()) {
       // store segmentID
-      if(!segmentID.isUnpaired()) {
-        unselectedSegments.add(segmentID);
+      if(!segment.isUnpaired()) {
+        unselectedSegments.add(segment);
         // and store their get all objects
-        unselectedObjects.addDBIDs(segments.getSegmentDBIDs(segmentID));
+        unselectedObjects.addDBIDs(segment.objIds);
       }
     }
 
@@ -61,7 +59,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.add(segment);
     unselectedSegments.remove(segment);
-    unselectedObjects.removeDBIDs(segments.getSegmentDBIDs(segment));
+    unselectedObjects.removeDBIDs(segment.objIds);
   }
 
   public boolean hasSegmentSelected(Segment segment) {
@@ -78,13 +76,13 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.remove(segment);
     unselectedSegments.add(segment);
-    unselectedObjects.addDBIDs(segments.getSegmentDBIDs(segment));
+    unselectedObjects.addDBIDs(segment.objIds);
   }
 
   public void deselectAllObjects() {
-    for(Segment id : selectedSegments) {
-      unselectedSegments.add(id);
-      unselectedObjects.addDBIDs(segments.getSegmentDBIDs(id));
+    for(Segment segment : selectedSegments) {
+      unselectedSegments.add(segment);
+      unselectedObjects.addDBIDs(segment.objIds);
     }
     selectedSegments.clear();
   }
@@ -126,9 +124,9 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       return unselectedObjects.iterator();
     }
     else if(cnum == -1) {
-      return Collections.emptyIterator();
+      return DBIDUtil.EMPTYDBIDS.iterator();
     }
     // colors
-    return segments.getSegmentDBIDs(selectedSegments.get(cnum)).iterator();
+    return selectedSegments.get(cnum).objIds.iterator();
   }
 }
