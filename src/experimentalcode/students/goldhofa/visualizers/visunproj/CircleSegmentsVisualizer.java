@@ -179,7 +179,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   /**
    * Show unclustered Pairs in CircleSegments
    */
-  boolean showUnclusteredPairs = true;
+  boolean showUnclusteredPairs = false;
 
   UnorderedList selectionInfo;
 

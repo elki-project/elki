@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -111,22 +112,65 @@ public class EvaluateClustering implements Evaluator {
       return;
     }
     // Compute the reference clustering
-    Result refres = referencealg.run(db);
-    List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
-    if(refcrs.size() == 0) {
-      logger.warning("Reference algorithm did not return a clustering result!");
-      return;
+    Clustering<?> refc = null;
+    // Try to find an existing reference clustering (globally)
+    if(refc == null) {
+      Iterator<Clustering<?>> cs = ResultUtil.filteredResults(baseResult, Clustering.class);
+      while(cs.hasNext()) {
+        Clustering<?> test = cs.next();
+        if(isReferenceResult(test)) {
+          refc = test;
+          break;
+        }
+      }
     }
-    if(refcrs.size() > 1) {
-      logger.warning("Reference algorithm returned more than one result!");
+    // Try to find an existing reference clustering (locally)
+    if(refc == null) {
+      Iterator<Clustering<?>> cs = ResultUtil.filteredResults(result, Clustering.class);
+      while(cs.hasNext()) {
+        Clustering<?> test = cs.next();
+        if(isReferenceResult(test)) {
+          refc = test;
+          break;
+        }
+      }
     }
-    Clustering<?> refc = refcrs.get(0);
+    if(refc == null) {
+      logger.debug("Generating a new reference clustering.");
+      Result refres = referencealg.run(db);
+      List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
+      if(refcrs.size() == 0) {
+        logger.warning("Reference algorithm did not return a clustering result!");
+        return;
+      }
+      if(refcrs.size() > 1) {
+        logger.warning("Reference algorithm returned more than one result!");
+      }
+      refc = refcrs.get(0);
+    }
+    else {
+      logger.debug("Using existing clustering: " + refc.getLongName() + " " + refc.getShortName());
+    }
     for(Clustering<?> c : crs) {
+      if(c == refc) {
+        continue;
+      }
       ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
       contmat.process(refc, c);
 
       db.getHierarchy().add(c, new ScoreResult(contmat));
     }
+  }
+
+  private boolean isReferenceResult(Clustering<?> t) {
+    // FIXME: don't hard-code strings
+    if(t.getShortName().startsWith("bylabel-")) {
+      return true;
+    }
+    if(t.getShortName().startsWith("bymodel-")) {
+      return true;
+    }
+    return false;
   }
 
   /**
