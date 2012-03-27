@@ -493,26 +493,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     CSSClass unpaired_segment_selected = new CSSClass(this, CCConstants.SEG_UNPAIRED_SELECTED_CLASS);
     unpaired_segment_selected.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.SELECTED_UNPAIRED_SEGMENT.getColor());
     svgp.addCSSClassOrLogError(unpaired_segment_selected);
-
-    //
-    // SELECTION CLASSES
-    // TODO refactor: mixed by classes in ClusteringComparisonVisualization &
-    // CCMarkers
-    //
-
-    // Color classes for differentiation of segments
-    int index = 0;
-    for(String colorValue : CCConstants.ColorArray) {
-      CSSClass bordercolor = new CSSClass(this, CCConstants.PRE_STROKE_COLOR_CLASS + index);
-      bordercolor.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, colorValue);
-      svgp.addCSSClassOrLogError(bordercolor);
-
-      CSSClass fillcolor = new CSSClass(this, CCConstants.PRE_FILL_COLOR_CLASS + index);
-      fillcolor.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, colorValue);
-      svgp.addCSSClassOrLogError(fillcolor);
-
-      index++;
-    }
   }
 
   /**
