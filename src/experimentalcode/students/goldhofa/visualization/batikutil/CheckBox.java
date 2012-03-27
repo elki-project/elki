@@ -42,7 +42,7 @@ public class CheckBox implements UIInterfaceElement, EventListener {
     // create check
     checkmark = SVGUI.svgCheckmark(svgp);
     if(!checked) {
-      SVGUtil.addCSSClass(checkmark, CCConstants.CSS_DISPLAY_NONE);
+      checkmark.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_DISPLAY_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
     }
 
     // create box
@@ -81,13 +81,13 @@ public class CheckBox implements UIInterfaceElement, EventListener {
   }
 
   protected void check() {
-    SVGUtil.removeCSSClass(checkmark, CCConstants.CSS_DISPLAY_NONE);
+    checkmark.removeAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE);
     checked = true;
     fireSwitchEvent(new SwitchEvent(this, checked));
   }
 
   protected void uncheck() {
-    SVGUtil.addCSSClass(checkmark, CCConstants.CSS_DISPLAY_NONE);
+    checkmark.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_DISPLAY_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
     checked = false;
     fireSwitchEvent(new SwitchEvent(this, checked));
   }
