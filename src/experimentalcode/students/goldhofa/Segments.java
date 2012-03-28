@@ -3,13 +3,13 @@ package experimentalcode.students.goldhofa;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -109,7 +109,7 @@ public class Segments {
     // save count of clusters
     int clusteringIndex = 0;
     for(Clustering<?> clr : clusterings) {
-      List<? extends Cluster<?>> curClusters = ((Clustering<Model>) clr).getAllClusters();
+      List<? extends Cluster<?>> curClusters = clr.getAllClusters();
       clusters.add(curClusters);
       numclusters[clusteringIndex] = curClusters.size();
 
@@ -131,7 +131,7 @@ public class Segments {
       path[0] = (cnum + 1);
       if(numclusterings > 1) {
         SetDBIDs idset = DBIDUtil.ensureSet(clust.getIDs());
-        recursivelyFill(cs, 1, idset, idset, path, true);
+        recursivelyFill(cs, 1, idset, idset, path, true, 1);
       }
       else {
         // Add to results.
@@ -161,7 +161,7 @@ public class Segments {
     seg.pairsize += pairsize;
   }
 
-  private void recursivelyFill(List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path, boolean objectsegment) {
+  private void recursivelyFill(List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path, boolean objectsegment, int div) {
     final int numclusterings = cs.size();
     Iterator<? extends Cluster<?>> iter = cs.get(depth).iterator();
     for(int cnum = 0; iter.hasNext(); cnum++) {
@@ -191,16 +191,16 @@ public class Segments {
       if(nfirstp.size() > 0) {
         path[depth] = cnum;
         if(depth < numclusterings - 1) {
-          recursivelyFill(cs, depth + 1, nfirstp, nsecond, path, objectsegment);
+          recursivelyFill(cs, depth + 1, nfirstp, nsecond, path, objectsegment, div);
         }
         else {
           // Add to results.
           int selfpairs = DBIDUtil.intersection(nfirstp, nsecond).size();
           if(objectsegment) {
-            makeOrUpdateSegment(path, nfirstp, nsecond, (nfirstp.size() * nsecond.size()) - selfpairs);
+            makeOrUpdateSegment(path, nfirstp, nsecond, ((nfirstp.size() * nsecond.size()) - selfpairs) / div);
           }
           else {
-            makeOrUpdateSegment(path, null, null, (nfirstp.size() * nsecond.size()) - selfpairs);
+            makeOrUpdateSegment(path, null, null, ((nfirstp.size() * nsecond.size()) - selfpairs) / div);
           }
         }
       }
@@ -208,23 +208,27 @@ public class Segments {
       if(ndelta1.size() > 0) {
         path[depth] = Segment.UNCLUSTERED;
         if(depth < numclusterings - 1) {
-          recursivelyFill(cs, depth + 1, ndelta1, nsecond, path, false);
+          recursivelyFill(cs, depth + 1, ndelta1, nsecond, path, false, div);
         }
         else {
           // Add to results.
-          makeOrUpdateSegment(path, null, null, ndelta1.size() * nsecond.size());
+          int selfpairs = DBIDUtil.intersection(ndelta1, nsecond).size();
+          makeOrUpdateSegment(path, null, null, (ndelta1.size() * nsecond.size() - selfpairs) / div);
         }
       }
+      // FIXME: this part doesn't work right yet for over 2 clusterings!
+      // It used to work in revision 9236, eventually go back to this code!
       if(ndelta2.size() > 0) {
         int[] npath = new int[path.length];
         Arrays.fill(npath, Segment.UNCLUSTERED);
         npath[depth] = cnum;
         if(depth < numclusterings - 1) {
-          recursivelyFill(cs, depth + 1, ndelta2, nsecond, npath, false);
+          recursivelyFill(cs, depth + 1, ndelta2, nsecond, npath, false, div * 2);
         }
         else {
           // Add to results.
-          makeOrUpdateSegment(npath, null, null, ndelta2.size() * nsecond.size());
+          int selfpairs = DBIDUtil.intersection(ndelta2, nsecond).size();
+          makeOrUpdateSegment(npath, null, null, (ndelta2.size() * nsecond.size() - selfpairs) / (div * 2));
         }
       }
     }
@@ -257,42 +261,26 @@ public class Segments {
    * @return Segments describing the set of objects that result in an unpaired
    *         segment
    */
-  public ArrayList<Segment> getPairedSegments(Segment unpairedSegment) {
+  public List<Segment> getPairedSegments(Segment unpairedSegment) {
     ArrayList<Segment> pairedSegments = new ArrayList<Segment>();
-
-    // get the clustering index, with missing object pairs
-    int unpairedClusteringIndex = unpairedSegment.getUnpairedClusteringIndex();
-
-    // if this is not an unpairedSegment return an empty list
-    // - optional return given segment in list?
-    if(unpairedClusteringIndex <= -1) {
-      return pairedSegments;
-    }
-
     // search the segments. Index at "unpairedClustering" being the wildcard.
-    for(Segment segment : getSegments()) {
+    segments: for(Segment segment : getSegments()) {
       // if mismatch except at unpaired Clustering index => exclude.
-      boolean match = true;
       for(int i = 0; i < clusteringsCount; i++) {
-        if(i == unpairedClusteringIndex) {
-          continue;
-        }
-        // mismatch
-        if(segment.get(i) != unpairedSegment.get(i)) {
-          match = false;
-          break;
+        if(unpairedSegment.get(i) != Segment.UNCLUSTERED) {
+          // mismatch
+          if(segment.get(i) != unpairedSegment.get(i)) {
+            continue segments;
+          }
         }
         // do not add wildcard
-        else if(segment.get(unpairedClusteringIndex) == Segment.UNCLUSTERED) {
-          match = false;
-          break;
+        if(segment.get(i) == Segment.UNCLUSTERED) {
+          continue segments;
         }
       }
 
-      if(match == true) {
-        // add segment to list
-        pairedSegments.add(segment);
-      }
+      // add segment to list
+      pairedSegments.add(segment);
     }
 
     return pairedSegments;
