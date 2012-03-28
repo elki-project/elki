@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -46,7 +47,9 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       if(!segment.isUnpaired()) {
         unselectedSegments.add(segment);
         // and store their get all objects
-        unselectedObjects.addDBIDs(segment.firstIDs);
+        if(segment.firstIDs != null) {
+          unselectedObjects.addDBIDs(segment.firstIDs);
+        }
       }
     }
 
@@ -59,7 +62,9 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.add(segment);
     unselectedSegments.remove(segment);
-    unselectedObjects.removeDBIDs(segment.firstIDs);
+    if(segment.firstIDs != null) {
+      unselectedObjects.removeDBIDs(segment.firstIDs);
+    }
   }
 
   public boolean hasSegmentSelected(Segment segment) {
@@ -76,13 +81,17 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.remove(segment);
     unselectedSegments.add(segment);
-    unselectedObjects.addDBIDs(segment.firstIDs);
+    if(segment.firstIDs != null) {
+      unselectedObjects.addDBIDs(segment.firstIDs);
+    }
   }
 
   public void deselectAllObjects() {
     for(Segment segment : selectedSegments) {
       unselectedSegments.add(segment);
-      unselectedObjects.addDBIDs(segment.firstIDs);
+      if(segment.firstIDs != null) {
+        unselectedObjects.addDBIDs(segment.firstIDs);
+      }
     }
     selectedSegments.clear();
   }
@@ -127,6 +136,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       return DBIDUtil.EMPTYDBIDS.iterator();
     }
     // colors
-    return selectedSegments.get(cnum).firstIDs.iterator();
+    DBIDs ids = selectedSegments.get(cnum).firstIDs;
+    return (ids != null) ? ids.iterator() : DBIDUtil.EMPTYDBIDS.iterator();
   }
 }
