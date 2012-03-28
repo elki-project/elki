@@ -1,8 +1,8 @@
 package experimentalcode.students.goldhofa.visualization.style;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -38,10 +38,10 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     this.segments = segments;
 
     // get all selectable segments
-    TreeMap<Segment, Segment> allObjectSegments = segments.getSegments();
+    Collection<Segment> allObjectSegments = segments.getSegments();
     unselectedSegments = new TreeSet<Segment>();
     unselectedObjects = DBIDUtil.newHashSet();
-    for(Segment segment : allObjectSegments.keySet()) {
+    for(Segment segment : allObjectSegments) {
       // store segmentID
       if(!segment.isUnpaired()) {
         unselectedSegments.add(segment);

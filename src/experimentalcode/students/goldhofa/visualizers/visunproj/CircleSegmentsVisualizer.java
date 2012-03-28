@@ -1,8 +1,8 @@
 package experimentalcode.students.goldhofa.visualizers.visunproj;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -74,7 +74,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   /**
    * Pairsegments
    */
-  private TreeMap<Segment, Segment> pairSegments;
+  private Collection<Segment> pairSegments;
 
   /**
    * Max number of clusters of a clustering
@@ -230,7 +230,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       calculateSegmentProperties();
     }
 
-    for(Segment id : pairSegments.descendingKeySet()) {
+    for(Segment id : pairSegments) {
       long currentPairCount = id.getPairCount();
 
       // resize small segments if below minimum
@@ -422,7 +422,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
     // number of segments needed to be resized
     int segMinCount = 0;
-    for(Segment segment : pairSegments.values()) {
+    for(Segment segment : pairSegments) {
       if(segment.getPairCount() <= Properties.PAIR_MIN_COUNT.getValue()) {
         segMinCount++;
       }
@@ -549,7 +549,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   }
 
   public Segment mapElementToSegment(Element segmentElement) {
-    Segment segment = new Segment(segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE));
+    String attr = segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
+    logger.warning("Element ID: "+attr);
+    Segment segment = new Segment(attr);
     segment = segments.unifySegment(segment);
     return segment;
   }

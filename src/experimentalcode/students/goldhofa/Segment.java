@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 2-0
  */
 public class Segment implements Comparable<Segment> {
-  private static final String SEPARATOR = "-";
+  private static final String SEPARATOR = "/";
 
   /**
    * Object is not clustered
@@ -119,11 +119,14 @@ public class Segment implements Comparable<Segment> {
 
   @Override
   public String toString() {
-    String string = "";
+    StringBuffer string = new StringBuffer();
     for(int id : clusterIds) {
-      string += id + SEPARATOR;
+      if (string.length() > 0) {
+        string.append(SEPARATOR);
+      }
+      string.append(id);
     }
-    return string.substring(0, string.length() - SEPARATOR.length());
+    return string.toString();
   }
 
   @Override
