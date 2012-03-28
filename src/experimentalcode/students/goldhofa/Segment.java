@@ -64,7 +64,7 @@ public class Segment implements Comparable<Segment> {
   }
 
   public int get(int idx) {
-    return (clusterIds[idx] > 0) ? (clusterIds[idx] - 1) : UNCLUSTERED;
+    return clusterIds[idx];
   }
 
   /**
@@ -75,7 +75,7 @@ public class Segment implements Comparable<Segment> {
    */
   public boolean isUnpaired() {
     for(int id : clusterIds) {
-      if(id < 0) { //== UNCLUSTERED) {
+      if(id == UNCLUSTERED) {
         return true;
       }
     }
@@ -91,7 +91,7 @@ public class Segment implements Comparable<Segment> {
    */
   public boolean isNone() {
     for(int id : clusterIds) {
-      if(id > 0) { // != UNCLUSTERED) {
+      if(id != UNCLUSTERED) {
         return false;
       }
     }
@@ -106,14 +106,11 @@ public class Segment implements Comparable<Segment> {
    * @return clustering id or -1
    */
   public int getUnpairedClusteringIndex() {
-    int index = 0;
-    for(int id : clusterIds) {
-      if(id < 0) { //== UNCLUSTERED) {
+    for (int index = 0; index < clusterIds.length; index++) {
+      if(clusterIds[index] == UNCLUSTERED) {
         return index;
       }
-      index++;
     }
-
     return -1;
   }
 

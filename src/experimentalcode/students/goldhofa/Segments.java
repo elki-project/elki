@@ -17,7 +17,6 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Creates segments of two or more clusterings.
@@ -190,7 +189,7 @@ public class Segments {
         continue; // disjoint
       }
       if(nfirstp.size() > 0) {
-        path[depth] = (cnum + 1);
+        path[depth] = cnum;
         if(depth < numclusterings - 1) {
           recursivelyFill(cs, depth + 1, nfirstp, nsecond, path, objectsegment);
         }
@@ -207,7 +206,7 @@ public class Segments {
       }
       // Elements that were in first, but in not in the cluster
       if(ndelta1.size() > 0) {
-        path[depth] = -1; // (cnum + 1);
+        path[depth] = Segment.UNCLUSTERED;
         if(depth < numclusterings - 1) {
           recursivelyFill(cs, depth + 1, ndelta1, nsecond, path, false);
         }
@@ -218,8 +217,8 @@ public class Segments {
       }
       if(ndelta2.size() > 0) {
         int[] npath = new int[path.length];
-        Arrays.fill(npath, -1);
-        npath[depth] = (cnum + 1);
+        Arrays.fill(npath, Segment.UNCLUSTERED);
+        npath[depth] = cnum;
         if(depth < numclusterings - 1) {
           recursivelyFill(cs, depth + 1, ndelta2, nsecond, npath, false);
         }
@@ -275,15 +274,18 @@ public class Segments {
       // if mismatch except at unpaired Clustering index => exclude.
       boolean match = true;
       for(int i = 0; i < clusteringsCount; i++) {
-        if(i != unpairedClusteringIndex) {
-          // mismatch
-          if(segment.get(i) != unpairedSegment.get(i)) {
-            match = false;
-          }
-          // do not add wildcard
-          else if(segment.get(unpairedClusteringIndex) == 0) {
-            match = false;
-          }
+        if(i == unpairedClusteringIndex) {
+          continue;
+        }
+        // mismatch
+        if(segment.get(i) != unpairedSegment.get(i)) {
+          match = false;
+          break;
+        }
+        // do not add wildcard
+        else if(segment.get(unpairedClusteringIndex) == Segment.UNCLUSTERED) {
+          match = false;
+          break;
         }
       }
 
