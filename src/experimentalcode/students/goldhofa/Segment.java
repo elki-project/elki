@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
-
 /**
  * Identifies a CircleSegment by its clusterings and cluster. Can be stored as
  * and retrieved from a String.
@@ -27,7 +26,7 @@ public class Segment implements Comparable<Segment> {
   public DBIDs firstIDs = null;
 
   public DBIDs secondIDs = null;
-  
+
   public long pairsize = 0;
 
   // Cluster ids
@@ -36,7 +35,7 @@ public class Segment implements Comparable<Segment> {
   public Segment(int clusterings) {
     clusterIds = new int[clusterings];
   }
-  
+
   public long getPairCount() {
     return pairsize;
   }
@@ -106,7 +105,7 @@ public class Segment implements Comparable<Segment> {
    * @return clustering id or -1
    */
   public int getUnpairedClusteringIndex() {
-    for (int index = 0; index < clusterIds.length; index++) {
+    for(int index = 0; index < clusterIds.length; index++) {
       if(clusterIds[index] == UNCLUSTERED) {
         return index;
       }
@@ -118,7 +117,7 @@ public class Segment implements Comparable<Segment> {
   public String toString() {
     StringBuffer string = new StringBuffer();
     for(int id : clusterIds) {
-      if (string.length() > 0) {
+      if(string.length() > 0) {
         string.append(SEPARATOR);
       }
       string.append(id);
@@ -144,11 +143,17 @@ public class Segment implements Comparable<Segment> {
   @Override
   public int compareTo(Segment sid) {
     for(int i = 0; i < clusterIds.length; i++) {
-      if(this.clusterIds[i] < sid.clusterIds[i]) {
-        return -1;
-      }
-      else if(this.clusterIds[i] > sid.clusterIds[i]) {
-        return 1;
+      final int a = this.clusterIds[i];
+      final int b = sid.clusterIds[i];
+      if(a != b) {
+        if(a * b > 0) {
+          // Regular comparison
+          return (a < b) ? -1 : +1;
+        }
+        else {
+          // Inverse, to sort negative last
+          return (a < b) ? +1 : -1;
+        }
       }
     }
     return 0;

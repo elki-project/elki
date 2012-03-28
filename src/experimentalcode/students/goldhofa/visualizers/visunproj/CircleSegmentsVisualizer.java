@@ -2,17 +2,18 @@ package experimentalcode.students.goldhofa.visualizers.visunproj;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
-import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -23,7 +24,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -54,7 +54,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
    * Class logger
    */
   private static final Logging logger = Logging.getLogger(CircleSegmentsVisualizer.class);
-  
+
   /**
    * CircleSegments visualizer name
    */
@@ -104,13 +104,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
   private final double centery = 0.5 * StyleLibrary.SCALE;
 
-  protected EventListener mouseOver;
-
-  protected EventListener mouseOut;
-
-  protected EventListener mouseClick;
-
   protected CSSClass[] cssClr;
+
+  public Map<Segment, List<Element>> segmentToElements = new HashMap<Segment, List<Element>>();
 
   /**
    * Segment selection manager
@@ -229,7 +225,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       calculateSegmentProperties();
     }
 
-    for(Segment id : pairSegments) {
+    this.segmentToElements.clear();
+
+    for(final Segment id : pairSegments) {
       long currentPairCount = id.getPairCount();
 
       // resize small segments if below minimum
@@ -240,6 +238,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
       // ITERATE OVER ALL SEGMENT-CLUSTERS
 
+      ArrayList<Element> elems = new ArrayList<Element>(clusterings);
+      segmentToElements.put(id, elems);
       // draw segment for every clustering
 
       for(int i = 0; i < clusterings; i++) {
@@ -262,19 +262,28 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
         // create ring segment
         Element segment = SVGUtil.svgCircleSegment(svgp, centerx, centery, offsetAngle, alpha, currentRadius, currentRadius + Properties.RADIUS_DELTA.getValue());
-        segment.setAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE, "" + cluster);
-        segment.setAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE, "" + i);
-        connectElementToSegment(id, segment);
-        // segment.setAttribute(CCConstants.SEG_PAIRCOUNT_ATTRIBUTE,
-        // pairSegments.get(id).toString());
-        // segment.setAttribute(CCConstants.CLR_PAIRCOUNT_ATTRIBUTE,
-        // ""+segments.getPairCount(i, cluster));
+        elems.add(segment);
 
+        final int segid = i;
         // MouseEvents on segment cluster
+        EventListener listener = new EventListener() {
+          @Override
+          public void handleEvent(Event evt) {
+            if (SVGConstants.SVG_MOUSEOVER_EVENT_TYPE.equals(evt.getType())) {
+              segmentHover(id, segid, true);
+            }
+            if (SVGConstants.SVG_MOUSEOUT_EVENT_TYPE.equals(evt.getType())) {
+              segmentHover(id, segid, false);
+            }
+            if (SVGConstants.SVG_CLICK_EVENT_TYPE.equals(evt.getType())) {
+              segmentClick(id, evt);
+            }
+          }
+        };
         EventTarget targ = (EventTarget) segment;
-        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, mouseOver, false);
-        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, mouseOut, false);
-        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, mouseClick, false);
+        targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, listener, false);
+        targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, listener, false);
+        targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, listener, false);
 
         // Coloring based on clusterID
         if(cluster >= 0) {
@@ -305,19 +314,16 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       offsetAngle += alpha + Properties.CLUSTER_DISTANCE.getValue();
     }
   }
-  
+
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);
     // Redraw on style result changes.
-    if (current == context.getStyleResult()) {
-      // FIXME: use the usual redrawing function, to allow other tools to change the segment selection?
+    if(current == context.getStyleResult()) {
+      // FIXME: use the usual redrawing function, to allow other tools to change
+      // the segment selection?
       // synchronizedRedraw();
     }
-  }
-
-  public void connectElementToSegment(Segment id, Element segment) {
-    segment.setAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE, id.toString());
   }
 
   public void buildSegments() {
@@ -355,11 +361,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       svgp.addCSSClassOrLogError(cssClr[i]);
     }
 
-    // initialize events
-    mouseOver = new MouseOverSegmentCluster(this);
-    mouseOut = new MouseOutSegmentCluster();
-    mouseClick = new MouseClickSegmentCluster(selection);
-
+    // initialize css
     addCSSClasses();
 
     // and create svg elements
@@ -436,29 +438,31 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     cssReferenceBorder.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.BORDER.getColor());
     svgp.addCSSClassOrLogError(cssReferenceBorder);
 
+    // Note: !important is needed to override the regular color assignment
+
     // CLUSTER HOVER
     CSSClass cluster_hover = new CSSClass(this, CCConstants.CLR_HOVER_CLASS);
-    cluster_hover.setStatement(SVGConstants.SVG_FILL_OPACITY_ATTRIBUTE, Colors.HOVER_ALPHA.getColor());
+    cluster_hover.setStatement(SVGConstants.SVG_FILL_OPACITY_ATTRIBUTE, Colors.HOVER_ALPHA.getColor() + " !important");
     cluster_hover.setStatement(SVGConstants.SVG_CURSOR_TAG, SVGConstants.SVG_POINTER_VALUE);
     svgp.addCSSClassOrLogError(cluster_hover);
 
     CSSClass cluster_selection = new CSSClass(this, CCConstants.CLR_HOVER_SELECTION_CLASS);
-    cluster_selection.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_SELECTION.getColor());
+    cluster_selection.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_SELECTION.getColor() + " !important");
     cluster_selection.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_selection);
 
     CSSClass cluster_identical = new CSSClass(this, CCConstants.CLR_HOVER_INCLUSTER_CLASS);
-    cluster_identical.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_INCLUSTER.getColor());
+    cluster_identical.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_INCLUSTER.getColor() + " !important");
     cluster_identical.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_identical);
 
     CSSClass cluster_unpaired = new CSSClass(this, CCConstants.CLR_HOVER_UNPAIRED_CLASS);
-    cluster_unpaired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_UNPAIRED.getColor());
+    cluster_unpaired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_UNPAIRED.getColor() + " !important");
     cluster_unpaired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_unpaired);
 
     CSSClass cluster_paired = new CSSClass(this, CCConstants.CLR_HOVER_PAIRED_CLASS);
-    cluster_paired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_PAIRED.getColor());
+    cluster_paired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, Colors.HOVER_PAIRED.getColor() + " !important");
     cluster_paired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_paired);
 
@@ -539,14 +543,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     return thumbnail;
   }
 
-  public Segment mapElementToSegment(Element segmentElement) {
-    String attr = segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
-    // logger.warning("Element ID: "+attr);
-    Segment segment = new Segment(attr);
-    segment = segments.unifySegment(segment);
-    return segment;
-  }
-
   /**
    * Factory for visualizers for a circle segment
    * 
@@ -583,186 +579,99 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
   }
 
-  // TODO Ghost und Liste animieren
-  static class MouseDragAndDrop implements EventListener {
-    private SVGPlot svgp;
-
-    private double lastMouseY;
-
-    public MouseDragAndDrop(SVGPlot svgp) {
-      super();
-
-      this.svgp = svgp;
-    }
-
-    @Override
-    public void handleEvent(Event evt) {
-      if(!(evt instanceof MouseEvent)) {
-        return;
-      }
-
-      Element rectangle = (Element) evt.getTarget();
-      SVGPoint location = svgp.elementCoordinatesFromEvent(rectangle, evt);
-
-      MouseEvent mouse = (MouseEvent) evt;
-
-      if(!(mouse.getButton() == 0)) {
-        lastMouseY = location.getY();
-        return;
-      }
-
-      // java.awt.PointerInfo info = java.awt.MouseInfo.getPointerInfo();
-      // java.awt.Point location = info.getLocation();
-
-      double rectangleY = Double.valueOf(rectangle.getAttribute(SVGConstants.SVG_Y_ATTRIBUTE));
-      rectangle.setAttribute(SVGConstants.SVG_Y_ATTRIBUTE, "" + (rectangleY + (location.getY() - lastMouseY)));
-      lastMouseY = location.getY();
-    }
-  }
-
-  class MouseOverSegmentCluster implements EventListener {
-    CircleSegmentsVisualizer cs;
-
-    public MouseOverSegmentCluster(CircleSegmentsVisualizer cs) {
-      super();
-      this.cs = cs;
-    }
-
-    @Override
-    public void handleEvent(Event evt) {
-      // hovered segment cluster
-      Element thisSegmentCluster = (Element) evt.getTarget();
-
-      // hovered clustering
-      int thisClusteringID = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE)).intValue();
-
-      // hovered clusterID
-      int thisClusterID = Integer.valueOf(thisSegmentCluster.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE)).intValue();
-
-      // List of all segments (and others)
-      NodeList segmentClusters = thisSegmentCluster.getParentNode().getChildNodes();
-
-      // SegmentID
-      Segment thisSegmentID = mapElementToSegment(thisSegmentCluster);
-
+  protected void segmentHover(Segment thisSegmentID, int segid, boolean active) {
+    if(active) {
+      Element thisSegmentCluster = segmentToElements.get(thisSegmentID).get(segid);
       // abort if this are the unclustered pairs
-      if(thisSegmentID.isNone()) {
+      if(thisSegmentID.isNone() || thisSegmentCluster == null) {
         return;
       }
-
-      //
-      // STANDARD CLUSTER SEGMENT
-      // highlight all ring segments in this clustering and this cluster
-      //
+      if(logger.isDebugging()) {
+        logger.debug("Hover on segment: " + thisSegmentID + " unpaired: " + thisSegmentID.isUnpaired());
+      }
 
       if(!thisSegmentID.isUnpaired()) {
+        //
+        // STANDARD CLUSTER SEGMENT
+        // highlight all ring segments in this clustering and this cluster
+        //
         // highlight current hovered ring segment
-        SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_CLASS);
-        SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_SELECTION_CLASS);
+        // SVGUtil.addCSSClass(thisSegmentCluster, CCConstants.CLR_HOVER_CLASS);
+        // SVGUtil.addCSSClass(thisSegmentCluster,
+        // CCConstants.CLR_HOVER_SELECTION_CLASS);
 
         // and all corresponding ring Segments
-        for(int i = 0; i < segmentClusters.getLength(); i++) {
-          Element ringSegment = (Element) segmentClusters.item(i);
-          // just segments
-          if(ringSegment.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-            // only this selected clustering
-            if(ringSegment.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE).compareTo(String.valueOf(thisClusteringID)) == 0) {
-              // and same cluster
-              if(ringSegment.getAttribute(CCConstants.SEG_CLUSTER_ATTRIBUTE).compareTo(String.valueOf(thisClusterID)) == 0) {
-                // mark as selected
-                SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
-                SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_SELECTION_CLASS);
-              }
-            }
-
+        for(Entry<Segment, List<Element>> entry : segmentToElements.entrySet()) {
+          Segment other = entry.getKey();
+          // Same cluster in same clustering?
+          if(other.get(segid) != thisSegmentID.get(segid)) {
+            continue;
           }
+          Element ringSegment = entry.getValue().get(segid);
+          // mark as selected
+          SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
+          SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_SELECTION_CLASS);
         }
       }
-      //
-      // UNPAIRED SEGMENT
-      // highlight all ring segments in this clustering responsible for unpaired
-      // segment
-      //
       else {
+        //
+        // UNPAIRED SEGMENT
+        // highlight all ring segments in this clustering responsible for
+        // unpaired
+        // segment
+        //
         // get the paired segments corresponding to the unpaired segment
-        ArrayList<Segment> segments = cs.segments.getPairedSegments(thisSegmentID);
-
-        // and all corresponding ring Segments
-        for(int i = 0; i < segmentClusters.getLength(); i++) {
-          Element ringSegment = (Element) segmentClusters.item(i);
-          // just segments
-          if(ringSegment.hasAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE)) {
-            Segment segment = mapElementToSegment(ringSegment);
-            if(segments.contains(segment) && ringSegment.getAttribute(CCConstants.SEG_CLUSTERING_ATTRIBUTE).compareTo(String.valueOf(thisClusteringID)) == 0) {
-              // mark as selected
-              SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
-              SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_SELECTION_CLASS);
-            }
+        for(Entry<Segment, List<Element>> entry : segmentToElements.entrySet()) {
+          if (entry.getKey().isUnpaired()) {
+            continue;
           }
+          Element ringSegment = entry.getValue().get(segid);
+          // mark as selected
+          SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_CLASS);
+          SVGUtil.addCSSClass(ringSegment, CCConstants.CLR_HOVER_SELECTION_CLASS);
+        }
+      }
+    }
+    else {
+      for(List<Element> elems : segmentToElements.values()) {
+        for(Element current : elems) {
+          SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_CLASS);
+          SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_SELECTION_CLASS);
+          SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_INCLUSTER_CLASS);
+          SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_PAIRED_CLASS);
+
+          SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_UNPAIRED_CLASS);
         }
       }
     }
   }
 
-  static class MouseOutSegmentCluster implements EventListener {
-    public MouseOutSegmentCluster() {
-      super();
+  private long lastClick = 0;
+
+  protected void segmentClick(Segment segment, Event evt) {
+    MouseEvent mouse = (MouseEvent) evt;
+
+    // Check Double Click
+    boolean dblClick = false;
+    long time = java.util.Calendar.getInstance().getTimeInMillis();
+    if(time - lastClick <= CCConstants.EVT_DBLCLICK_DELAY) {
+      dblClick = true;
+    }
+    lastClick = time;
+
+    // CTRL (add) pressed?
+    boolean ctrl = false;
+    if(mouse.getCtrlKey()) {
+      System.out.println("CTRL");
+      ctrl = true;
     }
 
-    @Override
-    public void handleEvent(Event evt) {
-      Element segment = (Element) evt.getTarget();
-
-      NodeList segments = segment.getParentNode().getChildNodes();
-      for(int i = 0; i < segments.getLength(); i++) {
-        Element current = (Element) segments.item(i);
-        SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_CLASS);
-        SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_SELECTION_CLASS);
-        SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_INCLUSTER_CLASS);
-        SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_PAIRED_CLASS);
-
-        SVGUtil.removeCSSClass(current, CCConstants.CLR_HOVER_UNPAIRED_CLASS);
-      }
+    // Unselect others on double click
+    if(dblClick) {
+      selection.deselectAllSegments();
     }
-  }
-
-  /**
-   * TODO CTRL for add/substract selections
-   */
-  class MouseClickSegmentCluster implements EventListener {
-    private SegmentSelection selection;
-
-    private long lastClick = 0;
-
-    MouseClickSegmentCluster(SegmentSelection selection) {
-      this.selection = selection;
-    }
-
-    public void handleEvent(Event evt) {
-      MouseEvent mouse = (MouseEvent) evt;
-
-      // Check Double Click
-      boolean dblClick = false;
-      long time = java.util.Calendar.getInstance().getTimeInMillis();
-      if(time - lastClick <= CCConstants.EVT_DBLCLICK_DELAY) {
-        dblClick = true;
-      }
-      lastClick = time;
-
-      // CTRL (add) pressed?
-      boolean ctrl = false;
-      if(mouse.getCtrlKey()) {
-        System.out.println("CTRL");
-        ctrl = true;
-      }
-
-      // clicked segment cluster
-      Element thisSegmentElement = (Element) evt.getTarget();
-      // get segmentID
-      Segment segment = mapElementToSegment(thisSegmentElement);
-      selection.select(segment, ctrl);
-      // update stylePolicy
-      selection.update();
-    }
+    selection.select(segment, ctrl);
+    // update stylePolicy
+    selection.update();
   }
 }
