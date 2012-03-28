@@ -15,7 +15,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Creates segments of two or more clusterings.
@@ -47,8 +49,14 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * </p>
  * 
  * @author Sascha Goldhofer
+ * @author Erich Schubert
  */
 public class Segments {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(Segments.class);
+
   /**
    * Clusterings
    */
@@ -124,7 +132,7 @@ public class Segments {
       path[0] = (cnum + 1);
       if(numclusterings > 1) {
         SetDBIDs idset = DBIDUtil.ensureSet(clust.getIDs());
-        recursivelyFill(cs, 1, idset, idset, path);
+        recursivelyFill(cs, 1, idset, idset, path, true);
       }
       else {
         // Add to results.
@@ -142,19 +150,19 @@ public class Segments {
       segments.put(seg, seg);
     }
     if(first != null || second != null) {
-      // if (seg.firstIDs != null) {
-      // throw new AbortException("Expected segment to not have IDs.");
-      // }
-      // if (seg.secondIDs != null) {
-      // throw new AbortException("Expected segment to not have IDs.");
-      // }
+      if(seg.firstIDs != null) {
+        logger.warning("Expected segment to not have IDs.");
+      }
+      if(seg.secondIDs != null) {
+        logger.warning("Expected segment to not have IDs.");
+      }
       seg.firstIDs = first;
       seg.secondIDs = second;
     }
     seg.pairsize += pairsize;
   }
 
-  private void recursivelyFill(List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path) {
+  private void recursivelyFill(List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path, boolean objectsegment) {
     final int numclusterings = cs.size();
     Iterator<? extends Cluster<?>> iter = cs.get(depth).iterator();
     for(int cnum = 0; iter.hasNext(); cnum++) {
@@ -184,23 +192,28 @@ public class Segments {
       if(nfirstp.size() > 0) {
         path[depth] = (cnum + 1);
         if(depth < numclusterings - 1) {
-          recursivelyFill(cs, depth + 1, nfirstp, nsecond, path);
+          recursivelyFill(cs, depth + 1, nfirstp, nsecond, path, objectsegment);
         }
         else {
           // Add to results.
           int selfpairs = DBIDUtil.intersection(nfirstp, nsecond).size();
-          makeOrUpdateSegment(path, nfirstp, nsecond, (nfirstp.size() * nsecond.size()) - selfpairs);
+          if(objectsegment) {
+            makeOrUpdateSegment(path, nfirstp, nsecond, (nfirstp.size() * nsecond.size()) - selfpairs);
+          }
+          else {
+            makeOrUpdateSegment(path, null, null, (nfirstp.size() * nsecond.size()) - selfpairs);
+          }
         }
       }
       // Elements that were in first, but in not in the cluster
       if(ndelta1.size() > 0) {
-        path[depth] = -1; //(cnum + 1);
+        path[depth] = -1; // (cnum + 1);
         if(depth < numclusterings - 1) {
-          recursivelyFill(cs, depth + 1, ndelta1, nsecond, path);
+          recursivelyFill(cs, depth + 1, ndelta1, nsecond, path, false);
         }
         else {
           // Add to results.
-          makeOrUpdateSegment(path, ndelta1, nsecond, ndelta1.size() * nsecond.size());
+          makeOrUpdateSegment(path, null, null, ndelta1.size() * nsecond.size());
         }
       }
       if(ndelta2.size() > 0) {
@@ -208,11 +221,11 @@ public class Segments {
         Arrays.fill(npath, -1);
         npath[depth] = (cnum + 1);
         if(depth < numclusterings - 1) {
-          recursivelyFill(cs, depth + 1, ndelta2, nsecond, npath);
+          recursivelyFill(cs, depth + 1, ndelta2, nsecond, npath, false);
         }
         else {
           // Add to results.
-          makeOrUpdateSegment(npath, ndelta2, nsecond, ndelta2.size() * nsecond.size());
+          makeOrUpdateSegment(npath, null, null, ndelta2.size() * nsecond.size());
         }
       }
     }
