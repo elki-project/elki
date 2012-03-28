@@ -35,7 +35,6 @@ import experimentalcode.students.goldhofa.Color;
 import experimentalcode.students.goldhofa.Segment;
 import experimentalcode.students.goldhofa.SegmentSelection;
 import experimentalcode.students.goldhofa.Segments;
-import experimentalcode.students.goldhofa.visualization.batikutil.BarChart;
 import experimentalcode.students.goldhofa.visualization.batikutil.CheckBox;
 import experimentalcode.students.goldhofa.visualization.batikutil.CheckBoxListener;
 import experimentalcode.students.goldhofa.visualization.batikutil.SwitchEvent;
@@ -385,13 +384,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     info.addItem(clrInfo, Integer.valueOf(clrInfo.getAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE)));
     // checkbox
     info.addItem(checkbox.asElement(), 20);
-    // pairs:clusteredpairs ratio
-    BarChart barchart = new BarChart(svgp, 200.0, 20.0, true);
-    barchart.setSize(segments.getPairCount(true));
-    barchart.setFill(segments.getPairCount(false));
-    barchart.showValues();
-    barchart.addLabel("Total paircount : clustered pairs");
-    info.addItem(barchart.asElement(), 20);
     // and add selection info
     // ! TODO VARIABLE LENGTH
     info.addItem(selectionInfo.asElement(), 50);

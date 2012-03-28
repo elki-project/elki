@@ -46,6 +46,11 @@ public final class FormatUtil {
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);
 
   /**
+   * Number Formatter (0 digits) for output purposes.
+   */
+  public static final NumberFormat NF0 = NumberFormat.getInstance(Locale.US);
+
+  /**
    * Number Formatter (2 digits) for output purposes.
    */
   public static final NumberFormat NF2 = NumberFormat.getInstance(Locale.US);
@@ -69,6 +74,9 @@ public final class FormatUtil {
     NF.setMinimumFractionDigits(0);
     NF.setMaximumFractionDigits(10);
     NF.setGroupingUsed(false);
+    NF0.setMinimumFractionDigits(0);
+    NF0.setMaximumFractionDigits(0);
+    NF0.setGroupingUsed(false);
     NF2.setMinimumFractionDigits(2);
     NF2.setMaximumFractionDigits(2);
     NF2.setGroupingUsed(false);
