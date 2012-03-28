@@ -3,7 +3,6 @@ package experimentalcode.students.goldhofa;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -218,7 +217,7 @@ public class Segments {
       }
       // FIXME: this part doesn't work right yet for over 2 clusterings!
       // It used to work in revision 9236, eventually go back to this code!
-      if(ndelta2.size() > 0) {
+      if(ndelta2.size() > 0 && objectsegment) {
         int[] npath = new int[path.length];
         Arrays.fill(npath, Segment.UNCLUSTERED);
         npath[depth] = cnum;

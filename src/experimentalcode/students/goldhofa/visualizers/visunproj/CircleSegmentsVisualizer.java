@@ -155,7 +155,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // attTranslate);
     parent.appendChild(visLayer);
 
-    redraw();
+    draw();
 
     selection.reselect();
   }
@@ -163,14 +163,11 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   /**
    * Create the segments
    */
-  public void redraw() {
+  private void draw() {
     int refClustering = 0;
     int refSegment = Segment.UNCLUSTERED;
     double offsetAngle = 0.0;
 
-    if(segments == null) {
-      buildSegments();
-    }
     int numsegments = segments.getSegments().size();
 
     double angle_pair = (MathUtil.TWOPI - (SEGMENT_MIN_SEP_ANGLE * numsegments)) / segments.getPairCount(showUnclusteredPairs);
@@ -237,7 +234,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
         // Coloring based on clusterID
         if(cluster >= 0) {
-          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[cluster].getName());
+          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, cssClr[cluster % cssClr.length].getName());
         }
         // if its an unpaired cluster set color to white
         else {
@@ -275,12 +272,13 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
   }
 
-  public void buildSegments() {
-    VisualizationTask task = this.task;
-
+  @Override
+  public void redraw() {
     this.segments = ccr.getSegments();
     this.clusterSize = segments.getHighestClusterCount();
     this.clusterings = segments.getClusterings();
+    // initialize css (needs clusterSize!)
+    addCSSClasses();
 
     // Setup scaling for canvas: 0 to StyleLibrary.SCALE (usually 100 to avoid a
     // Java drawing bug!)
@@ -296,11 +294,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // CSStylingPolicy. Could completely replace SegmentSelection
     this.selection = new SegmentSelection(task, segments);
 
-    // initialize css
-    addCSSClasses();
-
     // and create svg elements
-    redraw();
+    draw();
 
     //
     // Build Interface
