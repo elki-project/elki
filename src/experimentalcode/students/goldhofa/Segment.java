@@ -148,7 +148,8 @@ public class Segment implements Comparable<Segment> {
       if(a != b) {
         if(a * b > 0) {
           // Regular comparison
-          return (a < b) ? -1 : +1;
+          // FIXME: re-use: return (a < b) ? -1 : +1;
+          return (a < b) ? +1 : -1;
         }
         else {
           // Inverse, to sort negative last
