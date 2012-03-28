@@ -1,6 +1,8 @@
 package experimentalcode.students.goldhofa;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -10,6 +12,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -81,8 +84,6 @@ public class Segments {
    */
   private TreeMap<Segment, Segment> segments;
 
-  private boolean selfPairing = false;
-
   /**
    * Initialize segments. Add DB objects via addObject method.
    * 
@@ -108,13 +109,13 @@ public class Segments {
       clusteringIndex++;
     }
 
-    recursivelyFill(segments, clusters);
+    recursivelyFill(clusters);
     for(Segment seg : segments.keySet()) {
       actualPairs += seg.getPairCount();
     }
   }
 
-  private void recursivelyFill(TreeMap<Segment, Segment> contingency, List<List<? extends Cluster<?>>> cs) {
+  private void recursivelyFill(List<List<? extends Cluster<?>>> cs) {
     final int numclusterings = cs.size();
     Iterator<? extends Cluster<?>> iter = cs.get(0).iterator();
     int[] path = new int[numclusterings];
@@ -123,22 +124,37 @@ public class Segments {
       path[0] = (cnum + 1);
       if(numclusterings > 1) {
         SetDBIDs idset = DBIDUtil.ensureSet(clust.getIDs());
-        recursivelyFill(contingency, cs, 1, idset, idset, path);
+        recursivelyFill(cs, 1, idset, idset, path);
       }
       else {
         // Add to results.
-        Segment cop = new Segment(path.clone());
-        cop.firstIDs = clust.getIDs();
-        cop.secondIDs = clust.getIDs();
-        cop.pairsize = (clust.size() * (clust.size() - 1));
-        contingency.put(cop, cop);
+        makeOrUpdateSegment(path, clust.getIDs(), clust.getIDs(), clust.size() * (clust.size() - 1));
       }
 
       totalObjects += clust.size();
     }
   }
 
-  private void recursivelyFill(TreeMap<Segment, Segment> contingency, List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path) {
+  private void makeOrUpdateSegment(int[] path, DBIDs first, DBIDs second, int pairsize) {
+    Segment seg = segments.get(new Segment(path));
+    if(seg == null) {
+      seg = new Segment(path.clone());
+      segments.put(seg, seg);
+    }
+    if(first != null || second != null) {
+      // if (seg.firstIDs != null) {
+      // throw new AbortException("Expected segment to not have IDs.");
+      // }
+      // if (seg.secondIDs != null) {
+      // throw new AbortException("Expected segment to not have IDs.");
+      // }
+      seg.firstIDs = first;
+      seg.secondIDs = second;
+    }
+    seg.pairsize += pairsize;
+  }
+
+  private void recursivelyFill(List<List<? extends Cluster<?>>> cs, int depth, SetDBIDs first, SetDBIDs second, int[] path) {
     final int numclusterings = cs.size();
     Iterator<? extends Cluster<?>> iter = cs.get(depth).iterator();
     for(int cnum = 0; iter.hasNext(); cnum++) {
@@ -166,53 +182,37 @@ public class Segments {
         continue; // disjoint
       }
       if(nfirstp.size() > 0) {
-        path[depth] = cnum + 1;
+        path[depth] = (cnum + 1);
         if(depth < numclusterings - 1) {
-          recursivelyFill(contingency, cs, depth + 1, nfirstp, nsecond, path);
+          recursivelyFill(cs, depth + 1, nfirstp, nsecond, path);
         }
         else {
           // Add to results.
-          Segment cop = new Segment(path.clone());
-          cop.firstIDs = nfirstp;
-          cop.secondIDs = nsecond;
           int selfpairs = DBIDUtil.intersection(nfirstp, nsecond).size();
-          cop.pairsize = (nfirstp.size() * nsecond.size() - selfpairs);
-          contingency.put(cop, cop);
+          makeOrUpdateSegment(path, nfirstp, nsecond, (nfirstp.size() * nsecond.size()) - selfpairs);
         }
       }
       // Elements that were in first, but in not in the cluster
       if(ndelta1.size() > 0) {
-        path[depth] = -cnum;
+        path[depth] = -1; //(cnum + 1);
         if(depth < numclusterings - 1) {
-          recursivelyFill(contingency, cs, depth + 1, ndelta1, nsecond, path);
+          recursivelyFill(cs, depth + 1, ndelta1, nsecond, path);
         }
         else {
           // Add to results.
-          Segment cop = new Segment(path.clone());
-          cop.firstIDs = ndelta1;
-          cop.secondIDs = nsecond;
-          cop.pairsize = (ndelta1.size() * nsecond.size());
-          contingency.put(cop, cop);
+          makeOrUpdateSegment(path, ndelta1, nsecond, ndelta1.size() * nsecond.size());
         }
       }
       if(ndelta2.size() > 0) {
-        path[depth] = cnum;
-        for(int i = 0; i < depth; i++) {
-          path[i] = -path[i];
-        }
+        int[] npath = new int[path.length];
+        Arrays.fill(npath, -1);
+        npath[depth] = (cnum + 1);
         if(depth < numclusterings - 1) {
-          recursivelyFill(contingency, cs, depth + 1, ndelta2, nsecond, path);
+          recursivelyFill(cs, depth + 1, ndelta2, nsecond, npath);
         }
         else {
           // Add to results.
-          Segment cop = new Segment(path.clone());
-          cop.firstIDs = ndelta2;
-          cop.secondIDs = nsecond;
-          cop.pairsize = (ndelta2.size() * nsecond.size());
-          contingency.put(cop, cop);
-        }
-        for(int i = 0; i < depth; i++) {
-          path[i] = -path[i];
+          makeOrUpdateSegment(npath, ndelta2, nsecond, ndelta2.size() * nsecond.size());
         }
       }
     }
@@ -258,7 +258,7 @@ public class Segments {
     }
 
     // search the segments. Index at "unpairedClustering" being the wildcard.
-    for(Segment segment : segments.keySet()) {
+    for(Segment segment : getSegments()) {
       // if mismatch except at unpaired Clustering index => exclude.
       boolean match = true;
       for(int i = 0; i < clusteringsCount; i++) {
@@ -297,7 +297,7 @@ public class Segments {
     int inFirst = 0;
     int inSecond = 0;
 
-    for(Segment segment : segments.keySet()) {
+    for(Segment segment : getSegments()) {
       if(segment.get(firstClustering) != 0) {
         if(segment.get(secondClustering) != 0) {
           inBoth += segment.getPairCount();
@@ -344,8 +344,8 @@ public class Segments {
    * 
    * @return
    */
-  public TreeMap<Segment, Segment> getSegments() {
-    return segments;
+  public Collection<Segment> getSegments() {
+    return segments.keySet();
   }
 
   public int getClusterings() {
@@ -386,9 +386,5 @@ public class Segments {
     }
 
     return maxClusters;
-  }
-
-  private int getTotalPairs() {
-    return (totalObjects * (totalObjects - 1)) / 2;
   }
 }
