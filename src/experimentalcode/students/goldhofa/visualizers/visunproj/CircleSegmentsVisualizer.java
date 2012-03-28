@@ -305,7 +305,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     //
     // Build Interface
     //
-
     CheckBox checkbox = new CheckBox(svgp, showUnclusteredPairs, "Show unclustered pairs");
     checkbox.addCheckBoxListener(new CheckBoxListener() {
       public void switched(SwitchEvent evt) {
@@ -322,11 +321,11 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // checkbox
     info.addItem(checkbox.asElement(), 20);
 
-    ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.1) translate(" + (-5 * StyleLibrary.SCALE) + " " + (-5 * StyleLibrary.SCALE) + ")");
+    ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + (-.5 * StyleLibrary.SCALE) + " " + (-.5 * StyleLibrary.SCALE) + ") scale(0.12)");
     ctrlLayer.appendChild(info.asElement());
 
-    layer.appendChild(ctrlLayer);
     layer.appendChild(visLayer);
+    layer.appendChild(ctrlLayer);
   }
 
   /**
