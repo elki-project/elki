@@ -388,7 +388,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     // ! TODO VARIABLE LENGTH
     info.addItem(selectionInfo.asElement(), 50);
 
-    // FIXME: use SCALE for scaling the circle, too.
     ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(0.1)");
     ctrlLayer.appendChild(info.asElement());
 
@@ -542,7 +541,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
   public Segment mapElementToSegment(Element segmentElement) {
     String attr = segmentElement.getAttribute(CCConstants.SEG_SEGMENT_ATTRIBUTE);
-    logger.warning("Element ID: "+attr);
+    // logger.warning("Element ID: "+attr);
     Segment segment = new Segment(attr);
     segment = segments.unifySegment(segment);
     return segment;
