@@ -50,7 +50,10 @@ public class SVGCloneVisible extends DOMCloner {
     Node enew = doc.importNode(eold, false);
     // Recurse:
     for(Node n = eold.getFirstChild(); n != null; n = n.getNextSibling()) {
-      enew.appendChild(cloneNode(doc, n));
+      final Node clone = cloneNode(doc, n);
+      if (clone != null) {
+        enew.appendChild(clone);
+      }
     }
     return enew;
   }
