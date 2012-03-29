@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.visualizer.selection;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
 
 /*
  This file is part of ELKI:
@@ -29,20 +29,18 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -51,61 +49,41 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
- * Visualizer for generating SVG-Elements representing the selected objects
+ * Visualizer for generating an SVG-Element representing the selected range for
+ * each dimension
  * 
  * @author Robert Rödler
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
+ * @apiviz.has RangeSelection oneway - - visualizes
  */
-public class SelectionLineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class SelectionAxisRangeVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Selection Line";
+  private static final String NAME = "Selection Axis Range";
 
   /**
    * CSS Class for the range marker
    */
-  public static final String MARKER = "SelectionLine";
+  public static final String MARKER = "selectionAxisRange";
 
   /**
    * Constructor.
-   *
+   * 
    * @param task Visualization task
    */
-  public SelectionLineVisualization(VisualizationTask task) {
+  public SelectionAxisRangeVisualization(VisualizationTask task) {
     super(task);
     addCSSClasses(svgp);
-    context.addDataStoreListener(this);
     context.addResultListener(this);
     incrementalRedraw();
   }
-  
+
   @Override
   public void destroy() {
-    context.removeDataStoreListener(this);
     context.removeResultListener(this);
     super.destroy();
-  }
-
-  @Override
-  protected void redraw() {
-    DBIDSelection selContext = context.getSelection();
-    if(selContext != null) {
-      DBIDs selection = selContext.getSelectedIds();
-
-      for(DBID objId : selection) {
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(objId));
-
-        SVGPath path = new SVGPath();
-        for(int i = 0; i < proj.getVisibleDimensions(); i++) {
-          path.drawTo(getVisibleAxisX(i), yPos[i]);
-        }
-        Element marker = path.makeElement(svgp);
-        SVGUtil.addCSSClass(marker, MARKER);
-        layer.appendChild(marker);
-      }
-    }
   }
 
   /**
@@ -120,11 +98,49 @@ public class SelectionLineVisualization extends AbstractParallelVisualization<Nu
       CSSClass cls = new CSSClass(this, MARKER);
       cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
       cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
       cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+      cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+
       svgp.addCSSClassOrLogError(cls);
+    }
+  }
+
+  @Override
+  protected void redraw() {
+    DBIDSelection selContext = context.getSelection();
+    if(selContext == null || !(selContext instanceof RangeSelection)) {
+      return;
+    }
+    DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
+    if(ranges == null) {
+      return;
+    }
+
+    // Project:
+    double[] min = new double[ranges.length];
+    double[] max = new double[ranges.length];
+    for(int d = 0; d < ranges.length; d++) {
+      if(ranges[d] != null) {
+        min[d] = ranges[d].first;
+        max[d] = ranges[d].second;
+      }
+    }
+    min = proj.fastProjectDataToRenderSpace(min);
+    max = proj.fastProjectDataToRenderSpace(max);
+
+    int dim = proj.getVisibleDimensions();
+    for(int d = 0; d < dim; d++) {
+      if(ranges[proj.getDimForVisibleAxis(d)] != null) {
+        double amin = Math.min(min[d], max[d]);
+        double amax = Math.max(min[d], max[d]);
+        Element rect = svgp.svgRect(getVisibleAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
+        SVGUtil.addCSSClass(rect, MARKER);
+        layer.appendChild(rect);
+      }
     }
   }
 
@@ -132,10 +148,10 @@ public class SelectionLineVisualization extends AbstractParallelVisualization<Nu
    * Factory for visualizers to generate an SVG-Element containing a cube as
    * marker representing the selected range for each dimension
    * 
-   * @author Heidi Kolb
+   * @author Robert Rödler
    * 
    * @apiviz.stereotype factory
-   * 
+   * @apiviz.uses SelectionAxisRangeVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -143,12 +159,12 @@ public class SelectionLineVisualization extends AbstractParallelVisualization<Nu
      */
     public Factory() {
       super();
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
+      thumbmask |= ThumbnailVisualization.ON_SELECTION;
     }
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionLineVisualization(task);
+      return new SelectionAxisRangeVisualization(task);
     }
 
     @Override
@@ -158,7 +174,7 @@ public class SelectionLineVisualization extends AbstractParallelVisualization<Nu
         IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
         for(ParallelPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA -1);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
           baseResult.getHierarchy().add(selres, task);
           baseResult.getHierarchy().add(p, task);
         }
