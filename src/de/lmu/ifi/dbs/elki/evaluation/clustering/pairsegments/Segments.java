@@ -1,4 +1,4 @@
-package experimentalcode.students.goldhofa;
+package de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments;
 
 import java.util.ArrayList;
 import java.util.Arrays;

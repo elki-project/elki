@@ -37,6 +37,8 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.events.MouseEvent;
 
+import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -51,9 +53,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.goldhofa.Segment;
 import experimentalcode.students.goldhofa.SegmentSelection;
-import experimentalcode.students.goldhofa.Segments;
 import experimentalcode.students.goldhofa.visualization.batikutil.CheckBox;
 import experimentalcode.students.goldhofa.visualization.batikutil.CheckBoxListener;
 import experimentalcode.students.goldhofa.visualization.batikutil.SwitchEvent;
