@@ -1,7 +1,6 @@
 package experimentalcode.students.goldhofa.visualization.style;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -39,10 +38,9 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     this.segments = segments;
 
     // get all selectable segments
-    Collection<Segment> allObjectSegments = segments.getSegments();
     unselectedSegments = new TreeSet<Segment>();
     unselectedObjects = DBIDUtil.newHashSet();
-    for(Segment segment : allObjectSegments) {
+    for(Segment segment : segments) {
       // store segmentID
       if(!segment.isUnpaired()) {
         unselectedSegments.add(segment);

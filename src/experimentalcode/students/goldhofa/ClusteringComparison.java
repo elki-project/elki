@@ -1,10 +1,8 @@
 package experimentalcode.students.goldhofa;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -47,15 +45,6 @@ public class ClusteringComparison implements Evaluator {
     // result to save evaluations
     ClusteringComparisonResult thisResult = new ClusteringComparisonResult("ClusteringComparison", "cc", clusterings.get(0));
 
-    // build clustering sets (for evaluation. obsolete...)
-    ArrayList<ClusteringInfo> clrsExt = new ArrayList<ClusteringInfo>();
-
-    int index = 1;
-    for(Clustering<?> clustering : clusterings) {
-      clrsExt.add(new ClusteringInfo(index, clustering));
-      index++;
-    }
-
     // create segments
     Segments segments = new Segments(clusterings, baseResult);
 
@@ -64,9 +53,6 @@ public class ClusteringComparison implements Evaluator {
 
     // add segmentation to result
     thisResult.add(segments);
-
-    // store measure results (segments) in comparison result for visualization
-    thisResult.add(clrsExt);
 
     // and add comparison result to result tree
     baseResult.getHierarchy().add(result, thisResult);
