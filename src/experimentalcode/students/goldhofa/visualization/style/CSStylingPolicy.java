@@ -45,8 +45,8 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       if(!segment.isUnpaired()) {
         unselectedSegments.add(segment);
         // and store their get all objects
-        if(segment.firstIDs != null) {
-          unselectedObjects.addDBIDs(segment.firstIDs);
+        if(segment.getDBIDs() != null) {
+          unselectedObjects.addDBIDs(segment.getDBIDs());
         }
       }
     }
@@ -60,8 +60,8 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.add(segment);
     unselectedSegments.remove(segment);
-    if(segment.firstIDs != null) {
-      unselectedObjects.removeDBIDs(segment.firstIDs);
+    if(segment.getDBIDs() != null) {
+      unselectedObjects.removeDBIDs(segment.getDBIDs());
     }
   }
 
@@ -79,16 +79,16 @@ public class CSStylingPolicy implements ClassStylingPolicy {
     }
     selectedSegments.remove(segment);
     unselectedSegments.add(segment);
-    if(segment.firstIDs != null) {
-      unselectedObjects.addDBIDs(segment.firstIDs);
+    if(segment.getDBIDs() != null) {
+      unselectedObjects.addDBIDs(segment.getDBIDs());
     }
   }
 
   public void deselectAllObjects() {
     for(Segment segment : selectedSegments) {
       unselectedSegments.add(segment);
-      if(segment.firstIDs != null) {
-        unselectedObjects.addDBIDs(segment.firstIDs);
+      if(segment.getDBIDs() != null) {
+        unselectedObjects.addDBIDs(segment.getDBIDs());
       }
     }
     selectedSegments.clear();
@@ -134,7 +134,7 @@ public class CSStylingPolicy implements ClassStylingPolicy {
       return DBIDUtil.EMPTYDBIDS.iterator();
     }
     // colors
-    DBIDs ids = selectedSegments.get(cnum).firstIDs;
+    DBIDs ids = selectedSegments.get(cnum).getDBIDs();
     return (ids != null) ? ids.iterator() : DBIDUtil.EMPTYDBIDS.iterator();
   }
 }
