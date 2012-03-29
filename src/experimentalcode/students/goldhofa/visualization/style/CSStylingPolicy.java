@@ -8,10 +8,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import experimentalcode.students.goldhofa.Segment;
-import experimentalcode.students.goldhofa.Segments;
 
 /**
  * Die CS Vis will also eine eigene stylingpolicy basierend auf
