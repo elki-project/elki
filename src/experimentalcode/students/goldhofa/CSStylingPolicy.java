@@ -1,4 +1,4 @@
-package experimentalcode.students.goldhofa.visualization.style;
+package experimentalcode.students.goldhofa;
 
 import java.util.ArrayList;
 import java.util.Iterator;
