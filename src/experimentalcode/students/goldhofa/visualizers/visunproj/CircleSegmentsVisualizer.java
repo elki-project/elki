@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -49,15 +52,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGCheckbox;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import experimentalcode.students.goldhofa.SegmentSelection;
-import experimentalcode.students.goldhofa.visualization.batikutil.CheckBox;
-import experimentalcode.students.goldhofa.visualization.batikutil.CheckBoxListener;
-import experimentalcode.students.goldhofa.visualization.batikutil.SwitchEvent;
-import experimentalcode.students.goldhofa.visualization.batikutil.UnorderedList;
 import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
 
 /**
@@ -243,24 +243,21 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     //
     // Build Interface
     //
-    CheckBox checkbox = new CheckBox(svgp, showUnclusteredPairs, "Show unclustered pairs");
-    checkbox.addCheckBoxListener(new CheckBoxListener() {
-      public void switched(SwitchEvent evt) {
-        toggleUnclusteredPairs(evt.isOn());
+    SVGCheckbox checkbox = new SVGCheckbox(showUnclusteredPairs, "Show unclustered pairs");
+    checkbox.addCheckBoxListener(new ChangeListener() {
+      @Override
+      public void stateChanged(ChangeEvent e) {
+        toggleUnclusteredPairs(((SVGCheckbox) e.getSource()).isChecked());
       }
     });
 
-    // list to store all elements
-    UnorderedList info = new UnorderedList(svgp);
-
     // Add ring:clustering info
     Element clrInfo = getClusteringInfo();
-    info.addItem(clrInfo, Integer.valueOf(clrInfo.getAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE)));
-    // checkbox
-    info.addItem(checkbox.asElement(), 20);
+    Element c = checkbox.renderCheckBox(svgp, 1, 5 + Double.parseDouble(clrInfo.getAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE)), 11);
+    ctrlLayer.appendChild(clrInfo);
+    ctrlLayer.appendChild(c);
 
     ctrlLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "scale(" + (0.25 / StyleLibrary.SCALE) + ")");
-    ctrlLayer.appendChild(info.asElement());
 
     layer.appendChild(visLayer);
     layer.appendChild(ctrlLayer);
