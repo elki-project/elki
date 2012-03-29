@@ -54,7 +54,7 @@ public class ListBasedColorLibrary implements ColorLibrary {
 
   @Override
   public String getColor(int index) {
-    return colors[index % colors.length];
+    return colors[Math.abs(index) % colors.length];
   }
 
   @Override

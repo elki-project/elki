@@ -91,7 +91,6 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
     this.colors = style.getColorSet(StyleLibrary.PLOT);
     this.dotcolor = style.getColor(StyleLibrary.MARKERPLOT);
     this.greycolor = style.getColor(StyleLibrary.PLOTGREY);
-    // TODO: Do a divisor-check to optimize colors * styles combinations?
   }
 
   @Override
@@ -121,7 +120,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
     }
     cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, SVGUtil.fmt(width));
     // handle dashing
-    int styleflav = style % dashnum;
+    int styleflav = (style > 0) ? (style % dashnum) : (-style % dashnum);
     if(!interpolated) {
       double[] pat = dashpatterns[styleflav];
       assert (pat.length % 2 == 0);

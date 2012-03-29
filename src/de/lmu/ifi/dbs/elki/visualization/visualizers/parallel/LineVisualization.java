@@ -172,6 +172,7 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
         svgp.addCSSClassOrLogError(cls);
       }
     }
+    svgp.updateStyleElement();
   }
 
   /**
