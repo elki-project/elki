@@ -1,4 +1,4 @@
-package experimentalcode.students.goldhofa.visualizers.visunproj;
+package experimentalcode.students.goldhofa;
 
 /*
  This file is part of ELKI:
@@ -57,8 +57,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import experimentalcode.students.goldhofa.SegmentSelection;
-import experimentalcode.students.goldhofa.visualization.style.CSStylingPolicy;
 
 /**
  * Visualizer to draw circle segments of clusterings
