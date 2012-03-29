@@ -127,7 +127,7 @@ public class Segments {
     int[] path = new int[numclusterings];
     for(int cnum = 0; iter.hasNext(); cnum++) {
       Cluster<?> clust = iter.next();
-      path[0] = (cnum + 1);
+      path[0] = cnum;
       if(numclusterings > 1) {
         SetDBIDs idset = DBIDUtil.ensureSet(clust.getIDs());
         recursivelyFill(cs, 1, idset, idset, path, true, 1);
@@ -382,11 +382,8 @@ public class Segments {
     int maxClusters = 0;
 
     for(int i = 0; i < numclusters.length; i++) {
-      if(maxClusters < numclusters[i]) {
-        maxClusters = numclusters[i];
-      }
+      maxClusters = Math.max(maxClusters, numclusters[i]);
     }
-
     return maxClusters;
   }
 }
