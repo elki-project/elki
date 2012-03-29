@@ -5,31 +5,31 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
- * Identifies a CircleSegment by its clusterings and cluster. Can be stored as
- * and retrieved from a String.
+ * A segment represents a set of pairs that share the same clustering
+ * properties.
  * 
- * A segmentID String consists of the cluster id of each clustering, ordered by
- * clustering and separated by a character. Thus a segment ID describes the
- * common pairs in all clusterings and cluster.
- * 
- * i.e. clusteringID 0 & clusterID 2, clusteringID 1 & clusterID 0 => segmentID:
- * 2-0
+ * As such, for each ring (= clustering), a cluster number (or the constant
+ * {@link #UNCLUSTERED}) is stored.
  */
 public class Segment implements Comparable<Segment> {
-  private static final String SEPARATOR = "/";
-
   /**
    * Object is not clustered
    */
   public static final int UNCLUSTERED = -1;
 
-  public DBIDs firstIDs = null;
+  /**
+   * IDs in segment, for object segments.
+   */
+  protected DBIDs objIDs = null;
 
-  public DBIDs secondIDs = null;
+  /**
+   * Size of cluster, in pairs.
+   */
+  protected long pairsize = 0;
 
-  public long pairsize = 0;
-
-  // Cluster ids
+  /**
+   * The cluster numbers in each ring
+   */
   protected int[] clusterIds;
 
   public Segment(int clusterings) {
@@ -41,27 +41,20 @@ public class Segment implements Comparable<Segment> {
   }
 
   /**
-   * Creates a SegmentID by its String representation, extracting clustering and
-   * corresponding clusterIDs.
+   * Constructor.
    * 
-   * @param segmentID String representation of SegmentID
+   * @param clone Clone of cluster ids
    */
-  public Segment(String segmentID) {
-    String[] id = segmentID.split(SEPARATOR);
-    clusterIds = new int[id.length];
-    for(int i = 0; i < id.length; i++) {
-      set(i, Integer.valueOf(id[i]).intValue());
-    }
-  }
-
   public Segment(int[] clone) {
     clusterIds = clone;
   }
 
-  public void set(int i, int currentCluster) {
-    clusterIds[i] = currentCluster;
-  }
-
+  /**
+   * Get cluster number for index idx.
+   * 
+   * @param idx Index
+   * @return Cluster number
+   */
   public int get(int idx) {
     return clusterIds[idx];
   }
@@ -70,7 +63,7 @@ public class Segment implements Comparable<Segment> {
    * Checks if the segment has a cluster with unpaired objects. Unpaired
    * clusters are represented by "0" (0 = all).
    * 
-   * @return
+   * @return true when unclustered in at least one dimension.
    */
   public boolean isUnpaired() {
     for(int id : clusterIds) {
@@ -78,7 +71,6 @@ public class Segment implements Comparable<Segment> {
         return true;
       }
     }
-
     return false;
   }
 
@@ -86,7 +78,7 @@ public class Segment implements Comparable<Segment> {
    * Check if this segment contains the pairs that are never clustered by any of
    * the clusterings (all 0).
    * 
-   * @return
+   * @return true when unclustered everywhere
    */
   public boolean isNone() {
     for(int id : clusterIds) {
@@ -94,7 +86,6 @@ public class Segment implements Comparable<Segment> {
         return false;
       }
     }
-
     return true;
   }
 
@@ -113,16 +104,13 @@ public class Segment implements Comparable<Segment> {
     return -1;
   }
 
-  @Override
-  public String toString() {
-    StringBuffer string = new StringBuffer();
-    for(int id : clusterIds) {
-      if(string.length() > 0) {
-        string.append(SEPARATOR);
-      }
-      string.append(id);
-    }
-    return string.toString();
+  /**
+   * Get the DBIDs of objects contained in this segment.
+   * 
+   * @return the segment IDs
+   */
+  public DBIDs getDBIDs() {
+    return objIDs;
   }
 
   @Override
@@ -130,7 +118,6 @@ public class Segment implements Comparable<Segment> {
     if(!(Segment.class.isInstance(obj))) {
       return false;
     }
-
     Segment other = (Segment) obj;
     return Arrays.equals(clusterIds, other.clusterIds);
   }
@@ -148,8 +135,8 @@ public class Segment implements Comparable<Segment> {
       if(a != b) {
         if(a * b > 0) {
           // Regular comparison
-          // FIXME: re-use: return (a < b) ? -1 : +1;
-          return (a < b) ? +1 : -1;
+          return (a < b) ? -1 : +1;
+          // return (a < b) ? +1 : -1;
         }
         else {
           // Inverse, to sort negative last
