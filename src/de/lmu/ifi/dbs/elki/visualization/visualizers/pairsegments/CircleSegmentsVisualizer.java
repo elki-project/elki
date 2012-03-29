@@ -1,4 +1,4 @@
-package experimentalcode.students.goldhofa;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments;
 
 /*
  This file is part of ELKI:
@@ -169,7 +169,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   protected final SegmentsStylingPolicy policy;
 
   /**
-   * Flag to disallow an incrmental redraw
+   * Flag to disallow an incremental redraw
    */
   private boolean noIncrementalRedraw = true;
 
@@ -179,7 +179,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   public CircleSegmentsVisualizer(VisualizationTask task) {
     super(task);
     segments = task.getResult();
-    policy = new SegmentsStylingPolicy(segments);
+    policy = new SegmentsStylingPolicy(segments, context.getStyleLibrary());
     // Listen for result changes (Selection changed)
     context.addResultListener(this);
   }
@@ -197,7 +197,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     if(current == context.getStyleResult()) {
       // When switching to a different policy, unhighlight segments.
       if(context.getStyleResult().getStylingPolicy() != policy) {
-        policy.deselectAllObjects();
+        policy.deselectAllSegments();
       }
       synchronizedRedraw();
     }
@@ -244,7 +244,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     });
 
     // Add ring:clustering info
-    Element clrInfo = getClusteringInfo();
+    Element clrInfo = drawClusteringInfo();
     Element c = checkbox.renderCheckBox(svgp, 1, 5 + Double.parseDouble(clrInfo.getAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE)), 11);
     ctrlLayer.appendChild(clrInfo);
     ctrlLayer.appendChild(c);
@@ -261,12 +261,12 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   protected void addCSSClasses(int maxClusterSize) {
     StyleLibrary style = context.getStyleLibrary();
 
-    // CLUSTER BORDER
+    // Cluster separation lines
     CSSClass cssReferenceBorder = new CSSClass(this.getClass(), CLR_BORDER_CLASS);
     cssReferenceBorder.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, style.getColor(STYLE_BORDER));
     svgp.addCSSClassOrLogError(cssReferenceBorder);
 
-    // CLUSTER HOVER
+    // Hover effect for clusters
     CSSClass cluster_hover = new CSSClass(this.getClass(), CLR_HOVER_CLASS);
     // Note: !important is needed to override the regular color assignment
     cluster_hover.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, style.getColor(STYLE_HOVER) + " !important");
@@ -278,6 +278,11 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     cluster_unpaired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, style.getBackgroundColor(STYLE));
     cluster_unpaired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.CSS_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_unpaired);
+    
+    // Selected unpaired cluster segment
+    CSSClass cluster_unpaired_s = new CSSClass(this.getClass(), SEG_UNPAIRED_SELECTED_CLASS);
+    cluster_unpaired_s.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, style.getColor(STYLE_HOVER) + " !important");
+    svgp.addCSSClassOrLogError(cluster_unpaired_s);
 
     // create Color shades for clusters
     String firstcol = style.getColor(STYLE_GRADIENT_FIRST);
@@ -389,7 +394,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       elems.add(extension);
 
       if(segment.isUnpaired()) {
-        if(policy.selectedUnpairedSegments.containsValue(segment)) {
+        if(policy.isSelected(segment)) {
           SVGUtil.addCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
         }
         else {
@@ -398,7 +403,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
         }
       }
       else {
-        int idx = policy.getSelectedSegments().indexOf(segment);
+        int idx = policy.indexOfSegment(segment);
         if(idx >= 0) {
           String color = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT).getColor(idx);
           extension.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ":" + color);
@@ -423,7 +428,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       // The selection marker is the extra element in the list
       Element extension = entry.getValue().get(segments.getClusterings());
       if(segment.isUnpaired()) {
-        if(policy.selectedUnpairedSegments.containsValue(segment)) {
+        if(policy.isSelected(segment)) {
           SVGUtil.addCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
         }
         else {
@@ -432,7 +437,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
         }
       }
       else {
-        int idx = policy.getSelectedSegments().indexOf(segment);
+        int idx = policy.indexOfSegment(segment);
         if(idx >= 0) {
           String color = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT).getColor(idx);
           extension.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ":" + color);
@@ -491,7 +496,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     return colorShades;
   }
 
-  protected Element getClusteringInfo() {
+  protected Element drawClusteringInfo() {
     Element thumbnail = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
 
     // build thumbnail
