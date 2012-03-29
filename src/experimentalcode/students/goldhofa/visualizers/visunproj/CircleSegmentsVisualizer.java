@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
@@ -128,24 +127,27 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   /**
    * Comparison Result of {@link ClusteringComparison}
    */
-  private ClusteringComparisonResult ccr;
+  private final ClusteringComparisonResult ccr;
 
   /**
    * Segmentation of Clusterings
    */
-  public Segments segments;
+  protected final Segments segments;
 
   /**
-   * 
+   * The two main layers
    */
   private Element visLayer, ctrlLayer;
 
+  /**
+   * Map to connect segments to their visual elements
+   */
   public Map<Segment, List<Element>> segmentToElements = new HashMap<Segment, List<Element>>();
 
   /**
    * Segment selection manager
    */
-  public SegmentSelection selection;
+  protected final SegmentSelection selection;
 
   /**
    * Show unclustered Pairs in CircleSegments
@@ -153,57 +155,56 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   boolean showUnclusteredPairs = false;
 
   /**
+   * Styling policy
+   */
+  protected final CSStylingPolicy policy;
+  
+  /**
+   * Flag to disallow an incrmental redraw
+   */
+  private boolean noIncrementalRedraw = true;
+
+  /**
    * Constructor
    */
   public CircleSegmentsVisualizer(VisualizationTask task) {
     super(task);
     ccr = task.getResult();
+    segments = ccr.getSegments();
+    policy = new CSStylingPolicy(segments, task.getContext().getStyleLibrary());
+    selection = new SegmentSelection(policy, segments);
     // Listen for result changes (Selection changed)
     context.addResultListener(this);
   }
 
-  public void showUnclusteredPairs(boolean show) {
-    if(showUnclusteredPairs == show) {
-      return;
-    }
+  public void toggleUnclusteredPairs(boolean show) {
+    noIncrementalRedraw = true;
     showUnclusteredPairs = show;
-
-    // store attributes & delete old visLayer
-    Node parent = visLayer.getParentNode();
-    parent.removeChild(visLayer);
-
-    // add new node to draw
-    visLayer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    parent.appendChild(visLayer);
-
-    draw();
-
-    selection.reselect();
+    synchronizedRedraw();
   }
 
   /**
    * Create the segments
    */
-  private void draw() {
-    final int numsegments = segments.getSegments().size();
+  private void drawSegments() {
     final int clusterings = segments.getClusterings();
 
     // Reinitialize
     this.segmentToElements.clear();
 
-    double angle_pair = (MathUtil.TWOPI - (SEGMENT_MIN_SEP_ANGLE * numsegments)) / segments.getPairCount(showUnclusteredPairs);
+    double angle_pair = (MathUtil.TWOPI - (SEGMENT_MIN_SEP_ANGLE * segments.size())) / segments.getPairCount(showUnclusteredPairs);
     final int pair_min_count = (int) Math.ceil(SEGMENT_MIN_ANGLE / angle_pair);
 
     // number of segments needed to be resized
     int cluster_min_count = 0;
-    for(Segment segment : segments.getSegments()) {
+    for(Segment segment : segments) {
       if(segment.getPairCount() <= pair_min_count) {
         cluster_min_count++;
       }
     }
 
     // update width of a pair
-    angle_pair = (MathUtil.TWOPI - (SEGMENT_MIN_SEP_ANGLE * numsegments + cluster_min_count * SEGMENT_MIN_ANGLE)) / (segments.getPairCount(showUnclusteredPairs) - cluster_min_count);
+    angle_pair = (MathUtil.TWOPI - (SEGMENT_MIN_SEP_ANGLE * segments.size() + cluster_min_count * SEGMENT_MIN_ANGLE)) / (segments.getPairCount(showUnclusteredPairs) - cluster_min_count);
     double radius_delta = (RADIUS_OUTER - RADIUS_INNER - clusterings * RADIUS_DISTANCE) / clusterings;
     double border_width = SEGMENT_MIN_SEP_ANGLE;
 
@@ -211,8 +212,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     int refSegment = Segment.UNCLUSTERED;
     double offsetAngle = 0.0;
 
-    for(final Segment id : segments.getSegments()) {
-      long currentPairCount = id.getPairCount();
+    for(final Segment segment : segments) {
+      long currentPairCount = segment.getPairCount();
 
       // resize small segments if below minimum
       double alpha = SEGMENT_MIN_ANGLE;
@@ -223,7 +224,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       // ITERATE OVER ALL SEGMENT-CLUSTERS
 
       ArrayList<Element> elems = new ArrayList<Element>(clusterings);
-      segmentToElements.put(id, elems);
+      segmentToElements.put(segment, elems);
       // draw segment for every clustering
 
       for(int i = 0; i < clusterings; i++) {
@@ -231,40 +232,40 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
         // Add border if the next segment is a different cluster in the
         // reference clustering
-        if((refSegment != id.get(refClustering)) && refClustering == i) {
+        if((refSegment != segment.get(refClustering)) && refClustering == i) {
           Element border = SVGUtil.svgCircleSegment(svgp, 0, 0, offsetAngle - SEGMENT_MIN_SEP_ANGLE, border_width, currentRadius, RADIUS_OUTER - RADIUS_DISTANCE);
           border.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CLR_BORDER_CLASS);
           visLayer.appendChild(border);
 
-          if(id.get(refClustering) == Segment.UNCLUSTERED) {
+          if(segment.get(refClustering) == Segment.UNCLUSTERED) {
             refClustering = Math.min(refClustering + 1, clusterings - 1);
           }
-          refSegment = id.get(refClustering);
+          refSegment = segment.get(refClustering);
         }
 
-        int cluster = id.get(i);
+        int cluster = segment.get(i);
 
         // create ring segment
-        Element segment = SVGUtil.svgCircleSegment(svgp, 0, 0, offsetAngle, alpha, currentRadius, currentRadius + radius_delta);
-        elems.add(segment);
+        Element segelement = SVGUtil.svgCircleSegment(svgp, 0, 0, offsetAngle, alpha, currentRadius, currentRadius + radius_delta);
+        elems.add(segelement);
 
         // MouseEvents on segment cluster
-        EventListener listener = new SegmentListenerProxy(id, i);
-        EventTarget targ = (EventTarget) segment;
+        EventListener listener = new SegmentListenerProxy(segment, i);
+        EventTarget targ = (EventTarget) segelement;
         targ.addEventListener(SVGConstants.SVG_MOUSEOVER_EVENT_TYPE, listener, false);
         targ.addEventListener(SVGConstants.SVG_MOUSEOUT_EVENT_TYPE, listener, false);
         targ.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, listener, false);
 
         // Coloring based on clusterID
         if(cluster >= 0) {
-          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CLR_CLUSTER_CLASS_PREFIX + "_" + cluster);
+          segelement.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CLR_CLUSTER_CLASS_PREFIX + "_" + cluster);
         }
         // if its an unpaired cluster set color to white
         else {
-          segment.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CLR_UNPAIRED_CLASS);
+          segelement.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CLR_UNPAIRED_CLASS);
         }
 
-        visLayer.appendChild(segment);
+        visLayer.appendChild(segelement);
       }
 
       //
@@ -277,6 +278,28 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       Element extension = SVGUtil.svgCircleSegment(svgp, 0, 0, offsetAngle, alpha, currentRadius, currentRadius + RADIUS_SELECTION);
       extension.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, CLR_UNPAIRED_CLASS);
       elems.add(extension);
+
+      if(segment.isUnpaired()) {
+        if(selection.segmentLabels.containsKey(segment)) {
+          SVGUtil.addCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
+        }
+        else {
+          // Remove highlight
+          SVGUtil.removeCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
+        }
+      }
+      else {
+        int idx = policy.getSelectedSegments().indexOf(segment);
+        if(idx >= 0) {
+          String color = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT).getColor(idx);
+          extension.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ":" + color);
+        }
+        else {
+          // Remove styling
+          extension.removeAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE);
+        }
+      }
+      
       visLayer.appendChild(extension);
 
       // calculate angle for next segment
@@ -289,20 +312,32 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     super.resultChanged(current);
     // Redraw on style result changes.
     if(current == context.getStyleResult()) {
-      // FIXME: use the usual redrawing function, to allow other tools to change
-      // the segment selection?
-      // synchronizedRedraw();
+      // When switching to a different policy, unhighlight segments.
+      if (context.getStyleResult().getStylingPolicy() != policy) {
+        policy.deselectAllObjects();
+      }
+      synchronizedRedraw();
+    }
+  }
+  
+  @Override
+  protected void incrementalRedraw() {
+    if (noIncrementalRedraw) {
+      super.incrementalRedraw();
+    } else {
+      redrawSelection();
     }
   }
 
   @Override
   public void redraw() {
-    segments = ccr.getSegments();
+    logger.debug("Full redraw");
+    noIncrementalRedraw = false; // Done that.
+
     // initialize css (needs clusterSize!)
     addCSSClasses(segments.getHighestClusterCount());
 
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-
     visLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
     // Setup scaling for canvas: 0 to StyleLibrary.SCALE (usually 100 to avoid a
     // Java drawing bug!)
@@ -310,12 +345,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     ctrlLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
-    // create selection helper. SegmentSelection initializes and manages
-    // CSStylingPolicy. Could completely replace SegmentSelection
-    selection = new SegmentSelection(task, segments);
-
     // and create svg elements
-    draw();
+    drawSegments();
 
     //
     // Build Interface
@@ -323,7 +354,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     CheckBox checkbox = new CheckBox(svgp, showUnclusteredPairs, "Show unclustered pairs");
     checkbox.addCheckBoxListener(new CheckBoxListener() {
       public void switched(SwitchEvent evt) {
-        showUnclusteredPairs(evt.isOn());
+        toggleUnclusteredPairs(evt.isOn());
       }
     });
 
@@ -380,12 +411,12 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
   }
 
-  protected void redrawSelection() {
-    CSStylingPolicy policy = selection.policy;
+  private void redrawSelection() {
+    logger.debug("Updating selection only.");
     for(Entry<Segment, List<Element>> entry : segmentToElements.entrySet()) {
       Segment segment = entry.getKey();
-      Element extension = entry.getValue().get(segments.getClusterings()); // extra
-                                                                           // element
+      // The selection marker is the extra element in the list
+      Element extension = entry.getValue().get(segments.getClusterings());
       if(segment.isUnpaired()) {
         if(selection.segmentLabels.containsKey(segment)) {
           SVGUtil.addCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
@@ -549,12 +580,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     }
     selection.select(segment, ctrl);
     // update stylePolicy
-    // update stylePolicy
-    context.getStyleResult().setStylingPolicy(selection.policy);
+    context.getStyleResult().setStylingPolicy(policy);
     // fire changed event to trigger redraw
     context.getHierarchy().resultChanged(context.getStyleResult());
-    // redraw
-    redrawSelection();
   }
 
   /**

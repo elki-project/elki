@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * @author Sascha Goldhofer
  * @author Erich Schubert
  */
-public class Segments {
+public class Segments implements Iterable<Segment> {
   /**
    * Class logger
    */
@@ -263,7 +263,7 @@ public class Segments {
   public List<Segment> getPairedSegments(Segment unpairedSegment) {
     ArrayList<Segment> pairedSegments = new ArrayList<Segment>();
     // search the segments. Index at "unpairedClustering" being the wildcard.
-    segments: for(Segment segment : getSegments()) {
+    segments: for(Segment segment : this) {
       // if mismatch except at unpaired Clustering index => exclude.
       for(int i = 0; i < clusteringsCount; i++) {
         if(unpairedSegment.get(i) != Segment.UNCLUSTERED) {
@@ -299,7 +299,7 @@ public class Segments {
     int inFirst = 0;
     int inSecond = 0;
 
-    for(Segment segment : getSegments()) {
+    for(Segment segment : this) {
       if(segment.get(firstClustering) != 0) {
         if(segment.get(secondClustering) != 0) {
           inBoth += segment.getPairCount();
@@ -316,9 +316,9 @@ public class Segments {
   }
 
   /**
-   * get size of object segments or pair segments if calculated
+   * Get the number of segments
    * 
-   * @return size of segments
+   * @return Number of segments
    */
   public int size() {
     return segments.size();
@@ -385,5 +385,10 @@ public class Segments {
       maxClusters = Math.max(maxClusters, numclusters[i]);
     }
     return maxClusters;
+  }
+
+  @Override
+  public Iterator<Segment> iterator() {
+    return segments.keySet().iterator();
   }
 }
