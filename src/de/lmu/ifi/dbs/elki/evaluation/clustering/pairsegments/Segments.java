@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Creates segments of two or more clusterings.
@@ -35,20 +36,19 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * Within the visualization they describe (at least two) pair Segments that have
  * a corresponding object Segment.
  * </p>
+ * 
  * <p>
- * Objects are combined by a string (segmentID), so no database objects have to
- * be saved. <br />
- * EDIT: extending the visualization now stores all DBIDs described by their
- * objectSegment for a faster selection of objects on the cost of memory.
- * </p>
- * <p>
- * Segments are created by adding each DB object via the <i>addObject()</i>
- * method and afterwards converted to pairs by <i>convertToPairSegments()</i>.
+ * Reference:<br />
+ * Evaluation of Clusterings – Metrics and Visual Support<br />
+ * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur
+ * Zimek<br />
+ * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
  * </p>
  * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
  */
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://elki.dbs.ifi.lmu.de/wiki/PairSegments")
 public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Class logger
