@@ -514,7 +514,7 @@ public final class VMath {
    * Linear algebraic matrix multiplication, v1 * m2^T
    * 
    * @param v1 vector
-   * @param v2 other matrix
+   * @param m2 other matrix
    * @return Matrix product, v1 * m2^T
    */
   public final static double[][] timesTranspose(final double[] v1, final double[][] m2) {
@@ -583,7 +583,7 @@ public final class VMath {
    * Normalizes v1 to the length of 1.0.
    * 
    * @param v1 vector
-   * @param normalized copy of v1
+   * @return normalized copy of v1
    */
   public final static double[] normalize(final double[] v1) {
     double norm = euclideanLength(v1);
@@ -600,7 +600,7 @@ public final class VMath {
    * Normalizes v1 to the length of 1.0.
    * 
    * @param v1 vector
-   * @param normalized v1
+   * @return normalized v1
    */
   public final static double[] normalizeEquals(final double[] v1) {
     double norm = euclideanLength(v1);
@@ -739,7 +739,7 @@ public final class VMath {
    * Returns a quadratic Matrix consisting of zeros and of the given values on
    * the diagonal.
    * 
-   * @param diagonal the values on the diagonal
+   * @param v1 the values on the diagonal
    * @return the resulting matrix
    */
   public final static double[][] diagonal(final double[] v1) {

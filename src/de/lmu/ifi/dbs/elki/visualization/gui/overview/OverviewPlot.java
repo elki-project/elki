@@ -408,7 +408,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * Test whether a task should be displayed in the overview plot.
    * 
    * @param task Task to display
-   * @return
+   * @return visibility
    */
   protected boolean visibleInOverview(VisualizationTask task) {
     if(!VisualizerUtil.isVisible(task)) {

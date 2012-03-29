@@ -43,7 +43,6 @@ public class OPTICSColorFromStylingPolicy implements OPTICSColorAdapter {
    * Constructor.
    * 
    * @param policy Styling policy
-   * @param refc Clustering to use
    */
   public OPTICSColorFromStylingPolicy(StylingPolicy policy) {
     super();
