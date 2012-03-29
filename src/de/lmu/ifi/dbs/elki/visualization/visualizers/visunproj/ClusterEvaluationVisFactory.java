@@ -138,7 +138,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
 
     PairCounting paircount = cont.getPaircount();
     ypos = addBarChart(svgp, parent, ypos, "Jaccard", 1, paircount.jaccard());
-    // addBarChart("F1-Measure", 1, paircount.f1Measure());
+    ypos = addBarChart(svgp, parent, ypos, "F1-Measure", 1, paircount.f1Measure());
     ypos = addBarChart(svgp, parent, ypos, "Precision", 1, paircount.precision());
     ypos = addBarChart(svgp, parent, ypos, "Recall", 1, paircount.recall());
     ypos = addBarChart(svgp, parent, ypos, "Rand", 1, paircount.randIndex());

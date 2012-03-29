@@ -339,6 +339,12 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     }
   }
 
+  /**
+   * Get color from a simple heatmap.
+   * 
+   * @param val Score value
+   * @return Color in heatmap
+   */
   public static final Color getColorForValue(double val) {
     // Color positions
     double[] pos = new double[] { 0.0, 0.6, 0.8, 1.0 };

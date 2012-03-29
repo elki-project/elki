@@ -75,8 +75,8 @@ public class AxisVisualization extends AbstractScatterplotVisualization {
     // compute angle to diagonal line, used for axis labeling.
     double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
 
-    double alfontsize = 1.2 * context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL);
-    CSSClass alcls = new CSSClass(svgp, "unmanaged");
+    double alfontsize = 1.1 * context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL);
+    CSSClass alcls = new CSSClass(AxisVisualization.class, "unmanaged");
     alcls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(alfontsize));
     alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
     alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
