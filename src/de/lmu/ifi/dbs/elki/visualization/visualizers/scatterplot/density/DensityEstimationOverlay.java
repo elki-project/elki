@@ -1,4 +1,4 @@
-package experimentalcode.erich.visualization;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density;
 
 /*
  This file is part of ELKI:
@@ -38,8 +38,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
@@ -49,11 +47,19 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
-public class DensityEstimation2DVisualization extends AbstractScatterplotVisualization {
+/**
+ * A simple density estimation visualization, based on a simple kernel-density
+ * <em>in the projection, not the actual data!</em>
+ * 
+ * @author Erich Schubert
+ */
+// TODO: make parameterizable, in particular color map, kernel bandwidth and
+// kernel function
+public class DensityEstimationOverlay extends AbstractScatterplotVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Density Estimation";
+  private static final String NAME = "Density estimation overlay";
 
   /**
    * Density map resolution
@@ -70,7 +76,7 @@ public class DensityEstimation2DVisualization extends AbstractScatterplotVisuali
    * 
    * @param task Task
    */
-  public DensityEstimation2DVisualization(VisualizationTask task) {
+  public DensityEstimationOverlay(VisualizationTask task) {
     super(task);
     incrementalRedraw();
   }
@@ -201,8 +207,6 @@ public class DensityEstimation2DVisualization extends AbstractScatterplotVisuali
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses DensityEstimation2DVisualization oneway - - «create»
-   * 
-   * @param <NV> Type of the NumberVector being visualized.
    */
   public static class Factory extends AbstractVisFactory {
     /**
@@ -215,7 +219,7 @@ public class DensityEstimation2DVisualization extends AbstractScatterplotVisuali
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new DensityEstimation2DVisualization(task);
+      return new DensityEstimationOverlay(task);
     }
 
     @Override
@@ -226,25 +230,6 @@ public class DensityEstimation2DVisualization extends AbstractScatterplotVisuali
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
         task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         baseResult.getHierarchy().add(p, task);
-      }
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory();
       }
     }
   }
