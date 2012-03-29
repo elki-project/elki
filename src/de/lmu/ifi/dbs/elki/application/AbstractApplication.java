@@ -75,7 +75,7 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.4 (2011, August)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Spatial Outlier Detection: Data, Algorithms, Visualizations." + NEWLINE + "In Proceedings of the 12th International Symposium on" + NEWLINE + "Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011." + NEWLINE;
+  public static final String INFORMATION = "ELKI Version 0.5.0~beta1 (2012, April)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th"+NEWLINE+"International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
 
   /**
    * Parameter that specifies the name of the output file.
