@@ -159,11 +159,6 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   public Map<Segment, List<Element>> segmentToElements = new HashMap<Segment, List<Element>>();
 
   /**
-   * Segment selection manager
-   */
-  protected final SegmentSelection selection;
-
-  /**
    * Show unclustered Pairs in CircleSegments
    */
   boolean showUnclusteredPairs = false;
@@ -171,7 +166,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   /**
    * Styling policy
    */
-  protected final CSStylingPolicy policy;
+  protected final SegmentsStylingPolicy policy;
 
   /**
    * Flag to disallow an incrmental redraw
@@ -184,8 +179,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
   public CircleSegmentsVisualizer(VisualizationTask task) {
     super(task);
     segments = task.getResult();
-    policy = new CSStylingPolicy(segments, task.getContext().getStyleLibrary());
-    selection = new SegmentSelection(policy, segments);
+    policy = new SegmentsStylingPolicy(segments);
     // Listen for result changes (Selection changed)
     context.addResultListener(this);
   }
@@ -395,7 +389,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       elems.add(extension);
 
       if(segment.isUnpaired()) {
-        if(selection.segmentLabels.containsKey(segment)) {
+        if(policy.selectedUnpairedSegments.containsValue(segment)) {
           SVGUtil.addCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
         }
         else {
@@ -429,7 +423,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       // The selection marker is the extra element in the list
       Element extension = entry.getValue().get(segments.getClusterings());
       if(segment.isUnpaired()) {
-        if(selection.segmentLabels.containsKey(segment)) {
+        if(policy.selectedUnpairedSegments.containsValue(segment)) {
           SVGUtil.addCSSClass(extension, SEG_UNPAIRED_SELECTED_CLASS);
         }
         else {
@@ -588,9 +582,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
 
     // Unselect others on double click
     if(dblClick) {
-      selection.deselectAllSegments();
+      policy.deselectAllSegments();
     }
-    selection.select(segment, ctrl);
+    policy.select(segment, ctrl);
     // update stylePolicy
     context.getStyleResult().setStylingPolicy(policy);
     // fire changed event to trigger redraw
