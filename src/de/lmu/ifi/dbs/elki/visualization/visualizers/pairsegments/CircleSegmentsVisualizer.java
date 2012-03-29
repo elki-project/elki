@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -59,11 +60,22 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
- * Visualizer to draw circle segments of clusterings
+ * Visualizer to draw circle segments of clusterings and enable interactive
+ * selection of segments. For "empty" segments, all related segments are
+ * selected instead, to visualize the differences.
+ * 
+ * <p>
+ * Reference:<br />
+ * Evaluation of Clusterings – Metrics and Visual Support<br />
+ * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur
+ * Zimek<br />
+ * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
+ * </p>
  * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
  */
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://elki.dbs.ifi.lmu.de/wiki/PairSegments")
 public class CircleSegmentsVisualizer extends AbstractVisualization implements ResultListener {
   /**
    * Class logger
@@ -278,7 +290,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
     cluster_unpaired.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, style.getBackgroundColor(STYLE));
     cluster_unpaired.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, SVGConstants.CSS_NONE_VALUE);
     svgp.addCSSClassOrLogError(cluster_unpaired);
-    
+
     // Selected unpaired cluster segment
     CSSClass cluster_unpaired_s = new CSSClass(this.getClass(), SEG_UNPAIRED_SELECTED_CLASS);
     cluster_unpaired_s.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, style.getColor(STYLE_HOVER) + " !important");

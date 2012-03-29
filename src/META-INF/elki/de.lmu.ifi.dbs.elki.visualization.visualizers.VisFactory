@@ -13,6 +13,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipScoreVisualizat
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipStringVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ToolBox2DVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ReferencePointsVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density.DensityEstimationOverlay$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.MoveObjectsToolVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionDotVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionConvexHullVisualization$Factory
@@ -24,13 +25,15 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.LineVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.ParallelAxisVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterParallelMeanVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterOutlineVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index.RTreeParallelVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.ClusterEvaluationVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.PixmapVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSClusterVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotCutVisualization$Factory
