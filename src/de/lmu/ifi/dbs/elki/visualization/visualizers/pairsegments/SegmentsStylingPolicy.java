@@ -1,4 +1,4 @@
-package experimentalcode.students.goldhofa;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments;
 
 /*
  This file is part of ELKI:
@@ -25,9 +25,8 @@ package experimentalcode.students.goldhofa;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -35,12 +34,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Styling policy to communicate the segment selection to other visualizers.
  * 
  * @author Sascha Goldhofer
+ * @author Erich Schubert
  */
 public class SegmentsStylingPolicy implements ClassStylingPolicy {
   /**
@@ -54,14 +57,9 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   protected ArrayList<Segment> selectedSegments = new ArrayList<Segment>();
 
   /**
-   * Not selected segments.
-   */
-  protected TreeSet<Segment> unselectedSegments = new TreeSet<Segment>();
-
-  /**
    * Segments indirectly selected
    */
-  protected TreeMap<Segment, Segment> selectedUnpairedSegments = new TreeMap<Segment, Segment>();
+  protected TreeMap<Segment, Segment> indirectSelections = new TreeMap<Segment, Segment>();
 
   /**
    * Not selected IDs that will be drawn in default colors.
@@ -69,19 +67,25 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   protected ModifiableDBIDs unselectedObjects = DBIDUtil.newHashSet();
 
   /**
+   * Color library (only used in compatibility mode)
+   */
+  // TODO: move to abstract super class?
+  ColorLibrary colorset;
+
+  /**
    * Constructor.
    * 
    * @param segments Segments
    */
-  public SegmentsStylingPolicy(Segments segments) {
+  public SegmentsStylingPolicy(Segments segments, StyleLibrary style) {
     super();
     this.segments = segments;
+    this.colorset = style.getColorSet(StyleLibrary.PLOT);
 
     // get all selectable segments
     for(Segment segment : segments) {
       // store segmentID
       if(!segment.isUnpaired()) {
-        unselectedSegments.add(segment);
         // and store their get all objects
         if(segment.getDBIDs() != null) {
           unselectedObjects.addDBIDs(segment.getDBIDs());
@@ -90,52 +94,34 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
     }
   }
 
-  public boolean hasSegmentSelected(Segment segment) {
-    return selectedSegments.contains(segment);
-  }
-
-  public ArrayList<Segment> getSelectedSegments() {
-    return selectedSegments;
-  }
-
-  public void deselectObjects(Segment segment) {
-    if(unselectedSegments.contains(segment)) {
-      return;
-    }
-    selectedSegments.remove(segment);
-    unselectedSegments.add(segment);
-    if(segment.getDBIDs() != null) {
-      unselectedObjects.addDBIDs(segment.getDBIDs());
-    }
-  }
-
-  public void deselectAllObjects() {
-    for(Segment segment : selectedSegments) {
-      unselectedSegments.add(segment);
-      if(segment.getDBIDs() != null) {
-        unselectedObjects.addDBIDs(segment.getDBIDs());
-      }
-    }
-    selectedSegments.clear();
+  /**
+   * Test whether a segment is selected.
+   * 
+   * @param segment Segment to test
+   * @return true when selected
+   */
+  public boolean isSelected(Segment segment) {
+    return selectedSegments.contains(segment) || indirectSelections.containsValue(segment);
   }
 
   @Override
   public int getStyleForDBID(DBID id) {
-    /*
-     * System.out.println("policy: serving style"); for(int i = 0; i <
-     * ids.size(); i++) { if(ids.get(i).contains(id)) { return i; } }
-     */
+    Iterator<Segment> s = selectedSegments.iterator();
+    for(int i = 0; s.hasNext(); i++) {
+      Segment seg = s.next();
+      DBIDs ids = seg.getDBIDs();
+      if(ids != null && ids.contains(id)) {
+        return i;
+      }
+    }
     return -2;
   }
 
   @Override
   public int getColorForDBID(DBID id) {
-    /*
-     * System.out.println("policy: serving color"); for(int i = 0; i <
-     * ids.size(); i++) { if(ids.get(i).contains(id)) { return colors.get(i); }
-     * }
-     */
-    return 0;
+    int style = getStyleForDBID(id);
+    // FIXME: slow
+    return SVGUtil.stringToColor(colorset.getColor(style)).getRGB();
   }
 
   @Override
@@ -146,7 +132,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getMaxStyle() {
-    return selectedSegments.size();// ids.size();
+    return selectedSegments.size();
   }
 
   @Override
@@ -181,48 +167,41 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
     if(segment.isNone()) {
       return;
     }
+    if(!addToSelection) {
+      deselectAllSegments();
+    }
 
     // get selected segments
     if(segment.isUnpaired()) {
-      // (unpaired segments represent multiple segments)
-      List<Segment> newSelection = segments.getPairedSegments(segment);
-
       // check if all segments are selected
-      boolean allSegmentsSelected = true;
-      for(int i = 0; i < newSelection.size(); ++i) {
-        if(!hasSegmentSelected(newSelection.get(i))) {
-          allSegmentsSelected = false;
-          break;
+      if(addToSelection) {
+        boolean allSegmentsSelected = true;
+        for(Segment other : segments.getPairedSegments(segment)) {
+          if(!isSelected(other)) {
+            allSegmentsSelected = false;
+            break;
+          }
+        }
+
+        // if all are selected, deselect all
+        if(allSegmentsSelected) {
+          deselectSegment(segment);
+          return;
         }
       }
-
-      // if all are selected, deselect all
-      if(allSegmentsSelected) {
-        for(int i = 0; i < newSelection.size(); ++i) {
-          Segment other = newSelection.get(i);
-          deselectSegment(other);
-        }
-        // and deselect unpaired segment
+      if(isSelected(segment)) {
         deselectSegment(segment);
       }
       else {
-        // else, select all
-        for(int i = 0; i < newSelection.size(); ++i) {
-          Segment other = newSelection.get(i);
-          selectSegment(other);
-        }
-        // and highlight pair segment
         selectSegment(segment);
       }
     }
     else {
       // an object segment was selected
-      if(hasSegmentSelected(segment)) {
-        // Deselect
+      if(isSelected(segment)) {
         deselectSegment(segment);
       }
       else {
-        // highlight segment
         selectSegment(segment);
       }
     }
@@ -232,9 +211,8 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
    * Deselect all currently selected segments
    */
   public void deselectAllSegments() {
-    ArrayList<Segment> selectedSegments = getSelectedSegments();
-    for(int i = 0; i < selectedSegments.size(); ++i) {
-      deselectSegment(selectedSegments.get(i));
+    while(selectedSegments.size() > 0) {
+      deselectSegment(selectedSegments.get(selectedSegments.size() - 1));
     }
   }
 
@@ -248,26 +226,25 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
       ArrayList<Segment> remove = new ArrayList<Segment>();
       // remove all object segments associated with unpaired segment from
       // selection list
-      for(Segment objSegment : selectedUnpairedSegments.keySet()) {
-        if(selectedUnpairedSegments.get(objSegment).compareTo(segment) == 0) {
-          remove.add(objSegment);
+      for(Entry<Segment, Segment> entry : indirectSelections.entrySet()) {
+        if(entry.getValue() == segment) {
+          remove.add(entry.getKey());
         }
       }
 
-      for(int i = 0; i < remove.size(); ++i) {
-        selectedUnpairedSegments.remove(remove.get(i));
+      for(Segment other : remove) {
+        indirectSelections.remove(other);
+        deselectSegment(other);
       }
     }
     else {
       // check if deselected object Segment has a unpaired segment highlighted
-      if(selectedUnpairedSegments.containsKey(segment)) {
-        Segment unpaired = selectedUnpairedSegments.get(segment);
+      Segment unpaired = indirectSelections.get(segment);
+      if(unpaired != null) {
         // remove highlight
         deselectSegment(unpaired);
       }
-      if(!unselectedSegments.contains(segment)) {
-        selectedSegments.remove(segment);
-        unselectedSegments.add(segment);
+      if(selectedSegments.remove(segment)) {
         if(segment.getDBIDs() != null) {
           unselectedObjects.addDBIDs(segment.getDBIDs());
         }
@@ -284,17 +261,27 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
     if(segment.isUnpaired()) {
       // remember selected unpaired segment
       for(Segment other : segments.getPairedSegments(segment)) {
-        selectedUnpairedSegments.put(other, segment);
+        indirectSelections.put(other, segment);
+        selectSegment(other);
       }
     }
     else {
       if(!selectedSegments.contains(segment)) {
         selectedSegments.add(segment);
-        unselectedSegments.remove(segment);
         if(segment.getDBIDs() != null) {
           unselectedObjects.removeDBIDs(segment.getDBIDs());
         }
       }
     }
+  }
+
+  /**
+   * Get the index of a selected segment.
+   * 
+   * @param segment Segment to find
+   * @return Index, or -1
+   */
+  public int indexOfSegment(Segment segment) {
+    return selectedSegments.indexOf(segment);
   }
 }
