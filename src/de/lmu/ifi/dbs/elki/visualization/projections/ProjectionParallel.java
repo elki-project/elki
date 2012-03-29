@@ -131,7 +131,7 @@ public interface ProjectionParallel extends Projection {
   /**
    * shift a dimension to another position
    * 
-   * @param dim dimension to shift
+   * @param axis axis to shift
    * @param rn new position
    */
   public void moveAxis(int axis, int rn);

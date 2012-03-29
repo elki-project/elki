@@ -283,33 +283,12 @@ public class Segments extends BasicResult implements Iterable<Segment> {
   }
 
   /**
-   * @param segmentIDString string representation of the segmentID
+   * @param temp Temporary segment to be unified
    * @return the segmentID given by its string representation
    */
   public Segment unifySegment(Segment temp) {
     Segment found = segments.get(temp);
     return (found != null) ? found : temp;
-  }
-
-  public int[] getPaircount(int firstClustering, boolean firstClusterNoise, int secondClustering, boolean secondClusterNoise) {
-    int inBoth = 0;
-    int inFirst = 0;
-    int inSecond = 0;
-
-    for(Segment segment : this) {
-      if(segment.get(firstClustering) != 0) {
-        if(segment.get(secondClustering) != 0) {
-          inBoth += segment.getPairCount();
-        }
-        else {
-          inFirst += segment.getPairCount();
-        }
-      }
-      else if(segment.get(secondClustering) != 0) {
-        inSecond += segment.getPairCount();
-      }
-    }
-    return new int[] { inBoth, inFirst, inSecond };
   }
 
   /**
@@ -326,7 +305,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    * 
    * @param withUnclusteredPairs if false, segment with unclustered pairs is
    *        removed
-   * @return
+   * @return pair count, with or without unclusted (non-existant) pairs
    */
   public int getPairCount(boolean withUnclusteredPairs) {
     if(withUnclusteredPairs) {
@@ -337,6 +316,11 @@ public class Segments extends BasicResult implements Iterable<Segment> {
     }
   }
 
+  /**
+   * Get the number of clusterings
+   * 
+   * @return number of clusterings compared
+   */
   public int getClusterings() {
     return clusteringsCount;
   }
@@ -344,7 +328,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Return the sum of all clusters
    * 
-   * @return
+   * @return sum of all cluster counts
    */
   public int getTotalClusterCount() {
     int clusterCount = 0;
@@ -359,7 +343,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Returns the highest number of Clusters in the clusterings
    * 
-   * @return
+   * @return highest cluster count
    */
   public int getHighestClusterCount() {
     int maxClusters = 0;

@@ -69,7 +69,6 @@ public class ScalesResult extends BasicResult {
    * 
    * @param dim Dimension
    * @param scale New scale
-   * @return Scale
    */
   public void setScale(int dim, LinearScale scale) {
     scales[dim - 1] = scale;
