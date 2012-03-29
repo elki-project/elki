@@ -26,6 +26,10 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.ParallelAxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterParallelMeanVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterOutlineVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index.RTreeParallelVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionAxisRangeVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionLineVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolAxisRangeVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolLineVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.ClusterEvaluationVisFactory
