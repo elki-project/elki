@@ -85,7 +85,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   public static final OptionID H_ID = OptionID.getOrCreateOptionID("HilOut.h", "Max. Hilbert-Level");
   
   /**
-   * Parameter to specify the maximum Hilbert-Level
+   * Parameter to specify p of LP-NormDistance
    */
   public static final OptionID T_ID = OptionID.getOrCreateOptionID("HilOut.t", "t of Lt Metric");
   
@@ -200,7 +200,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     }
     
     if(n_star < n){
-      scan(shift*d, capital_n);
+      scan(shift*d, capital_n_star); //? See 4.1 Complexity Analysis
     }
     if(progressHilOut != null) {
       progressHilOut.ensureCompleted(logger);
@@ -477,7 +477,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     
     protected int h = 31;
     
-    protected double t = 2.0;
+    protected double t = Double.POSITIVE_INFINITY;
     
     @Override
     protected void makeOptions(Parameterization config) {
@@ -498,9 +498,9 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         h = hP.getValue();
       }
       
-      final DoubleParameter tP = new DoubleParameter(T_ID, 2.0);
+      final DoubleParameter tP = new DoubleParameter(T_ID, Double.POSITIVE_INFINITY);
       if(config.grab(tP)) {
-        t = (tP.getValue() >= 1.0)? tP.getValue() : 2.0;
+        t = (tP.getValue() >= 1.0)? tP.getValue() : Double.POSITIVE_INFINITY;
       }
     }
 
