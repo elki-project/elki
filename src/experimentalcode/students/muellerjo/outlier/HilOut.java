@@ -133,7 +133,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     HilLowerComparator lc = new HilLowerComparator();
     this.out = new Heap<HilFeature>(n+1, uc);
     this.wlb = new Heap<HilFeature>(n+1, lc);
-    this.top = new HashSet<HilFeature>();
+    this.top = new HashSet<HilFeature>(2*n+1);
     this.n_star = 0;
   }
 
@@ -175,11 +175,11 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       }
     }
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
-    while(j < d+1 && n_star < n){
-      out.clear();
-      wlb.clear();
+    while(j <= d && n_star < n){
+      //out.clear();
+      //wlb.clear();
       double v = j*shift;
-      hilbert(v);
+      hilbert(v, j);
       scan(v, (int)(k * ((double)capital_n / (double)capital_n_star)));
       trueOutliers();
       top.clear();
@@ -198,15 +198,14 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         progressHilOut.incrementProcessed(logger);
       }
     }
-    
     if(n_star < n){
-      scan(shift*d, capital_n_star); //? See 4.1 Complexity Analysis
+      scan(shift*d, capital_n);
     }
     if(progressHilOut != null) {
       progressHilOut.ensureCompleted(logger);
     }
     for(HilFeature entry: out){
-      hilout_weight.putDouble(entry.id, entry.ubound);
+      hilout_weight.putDouble(entry.id, entry.sum_nn);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, Double.POSITIVE_INFINITY, 0.0, Double.POSITIVE_INFINITY);
@@ -214,20 +213,20 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     return result;
   }
   
-  private void hilbert(double v){
+  private void hilbert(double v, int j){
+    int half_max_int = Integer.MAX_VALUE >> 1;
+    int v_half_max_int = (int)(v * half_max_int);
     for (int i=0; i < pf.length; i++){
       int[] coord = new int[d];
-      for(int dim=0; dim < d; dim++){  
-        coord[dim] = (int)((Integer.MAX_VALUE >> 1) * (v+pf[i].point[dim]));
+      for(int dim=0; dim < d; dim++){
+        coord[dim] = (int)(v_half_max_int + half_max_int * pf[i].point[dim]);
       }
       pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
     }
     java.util.Arrays.sort(pf);
     capital_n_star = 0;
     for (int i=0; i < pf.length-1; i++){
-      long[] pf_i = BitsUtil.copy(pf[i].hilbert);
-      BitsUtil.xorI(pf_i, pf[i+1].hilbert);
-      pf[i].level = (1 << (BitsUtil.numberOfLeadingZeros(pf_i) / d)) >> 1;
+      pf[i].level = minReg(i, i+1);
       if (pf[i].ubound >= omega_star){
         capital_n_star++;
       }
@@ -297,42 +296,21 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   
   
   private double fastUpperBound(int i){
-    int pre = i-1;
+    int pre = i;
     int post = i;
     int z = 0;
-    int lvl = Integer.MAX_VALUE;
     while(z < k){
-      int pre_level = (pre >= 0) ?  pf[pre].level : -1;
-      int post_level = (post < capital_n)? pf[post].level : -1;
-      int new_level;
-      if (post_level > pre_level){
-        new_level = post_level; 
+      int pre_level = (pre-1 >= 0) ?  pf[pre-1].level : -1;
+      int post_level = (post < capital_n-1)? pf[post].level : -1;
+      if (post_level >= pre_level){
         post++;
       }
       else{
-        new_level = pre_level; 
         pre--;
       }
-      lvl = java.lang.Math.min(lvl, new_level);
       z++;
     }
-    double omega = Double.NEGATIVE_INFINITY;
-    double r = 2.0 / (double)(1 << (lvl+1));
-    if (t == Double.POSITIVE_INFINITY){
-      for(int dim=0; dim < d; dim++){
-        double p_m_r = pf[i].point[dim] - ((int)(pf[i].point[dim] / r)) * r;
-        omega = java.lang.Math.max(java.lang.Math.max(p_m_r , r-p_m_r), omega);
-      }
-    }
-    else{
-      omega = 0.0;
-      for(int dim = 0; dim < d; dim++){
-        double p_m_r = pf[i].point[dim] - ((int)(pf[i].point[dim] / r)) * r;
-        omega += java.lang.Math.pow(java.lang.Math.max(p_m_r , r-p_m_r), t);
-      }
-      omega = java.lang.Math.pow(omega, 1.0/t);
-    }
-    return omega;
+    return k*maxDist(pf[i].point,minReg(pre, post));
   }
   
   private DoubleDoublePair innerScan(int i, int maxcount, double v){
@@ -372,7 +350,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
           }
       }
     }
-    double br = boxRadius(i, (a-1 < 0) ? 0 : a-1 , (b+1 >= capital_n) ? capital_n-1 : b+1, v);
+    double br = boxRadius(i, (a-1 < 0) ? 0 : a-1 , (b+1 > capital_n-1) ? capital_n-1 : b+1, v);
     double newlb = 0.0;
     double newub = 0.0;
     for(NN entry : pf[i].nn){
@@ -385,13 +363,38 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   }
   
   private double minDist(double[] p, int level){
-    double delta = Double.POSITIVE_INFINITY;
-    double r = 1.0 / (double)(1 << level+1);
+    double dist = Double.POSITIVE_INFINITY;
+    double r = 2.0 / (double)(1 << level+1);
     for (int dim=0; dim < d; dim++){
       double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r)*r;
-      delta = java.lang.Math.min(delta, java.lang.Math.min(p_m_r, r-p_m_r));
+      dist = java.lang.Math.min(dist, java.lang.Math.min(p_m_r, r-p_m_r));
     }
-    return delta;
+    return dist;
+  }
+  
+  private double maxDist(double[] p, int level){
+    double dist = Double.NEGATIVE_INFINITY;
+    double r = 2.0 / (double)(1 << level+1);
+    if (t == Double.POSITIVE_INFINITY){
+      for (int dim=0; dim < d; dim++){
+        double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r)*r;
+        dist = java.lang.Math.max(dist, java.lang.Math.max(p_m_r, r-p_m_r));
+      }
+    }
+    else{
+      for (int dim=0; dim < d; dim++){
+        double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r)*r;
+        dist += java.lang.Math.pow(java.lang.Math.max(p_m_r, r-p_m_r), t);
+      }
+      dist = java.lang.Math.pow(dist, 1.0/t);
+    }
+    return dist;
+  }
+  
+  private int minReg(int a, int b){
+      long[] pf_a = BitsUtil.copy(pf[a].hilbert);
+      BitsUtil.xorI(pf_a, pf[b].hilbert);
+      return (1 << (numberOfLeadingZeros(pf_a) / d)) >> 1;
   }
   
   private void insert(int i, DBID id, double dt){
@@ -430,17 +433,17 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   }
   
   private double boxRadius(int i, int a, int b, double v){
-    double br = Double.POSITIVE_INFINITY;
     long[] hil1 = BitsUtil.copy(pf[a].hilbert);
     long[] hil2 = BitsUtil.copy(pf[b].hilbert);
     BitsUtil.xorI(hil1, pf[i].hilbert);
     BitsUtil.xorI(hil2, pf[i].hilbert);
-    double r = 2.0 / (double)(1 << (java.lang.Math.max(BitsUtil.numberOfLeadingZeros(hil1), BitsUtil.numberOfLeadingZeros(hil2)) / d));
-    for (int dim=0; dim < d; dim++){
-      double p_m_r = (v+pf[i].point[dim]) - java.lang.Math.floor((v+pf[i].point[dim]) / r)*r;
-      br = java.lang.Math.min(br, java.lang.Math.min(p_m_r, r-p_m_r));
-    }
-    return br;
+    int level = (1 << (java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d));
+    return minDist(pf[i].point, level);
+  }
+  
+  private int numberOfLeadingZeros(long[] in){
+    int out = BitsUtil.numberOfLeadingZeros(in);
+    return (out == -1) ? 0 : out;
   }
 
   @Override
@@ -475,9 +478,9 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     
     protected int n = 10;
     
-    protected int h = 31;
+    protected int h = 32;
     
-    protected double t = Double.POSITIVE_INFINITY;
+    protected double t = 2.0;
     
     @Override
     protected void makeOptions(Parameterization config) {
@@ -493,14 +496,14 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         n = nP.getValue();
       }
       
-      final IntParameter hP = new IntParameter(H_ID, 31);
+      final IntParameter hP = new IntParameter(H_ID, 32);
       if(config.grab(hP)) {
         h = hP.getValue();
       }
       
-      final DoubleParameter tP = new DoubleParameter(T_ID, Double.POSITIVE_INFINITY);
+      final DoubleParameter tP = new DoubleParameter(T_ID, 2.0);
       if(config.grab(tP)) {
-        t = (tP.getValue() >= 1.0)? tP.getValue() : Double.POSITIVE_INFINITY;
+        t = (tP.getValue() >= 1.0)? tP.getValue() : 2.0;
       }
     }
 
