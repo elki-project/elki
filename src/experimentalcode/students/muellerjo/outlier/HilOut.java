@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -90,6 +91,11 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   public static final OptionID T_ID = OptionID.getOrCreateOptionID("HilOut.t", "t of Lt Metric");
   
   /**
+   * Parameter to specify if only the Top n, or also approximations for the other elements, should be returned
+   */
+  public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output for Top n or all elements");
+  
+  /**
    * Holds the value of {@link #K_ID}.
    */
   private int k;
@@ -110,6 +116,11 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private double t;
   
   /**
+   * Holds the value of {@link #TN_ID}.
+   */
+  private Enum<Selection> tn;
+  
+  /**
    * Distance function for HilOut
    */  
   private LPNormDistanceFunction distfunc;
@@ -123,12 +134,13 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private O factory;
   private WritableDoubleDataStore hilout_weight;
   
-  protected HilOut(int k, int n, int h, double t) {
+  protected HilOut(int k, int n, int h, double t, Enum<Selection> tn) {
     super();
     this.n = n;
     this.k = k;
     this.h = h;
     this.t = t;
+    this.tn = tn;
     this.distfunc = new LPNormDistanceFunction(t);
     HilUpperComparator uc = new HilUpperComparator();
     HilLowerComparator lc = new HilLowerComparator();
@@ -157,7 +169,9 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     double shift = 1.0 / (double)d;
     int pos = 0;
     for(DBID id : relation.iterDBIDs()) {
-      hilout_weight.putDouble(id, 0.0);
+      if(tn == Selection.TopN){
+        hilout_weight.putDouble(id, 0.0);
+      }
       HilFeature entry = new HilFeature();
       entry.id  = id;
       entry.lbound = 0.0;
@@ -200,9 +214,20 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       }
     }
     if(n_star < n){
-      //out.clear();
-      //wlb.clear();
+      out.clear();
+      wlb.clear();
       scan(1.0, capital_n);
+    }
+    if (tn == Selection.TopN){
+      for(HilFeature ent : out){
+        hilout_weight.putDouble(ent.id, ent.ubound);
+      }
+    }
+    else{
+      for(HilFeature ent : pf){
+        hilout_weight.putDouble(ent.id, ent.ubound);
+      }
+      
     }
     if(progressHilOut != null) {
       progressHilOut.ensureCompleted(logger);
@@ -235,7 +260,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   
   private void scan(double v, int k0){
     for (int i=0; i < pf.length; i++){
-      if (pf[i].ubound >= omega_star){         
+      if (pf[i].ubound >= omega_star){        
         if (pf[i].lbound < pf[i].ubound){
           double omega = fastUpperBound(i);
           if (omega < omega_star){
@@ -257,13 +282,14 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
             }
             if(newub < pf[i].ubound){
               pf[i].ubound = newub;
-              hilout_weight.putDouble(pf[i].id, pf[i].ubound);
             }
           }
         }
         updateOUT(i);
         updateWLB(i);
-        omega_star = java.lang.Math.max(omega_star, wlb.peek().lbound);
+        if (wlb.size() >= n){
+          omega_star = java.lang.Math.max(omega_star, wlb.peek().lbound);
+        }
       }
     }
   }
@@ -459,7 +485,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private class HilLowerComparator implements Comparator<HilFeature>{
     @Override
     public int compare(HilFeature o1, HilFeature o2) {
-      return (int)java.lang.Math.signum(o2.lbound - o1.lbound);
+      return (int)java.lang.Math.signum(o1.lbound - o2.lbound);
     }
     
   }
@@ -467,7 +493,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private class HilUpperComparator implements Comparator<HilFeature>{
     @Override
     public int compare(HilFeature o1, HilFeature o2) {
-      return (int)java.lang.Math.signum(o2.ubound - o1.ubound);
+      return (int)java.lang.Math.signum(o1.ubound - o2.ubound);
     }
     
   }
@@ -481,6 +507,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     protected int h = 32;
     
     protected double t = 2.0;
+    
+    protected Enum<Selection> tn;
     
     @Override
     protected void makeOptions(Parameterization config) {
@@ -505,15 +533,24 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       if(config.grab(tP)) {
         t = (tP.getValue() >= 1.0)? tP.getValue() : 2.0;
       }
+      
+      final EnumParameter<Selection> tnP = new EnumParameter<Selection>(TN_ID, Selection.class,  Selection.TopN);
+      if(config.grab(tnP)) {
+        tn = tnP.getValue();
+      }
     }
 
     @Override
     protected HilOut<O> makeInstance() {
-      return new HilOut<O>(k, n, h, t);
+      return new HilOut<O>(k, n, h, t, tn);
     }
     
   }
 
+}
+
+enum Selection {
+  All, TopN
 }
 
 final class NNComparator implements Comparator<NN>{
