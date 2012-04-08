@@ -115,12 +115,13 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private LPNormDistanceFunction distfunc;
   
   private int capital_n, n_star,capital_n_star,d;
-  private double omega_star = 0.0;
+  private double omega_star;
   private Set<HilFeature> top;
   private HilFeature[] pf;
   private Heap<HilFeature> out;
   private Heap<HilFeature> wlb;
   private O factory;
+  private WritableDoubleDataStore hilout_weight;
   
   protected HilOut(int k, int n, int h, double t) {
     super();
@@ -135,16 +136,16 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     this.wlb = new Heap<HilFeature>(n+1, lc);
     this.top = new HashSet<HilFeature>(2*n+1);
     this.n_star = 0;
+    this.omega_star = 0.0;
   }
 
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
     
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
-    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;
-    WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;    
     factory = DatabaseUtil.assumeVectorField(relation).getFactory();
-    
+    hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     capital_n_star = capital_n = relation.size();
     int j = 0;
     
@@ -176,8 +177,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     }
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
     while(j <= d && n_star < n){
-      //out.clear();
-      //wlb.clear();
+      out.clear();
+      wlb.clear();
       double v = j*shift;
       hilbert(v, j);
       scan(v, (int)(k * ((double)capital_n / (double)capital_n_star)));
@@ -199,13 +200,12 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       }
     }
     if(n_star < n){
-      scan(shift*d, capital_n);
+      //out.clear();
+      //wlb.clear();
+      scan(1.0, capital_n);
     }
     if(progressHilOut != null) {
       progressHilOut.ensureCompleted(logger);
-    }
-    for(HilFeature entry: out){
-      hilout_weight.putDouble(entry.id, entry.sum_nn);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, Double.POSITIVE_INFINITY, 0.0, Double.POSITIVE_INFINITY);
@@ -214,12 +214,12 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   }
   
   private void hilbert(double v, int j){
-    int half_max_int = Integer.MAX_VALUE >> 1;
+    int half_max_int = Integer.MAX_VALUE >>> (32-h);
     int v_half_max_int = (int)(v * half_max_int);
     for (int i=0; i < pf.length; i++){
       int[] coord = new int[d];
       for(int dim=0; dim < d; dim++){
-        coord[dim] = (int)(v_half_max_int + half_max_int * pf[i].point[dim]);
+        coord[dim] = (int)(v_half_max_int + half_max_int * pf[i].point[dim]) << (32-h);
       }
       pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
     }
@@ -235,36 +235,36 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   
   private void scan(double v, int k0){
     for (int i=0; i < pf.length; i++){
-      if (pf[i].ubound < omega_star){
-        continue;
-      }          
-      if (pf[i].lbound < pf[i].ubound){
-        double omega = fastUpperBound(i);
-        if (omega < omega_star){
-          pf[i].ubound = omega;
-        }
-        else{
-          int maxcount;
-          if (top.contains(pf[i])){
-            maxcount = capital_n-1;
+      if (pf[i].ubound >= omega_star){         
+        if (pf[i].lbound < pf[i].ubound){
+          double omega = fastUpperBound(i);
+          if (omega < omega_star){
+            pf[i].ubound = omega;
           }
           else{
-            maxcount = java.lang.Math.min(2*k0, capital_n-1);
-          }
-          DoubleDoublePair bounds = innerScan(i, maxcount, v);
-          double newlb = bounds.first;
-          double newub = bounds.second;
-          if(newlb > pf[i].lbound){
-            pf[i].lbound = newlb;
-          }
-          if(newub < pf[i].ubound){
-            pf[i].ubound = newub;
+            int maxcount;
+            if (top.contains(pf[i])){
+              maxcount = capital_n-1;
+            }
+            else{
+              maxcount = java.lang.Math.min(2*k0, capital_n-1);
+            }
+            DoubleDoublePair bounds = innerScan(i, maxcount, v);
+            double newlb = bounds.first;
+            double newub = bounds.second;
+            if(newlb > pf[i].lbound){
+              pf[i].lbound = newlb;
+            }
+            if(newub < pf[i].ubound){
+              pf[i].ubound = newub;
+              hilout_weight.putDouble(pf[i].id, pf[i].ubound);
+            }
           }
         }
+        updateOUT(i);
+        updateWLB(i);
+        omega_star = java.lang.Math.max(omega_star, wlb.peek().lbound);
       }
-      updateOUT(i);
-      updateWLB(i);
-      omega_star = java.lang.Math.max(omega_star, wlb.peek().lbound);
     }
   }
   
@@ -328,7 +328,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         levela = java.lang.Math.min(levela, pf[a].level);
         c = a;                  
       }
-      else if(b < maxcount) {
+      else if(b < capital_n-1) {
         levelb = java.lang.Math.min(levelb, pf[b].level);
         b++;
         c = b;
@@ -416,7 +416,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
           pf[i].nn.offer(entry);
           pf[i].nn_keys.remove(head.id);
           pf[i].nn_keys.add(id);
-          pf[i].nn.poll();
+          head = pf[i].nn.poll();
           pf[i].sum_nn -= (head.distance - entry.distance);
         }
       }
@@ -426,7 +426,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private void trueOutliers(){
     n_star = 0;
     for (HilFeature  entry : out){
-      if (entry.lbound == entry.ubound && entry.ubound >= omega_star){
+      if (entry.lbound >= entry.ubound && entry.ubound >= omega_star){
         n_star++;
       }
     }
