@@ -93,7 +93,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   /**
    * Parameter to specify if only the Top n, or also approximations for the other elements, should be returned
    */
-  public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output for Top n or all elements");
+  public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output of Top n or all elements");
   
   /**
    * Holds the value of {@link #K_ID}.
