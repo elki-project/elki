@@ -146,7 +146,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     HilLowerComparator lc = new HilLowerComparator();
     this.out = new Heap<HilFeature>(n+1, uc);
     this.wlb = new Heap<HilFeature>(n+1, lc);
-    this.top = new HashSet<HilFeature>(2*n+1);
+    this.top = new HashSet<HilFeature>(2*n);
     this.n_star = 0;
     this.omega_star = 0.0;
   }
