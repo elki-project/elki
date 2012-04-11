@@ -397,15 +397,24 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   }
   
   private double maxDist(double[] p, int level){
-    double dist = Double.NEGATIVE_INFINITY;
+    double dist;
     double r = 2.0 / (double)(1 << level+1);
-    if (t == Double.POSITIVE_INFINITY){
+    if (t == 1.0){
+      dist = 0.0;
+      for (int dim=0; dim < d; dim++){
+        double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r)*r;
+        dist += java.lang.Math.max(p_m_r, r-p_m_r);
+      }
+    }
+    else if (Double.isInfinite(t)){
+      dist = Double.NEGATIVE_INFINITY;
       for (int dim=0; dim < d; dim++){
         double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r)*r;
         dist = java.lang.Math.max(dist, java.lang.Math.max(p_m_r, r-p_m_r));
-      }
+      } 
     }
-    else{
+    else {
+      dist = 0.0;
       for (int dim=0; dim < d; dim++){
         double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r)*r;
         dist += java.lang.Math.pow(java.lang.Math.max(p_m_r, r-p_m_r), t);
@@ -529,7 +538,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       
       final DoubleParameter tP = new DoubleParameter(T_ID, 2.0);
       if(config.grab(tP)) {
-        t = (tP.getValue() >= 1.0)? tP.getValue() : 2.0;
+        t = java.lang.Math.abs(tP.getValue());
+        t = (t >= 1.0)? t : 1.0;
       }
       
       final EnumParameter<Selection> tnP = new EnumParameter<Selection>(TN_ID, Selection.class,  Selection.TopN);
