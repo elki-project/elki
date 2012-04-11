@@ -218,6 +218,9 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       wlb.clear();
       scan(1.0, capital_n);
     }
+    if(progressHilOut != null) {
+      progressHilOut.ensureCompleted(logger);
+    }
     if (tn == Selection.TopN){
       for(HilFeature ent : out){
         hilout_weight.putDouble(ent.id, ent.ubound);
@@ -228,9 +231,6 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         hilout_weight.putDouble(ent.id, ent.ubound);
       }
       
-    }
-    if(progressHilOut != null) {
-      progressHilOut.ensureCompleted(logger);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, Double.POSITIVE_INFINITY, 0.0, Double.POSITIVE_INFINITY);
@@ -324,8 +324,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private double fastUpperBound(int i){
     int pre = i;
     int post = i;
-    int z = 0;
-    while(z < k){
+    while(post-pre < k){
       int pre_level = (pre-1 >= 0) ?  pf[pre-1].level : -1;
       int post_level = (post < capital_n-1)? pf[post].level : -1;
       if (post_level >= pre_level){
@@ -334,7 +333,6 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       else{
         pre--;
       }
-      z++;
     }
     return k*maxDist(pf[i].point,minReg(pre, post));
   }
