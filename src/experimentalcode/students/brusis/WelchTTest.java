@@ -23,12 +23,17 @@ package experimentalcode.students.brusis;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 
 /**
  * Calculates a test statistic according to Welch's t test for two samples
  * Supplies methods for calculating the degrees of freedom according to the
- * Welch-Satterthwaite Equation Calculates a two-sided p-value for the
+ * Welch-Satterthwaite Equation. Also directly calculates a two-sided p-value for the
  * underlying t-distribution
  * 
  * @author Jan Brusis
@@ -37,21 +42,42 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 public class WelchTTest implements StatisticalTest {
 
   public static void main(String... args) {
-    double[] sample1 = { 498, 510, 505, 495, 491, 488, 493, 501, 502, 501 };
-    double[] sample2 = { 495, 510, 507, 500, 498, 492, 498, 501 };
-    MeanVariance MV1 = new MeanVariance();
-    MeanVariance MV2 = new MeanVariance();
+//    double[] sample1 = { 498, 510, 505, 495, 491, 488, 493, 501, 502, 501 };
+//    double[] sample2 = { 495, 510, 507, 500, 498, 492, 498, 501 };
+    double[] sample1 = new double[610];
+    double[] sample2 = new double[192];
+    try {
+      BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+      String line = reader.readLine();
+      String[] split = line.split("\\s");
+      for(int i = 0; i<split.length;i++) {
+        sample1[i] = Double.parseDouble(split[i]);
+      }
+      reader = new BufferedReader(new FileReader(args[1]));
+      line = reader.readLine();
+      split = line.split("\\s");
+      for(int i = 0; i<split.length;i++) {
+        sample2[i] = Double.parseDouble(split[i]);
+      }
+      reader.close();
+    }
+    catch(FileNotFoundException e) {
+      // TODO Auto-generated catch block
+      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+    }
+    catch(IOException e) {
+      // TODO Auto-generated catch block
+      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+    }
 
-    for(double d : sample1) {
-      MV1.put(d);
-    }
-    for(double d : sample2) {
-      MV2.put(d);
-    }
     new WelchTTest().deviation(sample1, sample2);
   }
 
   @Override
+  /**
+   * The deviation as needed for HiCS
+   * Returns the contrast value as defined by HiCS
+   */
   public double deviation(double[] sample1, double[] sample2) {
     MeanVariance MV1 = new MeanVariance();
     MeanVariance MV2 = new MeanVariance();
@@ -63,10 +89,9 @@ public class WelchTTest implements StatisticalTest {
       MV2.put(d);
     }
 
-    double t = -calculateTestStatistic(MV1.getMean(), MV2.getMean(), MV1.getSampleVariance(), MV2.getSampleVariance(), sample1.length, sample2.length);
+    double t = calculateTestStatistic(MV1.getMean(), MV2.getMean(), MV1.getSampleVariance(), MV2.getSampleVariance(), sample1.length, sample2.length);
     int v = calculateDG(MV1.getSampleVariance(), MV2.getSampleVariance(), sample1.length, sample2.length);
-    // System.out.println("t : "+t+"\tv: "+v+"\tpVal: "+calculatePValue(t,
-    // v)/2.0);
+//     System.out.println("t : "+t+"\tv: "+v+"\tpVal: "+(1-calculatePValue(t, v)));
     return 1 - calculatePValue(t, v);
   }
 
@@ -92,7 +117,7 @@ public class WelchTTest implements StatisticalTest {
   }
 
   /**
-   * Calculate the statistic of Welch's t test
+   * Calculate the statistic of Welch's t test using statistical moments of the provided data samples
    * 
    * @param mean1
    * @param mean2
@@ -104,10 +129,10 @@ public class WelchTTest implements StatisticalTest {
    */
   public static double calculateTestStatistic(double mean1, double mean2, double var1, double var2, int size1, int size2) {
 
-    // System.err.println("Mean of sample 1: " + mean1);
-    // System.err.println("Mean of sample 2: " + mean2);
-    // System.err.println("Variance of sample 1: " + var1);
-    // System.err.println("Variance of sample 2: " + var2);
+//    System.err.println("Mean of sample 1: " + mean1);
+//    System.err.println("Mean of sample 2: " + mean2);
+//    System.err.println("Variance of sample 1: " + var1);
+//    System.err.println("Variance of sample 2: " + var2);
     double t = (mean1 - mean2) / Math.sqrt(var1 / size1 + var2 / size2);
     // System.err.println("Test Statistic: " + t);
     return t;

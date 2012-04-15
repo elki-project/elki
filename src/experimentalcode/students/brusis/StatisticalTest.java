@@ -23,12 +23,13 @@ package experimentalcode.students.brusis;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-import java.util.Set;
-
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
+/**
+ * Interface for the statistical test used by HiCS
+ * Provides a single method that calculates the deviation between two data samples, given as arrays of double values 
+ * 
+ * @author Jan Brusis
+ *
+ */
 public interface StatisticalTest {
 
   public double deviation(double[] fullSample, double[] conditionalSample);
