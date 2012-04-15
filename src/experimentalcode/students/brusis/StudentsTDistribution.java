@@ -58,16 +58,22 @@ public class StudentsTDistribution implements Distribution {
     return cdf(val, v);
   }
 
+  /**
+   * Static version of the t distribution's PDF
+   * @param val value toe valuate
+   * @param v degrees of freedom
+   * @return f(val,v)
+   */
   public static double pdf(double val, int v) {
     return Math.exp(GammaDistribution.logGamma((v + 1) / 2) - GammaDistribution.logGamma(v / 2)) * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) / 2));
   }
 
   /**
-   * The CDF of the t-distribution for t > 0
+   * Static version of the CDF of the t-distribution for t > 0
    * 
-   * @param val
-   * @param v
-   * @return
+   * @param val value to evaluate
+   * @param v degrees of freedom
+   * @return F(val, v)
    */
   public static double cdf(double val, int v) {
     double x = v / (val * val + v);

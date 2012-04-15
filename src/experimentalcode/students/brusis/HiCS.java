@@ -23,10 +23,6 @@ package experimentalcode.students.brusis;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -38,16 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.SOD;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -56,7 +48,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -64,13 +55,9 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
 
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -79,7 +66,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -87,8 +73,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Algorithm to compute High Contrast Subspaces for Density-Based Outlier
@@ -145,10 +129,10 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    */
   private double alpha;
 
-  /**
-   * Holds the value of {@link #ALGO_ID}
-   */
-  private OutlierAlgorithm outlierAlgorithm;
+//  /**
+//   * Holds the value of {@link #ALGO_ID}
+//   */
+//  private OutlierAlgorithm outlierAlgorithm;
 
   /**
    * Holds the value of{@link #TEST_ID}
@@ -175,7 +159,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     super();
     this.m = m;
     this.alpha = alpha;
-    this.outlierAlgorithm = outlierAlgorithm;
+//    this.outlierAlgorithm = outlierAlgorithm;
     this.statTest = statTest;
     this.cutoff = cutoff;
   }
@@ -192,45 +176,13 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     this.subspaceIndex = calculateIndices(relation);
 
     Set<BitSet> subspaces = calculateSubspaces(relation);
-
-    // TEST PART THAT READS SUBSPACES FROM A TEXTFILE (so I don't have to
-    // compute them every time)
-    // Set<BitSet> subspaces = new HashSet<BitSet>();
-    // //
-    // try {
-    // BufferedReader reader = new BufferedReader(new
-    // FileReader("E:\\metabolom_hics.txt"));
-    //
-    // for(int i = 0; i < 5; i++) {
-    // String line = reader.readLine();
-    // String subspace = line.substring(line.indexOf("[") + 1,
-    // line.indexOf("]"));
-    // String[] indices = subspace.split("\\s");
-    // SubspaceSet<Integer> set = new SubspaceSet<Integer>();
-    // for(String s : indices) {
-    // if(s.contains(","))
-    // s = s.substring(0, s.indexOf(","));
-    // set.add(Integer.parseInt(s));
-    // }
-    // subspaces.add(set.BitSetRepresentation());
-    // }
-    // reader.close();
-    // }
-    // catch(FileNotFoundException e) {
-    // // TODO Auto-generated catch block
-    // de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-    // }
-    // catch(IOException e) {
-    // // TODO Auto-generated catch block
-    // de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-    // }
-
-    //
+    
     System.out.println("Number of high-contrast subspaces: " + subspaces.size());
     List<OutlierResult> results = new ArrayList<OutlierResult>();
     FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), logger) : null;
 
     // run outlier detection and collect the result
+    //TODO extend so that any outlierAlgorithm can be used (use materialized relation instead of SubspaceEuclideanDistanceFunction?)
     LOF<NumberVector<?, ?>, DoubleDistance> lof;
     for(BitSet dimset : subspaces) {
       SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
@@ -392,7 +344,6 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
             joinedSet.addAll(set2);
             double contrast = calculateHiCS(relation, new ArrayList<Integer>(joinedSet));
             joinedSet.setContrast(contrast);
-            // System.out.println("Set1: "+set1+"\t"+set1.getContrast()+"\tSet2"+set2+"\t"+set2.getContrast()+"\tJoined: "+joinedSet+"\t"+joinedSet.getContrast());
           }
 
           if(joinedSet == null) {
@@ -424,8 +375,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     }
 
     Iterator<SubspaceSet<Integer>> it = subspaceList.iterator();
-    // for(int i = 0; i < (subspaceList.size() < 100 ? subspaceList.size() :
-    // 100); i++) {
+
     for(int i = 0; i < subspaceList.size(); i++) {
       SubspaceSet<Integer> set = it.next();
       System.out.println(set + " Contrast: " + set.getContrast());
@@ -468,7 +418,6 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
 
         conditionalSample = DBIDUtil.intersection(conditionalSample, indexBlock);
       }
-
       if(conditionalSample.size() < 10) {
         i--;
         error++;
@@ -488,7 +437,6 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
       }
       conditionalSample = null;
       sample = null;
-
       double contrast = statTest.deviation(fullValues, sampleValues);
 
       if(Double.isNaN(contrast)) {
