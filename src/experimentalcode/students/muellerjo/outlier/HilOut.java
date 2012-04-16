@@ -132,7 +132,6 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private Heap<HilFeature> out;
   private Heap<HilFeature> wlb;
   private O factory;
-  private WritableDoubleDataStore hilout_weight;
   
   protected HilOut(int k, int n, int h, double t, Enum<Selection> tn) {
     super();
@@ -157,7 +156,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;    
     factory = DatabaseUtil.assumeVectorField(relation).getFactory();
-    hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     capital_n_star = capital_n = relation.size();
     int j = 0;
     
@@ -189,7 +188,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         progressPreproc.incrementProcessed(logger);
       }
     }
-    FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
+    FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
     while(j <= d && n_star < n){
       out.clear();
       wlb.clear();
