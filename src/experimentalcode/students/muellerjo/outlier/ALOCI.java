@@ -257,6 +257,8 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
    * @param qts List of (shifted) QuadTrees
    * @param cg Node containing the counting Neighborhood found to fit best for the Object
    * @param level Target Level of the Sampling Neighborhood
+   * 
+   * @return DoubleIntPair containing the MDEF Norm and the level of the sampling Neighborhood
    */
   
   private DoubleIntPair calculate_MDEF_norm(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode<O> cg, int level){
