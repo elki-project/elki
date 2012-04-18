@@ -188,6 +188,9 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         progressPreproc.incrementProcessed(logger);
       }
     }
+    if(progressPreproc != null) {
+      progressPreproc.ensureCompleted(logger);
+    }
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
     while(j <= d && n_star < n){
       out.clear();

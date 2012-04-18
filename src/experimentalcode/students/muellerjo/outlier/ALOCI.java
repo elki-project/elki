@@ -138,7 +138,7 @@ public class ALOCI<O  extends NumberVector<O, ?>, D extends NumberDistance<D, ?>
   public OutlierResult run(Database database) throws IllegalStateException {    
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("aLOCI preprocessing", relation.size(), logger) : null;
+    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("aLOCI preprocessing", relation.size()*g, logger) : null;
     /* Initialization part
      * Generate a list for the g QuadTrees and insert the first unshifted Tree.
      */
