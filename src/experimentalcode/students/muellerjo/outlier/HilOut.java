@@ -47,6 +47,9 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -59,10 +62,22 @@ import experimentalcode.erich.BitsUtil;
 import experimentalcode.erich.HilbertSpatialSorter;
 
 /**
+ * Fast Outlier Detection in High Dimensional Spaces
+ * 
+ * Outlier Detection using Hilbert space filling curves
+ * 
+ * Based on: F. Angiulli, C. Pizzuti: 
+ * Fast Outlier Detection in High Dimensional Spaces. In: Proc. 
+ * European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02), 
+ * Helsinki, Finland, 2002. 
+ * 
  * @author Jonathan von Brünken
  *
  * @param <O> Object type
  */
+@Title("Fast Outlier Detection in High Dimensional Spaces")
+@Description("Algorithm to compute outliers using Hilbert space filling curves")
+@Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", url = "http://dx.doi.org/10.1145/375663.375668")
 public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
 
   /**
@@ -133,6 +148,15 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private Heap<HilFeature> wlb;
   private O factory;
   
+  /**
+   * Constructor.
+   * 
+   * @param k Number of Next Neighbors 
+   * @param n Number of Outlier
+   * @param h Number of Bits for precision to use - max 32
+   * @param t p of LP-NormDistance - 1.0-Infinity
+   * @param tn TopN or All Outlier Rank to return
+   */
   protected HilOut(int k, int n, int h, double t, Enum<Selection> tn) {
     super();
     this.n = n;
@@ -150,6 +174,9 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     this.omega_star = 0.0;
   }
 
+  /**
+   * Runs the algorithm in the timed evaluation part.
+   */
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
     
@@ -157,12 +184,12 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;    
     factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    
+    // Initialization part
     capital_n_star = capital_n = relation.size();
     int j = 0;
-    
     pf = new HilFeature[capital_n];
     d = DatabaseUtil.dimensionality(relation);
-    
     NNComparator distcheck = new NNComparator();
     Pair<O,O> minMax = DatabaseUtil.computeMinMax(relation);
     double shift = 1.0 / (double)d;
@@ -192,13 +219,19 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       progressPreproc.ensureCompleted(logger);
     }
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
+    //Main part: 1. Phase max. d+1 loops
     while(j <= d && n_star < n){
+      //initialize (clear) out and wlb - not 100% clear in the paper
       out.clear();
       wlb.clear();
       double v = j*shift;
-      hilbert(v, j);
+      // Initialize Hilbert values in pf according to current shift 
+      hilbert(v);
+      // scan the Data according to the current shift; build out and wlb
       scan(v, (int)(k * ((double)capital_n / (double)capital_n_star)));
+      // determine the true Outliers (n_star)
       trueOutliers();
+      // Build the top Set as out + wlb
       top.clear();
       Set<DBID> top_keys = new HashSet<DBID>(out.size());
       for(HilFeature entry : out){
@@ -215,6 +248,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         progressHilOut.incrementProcessed(logger);
       }
     }
+    // 2. Phase: Additional Scan if less than n true Outlier determined
     if(n_star < n){
       out.clear();
       wlb.clear();
@@ -223,11 +257,13 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     if(progressHilOut != null) {
       progressHilOut.ensureCompleted(logger);
     }
+    // Return weights in out
     if (tn == Selection.TopN){
       for(HilFeature ent : out){
         hilout_weight.putDouble(ent.id, ent.ubound);
       }
     }
+    // Return all weights in pf
     else{
       for(HilFeature ent : pf){
         hilout_weight.putDouble(ent.id, ent.ubound);
@@ -239,8 +275,13 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;
   }
-  
-  private void hilbert(double v, int j){
+  /**
+   * Hilbert function to fill pf with shifted Hilbert values.
+   * Also calculates the number current Outlier candidates capital_n_star
+   * 
+   * @param v the current shift factor
+   */ 
+  private void hilbert(double v){
     int half_max_int = Integer.MAX_VALUE >>> (32-h);
     int v_half_max_int = (int)(v * half_max_int);
     for (int i=0; i < pf.length; i++){
@@ -260,6 +301,12 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     }
   }
   
+  /**
+   * Scan function performs a squential scan over the data.
+   * 
+   * @param v the current shift factor
+   * @param k0 
+   */ 
   private void scan(double v, int k0){
     for (int i=0; i < pf.length; i++){
       if (pf[i].ubound >= omega_star){        
@@ -270,6 +317,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
           }
           else{
             int maxcount;
+            // capital_n-1 instead of capital_n to prevent ArrayOutOfBounds
             if (top.contains(pf[i])){
               maxcount = capital_n-1;
             }
@@ -296,6 +344,11 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     }
   }
   
+  /**
+   * updateOUT function inserts pf[i] in out.
+   * 
+   * @param i position in pf of the feature to be inserted
+   */ 
   private void updateOUT(int i){
     if (out.size() < n){
       out.offer(pf[i]);
@@ -309,6 +362,11 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     }
   }
   
+  /**
+   * updateWLB function inserts pf[i] in wlb.
+   * 
+   * @param i position in pf of the feature to be inserted
+   */ 
   private void updateWLB(int i){
     if (wlb.size() < n){
       wlb.offer(pf[i]);
@@ -322,7 +380,11 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     } 
   }
   
-  
+  /**
+   * fastUpperBound function calculates an upper Bound as k*maxDist(pf[i], smallest neighborhood)
+   * 
+   * @param i position in pf of the feature for which the bound should be calculated
+   */ 
   private double fastUpperBound(int i){
     int pre = i;
     int post = i;
@@ -339,6 +401,15 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     return k*maxDist(pf[i].point,minReg(pre, post));
   }
   
+  /**
+   * innerScan function calculates new upper and lower bounds and inserts the points of the neighborhood the bounds are based on in the NN Set
+   * 
+   * @param i position in pf of the feature for which the bounds should be calculated
+   * @param maxcount maximal size of the neighborhood
+   * @param v the current shift
+   * 
+   * @return DoubleDoublePair containing the new lower and upper bound
+   */ 
   private DoubleDoublePair innerScan(int i, int maxcount, double v){
     int a;
     int b = a = i;
@@ -346,6 +417,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     int level = levela = levelb = h;
     int count = 0;
     boolean stop = false;
+    //Small changes to prevent ArrayOutOfBound Exceptions
     while(count < maxcount && !stop){
       int c;
       count++;
@@ -388,6 +460,12 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     return new DoubleDoublePair(newlb, newub);
   }
   
+  /**
+   * minDist function calculate the minimal Distance from Vector p to the border of the corresponding r-region at the given level 
+   * 
+   * @param p Point as Vector
+   * @param level Level of the corresponding r-region
+   */ 
   private double minDist(double[] p, int level){
     double dist = Double.POSITIVE_INFINITY;
     double r = 2.0 / (double)(1 << level+1);
@@ -398,6 +476,12 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     return dist;
   }
   
+  /**
+   * maxDist function calculate the maximal Distance from Vector p to the border of the corresponding r-region at the given level 
+   * 
+   * @param p Point as Vector
+   * @param level Level of the corresponding r-region
+   */ 
   private double maxDist(double[] p, int level){
     double dist;
     double r = 2.0 / (double)(1 << level+1);
@@ -426,12 +510,26 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     return dist;
   }
   
+  /**
+   * minReg function calculate the minimal r-region level containing two points
+   * 
+   * @param a index of first point in pf
+   * @param b index of second point in pf
+   * 
+   * @return Level of the r-region
+   */ 
   private int minReg(int a, int b){
       long[] pf_a = BitsUtil.copy(pf[a].hilbert);
       BitsUtil.xorI(pf_a, pf[b].hilbert);
       return (1 << (numberOfLeadingZeros(pf_a) / d)) >> 1;
   }
   
+  /**
+   * insert function inserts a nearest neighbor into a features nn list and its distance 
+   * @param i index of the feature in pf
+   * @param id DBID of the nearest neighbor
+   * @param dt distance or the neighbor to the features position
+   */ 
   private void insert(int i, DBID id, double dt){
     if (!pf[i].nn_keys.contains(id)){
       if (pf[i].nn.size() < k){
@@ -466,7 +564,15 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       }
     }
   }
-  
+  /**
+   * boxRadius function calculate the Boxradius
+   * 
+   * @param i index of first point
+   * @param a index of second point
+   * @param b index of third point
+   * 
+   * @return
+   */ 
   private double boxRadius(int i, int a, int b, double v){
     long[] hil1 = BitsUtil.copy(pf[a].hilbert);
     long[] hil2 = BitsUtil.copy(pf[b].hilbert);
@@ -476,6 +582,13 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     return minDist(pf[i].point, level);
   }
   
+  /**
+   * numberOfLeadingZeros wrapper function for the corresponding BitsUtil function
+   * 
+   * @param in long Array input
+   * 
+   * @return number of leading zeros and 0 if none
+   */ 
   private int numberOfLeadingZeros(long[] in){
     int out = BitsUtil.numberOfLeadingZeros(in);
     return (out == -1) ? 0 : out;
