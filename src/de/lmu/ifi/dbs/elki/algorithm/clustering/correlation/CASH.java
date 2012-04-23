@@ -84,7 +84,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
- * hough transform.
+ * Hough transform.
+ * 
+ * <b>Note:</b> CASH requires explicitly setting the input parser other than default to
+ * {@link de.lmu.ifi.dbs.elki.datasource.parser.ParameterizationFunctionLabelParser}:
+ * (in the MiniGui, set option: dbc.parser ParameterizationFunctionLabelParser).
+ * 
  * <p>
  * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek: Robust
  * clustering in arbitrarily oriented subspaces. <br>
@@ -99,7 +104,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
-@Description("Subspace clustering algorithm based on the hough transform.")
+@Description("Subspace clustering algorithm based on the Hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
 public class CASH extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
