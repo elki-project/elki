@@ -135,7 +135,7 @@ public class TestBitsUtil {
     long[] bituti = BitsUtil.zero(Long.SIZE);
     for (int i = 0; i >= 0;) {
       assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
-      i = bitset.nextSetBit(i);
+      i = bitset.nextSetBit(i + 1);
     }
     // Java 7:
     // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
@@ -144,7 +144,7 @@ public class TestBitsUtil {
     BitsUtil.setI(bituti, 4);
     for (int i = 0; i >= 0;) {
       assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
-      i = bitset.nextSetBit(i);
+      i = bitset.nextSetBit(i + 1);
     }
     // Java 7:
     // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
@@ -153,7 +153,7 @@ public class TestBitsUtil {
     BitsUtil.setI(bituti, 15);
     for (int i = 0; i >= 0;) {
       assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
-      i = bitset.nextSetBit(i);
+      i = bitset.nextSetBit(i + 1);
     }
     // Java 7:
     // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
