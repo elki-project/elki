@@ -412,7 +412,8 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      for(int i = shiftWords; i < v.length; i++) {
+      final int end = Math.min(v.length, o.length + shiftWords);
+      for(int i = shiftWords; i < end; i++) {
         v[i] ^= o[i - shiftWords];
       }
       return v;
@@ -470,7 +471,8 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      for(int i = shiftWords; i < v.length; i++) {
+      final int end = Math.min(v.length, o.length + shiftWords);
+      for(int i = shiftWords; i < end; i++) {
         v[i] |= o[i - shiftWords];
       }
       return v;
@@ -527,7 +529,8 @@ public final class BitsUtil {
     }
     // Simple case - multiple of word size
     if(shiftBits == 0) {
-      for(int i = shiftWords; i < v.length; i++) {
+      final int end = Math.min(v.length, o.length + shiftWords);
+      for(int i = shiftWords; i < end; i++) {
         v[i] &= o[i - shiftWords];
       }
       // Clear bottom words
