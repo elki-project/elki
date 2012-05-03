@@ -1,37 +1,5 @@
 package experimentalcode.erich.approxknn;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
-import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -54,6 +22,44 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import experimentalcode.erich.BitsUtil;
+import experimentalcode.erich.HilbertSpatialSorter;
+
 /**
  * Simple experiment to estimate the effects of approximating the kNN with space
  * filling curves.
@@ -68,27 +74,56 @@ public class SpacefillingKNNExperiment {
   private void run() {
     Database database = loadDatabase();
     Relation<NumberVector<?, ?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    final int dim = DatabaseUtil.dimensionality(rel);
     DBIDs ids = rel.getDBIDs();
 
     List<SpatialRef> zs = new ArrayList<SpatialRef>(ids.size());
     List<SpatialRef> ps = new ArrayList<SpatialRef>(ids.size());
-    for(DBID id : ids) {
-      SpatialRef ref = new SpatialRef(id, rel.get(id));
-      zs.add(ref);
-      ps.add(ref);
+    List<HilbertRef> hs = new ArrayList<HilbertRef>(ids.size());
+    {
+      DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+      for(DBID id : ids) {
+        final NumberVector<?, ?> v = rel.get(id);
+        SpatialRef ref = new SpatialRef(id, v);
+        zs.add(ref);
+        ps.add(ref);
+        for(int d = 0; d < dim; d++) {
+          mms[d].put(v.doubleValue(d + 1));
+        }
+      }
+      // Build hilbert curves
+      int[] buf = new int[dim];
+      for(DBID id : ids) {
+        final NumberVector<?, ?> v = rel.get(id);
+        // Convert into integers
+        for(int d = 0; d < dim; d++) {
+          double val = (v.doubleValue(d + 1) - mms[d].getMin()) / mms[d].getDiff() * Integer.MAX_VALUE;
+          buf[d] = (int) val;
+        }
+        HilbertRef ref = new HilbertRef(id, v, HilbertSpatialSorter.coordinatesToHilbert(buf, Integer.SIZE - 1));
+        hs.add(ref);
+      }
+
+      // Sort spatially
+      (new ZCurveSpatialSorter()).sort(zs);
+      (new PeanoSpatialSorter()).sort(ps);
+      Collections.sort(hs);
+      // Discard bits, we don't need them anymore
+      for(HilbertRef ref : hs) {
+        ref.bits = null;
+      }
     }
-    // Sort spatially
-    (new ZCurveSpatialSorter()).sort(zs);
-    (new PeanoSpatialSorter()).sort(ps);
-    // Build index
+    // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
     {
       Iterator<SpatialRef> it = zs.iterator();
       for(int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
-        positions.put(r.id, new int[] { i, -1 });
+        positions.put(r.id, new int[] { i, -1, -1 });
       }
-      it = ps.iterator();
+    }
+    {
+      Iterator<SpatialRef> it = ps.iterator();
       for(int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
@@ -96,21 +131,31 @@ public class SpacefillingKNNExperiment {
         positions.put(r.id, data);
       }
     }
+    {
+      Iterator<HilbertRef> it = hs.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        HilbertRef r = it.next();
+        int[] data = positions.get(r.id);
+        data[2] = i;
+        positions.put(r.id, data);
+      }
+    }
 
     // True kNN value
     final int k = 50;
-    final int maxoff = 501;
+    final int maxoff = 101;
     DistanceQuery<NumberVector<?, ?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
     KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
     ArrayList<MeanVariance[]> mvs = new ArrayList<MeanVariance[]>();
     for(int i = 0; i < maxoff; i++) {
-      mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance() });
+      mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance(), new MeanVariance() });
     }
     for(DBID id : ids) {
-      DBIDs trueIds = knnq.getKNNForDBID(id, k).asDBIDs();
+      final KNNResult<DoubleDistance> trueNN = knnq.getKNNForDBID(id, k);
+      DBIDs trueIds = DBIDUtil.ensureSet(trueNN.asDBIDs());
       int[] posi = positions.get(id);
-      // Z only
+      // Approximate NN in Z curve only
       {
         ModifiableDBIDs candz = DBIDUtil.newHashSet();
         candz.add(zs.get(posi[0]).id);
@@ -127,7 +172,7 @@ public class SpacefillingKNNExperiment {
           mvs.get(off)[0].put(isize);
         }
       }
-      // Peano only
+      // Approximate NN in Peano curve only
       {
         ModifiableDBIDs candp = DBIDUtil.newHashSet();
         candp.add(ps.get(posi[1]).id);
@@ -144,7 +189,24 @@ public class SpacefillingKNNExperiment {
           mvs.get(off)[1].put(isize);
         }
       }
-      // Peano and Z
+      // Approximate NN in Hilbert curve only
+      {
+        ModifiableDBIDs candh = DBIDUtil.newHashSet();
+        candh.add(ps.get(posi[2]).id);
+        assert (candh.size() == 1);
+        for(int off = 1; off < maxoff; off++) {
+          if(posi[2] - off >= 0) {
+            candh.add(ps.get(posi[2] - off).id);
+          }
+          if(posi[2] + off < ids.size()) {
+            candh.add(ps.get(posi[2] + off).id);
+          }
+
+          final int isize = DBIDUtil.intersection(trueIds, candh).size();
+          mvs.get(off)[2].put(isize);
+        }
+      }
+      // Approximate NN in Z + Peano + Hilbert curves
       {
         ModifiableDBIDs cands = DBIDUtil.newHashSet();
         cands.add(zs.get(posi[0]).id);
@@ -163,9 +225,15 @@ public class SpacefillingKNNExperiment {
           if(posi[1] + off < ids.size()) {
             cands.add(ps.get(posi[1] + off).id);
           }
+          if(posi[2] - off >= 0) {
+            cands.add(hs.get(posi[2] - off).id);
+          }
+          if(posi[2] + off < ids.size()) {
+            cands.add(hs.get(posi[2] + off).id);
+          }
 
           final int isize = DBIDUtil.intersection(trueIds, cands).size();
-          mvs.get(off)[2].put(isize);
+          mvs.get(off)[3].put(isize);
         }
       }
     }
@@ -173,9 +241,10 @@ public class SpacefillingKNNExperiment {
     for(int i = 1; i < maxoff; i++) {
       MeanVariance[] mv = mvs.get(i);
       System.out.print(i);
-      System.out.print(" "+mv[0].getMean()+" "+mv[0].getNaiveStddev());
-      System.out.print(" "+mv[1].getMean()+" "+mv[1].getNaiveStddev());
-      System.out.print(" "+mv[2].getMean()+" "+mv[2].getNaiveStddev());
+      System.out.print(" " + mv[0].getMean() + " " + mv[0].getNaiveStddev());
+      System.out.print(" " + mv[1].getMean() + " " + mv[1].getNaiveStddev());
+      System.out.print(" " + mv[2].getMean() + " " + mv[2].getNaiveStddev());
+      System.out.print(" " + mv[3].getMean() + " " + mv[3].getNaiveStddev());
       System.out.println();
     }
   }
@@ -194,7 +263,7 @@ public class SpacefillingKNNExperiment {
       return db;
     }
     catch(Exception e) {
-      throw new RuntimeException("Cannot load database."+e, e);
+      throw new RuntimeException("Cannot load database." + e, e);
     }
   }
 
@@ -234,6 +303,38 @@ public class SpacefillingKNNExperiment {
     @Override
     public double getMax(int dimension) {
       return vec.getMax(dimension);
+    }
+  }
+
+  /**
+   * Object used in spatial sorting, combining the spatial object and the object
+   * ID.
+   * 
+   * @author Erich Schubert
+   */
+  static class HilbertRef implements Comparable<HilbertRef> {
+    protected DBID id;
+
+    protected NumberVector<?, ?> vec;
+
+    protected long[] bits;
+
+    /**
+     * Constructor.
+     * 
+     * @param id
+     * @param vec
+     */
+    protected HilbertRef(DBID id, NumberVector<?, ?> vec, long[] bits) {
+      super();
+      this.id = id;
+      this.vec = vec;
+      this.bits = bits;
+    }
+
+    @Override
+    public int compareTo(HilbertRef o) {
+      return BitsUtil.compare(this.bits, o.bits);
     }
   }
 

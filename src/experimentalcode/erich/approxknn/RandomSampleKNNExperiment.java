@@ -1,5 +1,27 @@
 package experimentalcode.erich.approxknn;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,35 +57,13 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2012
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 /**
  * Simple experiment to estimate the effects of approximating the kNN distances.
  * 
  * @author Erich Schubert
  */
-public class ApproxKNNExperiment {
-  private static final Logging logger = Logging.getLogger(ApproxKNNExperiment.class);
+public class RandomSampleKNNExperiment {
+  private static final Logging logger = Logging.getLogger(RandomSampleKNNExperiment.class);
 
   DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
 
@@ -243,7 +243,7 @@ public class ApproxKNNExperiment {
     // LoggingConfiguration.setDefaultLevel(Level.INFO);
     // logger.getWrappedLogger().setLevel(Level.INFO);
     try {
-      new ApproxKNNExperiment().run();
+      new RandomSampleKNNExperiment().run();
     }
     catch(Exception e) {
       logger.exception(e);
