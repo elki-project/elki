@@ -23,7 +23,6 @@ package experimentalcode.erich.approxknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -50,14 +49,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import experimentalcode.erich.BitsUtil;
 import experimentalcode.erich.HilbertSpatialSorter;
 
 /**
@@ -74,44 +70,24 @@ public class SpacefillingKNNExperiment {
   private void run() {
     Database database = loadDatabase();
     Relation<NumberVector<?, ?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    final int dim = DatabaseUtil.dimensionality(rel);
     DBIDs ids = rel.getDBIDs();
 
     List<SpatialRef> zs = new ArrayList<SpatialRef>(ids.size());
     List<SpatialRef> ps = new ArrayList<SpatialRef>(ids.size());
-    List<HilbertRef> hs = new ArrayList<HilbertRef>(ids.size());
+    List<SpatialRef> hs = new ArrayList<SpatialRef>(ids.size());
     {
-      DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
       for(DBID id : ids) {
         final NumberVector<?, ?> v = rel.get(id);
         SpatialRef ref = new SpatialRef(id, v);
         zs.add(ref);
         ps.add(ref);
-        for(int d = 0; d < dim; d++) {
-          mms[d].put(v.doubleValue(d + 1));
-        }
-      }
-      // Build hilbert curves
-      int[] buf = new int[dim];
-      for(DBID id : ids) {
-        final NumberVector<?, ?> v = rel.get(id);
-        // Convert into integers
-        for(int d = 0; d < dim; d++) {
-          double val = (v.doubleValue(d + 1) - mms[d].getMin()) / mms[d].getDiff() * Integer.MAX_VALUE;
-          buf[d] = (int) val;
-        }
-        HilbertRef ref = new HilbertRef(id, v, HilbertSpatialSorter.coordinatesToHilbert(buf, Integer.SIZE - 1));
         hs.add(ref);
       }
 
       // Sort spatially
       (new ZCurveSpatialSorter()).sort(zs);
       (new PeanoSpatialSorter()).sort(ps);
-      Collections.sort(hs);
-      // Discard bits, we don't need them anymore
-      for(HilbertRef ref : hs) {
-        ref.bits = null;
-      }
+      (new HilbertSpatialSorter()).sort(hs);
     }
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
@@ -132,9 +108,9 @@ public class SpacefillingKNNExperiment {
       }
     }
     {
-      Iterator<HilbertRef> it = hs.iterator();
+      Iterator<SpatialRef> it = hs.iterator();
       for(int i = 0; it.hasNext(); i++) {
-        HilbertRef r = it.next();
+        SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[2] = i;
         positions.put(r.id, data);
@@ -143,7 +119,7 @@ public class SpacefillingKNNExperiment {
 
     // True kNN value
     final int k = 50;
-    final int maxoff = 101;
+    final int maxoff = 2 * k + 1;
     DistanceQuery<NumberVector<?, ?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
     KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
@@ -303,38 +279,6 @@ public class SpacefillingKNNExperiment {
     @Override
     public double getMax(int dimension) {
       return vec.getMax(dimension);
-    }
-  }
-
-  /**
-   * Object used in spatial sorting, combining the spatial object and the object
-   * ID.
-   * 
-   * @author Erich Schubert
-   */
-  static class HilbertRef implements Comparable<HilbertRef> {
-    protected DBID id;
-
-    protected NumberVector<?, ?> vec;
-
-    protected long[] bits;
-
-    /**
-     * Constructor.
-     * 
-     * @param id
-     * @param vec
-     */
-    protected HilbertRef(DBID id, NumberVector<?, ?> vec, long[] bits) {
-      super();
-      this.id = id;
-      this.vec = vec;
-      this.bits = bits;
-    }
-
-    @Override
-    public int compareTo(HilbertRef o) {
-      return BitsUtil.compare(this.bits, o.bits);
     }
   }
 
