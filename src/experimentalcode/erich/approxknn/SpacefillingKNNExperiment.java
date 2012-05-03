@@ -168,14 +168,14 @@ public class SpacefillingKNNExperiment {
       // Approximate NN in Hilbert curve only
       {
         ModifiableDBIDs candh = DBIDUtil.newHashSet();
-        candh.add(ps.get(posi[2]).id);
+        candh.add(hs.get(posi[2]).id);
         assert (candh.size() == 1);
         for(int off = 1; off < maxoff; off++) {
           if(posi[2] - off >= 0) {
-            candh.add(ps.get(posi[2] - off).id);
+            candh.add(hs.get(posi[2] - off).id);
           }
           if(posi[2] + off < ids.size()) {
-            candh.add(ps.get(posi[2] + off).id);
+            candh.add(hs.get(posi[2] + off).id);
           }
 
           final int isize = DBIDUtil.intersection(trueIds, candh).size();
