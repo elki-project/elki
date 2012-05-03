@@ -22,6 +22,8 @@ package experimentalcode.erich;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
@@ -40,9 +42,69 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
-    final int dims = minmax.length >>> 1;
-    final long[] refl = BitsUtil.zero(dims);
-    hilbertSort(objs, start, end, minmax, 0, 0, refl, BitsUtil.zero(dims), false, dims);
+    expensiveSort(objs, start, end, minmax);
+    // final int dims = minmax.length >>> 1;
+    // final long[] refl = BitsUtil.zero(dims);
+    // hilbertSort(objs, start, end, minmax, 0, 0, refl, BitsUtil.zero(dims),
+    // false, dims);
+  }
+
+  /**
+   * Expensive sorting implementation that materializes the hilbert numbers.
+   * 
+   * @param objs Objects
+   * @param start Starting index
+   * @param end End index
+   * @param minmax Minimum and Maximum values
+   * @param <T> actual type
+   */
+  private <T extends SpatialComparable> void expensiveSort(List<T> objs, int start, int end, double[] minmax) {
+    final int dim = minmax.length >> 1;
+    List<HilbertRef<T>> tmp = new ArrayList<HilbertRef<T>>(end - start);
+    int[] buf = new int[dim];
+    for(int i = start; i < end; i++) {
+      T v = objs.get(i);
+      // Convert into integers
+      for(int d = 0; d < dim; d++) {
+        double val = (v.getMin(d + 1) + v.getMax(d + 1)) / 2;
+        val = Integer.MAX_VALUE * ((val - minmax[2 * d]) / (minmax[2 * d + 1] - minmax[2 * d]));
+        buf[d] = (int) val;
+      }
+      tmp.add(new HilbertRef<T>(v, coordinatesToHilbert(buf, Integer.SIZE - 1)));
+    }
+    // Sort and copy back
+    Collections.sort(tmp);
+    for(int i = start; i < end; i++) {
+      objs.set(i, tmp.get(i - start).vec);
+    }
+  }
+
+  /**
+   * Object used in spatial sorting, combining the spatial object and the object
+   * ID.
+   * 
+   * @author Erich Schubert
+   */
+  private static class HilbertRef<T extends SpatialComparable> implements Comparable<HilbertRef<T>> {
+    protected T vec;
+
+    protected long[] bits;
+
+    /**
+     * Constructor.
+     * 
+     * @param vec
+     */
+    protected HilbertRef(T vec, long[] bits) {
+      super();
+      this.vec = vec;
+      this.bits = bits;
+    }
+
+    @Override
+    public int compareTo(HilbertRef<T> o) {
+      return BitsUtil.compare(this.bits, o.bits);
+    }
   }
 
   /**
