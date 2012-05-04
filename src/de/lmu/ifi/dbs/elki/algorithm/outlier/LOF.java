@@ -169,8 +169,21 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   }
 
   /**
+   * Constructor.
+   * 
+   * @param k the value of k
+   * @param neighborhoodDistanceFunction the distance function
+   * 
+   * Uses the same distance function for neighborhood computation and reachability distance (standard as in the original publication),
+   * same as {@link #LOF(int, DistanceFunction, DistanceFunction) LOF(int, distanceFunction, distanceFunction)}.
+   */
+  public LOF(int k, DistanceFunction<? super O, D> distanceFunction) {
+    this(k, distanceFunction, distanceFunction);
+  }
+  
+  /**
    * Performs the Generalized LOF_SCORE algorithm on the given database by
-   * calling {@code #doRunInTime(Database)}.
+   * calling {@link #doRunInTime(Database)}.
    * 
    * @param relation Data to process
    */
