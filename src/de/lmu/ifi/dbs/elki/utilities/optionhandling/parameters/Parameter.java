@@ -468,7 +468,7 @@ public abstract class Parameter<S, T extends S> {
   /**
    * Returns the value of the option.
    * 
-   * You should use either {Parameterization#grab} or {@link #isDefined} to test
+   * You should use either {@link Parameterization#grab} or {@link #isDefined} to test
    * if getValue() will return a well-defined value.
    * 
    * @return the option's value.
