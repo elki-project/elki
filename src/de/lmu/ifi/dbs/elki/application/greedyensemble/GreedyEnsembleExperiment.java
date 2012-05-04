@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * while the reduced ensemble size is actually responsible for the improvements,
  * by being more decisive and less noisy due to dropping "unhelpful" members.
  * 
- * This still leaves quite a bit of room for improvement. If you built upon this
+ * This still leaves quite a bit of room for improvement. If you build upon this
  * basic approach, please acknowledge our proof of concept work.
  * 
  * Reference:
