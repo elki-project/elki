@@ -50,10 +50,10 @@ public class ShuffleObjectsFilter implements ObjectFilter {
    * database. If unused, no shuffling will be performed. Shuffling takes time
    * linearly dependent from the size of the database.
    * <p>
-   * Key: {@code -dbc.seed}
+   * Key: {@code -shuffle.seed}
    * </p>
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
 
   /**
    * Seed for randomly shuffling the rows of the database. If null, no shuffling
