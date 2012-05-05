@@ -1,0 +1,218 @@
+package experimentalcode.arthur;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+
+/**
+ * A filter to perturbe the values by adding Gaussian micro-noise.
+ * 
+ * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a standard deviation that is attribute-wise scaled to a given percentage of the original standard deviation in the data distribution (assuming a Gaussian distribution there).
+ * 
+ * @author Arthur Zimek
+ */
+public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractConversionFilter<V, V> {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(PerturbationFilter.class);
+
+  
+  /**
+   * Random object to generate the attribute-wise seeds for the Gaussian noise.
+   */
+  private final Random RANDOM;
+  
+  /**
+   * Percentage of the variance of the random Gaussian noise generation, given the variance of the corresponding attribute in the data.
+   */
+  private double percentage;
+  
+  /**
+   * Temporary storage used during initialization.
+   */
+  private MeanVariance[] mvs = null;
+  
+  /**
+   * Stores the standard deviation in each dimension.
+   */
+  private double[] stddev = new double[0];
+  
+  /**
+   * The random objects to generate Gaussians independently for each attribute.
+   */
+  private Random[] randomPerAttribute = null;
+  
+  /**
+   * Constructor.
+   * 
+   * @param seed Seed value, may be {@code null} for a random seed.
+   */
+  public PerturbationFilter(Long seed, double percentage) {
+    super();
+    this.percentage = percentage;
+    this.RANDOM = (seed == null) ? new Random() : new Random(seed);
+  }
+  
+  @Override
+  protected boolean prepareStart(SimpleTypeInformation<V> in) {
+    return (stddev.length == 0);
+  }
+
+  @Override
+  protected void prepareProcessInstance(V featureVector) {
+    // First object? Then init. (We didn't have a dimensionality before!)
+    if(mvs == null) {
+      int dimensionality = featureVector.getDimensionality();
+      mvs = MeanVariance.newArray(dimensionality);
+    }
+    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+      mvs[d - 1].put(featureVector.doubleValue(d));
+    }
+  }
+
+  @Override
+  protected void prepareComplete() {
+    StringBuffer buf = logger.isVerbose() ? new StringBuffer() : null;
+    final int dimensionality = mvs.length;
+    stddev = new double[dimensionality];
+    randomPerAttribute = new Random[dimensionality];
+    if(buf != null) {
+      buf.append("Standard deviation per attribute: ");
+    }
+    for(int d = 0; d < dimensionality; d++) {
+      stddev[d] = mvs[d].getSampleStddev() * percentage;
+      if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
+        stddev[d] = percentage;
+      }
+      randomPerAttribute[d] = new Random(RANDOM.nextLong());
+      if(buf != null) {
+        buf.append(" ").append(d).append(": ").append(stddev[d]/percentage);
+      }
+    }    
+    mvs = null;
+    if(buf != null) {
+      logger.debugFine(buf.toString());
+    }
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+  
+  @Override
+  protected V filterSingleObject(V featureVector) {
+    double[] values = new double[featureVector.getDimensionality()];
+    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+      values[d - 1] = featureVector.doubleValue(d) + randomPerAttribute[d - 1].nextGaussian()*stddev[d-1];
+    }
+    return featureVector.newNumberVector(values);
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    return in;
+  }
+  
+  
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Arthur Zimek
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    
+    /**
+     * Optional parameter to specify a seed for random Gaussian noise generation.
+     * If unused, system time is used as seed.
+     * <p>
+     * Key: {@code -perturbationfilter.seed}
+     * </p>
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("perturbationfilter.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
+
+    /**
+     * Seed for randomly shuffling the rows of the database. If null, system time is used as seed.
+     */
+    protected Long seed = null;
+    
+    /**
+     * Optional parameter to specify a percentage of the standard deviation of the random Gaussian noise generation, given the standard deviation of the corresponding attribute in the original data distribution (assuming a Gaussian there).
+     * 
+     * <p>
+     * Key: {@code -perturbationfilter.percentage}
+     * </p>
+     * <p>
+     * Default: <code>0.01</code>
+     * </p>
+     * <p>
+     * Constraint: &leq;1
+     * </p>
+     */
+    public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID("perturbationfilter.percentage", "Percentage of the standard deviation of the random Gaussian noise generation per attribute, given the standard deviation of the corresponding attribute in the original data distribution (assuming a Gaussian distribution there).");
+
+    /**
+     * Percentage of the variance of the random Gaussian noise generation, given the variance of the corresponding attribute in the data.
+     */
+    protected double percentage;
+   
+    
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, new LessEqualConstraint(1), .01);
+      if(config.grab(percentageP)) {
+        percentage = percentageP.getValue();
+      }
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+    
+    @Override
+    protected PerturbationFilter<V> makeInstance() {
+      return new PerturbationFilter<V>(seed, percentage);
+    }
+  }
+
+
+}
