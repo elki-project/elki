@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -39,7 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -47,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.VoronoiVisualization.Mode;
 
 /**
  * A filter to perturbe the values by adding Gaussian micro-noise.
@@ -253,12 +250,12 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
     /**
      * Parameter for minimum.
      */
-    public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
+    public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.min", "Only used, if "+ScalingReference.MINMAX+" is set as scaling reference: a comma separated concatenation of the minimum values in each dimension assumed as a reference. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
 
     /**
      * Parameter for maximum.
      */
-    public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
+    public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.max", "Only used, if "+ScalingReference.MINMAX+" is set as scaling reference: a comma separated concatenation of the maximum values in each dimension assumed as a reference. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
 
     /**
      * Stores the maximum in each dimension.
@@ -301,7 +298,7 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
 
     
     /**
-     * OParameter for selecting scaling reference.
+     * Parameter for selecting scaling reference.
      * <p>
      * Key: {@code -perturbationfilter.scalingreference}
      * </p>
@@ -347,15 +344,15 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
-      ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
-      global_1.add(minimaP);
-      global_1.add(maximaP);
-      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+      ArrayList<Parameter<?, ?>> globalSetMinAndMax = new ArrayList<Parameter<?, ?>>();
+      globalSetMinAndMax.add(minimaP);
+      globalSetMinAndMax.add(maximaP);
+      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(globalSetMinAndMax));
 
-      ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
-      global.add(minimaP);
-      global.add(maximaP);
-      config.checkConstraint(new EqualSizeGlobalConstraint(global));
+      ArrayList<ListParameter<?>> globalMinMaxEqualsize = new ArrayList<ListParameter<?>>();
+      globalMinMaxEqualsize.add(minimaP);
+      globalMinMaxEqualsize.add(maximaP);
+      config.checkConstraint(new EqualSizeGlobalConstraint(globalMinMaxEqualsize));
     }
     
     @Override
