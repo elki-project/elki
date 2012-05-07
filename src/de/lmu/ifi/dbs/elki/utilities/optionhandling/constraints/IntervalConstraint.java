@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 public class IntervalConstraint implements ParameterConstraint<Number> {
   /**
    * Available interval boundary types types:
-   * {@link IntervalConstraint.IntervalBoundary#OPEN} denotes an opend interval,
+   * {@link IntervalConstraint.IntervalBoundary#OPEN} denotes an open interval,
    * i.e. less than (or greater than) comparison
    * {@link IntervalConstraint.IntervalBoundary#CLOSE} denotes a closed
    * interval, i.e. an equal to or less than (or equal to or greater than)
@@ -66,7 +66,9 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
   private final Number lowConstraintValue;
 
   /**
-   * The interval boundary for the low constraint value (@see IntervalBoundary)
+   * The interval boundary for the low constraint value.
+   * 
+   * @see IntervalBoundary
    */
   private final IntervalBoundary lowBoundary;
 
@@ -76,7 +78,9 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
   private final Number highConstraintValue;
 
   /**
-   * The interval boundary for the high constraint value (@see IntervalBoundary)
+   * The interval boundary for the high constraint value.
+   * 
+   * @see IntervalBoundary
    */
   private final IntervalBoundary highBoundary;
 
@@ -88,12 +92,11 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
    * than (or equal to, if specified) than the specified high constraint value.
    * 
    * @param lowConstraintValue the low constraint value (left interval boundary)
-   * @param lowBoundary the interval boundary for the low constraint value (@see
-   *        IntervalBoundary)
+   * @param lowBoundary the interval boundary for the low constraint value (see {@link #IntervalBoundary})
    * @param highConstraintValue the high constraint value (right interval
    *        boundary)
    * @param highBoundary the interval boundary for the high constraint value
-   *        (@see IntervalBoundary)
+   *        (see {@link #IntervalBoundary})
    */
   public IntervalConstraint(Number lowConstraintValue, IntervalBoundary lowBoundary, Number highConstraintValue, IntervalBoundary highBoundary) {
     if(lowConstraintValue.doubleValue() >= highConstraintValue.doubleValue()) {

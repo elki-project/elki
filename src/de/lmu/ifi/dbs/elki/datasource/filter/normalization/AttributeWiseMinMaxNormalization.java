@@ -117,6 +117,9 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
   @Override
   protected V filterSingleObject(V featureVector) {
     double[] values = new double[featureVector.getDimensionality()];
+    if(minima.length != featureVector.getDimensionality()) {
+      throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
+    }
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
       values[d - 1] = (featureVector.doubleValue(d) - minima[d - 1]) / factor(d);
     }

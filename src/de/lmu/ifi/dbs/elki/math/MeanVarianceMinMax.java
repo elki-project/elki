@@ -110,6 +110,20 @@ public class MeanVarianceMinMax extends MeanVariance {
   public double getDiff() {
     return this.getMax() - this.getMin();
   }
+  
+  /**
+   * Create and initialize a new array of MeanVarianceMinMax
+   * 
+   * @param dimensionality Dimensionality
+   * @return New and initialized Array
+   */
+  public static MeanVarianceMinMax[] newArray(int dimensionality) {
+    MeanVarianceMinMax[] arr = new MeanVarianceMinMax[dimensionality];
+    for(int i = 0; i < dimensionality; i++) {
+      arr[i] = new MeanVarianceMinMax();
+    }
+    return arr;
+  }
 
   @Override
   public String toString() {
