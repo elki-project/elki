@@ -23,6 +23,7 @@ package experimentalcode.arthur;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -31,17 +32,28 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.VoronoiVisualization.Mode;
 
 /**
  * A filter to perturbe the values by adding Gaussian micro-noise.
  * 
- * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a standard deviation that is attribute-wise scaled to a given percentage of the original standard deviation in the data distribution (assuming a Gaussian distribution there).
+ * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a standard deviation.
+ * The standard deviation can be scaled, attribute-wise, to a given percentage of the original standard deviation in the data distribution (assuming a Gaussian distribution there), or to a percentage of the extension in each attribute ({@code maximumValue - minimumValue}).
  * 
  * @author Arthur Zimek
  */
@@ -51,6 +63,21 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
    */
   private static final Logging logger = Logging.getLogger(PerturbationFilter.class);
 
+  /**
+   * Scaling reference options.
+   * 
+   * @author Arthur Zimek
+   * 
+   * @apiviz.exclude
+   */
+  public static enum ScalingReference {
+    UNITCUBE, STDDEV, MINMAX
+  }
+  
+  /**
+   * Which reference to use for scaling the noise.
+   */
+  private ScalingReference scalingreference;
   
   /**
    * Random object to generate the attribute-wise seeds for the Gaussian noise.
@@ -65,12 +92,12 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
   /**
    * Temporary storage used during initialization.
    */
-  private MeanVariance[] mvs = null;
+  private MeanVarianceMinMax[] mvs = null;
   
   /**
-   * Stores the standard deviation in each dimension.
+   * Stores the scaling reference in each dimension.
    */
-  private double[] stddev = new double[0];
+  private double[] scalingreferencevalues = new double[0];
   
   /**
    * The random objects to generate Gaussians independently for each attribute.
@@ -78,28 +105,62 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
   private Random[] randomPerAttribute = null;
   
   /**
+   * Stores the maximum in each dimension.
+   */
+  private double[] maxima;
+
+  /**
+   * Stores the minimum in each dimension.
+   */
+  private double[] minima;
+  
+  /**
+   * Stores the dimensionality from the preprocessing.
+   */
+  private int dimensionality = 0;
+  
+  /**
    * Constructor.
    * 
    * @param seed Seed value, may be {@code null} for a random seed.
    */
-  public PerturbationFilter(Long seed, double percentage) {
+  public PerturbationFilter(Long seed, double percentage, ScalingReference scalingreference, double[] minima, double[] maxima) {
     super();
     this.percentage = percentage;
+    this.scalingreference = scalingreference;
+    this.minima = minima;
+    this.maxima = maxima;
     this.RANDOM = (seed == null) ? new Random() : new Random(seed);
   }
   
   @Override
   protected boolean prepareStart(SimpleTypeInformation<V> in) {
-    return (stddev.length == 0);
+    if(scalingreference==ScalingReference.MINMAX && minima.length != 0 && maxima.length != 0){
+      dimensionality = minima.length;
+      scalingreferencevalues = new double[dimensionality];
+      randomPerAttribute = new Random[dimensionality];
+      for(int d = 0; d < dimensionality; d++) {
+        scalingreferencevalues[d] = (maxima[d] - minima[d]) * percentage;
+        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+          scalingreferencevalues[d] = percentage;
+        }
+        randomPerAttribute[d] = new Random(RANDOM.nextLong());
+      }
+      return false;
+    }
+    if(scalingreference==ScalingReference.UNITCUBE){
+      return false;
+    }
+    return (scalingreferencevalues.length == 0);
   }
 
   @Override
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
     if(mvs == null) {
-      int dimensionality = featureVector.getDimensionality();
-      mvs = MeanVariance.newArray(dimensionality);
-    }
+      dimensionality = featureVector.getDimensionality();
+      mvs = MeanVarianceMinMax.newArray(dimensionality);
+    }    
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
       mvs[d - 1].put(featureVector.doubleValue(d));
     }
@@ -108,22 +169,38 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
   @Override
   protected void prepareComplete() {
     StringBuffer buf = logger.isVerbose() ? new StringBuffer() : null;
-    final int dimensionality = mvs.length;
-    stddev = new double[dimensionality];
+    scalingreferencevalues = new double[dimensionality];
     randomPerAttribute = new Random[dimensionality];
-    if(buf != null) {
-      buf.append("Standard deviation per attribute: ");
-    }
-    for(int d = 0; d < dimensionality; d++) {
-      stddev[d] = mvs[d].getSampleStddev() * percentage;
-      if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
-        stddev[d] = percentage;
-      }
-      randomPerAttribute[d] = new Random(RANDOM.nextLong());
+    if(scalingreference == ScalingReference.STDDEV){
       if(buf != null) {
-        buf.append(" ").append(d).append(": ").append(stddev[d]/percentage);
+        buf.append("Standard deviation per attribute: ");
       }
-    }    
+      for(int d = 0; d < dimensionality; d++) {
+        scalingreferencevalues[d] = mvs[d].getSampleStddev() * percentage;
+        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+          scalingreferencevalues[d] = percentage;
+        }
+        randomPerAttribute[d] = new Random(RANDOM.nextLong());
+        if(buf != null) {
+          buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d]/percentage);
+        }
+      }
+    }
+    else if (scalingreference == ScalingReference.MINMAX && minima.length == 0 && maxima.length == 0){
+      if(buf != null) {
+        buf.append("extension per attribute: ");
+      }
+      for(int d = 0; d < dimensionality; d++) {
+        scalingreferencevalues[d] = (mvs[d].getMax() - mvs[d].getMin()) * percentage;
+        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+          scalingreferencevalues[d] = percentage;
+        }
+        randomPerAttribute[d] = new Random(RANDOM.nextLong());
+        if(buf != null) {
+          buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d]/percentage);
+        }
+      }
+    }
     mvs = null;
     if(buf != null) {
       logger.debugFine(buf.toString());
@@ -137,9 +214,21 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
   
   @Override
   protected V filterSingleObject(V featureVector) {
+    if(scalingreference == ScalingReference.UNITCUBE && dimensionality == 0){
+      dimensionality = featureVector.getDimensionality();
+      scalingreferencevalues = new double[dimensionality];
+      randomPerAttribute = new Random[dimensionality];
+      for(int d = 0; d < dimensionality; d++) {
+        scalingreferencevalues[d] = percentage;
+        randomPerAttribute[d] = new Random(RANDOM.nextLong());
+      }
+    }
+    if(scalingreferencevalues.length != featureVector.getDimensionality()) {
+      throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
+    }
     double[] values = new double[featureVector.getDimensionality()];
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      values[d - 1] = featureVector.doubleValue(d) + randomPerAttribute[d - 1].nextGaussian()*stddev[d-1];
+      values[d - 1] = featureVector.doubleValue(d) + randomPerAttribute[d - 1].nextGaussian()*scalingreferencevalues[d-1];
     }
     return featureVector.newNumberVector(values);
   }
@@ -159,6 +248,27 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+    
+   
+    /**
+     * Parameter for minimum.
+     */
+    public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
+
+    /**
+     * Parameter for maximum.
+     */
+    public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
+
+    /**
+     * Stores the maximum in each dimension.
+     */
+    private double[] maxima = new double[0];
+
+    /**
+     * Stores the minimum in each dimension.
+     */
+    private double[] minima = new double[0];
     
     /**
      * Optional parameter to specify a seed for random Gaussian noise generation.
@@ -184,21 +294,43 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
      * Default: <code>0.01</code>
      * </p>
      * <p>
-     * Constraint: &leq;1
+     * Constraint: 0 &lt; percentage &leq;1
      * </p>
      */
     public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID("perturbationfilter.percentage", "Percentage of the standard deviation of the random Gaussian noise generation per attribute, given the standard deviation of the corresponding attribute in the original data distribution (assuming a Gaussian distribution there).");
 
+    
+    /**
+     * OParameter for selecting scaling reference.
+     * <p>
+     * Key: {@code -perturbationfilter.scalingreference}
+     * </p>
+     * <p>
+     * Default: <code>ScalingReference.UNITCUBE</code>
+     * </p>
+     */
+    public static final OptionID SCALINGREFERENCE_ID = OptionID.getOrCreateOptionID("perturbationfilter.scalingreference", "The reference for scaling the Gaussian noise. Default is "+ScalingReference.UNITCUBE+", parameter "+PERCENTAGE_ID.getName()+" will then directly define the standard deviation of all noise Gaussians. For options "+ScalingReference.STDDEV+" and  "+ScalingReference.MINMAX+", the percentage of the attributewise standard deviation or extension, repectively, will define the attributewise standard deviation of the noise Gaussians.");
+
+    
     /**
      * Percentage of the variance of the random Gaussian noise generation, given the variance of the corresponding attribute in the data.
      */
     protected double percentage;
-   
+
+    /**
+     * The option which reference to use for scaling the noise.
+     */
+    protected ScalingReference scalingreference;
+
     
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, new LessEqualConstraint(1), .01);
+      EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
+      if(config.grab(scalingReferenceP)) {
+        scalingreference = scalingReferenceP.getValue();
+      }
+      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, new IntervalConstraint(0,IntervalConstraint.IntervalBoundary.OPEN,1,IntervalConstraint.IntervalBoundary.CLOSE), .01);
       if(config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }
@@ -206,11 +338,29 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
       if(config.grab(seedP)) {
         seed = seedP.getValue();
       }
+      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
+      if(config.grab(minimaP)) {
+        minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
+      }
+      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
+      if(config.grab(maximaP)) {
+        maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
+      }
+
+      ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
+      global_1.add(minimaP);
+      global_1.add(maximaP);
+      config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
+
+      ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
+      global.add(minimaP);
+      global.add(maximaP);
+      config.checkConstraint(new EqualSizeGlobalConstraint(global));
     }
     
     @Override
     protected PerturbationFilter<V> makeInstance() {
-      return new PerturbationFilter<V>(seed, percentage);
+      return new PerturbationFilter<V>(seed, percentage, scalingreference, minima, maxima);
     }
   }
 
