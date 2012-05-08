@@ -120,7 +120,7 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
    * @param objs Objects
    * @return Array of min, max pairs (length = 2 * dim)
    */
-  protected <T extends SpatialComparable> double[] computeMinMax(List<T> objs) {
+  public static <T extends SpatialComparable> double[] computeMinMax(List<T> objs) {
     final int dim = objs.get(0).getDimensionality();
     // Compute min and max for each dimension:
     double[] mm = new double[dim * 2];
