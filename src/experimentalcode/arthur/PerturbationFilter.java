@@ -50,7 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * A filter to perturb the values by adding Gaussian micro-noise.
  * 
  * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a standard deviation.
- * The standard deviation can be scaled, attribute-wise, to a given percentage of the original standard deviation in the data distribution (assuming a Gaussian distribution there), or to a percentage of the extension in each attribute ({@code maximumValue - minimumValue}).
+ * The standard deviation can be scaled, attribute-wise, to a given percentage of the original standard deviation in the data distribution
+ * (assuming a Gaussian distribution there), or to a percentage of the extension in each attribute ({@code maximumValue - minimumValue}).
  * 
  * @author Arthur Zimek
  */
