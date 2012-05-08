@@ -2,7 +2,7 @@
  * <p><b>Parameter handling and option descriptions.</b></p> 
  * 
  * <ol>
- * <li><b>Option ID</b>: Any parameter <em>must</em> have a {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID OptionID}.<br />
+ * <li><b>Option ID</b>: Any parameter <em>must</em> have an {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID OptionID}.<br />
  * These are Singleton objects to uniquely identify the option. They should be "public static". <br />
  * The OptionID specifies the parameter name and a generic description.
  * <p />
