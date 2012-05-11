@@ -74,13 +74,13 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
     return sum;
   }
   
-  //TODO: define method in interface
   /**
    * Returns the Manhattan norm of the given vector.
    * 
    * @param v the vector to compute the norm of
    * @return the Manhattan norm of the given vector
    */
+  @Override
   public double doubleNorm(NumberVector<?,?> v){
     final int dim = v.getDimensionality();
     double sum = 0;
@@ -90,7 +90,7 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
     return sum;
   }
 
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
+  private double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
     final int dim = mbr.getDimensionality();
     if(dim != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
