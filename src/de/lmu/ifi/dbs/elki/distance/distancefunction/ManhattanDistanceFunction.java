@@ -25,9 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -156,18 +153,8 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
-  }
-
-  @Override
   public boolean isMetric() {
     return true;
-  }
-
-  @Override
-  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
   @Override

@@ -24,6 +24,10 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -37,9 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.landmark
  */
-public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm {
-  // TODO: implement SpatialPrimitiveDoubleDistanceFunction?
-
+public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * OptionID for the "p" parameter
    */
@@ -83,14 +85,14 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm {
     }
     return Math.pow(sqrDist, 1.0 / p);
   }
-  
+
   @Override
-  public double doubleNorm(NumberVector<?,?> v){
+  public double doubleNorm(NumberVector<?, ?> v) {
     final int dim = v.getDimensionality();
     double sqrDist = 0;
     for(int i = 1; i <= dim; i++) {
       final double delta = v.doubleValue(i);
-      sqrDist += Math.pow(delta,p);
+      sqrDist += Math.pow(delta, p);
     }
     return Math.pow(sqrDist, 1.0 / p);
   }
@@ -102,6 +104,45 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm {
    */
   public double getP() {
     return p;
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    // Optimization for the simplest case
+    if(mbr1 instanceof NumberVector) {
+      if(mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?, ?>) mbr1, (NumberVector<?, ?>) mbr2);
+      }
+    }
+    // TODO: optimize for more simpler cases: obj vs. rect?
+    final int dim1 = mbr1.getDimensionality();
+    if(dim1 != mbr2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
+    }
+
+    double sumDist = 0;
+    for(int d = 1; d <= dim1; d++) {
+      final double m1, m2;
+      if(mbr1.getMax(d) < mbr2.getMin(d)) {
+        m1 = mbr1.getMax(d);
+        m2 = mbr2.getMin(d);
+      }
+      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
+        m1 = mbr1.getMin(d);
+        m2 = mbr2.getMax(d);
+      }
+      else { // The mbrs intersect!
+        continue;
+      }
+      final double manhattanI = m1 - m2;
+      sumDist += Math.pow(Math.abs(manhattanI), p);
+    }
+    return Math.pow(sumDist, 1.0 / p);
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
 
   @Override
@@ -123,6 +164,11 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm {
       return this.p == ((LPNormDistanceFunction) obj).p;
     }
     return false;
+  }
+
+  @Override
+  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
   /**
