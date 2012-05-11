@@ -124,8 +124,8 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
     for(int d = 1; d <= dim1; d++) {
       final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
-        m1 = mbr1.getMax(d);
-        m2 = mbr2.getMin(d);
+        m1 = mbr2.getMin(d);
+        m2 = mbr1.getMax(d);
       }
       else if(mbr1.getMin(d) > mbr2.getMax(d)) {
         m1 = mbr1.getMin(d);
@@ -135,7 +135,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
         continue;
       }
       final double manhattanI = m1 - m2;
-      sumDist += Math.pow(Math.abs(manhattanI), p);
+      sumDist += Math.pow(manhattanI, p);
     }
     return Math.pow(sumDist, 1.0 / p);
   }

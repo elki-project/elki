@@ -78,19 +78,19 @@ public class ArcCosineDistanceFunction extends AbstractVectorDoubleDistanceFunct
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Essentially, we want to compute this:
-    // min(v1.transposeTimes(v2)) / (max(v1.euclideanLength()) *
-    // max(v2.euclideanLength()));
+    // max(v1.transposeTimes(v2)) / (min(v1.euclideanLength()) *
+    // min(v2.euclideanLength()));
     // We can just compute all three in parallel.
     final int dim = mbr1.getDimensionality();
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < dim; k++) {
-      s += mbr1.getMin(k + 1) * mbr2.getMin(k + 1);
-      final double r1 = mbr1.getMax(k + 1);
-      final double r2 = mbr2.getMax(k + 1);
+      s += mbr1.getMax(k + 1) * mbr2.getMax(k + 1);
+      final double r1 = mbr1.getMin(k + 1);
+      final double r2 = mbr2.getMin(k + 1);
       e1 += r1 * r1;
       e2 += r2 * r2;
     }
-    double d = 1 - Math.acos(Math.sqrt((s / e1) * (s / e2)));
+    double d = Math.acos(Math.sqrt((s / e1) * (s / e2)));
     if(d < 0) {
       d = 0;
     }
