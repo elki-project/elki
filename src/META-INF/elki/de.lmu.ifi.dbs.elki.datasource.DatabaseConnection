@@ -5,4 +5,6 @@ de.lmu.ifi.dbs.elki.datasource.GeneratorXMLDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.RandomDoubleVectorDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.ConcatenateFilesDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.EmptyDatabaseConnection
+de.lmu.ifi.dbs.elki.datasource.DBIDRangeDatabaseConnection
 # de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection
+# de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection

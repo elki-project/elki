@@ -18,6 +18,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
+de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
