@@ -48,7 +48,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
   /**
    * Constructor.
    * 
-   * @param data
+   * @param data Existing data matrix
    */
   public ArrayAdapterDatabaseConnection(double[][] data) {
     super();
