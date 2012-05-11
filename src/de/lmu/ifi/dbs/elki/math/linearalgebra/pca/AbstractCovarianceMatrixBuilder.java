@@ -54,17 +54,17 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<? e
   public abstract Matrix processIds(DBIDs ids, Relation<? extends V> database);
 
   @Override
-  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
+  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
-    for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && have < k; have++) {
+    for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext() && have < k; have++) {
       ids.add(it.next().getDBID());
     }
     return processIds(ids, database);
   }
 
   @Override
-  final public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  final public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processQueryResults(results, database, results.size());
   }
   

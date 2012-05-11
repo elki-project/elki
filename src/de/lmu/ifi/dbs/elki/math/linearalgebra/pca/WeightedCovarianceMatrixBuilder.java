@@ -158,7 +158,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * @return Covariance Matrix
    */
   @Override
-  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
+  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
     final int dim = DatabaseUtil.dimensionality(database);
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
 
@@ -172,7 +172,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     double stddev = 0.0;
     {
       int i = 0;
-      for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
+      for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
         DistanceResultPair<D> res = it.next();
         final double dist;
         if(res instanceof DoubleDistanceResultPair) {
@@ -194,7 +194,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
 
     // calculate weighted PCA
     int i = 0;
-    for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
+    for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
       DistanceResultPair<? extends NumberDistance<?, ?>> res = it.next();
       final double dist;
       if(res instanceof DoubleDistanceResultPair) {

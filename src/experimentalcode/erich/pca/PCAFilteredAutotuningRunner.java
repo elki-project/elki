@@ -1,36 +1,42 @@
 package experimentalcode.erich.pca;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
@@ -42,6 +48,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given
@@ -54,10 +61,11 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * @author Erich Schubert
  * @param <V> vector type
  */
+@Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
 public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>> extends PCAFilteredRunner<V> {
   /**
    * Constructor.
-   *
+   * 
    * @param covarianceMatrixBuilder
    * @param eigenPairFilter
    * @param big
@@ -76,9 +84,16 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
    */
   @Override
   public PCAFilteredResult processIds(DBIDs ids, Relation<? extends V> database) {
-    // FIXME: We're only supporting QueryResults for now, add compatibility
-    // wrapper?
-    return null;
+    // Assume Euclidean distance. In the context of PCA, the neighborhood should
+    // be L2-spherical to be unbiased.
+    V center = DatabaseUtil.centroid(database, ids);
+    List<DoubleDistanceResultPair> dres = new ArrayList<DoubleDistanceResultPair>(ids.size());
+    for(DBID id : ids) {
+      final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(id));
+      dres.add(new DoubleDistanceResultPair(dist, id));
+    }
+    Collections.sort(dres);
+    return processQueryResult(dres, database);
   }
 
   /**
@@ -89,7 +104,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
    * @return PCA result
    */
   @Override
-  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
     assertSortedByDistance(results);
     final int dim = DatabaseUtil.dimensionality(database);
 
@@ -180,9 +195,8 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
       }
     }
     // NOTE: if we didn't get a 'maximum' anywhere, we end up with the data from
-    // the last
-    // run of the loop above. I.e. PCA on the full data set. That is intended.
-
+    // the last run of the loop above. I.e. PCA on the full data set. That is
+    // intended.
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
@@ -209,18 +223,18 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
    * 
    * @param results
    */
-  private <D extends NumberDistance<?, ?>> void assertSortedByDistance(Collection<DistanceResultPair<D>> results) {
+  private <D extends NumberDistance<?, ?>> void assertSortedByDistance(Collection<? extends DistanceResultPair<D>> results) {
     // TODO: sort results instead?
     double dist = -1.0;
-    for(Iterator<DistanceResultPair<D>> it = results.iterator(); it.hasNext();) {
-      DistanceResultPair<D> qr = it.next();
-      if(qr.getDistance().doubleValue() < dist) {
+    for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext();) {
+      double qr = it.next().getDistance().doubleValue();
+      if(qr < dist) {
         System.err.println("WARNING: results not sorted by distance!");
       }
-      dist = qr.getDistance().doubleValue();
+      dist = qr;
     }
   }
-  
+
   /**
    * Parameterization class.
    * 

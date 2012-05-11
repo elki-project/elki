@@ -141,7 +141,7 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
    * @return PCA result
    */
   @Override
-  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 

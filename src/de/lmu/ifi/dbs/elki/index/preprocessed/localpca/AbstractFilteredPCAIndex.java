@@ -185,7 +185,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
     public TypeInformation getInputTypeRestriction() {
       return pcaDistanceFunction.getInputTypeRestriction();
     }
-    
+
     /**
      * Parameterization class.
      * 

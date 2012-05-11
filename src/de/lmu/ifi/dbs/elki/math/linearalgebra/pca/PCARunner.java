@@ -113,7 +113,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
    * @param database the database used
    * @return PCA result
    */
-  public <D extends NumberDistance<?, ?>> PCAResult processQueryResult(Collection<DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<?, ?>> PCAResult processQueryResult(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
