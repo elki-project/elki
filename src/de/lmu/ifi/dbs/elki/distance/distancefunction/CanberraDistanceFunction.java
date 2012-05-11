@@ -23,6 +23,11 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -40,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", title = "Computer programs for hierarchical polythetic classification (similarity analysis).", booktitle = "Computer Journal, Volume 9, Issue 1", url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
-public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
   /**
    * Static instance. Use this!
    */
@@ -63,6 +68,41 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
       sum += Math.abs(v1 - v2) / (Math.abs(v1) + Math.abs(v2));
     }
     return sum;
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim = mbr1.getDimensionality();
+    double sum = 0.0;
+    for(int d = 1; d <= dim; d++) {
+      final double m1, m2;
+      if(mbr1.getMax(d) < mbr2.getMin(d)) {
+        m1 = mbr1.getMax(d);
+        m2 = mbr2.getMin(d);
+      }
+      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
+        m1 = mbr1.getMin(d);
+        m2 = mbr2.getMax(d);
+      }
+      else { // The mbrs intersect!
+        continue;
+      }
+      final double manhattanI = m1 - m2;
+      final double a1 = Math.max(-mbr1.getMin(d), mbr1.getMax(d));
+      final double a2 = Math.max(-mbr2.getMin(d), mbr2.getMax(d));
+      sum += manhattanI / (a1 + a2);
+    }
+    return sum;
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
+  }
+
+  @Override
+  public <T extends NumberVector<?, ?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
   /**
