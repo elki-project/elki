@@ -25,11 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -40,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class ArcCosineDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class ArcCosineDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance
    */
@@ -76,33 +71,6 @@ public class ArcCosineDistanceFunction extends AbstractVectorDoubleDistanceFunct
   }
 
   @Override
-  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    // Essentially, we want to compute this:
-    // max(v1.transposeTimes(v2)) / (min(v1.euclideanLength()) *
-    // min(v2.euclideanLength()));
-    // We can just compute all three in parallel.
-    final int dim = mbr1.getDimensionality();
-    double s = 0, e1 = 0, e2 = 0;
-    for(int k = 0; k < dim; k++) {
-      s += mbr1.getMax(k + 1) * mbr2.getMax(k + 1);
-      final double r1 = mbr1.getMin(k + 1);
-      final double r2 = mbr2.getMin(k + 1);
-      e1 += r1 * r1;
-      e2 += r2 * r2;
-    }
-    double d = Math.acos(Math.sqrt((s / e1) * (s / e2)));
-    if(d < 0) {
-      d = 0;
-    }
-    return d;
-  }
-
-  @Override
-  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
-  }
-
-  @Override
   public String toString() {
     return "ArcCosineDistance";
   }
@@ -116,11 +84,6 @@ public class ArcCosineDistanceFunction extends AbstractVectorDoubleDistanceFunct
       return true;
     }
     return this.getClass().equals(obj.getClass());
-  }
-
-  @Override
-  public <T extends NumberVector<?, ?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 
   /**
