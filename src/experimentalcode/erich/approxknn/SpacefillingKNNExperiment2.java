@@ -85,6 +85,9 @@ public class SpacefillingKNNExperiment2 {
     List<SpatialRef> zs2 = new ArrayList<SpatialRef>(ids.size());
     List<SpatialRef> ps2 = new ArrayList<SpatialRef>(ids.size());
     List<SpatialRef> hs2 = new ArrayList<SpatialRef>(ids.size());
+    List<SpatialRef> zs3 = new ArrayList<SpatialRef>(ids.size());
+    List<SpatialRef> ps3 = new ArrayList<SpatialRef>(ids.size());
+    List<SpatialRef> hs3 = new ArrayList<SpatialRef>(ids.size());
     {
       for(DBID id : ids) {
         final NumberVector<?, ?> v = rel.get(id);
@@ -95,35 +98,31 @@ public class SpacefillingKNNExperiment2 {
         zs2.add(ref);
         ps2.add(ref);
         hs2.add(ref);
+        zs3.add(ref);
+        ps3.add(ref);
+        hs3.add(ref);
       }
 
       // Sort spatially
       double[] mms = AbstractSpatialSorter.computeMinMax(zs);
       (new ZCurveSpatialSorter()).sort(zs, 0, zs.size(), mms);
-      mms = AbstractSpatialSorter.computeMinMax(zs);
       (new PeanoSpatialSorter()).sort(ps, 0, ps.size(), mms);
-      mms = AbstractSpatialSorter.computeMinMax(zs);
       (new HilbertSpatialSorter()).sort(hs, 0, hs.size(), mms);
-      mms = AbstractSpatialSorter.computeMinMax(zs);
       double[] mms2 = new double[mms.length];
+      double[] mms3 = new double[mms.length];
       for(int i = 0; i < mms.length; i += 2) {
         double len = mms[i + 1] - mms[i];
         mms2[i] = mms[i] - len * .1234;
         mms2[i + 1] = mms[i + 1] + len * .3784123;
+        mms3[i] = mms[i] - len * .321078;
+        mms3[i + 1] = mms[i + 1] + len * .51824172;
       }
       (new ZCurveSpatialSorter()).sort(zs2, 0, zs2.size(), mms2);
-      for(int i = 0; i < mms.length; i += 2) {
-        double len = mms[i + 1] - mms[i];
-        mms2[i] = mms[i] - len * .1234;
-        mms2[i + 1] = mms[i + 1] + len * .3784123;
-      }
       (new PeanoSpatialSorter()).sort(ps2, 0, ps2.size(), mms2);
-      for(int i = 0; i < mms.length; i += 2) {
-        double len = mms[i + 1] - mms[i];
-        mms2[i] = mms[i] - len * .1234;
-        mms2[i + 1] = mms[i + 1] + len * .3784123;
-      }
       (new HilbertSpatialSorter()).sort(hs2, 0, hs2.size(), mms2);
+      (new ZCurveSpatialSorter()).sort(zs3, 0, zs3.size(), mms3);
+      (new PeanoSpatialSorter()).sort(ps3, 0, ps3.size(), mms3);
+      (new HilbertSpatialSorter()).sort(hs3, 0, hs3.size(), mms3);
     }
     // Build position index, DBID -> position in the three curves
     WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
@@ -131,7 +130,7 @@ public class SpacefillingKNNExperiment2 {
       Iterator<SpatialRef> it = zs.iterator();
       for(int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
-        positions.put(r.id, new int[] { i, -1, -1, -1, -1, -1 });
+        positions.put(r.id, new int[] { i, -1, -1, -1, -1, -1, -1, -1, -1  });
       }
     }
     {
@@ -179,11 +178,38 @@ public class SpacefillingKNNExperiment2 {
         positions.put(r.id, data);
       }
     }
+    {
+      Iterator<SpatialRef> it = zs3.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
+        int[] data = positions.get(r.id);
+        data[6] = i;
+        positions.put(r.id, data);
+      }
+    }
+    {
+      Iterator<SpatialRef> it = ps3.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
+        int[] data = positions.get(r.id);
+        data[7] = i;
+        positions.put(r.id, data);
+      }
+    }
+    {
+      Iterator<SpatialRef> it = hs3.iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
+        int[] data = positions.get(r.id);
+        data[8] = i;
+        positions.put(r.id, data);
+      }
+    }
 
     // True kNN value
     final int k = 50;
     final int maxoff = 50 * k + 1;
-    final int numcurves = 13;
+    final int numcurves = 29;
     DistanceQuery<NumberVector<?, ?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
     KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
@@ -243,17 +269,23 @@ public class SpacefillingKNNExperiment2 {
       // Spatial curves
       for(int off = 1; off < maxoff; off++) {
         // Candidates from Z curve
-        addCandidates(zs, posi[0], off, vec, rel, rec, 1, 7, 10, 12);
+        addCandidates(zs, posi[0], off, vec, rel, rec, 1, 10, 13, 19, 22, 25, 26, 28);
         // Candidates from Peano curve
-        addCandidates(ps, posi[1], off, vec, rel, rec, 2, 8, 10, 12);
+        addCandidates(ps, posi[1], off, vec, rel, rec, 2, 11, 14, 19, 23, 25, 26, 28);
         // Candidates from Hilbert curve
-        addCandidates(hs, posi[2], off, vec, rel, rec, 3, 9, 10, 12);
+        addCandidates(hs, posi[2], off, vec, rel, rec, 3, 12, 15, 19, 24, 25, 26, 28);
         // Candidates from second Z curve
-        addCandidates(zs2, posi[3], off, vec, rel, rec, 4, 7, 11, 12);
+        addCandidates(zs2, posi[3], off, vec, rel, rec, 4, 10, 16, 20, 22, 25, 27, 28);
         // Candidates from second Peanocurve
-        addCandidates(ps2, posi[4], off, vec, rel, rec, 5, 8, 11, 12);
+        addCandidates(ps2, posi[4], off, vec, rel, rec, 5, 11, 17, 20, 23, 25, 27, 28);
         // Candidates from second Hilbert curve
-        addCandidates(hs2, posi[5], off, vec, rel, rec, 6, 9, 11, 12);
+        addCandidates(hs2, posi[5], off, vec, rel, rec, 6, 12, 18, 20, 24, 25, 27, 28);
+        // Candidates from third Z curve
+        addCandidates(zs3, posi[3], off, vec, rel, rec, 7, 13, 16, 21, 22, 26, 27, 28);
+        // Candidates from third Peanocurve
+        addCandidates(ps3, posi[4], off, vec, rel, rec, 8, 14, 17, 21, 23, 26, 27, 28);
+        // Candidates from third Hilbert curve
+        addCandidates(hs3, posi[5], off, vec, rel, rec, 9, 15, 18, 21, 24, 26, 27, 28);
         // Evaluate curve performances
         for(int i = 1; i < numcurves; i++) {
           // Candidate set size: distance computations
@@ -269,10 +301,17 @@ public class SpacefillingKNNExperiment2 {
     }
 
     String[] labels = new String[] { "R", //
-    "Z", "P", "H", //
+    "Z1", "P1", "H1", //
     "Z2", "P2", "H2", //
-    "ZZ2", "PP2", "HH2", //
-    "ZPH", "Z2P2H2", "ZPHZ2P2H2" };
+    "Z3", "P3", "H3", //
+    "Z1Z2", "P1P2", "H1H2", //
+    "Z1Z3", "P1P3", "H1H3", //
+    "Z2Z3", "P2P3", "H2H3", //
+    "ZPH", "Z2P2H2", "Z3P3H3", //
+    "Z123", "P123", "H123", //
+    "Z12P12H12", "Z13P13H13", "Z23P23H23", //
+    "Z123P123H123"};
+    assert(labels.length == numcurves);
     System.out.print("# i");
     // Recall of exact NN:
     for(String s : labels) {
