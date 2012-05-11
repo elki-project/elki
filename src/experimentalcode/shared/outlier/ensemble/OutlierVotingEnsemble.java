@@ -67,11 +67,11 @@ import experimentalcode.shared.outlier.ensemble.voting.EnsembleVoting;
  * 
  * @param <O> object type
  */
-public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
+public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OutlierEnsemble.class);
+  private static final Logging logger = Logging.getLogger(OutlierVotingEnsemble.class);
   
   /**
    * Parameter for the individual algorithms
@@ -104,7 +104,7 @@ public class OutlierEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
    * 
    * @param config Parameterization
    */
-  public OutlierEnsemble(Parameterization config) {
+  public OutlierVotingEnsemble(Parameterization config) {
     super();
     config = config.descend(this);
     if(config.grab(ALGORITHMS_PARAM)) {
