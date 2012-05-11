@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -94,7 +95,7 @@ public class AveragePrecisionAtK<V extends NumberVector<V, ?>, D extends NumberD
       logger.verbose("Preprocessing clusters...");
     }
 
-    MeanVariance mv = new MeanVariance();
+    MeanVariance[] mvs = MeanVariance.newArray(k);
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
@@ -106,8 +107,10 @@ public class AveragePrecisionAtK<V extends NumberVector<V, ?>, D extends NumberD
       Object label = lrelation.get(id);
 
       int positive = 0;
-      for(DistanceResultPair<D> res : knn) {
-        Object olabel = lrelation.get(res.getDBID());
+      Iterator<DistanceResultPair<D>> ri = knn.iterator();
+      for(int i = 0; i < k && ri.hasNext(); i++) {
+        DBID nid = ri.next().getDBID();
+        Object olabel = lrelation.get(nid);
         if(label == null) {
           if(olabel == null) {
             positive += 1;
@@ -118,9 +121,9 @@ public class AveragePrecisionAtK<V extends NumberVector<V, ?>, D extends NumberD
             positive += 1;
           }
         }
+        final double precision = positive / (double) (i + 1);
+        mvs[i].put(precision);
       }
-      final double precision = positive / (double) knn.size();
-      mv.put(precision);
       if(objloop != null) {
         objloop.incrementProcessed(logger);
       }
@@ -131,9 +134,11 @@ public class AveragePrecisionAtK<V extends NumberVector<V, ?>, D extends NumberD
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(1);
-    DoubleVector row = new DoubleVector(new double[] { mv.getMean(), mv.getSampleStddev() });
-    res.add(row);
+    Collection<DoubleVector> res = new ArrayList<DoubleVector>(k);
+    for(int i = 0; i < k; i++) {
+      DoubleVector row = new DoubleVector(new double[] { mvs[i].getMean(), mvs[i].getSampleStddev() });
+      res.add(row);
+    }
     return new HistogramResult<DoubleVector>("Average Precision", "average-precision", res);
   }
 
