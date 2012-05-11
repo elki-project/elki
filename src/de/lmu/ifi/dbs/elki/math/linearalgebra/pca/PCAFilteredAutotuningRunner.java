@@ -1,4 +1,4 @@
-package experimentalcode.erich.pca;
+package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 /*
  This file is part of ELKI:
@@ -42,11 +42,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CovarianceMatrixBuilder;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
