@@ -92,7 +92,7 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
    * than (or equal to, if specified) than the specified high constraint value.
    * 
    * @param lowConstraintValue the low constraint value (left interval boundary)
-   * @param lowBoundary the interval boundary for the low constraint value (see {@link #IntervalBoundary})
+   * @param lowBoundary the interval boundary for the low constraint value (see {@link IntervalBoundary})
    * @param highConstraintValue the high constraint value (right interval
    *        boundary)
    * @param highBoundary the interval boundary for the high constraint value

@@ -298,7 +298,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
      * Constructor.
      * 
      * @param distanceQuery Distance query object
-     * @parma p LP norm p
+     * @param p LP norm p
      */
 
     public VAFileRangeQuery(DistanceQuery<V, DoubleDistance> distanceQuery, double p) {
@@ -357,7 +357,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
      * Constructor.
      * 
      * @param distanceQuery Distance query object
-     * @parma p LP norm p
+     * @param p LP norm p
      */
     public VAFileKNNQuery(DistanceQuery<V, DoubleDistance> distanceQuery, double p) {
       super(distanceQuery);
