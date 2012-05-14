@@ -14,3 +14,4 @@ de.lmu.ifi.dbs.elki.index.preprocessed.knn.MetricalIndexApproximationMaterialize
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.PartitionApproximationMaterializeKNNPreprocessor
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpatialApproximationMaterializeKNNPreprocessor
+de.lmu.ifi.dbs.elki.index.vafile.VAFile
