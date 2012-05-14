@@ -324,7 +324,7 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
+      EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<ScalingReference>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
       if(config.grab(scalingReferenceP)) {
         scalingreference = scalingReferenceP.getValue();
       }
