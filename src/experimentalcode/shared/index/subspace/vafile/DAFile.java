@@ -33,13 +33,26 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.vafile.VectorApproximation;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * DAFile
+ * Dimension approximation file, a one-dimensional part of the
+ * {@link PartialVAFile}.
+ * 
+ * Reference:
+ * <p>
+ * Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu:<br />
+ * Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations
+ * <br />
+ * in Proc. 18th Int. Conf. on Scientific and Statistical Database Management
+ * (SSDBM 06), Wien, Austria, 2006.
+ * </p>
  * 
  * @author Thomas Bernecker
  * @author Erich Schubert
  */
+// FIXME: does not allow multiple queries in parallel, because of the selectivity coefficient handling!
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
 public class DAFile {
   /**
    * Dimension of this approximation file
@@ -58,17 +71,13 @@ public class DAFile {
 
   /**
    * Constructor.
-   *
+   * 
    * @param dimension Dimension of this file
    */
-  public DAFile(int dimension) {
-    this.dimension = dimension;
-    selectivityCoeff = -1;
-  }
-
-  public void setPartitions(Relation<? extends NumberVector<?, ?>> relation, int partitions) {
-    splitPositions = new double[partitions + 1];
+  public DAFile(Relation<? extends NumberVector<?, ?>> relation, int dimension, int partitions) {
     final int size = relation.size();
+    this.dimension = dimension;
+    this.splitPositions = new double[partitions + 1];
 
     double[] tempdata = new double[size];
     int j = 0;
@@ -84,6 +93,8 @@ public class DAFile {
     }
     // make sure that last object will be included
     splitPositions[partitions] = tempdata[size - 1] + 0.000001;
+
+    this.selectivityCoeff = -1;
   }
 
   /**
@@ -114,10 +125,20 @@ public class DAFile {
     return selectivityCoeff;
   }
 
-  public void setSelectivityCoeff(int val) {
+  /**
+   * Set the computed selectivity coefficient.
+   * 
+   * @param val New value.
+   */
+  private void setSelectivityCoeff(int val) {
     selectivityCoeff = val;
   }
 
+  /**
+   * Estimate the IO costs for this index.
+   * 
+   * @return IO costs
+   */
   public int getIOCosts() {
     return splitPositions.length * 8 + 4;
   }
@@ -128,7 +149,7 @@ public class DAFile {
    * @param query
    * @param epsilon
    */
-  public static <V extends NumberVector<?, ?>> void calculateSelectivityCoeffs(List<DAFile> daFiles, V query, double epsilon) {
+  public static void calculateSelectivityCoeffs(List<DAFile> daFiles, NumberVector<?, ?> query, double epsilon) {
     final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
@@ -178,12 +199,28 @@ public class DAFile {
     return new VectorApproximation(id, approximation);
   }
 
-  public static <V extends NumberVector<?, ?>> List<DAFile> sortBySelectivity(List<DAFile> daFiles) {
-    Collections.sort(daFiles, new DAFileSelectivityComparator<V>());
-    return daFiles;
+  /**
+   * Sort a list of DA files by selectivity.
+   * 
+   * @param daFiles List of directory approximation files.
+   */
+  public static void sortBySelectivity(List<DAFile> daFiles) {
+    Collections.sort(daFiles, selectivityComparator);
   }
+  
+  /**
+   * Static instance of selectivity comparator.
+   */
+  private static final DAFileSelectivityComparator selectivityComparator = new DAFileSelectivityComparator();
 
-  static class DAFileSelectivityComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile> {
+  /**
+   * Class to compare DAFiles by selectivity.
+   * 
+   * @author Thomas Bernecker
+   *
+   * @apiviz.exclude
+   */
+  private static class DAFileSelectivityComparator implements Comparator<DAFile> {
     @Override
     public int compare(DAFile a, DAFile b) {
       return Double.compare(a.getSelectivityCoeff(), b.getSelectivityCoeff());
