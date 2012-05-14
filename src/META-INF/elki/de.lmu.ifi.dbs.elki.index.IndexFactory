@@ -7,6 +7,7 @@ de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeFac
 # de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCopTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeFactory
+de.lmu.ifi.dbs.elki.index.vafile.VAFile$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory
