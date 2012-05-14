@@ -154,8 +154,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     splitPartitions = new double[dimensions][];
     daFiles = new ArrayList<DAFile>(dimensions);
     for(int d = 0; d < dimensions; d++) {
-      final DAFile f = new DAFile(d);
-      f.setPartitions(relation, partitions);
+      final DAFile f = new DAFile(relation, d, partitions);
       splitPartitions[d] = f.getSplitPositions();
       daFiles.add(f);
     }
@@ -360,7 +359,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       }
       DAFile.calculateSelectivityCoeffs(subspaceDAFiles, query, epsilon);
       // sort DA files by selectivity
-      subspaceDAFiles = DAFile.sortBySelectivity(subspaceDAFiles);
+      DAFile.sortBySelectivity(subspaceDAFiles);
 
       // for (Integer key: subspaceDims)
       // {
