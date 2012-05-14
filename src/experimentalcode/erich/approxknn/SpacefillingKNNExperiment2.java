@@ -281,11 +281,11 @@ public class SpacefillingKNNExperiment2 {
         // Candidates from second Hilbert curve
         addCandidates(hs2, posi[5], off, vec, rel, rec, 6, 12, 18, 20, 24, 25, 27, 28);
         // Candidates from third Z curve
-        addCandidates(zs3, posi[3], off, vec, rel, rec, 7, 13, 16, 21, 22, 26, 27, 28);
+        addCandidates(zs3, posi[6], off, vec, rel, rec, 7, 13, 16, 21, 22, 26, 27, 28);
         // Candidates from third Peanocurve
-        addCandidates(ps3, posi[4], off, vec, rel, rec, 8, 14, 17, 21, 23, 26, 27, 28);
+        addCandidates(ps3, posi[7], off, vec, rel, rec, 8, 14, 17, 21, 23, 26, 27, 28);
         // Candidates from third Hilbert curve
-        addCandidates(hs3, posi[5], off, vec, rel, rec, 9, 15, 18, 21, 24, 26, 27, 28);
+        addCandidates(hs3, posi[8], off, vec, rel, rec, 9, 15, 18, 21, 24, 26, 27, 28);
         // Evaluate curve performances
         for(int i = 1; i < numcurves; i++) {
           // Candidate set size: distance computations
