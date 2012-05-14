@@ -70,13 +70,6 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     super(covarianceMatrixBuilder, eigenPairFilter, big, small);
   }
 
-  /**
-   * Run PCA on a collection of database IDs
-   * 
-   * @param ids a collection of ids
-   * @param rep the database used
-   * @return PCA result
-   */
   @Override
   public PCAFilteredResult processIds(DBIDs ids, Relation<? extends V> database) {
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
@@ -91,13 +84,6 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     return processQueryResult(dres, database);
   }
 
-  /**
-   * Run PCA on a QueryResult Collection
-   * 
-   * @param results a collection of QueryResults
-   * @param rep the database used
-   * @return PCA result
-   */
   @Override
   public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
     assertSortedByDistance(results);

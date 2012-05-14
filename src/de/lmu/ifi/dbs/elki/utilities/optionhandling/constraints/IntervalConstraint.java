@@ -96,7 +96,7 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
    * @param highConstraintValue the high constraint value (right interval
    *        boundary)
    * @param highBoundary the interval boundary for the high constraint value
-   *        (see {@link #IntervalBoundary})
+   *        (see {@link IntervalBoundary})
    */
   public IntervalConstraint(Number lowConstraintValue, IntervalBoundary lowBoundary, Number highConstraintValue, IntervalBoundary highBoundary) {
     if(lowConstraintValue.doubleValue() >= highConstraintValue.doubleValue()) {
