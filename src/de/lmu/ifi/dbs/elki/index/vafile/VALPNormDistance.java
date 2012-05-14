@@ -120,8 +120,8 @@ public class VALPNormDistance {
   /**
    * Get the maximum distance.
    * 
-   * @param vec
-   * @return
+   * @param vec Approximation vector
+   * @return Maximum distance of the vector
    */
   public double getMaxDist(VectorApproximation vec) {
     final int dim = lookup.length;
@@ -137,7 +137,7 @@ public class VALPNormDistance {
    * Get the maximum distance.
    * 
    * @param d Dimension
-   * @return
+   * @return Maximum distance in the given dimension
    */
   public double getPartialMaxMaxDist(int dimension) {
     double[] data = lookup[dimension];
