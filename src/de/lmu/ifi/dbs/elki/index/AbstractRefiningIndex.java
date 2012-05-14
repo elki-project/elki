@@ -1,4 +1,4 @@
-package experimentalcode.shared.index;
+package de.lmu.ifi.dbs.elki.index;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
@@ -27,12 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * 
  * @param <O> Object type
  */
-public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatistics {
-  /**
-   * The representation we are bound to.
-   */
-  private final Relation<O> relation;
-
+public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implements PageFileStatistics {
   /**
    * Refinement counter.
    */
@@ -44,8 +38,7 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
    * @param relation Relation indexed
    */
   public AbstractRefiningIndex(Relation<O> relation) {
-    super();
-    this.relation = relation;
+    super(relation);
   }
 
   /**
@@ -66,12 +59,6 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
     refinements++;
     return relation.get(id);
   }
-
-  @Override
-  abstract public String getLongName();
-
-  @Override
-  abstract public String getShortName();
 
   @Override
   public PageFileStatistics getPageFileStatistics() {
@@ -99,23 +86,8 @@ public abstract class AbstractRefiningIndex<O> implements Index, PageFileStatist
   }
 
   @Override
-  public void insert(DBID id) {
-    throw new UnsupportedOperationException("This index does not allow dynamic updates.");
-  }
-
-  @Override
   public void insertAll(DBIDs ids) {
     initialize(relation, ids);
-  }
-
-  @Override
-  public boolean delete(DBID id) {
-    throw new UnsupportedOperationException("This index does not allow dynamic updates.");
-  }
-
-  @Override
-  public void deleteAll(DBIDs id) {
-    throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
   /**
