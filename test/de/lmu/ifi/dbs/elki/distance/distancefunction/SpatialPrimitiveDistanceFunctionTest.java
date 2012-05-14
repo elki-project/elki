@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -61,8 +61,11 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     dists.add(new LPNormDistanceFunction(3));
     dists.add(new LPNormDistanceFunction(.5));
     dists.add(CanberraDistanceFunction.STATIC);
-    //dists.add(HistogramIntersectionDistanceFunction.STATIC); // Positive only!
+    // Histogram intersection distance isn't proper for negative values
+    // dists.add(HistogramIntersectionDistanceFunction.STATIC);
     dists.add(SquaredEuclideanDistanceFunction.STATIC);
+    dists.add(ArcCosineDistanceFunction.STATIC);
+    dists.add(CosineDistanceFunction.STATIC);
 
     double[] d1 = new double[dim];
     double[] d2 = new double[dim];
@@ -85,18 +88,11 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
         d4[d] = m * d2[d] + (1 - m) * d3[d];
       }
       for(SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, ?> dis : dists) {
-        // Pretend we'd know the exact distance type.
-        @SuppressWarnings("unchecked")
-        SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, DoubleDistance> dist = (SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, DoubleDistance>) dis;
-        DoubleDistance exact = dist.distance(v1, v2);
-        DoubleDistance mind = dist.minDist(v1, v2);
-        DoubleDistance mbrd = dist.minDist(v1, mbr);
-        assertEquals("Not same: " + dist.toString(), exact, mind);
-        assertTrue("Not smaller:" + dist.toString()+" "+mbrd+" > "+exact, mbrd.compareTo(exact) <= 0);
+        compareDistances(v1, mbr, v2, dis);
       }
     }
   }
-  
+
   @Test
   public void testSpatialDistanceConsistencyPositive() {
     final Random rnd = new Random(1);
@@ -113,6 +109,8 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     dists.add(CanberraDistanceFunction.STATIC);
     dists.add(HistogramIntersectionDistanceFunction.STATIC);
     dists.add(SquaredEuclideanDistanceFunction.STATIC);
+    dists.add(ArcCosineDistanceFunction.STATIC);
+    dists.add(CosineDistanceFunction.STATIC);
 
     double[] d1 = new double[dim];
     double[] d2 = new double[dim];
@@ -135,15 +133,16 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
         d4[d] = m * d2[d] + (1 - m) * d3[d];
       }
       for(SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, ?> dis : dists) {
-        // Pretend we'd know the exact distance type.
-        @SuppressWarnings("unchecked")
-        SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, DoubleDistance> dist = (SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, DoubleDistance>) dis;
-        DoubleDistance exact = dist.distance(v1, v2);
-        DoubleDistance mind = dist.minDist(v1, v2);
-        DoubleDistance mbrd = dist.minDist(v1, mbr);
-        assertEquals("Not same: " + dist.toString(), exact, mind);
-        assertTrue("Not smaller:" + dist.toString()+" "+mbrd+" > "+exact, mbrd.compareTo(exact) <= 0);
+        compareDistances(v1, mbr, v2, dis);
       }
     }
+  }
+
+  protected <D extends Distance<D>> void compareDistances(Vector v1, ModifiableHyperBoundingBox mbr, Vector v2, SpatialPrimitiveDistanceFunction<? super NumberVector<?, ?>, D> dist) {
+    D exact = dist.distance(v1, v2);
+    D mind = dist.minDist(v1, v2);
+    D mbrd = dist.minDist(v1, mbr);
+    assertEquals("Not same: " + dist.toString(), exact, mind);
+    assertTrue("Not smaller:" + dist.toString() + " " + mbrd + " > " + exact + " " + mbr + " " + v1, mbrd.compareTo(exact) <= 0);
   }
 }
