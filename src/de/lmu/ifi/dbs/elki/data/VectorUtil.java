@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.BitSet;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -169,13 +170,15 @@ public final class VectorUtil {
   }
 
   /**
-   * Compute the angle between two vectors.
+   * Compute the absolute cosine of the angle between two vectors.
+   * 
+   * To convert it to radians, use <code>Math.acos(angle)</code>!
    * 
    * @param v1 first vector
    * @param v2 second vector
    * @return Angle
    */
-  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public static double cosAngle(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
     if(v1 instanceof SparseNumberVector<?, ?> && v2 instanceof SparseNumberVector<?, ?>) {
       return angleSparse((SparseNumberVector<?, ?>) v1, (SparseNumberVector<?, ?>) v2);
     }
@@ -191,7 +194,51 @@ public final class VectorUtil {
       e1 += r1 * r1;
       e2 += r2 * r2;
     }
-    return Math.sqrt((s / e1) * (s / e2));
+    return Math.min(Math.sqrt((s / e1) * (s / e2)), 1);
+  }
+
+  // TODO: add more precise but slower O(n^2) angle computation according to:
+  // Computing the Angle between Vectors, P. Schatte
+  // Journal of Computing, Volume 63, Number 1 (1999)
+
+  /**
+   * Compute the minimum angle between two rectangles.
+   * 
+   * @param v1 first rectangle
+   * @param v2 second rectangle
+   * @return Angle
+   */
+  public static double minCosAngle(SpatialComparable v1, SpatialComparable v2) {
+    if(v1 instanceof NumberVector<?, ?> && v2 instanceof NumberVector<?, ?>) {
+      return cosAngle((NumberVector<?, ?>) v1, (NumberVector<?, ?>) v2);
+    }
+    // Essentially, we want to compute this:
+    // absmax(v1.transposeTimes(v2))/(min(v1.euclideanLength())*min(v2.euclideanLength()));
+    // We can just compute all three in parallel.
+    final int dim = v1.getDimensionality();
+    double s1 = 0, s2 = 0, e1 = 0, e2 = 0;
+    for(int k = 0; k < dim; k++) {
+      final double min1 = v1.getMin(k + 1), max1 = v1.getMax(k + 1);
+      final double min2 = v2.getMin(k + 1), max2 = v2.getMax(k + 1);
+      final double p1 = min1 * min2, p2 = min1 * max2;
+      final double p3 = max1 * min2, p4 = max1 * max2;
+      s1 += Math.max(Math.max(p1, p2), Math.max(p3, p4));
+      s2 += Math.min(Math.min(p1, p2), Math.min(p3, p4));
+      if(max1 < 0) {
+        e1 += max1 * max1;
+      }
+      else if(min1 > 0) {
+        e1 += min1 * min1;
+      } // else: 0
+      if(max2 < 0) {
+        e2 += max2 * max2;
+      }
+      else if(min2 > 0) {
+        e2 += min2 * min2;
+      } // else: 0
+    }
+    final double s = Math.max(s1, Math.abs(s2));
+    return Math.min(Math.sqrt((s / e1) * (s / e2)), 1.0);
   }
 
   /**
