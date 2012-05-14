@@ -468,8 +468,8 @@ public abstract class Parameter<S, T extends S> {
   /**
    * Returns the value of the option.
    * 
-   * You should use either {@link Parameterization#grab} or {@link #isDefined} to test
-   * if getValue() will return a well-defined value.
+   * You should use either {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab}
+   * or {@link #isDefined} to test if getValue() will return a well-defined value.
    * 
    * @return the option's value.
    */

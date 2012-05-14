@@ -136,7 +136,7 @@ public class ParallelAxisVisualization extends AbstractParallelVisualization<Num
    * Add an event listener to the Element
    * 
    * @param tag Element to add the listener
-   * @param tool Tool represented by the Element
+   * @param i Tool number for the Element
    */
   private void addEventListener(final Element tag, final int i) {
     EventTarget targ = (EventTarget) tag;
