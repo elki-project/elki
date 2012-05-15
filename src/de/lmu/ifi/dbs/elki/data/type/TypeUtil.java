@@ -80,6 +80,11 @@ public final class TypeUtil {
   public static final TypeInformation GUESSED_LABEL = new AlternativeTypeInformation(LABELLIST, CLASSLABEL, STRING);
 
   /**
+   * Number vectors of <em>variable</em> length.
+   */
+  public static final SimpleTypeInformation<? super NumberVector<?, ?>> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<NumberVector<?, ?>>(NumberVector.class);
+
+  /**
    * Input type for algorithms that require number vector fields.
    */
   public static final VectorFieldTypeInformation<NumberVector<?, ?>> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<NumberVector<?, ?>>(NumberVector.class);
