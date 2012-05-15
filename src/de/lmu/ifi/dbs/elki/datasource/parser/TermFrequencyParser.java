@@ -33,10 +33,12 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -144,8 +146,14 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   }
 
   @Override
-  protected VectorFieldTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimensionality));
+  protected SimpleTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
+    if(dimensionality > 0) {
+      return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimensionality));
+    }
+    if(dimensionality == DIMENSIONALITY_VARIABLE) {
+      return new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+    }
+    throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
 
   @Override

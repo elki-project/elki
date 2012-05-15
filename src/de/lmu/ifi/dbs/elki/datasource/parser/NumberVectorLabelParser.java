@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
@@ -94,6 +96,16 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * </p>
    */
   public static final OptionID VECTOR_TYPE_ID = OptionID.getOrCreateOptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
+
+  /**
+   * Constant used for unknown dimensionality (e.g. empty files)
+   */
+  public static final int DIMENSIONALITY_UNKNOWN = -1;
+
+  /**
+   * Constant used for records of variable dimensionality (e.g. time series)
+   */
+  public static final int DIMENSIONALITY_VARIABLE = -2;
 
   /**
    * Keeps the indices of the attributes to be treated as a string label.
@@ -158,7 +170,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   public void initStream(InputStream in) {
     reader = new BufferedReader(new InputStreamReader(in));
     lineNumber = 1;
-    dimensionality = -1;
+    dimensionality = DIMENSIONALITY_UNKNOWN;
   }
 
   @Override
@@ -177,15 +189,15 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           parseLineInternal(line);
-          if(dimensionality < 0) {
+          if(dimensionality == DIMENSIONALITY_UNKNOWN) {
             dimensionality = curvec.getDimensionality();
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
           }
-          else {
+          else if(dimensionality > 0) {
             if(dimensionality != curvec.getDimensionality()) {
-              dimensionality = curvec.getDimensionality();
+              dimensionality = DIMENSIONALITY_VARIABLE;
               buildMeta();
               nextevent = Event.NEXT_OBJECT;
               return Event.META_CHANGED;
@@ -277,17 +289,31 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * @param dimensionality Dimensionality
    * @return Prototype object
    */
-  VectorFieldTypeInformation<V> getTypeInformation(int dimensionality) {
+  SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
-    V f = factory.newNumberVector(new double[dimensionality]);
-    if(f instanceof ByteBufferSerializer) {
-      // TODO: Remove, once we have serializers for all types
-      @SuppressWarnings("unchecked")
-      final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
-      return new VectorFieldTypeInformation<V>(cls, ser, dimensionality, f);
+    if(dimensionality > 0) {
+      V f = factory.newNumberVector(new double[dimensionality]);
+      if(f instanceof ByteBufferSerializer) {
+        // TODO: Remove, once we have serializers for all types
+        @SuppressWarnings("unchecked")
+        final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
+        return new VectorFieldTypeInformation<V>(cls, ser, dimensionality, f);
+      }
+      return new VectorFieldTypeInformation<V>(cls, dimensionality, f);
     }
-    return new VectorFieldTypeInformation<V>(cls, dimensionality, f);
+    // Variable dimensionality - return non-vector field type
+    if(dimensionality == DIMENSIONALITY_VARIABLE) {
+      V f = factory.newNumberVector(new double[0]);
+      if(f instanceof ByteBufferSerializer) {
+        // TODO: Remove, once we have serializers for all types
+        @SuppressWarnings("unchecked")
+        final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
+        return new SimpleTypeInformation<V>(cls, ser);
+      }
+      return new SimpleTypeInformation<V>(cls);
+    }
+    throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
 
   @Override
