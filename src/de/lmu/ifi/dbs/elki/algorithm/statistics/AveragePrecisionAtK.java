@@ -30,7 +30,6 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -60,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public class AveragePrecisionAtK<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -144,7 +143,7 @@ public class AveragePrecisionAtK<V extends NumberVector<V, ?>, D extends NumberD
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new CombinedTypeInformation(getDistanceFunction().getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD), TypeUtil.GUESSED_LABEL);
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), TypeUtil.GUESSED_LABEL);
   }
 
   @Override
