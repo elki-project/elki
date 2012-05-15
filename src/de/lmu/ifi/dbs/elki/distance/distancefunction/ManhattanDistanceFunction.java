@@ -107,7 +107,7 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
         r = value;
       }
 
-      final double manhattanI = value - r;
+      final double manhattanI = Math.abs(value - r);
       sumDist += manhattanI;
     }
     return sumDist;
