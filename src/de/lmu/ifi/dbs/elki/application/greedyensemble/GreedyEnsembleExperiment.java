@@ -339,7 +339,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         // Build the improved ensemble:
         final double[] randomensemble = new double[dim];
         {
-          DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), i);
+          DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), (long)i);
           for(DBID id : random) {
             assert (!firstid.equals(id));
             // logger.verbose("Using: "+labels.get(id));

@@ -157,7 +157,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {
-        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1);
+        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1l);
       }
       else {
         DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
