@@ -267,7 +267,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1), 1);
+        final IntParameter numberOfNeighborsP = new IntParameter(NUMBER_OF_NEIGHBORS_ID, new GreaterEqualConstraint(1));
         if(config.grab(numberOfNeighborsP)) {
           numberOfNeighbors = numberOfNeighborsP.getValue();
         }

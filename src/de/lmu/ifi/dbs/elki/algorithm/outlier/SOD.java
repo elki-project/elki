@@ -450,7 +450,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         similarityFunction = simP.instantiateClass(config);
       }
 
-      final IntParameter knnP = new IntParameter(KNN_ID, new GreaterConstraint(0), 1);
+      final IntParameter knnP = new IntParameter(KNN_ID, new GreaterConstraint(0));
       if(config.grab(knnP)) {
         knn = knnP.getValue();
       }
