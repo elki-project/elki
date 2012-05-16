@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -48,8 +49,12 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * Evaluate a distance functions performance by computing the average precision
@@ -69,15 +74,29 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * The parameter k - the number of neighbors to retrieve.
    */
   private int k;
+  
+  /**
+   * Relative number of object to use in sampling.
+   */
+  private double sampling = 1.0;
+  
+  /**
+   * Random sampling seed.
+   */
+  private Long seed = null;
 
   /**
    * Constructor.
    * 
-   * @param distanceFunction
+   * @param distanceFunction Distance function
+   * @param sampling Sampling rate
+   * @param seed Random sampling seed (may be null)
    */
-  public AveragePrecisionAtK(DistanceFunction<? super V, D> distanceFunction, int k) {
+  public AveragePrecisionAtK(DistanceFunction<? super V, D> distanceFunction, int k, double sampling, Long seed) {
     super(distanceFunction);
     this.k = k;
+    this.sampling = sampling;
+    this.seed = seed;
   }
 
   /**
@@ -100,8 +119,15 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     }
     FiniteProgress objloop = logger.isVerbose() ? new FiniteProgress("Computing nearest neighbors", relation.size(), logger) : null;
 
+    final Iterable<DBID> iter;
+    if (sampling < 1.0) {
+      int size = Math.max(1, (int) sampling * relation.size());
+      iter = DBIDUtil.randomSample(relation.getDBIDs(), size, seed);
+    } else {
+      iter = relation.iterDBIDs();
+    }
     // sort neighbors
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBID id : iter) {
       KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
       Object label = lrelation.get(id);
 
@@ -164,7 +190,30 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
      */
     private static final OptionID K_ID = OptionID.getOrCreateOptionID("avep.k", "K to compute the average precision at.");
 
+    /**
+     * Parameter to enable sampling
+     */
+    public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("avep.sampling", "Relative amount of object to sample.");
+
+    /**
+     * Parameter to control the sampling random seed
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("avep.sampling-seed", "Random seed for deterministic sampling.");
+
+    /**
+     * Neighborhood size
+     */
     protected int k = 20;
+    
+    /**
+     * Relative amount of data to sample
+     */
+    protected double sampling = 1.0;
+    
+    /**
+     * Random sampling seed.
+     */
+    protected Long seed = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -173,11 +222,19 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       if(config.grab(param)) {
         k = param.getValue();
       }
+      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.CLOSE), true);
+      if (config.grab(samplingP)) {
+        sampling = samplingP.getValue();
+      }
+      final LongParameter seedP = new LongParameter(SEED_ID, true);
+      if (config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
     }
 
     @Override
     protected AveragePrecisionAtK<V, D> makeInstance() {
-      return new AveragePrecisionAtK<V, D>(distanceFunction, k);
+      return new AveragePrecisionAtK<V, D>(distanceFunction, k, sampling, seed);
     }
   }
 }
