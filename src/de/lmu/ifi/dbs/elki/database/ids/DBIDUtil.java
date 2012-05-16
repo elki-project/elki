@@ -305,11 +305,16 @@ public final class DBIDUtil {
    * @param seed Random generator seed
    * @return new DBIDs
    */
-  public static ModifiableDBIDs randomSample(DBIDs source, int k, long seed) {
+  public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
     if(k <= 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
     }
-    Random random = new Random(seed);
+    final Random random;
+    if (seed != null) {
+      random = new Random(seed);
+    } else {
+      random = new Random();
+    }
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
     if(k < source.size() / 2) {
