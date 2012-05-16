@@ -121,7 +121,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
 
     final Iterable<DBID> iter;
     if (sampling < 1.0) {
-      int size = Math.max(1, (int) sampling * relation.size());
+      int size = Math.max(1, (int) (sampling * relation.size()));
       iter = DBIDUtil.randomSample(relation.getDBIDs(), size, seed);
     } else {
       iter = relation.iterDBIDs();
@@ -218,9 +218,9 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(K_ID, new GreaterEqualConstraint(2));
-      if(config.grab(param)) {
-        k = param.getValue();
+      final IntParameter kP = new IntParameter(K_ID, new GreaterEqualConstraint(2));
+      if(config.grab(kP)) {
+        k = kP.getValue();
       }
       final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.CLOSE), true);
       if (config.grab(samplingP)) {
