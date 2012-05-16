@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -114,20 +115,21 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     }
 
     MeanVariance[] mvs = MeanVariance.newArray(k);
+
+    final DBIDs ids;
+    if (sampling < 1.0) {
+      int size = Math.max(1, (int) (sampling * relation.size()));
+      ids = DBIDUtil.randomSample(relation.getDBIDs(), size, seed);
+    } else {
+      ids = relation.getDBIDs();
+    }
+    
     if(logger.isVerbose()) {
       logger.verbose("Processing points...");
     }
-    FiniteProgress objloop = logger.isVerbose() ? new FiniteProgress("Computing nearest neighbors", relation.size(), logger) : null;
-
-    final Iterable<DBID> iter;
-    if (sampling < 1.0) {
-      int size = Math.max(1, (int) (sampling * relation.size()));
-      iter = DBIDUtil.randomSample(relation.getDBIDs(), size, seed);
-    } else {
-      iter = relation.iterDBIDs();
-    }
+    FiniteProgress objloop = logger.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), logger) : null;
     // sort neighbors
-    for(DBID id : iter) {
+    for(DBID id : ids) {
       KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
       Object label = lrelation.get(id);
 
