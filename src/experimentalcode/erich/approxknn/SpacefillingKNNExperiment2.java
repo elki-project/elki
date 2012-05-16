@@ -130,7 +130,7 @@ public class SpacefillingKNNExperiment2 {
       Iterator<SpatialRef> it = zs.iterator();
       for(int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
-        positions.put(r.id, new int[] { i, -1, -1, -1, -1, -1, -1, -1, -1  });
+        positions.put(r.id, new int[] { i, -1, -1, -1, -1, -1, -1, -1, -1 });
       }
     }
     {
@@ -139,7 +139,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[1] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -148,7 +147,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[2] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -157,7 +155,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[3] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -166,7 +163,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[4] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -175,7 +171,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[5] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -184,7 +179,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[6] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -193,7 +187,6 @@ public class SpacefillingKNNExperiment2 {
         SpatialRef r = it.next();
         int[] data = positions.get(r.id);
         data[7] = i;
-        positions.put(r.id, data);
       }
     }
     {
@@ -310,8 +303,8 @@ public class SpacefillingKNNExperiment2 {
     "ZPH", "Z2P2H2", "Z3P3H3", //
     "Z123", "P123", "H123", //
     "Z12P12H12", "Z13P13H13", "Z23P23H23", //
-    "Z123P123H123"};
-    assert(labels.length == numcurves);
+    "Z123P123H123" };
+    assert (labels.length == numcurves);
     System.out.print("# i");
     // Recall of exact NN:
     for(String s : labels) {
