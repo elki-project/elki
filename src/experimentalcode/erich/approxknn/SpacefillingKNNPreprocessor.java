@@ -408,7 +408,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
         if(config.grab(windowP)) {
           window = windowP.getValue();
         }
-        IntParameter variantsP = new IntParameter(VARIANTS_ID, new IntervalConstraint(1, IntervalBoundary.OPEN, 3, IntervalBoundary.OPEN), 1);
+        IntParameter variantsP = new IntParameter(VARIANTS_ID, new IntervalConstraint(1, IntervalBoundary.CLOSE, 3, IntervalBoundary.CLOSE), 1);
         if(config.grab(variantsP)) {
           variants = variantsP.getValue();
         }
