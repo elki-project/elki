@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Number Distance Parser")
 @Description("Parser for the following line format:\n" + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" + " The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
-public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Number> extends AbstractParser implements DistanceParser<D> {
+public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends AbstractParser implements DistanceParser<D> {
   /**
    * The logger for this class.
    */
@@ -73,23 +73,23 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
   /**
    * Parameter for distance function.
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("parser.distancefunction", "Distance function used for parsing values.");
+  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("parser.distance", "Distance type used for parsing values.");
 
   /**
    * The distance function.
    */
-  private DistanceFunction<?, D> distanceFunction;
+  private final D distanceFactory;
 
   /**
    * Constructor.
    * 
    * @param colSep
    * @param quoteChar
-   * @param distanceFunction
+   * @param distanceFactory Distance factory to use
    */
-  public NumberDistanceParser(Pattern colSep, char quoteChar, DistanceFunction<?, D> distanceFunction) {
+  public NumberDistanceParser(Pattern colSep, char quoteChar, D distanceFactory) {
     super(colSep, quoteChar);
-    this.distanceFunction = distanceFunction;
+    this.distanceFactory = distanceFactory;
   }
 
   @Override
@@ -127,7 +127,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
           }
 
           try {
-            D distance = distanceFunction.getDistanceFactory().parseString(entries.get(2));
+            D distance = distanceFactory.parseString(entries.get(2));
             put(id1, id2, distance, distanceCache);
             ids.add(id1);
             ids.add(id2);
@@ -223,24 +223,24 @@ public class NumberDistanceParser<D extends NumberDistance<D, N>, N extends Numb
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<D extends NumberDistance<D, N>, N extends Number> extends AbstractParser.Parameterizer {
+  public static class Parameterizer<D extends NumberDistance<D, ?>> extends AbstractParser.Parameterizer {
     /**
      * The distance function.
      */
-    protected DistanceFunction<?, D> distanceFunction;
+    protected D distanceFactory;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<?, D>> distFuncP = new ObjectParameter<DistanceFunction<?, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class);
+      ObjectParameter<D> distFuncP = new ObjectParameter<D>(DISTANCE_ID, Distance.class);
       if(config.grab(distFuncP)) {
-        distanceFunction = distFuncP.instantiateClass(config);
+        distanceFactory = distFuncP.instantiateClass(config);
       }
     }
 
     @Override
-    protected NumberDistanceParser<D, N> makeInstance() {
-      return new NumberDistanceParser<D, N>(colSep, quoteChar, distanceFunction);
+    protected NumberDistanceParser<D> makeInstance() {
+      return new NumberDistanceParser<D>(colSep, quoteChar, distanceFactory);
     }
   }
 }

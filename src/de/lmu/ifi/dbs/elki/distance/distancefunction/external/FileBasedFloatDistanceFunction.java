@@ -42,6 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -165,6 +167,10 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
       }
       final ObjectParameter<DistanceParser<FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
+        ListParameterization parserConfig = new ListParameterization();
+        parserConfig.addParameter(NumberDistanceParser.DISTANCE_ID, FloatDistance.class);
+        ChainedParameterization combinedConfig = new ChainedParameterization(parserConfig, config);
+        combinedConfig.errorsTo(config);
         parser = PARSER_PARAM.instantiateClass(config);
       }
     }
