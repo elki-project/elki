@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -69,11 +68,6 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    * The logger for this class.
    */
   private static final Logging logger = Logging.getLogger(NumberDistanceParser.class);
-
-  /**
-   * Parameter for distance function.
-   */
-  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("parser.distance", "Distance type used for parsing values.");
 
   /**
    * The distance function.
