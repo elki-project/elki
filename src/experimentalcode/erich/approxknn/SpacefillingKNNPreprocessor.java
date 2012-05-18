@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -50,6 +51,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -69,6 +72,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @author Erich Schubert
  */
 public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends AbstractIndex<O> implements KNNIndex<O> {
+  /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(SpacefillingKNNPreprocessor.class);
+
+  static {
+    logger.getWrappedLogger().setLevel(Level.INFO);
+  }
+
   /**
    * Spatial curve generators
    */
@@ -93,6 +105,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
    * Curve position storage
    */
   WritableDataStore<int[]> positions = null;
+
+  /**
+   * Mean number of distance computations
+   */
+  Mean mean = new Mean();
 
   /**
    * Constructor.
@@ -122,6 +139,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
   }
 
   protected void preprocess() {
+    final long start = System.nanoTime();
     final int size = relation.size();
 
     final int numgen = curvegen.size();
@@ -189,6 +207,15 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
         data[cnum] = i;
       }
     }
+    final long end = System.nanoTime();
+    if(logger.isVerbose()) {
+      logger.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds.");
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "Mean number of distance computations / k: " + mean.getMean();
   }
 
   @Override
@@ -236,7 +263,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
 
     @Override
     public KNNResult<D> getKNNForDBID(DBID id, int k) {
-      int wsize = (int) (window * k);
+      final int wsize = (int) (window * k);
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * curves.size());
       final int[] posi = positions.get(id);
@@ -249,11 +276,14 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
         }
       }
       // Refine:
+      int distc = 0;
       KNNHeap<D> heap = new KNNHeap<D>(k);
       final O vec = relation.get(id);
       for(DBID cand : cands) {
         heap.add(new GenericDistanceResultPair<D>(distq.distance(vec, cand), cand));
+        distc++;
       }
+      mean.put(distc / (double) k);
       return heap.toKNNList();
     }
 
