@@ -65,7 +65,10 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
     for(int i = 1; i <= dim; i++) {
       double v1 = o1.doubleValue(i);
       double v2 = o2.doubleValue(i);
-      sum += Math.abs(v1 - v2) / (Math.abs(v1) + Math.abs(v2));
+      final double div = Math.abs(v1) + Math.abs(v2);
+      if (div > 0) {
+        sum += Math.abs(v1 - v2) / div;
+      }
     }
     return sum;
   }
@@ -90,7 +93,10 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
       final double manhattanI = m1 - m2;
       final double a1 = Math.max(-mbr1.getMin(d), mbr1.getMax(d));
       final double a2 = Math.max(-mbr2.getMin(d), mbr2.getMax(d));
-      sum += manhattanI / (a1 + a2);
+      final double div = a1 + a2;
+      if (div > 0) {
+        sum += manhattanI / div;
+      }
     }
     return sum;
   }
