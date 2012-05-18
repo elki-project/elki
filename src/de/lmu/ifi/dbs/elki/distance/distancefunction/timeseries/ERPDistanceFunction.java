@@ -48,7 +48,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * Keeps the currently set g.
    */
-  private double g;
+  private final double g;
 
   /**
    * Constructor.
@@ -76,10 +76,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
 
     // size of edit distance band
     // bandsize is the maximum allowed distance to the diagonal
-    int band = (int) Math.ceil(v2.getDimensionality() * bandSize);
-
-    // g parameter for local usage
-    double gValue = g;
+    final int band = (int) Math.ceil(v2.getDimensionality() * bandSize);
 
     for(int i = 0; i < v1.getDimensionality(); i++) {
       // Swap current and prev arrays. We'll just overwrite the new curr.
@@ -101,11 +98,11 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
         if(Math.abs(i - j) <= band) {
           // compute squared distance of feature vectors
           double val1 = v1.doubleValue(i + 1);
-          double val2 = gValue;
+          double val2 = g;
           double diff = (val1 - val2);
           final double d1 = Math.sqrt(diff * diff);
 
-          val1 = gValue;
+          val1 = g;
           val2 = v2.doubleValue(j + 1);
           diff = (val1 - val2);
           final double d2 = Math.sqrt(diff * diff);
