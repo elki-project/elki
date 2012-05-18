@@ -45,6 +45,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -179,9 +181,14 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
+
       final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
-        parser = PARSER_PARAM.instantiateClass(config);
+        ListParameterization parserConfig = new ListParameterization();
+        parserConfig.addParameter(NumberDistanceParser.DISTANCE_ID, DoubleDistance.class);
+        ChainedParameterization combinedConfig = new ChainedParameterization(parserConfig, config);
+        combinedConfig.errorsTo(config);
+        parser = PARSER_PARAM.instantiateClass(combinedConfig);
       }
     }
 
