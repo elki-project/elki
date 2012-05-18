@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.parser;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 /*
  This file is part of ELKI:

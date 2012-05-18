@@ -31,9 +31,6 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
-import de.lmu.ifi.dbs.elki.datasource.parser.DistanceParser;
-import de.lmu.ifi.dbs.elki.datasource.parser.DistanceParsingResult;
-import de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
