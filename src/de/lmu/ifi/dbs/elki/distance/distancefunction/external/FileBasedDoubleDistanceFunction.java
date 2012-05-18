@@ -185,7 +185,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
       final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         ListParameterization parserConfig = new ListParameterization();
-        parserConfig.addParameter(NumberDistanceParser.DISTANCE_ID, DoubleDistance.class);
+        parserConfig.addParameter(DistanceParser.DISTANCE_ID, DoubleDistance.class);
         ChainedParameterization combinedConfig = new ChainedParameterization(parserConfig, config);
         combinedConfig.errorsTo(config);
         parser = PARSER_PARAM.instantiateClass(combinedConfig);

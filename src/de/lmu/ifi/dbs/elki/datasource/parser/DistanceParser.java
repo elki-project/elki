@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import java.io.InputStream;
 
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * A DistanceParser shall provide a DistanceParsingResult by parsing an InputStream.
@@ -37,6 +38,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <D> distance type
  */
 public interface DistanceParser<D extends Distance<D>> {
+  /**
+   * Parameter for distance function.
+   */
+  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("parser.distance", "Distance type used for parsing values.");
+
   /**
    * Returns a list of the objects parsed from the specified input stream
    * and a list of the labels associated with the objects.
