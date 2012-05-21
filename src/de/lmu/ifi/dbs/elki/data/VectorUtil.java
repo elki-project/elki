@@ -185,13 +185,23 @@ public final class VectorUtil {
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
     // We can just compute all three in parallel.
-    final int dim = v1.getDimensionality();
+    final int d1 = v1.getDimensionality();
+    final int d2 = v2.getDimensionality();
+    final int dim = Math.min(d1, d2);
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < dim; k++) {
       final double r1 = v1.doubleValue(k + 1);
       final double r2 = v2.doubleValue(k + 1);
       s += r1 * r2;
       e1 += r1 * r1;
+      e2 += r2 * r2;
+    }
+    for(int k = dim; k < d1; k++) {
+      final double r1 = v1.doubleValue(k + 1);
+      e1 += r1 * r1;
+    }
+    for(int k = dim; k < d2; k++) {
+      final double r2 = v2.doubleValue(k + 1);
       e2 += r2 * r2;
     }
     return Math.min(Math.sqrt((s / e1) * (s / e2)), 1);
