@@ -229,6 +229,9 @@ public class InspectionUtil {
             catch(Exception e) {
               continue;
             }
+            catch(Error e) {
+              continue;
+            }
           }
         }
       }
