@@ -1,34 +1,11 @@
 package experimentalcode.students.muellerjo.outlier;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Comparator;
-
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2011
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -37,11 +14,16 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -79,7 +61,6 @@ import experimentalcode.erich.HilbertSpatialSorter;
 @Description("Algorithm to compute outliers using Hilbert space filling curves")
 @Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", url = "http://dx.doi.org/10.1145/375663.375668")
 public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-
   /**
    * The logger for this class.
    */
@@ -146,7 +127,6 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private HilFeature[] pf;
   private Heap<HilFeature> out;
   private Heap<HilFeature> wlb;
-  private O factory;
   
   /**
    * Constructor.
@@ -164,7 +144,13 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     this.h = h;
     this.t = t;
     this.tn = tn;
-    this.distfunc = new LPNormDistanceFunction(t);
+    if (t == 1.0) {
+      this.distfunc = ManhattanDistanceFunction.STATIC;
+    } else if (t == 2.0) {
+      this.distfunc = EuclideanDistanceFunction.STATIC;
+    } else {
+      this.distfunc = new LPNormDistanceFunction(t);
+    }
     HilUpperComparator uc = new HilUpperComparator();
     HilLowerComparator lc = new HilLowerComparator();
     this.out = new Heap<HilFeature>(n+1, uc);
@@ -182,7 +168,6 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;    
-    factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     
     // Initialization part
@@ -202,13 +187,14 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       entry.id  = id;
       entry.lbound = 0.0;
       entry.level = 0;
-      entry.point = new double[d];
-      for (int dim=0; dim < d; dim++)
-        entry.point[dim] = (relation.get(entry.id).doubleValue(dim+1) - minMax.first.doubleValue(dim+1)) / (minMax.second.doubleValue(dim+1) - minMax.first.doubleValue(dim+1));
+      entry.point = new Vector(d);
+      for (int dim=0; dim < d; dim++) {
+        entry.point.set(dim, (relation.get(entry.id).doubleValue(dim+1) - minMax.first.doubleValue(dim+1)) / (minMax.second.doubleValue(dim+1) - minMax.first.doubleValue(dim+1)));
+      }
       entry.ubound = Double.POSITIVE_INFINITY;
       entry.hilbert = null;
       entry.nn = new Heap<NN>(k+1, distcheck);
-      entry.nn_keys = new HashSet<DBID>(k);
+      entry.nn_keys = DBIDUtil.newHashSet();
       entry.sum_nn = 0.0;
       pf[pos++] = entry;
       if(progressPreproc != null) {
@@ -233,7 +219,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
       trueOutliers();
       // Build the top Set as out + wlb
       top.clear();
-      Set<DBID> top_keys = new HashSet<DBID>(out.size());
+      HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(out.size());
       for(HilFeature entry : out){
         top_keys.add(entry.id);
         top.add(entry);
@@ -287,7 +273,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     for (int i=0; i < pf.length; i++){
       int[] coord = new int[d];
       for(int dim=0; dim < d; dim++){
-        coord[dim] = (int)(v_half_max_int + half_max_int * pf[i].point[dim]) << (32-h);
+        coord[dim] = (int)(v_half_max_int + half_max_int * pf[i].point.get(dim)) << (32-h);
       }
       pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
     }
@@ -436,7 +422,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
         levela = java.lang.Math.min(levela, pf[a].level);
         c = a;
       }
-      insert(i, pf[c].id, distfunc.doubleDistance(factory.newNumberVector(pf[i].point), factory.newNumberVector(pf[c].point)));
+      insert(i, pf[c].id, distfunc.doubleDistance(pf[i].point, pf[c].point));
       if(pf[i].nn.size() == k){
         if(pf[i].sum_nn < omega_star){
           stop = true;
@@ -466,7 +452,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
    * @param p Point as Vector
    * @param level Level of the corresponding r-region
    */ 
-  private double minDist(double[] p, int level){
+  private double minDist(Vector v, int level){
+    double[] p = v.getArrayRef();
     double dist = Double.POSITIVE_INFINITY;
     double r = 2.0 / (double)(1 << level+1);
     for (int dim=0; dim < d; dim++){
@@ -482,7 +469,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
    * @param p Point as Vector
    * @param level Level of the corresponding r-region
    */ 
-  private double maxDist(double[] p, int level){
+  private double maxDist(Vector v, int level){
+    double[] p = v.getArrayRef();
     double dist;
     double r = 2.0 / (double)(1 << level+1);
     if (t == 1.0){
@@ -692,13 +680,13 @@ final class NN{
 
 final class HilFeature implements Comparable<HilFeature>{
   public DBID id;
-  public double[] point;
+  public Vector point;
   public long[] hilbert;
   public int level;
   public double ubound;
   public double lbound;
   public Heap<NN> nn;
-  public Set<DBID> nn_keys;
+  public HashSetModifiableDBIDs nn_keys;
   public double sum_nn;
   
   @Override
