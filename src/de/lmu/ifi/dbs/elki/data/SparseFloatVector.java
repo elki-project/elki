@@ -106,7 +106,6 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       for (int i = 0; iter.hasNext(); i++) {
         iter.advance();
         this.indexes[i] = iter.key();
-        i++;
       }
       Arrays.sort(this.indexes);
     }
