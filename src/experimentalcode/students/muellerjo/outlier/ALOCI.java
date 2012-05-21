@@ -149,11 +149,19 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     double[] min, max;
     {
       Pair<O, O> hbbs = DatabaseUtil.computeMinMax(relation);
+      double maxd = 0;
       min = new double[dim];
       max = new double[dim];
       for(int i = 0; i < dim; i++) {
         min[i] = hbbs.first.doubleValue(i + 1);
         max[i] = hbbs.second.doubleValue(i + 1);
+        maxd = Math.max(maxd, max[i] - min[i]);
+      }
+      // Enlarge bounding box to have equal lengths.
+      for(int i = 0; i < dim; i++) {
+        double diff = (maxd - (max[i] - min[i])) / 2;
+        min[i] -= diff;
+        max[i] += diff;
       }
     }
 
