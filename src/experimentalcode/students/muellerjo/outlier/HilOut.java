@@ -375,8 +375,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     int pre = i;
     int post = i;
     while(post-pre < k){
-      int pre_level = (pre-1 >= 0) ?  pf[pre-1].level : -1;
-      int post_level = (post < capital_n-1)? pf[post].level : -1;
+      int pre_level = (pre-1 >= 0) ?  pf[pre-1].level : -2;
+      int post_level = (post < capital_n-1)? pf[post].level : -2;
       if (post_level >= pre_level){
         post++;
       }
@@ -509,7 +509,7 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
   private int minReg(int a, int b){
       long[] pf_a = BitsUtil.copy(pf[a].hilbert);
       BitsUtil.xorI(pf_a, pf[b].hilbert);
-      return (1 << (numberOfLeadingZeros(pf_a) / d)) >> 1;
+      return (-1 + (numberOfLeadingZeros(pf_a) / d));
   }
   
   /**
@@ -566,8 +566,8 @@ public class HilOut<O  extends NumberVector<O, ?>> extends AbstractAlgorithm<Out
     long[] hil2 = BitsUtil.copy(pf[b].hilbert);
     BitsUtil.xorI(hil1, pf[i].hilbert);
     BitsUtil.xorI(hil2, pf[i].hilbert);
-    int level = (1 << (java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d));
-    return minDist(pf[i].point, level);
+    int level = java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d;
+    return minDist(pf[i].point.copy().plusEquals(v), level);
   }
   
   /**
