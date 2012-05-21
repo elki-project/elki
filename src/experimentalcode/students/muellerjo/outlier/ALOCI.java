@@ -318,17 +318,19 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
      * circumvents the problem of undefined values.
      */
     if(sq == sn.getBucketCount()) {
-      mdef_norm = 0.0;
+      return new DoubleIntPair(0.0, sn.getLevel());
     }
     // calculation of mdef according to the paper and standardization as done in
     // LOCI
-    else {
-      long cb = sn.getBoxCountCubicSum(alpha, qts.get(qti));
-      double n_hat = (double) sq / (double) sn.getBucketCount();
-      double sig_n_hat = java.lang.Math.sqrt(cb * sn.getBucketCount() - (sq * sq)) / sn.getBucketCount();
-      double mdef = n_hat - cg.getBucketCount();
-      mdef_norm = mdef / sig_n_hat;
+    long cb = sn.getBoxCountCubicSum(alpha, qts.get(qti));
+    double n_hat = (double) sq / (double) sn.getBucketCount();
+    double sig_n_hat = java.lang.Math.sqrt(cb * sn.getBucketCount() - (sq * sq)) / sn.getBucketCount();
+    // Avoid NaN - correct result 0.0?
+    if(sig_n_hat < Double.MIN_NORMAL) {
+      return new DoubleIntPair(0.0, sn.getLevel());
     }
+    double mdef = n_hat - cg.getBucketCount();
+    mdef_norm = mdef / sig_n_hat;
     return new DoubleIntPair(mdef_norm, sn.getLevel());
   }
 
