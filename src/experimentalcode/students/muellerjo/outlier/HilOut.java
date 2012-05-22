@@ -23,6 +23,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -179,19 +180,19 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
 
     // Compute extend of dataset.
     double[] min, max;
+    double diameter = 0; // Actually "length of edge"
     {
       Pair<O, O> hbbs = DatabaseUtil.computeMinMax(relation);
-      double maxd = 0;
       min = new double[d];
       max = new double[d];
       for(int i = 0; i < d; i++) {
         min[i] = hbbs.first.doubleValue(i + 1);
         max[i] = hbbs.second.doubleValue(i + 1);
-        maxd = Math.max(maxd, max[i] - min[i]);
+        diameter = Math.max(diameter, max[i] - min[i]);
       }
       // Enlarge bounding box to have equal lengths.
       for(int i = 0; i < d; i++) {
-        double diff = (maxd - (max[i] - min[i])) / 2;
+        double diff = (diameter - (max[i] - min[i])) / 2;
         min[i] -= diff;
         max[i] += diff;
       }
@@ -207,10 +208,10 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         if(tn == Selection.TopN) {
           hilout_weight.putDouble(id, 0.0);
         }
-        Vector v = new Vector(d);
+        double[] v = new double[d];
         O obj = relation.get(id);
         for(int dim = 0; dim < d; dim++) {
-          v.set(dim, (obj.doubleValue(dim + 1) - min[dim]) / (max[dim] - min[dim]));
+          v[dim] = (obj.doubleValue(dim + 1) - min[dim]) / (max[dim] - min[dim]);
         }
         pf[pos++] = new HilFeature(id, v, new Heap<NN>(k + 1, distcheck));
         if(progressPreproc != null) {
@@ -222,7 +223,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       }
     }
 
-    double shift = 1.0 / (double) d;
+    final double shift = 1.0 / (d + 1);
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
     // Main part: 1. Phase max. d+1 loops
     for(int j = 0; j <= d && n_star < n; j++) {
@@ -231,7 +232,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       wlb.clear();
       double v = j * shift;
       // Initialize Hilbert values in pf according to current shift
-      hilbert(v);
+      hilbert(min, diameter, v);
       // scan the Data according to the current shift; build out and wlb
       scan(v, (int) (k * ((double) capital_n / (double) capital_n_star)));
       // determine the true Outliers (n_star)
@@ -286,13 +287,14 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * 
    * @param v the current shift factor
    */
-  private void hilbert(double v) {
-    int half_max_int = Integer.MAX_VALUE >>> (32 - h);
-    int v_half_max_int = (int) (v * half_max_int);
+  private void hilbert(double[] min, double diameter, double shift) {
+    final int scale = ~1 >> (32 - h); // Top h bits set
     for(int i = 0; i < pf.length; i++) {
       int[] coord = new int[d];
       for(int dim = 0; dim < d; dim++) {
-        coord[dim] = (int) (v_half_max_int + half_max_int * pf[i].point.get(dim)) << (32 - h);
+        double val = (pf[i].point[dim] - min[dim] + shift) * scale / diameter;
+        assert(val < scale && val >= 0);
+        coord[dim] = (int) val;
       }
       pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
     }
@@ -446,7 +448,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         c = a;
       }
       if(!pf[i].nn_keys.contains(pf[c].id)) {
-        insert(i, pf[c].id, distfunc.doubleDistance(pf[i].point, pf[c].point));
+        insert(i, pf[c].id, distfunc.doubleDistance(new Vector(pf[i].point), new Vector(pf[c].point)));
         if(pf[i].nn.size() == k) {
           if(pf[i].sum_nn < omega_star) {
             stop = true;
@@ -478,8 +480,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param p Point as Vector
    * @param level Level of the corresponding r-region
    */
-  private double minDist(Vector v, int level) {
-    double[] p = v.getArrayRef();
+  private double minDist(double[] p, int level) {
     double dist = Double.POSITIVE_INFINITY;
     double r = 2.0 / (double) (1 << level + 1);
     for(int dim = 0; dim < d; dim++) {
@@ -496,8 +497,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param p Point as Vector
    * @param level Level of the corresponding r-region
    */
-  private double maxDist(Vector v, int level) {
-    double[] p = v.getArrayRef();
+  private double maxDist(double[] p, int level) {
     double dist;
     double r = 2.0 / (double) (1 << level + 1);
     if(t == 1.0) {
@@ -593,7 +593,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     BitsUtil.xorI(hil1, pf[i].hilbert);
     BitsUtil.xorI(hil2, pf[i].hilbert);
     int level = java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d;
-    return minDist(pf[i].point.copy().plusEquals(v), level);
+    return minDist(VMath.plus(pf[i].point, v), level);
   }
 
   /**
@@ -604,7 +604,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * 
    * @return number of leading zeros and 0 if none
    */
-  private int numberOfLeadingZeros(long[] in) {
+  private static int numberOfLeadingZeros(long[] in) {
     int out = BitsUtil.numberOfLeadingZeros(in);
     return (out == -1) ? 0 : out;
   }
@@ -709,7 +709,7 @@ final class NN {
 final class HilFeature implements Comparable<HilFeature> {
   public DBID id;
 
-  public Vector point;
+  public double[] point;
 
   public long[] hilbert = null;
 
@@ -725,7 +725,7 @@ final class HilFeature implements Comparable<HilFeature> {
 
   public double sum_nn = 0.0;
 
-  public HilFeature(DBID id, Vector point, Heap<NN> nn) {
+  public HilFeature(DBID id, double[] point, Heap<NN> nn) {
     super();
     this.id = id;
     this.point = point;
