@@ -150,6 +150,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     this.h = h;
     this.t = t;
     this.tn = tn;
+    // TODO: Make parameterizable with any LP norm, get t from the LP norm
     if(t == 1.0) {
       this.distfunc = ManhattanDistanceFunction.STATIC;
     }
@@ -159,10 +160,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     else {
       this.distfunc = new LPNormDistanceFunction(t);
     }
-    HilUpperComparator uc = new HilUpperComparator();
-    HilLowerComparator lc = new HilLowerComparator();
-    this.out = new Heap<HilFeature>(n + 1, uc);
-    this.wlb = new Heap<HilFeature>(n + 1, lc);
+    this.out = new Heap<HilFeature>(n + 1, new HilUpperComparator());
+    this.wlb = new Heap<HilFeature>(n + 1, new HilLowerComparator());
     this.top = new HashSet<HilFeature>(2 * n);
     this.n_star = 0;
     this.omega_star = 0.0;
@@ -173,48 +172,60 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    */
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
-
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+    d = DatabaseUtil.dimensionality(relation);
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
+    // Compute extend of dataset.
+    double[] min, max;
+    {
+      Pair<O, O> hbbs = DatabaseUtil.computeMinMax(relation);
+      double maxd = 0;
+      min = new double[d];
+      max = new double[d];
+      for(int i = 0; i < d; i++) {
+        min[i] = hbbs.first.doubleValue(i + 1);
+        max[i] = hbbs.second.doubleValue(i + 1);
+        maxd = Math.max(maxd, max[i] - min[i]);
+      }
+      // Enlarge bounding box to have equal lengths.
+      for(int i = 0; i < d; i++) {
+        double diff = (maxd - (max[i] - min[i])) / 2;
+        min[i] -= diff;
+        max[i] += diff;
+      }
+    }
+
     // Initialization part
-    capital_n_star = capital_n = relation.size();
-    int j = 0;
-    pf = new HilFeature[capital_n];
-    d = DatabaseUtil.dimensionality(relation);
-    NNComparator distcheck = new NNComparator();
-    Pair<O, O> minMax = DatabaseUtil.computeMinMax(relation);
-    double shift = 1.0 / (double) d;
-    int pos = 0;
-    for(DBID id : relation.iterDBIDs()) {
-      if(tn == Selection.TopN) {
-        hilout_weight.putDouble(id, 0.0);
+    {
+      capital_n_star = capital_n = relation.size();
+      pf = new HilFeature[capital_n];
+      NNComparator distcheck = new NNComparator();
+      int pos = 0;
+      for(DBID id : relation.iterDBIDs()) {
+        if(tn == Selection.TopN) {
+          hilout_weight.putDouble(id, 0.0);
+        }
+        Vector v = new Vector(d);
+        O obj = relation.get(id);
+        for(int dim = 0; dim < d; dim++) {
+          v.set(dim, (obj.doubleValue(dim + 1) - min[dim]) / (max[dim] - min[dim]));
+        }
+        pf[pos++] = new HilFeature(id, v, new Heap<NN>(k + 1, distcheck));
+        if(progressPreproc != null) {
+          progressPreproc.incrementProcessed(logger);
+        }
       }
-      HilFeature entry = new HilFeature();
-      entry.id = id;
-      entry.lbound = 0.0;
-      entry.level = 0;
-      entry.point = new Vector(d);
-      for(int dim = 0; dim < d; dim++) {
-        entry.point.set(dim, (relation.get(entry.id).doubleValue(dim + 1) - minMax.first.doubleValue(dim + 1)) / (minMax.second.doubleValue(dim + 1) - minMax.first.doubleValue(dim + 1)));
-      }
-      entry.ubound = Double.POSITIVE_INFINITY;
-      entry.hilbert = null;
-      entry.nn = new Heap<NN>(k + 1, distcheck);
-      entry.nn_keys = DBIDUtil.newHashSet();
-      entry.sum_nn = 0.0;
-      pf[pos++] = entry;
       if(progressPreproc != null) {
-        progressPreproc.incrementProcessed(logger);
+        progressPreproc.ensureCompleted(logger);
       }
     }
-    if(progressPreproc != null) {
-      progressPreproc.ensureCompleted(logger);
-    }
+
+    double shift = 1.0 / (double) d;
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
     // Main part: 1. Phase max. d+1 loops
-    while(j <= d && n_star < n) {
+    for(int j = 0; j <= d && n_star < n; j++) {
       // initialize (clear) out and wlb - not 100% clear in the paper
       out.clear();
       wlb.clear();
@@ -237,7 +248,6 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           top.add(entry);
         }
       }
-      j++;
       if(progressHilOut != null) {
         progressHilOut.incrementProcessed(logger);
       }
@@ -701,19 +711,26 @@ final class HilFeature implements Comparable<HilFeature> {
 
   public Vector point;
 
-  public long[] hilbert;
+  public long[] hilbert = null;
 
-  public int level;
+  public int level = 0;
 
-  public double ubound;
+  public double ubound = Double.POSITIVE_INFINITY;
 
-  public double lbound;
+  public double lbound = 0.0;
 
   public Heap<NN> nn;
 
-  public HashSetModifiableDBIDs nn_keys;
+  public HashSetModifiableDBIDs nn_keys = DBIDUtil.newHashSet();
 
-  public double sum_nn;
+  public double sum_nn = 0.0;
+
+  public HilFeature(DBID id, Vector point, Heap<NN> nn) {
+    super();
+    this.id = id;
+    this.point = point;
+    this.nn = nn;
+  }
 
   @Override
   public int compareTo(HilFeature o) {
