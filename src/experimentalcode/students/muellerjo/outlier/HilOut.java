@@ -16,15 +16,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -135,6 +135,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
 
   private Heap<HilFeature> wlb;
 
+  private PrimitiveDistanceQuery<O, DoubleDistance> distq;
+
   /**
    * Constructor.
    * 
@@ -178,13 +180,15 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
+    distq = distfunc.instantiate(relation);
+    
     // Compute extend of dataset.
-    double[] min, max;
+    double[] min;
     double diameter = 0; // Actually "length of edge"
     {
       Pair<O, O> hbbs = DatabaseUtil.computeMinMax(relation);
       min = new double[d];
-      max = new double[d];
+      double[] max = new double[d];
       for(int i = 0; i < d; i++) {
         min[i] = hbbs.first.doubleValue(i + 1);
         max[i] = hbbs.second.doubleValue(i + 1);
@@ -210,8 +214,9 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         }
         double[] v = new double[d];
         O obj = relation.get(id);
+        // Rescale and move to 0:1
         for(int dim = 0; dim < d; dim++) {
-          v[dim] = (obj.doubleValue(dim + 1) - min[dim]) / (max[dim] - min[dim]);
+          v[dim] = (obj.doubleValue(dim + 1) - min[dim]) / diameter;
         }
         pf[pos++] = new HilFeature(id, v, new Heap<NN>(k + 1, distcheck));
         if(progressPreproc != null) {
@@ -223,16 +228,15 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       }
     }
 
-    final double shift = 1.0 / (d + 1);
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
     // Main part: 1. Phase max. d+1 loops
     for(int j = 0; j <= d && n_star < n; j++) {
       // initialize (clear) out and wlb - not 100% clear in the paper
       out.clear();
       wlb.clear();
-      double v = j * shift;
+      final double v = j / (d + 1);
       // Initialize Hilbert values in pf according to current shift
-      hilbert(min, diameter, v);
+      hilbert(v);
       // scan the Data according to the current shift; build out and wlb
       scan(v, (int) (k * ((double) capital_n / (double) capital_n_star)));
       // determine the true Outliers (n_star)
@@ -285,18 +289,51 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * Hilbert function to fill pf with shifted Hilbert values. Also calculates
    * the number current Outlier candidates capital_n_star
    * 
-   * @param v the current shift factor
+   * @param shift the current shift factor
    */
-  private void hilbert(double[] min, double diameter, double shift) {
-    final int scale = ~1 >> (32 - h); // Top h bits set
-    for(int i = 0; i < pf.length; i++) {
-      int[] coord = new int[d];
-      for(int dim = 0; dim < d; dim++) {
-        double val = (pf[i].point[dim] - min[dim] + shift) * scale / diameter;
-        assert(val < scale && val >= 0);
-        coord[dim] = (int) val;
+  private void hilbert(double shift) {
+    // FIXME: 64 bit mode untested - sign bit is tricky to handle correctly with
+    // the rescaling. 63 bit should be fine. The sign bit probably needs to be
+    // handled differently, or at least needs careful unit testing of the API
+    if(h >= 32) {
+      final long scale = ~1l >>> 1; // Top h bits set
+      for(int i = 0; i < pf.length; i++) {
+        long[] coord = new long[d];
+        for(int dim = 0; dim < d; dim++) {
+          coord[dim] = (long) (.5 * (pf[i].point[dim] + shift) * scale) << 1;
+        }
+        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
       }
-      pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+    }
+    else if(h >= 16) {
+      final int scale = ~1 >>> 1; // Top h bits set
+      for(int i = 0; i < pf.length; i++) {
+        int[] coord = new int[d];
+        for(int dim = 0; dim < d; dim++) {
+          coord[dim] = (int) (.5 * (pf[i].point[dim] + shift) * scale) << 1;
+        }
+        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+      }
+    }
+    else if(h >= 8) {
+      final int scale = ~1 >>> 16; // Top h bits set
+      for(int i = 0; i < pf.length; i++) {
+        short[] coord = new short[d];
+        for(int dim = 0; dim < d; dim++) {
+          coord[dim] = (short) (.5 * (pf[i].point[dim] + shift) * scale);
+        }
+        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+      }
+    }
+    else {
+      final int scale = ~1 >>> 8; // Top h bits set
+      for(int i = 0; i < pf.length; i++) {
+        byte[] coord = new byte[d];
+        for(int dim = 0; dim < d; dim++) {
+          coord[dim] = (byte) (.5 * (pf[i].point[dim] + shift) * scale);
+        }
+        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+      }
     }
     java.util.Arrays.sort(pf);
     capital_n_star = 0;
@@ -422,10 +459,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @return DoubleDoublePair containing the new lower and upper bound
    */
   private DoubleDoublePair innerScan(int i, int maxcount, double v) {
-    int a;
-    int b = a = i;
-    int levela, levelb;
-    int level = levela = levelb = h;
+    int a = i, b = i;
+    int level = h, levela = h, levelb = h;
     int count = 0;
     boolean stop = false;
     // Small changes to prevent ArrayOutOfBound Exceptions
@@ -448,14 +483,14 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         c = a;
       }
       if(!pf[i].nn_keys.contains(pf[c].id)) {
-        insert(i, pf[c].id, distfunc.doubleDistance(new Vector(pf[i].point), new Vector(pf[c].point)));
+        insert(i, pf[c].id, distq.distance(pf[i].id, pf[c].id).doubleValue());
         if(pf[i].nn.size() == k) {
           if(pf[i].sum_nn < omega_star) {
             stop = true;
           }
           else if(java.lang.Math.max(levela, levelb) < level) {
             level = java.lang.Math.max(levela, levelb);
-            double delta = minDist(pf[i].point, level);
+            double delta = minDist(pf[i].point, v, level); // FIXME: 0 oder v?
             stop = (delta >= pf[i].nn.peek().distance);
           }
         }
@@ -480,11 +515,12 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param p Point as Vector
    * @param level Level of the corresponding r-region
    */
-  private double minDist(double[] p, int level) {
+  private double minDist(double[] p, double v, int level) {
     double dist = Double.POSITIVE_INFINITY;
     double r = 2.0 / (double) (1 << level + 1);
     for(int dim = 0; dim < d; dim++) {
-      double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r) * r;
+      final double pd = (p[dim] + v) / 2;
+      double p_m_r = pd - java.lang.Math.floor(pd / r) * r;
       dist = java.lang.Math.min(dist, java.lang.Math.min(p_m_r, r - p_m_r));
     }
     return dist;
@@ -593,7 +629,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     BitsUtil.xorI(hil1, pf[i].hilbert);
     BitsUtil.xorI(hil2, pf[i].hilbert);
     int level = java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d;
-    return minDist(VMath.plus(pf[i].point, v), level);
+    return minDist(pf[i].point, v, level);
   }
 
   /**
