@@ -478,7 +478,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         c = a;
       }
       if(!pf[i].nn_keys.contains(pf[c].id)) {
-        insert(i, pf[c].id, distfunc.doubleDistance(new Vector(pf[i].point), new Vector(pf[c].point)));
+        insert(i, pf[c].id, distfunc.doubleDistance(pf[i].pv, pf[c].pv));
         if(pf[i].nn.size() == k) {
           if(pf[i].sum_nn < omega_star) {
             stop = true;
@@ -756,11 +756,14 @@ final class HilFeature implements Comparable<HilFeature> {
 
   public double sum_nn = 0.0;
 
+  Vector pv; // wrapped as Vector
+
   public HilFeature(DBID id, double[] point, Heap<NN> nn) {
     super();
     this.id = id;
     this.point = point;
     this.nn = nn;
+    this.pv = new Vector(point);
   }
 
   @Override
