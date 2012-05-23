@@ -121,7 +121,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   protected HilOut(int k, int n, int h, double t, Enum<Selection> tn) {
     super();
     this.n = n;
-    this.k = k - 1; // HilOut does not count the object itself. We do in KNNWeightOutlier.
+    this.k = k - 1; // HilOut does not count the object itself. We do in
+                    // KNNWeightOutlier.
     this.h = h;
     this.t = t;
     this.tn = tn;
@@ -164,8 +165,10 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         min[i] -= diff;
         max[i] += diff;
       }
+      if (logger.isVerbose()) {
+        logger.verbose("Rescaling dataset by " + (1 / diameter)+" to fit the unit cube.");
+      }
     }
-    logger.warning("Rescaling dataset by " + (1 / diameter));
 
     // Initialization part
     capital_n_star = capital_n = relation.size();
@@ -183,7 +186,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       scan(h, (int) (k * capital_n / (double) capital_n_star));
       // determine the true outliers (n_star)
       trueOutliers(h);
-      logger.warning("True outliers found: " + n_star);
+      logger.verbose("True outliers found: " + n_star);
       // Build the top Set as out + wlb
       h.top.clear();
       HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(h.out.size());
@@ -244,7 +247,9 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    */
   private void scan(HilbertFeatures hf, int k0) {
     final int mink0 = Math.min(2 * k0, capital_n - 1);
-    logger.warning("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
+    if (logger.isDebuggingFine()) {
+      logger.debugFine("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
+    }
     for(int i = 0; i < hf.pf.length; i++) {
       if(hf.pf[i].ubound < omega_star) {
         continue;
@@ -265,18 +270,17 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           }
           innerScan(hf, i, maxcount);
         }
-        if(hf.pf[i].ubound > 0) {
-          hf.updateOUT(i);
-        }
-        if(hf.pf[i].lbound > 0) {
-          hf.updateWLB(i);
-        }
-        if(hf.wlb.size() >= n) {
-          omega_star = Math.max(omega_star, hf.wlb.peek().lbound);
-        }
+      }
+      if(hf.pf[i].ubound > 0) {
+        hf.updateOUT(i);
+      }
+      if(hf.pf[i].lbound > 0) {
+        hf.updateWLB(i);
+      }
+      if(hf.wlb.size() >= n) {
+        omega_star = Math.max(omega_star, hf.wlb.peek().lbound);
       }
     }
-    logger.warning("After scan: w*=" + omega_star);
   }
 
   /**
@@ -348,9 +352,6 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     }
     if(newub < hf.pf[i].ubound) {
       hf.pf[i].ubound = newub;
-    }
-    if(hf.pf[i].id.getIntegerID() == 12701 || hf.pf[i].id.getIntegerID() == 513 || hf.pf[i].id.getIntegerID() == 12035) {
-      System.err.println(hf.pf[i].id + " " + newlb + " " + newub + " br=" + br + " delta=" + hf.minDistLevel(hf.pf[i].id, level));
     }
   }
 
@@ -820,7 +821,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @param dt distance or the neighbor to the features position
      */
     protected void insert(DBID id, double dt, int k) {
-      assert(!nn_keys.contains(id));
+      assert (!nn_keys.contains(id));
       if(nn.size() < k) {
         DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
         nn.offer(entry);
@@ -833,9 +834,9 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           head = nn.poll(); // Remove worst
           sum_nn -= head.getDoubleDistance();
           nn_keys.remove(head.getDBID());
-          
-          assert(nn.peek().getDoubleDistance() <= head.getDoubleDistance());
-          
+
+          assert (nn.peek().getDoubleDistance() <= head.getDoubleDistance());
+
           DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
           nn.offer(entry);
           nn_keys.add(id);
