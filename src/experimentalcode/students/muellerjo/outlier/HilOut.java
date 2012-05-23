@@ -1,5 +1,6 @@
 package experimentalcode.students.muellerjo.outlier;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -120,7 +121,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   protected HilOut(int k, int n, int h, double t, Enum<Selection> tn) {
     super();
     this.n = n;
-    this.k = k;
+    this.k = k - 1; // HilOut does not count the object itself. We do in KNNWeightOutlier.
     this.h = h;
     this.t = t;
     this.tn = tn;
@@ -182,6 +183,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       scan(h, (int) (k * capital_n / (double) capital_n_star));
       // determine the true outliers (n_star)
       trueOutliers(h);
+      logger.warning("True outliers found: " + n_star);
       // Build the top Set as out + wlb
       h.top.clear();
       HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(h.out.size());
@@ -237,44 +239,41 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   /**
    * Scan function performs a squential scan over the data.
    * 
-   * @param h the hilbert features
+   * @param hf the hilbert features
    * @param k0
    */
-  private void scan(HilbertFeatures h, int k0) {
+  private void scan(HilbertFeatures hf, int k0) {
     final int mink0 = Math.min(2 * k0, capital_n - 1);
     logger.warning("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
-    for(int i = 0; i < h.pf.length; i++) {
-      if(h.pf[i].ubound < omega_star) {
+    for(int i = 0; i < hf.pf.length; i++) {
+      if(hf.pf[i].ubound < omega_star) {
         continue;
       }
-      if(h.pf[i].lbound < h.pf[i].ubound) {
-        double omega = h.fastUpperBound(i);
+      if(hf.pf[i].lbound < hf.pf[i].ubound) {
+        double omega = hf.fastUpperBound(i);
         if(omega < omega_star) {
-          h.pf[i].ubound = omega;
+          hf.pf[i].ubound = omega;
         }
         else {
           int maxcount;
           // capital_n-1 instead of capital_n: all, except self
-          if(h.top.contains(h.pf[i])) {
+          if(hf.top.contains(hf.pf[i])) {
             maxcount = capital_n - 1;
           }
           else {
             maxcount = mink0;
           }
-          innerScan(h, i, maxcount);
+          innerScan(hf, i, maxcount);
         }
-        if(h.pf[i].ubound > 0) {
-          h.updateOUT(i);
+        if(hf.pf[i].ubound > 0) {
+          hf.updateOUT(i);
         }
-        if(h.pf[i].lbound > 0) {
-          h.updateWLB(i);
+        if(hf.pf[i].lbound > 0) {
+          hf.updateWLB(i);
         }
-        if(h.wlb.size() >= n) {
-          omega_star = Math.max(omega_star, h.wlb.peek().lbound);
+        if(hf.wlb.size() >= n) {
+          omega_star = Math.max(omega_star, hf.wlb.peek().lbound);
         }
-      }
-      if (h.pf[i].id.getIntegerID() == 12701 || h.pf[i].id.getIntegerID() == 12035) {
-        System.err.println(h.pf[i].id+" "+h.pf[i].lbound+" "+h.pf[i].ubound);
       }
     }
     logger.warning("After scan: w*=" + omega_star);
@@ -288,13 +287,12 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    *        calculated
    * @param maxcount maximal size of the neighborhood
    */
-  private void innerScan(HilbertFeatures hf, int i, int maxcount) {
+  private void innerScan(HilbertFeatures hf, final int i, final int maxcount) {
     final O p = hf.relation.get(hf.pf[i].id); // Get only once for performance
     int a = i, b = i;
     int level = h, levela = h, levelb = h;
-    boolean stop = false;
     // Explore up to "maxcount" neighbors in this pass
-    for(int count = 0; count < maxcount && !stop; count++) {
+    for(int count = 0; count < maxcount; count++) {
       final int c; // Neighbor to explore
       if(a == 0) { // At left end, explore right
         assert (b < capital_n - 1);
@@ -320,23 +318,23 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         c = b;
       }
       if(!hf.pf[i].nn_keys.contains(hf.pf[c].id)) {
-        insert(hf, i, hf.pf[c].id, distq.distance(p, hf.pf[c].id).doubleValue());
+        hf.pf[i].insert(hf.pf[c].id, distq.distance(p, hf.pf[c].id).doubleValue(), k);
         if(hf.pf[i].nn.size() == k) {
           if(hf.pf[i].sum_nn < omega_star) {
-            stop = true;
+            break; // stop = true
           }
-          else {
-            final int mlevel = Math.max(levela, levelb);
-            if(mlevel < level) {
-              level = mlevel;
-              double delta = hf.minDistLevel(hf.pf[i].id, level);
-              stop = (delta >= hf.pf[i].nn.peek().getDoubleDistance());
+          final int mlevel = Math.max(levela, levelb);
+          if(mlevel < level) {
+            level = mlevel;
+            final double delta = hf.minDistLevel(hf.pf[i].id, level);
+            if(delta >= hf.pf[i].nn.peek().getDoubleDistance()) {
+              break; // stop = true
             }
           }
         }
       }
     }
-    double br = hf.boxRadius(i, (a - 1 < 0) ? 0 : a - 1, (b + 1 > capital_n - 1) ? capital_n - 1 : b + 1);
+    double br = hf.boxRadius(i, a - 1, b + 1);
     double newlb = 0.0;
     double newub = 0.0;
     for(DoubleDistanceResultPair entry : hf.pf[i].nn) {
@@ -351,35 +349,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     if(newub < hf.pf[i].ubound) {
       hf.pf[i].ubound = newub;
     }
-  }
-
-  /**
-   * insert function inserts a nearest neighbor into a features nn list and its
-   * distance
-   * 
-   * @param i index of the feature in pf
-   * @param id DBID of the nearest neighbor
-   * @param dt distance or the neighbor to the features position
-   */
-  private void insert(HilbertFeatures h, int i, DBID id, double dt) {
-    if(!h.pf[i].nn_keys.contains(id)) {
-      if(h.pf[i].nn.size() < k) {
-        DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
-        h.pf[i].nn.offer(entry);
-        h.pf[i].nn_keys.add(id);
-        h.pf[i].sum_nn += entry.getDoubleDistance();
-      }
-      else {
-        DoubleDistanceResultPair head = h.pf[i].nn.peek();
-        if(dt < head.getDoubleDistance()) {
-          DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
-          h.pf[i].nn.offer(entry);
-          h.pf[i].nn_keys.remove(head.getDBID());
-          h.pf[i].nn_keys.add(id);
-          head = h.pf[i].nn.poll();
-          h.pf[i].sum_nn -= (head.getDoubleDistance() - entry.getDoubleDistance());
-        }
-      }
+    if(hf.pf[i].id.getIntegerID() == 12701 || hf.pf[i].id.getIntegerID() == 513 || hf.pf[i].id.getIntegerID() == 12035) {
+      System.err.println(hf.pf[i].id + " " + newlb + " " + newub + " br=" + br + " delta=" + hf.minDistLevel(hf.pf[i].id, level));
     }
   }
 
@@ -508,7 +479,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
 
       int pos = 0;
       for(DBID id : relation.iterDBIDs()) {
-        pf[pos++] = new HilFeature(id, new Heap<DoubleDistanceResultPair>(k + 1));
+        pf[pos++] = new HilFeature(id, new Heap<DoubleDistanceResultPair>(k, Collections.reverseOrder()));
       }
       this.out = new Heap<HilFeature>(n, new Comparator<HilFeature>() {
         @Override
@@ -734,10 +705,11 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @return Number of level shared
      */
     private int numberSharedLevels(long[] a, long[] b) {
-      for (int i = 0, j = a.length - 1; i < a.length; i++, j--) {
+      for(int i = 0, j = a.length - 1; i < a.length; i++, j--) {
         final long diff = a[j] ^ b[j];
-        if (diff != 0) {
-          final int expected = (a.length * Long.SIZE) - (d * h); // unused = available - used
+        if(diff != 0) {
+          // expected unused = available - used
+          final int expected = (a.length * Long.SIZE) - (d * h);
           return ((BitsUtil.numberOfLeadingZeros(diff) + i * Long.SIZE) - expected) / d;
         }
       }
@@ -782,8 +754,20 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @return
      */
     private double boxRadius(int i, int a, int b) {
-      // Max: reverse
-      int level = Math.max(maxRegLevel(i, a), maxRegLevel(i, b));
+      // level are inversely ordered to box sizes. min -> max
+      final int level;
+      if(a < 0) {
+        if(b >= pf.length) {
+          return Double.POSITIVE_INFINITY;
+        }
+        level = maxRegLevel(i, b);
+      }
+      else if(b >= pf.length) {
+        level = maxRegLevel(i, a);
+      }
+      else {
+        level = Math.max(maxRegLevel(i, a), maxRegLevel(i, b));
+      }
       return minDistLevel(pf[i].id, level);
     }
 
@@ -825,6 +809,40 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     @Override
     public int compareTo(HilFeature o) {
       return BitsUtil.compare(this.hilbert, o.hilbert);
+    }
+
+    /**
+     * insert function inserts a nearest neighbor into a features nn list and
+     * its distance
+     * 
+     * @param i index of the feature in pf
+     * @param id DBID of the nearest neighbor
+     * @param dt distance or the neighbor to the features position
+     */
+    protected void insert(DBID id, double dt, int k) {
+      assert(!nn_keys.contains(id));
+      if(nn.size() < k) {
+        DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
+        nn.offer(entry);
+        nn_keys.add(id);
+        sum_nn += dt;
+      }
+      else {
+        DoubleDistanceResultPair head = nn.peek();
+        if(dt < head.getDoubleDistance()) {
+          head = nn.poll(); // Remove worst
+          sum_nn -= head.getDoubleDistance();
+          nn_keys.remove(head.getDBID());
+          
+          assert(nn.peek().getDoubleDistance() <= head.getDoubleDistance());
+          
+          DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
+          nn.offer(entry);
+          nn_keys.add(id);
+          sum_nn += dt;
+        }
+      }
+
     }
   }
 }
