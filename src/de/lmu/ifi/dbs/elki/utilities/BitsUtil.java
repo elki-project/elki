@@ -827,9 +827,9 @@ public final class BitsUtil {
    * Find the number of trailing zeros.
    * 
    * @param v Bitset
-   * @return Position of first set bit, -1 if no one was found.
+   * @return Position of first set bit, -1 if no set bit was found.
    */
-  public static int numberOfTrailingZeros(long[] v) {
+  public static int numberOfTrailingZerosSigned(long[] v) {
     for(int p = 0;; p++) {
       if(p == v.length) {
         return -1;
@@ -841,17 +841,58 @@ public final class BitsUtil {
   }
 
   /**
+   * Find the number of trailing zeros.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, v.length * 64 if no set bit was found.
+   */
+  public static int numberOfTrailingZeros(long[] v) {
+    for(int p = 0;; p++) {
+      if(p == v.length) {
+        return p * Long.SIZE;
+      }
+      if(v[p] != 0) {
+        return Long.numberOfTrailingZeros(v[p]) + p * Long.SIZE;
+      }
+    }
+  }
+
+  /**
+   * Find the number of trailing zeros.
+   * 
+  * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
+  * when the number is 0.
+   * 
+   * @param v Long
+   * @return Position of first set bit, -1 if no set bit was found.
+   */
+  public static int numberOfTrailingZerosSigned(long v) {
+    return Long.numberOfTrailingZeros(v);
+  }
+  
+  /**
+   * Find the number of trailing zeros.
+   * 
+   * Note: this is the same as {@link Long#numberOfTrailingZeros}
+   * 
+   * @param v Long
+   * @return Position of first set bit, 64 if no set bit was found.
+   */
+  public static int numberOfTrailingZeros(long v) {
+    return Long.numberOfTrailingZeros(v);
+  }
+
+  /**
    * Find the number of leading zeros.
    * 
    * @param v Bitset
-   * @return Position of first set bit, -1 if no one was found.
+   * @return Position of first set bit, -1 if no set bit was found.
    */
-  public static int numberOfLeadingZeros(long[] v) {
-    for(int p = 0;; p++) {
+  public static int numberOfLeadingZerosSigned(long[] v) {
+    for(int p = 0, ip = v.length - 1;; p++, ip--) {
       if(p == v.length) {
         return -1;
       }
-      final int ip = v.length - 1 - p;
       if(v[ip] != 0) {
         return Long.numberOfLeadingZeros(v[ip]) + p * Long.SIZE;
       }
@@ -861,16 +902,45 @@ public final class BitsUtil {
   /**
    * Find the number of leading zeros.
    * 
-   * Note: this has different semantics to {@link Long.numberOfLeadingZeros}
+   * @param v Bitset
+   * @return Position of first set bit, v.length * 64 if no set bit was found.
+   */
+  public static int numberOfLeadingZeros(long[] v) {
+    for(int p = 0, ip = v.length - 1;; p++, ip--) {
+      if(p == v.length) {
+        return p * Long.SIZE;
+      }
+      if(v[ip] != 0) {
+        return Long.numberOfLeadingZeros(v[ip]) + p * Long.SIZE;
+      }
+    }
+  }
+
+  /**
+   * Find the number of leading zeros; -1 if all zero
+   * 
+   * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
    * 
    * @param v Bitset
-   * @return Position of first set bit, -1 if no one was found.
+   * @return Position of first set bit, -1 if no set bit was found.
    */
-  public static int numberOfLeadingZeros(long v) {
+  public static int numberOfLeadingZerosSigned(long v) {
     if(v == 0) {
       return -1;
     }
+    return Long.numberOfLeadingZeros(v);
+  }
+
+  /**
+   * Find the number of leading zeros; 64 if all zero
+   * 
+   * Note: this the same as {@link Long#numberOfLeadingZeros}.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, 64 if no set bit was found.
+   */
+  public static int numberOfLeadingZeros(long v) {
     return Long.numberOfLeadingZeros(v);
   }
 
@@ -993,7 +1063,7 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long[] v) {
-    final int l = numberOfLeadingZeros(v);
+    final int l = numberOfLeadingZerosSigned(v);
     if(l < 0) {
       return 0;
     }
@@ -1007,7 +1077,7 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long v) {
-    final int l = numberOfLeadingZeros(v);
+    final int l = numberOfLeadingZerosSigned(v);
     if(l < 0) {
       return 0;
     }
