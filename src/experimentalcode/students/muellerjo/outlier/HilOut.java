@@ -16,14 +16,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -122,17 +123,11 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    */
   private LPNormDistanceFunction distfunc;
 
+  private DistanceQuery<O, DoubleDistance> distq;
+
   private int capital_n, n_star, capital_n_star, d;
 
   private double omega_star;
-
-  private Set<HilFeature> top;
-
-  private HilFeature[] pf;
-
-  private Heap<HilFeature> out;
-
-  private Heap<HilFeature> wlb;
 
   /**
    * Constructor.
@@ -160,21 +155,15 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     else {
       this.distfunc = new LPNormDistanceFunction(t);
     }
-    this.out = new Heap<HilFeature>(n + 1, new HilUpperComparator());
-    this.wlb = new Heap<HilFeature>(n + 1, new HilLowerComparator());
-    this.top = new HashSet<HilFeature>(2 * n);
     this.n_star = 0;
     this.omega_star = 0.0;
   }
 
-  /**
-   * Runs the algorithm in the timed evaluation part.
-   */
   @Override
   public OutlierResult run(Database database) throws IllegalStateException {
     Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+    distq = database.getDistanceQuery(relation, distfunc);
     d = DatabaseUtil.dimensionality(relation);
-    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("HilOut preprocessing", relation.size(), logger) : null;
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     // Compute extend of dataset.
@@ -196,83 +185,67 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         max[i] += diff;
       }
     }
+    final double distfactor = Math.pow(.5 / diameter, d);
+    logger.warning("Rescaling dataset by " + (.5 / diameter));
+    logger.warning("Distances should be off by " + distfactor);
 
     // Initialization part
-    {
-      capital_n_star = capital_n = relation.size();
-      pf = new HilFeature[capital_n];
-      NNComparator distcheck = new NNComparator();
-      int pos = 0;
-      for(DBID id : relation.iterDBIDs()) {
-        if(tn == Selection.TopN) {
-          hilout_weight.putDouble(id, 0.0);
-        }
-        double[] v = new double[d];
-        O obj = relation.get(id);
-        // Rescale and move to 0:1
-        for(int dim = 0; dim < d; dim++) {
-          v[dim] = (obj.doubleValue(dim + 1) - min[dim]) / (2 * diameter);
-        }
-        pf[pos++] = new HilFeature(id, v, new Heap<NN>(k + 1, distcheck));
-        if(progressPreproc != null) {
-          progressPreproc.incrementProcessed(logger);
-        }
-      }
-      if(progressPreproc != null) {
-        progressPreproc.ensureCompleted(logger);
-      }
-    }
+    capital_n_star = capital_n = relation.size();
+    HilbertFeatures h = new HilbertFeatures(relation, capital_n, min, diameter);
 
     FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
     // Main part: 1. Phase max. d+1 loops
     for(int j = 0; j <= d && n_star < n; j++) {
       // initialize (clear) out and wlb - not 100% clear in the paper
-      out.clear();
-      wlb.clear();
+      h.out.clear();
+      h.wlb.clear();
       final double v = .5 * j / (d + 1);
       // Initialize Hilbert values in pf according to current shift
-      hilbert(v);
+      h.initialize(v);
       // scan the Data according to the current shift; build out and wlb
-      scan(v, (int) (k * ((double) capital_n / (double) capital_n_star)));
-      // determine the true Outliers (n_star)
-      trueOutliers();
+      scan(h, (int) (k * ((double) capital_n / (double) capital_n_star)));
+      // determine the true outliers (n_star)
+      trueOutliers(h);
       // Build the top Set as out + wlb
-      top.clear();
-      HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(out.size());
-      for(HilFeature entry : out) {
+      h.top.clear();
+      HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(h.out.size());
+      for(HilFeature entry : h.out) {
         top_keys.add(entry.id);
-        top.add(entry);
+        h.top.add(entry);
       }
-      for(HilFeature entry : wlb) {
+      for(HilFeature entry : h.wlb) {
         if(!top_keys.contains(entry.id)) {
-          top.add(entry);
+          h.top.add(entry);
         }
       }
       if(progressHilOut != null) {
         progressHilOut.incrementProcessed(logger);
       }
     }
-    // 2. Phase: Additional Scan if less than n true Outlier determined
+    // 2. Phase: Additional Scan if less than n true outliers determined
     if(n_star < n) {
-      out.clear();
-      wlb.clear();
-      scan(1.0, capital_n);
+      h.out.clear();
+      h.wlb.clear();
+      // TODO: reinitialize shift to 0?
+      scan(h, capital_n);
     }
     if(progressHilOut != null) {
       progressHilOut.ensureCompleted(logger);
     }
     // Return weights in out
     if(tn == Selection.TopN) {
-      for(HilFeature ent : out) {
-        hilout_weight.putDouble(ent.id, ent.ubound);
+      for(DBID id : relation.iterDBIDs()) {
+        hilout_weight.putDouble(id, 0.0);
+      }
+      for(HilFeature ent : h.out) {
+        hilout_weight.putDouble(ent.id, distfactor * ent.ubound);
       }
     }
     // Return all weights in pf
     else {
-      for(HilFeature ent : pf) {
-        hilout_weight.putDouble(ent.id, ent.ubound);
+      for(HilFeature ent : h.pf) {
+        hilout_weight.putDouble(ent.id, distfactor * ent.ubound);
       }
-
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(0.0, Double.POSITIVE_INFINITY, 0.0, Double.POSITIVE_INFINITY);
@@ -281,165 +254,47 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   }
 
   /**
-   * Hilbert function to fill pf with shifted Hilbert values. Also calculates
-   * the number current Outlier candidates capital_n_star
-   * 
-   * @param shift the current shift factor
-   */
-  private void hilbert(double shift) {
-    // FIXME: 64 bit mode untested - sign bit is tricky to handle correctly with
-    // the rescaling. 63 bit should be fine. The sign bit probably needs to be
-    // handled differently, or at least needs careful unit testing of the API
-    if(h >= 32) {
-      final long scale = ~1l >>> 1; // Top h bits set
-      for(int i = 0; i < pf.length; i++) {
-        long[] coord = new long[d];
-        for(int dim = 0; dim < d; dim++) {
-          coord[dim] = (long) ((pf[i].point[dim] + shift) * scale) << 1;
-        }
-        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
-      }
-    }
-    else if(h >= 16) {
-      final int scale = ~1 >>> 1; // Top h bits set
-      for(int i = 0; i < pf.length; i++) {
-        int[] coord = new int[d];
-        for(int dim = 0; dim < d; dim++) {
-          coord[dim] = (int) ((pf[i].point[dim] + shift) * scale) << 1;
-        }
-        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
-      }
-    }
-    else if(h >= 8) {
-      final int scale = ~1 >>> 16; // Top h bits set
-      for(int i = 0; i < pf.length; i++) {
-        short[] coord = new short[d];
-        for(int dim = 0; dim < d; dim++) {
-          coord[dim] = (short) ((pf[i].point[dim] + shift) * scale);
-        }
-        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
-      }
-    }
-    else {
-      final int scale = ~1 >>> 8; // Top h bits set
-      for(int i = 0; i < pf.length; i++) {
-        byte[] coord = new byte[d];
-        for(int dim = 0; dim < d; dim++) {
-          coord[dim] = (byte) ((pf[i].point[dim] + shift) * scale);
-        }
-        pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
-      }
-    }
-    java.util.Arrays.sort(pf);
-    capital_n_star = 0;
-    for(int i = 0; i < pf.length - 1; i++) {
-      pf[i].level = minReg(i, i + 1);
-      if(pf[i].ubound >= omega_star) {
-        capital_n_star++;
-      }
-    }
-  }
-
-  /**
    * Scan function performs a squential scan over the data.
    * 
-   * @param v the current shift factor
+   * @param h the hilbert features
    * @param k0
    */
-  private void scan(double v, int k0) {
-    for(int i = 0; i < pf.length; i++) {
-      if(pf[i].ubound >= omega_star) {
-        if(pf[i].lbound < pf[i].ubound) {
-          double omega = fastUpperBound(i);
-          if(omega < omega_star) {
-            pf[i].ubound = omega;
+  private void scan(HilbertFeatures h, int k0) {
+    for(int i = 0; i < h.pf.length; i++) {
+      if(h.pf[i].ubound < omega_star) {
+        continue;
+      }
+      if(h.pf[i].lbound < h.pf[i].ubound) {
+        double omega = h.fastUpperBound(i);
+        if(omega < omega_star) {
+          h.pf[i].ubound = omega;
+        }
+        else {
+          int maxcount;
+          // capital_n-1 instead of capital_n: all, except self
+          if(h.top.contains(h.pf[i])) {
+            maxcount = capital_n - 1;
           }
           else {
-            int maxcount;
-            // capital_n-1 instead of capital_n: all, except self
-            if(top.contains(pf[i])) {
-              maxcount = capital_n - 1;
-            }
-            else {
-              maxcount = java.lang.Math.min(2 * k0, capital_n - 1);
-            }
-            DoubleDoublePair bounds = innerScan(i, maxcount, v);
-            double newlb = bounds.first;
-            double newub = bounds.second;
-            if(newlb > pf[i].lbound) {
-              pf[i].lbound = newlb;
-            }
-            if(newub < pf[i].ubound) {
-              pf[i].ubound = newub;
-            }
+            maxcount = java.lang.Math.min(2 * k0, capital_n - 1);
+          }
+          DoubleDoublePair bounds = innerScan(h, i, maxcount);
+          double newlb = bounds.first;
+          double newub = bounds.second;
+          if(newlb > h.pf[i].lbound) {
+            h.pf[i].lbound = newlb;
+          }
+          if(newub < h.pf[i].ubound) {
+            h.pf[i].ubound = newub;
           }
         }
-        updateOUT(i);
-        updateWLB(i);
-        if(wlb.size() >= n) {
-          omega_star = java.lang.Math.max(omega_star, wlb.peek().lbound);
-        }
+      }
+      h.updateOUT(i);
+      h.updateWLB(i);
+      if(h.wlb.size() >= n) {
+        omega_star = java.lang.Math.max(omega_star, h.wlb.peek().lbound);
       }
     }
-  }
-
-  /**
-   * updateOUT function inserts pf[i] in out.
-   * 
-   * @param i position in pf of the feature to be inserted
-   */
-  private void updateOUT(int i) {
-    if(out.size() < n) {
-      out.offer(pf[i]);
-    }
-    else {
-      HilFeature head = out.peek();
-      if(pf[i].ubound > head.ubound) {
-        out.offer(pf[i]);
-        out.poll();
-      }
-    }
-  }
-
-  /**
-   * updateWLB function inserts pf[i] in wlb.
-   * 
-   * @param i position in pf of the feature to be inserted
-   */
-  private void updateWLB(int i) {
-    if(wlb.size() < n) {
-      wlb.offer(pf[i]);
-    }
-    else {
-      HilFeature head = wlb.peek();
-      if(pf[i].lbound > head.lbound) {
-        wlb.offer(pf[i]);
-        wlb.poll();
-      }
-    }
-  }
-
-  /**
-   * fastUpperBound function calculates an upper Bound as k*maxDist(pf[i],
-   * smallest neighborhood)
-   * 
-   * @param i position in pf of the feature for which the bound should be
-   *        calculated
-   */
-  private double fastUpperBound(int i) {
-    int pre = i;
-    int post = i;
-    while(post - pre < k) {
-      int pre_level = (pre - 1 >= 0) ? pf[pre - 1].level : -2;
-      int post_level = (post < capital_n - 1) ? pf[post].level : -2;
-      if(post_level >= pre_level) {
-        post++;
-      }
-      else {
-        pre--;
-      }
-    }
-    return k * maxDist(pf[i].point, minReg(pre, post));
   }
 
   /**
@@ -449,11 +304,10 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param i position in pf of the feature for which the bounds should be
    *        calculated
    * @param maxcount maximal size of the neighborhood
-   * @param v the current shift
    * 
    * @return DoubleDoublePair containing the new lower and upper bound
    */
-  private DoubleDoublePair innerScan(int i, int maxcount, double v) {
+  private DoubleDoublePair innerScan(HilbertFeatures hf, int i, int maxcount) {
     int a = i, b = i;
     int level = h, levela = h, levelb = h;
     int count = 0;
@@ -462,112 +316,45 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     while(count < maxcount && !stop) {
       int c;
       count++;
-      if(a > 0 && pf[a - 1].level >= pf[b].level) {
+      if(a > 0 && hf.pf[a - 1].level >= hf.pf[b].level) {
         a--;
-        levela = java.lang.Math.min(levela, pf[a].level);
+        levela = java.lang.Math.min(levela, hf.pf[a].level);
         c = a;
       }
       else if(b < capital_n - 1) {
-        levelb = java.lang.Math.min(levelb, pf[b].level);
+        levelb = java.lang.Math.min(levelb, hf.pf[b].level);
         b++;
         c = b;
       }
       else {
         a--;
-        levela = java.lang.Math.min(levela, pf[a].level);
+        levela = java.lang.Math.min(levela, hf.pf[a].level);
         c = a;
       }
-      if(!pf[i].nn_keys.contains(pf[c].id)) {
-        insert(i, pf[c].id, distfunc.doubleDistance(pf[i].pv, pf[c].pv));
-        if(pf[i].nn.size() == k) {
-          if(pf[i].sum_nn < omega_star) {
+      if(!hf.pf[i].nn_keys.contains(hf.pf[c].id)) {
+        insert(hf, i, hf.pf[c].id, distq.distance(hf.pf[i].id, hf.pf[c].id).doubleValue());
+        if(hf.pf[i].nn.size() == k) {
+          if(hf.pf[i].sum_nn < omega_star) {
             stop = true;
           }
           else if(java.lang.Math.max(levela, levelb) < level) {
             level = java.lang.Math.max(levela, levelb);
-            double delta = minDist(pf[i].point, v, level); // FIXME: 0 oder v?
-            stop = (delta >= pf[i].nn.peek().distance);
+            double delta = hf.minDist(hf.pf[i].id, level); // FIXME: 0 oder v?
+            stop = (delta >= hf.pf[i].nn.peek().distance);
           }
         }
       }
     }
-    double br = boxRadius(i, (a - 1 < 0) ? 0 : a - 1, (b + 1 > capital_n - 1) ? capital_n - 1 : b + 1, v);
+    double br = hf.boxRadius(i, (a - 1 < 0) ? 0 : a - 1, (b + 1 > capital_n - 1) ? capital_n - 1 : b + 1);
     double newlb = 0.0;
     double newub = 0.0;
-    for(NN entry : pf[i].nn) {
+    for(NN entry : hf.pf[i].nn) {
       newub += entry.distance;
       if(entry.distance <= br) {
         newlb += entry.distance;
       }
     }
     return new DoubleDoublePair(newlb, newub);
-  }
-
-  /**
-   * minDist function calculate the minimal Distance from Vector p to the border
-   * of the corresponding r-region at the given level
-   * 
-   * @param p Point as Vector
-   * @param level Level of the corresponding r-region
-   */
-  private double minDist(double[] p, double v, int level) {
-    double dist = Double.POSITIVE_INFINITY;
-    double r = 2.0 / (double) (1 << level + 1);
-    for(int dim = 0; dim < d; dim++) {
-      final double pd = p[dim] + v;
-      double p_m_r = pd - java.lang.Math.floor(pd / r) * r;
-      dist = java.lang.Math.min(dist, java.lang.Math.min(p_m_r, r - p_m_r));
-    }
-    return dist;
-  }
-
-  /**
-   * maxDist function calculate the maximal Distance from Vector p to the border
-   * of the corresponding r-region at the given level
-   * 
-   * @param p Point as Vector
-   * @param level Level of the corresponding r-region
-   */
-  private double maxDist(double[] p, int level) {
-    double dist;
-    double r = 2.0 / (double) (1 << level + 1);
-    if(t == 1.0) {
-      dist = 0.0;
-      for(int dim = 0; dim < d; dim++) {
-        double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r) * r;
-        dist += java.lang.Math.max(p_m_r, r - p_m_r);
-      }
-    }
-    else if(Double.isInfinite(t)) {
-      dist = Double.NEGATIVE_INFINITY;
-      for(int dim = 0; dim < d; dim++) {
-        double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r) * r;
-        dist = java.lang.Math.max(dist, java.lang.Math.max(p_m_r, r - p_m_r));
-      }
-    }
-    else {
-      dist = 0.0;
-      for(int dim = 0; dim < d; dim++) {
-        double p_m_r = p[dim] - java.lang.Math.floor(p[dim] / r) * r;
-        dist += java.lang.Math.pow(java.lang.Math.max(p_m_r, r - p_m_r), t);
-      }
-      dist = java.lang.Math.pow(dist, 1.0 / t);
-    }
-    return dist;
-  }
-
-  /**
-   * minReg function calculate the minimal r-region level containing two points
-   * 
-   * @param a index of first point in pf
-   * @param b index of second point in pf
-   * 
-   * @return Level of the r-region
-   */
-  private int minReg(int a, int b) {
-    long[] pf_a = BitsUtil.copy(pf[a].hilbert);
-    BitsUtil.xorI(pf_a, pf[b].hilbert);
-    return (-1 + (numberOfLeadingZeros(pf_a) / d));
   }
 
   /**
@@ -578,53 +365,35 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param id DBID of the nearest neighbor
    * @param dt distance or the neighbor to the features position
    */
-  private void insert(int i, DBID id, double dt) {
-    if(!pf[i].nn_keys.contains(id)) {
-      if(pf[i].nn.size() < k) {
+  private void insert(HilbertFeatures h, int i, DBID id, double dt) {
+    if(!h.pf[i].nn_keys.contains(id)) {
+      if(h.pf[i].nn.size() < k) {
         NN entry = new NN(id, dt);
-        pf[i].nn.offer(entry);
-        pf[i].nn_keys.add(id);
-        pf[i].sum_nn += entry.distance;
+        h.pf[i].nn.offer(entry);
+        h.pf[i].nn_keys.add(id);
+        h.pf[i].sum_nn += entry.distance;
       }
       else {
-        NN head = pf[i].nn.peek();
+        NN head = h.pf[i].nn.peek();
         if(dt < head.distance) {
           NN entry = new NN(id, dt);
-          pf[i].nn.offer(entry);
-          pf[i].nn_keys.remove(head.id);
-          pf[i].nn_keys.add(id);
-          head = pf[i].nn.poll();
-          pf[i].sum_nn -= (head.distance - entry.distance);
+          h.pf[i].nn.offer(entry);
+          h.pf[i].nn_keys.remove(head.id);
+          h.pf[i].nn_keys.add(id);
+          head = h.pf[i].nn.poll();
+          h.pf[i].sum_nn -= (head.distance - entry.distance);
         }
       }
     }
   }
 
-  private void trueOutliers() {
+  private void trueOutliers(HilbertFeatures h) {
     n_star = 0;
-    for(HilFeature entry : out) {
+    for(HilFeature entry : h.out) {
       if(entry.lbound >= entry.ubound && entry.ubound >= omega_star) {
         n_star++;
       }
     }
-  }
-
-  /**
-   * boxRadius function calculate the Boxradius
-   * 
-   * @param i index of first point
-   * @param a index of second point
-   * @param b index of third point
-   * 
-   * @return
-   */
-  private double boxRadius(int i, int a, int b, double v) {
-    long[] hil1 = BitsUtil.copy(pf[a].hilbert);
-    long[] hil2 = BitsUtil.copy(pf[b].hilbert);
-    BitsUtil.xorI(hil1, pf[i].hilbert);
-    BitsUtil.xorI(hil2, pf[i].hilbert);
-    int level = java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d;
-    return minDist(pf[i].point, v, level);
   }
 
   /**
@@ -711,63 +480,320 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       return new HilOut<O>(k, n, h, t, tn);
     }
   }
-}
 
-enum Selection {
-  All, TopN
-}
-
-final class NNComparator implements Comparator<NN> {
-  @Override
-  public int compare(NN o1, NN o2) {
-    return (int) java.lang.Math.signum(o1.distance - o2.distance);
+  public static enum Selection {
+    All, TopN
   }
 
-}
+  final static class NNComparator implements Comparator<NN> {
+    @Override
+    public int compare(NN o1, NN o2) {
+      return (int) java.lang.Math.signum(o1.distance - o2.distance);
+    }
 
-final class NN {
-  public DBID id;
-
-  public double distance;
-
-  public NN(DBID id, double distance) {
-    super();
-    this.id = id;
-    this.distance = distance;
-  }
-}
-
-final class HilFeature implements Comparable<HilFeature> {
-  public DBID id;
-
-  public double[] point;
-
-  public long[] hilbert = null;
-
-  public int level = 0;
-
-  public double ubound = Double.POSITIVE_INFINITY;
-
-  public double lbound = 0.0;
-
-  public Heap<NN> nn;
-
-  public HashSetModifiableDBIDs nn_keys = DBIDUtil.newHashSet();
-
-  public double sum_nn = 0.0;
-
-  Vector pv; // wrapped as Vector
-
-  public HilFeature(DBID id, double[] point, Heap<NN> nn) {
-    super();
-    this.id = id;
-    this.point = point;
-    this.nn = nn;
-    this.pv = new Vector(point);
   }
 
-  @Override
-  public int compareTo(HilFeature o) {
-    return BitsUtil.compare(this.hilbert, o.hilbert);
+  final static class NN {
+    public DBID id;
+
+    public double distance;
+
+    public NN(DBID id, double distance) {
+      super();
+      this.id = id;
+      this.distance = distance;
+    }
+  }
+
+  class HilbertFeatures {
+    // todo add "n"
+    public HilbertFeatures(Relation<O> relation, int capital_n, double[] min, double diameter) {
+      super();
+      this.relation = relation;
+      this.min = min;
+      this.diameter = diameter;
+      this.pf = new HilFeature[capital_n];
+
+      final NNComparator distcheck = new NNComparator();
+      int pos = 0;
+      for(DBID id : relation.iterDBIDs()) {
+        pf[pos++] = new HilFeature(id, new Heap<NN>(k + 1, distcheck));
+      }
+      this.out = new Heap<HilFeature>(n + 1, new HilUpperComparator());
+      this.wlb = new Heap<HilFeature>(n + 1, new HilLowerComparator());
+      this.top = new HashSet<HilFeature>(2 * n);
+    }
+
+    Relation<O> relation;
+
+    HilFeature[] pf;
+
+    double[] min;
+
+    double diameter;
+
+    double shift;
+
+    private Set<HilFeature> top;
+
+    private Heap<HilFeature> out;
+
+    private Heap<HilFeature> wlb;
+
+    /**
+     * Hilbert function to fill pf with shifted Hilbert values. Also calculates
+     * the number current Outlier candidates capital_n_star
+     * 
+     * @param shift the new shift factor
+     */
+    private void initialize(double shift) {
+      this.shift = shift;
+      // FIXME: 64 bit mode untested - sign bit is tricky to handle correctly
+      // with
+      // the rescaling. 63 bit should be fine. The sign bit probably needs to be
+      // handled differently, or at least needs careful unit testing of the API
+      if(h >= 32) {
+        final long scale = ~1l >>> 1; // Top h bits set
+        for(int i = 0; i < pf.length; i++) {
+          O obj = relation.get(pf[i].id);
+          long[] coord = new long[d];
+          for(int dim = 0; dim < d; dim++) {
+            coord[dim] = (long) (getDimForObject(obj, dim) * scale) << 1;
+          }
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+        }
+      }
+      else if(h >= 16) {
+        final int scale = ~1 >>> 1; // Top h bits set
+        for(int i = 0; i < pf.length; i++) {
+          O obj = relation.get(pf[i].id);
+          int[] coord = new int[d];
+          for(int dim = 0; dim < d; dim++) {
+            coord[dim] = (int) (getDimForObject(obj, dim) * scale) << 1;
+          }
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+        }
+      }
+      else if(h >= 8) {
+        final int scale = ~1 >>> 16; // Top h bits set
+        for(int i = 0; i < pf.length; i++) {
+          O obj = relation.get(pf[i].id);
+          short[] coord = new short[d];
+          for(int dim = 0; dim < d; dim++) {
+            coord[dim] = (short) (getDimForObject(obj, dim) * scale);
+          }
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+        }
+      }
+      else {
+        final int scale = ~1 >>> 8; // Top h bits set
+        for(int i = 0; i < pf.length; i++) {
+          O obj = relation.get(pf[i].id);
+          byte[] coord = new byte[d];
+          for(int dim = 0; dim < d; dim++) {
+            coord[dim] = (byte) (getDimForObject(obj, dim) * scale);
+          }
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+        }
+      }
+      java.util.Arrays.sort(pf);
+      capital_n_star = 0;
+      for(int i = 0; i < pf.length - 1; i++) {
+        pf[i].level = minReg(i, i + 1);
+        if(pf[i].ubound >= omega_star) {
+          capital_n_star++;
+        }
+      }
+    }
+
+    /**
+     * updateOUT function inserts pf[i] in out.
+     * 
+     * @param i position in pf of the feature to be inserted
+     */
+    private void updateOUT(int i) {
+      if(out.size() < n) {
+        out.offer(pf[i]);
+      }
+      else {
+        HilFeature head = out.peek();
+        if(pf[i].ubound > head.ubound) {
+          out.offer(pf[i]);
+          out.poll();
+        }
+      }
+    }
+
+    /**
+     * updateWLB function inserts pf[i] in wlb.
+     * 
+     * @param i position in pf of the feature to be inserted
+     */
+    private void updateWLB(int i) {
+      if(wlb.size() < n) {
+        wlb.offer(pf[i]);
+      }
+      else {
+        HilFeature head = wlb.peek();
+        if(pf[i].lbound > head.lbound) {
+          wlb.offer(pf[i]);
+          wlb.poll();
+        }
+      }
+    }
+
+    /**
+     * fastUpperBound function calculates an upper Bound as k*maxDist(pf[i],
+     * smallest neighborhood)
+     * 
+     * @param i position in pf of the feature for which the bound should be
+     *        calculated
+     */
+    private double fastUpperBound(int i) {
+      int pre = i;
+      int post = i;
+      while(post - pre < k) {
+        int pre_level = (pre - 1 >= 0) ? pf[pre - 1].level : -2;
+        int post_level = (post < capital_n - 1) ? pf[post].level : -2;
+        if(post_level >= pre_level) {
+          post++;
+        }
+        else {
+          pre--;
+        }
+      }
+      return k * maxDist(pf[i].id, minReg(pre, post));
+    }
+
+    /**
+     * minDist function calculate the minimal Distance from Vector p to the
+     * border of the corresponding r-region at the given level
+     * 
+     * @param p Point as Vector
+     * @param level Level of the corresponding r-region
+     */
+    private double minDist(DBID id, int level) {
+      double dist = Double.POSITIVE_INFINITY;
+      double r = 1.0 / (double) (1 << level + 1);
+      O obj = relation.get(id);
+      for(int dim = 0; dim < d; dim++) {
+        final double pd = getDimForObject(obj, dim);
+        double p_m_r = pd - java.lang.Math.floor(pd / r) * r;
+        dist = java.lang.Math.min(dist, java.lang.Math.min(p_m_r, r - p_m_r));
+      }
+      return dist;
+    }
+
+    /**
+     * maxDist function calculate the maximal Distance from Vector p to the
+     * border of the corresponding r-region at the given level
+     * 
+     * @param p Point as Vector
+     * @param level Level of the corresponding r-region
+     */
+    private double maxDist(DBID id, int level) {
+      O obj = relation.get(id);
+      double dist;
+      double r = 1.0 / (double) (1 << level + 1);
+      if(t == 1.0) {
+        dist = 0.0;
+        for(int dim = 0; dim < d; dim++) {
+          final double pd = getDimForObject(obj, dim);
+          double p_m_r = pd - java.lang.Math.floor(pd / r) * r;
+          dist += java.lang.Math.max(p_m_r, r - p_m_r);
+        }
+      }
+      else if(Double.isInfinite(t)) {
+        dist = Double.NEGATIVE_INFINITY;
+        for(int dim = 0; dim < d; dim++) {
+          final double pd = getDimForObject(obj, dim);
+          double p_m_r = pd - java.lang.Math.floor(pd / r) * r;
+          dist = java.lang.Math.max(dist, java.lang.Math.max(p_m_r, r - p_m_r));
+        }
+      }
+      else {
+        dist = 0.0;
+        for(int dim = 0; dim < d; dim++) {
+          final double pd = getDimForObject(obj, dim);
+          double p_m_r = pd - java.lang.Math.floor(pd / r) * r;
+          dist += java.lang.Math.pow(java.lang.Math.max(p_m_r, r - p_m_r), t);
+        }
+        dist = java.lang.Math.pow(dist, 1.0 / t);
+      }
+      return dist;
+    }
+
+    /**
+     * minReg function calculate the minimal r-region level containing two
+     * points
+     * 
+     * @param a index of first point in pf
+     * @param b index of second point in pf
+     * 
+     * @return Level of the r-region
+     */
+    private int minReg(int a, int b) {
+      long[] pf_a = BitsUtil.copy(pf[a].hilbert);
+      BitsUtil.xorI(pf_a, pf[b].hilbert);
+      return (-1 + (numberOfLeadingZeros(pf_a) / d));
+    }
+
+    /**
+     * boxRadius function calculate the Boxradius
+     * 
+     * @param i index of first point
+     * @param a index of second point
+     * @param b index of third point
+     * 
+     * @return
+     */
+    private double boxRadius(int i, int a, int b) {
+      long[] hil1 = BitsUtil.copy(pf[a].hilbert);
+      long[] hil2 = BitsUtil.copy(pf[b].hilbert);
+      BitsUtil.xorI(hil1, pf[i].hilbert);
+      BitsUtil.xorI(hil2, pf[i].hilbert);
+      int level = java.lang.Math.max(numberOfLeadingZeros(hil1), numberOfLeadingZeros(hil2)) / d;
+      return minDist(pf[i].id, level);
+    }
+
+    /**
+     * Get the (projected) position of the object in dimension dim.
+     * 
+     * @param obj Object
+     * @param dim Dimension
+     * @return Projected and shifted position
+     */
+    private double getDimForObject(O obj, int dim) {
+      return (obj.doubleValue(dim + 1) - min[dim]) / (2 * diameter) + shift;
+    }
+  }
+
+  final static class HilFeature implements Comparable<HilFeature> {
+    public DBID id;
+
+    public long[] hilbert = null;
+
+    public int level = 0;
+
+    public double ubound = Double.POSITIVE_INFINITY;
+
+    public double lbound = 0.0;
+
+    public Heap<NN> nn;
+
+    public HashSetModifiableDBIDs nn_keys = DBIDUtil.newHashSet();
+
+    public double sum_nn = 0.0;
+
+    public HilFeature(DBID id, Heap<NN> nn) {
+      super();
+      this.id = id;
+      this.nn = nn;
+    }
+
+    @Override
+    public int compareTo(HilFeature o) {
+      return BitsUtil.compare(this.hilbert, o.hilbert);
+    }
   }
 }
