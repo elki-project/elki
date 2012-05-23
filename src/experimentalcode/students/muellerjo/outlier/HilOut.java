@@ -299,13 +299,13 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     for(int count = 0; count < maxcount; count++) {
       final int c; // Neighbor to explore
       if(a == 0) { // At left end, explore right
-        assert (b < capital_n - 1);
+        // assert (b < capital_n - 1);
         levelb = Math.min(levelb, hf.pf[b].level);
         b++;
         c = b;
       }
       else if(b >= capital_n - 1) { // At right end, explore left
-        assert (a > 0);
+        // assert (a > 0);
         a--;
         levela = Math.min(levela, hf.pf[a].level);
         c = a;
@@ -316,7 +316,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         c = a;
       }
       else {
-        assert (b < capital_n - 1);
+        // assert (b < capital_n - 1);
         levelb = Math.min(levelb, hf.pf[b].level);
         b++;
         c = b;
@@ -581,7 +581,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         if(pf[i].ubound > head.ubound) {
           // replace smallest
           out.poll();
-          assert (out.peek().ubound >= head.ubound);
+          // assert (out.peek().ubound >= head.ubound);
           out.offer(pf[i]);
         }
       }
@@ -601,7 +601,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         if(pf[i].lbound > head.lbound) {
           // replace smallest
           wlb.poll();
-          assert (wlb.peek().lbound >= head.lbound);
+          // assert (wlb.peek().lbound >= head.lbound);
           wlb.offer(pf[i]);
         }
       }
@@ -666,7 +666,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         dist = 0.0;
         for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
-          assert (p_m_r >= 0);
+          // assert (p_m_r >= 0);
           dist += Math.max(p_m_r, r - p_m_r);
         }
       }
@@ -674,7 +674,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         dist = 0.0;
         for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
-          assert (p_m_r >= 0);
+          // assert (p_m_r >= 0);
           double a = Math.max(p_m_r, r - p_m_r);
           dist += a * a;
         }
@@ -821,7 +821,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @param dt distance or the neighbor to the features position
      */
     protected void insert(DBID id, double dt, int k) {
-      assert (!nn_keys.contains(id));
+      // assert (!nn_keys.contains(id));
       if(nn.size() < k) {
         DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
         nn.offer(entry);
@@ -835,7 +835,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           sum_nn -= head.getDoubleDistance();
           nn_keys.remove(head.getDBID());
 
-          assert (nn.peek().getDoubleDistance() <= head.getDoubleDistance());
+          // assert (nn.peek().getDoubleDistance() <= head.getDoubleDistance());
 
           DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
           nn.offer(entry);
