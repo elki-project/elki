@@ -134,7 +134,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       final long[] bits = BitsUtil.copy(hist);
       BitsUtil.xorI(bits, refl);
       BitsUtil.cycleRightI(bits, rotation, numdim);
-      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZerosSigned(bits) + 2) % numdim;
       BitsUtil.invgrayI(bits);
       BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
       // System.err.println(BitsUtil.toString(output,
@@ -172,7 +172,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       final long[] bits = BitsUtil.copy(hist);
       BitsUtil.xorI(bits, refl);
       BitsUtil.cycleRightI(bits, rotation, numdim);
-      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZerosSigned(bits) + 2) % numdim;
       BitsUtil.invgrayI(bits);
       BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
       // System.err.println(BitsUtil.toString(output,
@@ -210,7 +210,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       final long[] bits = BitsUtil.copy(hist);
       BitsUtil.xorI(bits, refl);
       BitsUtil.cycleRightI(bits, rotation, numdim);
-      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZerosSigned(bits) + 2) % numdim;
       BitsUtil.invgrayI(bits);
       BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
       // System.err.println(BitsUtil.toString(output,
@@ -248,7 +248,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       final long[] bits = BitsUtil.copy(hist);
       BitsUtil.xorI(bits, refl);
       BitsUtil.cycleRightI(bits, rotation, numdim);
-      final int nextrot = (rotation + BitsUtil.numberOfTrailingZeros(bits) + 2) % numdim;
+      final int nextrot = (rotation + BitsUtil.numberOfTrailingZerosSigned(bits) + 2) % numdim;
       BitsUtil.invgrayI(bits);
       BitsUtil.orI(output, bits, numbits - (i + 1) * numdim);
       // System.err.println(BitsUtil.toString(output,

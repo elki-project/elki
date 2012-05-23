@@ -56,16 +56,16 @@ public class TestBitsUtil implements JUnit4Test {
     BitsUtil.setI(test, 5);
     BitsUtil.setI(test, 7);
     assertEquals(BitsUtil.toString(test), "10100000");
-    assertEquals(BitsUtil.numberOfTrailingZeros(test), 5);
+    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 5);
     BitsUtil.truncateI(test, 7);
     assertEquals(BitsUtil.toString(test), "100000");
-    assertEquals(BitsUtil.numberOfTrailingZeros(test), 5);
+    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 5);
     BitsUtil.setI(test, 7);
     assertEquals(BitsUtil.toString(test), "10100000");
-    assertEquals(BitsUtil.numberOfTrailingZeros(test), 5);
+    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 5);
     BitsUtil.cycleRightI(test, 6, 8);
     assertEquals(BitsUtil.toString(test), "10000010");
-    assertEquals(BitsUtil.numberOfTrailingZeros(test), 1);
+    assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 1);
 
     BitsUtil.zeroI(test);
     BitsUtil.setI(test, 125);
