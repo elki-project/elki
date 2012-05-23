@@ -109,12 +109,12 @@ public class HistogramJitterFilter<V extends NumberVector<V, N>, N extends Numbe
     /**
      * Option ID for the jitter strength.
      */
-    public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID("-jitter.amount", "Jitter amount relative to data.");
+    public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID("jitter.amount", "Jitter amount relative to data.");
 
     /**
      * Option ID for the jitter random seed.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("-jitter.seed", "Jitter random seed.");
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("jitter.seed", "Jitter random seed.");
 
     /**
      * Jitter amount
