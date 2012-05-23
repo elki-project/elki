@@ -26,6 +26,7 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * Which then expands to the next level as:
  * 
  * <pre>
- *   +-+ +-+ +-+ +-+ +
+ *   +-+ +-+ +-+ +-+ E
  *   | | | | | | | | |
  *   | +-+ +-+ | | +-+
  *   |         | |    
@@ -54,16 +55,21 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  *       | |         |
  *   +-+ | | +-+ +-+ |
  *   | | | | | | | | |
- *   + +-+ +-+ +-+ +-+
+ *   S +-+ +-+ +-+ +-+
  * </pre>
  * 
  * and so on.
  * 
- * INCOMPLETE attempt at a divide & conquer solution. TODO: for small sets,
- * resort to different strategy? Dupe handling? Fixme: Orientations
+ * Reference:
+ * <p>
+ * G. Peano<br />
+ * Sur une courbe, qui remplit toute une aire plane<br />
+ * Mathematische Annalen, 36(1)
+ * </p>
  * 
  * @author Erich Schubert
  */
+@Reference(authors = "G. Peano", title = "Sur une courbe, qui remplit toute une aire plane", booktitle = "Mathematische Annalen, 36(1)")
 public class PeanoSpatialSorter extends AbstractSpatialSorter {
   /**
    * Constructor.
@@ -98,19 +104,15 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
       boolean ok = false;
       for(int d = 0; d < mms.length; d += 2) {
         if(mms[d + 1] - mms[d] >= 1E-10) {
-          // LoggingUtil.warning("No: " + (mms[d + 1] - mms[d]));
           ok = true;
           break;
         }
       }
       if(!ok) {
-        // LoggingUtil.warning("Stop.");
         return;
       }
     }
     final boolean inv = bits.get(dim) ^ desc;
-    // LoggingUtil.warning("dim: " + dim + " " + inv + " " + bits.toString() +
-    // "^" + desc);
     // Split the data set into three parts
     int fsplit, ssplit;
     if(!inv) {
@@ -121,9 +123,6 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
       fsplit = pivotizeList1D(objs, start, end, dim + 1, tsecond, true);
       ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim + 1, tfirst, true) : fsplit;
     }
-    // LoggingUtil.warning("dim: " + dim + " " + min + "<" + tfirst + "<" +
-    // tsecond + "<" + max + " " + start + " < " + fsplit + " < " + ssplit +
-    // " < " + end);
     int nextdim = (dim + 1) % objs.get(0).getDimensionality();
     // Do we need to update the min/max values?
     if(start < fsplit - 1) {
@@ -146,6 +145,5 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
     // Restore ranges
     mms[2 * dim] = min;
     mms[2 * dim + 1] = max;
-    // FIXME: implement completely and test.
   }
 }

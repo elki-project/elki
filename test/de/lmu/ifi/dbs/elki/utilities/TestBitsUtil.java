@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.utilities;
 
 /*
  This file is part of ELKI:
@@ -31,7 +31,10 @@ import java.util.Random;
 
 import org.junit.Test;
 
-public class TestBitsUtil {
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+
+public class TestBitsUtil implements JUnit4Test {
   @Test
   public void testAgainstBigInteger() {
     BigInteger bigint = new BigInteger("123");

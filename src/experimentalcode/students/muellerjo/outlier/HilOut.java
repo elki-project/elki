@@ -25,9 +25,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -41,8 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.erich.BitsUtil;
-import experimentalcode.erich.HilbertSpatialSorter;
 
 /**
  * Fast Outlier Detection in High Dimensional Spaces
@@ -552,48 +552,48 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       // with
       // the rescaling. 63 bit should be fine. The sign bit probably needs to be
       // handled differently, or at least needs careful unit testing of the API
-      if(h >= 32) {
-        final long scale = ~1l >>> 1; // Top h bits set
+      if(h >= 32) { // 32 to 63 bit
+        final long scale = Long.MAX_VALUE; // = 63 bits
         for(int i = 0; i < pf.length; i++) {
           O obj = relation.get(pf[i].id);
           long[] coord = new long[d];
           for(int dim = 0; dim < d; dim++) {
-            coord[dim] = (long) (getDimForObject(obj, dim) * scale) << 1;
+            coord[dim] = (long) (getDimForObject(obj, dim) * scale);
           }
-          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 1);
         }
       }
-      else if(h >= 16) {
-        final int scale = ~1 >>> 1; // Top h bits set
+      else if(h >= 16) { // 16-31 bit
+        final int scale = ~1 >>> 1;
         for(int i = 0; i < pf.length; i++) {
           O obj = relation.get(pf[i].id);
           int[] coord = new int[d];
           for(int dim = 0; dim < d; dim++) {
-            coord[dim] = (int) (getDimForObject(obj, dim) * scale) << 1;
+            coord[dim] = (int) (getDimForObject(obj, dim) * scale);
           }
-          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 1);
         }
       }
-      else if(h >= 8) {
-        final int scale = ~1 >>> 16; // Top h bits set
+      else if(h >= 8) { // 8-15 bit
+        final int scale = ~1 >>> 16;
         for(int i = 0; i < pf.length; i++) {
           O obj = relation.get(pf[i].id);
           short[] coord = new short[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (short) (getDimForObject(obj, dim) * scale);
           }
-          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 16);
         }
       }
-      else {
-        final int scale = ~1 >>> 8; // Top h bits set
+      else { // 1-7 bit
+        final int scale = ~1 >>> 8;
         for(int i = 0; i < pf.length; i++) {
           O obj = relation.get(pf[i].id);
           byte[] coord = new byte[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (byte) (getDimForObject(obj, dim) * scale);
           }
-          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h);
+          pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 24);
         }
       }
       java.util.Arrays.sort(pf);
