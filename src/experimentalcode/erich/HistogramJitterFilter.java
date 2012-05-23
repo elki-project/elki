@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * 
  * @param <V> Vector type
  */
-public class HistogramJitterFilter<V extends NumberVector<V, N>, N extends Number> extends AbstractStreamConversionFilter<V, V> {
+public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends AbstractStreamConversionFilter<V, V> {
   /**
    * Jitter amount
    */
@@ -69,10 +68,11 @@ public class HistogramJitterFilter<V extends NumberVector<V, N>, N extends Numbe
 
   @Override
   protected V filterSingleObject(V obj) {
-    double[] raw = ArrayLikeUtil.toPrimitiveDoubleArray(obj);
+    double[] raw = new double[obj.getDimensionality()];
     // Compute the total sum.
     double osum = 0;
     for(int i = 0; i < raw.length; i++) {
+      raw[i] = obj.doubleValue(i + 1);
       osum += raw[i];
     }
     double nsum = 0;
@@ -140,8 +140,8 @@ public class HistogramJitterFilter<V extends NumberVector<V, N>, N extends Numbe
     }
 
     @Override
-    protected HistogramJitterFilter<DoubleVector, Double> makeInstance() {
-      return new HistogramJitterFilter<DoubleVector, Double>(jitter, seed);
+    protected HistogramJitterFilter<DoubleVector> makeInstance() {
+      return new HistogramJitterFilter<DoubleVector>(jitter, seed);
     }
   }
 }
