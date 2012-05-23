@@ -185,8 +185,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         max[i] += diff;
       }
     }
-    final double distfactor = Math.pow(.5 / diameter, d);
-    logger.warning("Rescaling dataset by " + (.5 / diameter));
+    final double distfactor = Math.pow(1 / diameter, d);
+    logger.warning("Rescaling dataset by " + (1 / diameter));
     logger.warning("Distances should be off by " + distfactor);
 
     // Initialization part
@@ -558,7 +558,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           O obj = relation.get(pf[i].id);
           long[] coord = new long[d];
           for(int dim = 0; dim < d; dim++) {
-            coord[dim] = (long) (getDimForObject(obj, dim) * scale);
+            coord[dim] = (long) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 1);
         }
@@ -569,7 +569,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           O obj = relation.get(pf[i].id);
           int[] coord = new int[d];
           for(int dim = 0; dim < d; dim++) {
-            coord[dim] = (int) (getDimForObject(obj, dim) * scale);
+            coord[dim] = (int) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 1);
         }
@@ -580,7 +580,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           O obj = relation.get(pf[i].id);
           short[] coord = new short[d];
           for(int dim = 0; dim < d; dim++) {
-            coord[dim] = (short) (getDimForObject(obj, dim) * scale);
+            coord[dim] = (short) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 16);
         }
@@ -591,7 +591,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
           O obj = relation.get(pf[i].id);
           byte[] coord = new byte[d];
           for(int dim = 0; dim < d; dim++) {
-            coord[dim] = (byte) (getDimForObject(obj, dim) * scale);
+            coord[dim] = (byte) (getDimForObject(obj, dim) * .5 * scale);
           }
           pf[i].hilbert = HilbertSpatialSorter.coordinatesToHilbert(coord, h, 24);
         }
@@ -764,7 +764,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @return Projected and shifted position
      */
     private double getDimForObject(O obj, int dim) {
-      return (obj.doubleValue(dim + 1) - min[dim]) / (2 * diameter) + shift;
+      return (obj.doubleValue(dim + 1) - min[dim]) / diameter + shift;
     }
   }
 
