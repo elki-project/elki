@@ -34,13 +34,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -84,11 +84,6 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
   final int variants;
 
   /**
-   * Mean number of distance computations
-   */
-  Mean mean = new Mean();
-
-  /**
    * Constructor.
    * 
    * @param relation Relation to index.
@@ -122,7 +117,9 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
       final O v = relation.get(id);
       SpatialRef ref = new SpatialRef(id, v);
       curve.add(ref);
+      tempstorage.put(id, new KNNHeap<D>(k));
     }
+    long distcomp = 0;
     // Compute min and max
     final double[] mms = AbstractSpatialSorter.computeMinMax(curve);
     // For each curve and variant:
@@ -133,7 +130,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
         // sort
         sorter.sort(curve, 0, size, mm);
         // Window-scan
-        scanCurve(curve, wsize, tempstorage);
+        distcomp += scanCurve(curve, wsize, tempstorage);
       }
     }
 
@@ -141,13 +138,14 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     for(DBID id : relation.iterDBIDs()) {
       storage.put(id, tempstorage.get(id).toKNNList());
-      tempstorage.delete(id);
+      tempstorage.put(id, null);
     }
     tempstorage.destroy();
 
     final long end = System.nanoTime();
     if(logger.isVerbose()) {
-      logger.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds.");
+      double av = distcomp / (double) relation.size();
+      logger.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds and "+av+" distance computations on average.");
     }
   }
 
@@ -158,19 +156,41 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
    * @param wsize Window size
    * @param tempstorage Temporary storage
    */
-  private void scanCurve(List<SpatialRef> curve, int wsize, WritableDataStore<KNNHeap<D>> tempstorage) {
+  private long scanCurve(List<SpatialRef> curve, int wsize, WritableDataStore<KNNHeap<D>> tempstorage) {
+    long distcomp = 0;
     for(int start = 0; start < curve.size(); start++) {
-      final int end = Math.min(curve.size() - 1, start + wsize + 1);
+      final int end;
+      if (start < wsize) {
+        end = 2 * wsize + 1;
+      } else if (start + 2 * wsize >= curve.size()) {
+        end = curve.size() - 1;
+      } else {
+        end = start + wsize + 1;
+      }
       SpatialRef ref1 = curve.get(start);
       KNNHeap<D> heap1 = tempstorage.get(ref1.id);
-      for(int pos = start; pos < end; pos++) {
+      next: for(int pos = start; pos < end; pos++) {
         SpatialRef ref2 = curve.get(pos);
         KNNHeap<D> heap2 = tempstorage.get(ref2.id);
+        // Avoid duplicate computations and results:
+        for (DistanceResultPair<D> pair : heap1) {
+          if (pair.getDBID().equals(ref2.id)) {
+            break next;
+          }
+        }
+        for (DistanceResultPair<D> pair : heap2) {
+          if (pair.getDBID().equals(ref1.id)) {
+            break next;
+          }
+        }
+
+        distcomp++;
         D dist = distanceQuery.distance(ref1.vec, ref2.vec);
         heap1.add(dist, ref2.id);
         heap2.add(dist, ref1.id);
       }
     }
+    return distcomp;
   }
 
   protected double[] setupMinMax(final double[] mms, int variant) {
@@ -202,11 +222,6 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
       }
     }
     return mm;
-  }
-
-  @Override
-  public String toString() {
-    return "Mean number of distance computations / k: " + mean.getMean();
   }
 
   @Override
