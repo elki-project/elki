@@ -100,19 +100,12 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     this.seed = seed;
   }
 
-  /**
-   * Run the algorithm.
-   */
   @Override
   public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final Relation<Object> lrelation = database.getRelation(getInputTypeRestriction()[1]);
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, k);
-
-    if(logger.isVerbose()) {
-      logger.verbose("Preprocessing clusters...");
-    }
 
     MeanVariance[] mvs = MeanVariance.newArray(k);
 
