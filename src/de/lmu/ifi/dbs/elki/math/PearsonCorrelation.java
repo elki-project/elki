@@ -254,4 +254,16 @@ public class PearsonCorrelation {
   public double getSampleStddevY() {
     return Math.sqrt(getSampleVarianceY());
   }
+
+  /**
+   * Reset the value.
+   */
+  public void reset() {
+    sumXX = 0;
+    sumXY = 0;
+    sumYY = 0;
+    meanX = 0;
+    meanY = 0;
+    sumWe = 0;
+  }
 }
