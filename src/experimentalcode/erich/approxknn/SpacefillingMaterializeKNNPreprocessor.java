@@ -34,13 +34,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -105,10 +107,10 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     // Prepare space filling curve:
     final long start = System.nanoTime();
     final int size = relation.size();
-    final int wsize = (int) (window * k);
+    final int wsize = (int) (window * (k - 1));
 
     // Setup temporary knn heap storage
-    WritableDataStore<KNNHeap<D>> tempstorage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNHeap.class);
+    WritableDataStore<HashSetModifiableDBIDs> tempstorage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, HashSetModifiableDBIDs.class);
 
     // Curve storage:
     List<SpatialRef> curve = new ArrayList<SpatialRef>(size);
@@ -117,35 +119,43 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
       final O v = relation.get(id);
       SpatialRef ref = new SpatialRef(id, v);
       curve.add(ref);
-      tempstorage.put(id, new KNNHeap<D>(k));
+      tempstorage.put(id, DBIDUtil.newHashSet(curvegen.size() * wsize));
     }
-    long distcomp = 0;
+    Mean mean = new Mean();
     // Compute min and max
     final double[] mms = AbstractSpatialSorter.computeMinMax(curve);
     // For each curve and variant:
-    for(SpatialSorter sorter : curvegen) {
-      for(int variant = 0; variant < variants; variant++) {
-        // Setup actual min and max:
-        final double[] mm = setupMinMax(mms, variant);
+    for(int variant = 0; variant < variants; variant++) {
+      // Setup actual min and max:
+      final double[] mm = setupMinMax(mms, variant);
+      for(SpatialSorter sorter : curvegen) {
         // sort
         sorter.sort(curve, 0, size, mm);
         // Window-scan
-        distcomp += scanCurve(curve, wsize, tempstorage);
+        scanCurve(curve, wsize, tempstorage);
       }
     }
 
     // Convert to final storage
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
+    KNNHeap<D> heap = new KNNHeap<D>(k);
     for(DBID id : relation.iterDBIDs()) {
-      storage.put(id, tempstorage.get(id).toKNNList());
+      final D n = distanceQuery.getDistanceFactory().nullDistance();
+      heap.add(n, id);
+      int distcomp = 0;
+      for(DBID cand : tempstorage.get(id)) {
+        heap.add(distanceQuery.distance(id, cand), cand);
+        distcomp++;
+      }
       tempstorage.put(id, null);
+      storage.put(id, heap.toKNNList());
+      mean.put(distcomp);
     }
     tempstorage.destroy();
 
     final long end = System.nanoTime();
     if(logger.isVerbose()) {
-      double av = distcomp / (double) relation.size();
-      logger.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds and "+av+" distance computations on average.");
+      logger.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds and " + mean.getMean() + " distance computations on average.");
     }
   }
 
@@ -156,41 +166,34 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
    * @param wsize Window size
    * @param tempstorage Temporary storage
    */
-  private long scanCurve(List<SpatialRef> curve, int wsize, WritableDataStore<KNNHeap<D>> tempstorage) {
-    long distcomp = 0;
+  private void scanCurve(List<SpatialRef> curve, final int wsize, WritableDataStore<HashSetModifiableDBIDs> tempstorage) {
+    final int win2size = wsize * 2 + 1;
     for(int start = 0; start < curve.size(); start++) {
       final int end;
-      if (start < wsize) {
-        end = 2 * wsize + 1;
-      } else if (start + 2 * wsize >= curve.size()) {
-        end = curve.size() - 1;
-      } else {
+      if(start < wsize) {
+        end = win2size;
+        // logger.debug("start: "+start+" end: "+end);
+      }
+      else if(start + win2size > curve.size()) {
+        end = curve.size();
+        // logger.debug("start: "+start+" end: "+end);
+      }
+      else {
         end = start + wsize + 1;
       }
       SpatialRef ref1 = curve.get(start);
-      KNNHeap<D> heap1 = tempstorage.get(ref1.id);
-      next: for(int pos = start; pos < end; pos++) {
-        SpatialRef ref2 = curve.get(pos);
-        KNNHeap<D> heap2 = tempstorage.get(ref2.id);
-        // Avoid duplicate computations and results:
-        for (DistanceResultPair<D> pair : heap1) {
-          if (pair.getDBID().equals(ref2.id)) {
-            break next;
-          }
-        }
-        for (DistanceResultPair<D> pair : heap2) {
-          if (pair.getDBID().equals(ref1.id)) {
-            break next;
-          }
-        }
+      HashSetModifiableDBIDs set1 = tempstorage.get(ref1.id);
 
-        distcomp++;
-        D dist = distanceQuery.distance(ref1.vec, ref2.vec);
-        heap1.add(dist, ref2.id);
-        heap2.add(dist, ref1.id);
+      for(int pos = start + 1; pos < end; pos++) {
+        SpatialRef ref2 = curve.get(pos);
+        if(set1.contains(ref2.id)) {
+          continue;
+        }
+        HashSetModifiableDBIDs set2 = tempstorage.get(ref2.id);
+        set1.add(ref2.id);
+        set2.add(ref1.id);
       }
     }
-    return distcomp;
   }
 
   protected double[] setupMinMax(final double[] mms, int variant) {
