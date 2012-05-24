@@ -34,7 +34,7 @@ import java.util.Iterator;
  * 
  * @apiviz.stereotype adapter
  * @apiviz.uses Iterator oneway
- *
+ * 
  * @param <E> Entry type
  */
 public class MergedIterator<E> implements IterableIterator<E> {
@@ -42,7 +42,7 @@ public class MergedIterator<E> implements IterableIterator<E> {
    * All the iterators we process
    */
   final Iterator<Iterator<E>> iterators;
-  
+
   /**
    * The iterator we are currently processing
    */
@@ -52,7 +52,7 @@ public class MergedIterator<E> implements IterableIterator<E> {
    * The last iterator we returned an object for, for remove()
    */
   Iterator<E> last = null;
-  
+
   /**
    * Main constructor.
    * 
@@ -83,20 +83,22 @@ public class MergedIterator<E> implements IterableIterator<E> {
 
   @Override
   public boolean hasNext() {
-    while((current != null && current.hasNext()) || iterators.hasNext()) {
-      // Next element in current iterator?
-      if (current != null && current.hasNext()) {
+    do {
+      if(current != null && current.hasNext()) {
         return true;
+      }
+      if(!iterators.hasNext()) {
+        return false;
       }
       // advance master iterator and retry
       current = iterators.next();
     }
-    return false;
+    while(true);
   }
 
   @Override
   public E next() {
-    while (!current.hasNext()) {
+    while(!current.hasNext()) {
       current = iterators.next();
     }
     last = current;
@@ -105,7 +107,7 @@ public class MergedIterator<E> implements IterableIterator<E> {
 
   @Override
   public void remove() {
-    if (last == null) {
+    if(last == null) {
       throw new RuntimeException("Iterator.remove() called without next()");
     }
     last.remove();
