@@ -23,6 +23,7 @@ package experimentalcode.erich.approxknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -109,49 +110,69 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     final int size = relation.size();
     final int wsize = (int) (window * (k - 1));
 
-    // Setup temporary knn heap storage
-    WritableDataStore<HashSetModifiableDBIDs> tempstorage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, HashSetModifiableDBIDs.class);
-
-    // Curve storage:
-    List<SpatialRef> curve = new ArrayList<SpatialRef>(size);
+    final int numgen = curvegen.size();
+    final int numcurves = numgen * variants;
+    List<List<SpatialRef>> curves = new ArrayList<List<SpatialRef>>(numcurves);
+    for(int i = 0; i < numcurves; i++) {
+      curves.add(new ArrayList<SpatialRef>(size));
+    }
 
     for(DBID id : relation.iterDBIDs()) {
       final O v = relation.get(id);
       SpatialRef ref = new SpatialRef(id, v);
-      curve.add(ref);
-      tempstorage.put(id, DBIDUtil.newHashSet(curvegen.size() * wsize));
-    }
-    Mean mean = new Mean();
-    // Compute min and max
-    final double[] mms = AbstractSpatialSorter.computeMinMax(curve);
-    // For each curve and variant:
-    for(int variant = 0; variant < variants; variant++) {
-      // Setup actual min and max:
-      final double[] mm = setupMinMax(mms, variant);
-      for(SpatialSorter sorter : curvegen) {
-        // sort
-        sorter.sort(curve, 0, size, mm);
-        // Window-scan
-        scanCurve(curve, wsize, tempstorage);
+      for(List<SpatialRef> curve : curves) {
+        curve.add(ref);
       }
     }
+
+    // Sort spatially
+    double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
+    for(int j = 0; j < variants; j++) {
+      final double[] mm = setupMinMax(mms, j);
+      for(int i = 0; i < numgen; i++) {
+        curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mm);
+      }
+    }
+
+    // Build position index, DBID -> position in the three curves
+    WritableDataStore<int[]> positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
+    for(int cnum = 0; cnum < numcurves; cnum++) {
+      Iterator<SpatialRef> it = curves.get(cnum).iterator();
+      for(int i = 0; it.hasNext(); i++) {
+        SpatialRef r = it.next();
+        final int[] data;
+        if(cnum == 0) {
+          data = new int[numcurves];
+          positions.put(r.id, data);
+        }
+        else {
+          data = positions.get(r.id);
+        }
+        data[cnum] = i;
+      }
+    }
+
+    Mean mean = new Mean();
 
     // Convert to final storage
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     KNNHeap<D> heap = new KNNHeap<D>(k);
+    HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
     for(DBID id : relation.iterDBIDs()) {
       final D n = distanceQuery.getDistanceFactory().nullDistance();
       heap.add(n, id);
+
+      // Get candidates.
+      cands.clear();
+      int[] ps = positions.get(id);
       int distcomp = 0;
-      for(DBID cand : tempstorage.get(id)) {
-        heap.add(distanceQuery.distance(id, cand), cand);
-        distcomp++;
+      for(int i = 0; i < numcurves; i++) {
+        distcomp += scanCurve(curves.get(i), wsize, ps[i], cands, heap);
       }
-      tempstorage.put(id, null);
+
       storage.put(id, heap.toKNNList());
       mean.put(distcomp);
     }
-    tempstorage.destroy();
 
     final long end = System.nanoTime();
     if(logger.isVerbose()) {
@@ -164,36 +185,39 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
    * 
    * @param curve Curve to process
    * @param wsize Window size
+   * @param heap Heap
    * @param tempstorage Temporary storage
+   * @return number of distance computations
    */
-  private void scanCurve(List<SpatialRef> curve, final int wsize, WritableDataStore<HashSetModifiableDBIDs> tempstorage) {
+  private int scanCurve(List<SpatialRef> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<D> heap) {
+    int distcomp = 0;
     final int win2size = wsize * 2 + 1;
-    for(int start = 0; start < curve.size(); start++) {
-      final int end;
-      if(start < wsize) {
-        end = win2size;
-        // logger.debug("start: "+start+" end: "+end);
-      }
-      else if(start + win2size > curve.size()) {
-        end = curve.size();
-        // logger.debug("start: "+start+" end: "+end);
-      }
-      else {
-        end = start + wsize + 1;
-      }
-      SpatialRef ref1 = curve.get(start);
-      HashSetModifiableDBIDs set1 = tempstorage.get(ref1.id);
+    final int start, end;
+    if(p < wsize) {
+      start = 0;
+      end = win2size;
+    }
+    else if(p + win2size > curve.size()) {
+      start = curve.size() - win2size;
+      end = curve.size();
+    }
+    else {
+      start = p - wsize;
+      end = p + wsize + 1;
+    }
 
-      for(int pos = start + 1; pos < end; pos++) {
-        SpatialRef ref2 = curve.get(pos);
-        if(set1.contains(ref2.id)) {
-          continue;
-        }
-        HashSetModifiableDBIDs set2 = tempstorage.get(ref2.id);
-        set1.add(ref2.id);
-        set2.add(ref1.id);
+    O q = curve.get(p).vec;
+    for(int pos = start; pos < end; pos++) {
+      if(pos == p) {
+        continue;
+      }
+      SpatialRef ref2 = curve.get(pos);
+      if(cands.add(ref2.id)) {
+        heap.add(distanceQuery.distance(q, ref2.vec), ref2.id);
+        distcomp++;
       }
     }
+    return distcomp;
   }
 
   protected double[] setupMinMax(final double[] mms, int variant) {
