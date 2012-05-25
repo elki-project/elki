@@ -230,7 +230,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
         final O obj = relation.get(id);
         for(int i = 0; i < g; i++) {
           Vector v2 = shiftObject(obj, shifts.get(i), min, max);
-          AbstractALOCIQuadTreeNode cg2 = qts.get(i).getCountingGrid(v2);
+          AbstractALOCIQuadTreeNode cg2 = qts.get(i).getCountingGrid(v2.getArrayRef());
           if(cg == null || distFunc.distance(cg.getCenter(), v).compareTo(distFunc.distance(cg2.getCenter(), v2)) > 0) {
             cg = cg2;
             v = v2;
@@ -360,7 +360,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       }
       // getSamplingNode(O int) returns null if there is no node containing the
       // coordinates given, or if the node does not have at least nmin Elements.
-      AbstractALOCIQuadTreeNode sn2 = qts.get(i).getSamplingNode(center, level);
+      AbstractALOCIQuadTreeNode sn2 = qts.get(i).getSamplingNode(center.getArrayRef(), level);
       if(sn2 == null) {
         continue;
       }
@@ -389,7 +389,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       }
       // getCountingNode(O, int) returns null if the Object has not reached the
       // right level in the Tree
-      AbstractALOCIQuadTreeNode cn2 = qts.get(i).getCountingNode(center, cn.getLevel());
+      AbstractALOCIQuadTreeNode cn2 = qts.get(i).getCountingNode(center.getArrayRef(), cn.getLevel());
       if(cn2 == null) {
         continue;
       }
