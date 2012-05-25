@@ -189,6 +189,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
 
     // Insert the database into the trees
     for(DBID id : relation.iterDBIDs()) {
+      // TODO: BULK LOAD, und dann Objekte nicht speichern?
       for(int i = 0; i < g; i++) {
         qts.get(i).insert(shiftObject(relation.get(id), shifts.get(i), min, max));
       }
@@ -231,6 +232,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
         for(int i = 0; i < g; i++) {
           Vector v2 = shiftObject(obj, shifts.get(i), min, max);
           AbstractALOCIQuadTreeNode cg2 = qts.get(i).getCountingGrid(v2.getArrayRef());
+          // TODO: statt distFunc evtl. Manhattan direkt - bei Würfeln sollte es keinen unterschied machen, welche LP norm!
           if(cg == null || distFunc.distance(cg.getCenter(), v).compareTo(distFunc.distance(cg2.getCenter(), v2)) > 0) {
             cg = cg2;
             v = v2;
