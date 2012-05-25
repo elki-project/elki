@@ -136,7 +136,7 @@ public class VALPNormDistance {
   /**
    * Get the maximum distance.
    * 
-   * @param d Dimension
+   * @param dimension Dimension
    * @return Maximum distance in the given dimension
    */
   public double getPartialMaxMaxDist(int dimension) {
