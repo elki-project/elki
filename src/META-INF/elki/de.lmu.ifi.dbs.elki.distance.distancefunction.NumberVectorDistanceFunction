@@ -1,0 +1,29 @@
+de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.JeffreyDivergenceDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedSquaredEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HSBHistogramQuadraticDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.RGBHistogramQuadraticDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.PearsonCorrelationDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.SquaredPearsonCorrelationDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedSquaredPearsonCorrelationDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.DTWDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.EDRDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.ERPDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.LCSSDistanceFunction
+# tutorial.distancefunction.MultiLPNorm
+# tutorial.distancefunction.TutorialDistanceFunction
