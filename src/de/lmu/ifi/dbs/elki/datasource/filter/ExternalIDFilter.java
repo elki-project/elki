@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // TODO: use a non-string class for external ids?
 public class ExternalIDFilter implements ObjectFilter {
   /**
-   * Optional parameter that specifies the index of the label to be used as
+   * Parameter that specifies the index of the label to be used as
    * external Id, must be an integer equal to or greater than 0.
    * <p>
    * Key: {@code -dbc.externalIdIndex}
@@ -57,8 +57,7 @@ public class ExternalIDFilter implements ObjectFilter {
   public static final OptionID EXTERNALID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
 
   /**
-   * The index of the label to be used as external Id, null if no external id
-   * index is specified.
+   * The index of the label to be used as external Id.
    */
   private final int externalIdIndex;
 
