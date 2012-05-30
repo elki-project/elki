@@ -39,12 +39,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
- * Dummy Algorithm, which just iterates over all points once, doing a 10NN query
+ * Dummy algorithm, which just iterates over all points once, doing a 10NN query
  * each. Useful in testing e.g. index structures and as template for custom
- * algorithms. If you are looking for an algorithm that does <em>nothing</em>,
+ * algorithms. While this algorithm doesn't produce a result, it
+ * still performs rather expensive operations. If you are looking for an algorithm that does <em>nothing</em>,
  * you must use {@link de.lmu.ifi.dbs.elki.algorithm.NullAlgorithm
- * NullAlgorithm} instead. While this algorithm doesn't produce a result, it
- * still performs rather expensive operations.
+ * NullAlgorithm} instead.
  * 
  * @author Erich Schubert
  * @param <O> Vector type
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @apiviz.uses KNNQuery
  */
 @Title("Dummy Algorithm")
-@Description("The algorithm executes a euclidena 10NN query on all data points, and can be used in unit testing")
+@Description("The algorithm executes an Euclidean 10NN query on all data points, and can be used in unit testing")
 public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgorithm<Result> {
   /**
    * The logger for this class.
