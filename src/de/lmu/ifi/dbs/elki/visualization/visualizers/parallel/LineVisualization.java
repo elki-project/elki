@@ -104,12 +104,14 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
       ids = relation.iterDBIDs();
     }
     if(sp instanceof ClassStylingPolicy) {
-      // FIXME: doesn't use sampling yet.
       ClassStylingPolicy csp = (ClassStylingPolicy) sp;
       for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
         String key = DATALINE + "_" + c;
         for(Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext();) {
           DBID id = iter.next();
+          if(!sample.getSample().contains(id)) {
+            continue; // TODO: can we test more efficiently than this?
+          }
           SVGPath path = new SVGPath();
           double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
           for(int i = 0; i < yPos.length; i++) {

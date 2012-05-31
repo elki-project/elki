@@ -98,7 +98,7 @@ public class ParallelAxisVisualization extends AbstractParallelVisualization<Num
         SVGUtil.setCSSClass(text, AXIS_LABEL);
         layer.appendChild(text);
         // TODO: Split into background + clickable layer.
-        Element button = svgp.svgRect(axisX - 2 * getMarginTop(), -getMarginTop(), 4 * getMarginTop(), .5 * getMarginTop());
+        Element button = svgp.svgRect(axisX - getAxisSep() * .475, -getMarginTop(), .95 * getAxisSep(), .5 * getMarginTop());
         SVGUtil.setCSSClass(button, INVERTEDAXIS);
         addEventListener(button, truedim);
         layer.appendChild(button);

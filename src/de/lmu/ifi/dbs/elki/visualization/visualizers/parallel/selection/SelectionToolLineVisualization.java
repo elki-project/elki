@@ -35,6 +35,7 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -194,7 +195,8 @@ public class SelectionToolLineVisualization extends AbstractParallelVisualizatio
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
     int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
-    for(DBID objId : relation.iterDBIDs()) {
+    DBIDs objIds = ResultUtil.getSamplingResult(relation).getSample();
+    for(DBID objId : objIds){
       double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(objId));
       if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
         if(mode == Mode.INVERT) {
