@@ -127,6 +127,15 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector<?, ?
   }
 
   /**
+   * Distance between axes.
+   * 
+   * @return Axis separation
+   */
+  protected double getAxisSep() {
+    return axsep;
+  }
+
+  /**
    * Recalculate axis positions, in particular after projection changes.
    */
   private void recalcAxisPositions() {
