@@ -222,7 +222,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
       }
       int i = dimOrder[j];
       v[o] = scales[i].getScaled(data.doubleValue(i + 1));
-      if(isDimInverted(i)) {
+      if(!isDimInverted(i)) {
         v[o] = 1 - v[o];
       }
       v[o] *= StyleLibrary.SCALE;
@@ -240,7 +240,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
       }
       int i = dimOrder[j];
       v[o] = scales[i].getScaled(data[i]);
-      if(isDimInverted(i)) {
+      if(!isDimInverted(i)) {
         v[o] = 1 - v[o];
       }
       v[o] *= StyleLibrary.SCALE;
@@ -253,7 +253,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   public double fastProjectRenderToDataSpace(double v, int projdim) {
     int truedim = dimOrder[projdim];
     v /= StyleLibrary.SCALE;
-    if(isDimInverted(truedim)) {
+    if(!isDimInverted(truedim)) {
       v = 1 - v;
     }
     return scales[truedim].getUnscaled(v);
@@ -263,7 +263,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   public double fastProjectDataToRenderSpace(double value, int dim) {
     double temp = scales[dimOrder[dim]].getScaled(value);
     temp *= StyleLibrary.SCALE;
-    if(isAxisInverted(dimOrder[dim])) {
+    if(!isAxisInverted(dimOrder[dim])) {
       return temp;
     }
     return 1 - temp;
