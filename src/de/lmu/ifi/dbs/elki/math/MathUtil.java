@@ -75,6 +75,11 @@ public final class MathUtil {
   public static final double LOG2 = Math.log(2);
 
   /**
+   * Math.log(Math.PI)
+   */
+  public static final double LOGPI = Math.log(Math.PI);
+
+  /**
    * Fake constructor for static class.
    */
   private MathUtil() {
