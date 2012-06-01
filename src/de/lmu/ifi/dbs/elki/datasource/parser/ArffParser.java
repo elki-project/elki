@@ -62,11 +62,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * TODO: Sparse vectors are not yet fully supported.
  * 
- * FIXME: Numbers in exponential notation (e.g. 1e-5) are not supported by Java
- * StreamTokenizer. This needs a rewrite.
- * 
- * FIXME: labels that are numerical are not properly supported.
- * 
  * @author Erich Schubert
  */
 public class ArffParser implements Parser {
@@ -315,7 +310,6 @@ public class ArffParser implements Parser {
   }
 
   private Object[] loadDenseInstance(StreamTokenizer tokenizer, int[] dimsize, TypeInformation[] etyp, int outdim) throws IOException {
-    // logger.warning("Regular instance.");
     Object[] data = new Object[outdim];
     for(int out = 0; out < outdim; out++) {
       if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
@@ -325,10 +319,17 @@ public class ArffParser implements Parser {
           if(tokenizer.ttype == '?') {
             tokenizer.nval = Double.NaN;
           }
-          else if(tokenizer.ttype != StreamTokenizer.TT_NUMBER) {
+          else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
+            try {
+              cur[k] = Double.parseDouble(tokenizer.sval);
+            }
+            catch(NumberFormatException e) {
+              throw new AbortException("Expected number value, got: " + tokenizer.sval);
+            }
+          }
+          else {
             throw new AbortException("Expected word token, got: " + tokenizer.toString());
           }
-          cur[k] = tokenizer.nval;
           nextToken(tokenizer);
         }
         data[out] = new DoubleVector(cur);
@@ -378,7 +379,11 @@ public class ArffParser implements Parser {
     // Setup tokenizer
     StreamTokenizer tokenizer = new StreamTokenizer(br);
     {
+      tokenizer.resetSyntax();
       tokenizer.whitespaceChars(0, ' ');
+      tokenizer.ordinaryChars('0', '9');
+      tokenizer.ordinaryChar('-');
+      tokenizer.ordinaryChar('.');
       tokenizer.wordChars(' ' + 1, '\u00FF');
       tokenizer.whitespaceChars(',', ',');
       tokenizer.commentChar('%');
