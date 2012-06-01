@@ -42,6 +42,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.OUTRES
 de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.SOD
 de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF
