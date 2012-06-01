@@ -67,6 +67,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
     return Math.sqrt(sqrDist);
   }
 
+  @Override
   protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
