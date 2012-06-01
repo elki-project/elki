@@ -188,9 +188,12 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
   }
 
   /**
+   * Subspace relevance test.
    * 
-   * @param test: subspace that will be tested about scattering
-   * @return if the subspace is scattered return will be 0, else 1
+   * @param subspace Subspace to test
+   * @param neigh Neighbor list
+   * @param kernel Kernel density estimator
+   * @return relevance test result
    */
   protected boolean relevantSubspace(BitSet subspace, List<DistanceResultPair<DoubleDistance>> neigh, KernelDensityEstimator kernel) {
     Relation<V> relation = kernel.relation;
