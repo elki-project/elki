@@ -178,7 +178,7 @@ public class GammaDistribution implements Distribution {
    * TODO: find out which approximation really is the best...
    * 
    * @param x Parameter x
-   * @return @return log(&#915;(x))
+   * @return log(&#915;(x))
    */
   public static double logGamma(final double x) {
     if(Double.isNaN(x) || (x <= 0.0)) {
