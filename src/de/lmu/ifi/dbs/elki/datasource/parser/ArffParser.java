@@ -60,7 +60,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * This parser is quite hackish, and contains lots of not yet configurable
  * magic.
  * 
- * TODO: Sparse vectors are not yet supported.
+ * TODO: Sparse vectors are not yet fully supported.
+ * 
+ * FIXME: Numbers in exponential notation (e.g. 1e-5) are not supported by Java
+ * StreamTokenizer. This needs a rewrite.
+ * 
+ * FIXME: labels that are numerical are not properly supported.
  * 
  * @author Erich Schubert
  */
