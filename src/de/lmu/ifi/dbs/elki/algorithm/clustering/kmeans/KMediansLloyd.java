@@ -87,7 +87,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
   }
 
   /**
-   * Run k-means
+   * Run k-medians
    * 
    * @param database Database
    * @param relation relation to use
