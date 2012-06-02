@@ -44,8 +44,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -76,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Partioning Around Medoids")
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -95,7 +96,7 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> ex
   /**
    * Method to choose initial means.
    */
-  protected KMedoidInitialization<V> initializer;
+  protected KMedoidsInitialization<V> initializer;
 
   /**
    * Constructor.
@@ -105,7 +106,7 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAM(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMedoidInitialization<V> initializer) {
+  public KMedoidsPAM(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -132,15 +133,44 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> ex
     for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
+    Mean[] mdists = Mean.newArray(k);
 
     // Initial assignment to nearest medoids
     // TODO: reuse this information, from the build phase, when possible?
-    assignToNearestCluster(medoids, clusters, distQ);
+    assignToNearestCluster(medoids, mdists, clusters, distQ);
 
-    // FIXME: iteration
+    // Swap phase
     boolean changed = true;
     while(changed) {
       changed = false;
+      // Try to swap the medoid with a better cluster member:
+      for(int i = 0; i < k; i++) {
+        DBID med = medoids.get(i);
+        DBID best = null;
+        Mean bestm = mdists[i];
+        for(DBID id : clusters.get(i)) {
+          if(med.equals(id)) {
+            continue;
+          }
+          Mean mdist = new Mean();
+          for(DBID other : clusters.get(i)) {
+            mdist.put(distQ.distance(id, other).doubleValue());
+          }
+          if(mdist.getMean() < bestm.getMean()) {
+            best = id;
+            bestm = mdist;
+          }
+        }
+        if(best != null && !med.equals(best)) {
+          changed = true;
+          medoids.set(i, best);
+          mdists[i] = bestm;
+        }
+      }
+      // Reassign
+      if(changed) {
+        assignToNearestCluster(medoids, mdists, clusters, distQ);
+      }
     }
 
     // Wrap result
@@ -161,26 +191,29 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * @param clusters cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(ArrayDBIDs means, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {
+  protected boolean assignToNearestCluster(ArrayDBIDs means, Mean[] mdist, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {
     boolean changed = false;
 
+    double[] dists = new double[k];
     for(DBID id : distQ.getRelation().iterDBIDs()) {
-      D mindist = distQ.getDistanceFactory().infiniteDistance();
       int minIndex = 0;
+      double mindist = Double.POSITIVE_INFINITY;
       for(int i = 0; i < k; i++) {
-        D dist = distQ.distance(id, means.get(i));
-        if(dist.compareTo(mindist) < 0) {
+        dists[i] = distQ.distance(id, means.get(i)).doubleValue();
+        if(dists[i] < mindist) {
           minIndex = i;
-          mindist = dist;
+          mindist = dists[i];
         }
       }
       if(clusters.get(minIndex).add(id)) {
         changed = true;
+        mdist[minIndex].put(mindist);
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for(int i = 0; i < k; i++) {
           if(i != minIndex) {
             if(clusters.get(i).remove(id)) {
+              mdist[minIndex].put(dists[i], -1);
               break;
             }
           }
@@ -207,12 +240,12 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
+  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
     protected int k;
 
     protected int maxiter;
 
-    protected KMedoidInitialization<V> initializer;
+    protected KMedoidsInitialization<V> initializer;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -222,7 +255,7 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends Distance<D>> ex
         k = kP.getValue();
       }
 
-      ObjectParameter<KMedoidInitialization<V>> initialP = new ObjectParameter<KMedoidInitialization<V>>(AbstractKMeans.INIT_ID, KMedoidInitialization.class, PAMInitialMeans.class);
+      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<KMedoidsInitialization<V>>(AbstractKMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }

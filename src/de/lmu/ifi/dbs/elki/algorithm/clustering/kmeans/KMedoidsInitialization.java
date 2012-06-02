@@ -11,7 +11,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
  * 
  * @param <V> Object type
  */
-public interface KMedoidInitialization<V> {
+public interface KMedoidsInitialization<V> {
   /**
    * Choose initial means
    * 

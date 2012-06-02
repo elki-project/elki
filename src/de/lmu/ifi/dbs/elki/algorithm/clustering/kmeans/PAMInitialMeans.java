@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <D> Distance type
  */
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> implements KMeansInitialization<V>, KMedoidInitialization<V> {
+public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
   /**
    * Constructor.
    */
