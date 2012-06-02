@@ -92,4 +92,27 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
+
+  /**
+   * Run KMedians with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testKMediansLloyd() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(AbstractKMeans.K_ID, 5);
+    params.addParameter(AbstractKMeans.SEED_ID, 3);
+    AbstractKMeans<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
+    testParameterizationOk(params);
+
+    // run KMedians on database
+    Clustering<MeanModel<DoubleVector>> result = kmedians.run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
 }
