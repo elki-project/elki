@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <D> Distance type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
-public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidInitialization<V> {
+public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
   /**
    * Constructor.
    * 

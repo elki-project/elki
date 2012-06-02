@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * 
  * @param <V> Vector type
  */
-public class RandomlyChosenInitialMeans<V extends NumberVector<V, ?>> extends AbstractKMeansInitialization<V> implements KMedoidInitialization<V> {
+public class RandomlyChosenInitialMeans<V extends NumberVector<V, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
   /**
    * Constructor.
    * 
