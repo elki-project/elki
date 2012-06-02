@@ -3,6 +3,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
 import java.util.Comparator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -771,6 +774,188 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T> void insertionSort(List<T> data, Comparator<? super T> comparator, int start, int end) {
+    for(int i = start + 1; i < end; i++) {
+      for(int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
+        swap(data, j, j - 1);
+      }
+    }
+  }
+
+  /**
+   * The usual swap method.
+   * 
+   * @param data Array
+   * @param a First index
+   * @param b Second index
+   */
+  private static final void swap(ArrayModifiableDBIDs data, int a, int b) {
+    data.set(b, data.set(a, data.get(b)));
+  }
+
+  /**
+   * QuickSelect is essentially quicksort, except that we only "sort" that half
+   * of the array that we are interested in.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param comparator Comparator to use
+   * @param rank Rank position that we are interested in (integer!)
+   * @return Value at the given rank
+   */
+  public static DBID quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int rank) {
+    quickSelect(data, comparator, 0, data.size(), rank);
+    return data.get(rank);
+  }
+
+  /**
+   * Compute the median of an array efficiently using the QuickSelect method.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param comparator Comparator to use
+   * @return Median value
+   */
+  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator) {
+    return median(data, comparator, 0, data.size());
+  }
+
+  /**
+   * Compute the median of an array efficiently using the QuickSelect method.
+   * 
+   * On an odd length, it will return the lower element.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param comparator Comparator to use
+   * @param begin Begin of valid values
+   * @param end End of valid values (exclusive!)
+   * @return Median value
+   */
+  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int begin, int end) {
+    final int length = end - begin;
+    assert (length > 0);
+    // Integer division is "floor" since we are non-negative.
+    final int left = begin + (length - 1) / 2;
+    quickSelect(data, comparator, begin, end, left);
+    return data.get(left);
+  }
+
+  /**
+   * Compute the median of an array efficiently using the QuickSelect method.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param comparator Comparator to use
+   * @param quant Quantile to compute
+   * @return Value at quantile
+   */
+  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, double quant) {
+    return quantile(data, comparator, 0, data.size(), quant);
+  }
+
+  /**
+   * Compute the median of an array efficiently using the QuickSelect method.
+   * 
+   * It will prefer the lower element.
+   * 
+   * Note: the array is <b>modified</b> by this.
+   * 
+   * @param data Data to process
+   * @param comparator Comparator to use
+   * @param begin Begin of valid values
+   * @param end End of valid values (inclusive!)
+   * @param quant Quantile to compute
+   * @return Value at quantile
+   */
+  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int begin, int end, double quant) {
+    final int length = end - begin;
+    assert (length > 0) : "Quantile on empty set?";
+    // Integer division is "floor" since we are non-negative.
+    final double dleft = begin + (length - 1) * quant;
+    final int ileft = (int) Math.floor(dleft);
+
+    quickSelect(data, comparator, begin, end, ileft);
+    return data.get(ileft);
+  }
+
+  /**
+   * QuickSelect is essentially quicksort, except that we only "sort" that half
+   * of the array that we are interested in.
+   * 
+   * @param data Data to process
+   * @param comparator Comparator to use
+   * @param start Interval start
+   * @param end Interval end (inclusive)
+   * @param rank rank position we are interested in (starting at 0)
+   */
+  public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int start, int end, int rank) {
+    // Optimization for small arrays
+    // This also ensures a minimum size below
+    if(start + SMALL > end) {
+      insertionSort(data, comparator, start, end);
+      return;
+    }
+
+    // Pick pivot from three candidates: start, middle, end
+    // Since we compare them, we can also just "bubble sort" them.
+    final int middle = (start + end) / 2;
+    if(comparator.compare(data.get(start), data.get(middle)) > 0) {
+      swap(data, start, middle);
+    }
+    if(comparator.compare(data.get(start), data.get(end - 1)) > 0) {
+      swap(data, start, end - 1);
+    }
+    if(comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
+      swap(data, middle, end - 1);
+    }
+    // TODO: use more candidates for larger arrays?
+
+    final DBID pivot = data.get(middle);
+    // Move middle element out of the way, just before end
+    // (Since we already know that "end" is bigger)
+    swap(data, middle, end - 2);
+
+    // Begin partitioning
+    int i = start + 1, j = end - 3;
+    // This is classic quicksort stuff
+    while(true) {
+      while(comparator.compare(data.get(i), pivot) <= 0 && i <= j) {
+        i++;
+      }
+      while(comparator.compare(data.get(j), pivot) >= 0 && j >= i) {
+        j--;
+      }
+      if(i >= j) {
+        break;
+      }
+      swap(data, i, j);
+    }
+
+    // Move pivot (former middle element) back into the appropriate place
+    swap(data, i, end - 2);
+
+    // In contrast to quicksort, we only need to recurse into the half we are
+    // interested in.
+    if(rank < i) {
+      quickSelect(data, comparator, start, i, rank);
+    }
+    else if(rank > i) {
+      quickSelect(data, comparator, i + 1, end, rank);
+    }
+  }
+
+  /**
+   * Sort a small array using repetitive insertion sort.
+   * 
+   * @param data Data to sort
+   * @param start Interval start
+   * @param end Interval end
+   */
+  private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int start, int end) {
     for(int i = start + 1; i < end; i++) {
       for(int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
         swap(data, j, j - 1);
