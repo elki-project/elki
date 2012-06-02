@@ -27,10 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -40,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @param <V> Vector type
  */
-public class FirstKInitialMeans<V extends NumberVector<V, ?>> implements KMeansInitialization<V> {
+public class FirstKInitialMeans<V extends NumberVector<V, ?>> implements KMeansInitialization<V>, KMedoidInitialization<V> {
   /**
    * Constructor.
    */
@@ -49,11 +52,21 @@ public class FirstKInitialMeans<V extends NumberVector<V, ?>> implements KMeansI
   }
 
   @Override
-  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     Iterator<DBID> iter = relation.iterDBIDs();
-    List<Vector> means = new ArrayList<Vector>(k);
+    List<V> means = new ArrayList<V>(k);
     for(int i = 0; i < k && iter.hasNext(); i++) {
-      means.add(relation.get(iter.next()).getColumnVector());
+      means.add(relation.get(iter.next()));
+    }
+    return means;
+  }
+
+  @Override
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distanceFunction) {
+    Iterator<DBID> iter = distanceFunction.getRelation().iterDBIDs();
+    ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
+    for(int i = 0; i < k && iter.hasNext(); i++) {
+      means.add(iter.next());
     }
     return means;
   }

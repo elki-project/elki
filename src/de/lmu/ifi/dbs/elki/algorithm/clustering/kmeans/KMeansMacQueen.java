@@ -101,7 +101,10 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
       return new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    List<Vector> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<Vector> means = new ArrayList<Vector>(k);
+    for(NumberVector<?, ?> nv : initializer.chooseInitialMeans(relation, k, getDistanceFunction())) {
+      means.add(nv.getColumnVector());
+    }
     // Initialize cluster and assign objects
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for(int i = 0; i < k; i++) {

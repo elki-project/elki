@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -99,7 +98,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
       return new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
-    List<Vector> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<? extends NumberVector<?, ?>> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for(int i = 0; i < k; i++) {
@@ -122,7 +121,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
     final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(medians.get(i).getArrayRef()));
+      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
       result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
     }
     return result;

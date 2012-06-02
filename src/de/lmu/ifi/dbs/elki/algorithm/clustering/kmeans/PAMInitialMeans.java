@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <D> Distance type
  */
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> implements KMeansInitialization<V> {
+public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> implements KMeansInitialization<V>, KMedoidInitialization<V> {
   /**
    * Constructor.
    */
@@ -72,7 +71,7 @@ public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDista
   }
 
   @Override
-  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     // Get a distance query
     if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
       throw new AbortException("PAM initialization can only be used with numerical distances.");
@@ -80,7 +79,22 @@ public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDista
     @SuppressWarnings("unchecked")
     final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
     final DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
-    final DBIDs ids = relation.getDBIDs();
+    DBIDs medids = chooseInitialMedoids(k, distQ);
+    List<V> medoids = new ArrayList<V>(k);
+    for(DBID id : medids) {
+      medoids.add(relation.get(id));
+    }
+    return medoids;
+  }
+
+  @Override
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
+    if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
+      throw new AbortException("PAM initialization can only be used with numerical distances.");
+    }
+    @SuppressWarnings("unchecked")
+    DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
+    final DBIDs ids = distQ.getRelation().getDBIDs();
 
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
     double best = Double.POSITIVE_INFINITY;
@@ -154,11 +168,7 @@ public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDista
     }
 
     mindist.destroy();
-    List<Vector> medoids = new ArrayList<Vector>(k);
-    for(DBID id : medids) {
-      medoids.add(relation.get(id).getColumnVector());
-    }
-    return medoids;
+    return medids;
   }
 
   /**

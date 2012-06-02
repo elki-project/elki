@@ -28,17 +28,17 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <D> Distance type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
-public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> {
+public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidInitialization<V> {
   /**
    * Constructor.
    * 
@@ -70,7 +70,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
   }
 
   @Override
-  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     // Get a distance query
     if(!(distanceFunction.getDistanceFactory() instanceof NumberDistance)) {
       throw new AbortException("K-Means++ initialization can only be used with numerical distances.");
@@ -80,14 +80,12 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
     DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
 
     // Chose first mean
-    List<Vector> means = new ArrayList<Vector>(k);
+    List<V> means = new ArrayList<V>(k);
 
     Random random = (seed != null) ? new Random(seed) : new Random();
     DBID first = DBIDUtil.randomSample(relation.getDBIDs(), 1, random.nextLong()).iterator().next();
-    means.add(relation.get(first).getColumnVector());
+    means.add(relation.get(first));
 
-    ModifiableDBIDs chosen = DBIDUtil.newHashSet(k);
-    chosen.add(first);
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Initialize weights
     double[] weights = new double[ids.size()];
@@ -107,18 +105,60 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
       }
       // Add new mean:
       DBID newmean = ids.get(pos);
-      means.add(relation.get(newmean).getColumnVector());
-      chosen.add(newmean);
+      means.add(relation.get(newmean));
       // Update weights:
       weights[pos] = 0.0;
       // Choose optimized version for double distances, if applicable.
-      if (distF instanceof PrimitiveDoubleDistanceFunction) {
+      if(distF instanceof PrimitiveDoubleDistanceFunction) {
         @SuppressWarnings("unchecked")
         PrimitiveDoubleDistanceFunction<V> ddist = (PrimitiveDoubleDistanceFunction<V>) distF;
         weightsum = updateWeights(weights, ids, newmean, ddist, relation);
-      } else {
+      }
+      else {
         weightsum = updateWeights(weights, ids, newmean, distQ);
       }
+    }
+
+    return means;
+  }
+
+  @Override
+  public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distQ2) {
+    if(!(distQ2.getDistanceFactory() instanceof NumberDistance)) {
+      throw new AbortException("PAM initialization can only be used with numerical distances.");
+    }
+    @SuppressWarnings("unchecked")
+    DistanceQuery<? super V, D> distQ = (DistanceQuery<? super V, D>) distQ2;
+    // Chose first mean
+    ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
+
+    Random random = (seed != null) ? new Random(seed) : new Random();
+    DBID first = DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, random.nextLong()).iterator().next();
+    means.add(first);
+
+    ArrayDBIDs ids = DBIDUtil.ensureArray(distQ.getRelation().getDBIDs());
+    // Initialize weights
+    double[] weights = new double[ids.size()];
+    double weightsum = initialWeights(weights, ids, first, distQ);
+    while(means.size() < k) {
+      if(weightsum > Double.MAX_VALUE) {
+        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - too many data points, too large squared distances?");
+      }
+      if(weightsum < Double.MIN_NORMAL) {
+        LoggingUtil.warning("Could not choose a reasonable mean for k-means++ - to few data points?");
+      }
+      double r = random.nextDouble() * weightsum;
+      int pos = 0;
+      while(r > 0 && pos < weights.length) {
+        r -= weights[pos];
+        pos++;
+      }
+      // Add new mean:
+      DBID newmean = ids.get(pos);
+      means.add(newmean);
+      // Update weights:
+      weights[pos] = 0.0;
+      weightsum = updateWeights(weights, ids, newmean, distQ);
     }
 
     return means;
@@ -133,7 +173,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double initialWeights(double[] weights, ArrayDBIDs ids, DBID latest, DistanceQuery<V, D> distQ) {
+  protected double initialWeights(double[] weights, ArrayDBIDs ids, DBID latest, DistanceQuery<? super V, D> distQ) {
     double weightsum = 0.0;
     DBIDIter it = ids.iter();
     for(int i = 0; i < weights.length; i++, it.advance()) {
@@ -159,7 +199,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
    * @param distQ Distance query
    * @return Weight sum
    */
-  protected double updateWeights(double[] weights, ArrayDBIDs ids, DBID latest, DistanceQuery<V, D> distQ) {
+  protected double updateWeights(double[] weights, ArrayDBIDs ids, DBID latest, DistanceQuery<? super V, D> distQ) {
     double weightsum = 0.0;
     DBIDIter it = ids.iter();
     for(int i = 0; i < weights.length; i++, it.advance()) {
