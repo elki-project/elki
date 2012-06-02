@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.PAMInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyChosenInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FirstKInitialMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansPlusPlusInitialMeans

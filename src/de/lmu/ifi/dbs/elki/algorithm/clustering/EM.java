@@ -170,28 +170,31 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     if(logger.isVerbose()) {
       logger.verbose("initializing " + k + " models");
     }
-    List<Vector> means = initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC);
+    List<Vector> means = new ArrayList<Vector>();
+    for(NumberVector<?, ?> nv : initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC)) {
+      means.add(nv.getColumnVector());
+    }
     List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
-    List<Double> normDistrFactor = new ArrayList<Double>(k);
+    double[] normDistrFactor = new double[k];
     List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
-    List<Double> clusterWeights = new ArrayList<Double>(k);
+    double[] clusterWeights = new double[k];
     probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
     final int dimensionality = means.get(0).getDimensionality();
     for(int i = 0; i < k; i++) {
       Matrix m = Matrix.identity(dimensionality, dimensionality);
       covarianceMatrices.add(m);
-      normDistrFactor.add(1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * m.det()));
+      normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * m.det());
       invCovMatr.add(m.inverse());
-      clusterWeights.add(1.0 / k);
+      clusterWeights[i] = 1.0 / k;
       if(logger.isDebuggingFinest()) {
         StringBuffer msg = new StringBuffer();
         msg.append(" model ").append(i).append(":\n");
         msg.append(" mean:    ").append(means.get(i)).append("\n");
         msg.append(" m:\n").append(FormatUtil.format(m, "        ")).append("\n");
         msg.append(" m.det(): ").append(m.det()).append("\n");
-        msg.append(" cluster weight: ").append(clusterWeights.get(i)).append("\n");
-        msg.append(" normDistFact:   ").append(normDistrFactor.get(i)).append("\n");
+        msg.append(" cluster weight: ").append(clusterWeights[i]).append("\n");
+        msg.append(" normDistFact:   ").append(normDistrFactor[i]).append("\n");
         logger.debugFine(msg.toString());
       }
     }
@@ -216,7 +219,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       double[] sumOfClusterProbabilities = new double[k];
 
       for(int i = 0; i < k; i++) {
-        clusterWeights.set(i, 0.0);
+        clusterWeights[i] = 0.0;
         meanSums.add(new Vector(dimensionality));
         covarianceMatrices.set(i, Matrix.zeroMatrix(dimensionality));
       }
@@ -233,7 +236,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
       final int n = relation.size();
       for(int i = 0; i < k; i++) {
-        clusterWeights.set(i, sumOfClusterProbabilities[i] / n);
+        clusterWeights[i] = sumOfClusterProbabilities[i] / n;
         Vector newMean = meanSums.get(i).timesEquals(1 / sumOfClusterProbabilities[i]);
         means.set(i, newMean);
       }
@@ -250,7 +253,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         covarianceMatrices.set(i, covarianceMatrices.get(i).times(1 / sumOfClusterProbabilities[i]).cheatToAvoidSingularity(SINGULARITY_CHEAT));
       }
       for(int i = 0; i < k; i++) {
-        normDistrFactor.set(i, 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * covarianceMatrices.get(i).det()));
+        normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * covarianceMatrices.get(i).det());
         invCovMatr.set(i, covarianceMatrices.get(i).inverse());
       }
       // reassign probabilities
@@ -309,25 +312,25 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * @param clusterWeights the weights of the current clusters
    * @return the expectation value of the current mixture of distributions
    */
-  protected double assignProbabilitiesToInstances(Relation<V> database, List<Double> normDistrFactor, List<Vector> means, List<Matrix> invCovMatr, List<Double> clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
+  protected double assignProbabilitiesToInstances(Relation<V> database, double[] normDistrFactor, List<Vector> means, List<Matrix> invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
     double emSum = 0.0;
 
     for(DBID id : database.iterDBIDs()) {
       Vector x = database.get(id).getColumnVector();
-      List<Double> probabilities = new ArrayList<Double>(k);
+      double[] probabilities = new double[k];
       for(int i = 0; i < k; i++) {
         Vector difference = x.minus(means.get(i));
         double rowTimesCovTimesCol = difference.transposeTimesTimes(invCovMatr.get(i), difference);
         double power = rowTimesCovTimesCol / 2.0;
-        double prob = normDistrFactor.get(i) * Math.exp(-power);
+        double prob = normDistrFactor[i] * Math.exp(-power);
         if(logger.isDebuggingFinest()) {
           logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
         }
-        probabilities.add(prob);
+        probabilities[i] = prob;
       }
       double priorProbability = 0.0;
       for(int i = 0; i < k; i++) {
-        priorProbability += probabilities.get(i) * clusterWeights.get(i);
+        priorProbability += probabilities[i] * clusterWeights[i];
       }
       double logP = Math.max(Math.log(priorProbability), MIN_LOGLIKELIHOOD);
       if(!Double.isNaN(logP)) {
@@ -337,13 +340,13 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       double[] clusterProbabilities = new double[k];
       for(int i = 0; i < k; i++) {
         assert (priorProbability >= 0.0);
-        assert (clusterWeights.get(i) >= 0.0);
+        assert (clusterWeights[i] >= 0.0);
         // do not divide by zero!
         if(priorProbability == 0.0) {
           clusterProbabilities[i] = 0.0;
         }
         else {
-          clusterProbabilities[i] = probabilities.get(i) / priorProbability * clusterWeights.get(i);
+          clusterProbabilities[i] = probabilities[i] / priorProbability * clusterWeights[i];
         }
       }
       probClusterIGivenX.put(id, clusterProbabilities);

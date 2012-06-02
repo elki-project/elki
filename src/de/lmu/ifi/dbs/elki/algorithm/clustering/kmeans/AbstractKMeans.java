@@ -98,6 +98,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
+   * @param initializer Function to generate the initial means
    */
   public AbstractKMeans(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction);
@@ -115,7 +116,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param clusters cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, List<Vector> means, List<? extends ModifiableDBIDs> clusters) {
+  protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector<?, ?>> means, List<? extends ModifiableDBIDs> clusters) {
     boolean changed = false;
 
     if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
@@ -189,7 +190,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<Vector> means, Relation<V> database) {
+  protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?, ?>> means, Relation<V> database) {
     List<Vector> newMeans = new ArrayList<Vector>(k);
     for(int i = 0; i < k; i++) {
       ModifiableDBIDs list = clusters.get(i);
@@ -204,7 +205,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
         }
       }
       else {
-        mean = means.get(i);
+        mean = means.get(i).getColumnVector();
       }
       newMeans.add(mean);
     }
@@ -219,25 +220,24 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> medians(List<? extends ModifiableDBIDs> clusters, List<Vector> medians, Relation<V> database) {
+  protected List<NumberVector<?, ?>> medians(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?, ?>> medians, Relation<V> database) {
     final int dim = medians.get(0).getDimensionality();
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
-    List<Vector> newMedians = new ArrayList<Vector>(k);
+    List<NumberVector<?, ?>> newMedians = new ArrayList<NumberVector<?, ?>>(k);
     for(int i = 0; i < k; i++) {
       ArrayModifiableDBIDs list = DBIDUtil.newArray(clusters.get(i));
-      Vector mean = null;
       if(list.size() > 0) {
-        mean = new Vector(dim);
-        for (int d = 0; d < dim; d++) {
+        Vector mean = new Vector(dim);
+        for(int d = 0; d < dim; d++) {
           sorter.setDimension(d + 1);
           DBID id = QuickSelect.median(list, sorter);
           mean.set(d, database.get(id).doubleValue(d + 1));
         }
+        newMedians.add(mean);
       }
       else {
-        mean = medians.get(i);
+        newMedians.add((NumberVector<?, ?>) medians.get(i));
       }
-      newMedians.add(mean);
     }
     return newMedians;
   }
