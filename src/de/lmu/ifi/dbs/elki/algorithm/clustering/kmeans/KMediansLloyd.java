@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> distance value type
  */
 @Title("K-Medians")
-@Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems")
+@Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url="http://nips.djvuzone.org/djvu/nips09/0368.djvu")
 public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * The logger for this class.
