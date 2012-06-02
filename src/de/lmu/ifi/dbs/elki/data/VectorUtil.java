@@ -24,9 +24,12 @@ package de.lmu.ifi.dbs.elki.data;
  */
 
 import java.util.BitSet;
+import java.util.Comparator;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -267,5 +270,97 @@ public final class VectorUtil {
       result += d1.doubleValue(i) * d2.doubleValue(i);
     }
     return result;
+  }
+
+  /**
+   * Compare number vectors by a single dimension
+   * 
+   * @author Erich Schubert
+   */
+  public static class SortDBIDsBySingleDimension implements Comparator<DBID> {
+    /**
+     * Dimension to sort with
+     */
+    public int d;
+
+    /**
+     * The relation to sort.
+     */
+    private Relation<? extends NumberVector<?, ?>> data;
+
+    /**
+     * Constructor.
+     * 
+     * @param data Vector data source
+     */
+    public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?, ?>> data) {
+      super();
+      this.data = data;
+    };
+
+    /**
+     * Get the dimension to sort by
+     * 
+     * @return Dimension to sort with
+     */
+    public int getDimension() {
+      return this.d;
+    }
+
+    /**
+     * Set the dimension to sort by
+     * 
+     * @param d Dimension to sort with
+     */
+    public void setDimension(int d) {
+      this.d = d;
+    }
+
+    @Override
+    public int compare(DBID id1, DBID id2) {
+      return Double.compare(data.get(id1).doubleValue(d), data.get(id2).doubleValue(d));
+    }
+  }
+
+  /**
+   * Compare number vectors by a single dimension
+   * 
+   * @author Erich Schubert
+   */
+  public static class SortVectorsBySingleDimension implements Comparator<NumberVector<?, ?>> {
+    /**
+     * Dimension to sort with
+     */
+    public int d;
+
+    /**
+     * Constructor.
+     */
+    public SortVectorsBySingleDimension() {
+      super();
+    };
+
+    /**
+     * Get the dimension to sort by
+     * 
+     * @return Dimension to sort with
+     */
+    public int getDimension() {
+      return this.d;
+    }
+
+    /**
+     * Set the dimension to sort by
+     * 
+     * @param d Dimension to sort with
+     */
+    public void setDimension(int d) {
+      this.d = d;
+    }
+
+    @Override
+    public int compare(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+      return Double.compare(o1.doubleValue(d), o2.doubleValue(d));
+    }
   }
 }
