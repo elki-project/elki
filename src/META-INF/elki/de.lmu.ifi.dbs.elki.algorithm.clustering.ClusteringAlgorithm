@@ -4,6 +4,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
 de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi
 de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH
