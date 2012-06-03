@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,8 +33,8 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
@@ -62,13 +63,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 /**
  * Visualizer drawing Voronoi cells for k-means clusterings.
  * 
- * See also: {@link de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd KMeans
- * clustering}
+ * See also: {@link de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
+ * KMeans clustering}
  * 
  * @author Robert Rödler
  * @author Erich Schubert
  * 
  * @apiviz.has MeanModel oneway - - visualizes
+ * @apiviz.has MedoidModel oneway - - visualizes
  */
 public class VoronoiVisualization extends AbstractScatterplotVisualization {
   /**
@@ -95,7 +97,7 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
   /**
    * The result we work on
    */
-  Clustering<MeanModel<? extends NumberVector<?, ?>>> clustering;
+  Clustering<Model> clustering;
 
   /**
    * The Voronoi diagram
@@ -123,7 +125,7 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
   @Override
   protected void redraw() {
     addCSSClasses(svgp);
-    final List<Cluster<MeanModel<? extends NumberVector<?, ?>>>> clusters = clustering.getAllClusters();
+    final List<Cluster<Model>> clusters = clustering.getAllClusters();
 
     if(clusters.size() < 2) {
       return;
@@ -133,8 +135,22 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
     if(clusters.size() == 2) {
       ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
       {
-        for(Cluster<MeanModel<? extends NumberVector<?, ?>>> clus : clusters) {
-          means.add(clus.getModel().getMean().getColumnVector().getArrayRef());
+        for(Cluster<Model> clus : clusters) {
+          Model model = clus.getModel();
+          double[] mean;
+          if(model instanceof MeanModel) {
+            @SuppressWarnings("unchecked")
+            MeanModel<? extends NumberVector<?, ?>> mmodel = (MeanModel<? extends NumberVector<?, ?>>) model;
+            mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
+          }
+          else if(model instanceof MedoidModel) {
+            MedoidModel mmodel = (MedoidModel) model;
+            mean = proj.fastProjectDataToRenderSpace(rel.get(mmodel.getMedoid()));
+          }
+          else {
+            continue;
+          }
+          means.add(mean);
         }
       }
       if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
@@ -143,7 +159,7 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
         layer.appendChild(path);
       }
       if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
-        Element path = new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0))).drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
+        Element path = new SVGPath(means.get(0)).drawTo(means.get(1)).makeElement(svgp);
         SVGUtil.addCSSClass(path, KMEANSBORDER);
         layer.appendChild(path);
       }
@@ -152,10 +168,23 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
       ArrayList<Vector> vmeans = new ArrayList<Vector>(clusters.size());
       ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
       {
-        for(Cluster<MeanModel<? extends NumberVector<?, ?>>> clus : clusters) {
-          Vector v = clus.getModel().getMean().getColumnVector();
-          vmeans.add(v);
-          means.add(v.getArrayRef());
+        for(Cluster<Model> clus : clusters) {
+          Model model = clus.getModel();
+          Vector mean;
+          if(model instanceof MeanModel) {
+            @SuppressWarnings("unchecked")
+            MeanModel<? extends NumberVector<?, ?>> mmodel = (MeanModel<? extends NumberVector<?, ?>>) model;
+            mean = mmodel.getMean().getColumnVector();
+          }
+          else if(model instanceof MedoidModel) {
+            MedoidModel mmodel = (MedoidModel) model;
+            mean = rel.get(mmodel.getMedoid()).getColumnVector();
+          }
+          else {
+            continue;
+          }
+          vmeans.add(mean);
+          means.add(mean.getArrayRef());
         }
       }
       // Compute Delaunay Triangulation
@@ -239,8 +268,7 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
       for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
-          Clustering<MeanModel<? extends NumberVector<?, ?>>> mcls = findMeanModel(c);
-          if(mcls != null) {
+          if(testMeanModel(c)) {
             IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
             for(ScatterPlotProjector<?> p : ps) {
               if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
@@ -259,15 +287,17 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
      * Test if the given clustering has a mean model.
      * 
      * @param c Clustering to inspect
-     * @return the clustering cast to return a mean model, null otherwise.
+     * @return true when the clustering has a mean or medoid model.
      */
-    @SuppressWarnings("unchecked")
-    private static Clustering<MeanModel<? extends NumberVector<?, ?>>> findMeanModel(Clustering<?> c) {
-      final Model firstModel = c.getAllClusters().get(0).getModel();
-      if(firstModel instanceof MeanModel<?> && !(firstModel instanceof EMModel<?>)) {
-        return (Clustering<MeanModel<? extends NumberVector<?, ?>>>) c;
+    private static boolean testMeanModel(Clustering<?> c) {
+      Model firstmodel = c.getAllClusters().get(0).getModel();
+      if(firstmodel instanceof MeanModel<?>) {
+        return true;
       }
-      return null;
+      if(firstmodel instanceof MedoidModel) {
+        return true;
+      }
+      return false;
     }
 
     /**
