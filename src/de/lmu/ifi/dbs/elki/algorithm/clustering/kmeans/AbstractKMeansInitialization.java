@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * 
  * @param <V> Vector type
  */
-public abstract class AbstractKMeansInitialization<V extends NumberVector<V, ?>> implements KMeansInitialization<V> {
+public abstract class AbstractKMeansInitialization<V> implements KMeansInitialization<V> {
   /**
    * Holds the value of {@link KMeansLloyd#SEED_ID}.
    */
@@ -56,7 +55,7 @@ public abstract class AbstractKMeansInitialization<V extends NumberVector<V, ?>>
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<V> extends AbstractParameterizer {
     protected Long seed;
 
     @Override

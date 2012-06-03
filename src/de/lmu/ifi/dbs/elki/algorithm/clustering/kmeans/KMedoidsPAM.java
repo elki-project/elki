@@ -31,8 +31,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -77,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("Partioning Around Medoids")
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
@@ -106,7 +105,7 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends NumberDistance<
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAM(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsPAM(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -119,11 +118,10 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends NumberDistance<
    * @param database Database
    * @param relation relation to use
    * @return result
-   * @throws IllegalStateException
    */
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<MedoidModel> run(Database database, Relation<V> relation)  {
     if(relation.size() <= 0) {
-      return new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
+      return new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
     }
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     // Choose initial medoids
@@ -174,10 +172,10 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends NumberDistance<
     }
 
     // Wrap result
-    Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Medoids Clustering", "kmedoids-clustering");
+    Clustering<MedoidModel> result = new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<V>(relation.get(medoids.get(i)));
-      result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
+      MedoidModel model = new MedoidModel(medoids.get(i));
+      result.addCluster(new Cluster<MedoidModel>(clusters.get(i), model));
     }
     return result;
   }
@@ -240,7 +238,7 @@ public class KMedoidsPAM<V extends NumberVector<V, ?>, D extends NumberDistance<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
+  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
     protected int k;
 
     protected int maxiter;

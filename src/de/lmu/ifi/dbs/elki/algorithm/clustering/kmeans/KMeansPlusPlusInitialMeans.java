@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -59,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <D> Distance type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", title = "k-means++: the advantages of careful seeding", booktitle = "Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2007", url = "http://dx.doi.org/10.1145/1283383.1283494")
-public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
+public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
   /**
    * Constructor.
    * 
@@ -244,7 +243,7 @@ public class KMeansPlusPlusInitialMeans<V extends NumberVector<V, ?>, D extends 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
     protected KMeansPlusPlusInitialMeans<V, D> makeInstance() {
       return new KMeansPlusPlusInitialMeans<V, D>(seed);

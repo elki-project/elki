@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
@@ -52,8 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * in: Statistical Data Analysis Based on the L_1–Norm and Related Methods
  * </p>
  * 
- * TODO: loosen type restrictions for use with arbitrary dissimilarities.
- * 
  * TODO: enforce using a distance matrix?
  * 
  * @author Erich Schubert
@@ -62,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <D> Distance type
  */
 @Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
+public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
   /**
    * Constructor.
    */
@@ -178,7 +175,7 @@ public class PAMInitialMeans<V extends NumberVector<V, ?>, D extends NumberDista
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
     @Override
     protected PAMInitialMeans<V, D> makeInstance() {
       return new PAMInitialMeans<V, D>();
