@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -53,10 +52,10 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<V, ?>> extends
   }
 
   @Override
-  public List<Vector> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
+  public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     final int dim = DatabaseUtil.dimensionality(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
-    List<Vector> means = new ArrayList<Vector>(k);
+    List<V> means = new ArrayList<V>(k);
     final Random random = (this.seed != null) ? new Random(this.seed) : new Random();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
@@ -64,11 +63,10 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<V, ?>> extends
       for(int d = 0; d < dim; d++) {
         r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
       }
-      means.add(new Vector(r));
+      means.add(minmax.first.newNumberVector(r));
     }
     return means;
   }
-
 
   /**
    * Parameterization class.
@@ -78,7 +76,6 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<V, ?>> extends
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
-
     @Override
     protected RandomlyGeneratedInitialMeans<V> makeInstance() {
       return new RandomlyGeneratedInitialMeans<V>(seed);

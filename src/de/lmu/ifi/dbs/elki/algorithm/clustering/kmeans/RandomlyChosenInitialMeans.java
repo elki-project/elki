@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * 
  * @param <V> Vector type
  */
-public class RandomlyChosenInitialMeans<V extends NumberVector<V, ?>> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
+public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<V> implements KMedoidsInitialization<V> {
   /**
    * Constructor.
    * 
@@ -73,7 +72,7 @@ public class RandomlyChosenInitialMeans<V extends NumberVector<V, ?>> extends Ab
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
+  public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer<V> {
 
     @Override
     protected RandomlyChosenInitialMeans<V> makeInstance() {

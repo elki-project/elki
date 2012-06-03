@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @param <V> Vector type
  */
-public class FirstKInitialMeans<V extends NumberVector<V, ?>> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
+public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsInitialization<V> {
   /**
    * Constructor.
    */

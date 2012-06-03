@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  */
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 
@@ -44,5 +43,5 @@ public interface KMeansInitialization<V> {
    * @param distanceFunction Distance function 
    * @return List of chosen means for k-means
    */
-  public abstract List<? extends NumberVector<?, ?>> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction);
+  public abstract List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction);
 }
