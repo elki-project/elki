@@ -6,6 +6,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
 de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.HiCO
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC
 de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD

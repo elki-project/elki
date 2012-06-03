@@ -35,22 +35,17 @@ import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -58,15 +53,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Provides the k-medoids clustering algorithm, using the
+ * Provides the k-medoids clustering algorithm, using a "bulk" variation of the
  * "Partitioning Around Medoids" approach.
  * 
- * Reference:
- * <p>
- * Clustering my means of Medoids<br />
- * Kaufman, L. and Rousseeuw, P.J.<br />
- * in: Statistical Data Analysis Based on the L_1–Norm and Related Methods
- * </p>
+ * In contrast to PAM, which will in each iteration update one medoid with one
+ * (arbitrary) non-medoid, this implementation follows the EM pattern. In the
+ * expectation step, the best medoid from the cluster members is chosen; in the
+ * M-step, the objects are reassigned to their nearest medoid.
+ * 
+ * We do not have a reference for this algorithm. It borrows ideas from EM and
+ * PAM. If needed, you are welcome cite it using the latest ELKI publication
+ * (this variation is likely not worth publishing on its own).
  * 
  * @author Erich Schubert
  * 
@@ -75,13 +72,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> vector datatype
  * @param <D> distance value type
  */
-@Title("Partioning Around Medoids")
-@Reference(title = "Clustering my means of Medoids", authors = "Kaufman, L. and Rousseeuw, P.J.", booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
-public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
+public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KMedoidsPAM.class);
+  private static final Logging logger = Logging.getLogger(KMedoidsEM.class);
 
   /**
    * Holds the value of {@link AbstractKMeans#K_ID}.
@@ -106,7 +101,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public KMedoidsPAM(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
+  public KMedoidsEM(PrimitiveDistanceFunction<? super V, D> distanceFunction, int k, int maxiter, KMedoidsInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -125,7 +120,6 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
       return new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
     }
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, getDistanceFunction());
-    DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, distQ));
     // Setup cluster assignment store
@@ -133,72 +127,43 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
+    Mean[] mdists = Mean.newArray(k);
 
-    WritableDoubleDataStore second = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // Initial assignment to nearest medoids
     // TODO: reuse this information, from the build phase, when possible?
-    assignToNearestCluster(medoids, ids, second, clusters, distQ);
+    assignToNearestCluster(medoids, mdists, clusters, distQ);
 
     // Swap phase
     boolean changed = true;
     while(changed) {
       changed = false;
       // Try to swap the medoid with a better cluster member:
-      double best = 0;
-      DBID bestid = null;
-      int bestcluster = -1;
       for(int i = 0; i < k; i++) {
         DBID med = medoids.get(i);
-        for(DBID cand : clusters.get(i)) { // O_p
-          if(med.equals(cand)) {
+        DBID best = null;
+        Mean bestm = mdists[i];
+        for(DBID id : clusters.get(i)) {
+          if(med.equals(id)) {
             continue;
           }
-          // double disti = distQ.distance(id, med).doubleValue();
-          double cost = 0;
-          for(int j = 0; j < k; j++) {
-            for(DBID other : clusters.get(j)) {
-              double distcur = distQ.distance(other, medoids.get(j)).doubleValue();
-              double distnew = distQ.distance(other, cand).doubleValue();
-              if(j == i) {
-                // Cases 1 and 2.
-                double distsec = second.doubleValue(other);
-                if(distcur > distsec) {
-                  // Case 1, other would switch to a third medoid
-                  cost += distsec - distcur; // Always positive!
-                }
-                else { // Would remain with the candidate
-                  cost += distnew - distcur; // Could be negative
-                }
-              }
-              else {
-                // Cases 3-4: objects from other clusters
-                if (distcur < distnew) {
-                  // Case 3: no change
-                } else {
-                  // Case 4: would switch to new medoid
-                  cost += distnew - distcur; // Always negative
-                }
-              }
-            }
+          Mean mdist = new Mean();
+          for(DBID other : clusters.get(i)) {
+            mdist.put(distQ.distance(id, other).doubleValue());
           }
-          if (cost < best) {
-            best = cost;
-            bestid = cand;
-            bestcluster = i;
+          if(mdist.getMean() < bestm.getMean()) {
+            best = id;
+            bestm = mdist;
           }
         }
-      }
-      if(logger.isDebugging()) {
-        logger.debug("Best cost: " + best);
-      }
-      if(bestid != null) {
-        changed = true;
-        medoids.set(bestcluster, bestid);
+        if(best != null && !med.equals(best)) {
+          changed = true;
+          medoids.set(i, best);
+          mdists[i] = bestm;
+        }
       }
       // Reassign
       if(changed) {
-        // TODO: can we save some of these recomputations?
-        assignToNearestCluster(medoids, ids, second, clusters, distQ);
+        assignToNearestCluster(medoids, mdists, clusters, distQ);
       }
     }
 
@@ -216,42 +181,38 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
    * 
    * @param relation the database to cluster
-   * @param ids Object ids
-   * @param second Distance to second nearest medoid
+   * @param means a list of k means
    * @param clusters cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {
+  protected boolean assignToNearestCluster(ArrayDBIDs means, Mean[] mdist, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {
     boolean changed = false;
 
+    double[] dists = new double[k];
     for(DBID id : distQ.getRelation().iterDBIDs()) {
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
-      double mindist2 = Double.POSITIVE_INFINITY;
       for(int i = 0; i < k; i++) {
-        double dist = distQ.distance(id, means.get(i)).doubleValue();
-        if(dist < mindist) {
+        dists[i] = distQ.distance(id, means.get(i)).doubleValue();
+        if(dists[i] < mindist) {
           minIndex = i;
-          mindist2 = mindist;
-          mindist = dist;
-        }
-        else if(dist < mindist2) {
-          mindist2 = dist;
+          mindist = dists[i];
         }
       }
       if(clusters.get(minIndex).add(id)) {
         changed = true;
+        mdist[minIndex].put(mindist);
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for(int i = 0; i < k; i++) {
           if(i != minIndex) {
             if(clusters.get(i).remove(id)) {
+              mdist[minIndex].put(dists[i], -1);
               break;
             }
           }
         }
       }
-      second.put(id, mindist2);
     }
     return changed;
   }
@@ -300,8 +261,8 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     }
 
     @Override
-    protected KMedoidsPAM<V, D> makeInstance() {
-      return new KMedoidsPAM<V, D>(distanceFunction, k, maxiter, initializer);
+    protected KMedoidsEM<V, D> makeInstance() {
+      return new KMedoidsEM<V, D>(distanceFunction, k, maxiter, initializer);
     }
   }
 }
