@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
+import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -59,6 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Heidi Kolb
  * 
  * @apiviz.has MeanModel oneway - - visualizes
+ * @apiviz.has MedoidModel oneway - - visualizes
  */
 public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
   /**
@@ -84,7 +87,7 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
   /**
    * Clustering to visualize.
    */
-  Clustering<MeanModel<? extends NumberVector<?, ?>>> clustering;
+  Clustering<Model> clustering;
 
   /**
    * Draw stars
@@ -111,10 +114,23 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
     MarkerLibrary ml = context.getStyleLibrary().markers();
     double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
 
-    Iterator<Cluster<MeanModel<? extends NumberVector<?, ?>>>> ci = clustering.getAllClusters().iterator();
+    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
     for(int cnum = 0; ci.hasNext(); cnum++) {
-      Cluster<MeanModel<? extends NumberVector<?, ?>>> clus = ci.next();
-      double[] mean = proj.fastProjectDataToRenderSpace(clus.getModel().getMean());
+      Cluster<Model> clus = ci.next();
+      Model model = clus.getModel();
+      double[] mean;
+      if(model instanceof MeanModel) {
+        @SuppressWarnings("unchecked")
+        MeanModel<? extends NumberVector<?, ?>> mmodel = (MeanModel<? extends NumberVector<?, ?>>) model;
+        mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
+      }
+      else if(model instanceof MedoidModel) {
+        MedoidModel mmodel = (MedoidModel) model;
+        mean = proj.fastProjectDataToRenderSpace(rel.get(mmodel.getMedoid()));
+      }
+      else {
+        continue;
+      }
 
       // add a greater Marker for the mean
       Element meanMarker = ml.useMarker(svgp, layer, mean[0], mean[1], cnum, marker_size * 3);
@@ -163,7 +179,7 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
     if(stars) {
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
-      Iterator<Cluster<MeanModel<? extends NumberVector<?, ?>>>> ci = clustering.getAllClusters().iterator();
+      Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; ci.hasNext(); cnum++) {
         ci.next();
         if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
@@ -224,8 +240,7 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
         Clustering<?> c = clusterings.next();
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
-          Clustering<MeanModel<? extends NumberVector<?, ?>>> mcls = findMeanModel(c);
-          if(mcls != null) {
+          if(testMeanModel(c)) {
             Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
             while(ps.hasNext()) {
               ScatterPlotProjector<?> p = ps.next();
@@ -243,14 +258,17 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
      * Test if the given clustering has a mean model.
      * 
      * @param c Clustering to inspect
-     * @return the clustering cast to return a mean model, null otherwise.
+     * @return true when the clustering has a mean or medoid model.
      */
-    @SuppressWarnings("unchecked")
-    private static Clustering<MeanModel<? extends NumberVector<?, ?>>> findMeanModel(Clustering<?> c) {
-      if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
-        return (Clustering<MeanModel<? extends NumberVector<?, ?>>>) c;
+    private static boolean testMeanModel(Clustering<?> c) {
+      Model firstmodel = c.getAllClusters().get(0).getModel();
+      if(firstmodel instanceof MeanModel<?>) {
+        return true;
       }
-      return null;
+      if(firstmodel instanceof MedoidModel) {
+        return true;
+      }
+      return false;
     }
 
     /**
