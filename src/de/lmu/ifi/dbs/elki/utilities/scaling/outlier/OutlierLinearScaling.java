@@ -56,7 +56,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
   public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("linearscale.min", "Fixed minimum to use in linear scaling.");
 
   /**
-   * Parameter to specify the maximum value
+   * Parameter to specify the maximum value.
    * <p>
    * Key: {@code -linearscale.max}
    * </p>
