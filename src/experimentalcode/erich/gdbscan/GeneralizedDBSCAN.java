@@ -23,9 +23,10 @@ package experimentalcode.erich.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 
-import ca.odell.glazedlists.impl.adt.gnutrove.TIntArrayList;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
