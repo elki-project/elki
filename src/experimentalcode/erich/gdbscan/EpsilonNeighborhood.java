@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -48,10 +49,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * The default DBSCAN and OPTICS neighbor predicate, using an
  * epsilon-neighborhood.
  * 
+ * <p>
+ * Reference: <br>
+ * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for
+ * Discovering Clusters in Large Spatial Databases with Noise. <br>
+ * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
+ * Portland, OR, 1996.
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @param <D> Distance type
  */
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
 public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPredicate {
   /**
    * Range to query with

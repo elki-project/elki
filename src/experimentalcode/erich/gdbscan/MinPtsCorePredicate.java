@@ -26,6 +26,7 @@ package experimentalcode.erich.gdbscan;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -34,10 +35,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * The DBSCAN default core point predicate -- having at least {@link #minpts}
  * neighbors.
  * 
+ * <p>
+ * Reference: <br>
+ * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu: A Density-Based Algorithm for
+ * Discovering Clusters in Large Spatial Databases with Noise. <br>
+ * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
+ * Portland, OR, 1996.
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.has Instance
  */
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
 public class MinPtsCorePredicate implements CorePredicate {
   /**
    * The minpts parameter.
