@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -158,10 +160,14 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
       }
       subspace.set(i);
       final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(subspace);
-      final DoubleDistance range = new DoubleDistance(kernel.adjustedEps(kernel.dim));
+      final double adjustedEps = kernel.adjustedEps(kernel.dim);
+      // Query with a larger window, to also get neighbors of neighbors
+      // Subspace euclidean is metric!
+      final DoubleDistance range = new DoubleDistance(adjustedEps * 2);
       RangeQuery<V, DoubleDistance> rq = QueryUtil.getRangeQuery(kernel.relation, df, range);
 
-      List<DistanceResultPair<DoubleDistance>> neigh = rq.getRangeForDBID(id, range);
+      List<DistanceResultPair<DoubleDistance>> neighc = rq.getRangeForDBID(id, range);
+      List<DoubleDistanceResultPair> neigh = refineRange(neighc, adjustedEps);
       if(neigh.size() > 2) {
         // Relevance test
         if(relevantSubspace(subspace, neigh, kernel)) {
@@ -169,8 +175,8 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
           final double deviation;
           // Compute mean and standard deviation for densities of neighbors.
           MeanVariance meanv = new MeanVariance();
-          for(DistanceResultPair<DoubleDistance> pair : neigh) {
-            List<DistanceResultPair<DoubleDistance>> n2 = rq.getRangeForDBID(pair.getDBID(), range);
+          for(DoubleDistanceResultPair pair : neigh) {
+            List<DoubleDistanceResultPair> n2 = subsetNeighborhoodQuery(neighc, pair.getDBID(), df, adjustedEps, kernel);
             meanv.put(kernel.subspaceDensity(subspace, n2));
           }
           deviation = (meanv.getMean() - density) / (2. * meanv.getSampleStddev());
@@ -188,6 +194,54 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
   }
 
   /**
+   * Refine a range query.
+   * 
+   * @param neighc Original result
+   * @param adjustedEps New epsilon
+   * @return refined list
+   */
+  private List<DoubleDistanceResultPair> refineRange(List<DistanceResultPair<DoubleDistance>> neighc, double adjustedEps) {
+    List<DoubleDistanceResultPair> n = new ArrayList<DoubleDistanceResultPair>(neighc.size());
+    // We don't have a guarantee for this list to be sorted
+    for (DistanceResultPair<DoubleDistance> p : neighc) {
+      if (p instanceof DoubleDistanceResultPair) {
+        if (((DoubleDistanceResultPair)p).getDoubleDistance() <= adjustedEps) {
+          n.add((DoubleDistanceResultPair)p);
+        }
+      } else {
+        double dist = p.getDistance().doubleValue();
+        if (dist <= adjustedEps) {
+          n.add(new DoubleDistanceResultPair(dist, p.getDBID()));
+        }
+      }
+    }
+    return n;
+  }
+
+  /**
+   * Refine neighbors within a subset.
+   * 
+   * @param neighc Neighbor candidates
+   * @param dbid Query object
+   * @param df distance function
+   * @param adjustedEps Epsilon range
+   * @param kernel Kernel
+   * @return Neighbors of neighbor object
+   */
+  private List<DoubleDistanceResultPair> subsetNeighborhoodQuery(List<DistanceResultPair<DoubleDistance>> neighc, DBID dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
+    List<DoubleDistanceResultPair> n = new ArrayList<DoubleDistanceResultPair>(neighc.size());
+    V query = kernel.relation.get(dbid);
+    for (DistanceResultPair<DoubleDistance> p : neighc) {
+      final DBID pid = p.getDBID();
+      double dist = df.doubleDistance(query, kernel.relation.get(pid));
+      if (dist <= adjustedEps) {
+        n.add(new DoubleDistanceResultPair(dist, pid));
+      }
+    }
+    return n;
+  }
+
+  /**
    * Subspace relevance test.
    * 
    * @param subspace Subspace to test
@@ -195,7 +249,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
    * @param kernel Kernel density estimator
    * @return relevance test result
    */
-  protected boolean relevantSubspace(BitSet subspace, List<DistanceResultPair<DoubleDistance>> neigh, KernelDensityEstimator kernel) {
+  protected boolean relevantSubspace(BitSet subspace, List<DoubleDistanceResultPair> neigh, KernelDensityEstimator kernel) {
     Relation<V> relation = kernel.relation;
     final double crit = K_S_CRITICAL001 / Math.sqrt(neigh.size());
 
@@ -204,7 +258,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
       double[] data = new double[neigh.size()];
       {
         int count = 0;
-        for(DistanceResultPair<DoubleDistance> object : neigh) {
+        for(DoubleDistanceResultPair object : neigh) {
           V vector = relation.get(object.getDBID());
           data[count] = vector.doubleValue(dim + 1);
           count++;
@@ -280,18 +334,12 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
      * @param neighbours Neighbor distance list
      * @return Density
      */
-    protected double subspaceDensity(BitSet subspace, List<DistanceResultPair<DoubleDistance>> neighbours) {
+    protected double subspaceDensity(BitSet subspace, List<DoubleDistanceResultPair> neighbours) {
       final double bandwidth = optimalBandwidth(subspace.cardinality());
 
-      // TODO: optimize by moving instanceof outside?
       double density = 0;
-      for(DistanceResultPair<DoubleDistance> pair : neighbours) {
-        if(pair instanceof DoubleDistanceResultPair) {
-          density += kernel.density(((DoubleDistanceResultPair) pair).getDoubleDistance() / bandwidth);
-        }
-        else {
-          density += kernel.density(pair.getDistance().doubleValue() / bandwidth);
-        }
+      for(DoubleDistanceResultPair pair : neighbours) {
+        density += kernel.density(pair.getDoubleDistance() / bandwidth);
       }
 
       return density / relation.size();
