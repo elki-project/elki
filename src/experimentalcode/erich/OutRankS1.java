@@ -133,8 +133,10 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("OutRank-S1", "OUTRANK_S1", TypeUtil.DOUBLE, score, ids);
-    OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY, 0);
-    return new OutlierResult(meta, scoreResult);
+    OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
+    OutlierResult res = new OutlierResult(meta, scoreResult);
+    res.addChildResult(clustering);
+    return res;
   }
 
   @Override
