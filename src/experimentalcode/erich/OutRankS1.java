@@ -57,7 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * OutRank: ranking outliers in high dimensional data.
  * 
- * Algorithm to score outliers based on a subspace clustering result.
+ * Algorithm to score outliers based on a subspace clustering result. This class
+ * implements score 1 of the OutRank publication, which is a score based on
+ * cluster sizes and cluster dimensionality.
  * 
  * Reference:
  * <p>
@@ -70,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  */
 @Title("OutRank: ranking outliers in high dimensional data")
-@Description("Ranking outliers in high dimensional data")
+@Description("Ranking outliers in high dimensional data - score 1")
 @Reference(authors = "Emmanuel Müller, Ira Assent, Uwe Steinhausen, Thomas Seidl", title = "OutRank: ranking outliers in high dimensional data", booktitle = "Proc. 24th Int. Conf. on Data Engineering (ICDE) Workshop on Ranking in Databases (DBRank), Cancun, Mexico", url = "http://dx.doi.org/10.1109/ICDEW.2008.4498387")
 public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
@@ -125,8 +127,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
       double reldim = cluster.getModel().getDimensions().cardinality() / (double) maxdim;
       // Process objects in the cluster
       for(DBID id : cluster.getIDs()) {
-        double prev = score.doubleValue(id);
-        double newscore = prev + alpha * relsize + (1 - alpha) * reldim;
+        double newscore = score.doubleValue(id) + alpha * relsize + (1 - alpha) * reldim;
         score.putDouble(id, newscore);
         minmax.put(newscore);
       }
