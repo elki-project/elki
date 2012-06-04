@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
 /*
  This file is part of ELKI:
