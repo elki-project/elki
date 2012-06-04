@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
- * Scaling that can map arbitrary values to a probability in the range of [0:1].
+ * Scaling that can map arbitrary values to a value in the range of [0:1].
  * 
  * Transformation is done by linear mapping onto 0:1 using the minimum and
  * maximum values.
@@ -53,7 +53,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.min}
    * </p>
    */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("linearscale.min", "Fixed minimum to use in lienar scaling.");
+  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("linearscale.min", "Fixed minimum to use in linear scaling.");
 
   /**
    * Parameter to specify the maximum value
