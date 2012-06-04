@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
@@ -261,7 +262,11 @@ public final class DBIDUtil {
     if(existing instanceof StaticDBIDs) {
       return (StaticDBIDs) existing;
     }
-    return new UnmodifiableDBIDs(existing);
+    if (existing instanceof ArrayDBIDs) {
+      return new UnmodifiableArrayDBIDs((ArrayDBIDs)existing);
+    } else {
+      return new UnmodifiableDBIDs(existing);
+    }
   }
 
   /**

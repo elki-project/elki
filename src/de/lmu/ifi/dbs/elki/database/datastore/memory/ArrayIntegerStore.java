@@ -28,6 +28,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * A class to answer representation queries using the stored Array.
@@ -68,6 +69,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
     super();
     this.data = new int[size];
     if (def != 0) {
+      LoggingUtil.warning("Fill: "+def);
       Arrays.fill(this.data, def);
     }
     this.idmap = idmap;
