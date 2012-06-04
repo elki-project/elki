@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
 /*
  This file is part of ELKI:
@@ -27,6 +27,7 @@ import java.util.BitSet;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
