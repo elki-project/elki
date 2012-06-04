@@ -252,8 +252,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         final DBID id = activeSet.remove(activeSet.size() - 1);
         clustersize += 1;
         // Assign object to cluster
-        final Integer oldclus = clusterids.putInt(id, clusterid);
-        if(oldclus == null) {
+        final int oldclus = clusterids.putInt(id, clusterid);
+        if(oldclus == -2) {
           // expandCluster again:
           // Evaluate Neighborhood predicate
           final DBIDs newneighbors = npred.getNeighborDBIDs(id);
