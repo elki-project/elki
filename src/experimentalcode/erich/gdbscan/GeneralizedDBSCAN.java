@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -156,21 +157,21 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", ids.size(), logger) : null;
       final IndefiniteProgress clusprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters", logger) : null;
       // (Temporary) store the cluster ID assigned.
-      final WritableIntegerDataStore clusterids = DataStoreFactory.FACTORY.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
+      final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -2);
       // Note: these are not exact!
       final TIntArrayList clustersizes = new TIntArrayList();
       // IDs to assign.
 
       // Implementation Note: using Integer objects should result in
       // reduced memory use in the HashMap!
-      final Integer noiseid = -1;
-      Integer clusterid = 0;
+      final int noiseid = -1;
+      int clusterid = 0;
       int clustersize = 0;
       int noisesize = 0;
       // Iterate over all objects in the database.
       for(DBID id : ids) {
         // Skip already processed ids.
-        if(clusterids.intValue(id) > -1) {
+        if(clusterids.intValue(id) > -2) {
           continue;
         }
         // Evaluate Neighborhood predicate
@@ -182,7 +183,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
           // start next cluster on next iteration.
           clustersizes.add(clustersize);
           clustersize = 0;
-          clusterid = clusterid + 1;
+          clusterid += 1;
           if(clusprogress != null) {
             clusprogress.setProcessed(clusterid, logger);
           }
