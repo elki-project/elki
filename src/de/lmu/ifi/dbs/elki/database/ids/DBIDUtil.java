@@ -194,6 +194,36 @@ public final class DBIDUtil {
   }
 
   /**
+   * Compute the set symmetric intersection of two sets.
+   * 
+   * @param first First set
+   * @param second Second set
+   * @param firstonly OUTPUT: elements only in first. MUST BE EMPTY
+   * @param intersection OUTPUT: elements in intersection. MUST BE EMPTY
+   * @param secondonly OUTPUT: elements only in second. MUST BE EMPTY
+   */
+  // TODO: optimize?
+  public static void symmetricIntersection(DBIDs first, DBIDs second, HashSetModifiableDBIDs firstonly, HashSetModifiableDBIDs intersection, HashSetModifiableDBIDs secondonly) {
+    if(first.size() > second.size()) {
+      symmetricIntersection(second, first, secondonly, intersection, firstonly);
+      return;
+    }
+    assert(firstonly.size() == 0) : "OUTPUT set should be empty!";
+    assert(intersection.size() == 0) : "OUTPUT set should be empty!";
+    assert(secondonly.size() == 0) : "OUTPUT set should be empty!";
+    // Initialize with second
+    secondonly.addDBIDs(second);
+    for(DBID id : first) {
+      // Try to remove
+      if(secondonly.remove(id)) {
+        intersection.add(id);
+      } else {
+        firstonly.add(id);
+      }
+    }
+  }
+
+  /**
    * Returns the union of the two specified collection of IDs.
    * 
    * @param ids1 the first collection
