@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
@@ -36,11 +36,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */
-public class ArrayDoubleStore implements WritableDoubleDataStore {
+public class ArrayIntegerStore implements WritableIntegerDataStore {
   /**
    * Data array
    */
-  private double[] data;
+  private int[] data;
 
   /**
    * DBID to index map
@@ -53,10 +53,10 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
    * @param size Size
    * @param idmap ID map
    */
-  public ArrayDoubleStore(int size, DataStoreIDMap idmap) {
-    this(size, idmap, Double.NaN);
+  public ArrayIntegerStore(int size, DataStoreIDMap idmap) {
+    this(size, idmap, 0);
   }
-
+  
   /**
    * Constructor.
    * 
@@ -64,10 +64,10 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
    * @param idmap ID map
    * @param def Default value
    */
-  public ArrayDoubleStore(int size, DataStoreIDMap idmap, double def) {
+  public ArrayIntegerStore(int size, DataStoreIDMap idmap, int def) {
     super();
-    this.data = new double[size];
-    if(def != 0) {
+    this.data = new int[size];
+    if (def != 0) {
       Arrays.fill(this.data, def);
     }
     this.idmap = idmap;
@@ -75,7 +75,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double get(DBID id) {
+  public Integer get(DBID id) {
     try {
       return data[idmap.map(id)];
     }
@@ -86,30 +86,30 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double put(DBID id, Double value) {
+  public Integer put(DBID id, Integer value) {
     final int off = idmap.map(id);
-    double ret = data[off];
+    int ret = data[off];
     data[off] = value;
     return ret;
   }
-
+  
   @Override
-  public double doubleValue(DBID id) {
+  public int intValue(DBID id) {
     return data[idmap.map(id)];
   }
 
   @Override
-  public double putDouble(DBID id, double value) {
+  public int putInt(DBID id, int value) {
     final int off = idmap.map(id);
-    final double ret = data[off];
+    final int ret = data[off];
     data[off] = value;
     return ret;
   }
 
   @Override
-  public double put(DBID id, double value) {
+  public int put(DBID id, int value) {
     final int off = idmap.map(id);
-    final double ret = data[off];
+    final int ret = data[off];
     data[off] = value;
     return ret;
   }

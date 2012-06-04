@@ -91,6 +91,38 @@ public interface DataStoreFactory {
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints);
 
   /**
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @param def Default value
+   * @return new data store
+   */
+  public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def);
+
+  /**
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @return new data store
+   */
+  public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints);
+
+  /**
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @param def Default value
+   * @return new data store
+   */
+  public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def);
+
+  /**
    * Make a new record storage, to associate the given ids with an object of
    * class dataclass.
    * 

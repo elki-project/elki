@@ -59,6 +59,41 @@ public final class DataStoreUtil {
   }
   
   /**
+   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @param def Default value
+   * @return new data store
+   */
+  public static WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def) {
+    return DataStoreFactory.FACTORY.makeDoubleStorage(ids, hints, def);
+  }
+  
+  /**
+   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @return new data store
+   */
+  public static WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints) {
+    return DataStoreFactory.FACTORY.makeIntegerStorage(ids, hints);
+  }
+  
+  /**
+   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @param def Default value
+   * @return new data store
+   */
+  public static WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def) {
+    return DataStoreFactory.FACTORY.makeIntegerStorage(ids, hints, def);
+  }
+  
+  /**
    * Make a new record storage, to associate the given ids with an object of class dataclass.
    * 
    * @param ids DBIDs to store data for

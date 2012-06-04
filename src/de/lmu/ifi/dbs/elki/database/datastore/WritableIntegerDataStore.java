@@ -26,20 +26,34 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  */
 
 /**
- * Double-valued data store (avoids boxing/unboxing).
+ * Data store specialized for doubles. Avoids boxing/unboxing.
  * 
  * @author Erich Schubert
  */
-public interface DoubleDataStore extends DataStore<Double> {
+public interface WritableIntegerDataStore extends IntegerDataStore, WritableDataStore<Integer> {
   @Override
   @Deprecated
-  public Double get(DBID id);
+  public Integer put(DBID id, Integer value);
 
   /**
-   * Retrieves an object from the storage.
+   * Associates the specified value with the specified id in this storage. If
+   * the storage previously contained a value for the id, the previous value is
+   * replaced by the specified value.
    * 
    * @param id Database ID.
-   * @return Double value
+   * @param value Value to store.
+   * @return previous value
    */
-  public double doubleValue(DBID id);
+  public int putInt(DBID id, int value);
+
+  /**
+   * Associates the specified value with the specified id in this storage. If
+   * the storage previously contained a value for the id, the previous value is
+   * replaced by the specified value.
+   * 
+   * @param id Database ID.
+   * @param value Value to store.
+   * @return previous value
+   */
+  public int put(DBID id, int value);
 }

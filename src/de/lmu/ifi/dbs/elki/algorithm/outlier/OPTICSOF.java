@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -116,7 +117,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // FIXME: implicit preprocessor.
     WritableDataStore<KNNResult<D>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNResult.class);
     WritableDoubleDataStore coreDistance = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    WritableDataStore<Integer> minPtsNeighborhoodSize = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Integer.class);
+    WritableIntegerDataStore minPtsNeighborhoodSize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
 
     // Pass 1
     // N_minpts(id) and core-distance(id)
@@ -143,7 +144,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
         lrd = rd + lrd;
         core.add(rd);
       }
-      lrd = (minPtsNeighborhoodSize.get(id) / lrd);
+      lrd = minPtsNeighborhoodSize.intValue(id) / lrd;
       reachDistance.put(id, core);
       lrds.putDouble(id, lrd);
     }
@@ -159,7 +160,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
         double lrdN = lrds.doubleValue(idN);
         of = of + lrdN / lrd;
       }
-      of = of / minPtsNeighborhoodSize.get(id);
+      of = of / minPtsNeighborhoodSize.intValue(id);
       ofs.putDouble(id, of);
       // update minimum and maximum
       ofminmax.put(of);
