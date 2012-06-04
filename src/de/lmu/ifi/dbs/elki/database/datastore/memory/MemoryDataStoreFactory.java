@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.RangeIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -47,8 +48,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @apiviz.uses MapRecordStore oneway - - «create»
  */
 public class MemoryDataStoreFactory implements DataStoreFactory {
+  @SuppressWarnings("unchecked")
   @Override
   public <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass) {
+    if (Double.class.equals(dataclass)) {
+      return (WritableDataStore<T>) makeDoubleStorage(ids, hints);
+    }
+    if (Integer.class.equals(dataclass)) {
+      return (WritableDataStore<T>) makeIntegerStorage(ids, hints);
+    }
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
       Object[] data = new Object[range.size()];
@@ -67,6 +75,39 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
     }
     else {
       return new MapIntegerDBIDDoubleStore(ids.size());
+    }
+  }
+
+  @Override
+  public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def) {
+    if(ids instanceof DBIDRange) {
+      DBIDRange range = (DBIDRange) ids;
+      return new ArrayDoubleStore(range.size(), new RangeIDMap(range), def);
+    }
+    else {
+      return new MapIntegerDBIDDoubleStore(ids.size(), def);
+    }
+  }
+
+  @Override
+  public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints) {
+    if(ids instanceof DBIDRange) {
+      DBIDRange range = (DBIDRange) ids;
+      return new ArrayIntegerStore(range.size(), new RangeIDMap(range));
+    }
+    else {
+      return new MapIntegerDBIDIntegerStore(ids.size());
+    }
+  }
+
+  @Override
+  public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def) {
+    if(ids instanceof DBIDRange) {
+      DBIDRange range = (DBIDRange) ids;
+      return new ArrayIntegerStore(range.size(), new RangeIDMap(range), def);
+    }
+    else {
+      return new MapIntegerDBIDIntegerStore(ids.size(), def);
     }
   }
 

@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
 /**
@@ -33,19 +33,19 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @author Erich Schubert
  */
-public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
+public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   /**
    * Data storage
    */
-  private TIntDoubleMap map;
+  private TIntIntMap map;
 
   /**
    * Constructor.
    * 
    * @param size Expected size
    */
-  public MapIntegerDBIDDoubleStore(int size) {
-    this(size, Double.NaN);
+  public MapIntegerDBIDIntegerStore(int size) {
+    this(size, 0);
   }
 
   /**
@@ -54,19 +54,19 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
    * @param size Expected size
    * @param def Default value
    */
-  public MapIntegerDBIDDoubleStore(int size, double def) {
+  public MapIntegerDBIDIntegerStore(int size, int def) {
     super();
-    map = new TIntDoubleHashMap(size, 0.5f, Integer.MIN_VALUE, def);
+    map = new TIntIntHashMap(size, 0.5f, Integer.MIN_VALUE, def);
   }
 
   @Override
   @Deprecated
-  public Double get(DBID id) {
+  public Integer get(DBID id) {
     return map.get(id.getIntegerID());
   }
 
   @Override
-  public double doubleValue(DBID id) {
+  public int intValue(DBID id) {
     return map.get(id.getIntegerID());
   }
 
@@ -82,7 +82,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double put(DBID id, Double value) {
+  public Integer put(DBID id, Integer value) {
     return map.put(id.getIntegerID(), value);
   }
 
@@ -98,12 +98,12 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
-  public double putDouble(DBID id, double value) {
+  public int putInt(DBID id, int value) {
     return map.put(id.getIntegerID(), value);
   }
 
   @Override
-  public double put(DBID id, double value) {
+  public int put(DBID id, int value) {
     return map.put(id.getIntegerID(), value);
   }
 }

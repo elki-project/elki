@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -156,7 +156,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", ids.size(), logger) : null;
       final IndefiniteProgress clusprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters", logger) : null;
       // (Temporary) store the cluster ID assigned.
-      final WritableDataStore<Integer> clusterids = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_TEMP, Integer.class);
+      final WritableIntegerDataStore clusterids = DataStoreFactory.FACTORY.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
       // Note: these are not exact!
       final TIntArrayList clustersizes = new TIntArrayList();
       // IDs to assign.
@@ -170,14 +170,14 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       // Iterate over all objects in the database.
       for(DBID id : ids) {
         // Skip already processed ids.
-        if(clusterids.get(id) != null) {
+        if(clusterids.intValue(id) > -1) {
           continue;
         }
         // Evaluate Neighborhood predicate
         final DBIDs neighbors = npred.getNeighborDBIDs(id);
         // Evaluate Core-Point predicate:
         if(corepred.isCorePoint(id, neighbors)) {
-          clusterids.put(id, clusterid);
+          clusterids.putInt(id, clusterid);
           clustersize = 1 + setbasedExpandCluster(clusterid, clusterids, neighbors, progress);
           // start next cluster on next iteration.
           clustersizes.add(clustersize);
@@ -189,7 +189,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         }
         else {
           // otherwise, it's a noise point
-          clusterids.put(id, noiseid);
+          clusterids.putInt(id, noiseid);
           noisesize += 1;
         }
         // We've completed this element
@@ -215,8 +215,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       }
       // do the actual inversion
       for(DBID id : ids) {
-        Integer cluster = clusterids.get(id);
-        assert (cluster != null);
+        int cluster = clusterids.intValue(id);
         clusterlists.get(cluster + 1).add(id);
       }
       clusterids.destroy();
@@ -242,7 +241,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * 
      * @return cluster size;
      */
-    protected int setbasedExpandCluster(final Integer clusterid, final WritableDataStore<Integer> clusterids, final DBIDs neighbors, final FiniteProgress progress) {
+    protected int setbasedExpandCluster(final Integer clusterid, final WritableIntegerDataStore clusterids, final DBIDs neighbors, final FiniteProgress progress) {
       int clustersize = 0;
       // TODO: can we sometimes save this copy?
       final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray(neighbors);
@@ -252,7 +251,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         final DBID id = activeSet.remove(activeSet.size() - 1);
         clustersize += 1;
         // Assign object to cluster
-        final Integer oldclus = clusterids.put(id, clusterid);
+        final Integer oldclus = clusterids.putInt(id, clusterid);
         if(oldclus == null) {
           // expandCluster again:
           // Evaluate Neighborhood predicate
