@@ -42,6 +42,7 @@ public interface ArrayDBIDs extends DBIDs {
    * 
    * @return Iterator
    */
+  @Override
   public DBIDIter iter();
 
   /**
@@ -49,6 +50,7 @@ public interface ArrayDBIDs extends DBIDs {
    * 
    * @return size
    */
+  @Override
   public int size();
 
   /**

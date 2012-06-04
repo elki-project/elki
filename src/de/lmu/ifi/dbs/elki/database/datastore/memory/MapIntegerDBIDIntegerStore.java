@@ -27,6 +27,7 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Writable data store for double values.
@@ -56,6 +57,7 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
    */
   public MapIntegerDBIDIntegerStore(int size, int def) {
     super();
+    LoggingUtil.warning("Default: "+def);
     map = new TIntIntHashMap(size, 0.5f, Integer.MIN_VALUE, def);
   }
 
