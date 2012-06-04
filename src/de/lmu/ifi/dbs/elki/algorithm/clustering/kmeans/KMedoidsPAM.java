@@ -283,17 +283,17 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(AbstractKMeans.K_ID, new GreaterConstraint(0));
+      IntParameter kP = new IntParameter(KMeans.K_ID, new GreaterConstraint(0));
       if(config.grab(kP)) {
         k = kP.getValue();
       }
 
-      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<KMedoidsInitialization<V>>(AbstractKMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
+      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(AbstractKMeans.MAXITER_ID, new GreaterEqualConstraint(0), 0);
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, new GreaterEqualConstraint(0), 0);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }

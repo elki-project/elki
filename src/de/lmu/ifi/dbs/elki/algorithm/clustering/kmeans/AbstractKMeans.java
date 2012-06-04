@@ -21,7 +21,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunc
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /*
  This file is part of ELKI:
@@ -54,29 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?, ?>, D, Clustering<MeanModel<V>>> {
-  /**
-   * Parameter to specify the number of clusters to find, must be an integer
-   * greater than 0.
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("kmeans.k", "The number of clusters to find.");
-
-  /**
-   * Parameter to specify the number of clusters to find, must be an integer
-   * greater or equal to 0, where 0 means no limit.
-   */
-  public static final OptionID MAXITER_ID = OptionID.getOrCreateOptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
-
-  /**
-   * Parameter to specify the random generator seed.
-   */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("kmeans.seed", "The random number generator seed.");
-
-  /**
-   * Parameter to specify the initialization method
-   */
-  public static final OptionID INIT_ID = OptionID.getOrCreateOptionID("kmeans.initialization", "Method to choose the initial means.");
-
+public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?, ?>, D, Clustering<MeanModel<V>>> implements KMeans {
   /**
    * Holds the value of {@link #K_ID}.
    */

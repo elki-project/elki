@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 public abstract class AbstractKMeansInitialization<V> implements KMeansInitialization<V> {
   /**
-   * Holds the value of {@link KMeansLloyd#SEED_ID}.
+   * Holds the value of {@link KMeans#SEED_ID}.
    */
   protected Long seed;
 
@@ -61,7 +61,7 @@ public abstract class AbstractKMeansInitialization<V> implements KMeansInitializ
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      LongParameter seedP = new LongParameter(AbstractKMeans.SEED_ID, true);
+      LongParameter seedP = new LongParameter(KMeans.SEED_ID, true);
       if(config.grab(seedP)) {
         seed = seedP.getValue();
       }
