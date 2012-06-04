@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.CLIQUE
+de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.DiSH
+de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS
+de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU

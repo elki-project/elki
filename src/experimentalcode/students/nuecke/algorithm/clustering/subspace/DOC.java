@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SubspaceClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -60,8 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DOC: Density-based Optimal projective Clustering")
 @Reference(authors = "Cecilia M. Procopiuc, Michael Jones, Pankaj K. Agarwal, T. M. Murali", title = "A Monte Carlo algorithm for fast projective clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", url = "http://dx.doi.org/10.1145/564691.564739")
-public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> {
-
+public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */

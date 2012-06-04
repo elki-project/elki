@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -66,7 +65,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
     testParameterizationOk(params);
 
     // run PROCLUS on database
-    Clustering<Model> result = proclus.run(db);
+    Clustering<?> result = proclus.run(db);
 
     testFMeasure(db, result, 0.68932);
     testClusterSizes(result, new int[] { 78, 93, 203, 226 });
@@ -91,7 +90,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
     testParameterizationOk(params);
 
     // run PROCLUS on database
-    Clustering<Model> result = proclus.run(db);
+    Clustering<?> result = proclus.run(db);
     testFMeasure(db, result, 0.9673718);
     testClusterSizes(result, new int[] { 150, 289, 411 });
   }
