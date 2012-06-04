@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -100,7 +99,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
-public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements ClusteringAlgorithm<Clustering<SubspaceModel<V>>> {
+public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */

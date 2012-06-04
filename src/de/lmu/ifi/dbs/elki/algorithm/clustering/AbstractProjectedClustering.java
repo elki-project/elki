@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<R extends Clustering<Model>, V extends NumberVector<V, ?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector<V, ?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.

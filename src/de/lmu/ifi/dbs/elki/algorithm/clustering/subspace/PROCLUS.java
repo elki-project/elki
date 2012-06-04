@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.Subspace;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -90,8 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
-// TODO: make the generics reflect the SubspaceModel
-public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<Clustering<Model>, V> {
+public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<Clustering<SubspaceModel<V>>, V> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -142,7 +140,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   /**
    * Performs the PROCLUS algorithm on the given database.
    */
-  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
     DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
     final Random random = new Random();
@@ -229,9 +227,9 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
     // build result
     int numClusters = 1;
-    Clustering<Model> result = new Clustering<Model>("ProClus clustering", "proclus-clustering");
+    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("ProClus clustering", "proclus-clustering");
     for(PROCLUSCluster c : finalClusters) {
-      Cluster<Model> cluster = new Cluster<Model>(c.objectIDs);
+      Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.objectIDs);
       cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
       cluster.setName("cluster_" + numClusters++);
 
