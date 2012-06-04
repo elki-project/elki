@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -59,8 +60,8 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractKMeans.K_ID, 5);
-    params.addParameter(AbstractKMeans.SEED_ID, 3);
+    params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(KMeans.SEED_ID, 3);
     AbstractKMeans<DoubleVector, DoubleDistance> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
     testParameterizationOk(params);
 
@@ -82,8 +83,8 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractKMeans.K_ID, 5);
-    params.addParameter(AbstractKMeans.SEED_ID, 3);
+    params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(KMeans.SEED_ID, 3);
     AbstractKMeans<DoubleVector, DoubleDistance> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMacQueen.class, params);
     testParameterizationOk(params);
 
@@ -105,13 +106,57 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(AbstractKMeans.K_ID, 5);
-    params.addParameter(AbstractKMeans.SEED_ID, 3);
+    params.addParameter(KMeans.K_ID, 5);
+    params.addParameter(KMeans.SEED_ID, 3);
     AbstractKMeans<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
     Clustering<MeanModel<DoubleVector>> result = kmedians.run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
+
+  /**
+   * Run KMedians PAM with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testKMedoidsPAM() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(KMeans.K_ID, 5);
+    KMedoidsPAM<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsPAM.class, params);
+    testParameterizationOk(params);
+
+    // run KMedians on database
+    Clustering<MedoidModel> result = kmedians.run(db);
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+  }
+
+  /**
+   * Run KMedoidsEM with fixed parameters and compare the result to a golden
+   * standard.
+   * 
+   * @throws ParameterException
+   */
+  @Test
+  public void testKMedoidsEM() {
+    Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(KMeans.K_ID, 5);
+    KMedoidsEM<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMedoidsEM.class, params);
+    testParameterizationOk(params);
+
+    // run KMedians on database
+    Clustering<MedoidModel> result = kmedians.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
