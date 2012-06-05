@@ -50,7 +50,7 @@ public interface CorePredicate {
    * @param type Type to instantiate for
    * @return Instance
    */
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<? super T> type);
+  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type);
 
   /**
    * Test whether the neighborhood type T is accepted by this predicate.

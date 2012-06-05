@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -47,6 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -98,7 +100,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   public Clustering<Model> run(Database database) {
-    return new Instance(npred.instantiate(database), corepred.instantiate(database)).run();
+    for (SimpleTypeInformation<?> t : npred.getOutputType()) {
+      if (corepred.acceptsType(t)) {
+        return new Instance<Object>(npred.instantiate(database, t), corepred.instantiate(database, t)).run();
+      }
+    }
+    throw new AbortException("No compatible types found.");
   }
 
   @Override
@@ -116,16 +123,16 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    * 
    * @author Erich Schubert
    */
-  public class Instance {
+  public class Instance<T> {
     /**
      * The neighborhood predicate
      */
-    final NeighborPredicate.Instance npred;
+    final NeighborPredicate.Instance<T> npred;
 
     /**
      * The core object property
      */
-    final CorePredicate.Instance corepred;
+    final CorePredicate.Instance<T> corepred;
 
     /**
      * Full Constructor
@@ -133,7 +140,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * @param npred Neighborhood predicate
      * @param corepred Core object predicate
      */
-    public Instance(NeighborPredicate.Instance npred, CorePredicate.Instance corepred) {
+    public Instance(NeighborPredicate.Instance<T> npred, CorePredicate.Instance<T> corepred) {
       super();
       this.npred = npred;
       this.corepred = corepred;
@@ -168,7 +175,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
           continue;
         }
         // Evaluate Neighborhood predicate
-        final DBIDs neighbors = npred.getNeighborDBIDs(id);
+        final T neighbors = npred.getNeighbors(id);
         // Evaluate Core-Point predicate:
         if(corepred.isCorePoint(id, neighbors)) {
           clusterids.putInt(id, clusterid);
@@ -235,10 +242,11 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * 
      * @return cluster size;
      */
-    protected int setbasedExpandCluster(final Integer clusterid, final WritableIntegerDataStore clusterids, final DBIDs neighbors, final FiniteProgress progress) {
+    protected int setbasedExpandCluster(final Integer clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
       int clustersize = 0;
       // TODO: can we sometimes save this copy?
-      final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray(neighbors);
+      final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
+      npred.addDBIDs(activeSet, neighbors);
       // run expandCluster as long as this set is non-empty (non-recursive
       // implementation)
       while(!activeSet.isEmpty()) {
@@ -249,12 +257,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         if(oldclus == -2) {
           // expandCluster again:
           // Evaluate Neighborhood predicate
-          final DBIDs newneighbors = npred.getNeighborDBIDs(id);
+          final T newneighbors = npred.getNeighbors(id);
           // Evaluate Core-Point predicate
           if(corepred.isCorePoint(id, newneighbors)) {
             // Note: the recursion is unrolled into iteration over the active
             // set.
-            activeSet.addDBIDs(newneighbors);
+            npred.addDBIDs(activeSet, newneighbors);
           }
           if(progress != null) {
             progress.incrementProcessed(logger);

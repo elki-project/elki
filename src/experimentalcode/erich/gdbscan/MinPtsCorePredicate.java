@@ -72,7 +72,7 @@ public class MinPtsCorePredicate implements CorePredicate {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<? super T> type) {
+  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
     if(TypeUtil.DBIDS.isAssignableFromType(type)) {
       return (Instance<T>) new DBIDsInstance(minpts);
     }
