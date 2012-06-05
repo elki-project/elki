@@ -213,7 +213,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the error vectors
    */
   public Vector errorVector(V p) {
-    return p.getColumnVector().minus(centroid).projection(weakEigenvectors);
+    return p.getColumnVector().minusEquals(centroid).projection(weakEigenvectors);
   }
 
   /**
@@ -223,7 +223,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the data projections
    */
   public Matrix dataProjections(V p) {
-    Vector centered = p.getColumnVector().minus(centroid);
+    Vector centered = p.getColumnVector().minusEquals(centroid);
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
       Vector v_i = strongEigenvectors.getCol(i);
@@ -240,7 +240,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
    * @return the error vectors
    */
   public Vector dataVector(V p) {
-    return p.getColumnVector().minus(centroid).projection(strongEigenvectors);
+    return p.getColumnVector().minusEquals(centroid).projection(strongEigenvectors);
   }
 
   /**
@@ -254,21 +254,21 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
   }
 
   /**
-   * Returns a copy of the strong eigenvectors.
+   * Returns the strong eigenvectors.
    * 
-   * @return a copy of the strong eigenvectors
+   * @return the strong eigenvectors
    */
   public Matrix getStrongEigenvectors() {
-    return strongEigenvectors.copy();
+    return strongEigenvectors;
   }
 
   /**
-   * Returns a copy of the weak eigenvectors.
+   * Returns the weak eigenvectors.
    * 
-   * @return a copy of the weak eigenvectors
+   * @return the weak eigenvectors
    */
   public Matrix getWeakEigenvectors() {
-    return weakEigenvectors.copy();
+    return weakEigenvectors;
   }
 
   /**
