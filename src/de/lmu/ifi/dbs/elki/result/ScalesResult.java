@@ -44,11 +44,20 @@ public class ScalesResult extends BasicResult {
   /**
    * Constructor.
    * 
-   * @param relation
+   * @param relation Relation to use
    */
   public ScalesResult(Relation<? extends NumberVector<?, ?>> relation) {
+    this(Scales.calcScales(relation));
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param scales Relation scales to use
+   */
+  public ScalesResult(LinearScale[] scales) {
     super("scales", "scales");
-    scales = Scales.calcScales(relation);
+    this.scales = scales;
   }
 
   /**

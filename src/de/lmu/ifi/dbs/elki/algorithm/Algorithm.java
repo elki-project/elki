@@ -53,11 +53,8 @@ public interface Algorithm extends Parameterizable {
    * 
    * @param database the database to run the algorithm on
    * @return the Result computed by this algorithm
-   * @throws IllegalStateException if the algorithm has not been initialized
-   *         properly (e.g. the setParameters(String[]) method has been failed
-   *         to be called).
    */
-  Result run(Database database) throws IllegalStateException;
+  Result run(Database database);
 
   /**
    * Get the input type restriction used for negotiating the data query.
