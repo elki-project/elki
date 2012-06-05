@@ -151,7 +151,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
         cop_score.putDouble(id, prob);
 
-        Vector errv = depsol.errorVector(data.get(id));
+        Vector errv = depsol.errorVector(data.get(id)).timesEquals(-1);
         cop_err_v.put(id, errv);
 
         Matrix datav = depsol.dataProjections(data.get(id));
