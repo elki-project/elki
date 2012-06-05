@@ -114,11 +114,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    */
   int numbins = 20;
 
-  /**
-   * Run the algorithm.
-   */
   @Override
-  public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
+  public HistogramResult<DoubleVector> run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());

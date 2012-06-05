@@ -139,9 +139,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * @param database Database
    * @param relation Relation
    * @return Result
-   * @throws IllegalStateException
    */
-  public OutlierResult run(Database database, Relation<V> relation) throws IllegalStateException {
+  public OutlierResult run(Database database, Relation<V> relation) {
     final int dbsize = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 

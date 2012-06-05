@@ -101,7 +101,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
   }
 
   @Override
-  public HistogramResult<DoubleVector> run(Database database) throws IllegalStateException {
+  public HistogramResult<DoubleVector> run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final Relation<Object> lrelation = database.getRelation(getInputTypeRestriction()[1]);
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());

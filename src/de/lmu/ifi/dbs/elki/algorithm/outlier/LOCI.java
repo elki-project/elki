@@ -137,11 +137,13 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   }
 
   /**
-   * Runs the algorithm in the timed evaluation part.
+   * Run the algorithm
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
+   * @return Outlier result
    */
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+  public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
 

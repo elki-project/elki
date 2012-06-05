@@ -93,7 +93,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   }
 
   @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) {
     Result innerresult = algorithm.run(database);
 
     OutlierResult or = getOutlierResult(innerresult);

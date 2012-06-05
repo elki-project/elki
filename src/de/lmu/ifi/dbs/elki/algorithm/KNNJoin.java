@@ -115,12 +115,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   /**
    * Joins in the given spatial database to each object its k-nearest neighbors.
    * 
-   * @throws IllegalStateException if not suitable {@link SpatialIndexTree} was
-   *         found or the specified distance function is not an instance of
-   *         {@link SpatialPrimitiveDistanceFunction}.
+   * @param database Database to process
+   * @param relation Relation to process
+   * @return result
    */
   @SuppressWarnings("unchecked")
-  public WritableDataStore<KNNList<D>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public WritableDataStore<KNNList<D>> run(Database database, Relation<V> relation) {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }

@@ -91,9 +91,8 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
    * @param database Database
    * @param relation relation to use
    * @return result
-   * @throws IllegalStateException
    */
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
       return new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
     }

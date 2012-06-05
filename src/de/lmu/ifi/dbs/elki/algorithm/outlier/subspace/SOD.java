@@ -142,8 +142,9 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * Performs the SOD algorithm on the given database.
    * 
    * @param relation Data relation to process
+   * @return Outlier result
    */
-  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
+  public OutlierResult run(Relation<V> relation) {
     SimilarityQuery<V, D> snnInstance = similarityFunction.instantiate(relation);
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), logger) : null;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);

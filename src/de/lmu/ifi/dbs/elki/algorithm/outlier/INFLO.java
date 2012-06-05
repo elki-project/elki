@@ -120,9 +120,14 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     this.k = k;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+  /**
+   * Run the algorithm
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
+   * @return Outlier result
+   */
+  public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
     ModifiableDBIDs processedIDs = DBIDUtil.newHashSet(relation.size());

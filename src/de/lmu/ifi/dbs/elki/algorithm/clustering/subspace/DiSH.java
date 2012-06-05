@@ -161,8 +161,11 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
 
   /**
    * Performs the DiSH algorithm on the given database.
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     // Instantiate DiSH distance (and thus run the preprocessor)
     if(logger.isVerbose()) {
       logger.verbose("*** Run DiSH preprocessor.");

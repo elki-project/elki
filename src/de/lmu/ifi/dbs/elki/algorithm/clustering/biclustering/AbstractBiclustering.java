@@ -109,7 +109,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * @param relation Relation to process
    * @return Clustering result
    */
-  public final Clustering<M> run(Relation<V> relation) throws IllegalStateException {
+  public final Clustering<M> run(Relation<V> relation) {
     this.relation = relation;
     if(this.relation == null || this.relation.size() == 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
@@ -140,12 +140,8 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
    * If a bicluster is to be appended to the result, the methods
    * {@link #defineBicluster(BitSet,BitSet)} and
    * {@link #addBiclusterToResult(Bicluster)} should be used.
-   * 
-   * @throws IllegalStateException if the properties are not set properly (e.g.
-   *         method is not called from method {@link #run(Database)}, but
-   *         directly)
    */
-  protected abstract void biclustering() throws IllegalStateException;
+  protected abstract void biclustering();
 
   /**
    * Convert a bitset into integer column ids.

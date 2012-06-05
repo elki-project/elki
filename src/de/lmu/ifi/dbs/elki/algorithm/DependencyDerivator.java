@@ -149,7 +149,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @return the CorrelationAnalysisSolution computed by this
    *         DependencyDerivator
    */
-  public CorrelationAnalysisSolution<V> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public CorrelationAnalysisSolution<V> run(Database database, Relation<V> relation) {
     if(logger.isVerbose()) {
       logger.verbose("retrieving database objects...");
     }

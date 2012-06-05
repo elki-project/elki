@@ -92,7 +92,13 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     this.invert = invert;
   }
 
-  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
+  /**
+   * Run the algorithm
+   * 
+   * @param relation Data relation
+   * @return Outlier result
+   */
+  public OutlierResult run(Relation<V> relation) {
     DoubleMinMax mm = new DoubleMinMax();
     // resulting scores
     WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
