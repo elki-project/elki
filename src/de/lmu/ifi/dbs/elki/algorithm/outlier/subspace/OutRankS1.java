@@ -104,7 +104,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
   }
 
   @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) {
     DBIDs ids = database.getRelation(TypeUtil.DBID).getDBIDs();
     // Run the primary algorithm
     Clustering<? extends SubspaceModel<?>> clustering = clusteralg.run(database);

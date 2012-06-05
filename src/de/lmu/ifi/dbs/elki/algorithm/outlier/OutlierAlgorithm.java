@@ -38,5 +38,5 @@ public interface OutlierAlgorithm extends Algorithm {
   // Note: usually you won't override this method directly, but instead
   // Use the magic in AbstractAlgorithm and just implement a run method for your input data
   @Override
-  OutlierResult run(Database database) throws IllegalStateException;
+  OutlierResult run(Database database);
 }

@@ -118,7 +118,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @param relation Relation to process
    * @return Clustering result
    */
-  public Clustering<CorrelationModel<V>> run(Relation<V> relation) throws IllegalStateException {
+  public Clustering<CorrelationModel<V>> run(Relation<V> relation) {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
@@ -291,7 +291,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     return parameters;
   }
 
-  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, IntegerDistance> query) throws IllegalStateException {
+  private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, IntegerDistance> query) {
     StringBuffer msg = new StringBuffer();
 
     DBSCAN<V, DoubleDistance> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));

@@ -127,7 +127,13 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     this.c = c;
   }
 
-  public OutlierResult run(Relation<V> relation) throws IllegalStateException {
+  /**
+   * Run the algorithm
+   * 
+   * @param relation Data relation
+   * @return Outlier result
+   */
+  public OutlierResult run(Relation<V> relation) {
     // Use an array list of object IDs for fast random access by an offset
     ArrayDBIDs objids = DBIDUtil.ensureArray(relation.getDBIDs());
     // A bit set to flag objects as anomalous, none at the beginning

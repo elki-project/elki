@@ -127,7 +127,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @param relation the Relation to process
    * @return the AprioriResult learned by this APRIORI
    */
-  public AprioriResult run(Database database, Relation<BitVector> relation) throws IllegalStateException {
+  public AprioriResult run(Database database, Relation<BitVector> relation) {
     Map<BitSet, Integer> support = new Hashtable<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
     final int size = relation.size();

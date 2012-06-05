@@ -96,7 +96,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
    * 
    * @param relation The data input to use
    */
-  public Clustering<Model> run(Relation<?> relation) throws IllegalStateException {
+  public Clustering<Model> run(Relation<?> relation) {
     HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
 

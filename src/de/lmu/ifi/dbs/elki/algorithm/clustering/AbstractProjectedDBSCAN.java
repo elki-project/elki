@@ -166,7 +166,14 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     this.lambda = lambda;
   }
 
-  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
+  /**
+   * Run the algorithm
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
+   * @return Clustering result
+   */
+  public Clustering<Model> run(Database database, Relation<V> relation) {
     FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", relation.size(), getLogger()) : null;
     IndefiniteProgress clusprog = getLogger().isVerbose() ? new IndefiniteProgress("Number of clusters", getLogger()) : null;
     resultList = new ArrayList<ModifiableDBIDs>();

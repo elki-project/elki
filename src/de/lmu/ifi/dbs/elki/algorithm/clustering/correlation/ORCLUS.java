@@ -139,8 +139,11 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
   /**
    * Performs the ORCLUS algorithm on the given database.
+   * 
+   * @param database Database
+   * @param relation Relation
    */
-  public Clustering<Model> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<Model> run(Database database, Relation<V> relation) {
     try {
       DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
       // current dimensionality associated with each seed

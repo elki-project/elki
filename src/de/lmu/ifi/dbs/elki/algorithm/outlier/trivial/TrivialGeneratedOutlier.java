@@ -100,7 +100,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
   }
 
   @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
+  public OutlierResult run(Database database) {
     Relation<NumberVector<?, ?>> vecs = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     Relation<Model> models = database.getRelation(new SimpleTypeInformation<Model>(Model.class));
     // Prefer a true class label

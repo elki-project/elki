@@ -161,7 +161,7 @@ public class SUBCLU<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * @param relation Relation to process
    * @return Clustering result
    */
-  public Clustering<SubspaceModel<V>> run(Relation<V> relation) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Relation<V> relation) {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
 
     StepProgress stepprog = logger.isVerbose() ? new StepProgress(dimensionality) : null;

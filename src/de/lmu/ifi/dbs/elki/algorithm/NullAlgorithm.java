@@ -53,7 +53,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Result> {
   }
 
   @Override
-  public Result run(Database database) throws IllegalStateException {
+  public Result run(Database database) {
     return null;
   }
   

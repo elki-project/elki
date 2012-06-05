@@ -68,7 +68,7 @@ public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implement
    * @param relation Relation
    * @return Result
    */
-  public OutlierResult run(Relation<?> relation) throws IllegalStateException {
+  public OutlierResult run(Relation<?> relation) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT);
     for(DBID id : relation.iterDBIDs()) {
       scores.putDouble(id, 0.0);

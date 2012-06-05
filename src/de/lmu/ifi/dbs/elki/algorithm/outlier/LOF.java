@@ -238,12 +238,15 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * Performs the Generalized LOF_SCORE algorithm on the given database and
    * returns a {@link LOF.LOFResult} encapsulating information that may be
    * needed by an OnlineLOF algorithm.
-   * 
+   *
+   * @param ids Object ids
    * @param kNNRefer the kNN query w.r.t. reference neighborhood distance
    *        function
    * @param kNNReach the kNN query w.r.t. reachability distance function
+   * @param stepprog Progress logger
+   * @return LOF result
    */
-  protected LOFResult<O, D> doRunInTime(DBIDs ids, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) throws IllegalStateException {
+  protected LOFResult<O, D> doRunInTime(DBIDs ids, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) {
     // Assert we got something
     if(kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");

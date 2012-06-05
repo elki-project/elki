@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
  */
 public interface OPTICSTypeAlgorithm<D extends Distance<D>> extends Algorithm {
   @Override
-  ClusterOrderResult<D> run(Database database) throws IllegalStateException;
+  ClusterOrderResult<D> run(Database database);
   
   /**
    * Get the minpts value used. Needed for OPTICS Xi etc.

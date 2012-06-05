@@ -139,8 +139,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
   /**
    * Performs the PROCLUS algorithm on the given database.
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
    */
-  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) throws IllegalStateException {
+  public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
     final Random random = new Random();
