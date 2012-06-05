@@ -90,7 +90,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   /**
    * The diagonal matrix of adapted strong eigenvalues: eigenvectors * e_czech.
    */
-  private Matrix adapatedStrongEigenvectors;
+  private Matrix adapatedStrongEigenvectors = null;
 
   /**
    * Construct a result object for the filtered PCA result.
@@ -151,7 +151,6 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
     }
 
     Matrix V = getEigenvectors();
-    adapatedStrongEigenvectors = V.times(e_czech).times(Matrix.identity(dim, localdim));
     m_hat = V.times(e_hat).timesTranspose(V);
     m_czech = V.times(e_czech).timesTranspose(V);
   }
@@ -260,6 +259,10 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * @return the adapted strong eigenvectors
    */
   public Matrix adapatedStrongEigenvectors() {
+    if (adapatedStrongEigenvectors == null) {
+      final Matrix ev = getEigenvectors();
+      adapatedStrongEigenvectors = ev.times(e_czech).times(Matrix.identity(ev.getRowDimensionality(), strongEigenvalues.length));
+    }
     return adapatedStrongEigenvectors;
   }
 }

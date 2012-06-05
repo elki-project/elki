@@ -160,7 +160,6 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -2);
       // Note: these are not exact!
       final TIntArrayList clustersizes = new TIntArrayList();
-      // IDs to assign.
 
       // Implementation Note: using Integer objects should result in
       // reduced memory use in the HashMap!
