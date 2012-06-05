@@ -98,7 +98,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   public Clustering<Model> run(Database database) {
-    return new Instance(database, npred.instantiate(database), corepred.instantiate(database)).run();
+    return new Instance(npred.instantiate(database), corepred.instantiate(database)).run();
   }
 
   @Override
@@ -118,11 +118,6 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    */
   public class Instance {
     /**
-     * The database context
-     */
-    final Database dbc;
-
-    /**
      * The neighborhood predicate
      */
     final NeighborPredicate.Instance npred;
@@ -135,13 +130,11 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * Full Constructor
      * 
-     * @param dbc Database context
      * @param npred Neighborhood predicate
      * @param corepred Core object predicate
      */
-    public Instance(Database dbc, NeighborPredicate.Instance npred, CorePredicate.Instance corepred) {
+    public Instance(NeighborPredicate.Instance npred, CorePredicate.Instance corepred) {
       super();
-      this.dbc = dbc;
       this.npred = npred;
       this.corepred = corepred;
     }
