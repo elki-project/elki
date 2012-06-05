@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
  * Get the neighbors of an object
@@ -45,7 +46,7 @@ public interface NeighborPredicate {
    * @param database Database to instantiate for
    * @return Instance
    */
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<? super T> type);
+  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type);
 
   /**
    * Input data type restriction.
@@ -59,7 +60,7 @@ public interface NeighborPredicate {
    * 
    * @return Type information
    */
-  public TypeInformation[] getOutputType();
+  public SimpleTypeInformation<?>[] getOutputType();
 
   /**
    * Instance for a particular data set.
@@ -73,7 +74,7 @@ public interface NeighborPredicate {
      * @param reference Reference object
      * @return Neighborhood
      */
-    public T getNeighborDBIDs(DBID reference);
+    public T getNeighbors(DBID reference);
 
     /**
      * Get the IDs the predicate is defined for.
@@ -81,5 +82,13 @@ public interface NeighborPredicate {
      * @return Database ids
      */
     public DBIDs getIDs();
+    
+    /**
+     * Add the neighbors to a DBID set
+     * 
+     * @param ids ID set
+     * @param neighbors Neighbors to add
+     */
+    public void addDBIDs(ModifiableDBIDs ids, T neighbors);
   }
 }

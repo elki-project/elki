@@ -91,7 +91,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<? super T> type) {
+  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
     if(TypeUtil.DBIDS.isAssignableFromType(type)) {
       DistanceQuery<O, D> dq = QueryUtil.getDistanceQuery(database, distFunc);
       RangeQuery<O, D> rq = database.getRangeQuery(dq);
@@ -106,8 +106,8 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
   }
 
   @Override
-  public TypeInformation[] getOutputType() {
-    return TypeUtil.array(TypeUtil.DBIDS, TypeUtil.NEIGHBORLIST);
+  public SimpleTypeInformation<?>[] getOutputType() {
+    return new SimpleTypeInformation<?>[] { TypeUtil.DBIDS, TypeUtil.NEIGHBORLIST };
   }
 
   @Override
@@ -156,7 +156,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
     }
 
     @Override
-    public DBIDs getNeighborDBIDs(DBID reference) {
+    public DBIDs getNeighbors(DBID reference) {
       List<DistanceResultPair<D>> res = rq.getRangeForDBID(reference, epsilon);
       // Throw away the actual distance values ...
       ModifiableDBIDs neighbors = DBIDUtil.newHashSet(res.size());
@@ -164,6 +164,11 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
         neighbors.add(dr.getDBID());
       }
       return neighbors;
+    }
+
+    @Override
+    public void addDBIDs(ModifiableDBIDs ids, DBIDs neighbors) {
+      ids.addDBIDs(neighbors);
     }
   }
 
@@ -208,8 +213,15 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
     }
 
     @Override
-    public DistanceDBIDResult<D> getNeighborDBIDs(DBID reference) {
+    public DistanceDBIDResult<D> getNeighbors(DBID reference) {
       return rq.getRangeForDBID(reference, epsilon);
+    }
+
+    @Override
+    public void addDBIDs(ModifiableDBIDs ids, DistanceDBIDResult<D> neighbors) {
+      for(DistanceResultPair<D> neighbor : neighbors) {
+        ids.add(neighbor.getDBID());
+      }
     }
   }
 
