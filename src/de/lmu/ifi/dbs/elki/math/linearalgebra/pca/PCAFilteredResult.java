@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * Result class for a filtered PCA. This differs from regular PCA by having the
@@ -89,8 +88,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   private Matrix m_czech;
 
   /**
-   * The diagonal matrix of adapted strong eigenvalues: eigenvectors *
-   * e_czech.
+   * The diagonal matrix of adapted strong eigenvalues: eigenvectors * e_czech.
    */
   private Matrix adapatedStrongEigenvectors;
 
@@ -152,7 +150,6 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
       }
     }
 
-    // TODO: unnecessary copy.
     Matrix V = getEigenvectors();
     adapatedStrongEigenvectors = V.times(e_czech).times(Matrix.identity(dim, localdim));
     m_hat = V.times(e_hat).timesTranspose(V);
@@ -160,43 +157,43 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   }
 
   /**
-   * Returns a copy of the matrix of strong eigenvectors after passing the eigen
-   * pair filter.
+   * Returns the matrix of strong eigenvectors after passing the eigen pair
+   * filter.
    * 
    * @return the matrix of eigenvectors
    */
   public final Matrix getStrongEigenvectors() {
-    return strongEigenvectors.copy();
+    return strongEigenvectors;
   }
 
   /**
-   * Returns a copy of the strong eigenvalues of the object after passing the
-   * eigen pair filter.
+   * Returns the strong eigenvalues of the object after passing the eigen pair
+   * filter.
    * 
    * @return the eigenvalues
    */
   public final double[] getStrongEigenvalues() {
-    return Util.copy(strongEigenvalues);
+    return strongEigenvalues;
   }
 
   /**
-   * Returns a copy of the matrix of weak eigenvectors after passing the eigen
-   * pair filter.
+   * Returns the matrix of weak eigenvectors after passing the eigen pair
+   * filter.
    * 
    * @return the matrix of eigenvectors
    */
   public final Matrix getWeakEigenvectors() {
-    return weakEigenvectors.copy();
+    return weakEigenvectors;
   }
 
   /**
-   * Returns a copy of the weak eigenvalues of the object after passing the
-   * eigen pair filter.
+   * Returns the weak eigenvalues of the object after passing the eigen pair
+   * filter.
    * 
    * @return the eigenvalues
    */
   public final double[] getWeakEigenvalues() {
-    return Util.copy(weakEigenvalues);
+    return weakEigenvalues;
   }
 
   /**
@@ -219,50 +216,50 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   }
 
   /**
-   * Returns a copy of the selection matrix of the weak eigenvectors (E_hat) of
+   * Returns the selection matrix of the weak eigenvectors (E_hat) of
    * the object to which this PCA belongs to.
    * 
    * @return the selection matrix of the weak eigenvectors E_hat
    */
   public Matrix selectionMatrixOfWeakEigenvectors() {
-    return e_hat.copy();
+    return e_hat;
   }
 
   /**
-   * Returns a copy of the selection matrix of the strong eigenvectors (E_czech)
+   * Returns the selection matrix of the strong eigenvectors (E_czech)
    * of this LocalPCA.
    * 
    * @return the selection matrix of the weak eigenvectors E_czech
    */
   public Matrix selectionMatrixOfStrongEigenvectors() {
-    return e_czech.copy();
+    return e_czech;
   }
 
   /**
-   * Returns a copy of the similarity matrix (M_hat) of this LocalPCA.
+   * Returns the similarity matrix (M_hat) of this LocalPCA.
    * 
    * @return the similarity matrix M_hat
    */
   @Override
   public Matrix similarityMatrix() {
-    return m_hat.copy();
+    return m_hat;
   }
 
   /**
-   * Returns a copy of the dissimilarity matrix (M_czech) of this LocalPCA.
+   * Returns the dissimilarity matrix (M_czech) of this LocalPCA.
    * 
    * @return the dissimilarity matrix M_hat
    */
   public Matrix dissimilarityMatrix() {
-    return m_czech.copy();
+    return m_czech;
   }
-  
+
   /**
-   * Returns a copy of the adapted strong eigenvectors.
-   *
+   * Returns the adapted strong eigenvectors.
+   * 
    * @return the adapted strong eigenvectors
    */
   public Matrix adapatedStrongEigenvectors() {
-      return adapatedStrongEigenvectors.copy();
+    return adapatedStrongEigenvectors;
   }
 }

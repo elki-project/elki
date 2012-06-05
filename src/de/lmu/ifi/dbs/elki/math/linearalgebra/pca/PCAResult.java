@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * Result class for Principal Component Analysis with some convenience methods
@@ -33,14 +32,14 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs
+ * @apiviz.has SortedEigenPairs
  */
 public class PCAResult {
   /**
    * The eigenpairs in decreasing order.
    */
   private SortedEigenPairs eigenPairs;
-  
+
   /**
    * The eigenvalues in decreasing order.
    */
@@ -73,44 +72,46 @@ public class PCAResult {
    */
   public PCAResult(SortedEigenPairs eigenPairs) {
     super();
-    // TODO: we might want to postpone the instantiation of eigenvalue and eigenvectors.
+    // TODO: we might want to postpone the instantiation of eigenvalue and
+    // eigenvectors.
     this.eigenPairs = eigenPairs;
     this.eigenvalues = eigenPairs.eigenValues();
     this.eigenvectors = eigenPairs.eigenVectors();
   }
 
   /**
-   * Returns a copy of the matrix of eigenvectors of the object to which this
-   * PCA belongs to.
+   * Returns the matrix of eigenvectors of the object to which this PCA belongs
+   * to.
    * 
    * @return the matrix of eigenvectors
    */
   public final Matrix getEigenvectors() {
-    return eigenvectors.copy();
+    return eigenvectors;
   }
 
   /**
-   * Returns a copy of the eigenvalues of the object to which this PCA belongs
-   * to in decreasing order.
+   * Returns the eigenvalues of the object to which this PCA belongs to in
+   * decreasing order.
    * 
    * @return the eigenvalues
    */
   public final double[] getEigenvalues() {
-    return Util.copy(eigenvalues);
+    return eigenvalues;
   }
 
   /**
-   * Returns a copy of the eigenpairs of the object to which this PCA belongs to
+   * Returns the eigenpairs of the object to which this PCA belongs to
    * in decreasing order.
    * 
    * @return the eigenpairs
    */
   public final SortedEigenPairs getEigenPairs() {
-    return eigenPairs.copy();
+    return eigenPairs;
   }
 
   /**
    * Returns the number of eigenvectors stored
+   * 
    * @return length
    */
   public final int length() {
