@@ -76,9 +76,6 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
     this.walpha = walpha;
   }
 
-  /**
-   * Filter eigenpairs
-   */
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
