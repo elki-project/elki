@@ -23,13 +23,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
@@ -90,8 +89,8 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    * @param epsilon Query range
    * @return Objects contained in query range.
    */
-  protected List<DistanceResultPair<D>> doRangeQuery(O object, D epsilon) {
-    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+  protected GenericDistanceDBIDList<D> doRangeQuery(O object, D epsilon) {
+    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>();
 
     // push root
@@ -128,12 +127,12 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRangeForObject(O obj, D range) {
+  public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
     return doRangeQuery(obj, range);
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
+  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
     return getRangeForObject(relation.get(id), range);
   }
 }

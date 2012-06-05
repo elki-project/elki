@@ -34,8 +34,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -307,7 +308,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     }
 
     @Override
-    public List<DistanceResultPair<DoubleDistance>> getRangeForObject(V query, DoubleDistance range) {
+    public DistanceDBIDResult<DoubleDistance> getRangeForObject(V query, DoubleDistance range) {
       final double eps = range.doubleValue();
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
@@ -318,7 +319,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       // Count a VA file scan
       scans += 1;
 
-      List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
+      GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
       // Approximation step
       for(int i = 0; i < vectorApprox.size(); i++) {
         VectorApproximation va = vectorApprox.get(i);

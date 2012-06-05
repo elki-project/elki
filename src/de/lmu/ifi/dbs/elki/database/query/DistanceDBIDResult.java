@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.range;
+package de.lmu.ifi.dbs.elki.database.query;
 
 /*
  This file is part of ELKI:
@@ -23,36 +23,17 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Default linear scan range query class.
- * 
- * Subtle optimization: for primitive distances, retrieve the query object only
- * once from the relation.
+ * Collection of objects and their distances.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.uses PrimitiveDistanceQuery
- * 
- * @param <O> Database object type
+ *
  * @param <D> Distance type
  */
-public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> extends LinearScanRangeQuery<O, D> {
-  /**
-   * Constructor.
-   * 
-   * @param distanceQuery Distance function to use
-   */
-  public LinearScanPrimitiveDistanceRangeQuery(PrimitiveDistanceQuery<O, D> distanceQuery) {
-    super(distanceQuery);
-  }
-
-  @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
-    return getRangeForObject(relation.get(id), range);
-  }
+public interface DistanceDBIDResult<D extends Distance<D>> extends List<DistanceResultPair<D>> {
+  // Empty. TODO: add "sorted" property?
 }

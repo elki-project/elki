@@ -6,7 +6,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -112,7 +112,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
     }
 
     @Override
-    public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
+    public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
       return getRangeForObject(relation.get(id), range);
     }
 

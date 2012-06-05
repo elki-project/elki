@@ -223,6 +223,7 @@ public class UpdatableHeap<O> extends Heap<O> {
    * @param pos insertion position
    * @param elem Element to insert
    */
+  @Override
   @SuppressWarnings("unchecked")
   protected void heapifyUpComparable(int pos, Object elem) {
     final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
@@ -247,6 +248,7 @@ public class UpdatableHeap<O> extends Heap<O> {
    * @param pos insertion position
    * @param cur Element to insert
    */
+  @Override
   protected void heapifyUpComparator(int pos, Object cur) {
     while(pos > 0) {
       final int parent = (pos - 1) >>> 1;

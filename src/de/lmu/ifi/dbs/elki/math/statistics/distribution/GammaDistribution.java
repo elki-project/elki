@@ -195,6 +195,22 @@ public class GammaDistribution implements Distribution {
   }
 
   /**
+   * Compute the regular Gamma function.
+   * 
+   * Note: for numerical reasons, it is preferrable to use {@link #logGamma}
+   * when possible! In particular, this method just computes
+   * {@code Math.exp(logGamma(x))} anyway.
+   * 
+   * Try to postpone the {@code Math.exp} call to preserve numeric range!
+   * 
+   * @param x Position
+   * @return Gamma at this position
+   */
+  public static double gamma(double x) {
+    return Math.exp(logGamma(x));
+  }
+
+  /**
    * Returns the regularized gamma function P(a, x).
    * 
    * Includes the quadrature way of computing.
@@ -313,7 +329,7 @@ public class GammaDistribution implements Distribution {
     final double e1 = 1.000000000, e2 = 0.499999994, e3 = 0.166666848;
     final double e4 = 0.041664508, e5 = 0.008345522, e6 = 0.001353826;
     final double e7 = 0.000247453;
-  
+
     if(k < 1.0) { // Base case, for small k
       final double b = 1.0 + 0.36788794412 * k; // Step 1
       while(true) {
@@ -360,11 +376,11 @@ public class GammaDistribution implements Distribution {
         /* v2 = tv2; */
         v12 = tv12;
       }
-  
+
       // double b = 0.0, c = 0.0;
       // double si = 0.0, q0 = 0.0;
       final double b, c, si, q0;
-  
+
       // Simpler accept cases & parameter computation
       {
         final double t = v1 * Math.sqrt(-2.0 * Math.log(v12) / v12);
@@ -373,14 +389,14 @@ public class GammaDistribution implements Distribution {
         if(t >= 0.0) {
           return (gds / theta); // Immediate acceptance
         }
-  
+
         // Random uniform
         final double un = random.nextDouble();
         // Squeeze acceptance
         if(d * un <= t * t * t) {
           return (gds / theta);
         }
-  
+
         if(k != -1.0) { // Step 4. Set-up for hat case
           final double r = 1.0 / k;
           q0 = ((((((((q9 * r + q8) * r + q7) * r + q6) * r + q5) * r + q4) * r + q3) * r + q2) * r + q1) * r;
@@ -425,7 +441,7 @@ public class GammaDistribution implements Distribution {
           }
         }
       }
-  
+
       // Double exponential deviate t
       while(true) {
         double e, u, sign_u, t;
@@ -438,7 +454,7 @@ public class GammaDistribution implements Distribution {
           t = b + (e * si) * sign_u;
         }
         while(t <= -0.71874483771719);
-  
+
         // New v(t) and q(t)
         final double v = t / (s + s);
         final double q;

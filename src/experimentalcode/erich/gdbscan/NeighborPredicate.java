@@ -23,6 +23,7 @@ package experimentalcode.erich.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -44,8 +45,8 @@ public interface NeighborPredicate {
    * @param database Database to instantiate for
    * @return Instance
    */
-  public Instance instantiate(Database database);
-  
+  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<? super T> type);
+
   /**
    * Input data type restriction.
    * 
@@ -54,18 +55,25 @@ public interface NeighborPredicate {
   public TypeInformation getInputTypeRestriction();
 
   /**
+   * Output data type information.
+   * 
+   * @return Type information
+   */
+  public TypeInformation[] getOutputType();
+
+  /**
    * Instance for a particular data set.
    * 
    * @author Erich Schubert
    */
-  public static interface Instance {
+  public static interface Instance<T> {
     /**
      * Get the neighbors of a reference object for DBSCAN.
      * 
      * @param reference Reference object
      * @return Neighborhood
      */
-    public DBIDs getNeighborDBIDs(DBID reference);
+    public T getNeighborDBIDs(DBID reference);
 
     /**
      * Get the IDs the predicate is defined for.

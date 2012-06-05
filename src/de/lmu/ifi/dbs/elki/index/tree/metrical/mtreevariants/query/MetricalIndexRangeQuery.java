@@ -23,12 +23,13 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
@@ -177,8 +178,8 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   }
   
   @Override
-  public List<DistanceResultPair<D>> getRangeForObject(O obj, D range) {
-    final List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+  public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
+    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
 
     doRangeQuery(null, index.getRoot(), obj, range, result);
 
@@ -188,7 +189,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRangeForDBID(DBID id, D range) {
+  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
     return getRangeForObject(relation.get(id), range);
   }
 }
