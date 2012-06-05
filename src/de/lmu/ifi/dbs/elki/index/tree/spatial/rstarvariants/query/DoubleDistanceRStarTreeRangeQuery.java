@@ -23,14 +23,13 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
@@ -91,8 +90,8 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    * @param epsilon Query range
    * @return Objects contained in query range.
    */
-  protected List<DistanceResultPair<DoubleDistance>> doRangeQuery(O object, double epsilon) {
-    final List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
+  protected GenericDistanceDBIDList<DoubleDistance> doRangeQuery(O object, double epsilon) {
+    final GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
     final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>();
 
     // push root
@@ -130,12 +129,12 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getRangeForObject(O obj, DoubleDistance range) {
+  public DistanceDBIDResult<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
     return doRangeQuery(obj, range.doubleValue());
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getRangeForDBID(DBID id, DoubleDistance range) {
+  public DistanceDBIDResult<DoubleDistance> getRangeForDBID(DBID id, DoubleDistance range) {
     return getRangeForObject(relation.get(id), range);
   }
 }

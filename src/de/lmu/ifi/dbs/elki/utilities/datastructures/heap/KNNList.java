@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractCollection;
+import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-public class KNNList<D extends Distance<D>> extends AbstractCollection<DistanceResultPair<D>> implements KNNResult<D> {
+public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultPair<D>> implements KNNResult<D> {
   /**
    * The value of k this was materialized for.
    */
@@ -96,46 +96,25 @@ public class KNNList<D extends Distance<D>> extends AbstractCollection<DistanceR
     assert (heap.size() == 0);
   }
 
-  /**
-   * Get the K parameter.
-   * 
-   * @return K
-   */
+  @Override
   public int getK() {
     return k;
   }
 
-  /**
-   * Get the distance to the k nearest neighbor, or maxdist otherwise.
-   * 
-   * @return Maximum distance
-   */
   @Override
   public D getKNNDistance() {
     return get(getK() - 1).getDistance();
   }
 
-  /**
-   * View as ArrayDBIDs
-   * 
-   * @return Static DBIDs
-   */
   @Override
   public ArrayDBIDs asDBIDs() {
     return KNNUtil.asDBIDs(this);
   }
 
-  /**
-   * View as list of distances
-   * 
-   * @return List of distances view
-   */
   @Override
   public List<D> asDistanceList() {
     return KNNUtil.asDistanceList(this);
   }
-
-  /* Make the list unmodifiable! */
 
   @Override
   public String toString() {

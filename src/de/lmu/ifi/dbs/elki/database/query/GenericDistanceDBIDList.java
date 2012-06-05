@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.range;
+package de.lmu.ifi.dbs.elki.database.query;
 
 /*
  This file is part of ELKI:
@@ -23,40 +23,46 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Abstract base class for range queries that use a distance query in their
- * instance
+ * Default class to keep a list of distance-object pairs.
  * 
  * @author Erich Schubert
  * 
- * @param <O> Database object type
  * @param <D> Distance type
  */
-public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RangeQuery<O, D> {
+public class GenericDistanceDBIDList<D extends Distance<D>> extends ArrayList<DistanceResultPair<D>> implements DistanceDBIDResult<D> {
   /**
-   * Hold the distance function to be used.
+   * Serialization Version
    */
-  protected DistanceQuery<O, D> distanceQuery;
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Constructor.
+   */
+  public GenericDistanceDBIDList() {
+    super();
+  }
 
   /**
    * Constructor.
    * 
-   * @param distanceQuery Distance query
+   * @param c existing collection
    */
-  public AbstractDistanceRangeQuery(DistanceQuery<O, D> distanceQuery) {
-    super(distanceQuery.getRelation());
-    this.distanceQuery = distanceQuery;
+  public GenericDistanceDBIDList(Collection<? extends DistanceResultPair<D>> c) {
+    super(c);
   }
 
-  @Override
-  abstract public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range);
-
-  @Override
-  abstract public DistanceDBIDResult<D> getRangeForObject(O obj, D range);
+  /**
+   * Constructor.
+   * 
+   * @param initialCapacity Capacity
+   */
+  public GenericDistanceDBIDList(int initialCapacity) {
+    super(initialCapacity);
+  }
 }

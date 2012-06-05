@@ -23,12 +23,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -86,7 +84,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>
   }
 
   @Override
-  protected List<DistanceResultPair<DoubleDistance>> objectsForPCA(DBID id) {
+  protected DistanceDBIDResult<DoubleDistance> objectsForPCA(DBID id) {
     return rangeQuery.getRangeForDBID(id, epsilon);
   }
 

@@ -23,9 +23,9 @@ package experimentalcode.erich.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Predicate for GeneralizedDBSCAN to evaluate whether a point is a core point
@@ -39,19 +39,35 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  */
 public interface CorePredicate {
   /**
+   * Constant for the generic type {@code List<? extends DistanceResultPair<?>>}
+   */
+  public static final String NEIGHBOR_LIST = "neighborhood-list";
+  
+  /**
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
+   * @param type Type to instantiate for
    * @return Instance
    */
-  public Instance instantiate(Database database);
+  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<? super T> type);
+
+  /**
+   * Test whether the neighborhood type T is accepted by this predicate.
+   * 
+   * @param type Type information
+   * @return true when the type is accepted
+   */
+  public boolean acceptsType(SimpleTypeInformation<?> type);
   
   /**
    * Instance for a particular data set.
    * 
    * @author Erich Schubert
+   * 
+   * @param <T> actual type
    */
-  public static interface Instance {
+  public static interface Instance<T> {
     /**
      * Decide whether the point is a core point, based on its neighborhood.
      * 
@@ -59,6 +75,6 @@ public interface CorePredicate {
      * @param neighbors Neighbors
      * @return core point property
      */
-    public boolean isCorePoint(DBID point, DBIDs neighbors);
+    public boolean isCorePoint(DBID point, T neighbors);
   }
 }

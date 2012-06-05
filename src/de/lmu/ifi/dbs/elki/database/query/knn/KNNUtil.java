@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractCollection;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
@@ -49,7 +48,7 @@ public final class KNNUtil {
    * 
    * @param <D> Distance
    */
-  protected static class KNNSubList<D extends Distance<D>> extends AbstractCollection<DistanceResultPair<D>> implements KNNResult<D> {
+  protected static class KNNSubList<D extends Distance<D>> extends AbstractList<DistanceResultPair<D>> implements KNNResult<D> {
     /**
      * Parameter k
      */

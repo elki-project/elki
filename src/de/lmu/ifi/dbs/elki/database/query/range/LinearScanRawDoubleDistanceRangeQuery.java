@@ -23,13 +23,12 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
@@ -56,14 +55,14 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getRangeForDBID(DBID id, DoubleDistance range) {
+  public DistanceDBIDResult<DoubleDistance> getRangeForDBID(DBID id, DoubleDistance range) {
     if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       @SuppressWarnings("unchecked")
       PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
 
       O qo = relation.get(id);
-      List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
+      GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
       for(DBID currentID : relation.iterDBIDs()) {
         double doubleDistance = rawdist.doubleDistance(qo, relation.get(currentID));
         if(doubleDistance <= epsilon) {
@@ -79,13 +78,13 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getRangeForObject(O obj, DoubleDistance range) {
+  public DistanceDBIDResult<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
     if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       @SuppressWarnings("unchecked")
       PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
 
-      List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
+      GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
       for(DBID currentID : relation.iterDBIDs()) {
         double doubleDistance = rawdist.doubleDistance(obj, relation.get(currentID));
         if(doubleDistance <= epsilon) {

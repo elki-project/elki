@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -58,6 +60,11 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<DBID>(DBID.class, DBIDFactory.FACTORY.getDBIDSerializer());
 
   /**
+   * Database ID lists
+   */
+  public static final SimpleTypeInformation<DBIDs> DBIDS = new SimpleTypeInformation<DBIDs>(DBIDs.class);
+
+  /**
    * A string
    */
   public static final SimpleTypeInformation<String> STRING = new SimpleTypeInformation<String>(String.class, ByteArrayUtil.STRING_SERIALIZER);
@@ -71,6 +78,11 @@ public final class TypeUtil {
    * A list of labels.
    */
   public static final SimpleTypeInformation<LabelList> LABELLIST = new SimpleTypeInformation<LabelList>(LabelList.class);
+
+  /**
+   * A list of neighbors
+   */
+  public static final SimpleTypeInformation<DistanceDBIDResult<?>> NEIGHBORLIST = new SimpleTypeInformation<DistanceDBIDResult<?>>(DistanceDBIDResult.class);
 
   /**
    * Either class label, object labels or a string - anything that will be

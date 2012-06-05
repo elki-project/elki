@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -174,7 +175,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         // determine neighbors in each dimension
         ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
         for(int d = 0; d < dim; d++) {
-          List<DistanceResultPair<DoubleDistance>> qrList = rangeQueries[d].getRangeForDBID(id, epsilon[d]);
+          DistanceDBIDResult<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(id, epsilon[d]);
           allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
           for(DistanceResultPair<DoubleDistance> qr : qrList) {
             allNeighbors[d].add(qr.getDBID());

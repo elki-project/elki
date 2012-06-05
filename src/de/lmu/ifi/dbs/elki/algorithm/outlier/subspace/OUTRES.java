@@ -203,14 +203,15 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
   private List<DoubleDistanceResultPair> refineRange(List<DistanceResultPair<DoubleDistance>> neighc, double adjustedEps) {
     List<DoubleDistanceResultPair> n = new ArrayList<DoubleDistanceResultPair>(neighc.size());
     // We don't have a guarantee for this list to be sorted
-    for (DistanceResultPair<DoubleDistance> p : neighc) {
-      if (p instanceof DoubleDistanceResultPair) {
-        if (((DoubleDistanceResultPair)p).getDoubleDistance() <= adjustedEps) {
-          n.add((DoubleDistanceResultPair)p);
+    for(DistanceResultPair<DoubleDistance> p : neighc) {
+      if(p instanceof DoubleDistanceResultPair) {
+        if(((DoubleDistanceResultPair) p).getDoubleDistance() <= adjustedEps) {
+          n.add((DoubleDistanceResultPair) p);
         }
-      } else {
+      }
+      else {
         double dist = p.getDistance().doubleValue();
-        if (dist <= adjustedEps) {
+        if(dist <= adjustedEps) {
           n.add(new DoubleDistanceResultPair(dist, p.getDBID()));
         }
       }
@@ -231,10 +232,10 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
   private List<DoubleDistanceResultPair> subsetNeighborhoodQuery(List<DistanceResultPair<DoubleDistance>> neighc, DBID dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
     List<DoubleDistanceResultPair> n = new ArrayList<DoubleDistanceResultPair>(neighc.size());
     V query = kernel.relation.get(dbid);
-    for (DistanceResultPair<DoubleDistance> p : neighc) {
+    for(DistanceResultPair<DoubleDistance> p : neighc) {
       final DBID pid = p.getDBID();
       double dist = df.doubleDistance(query, kernel.relation.get(pid));
-      if (dist <= adjustedEps) {
+      if(dist <= adjustedEps) {
         n.add(new DoubleDistanceResultPair(dist, pid));
       }
     }
@@ -314,7 +315,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
 
     /**
      * Constructor.
-     *
+     * 
      * @param relation Relation to apply to
      */
     public KernelDensityEstimator(Relation<V> relation) {
@@ -339,7 +340,10 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
 
       double density = 0;
       for(DoubleDistanceResultPair pair : neighbours) {
-        density += kernel.density(pair.getDoubleDistance() / bandwidth);
+        double v = pair.getDoubleDistance() / bandwidth;
+        if(v < 1) {
+          density += 1 - (v * v);
+        }
       }
 
       return density / relation.size();
@@ -353,7 +357,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
      */
     protected double optimalBandwidth(int dim) {
       // Pi in the publication is redundant and cancels out!
-      double hopt = 8 * Math.exp(GammaDistribution.logGamma(dim / 2.0 + 1)) * (dim + 4) * Math.pow(2, dim);
+      double hopt = 8 * GammaDistribution.gamma(dim / 2.0 + 1) * (dim + 4) * Math.pow(2, dim);
       return hopt * Math.pow(relation.size(), (-1 / (dim + 4)));
     }
 

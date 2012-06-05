@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.composedOf DistanceResultPair
  */
-public interface KNNResult<D extends Distance<D>> extends Collection<DistanceResultPair<D>> {
+public interface KNNResult<D extends Distance<D>> extends DistanceDBIDResult<D> {
   /**
    * Size
    */
@@ -58,6 +58,7 @@ public interface KNNResult<D extends Distance<D>> extends Collection<DistanceRes
    * 
    * @param index
    */
+  @Override
   public DistanceResultPair<D> get(int index);
 
   /**
