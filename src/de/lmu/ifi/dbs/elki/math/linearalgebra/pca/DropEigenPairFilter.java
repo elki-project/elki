@@ -79,7 +79,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
 
     // default value is "all strong".
     int contrastMaximum = eigenPairs.size() - 1;
-    double maxContrast = 0.0;
+    double maxContrast = 1.0;
 
     double[] ev = eigenPairs.eigenValues();
     // calc the eigenvalue sum.
@@ -88,16 +88,16 @@ public class DropEigenPairFilter implements EigenPairFilter {
       eigenValueSum += ev[i];
     }
     // Minimum value
-    final double weakEigenvalue = eigenValueSum / eigenPairs.size() * walpha;
+    final double weakEigenvalue = walpha * eigenValueSum / ev.length;
     // Now find the maximum contrast, scanning backwards.
     double prev_sum = ev[ev.length - 1];
-    double prev_rel = 1.0;
+    double prev_rel = 0.0;
     for(int i = 2; i <= ev.length; i++) {
       double curr_sum = prev_sum + ev[ev.length - i];
       double curr_rel = ev[ev.length - i] / (curr_sum / i);
       // not too weak?
       if(ev[ev.length - i] >= weakEigenvalue) {
-        double contrast = curr_rel / prev_rel;
+        double contrast = curr_rel - prev_rel;
         if(contrast > maxContrast) {
           maxContrast = contrast;
           contrastMaximum = ev.length - i;
