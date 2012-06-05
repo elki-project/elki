@@ -70,7 +70,12 @@ public class GeneratorMain {
   /**
    * List of clusters to generate
    */
-  private LinkedList<GeneratorInterface> generators = new LinkedList<GeneratorInterface>();
+  protected LinkedList<GeneratorInterface> generators = new LinkedList<GeneratorInterface>();
+
+  /**
+   * Controls whether points are tested against the model during generation
+   */
+  protected boolean testAgainstModel = true;
 
   /**
    * Add a cluster to the cluster list.
@@ -80,11 +85,6 @@ public class GeneratorMain {
   public void addCluster(GeneratorInterface c) {
     generators.add(c);
   }
-
-  /**
-   * Controls whether points are tested against the model during generation
-   */
-  private boolean testAgainstModel = true;
 
   /**
    * Main loop to generate data set.
