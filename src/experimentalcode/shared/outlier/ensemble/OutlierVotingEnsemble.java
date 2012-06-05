@@ -129,9 +129,10 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
       FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, logger) : null;
       for(Algorithm alg : algorithms) {
         Result res = alg.run(database);
-        for(OutlierResult ors : ResultUtil.getOutlierResults(res)) {
-          results.add(ors);
-          ids.addDBIDs(ors.getScores().getDBIDs());
+        List<OutlierResult> ors = ResultUtil.getOutlierResults(res);
+        for(OutlierResult or : ors) {
+          results.add(or);
+          ids.addDBIDs(or.getScores().getDBIDs());
         }
         if(prog != null) {
           prog.incrementProcessed(logger);
