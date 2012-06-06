@@ -1,0 +1,6 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="0">
+  <cluster name="Uniform" size="100">
+    <uniform min="0" max="1" />
+  </cluster>
+</dataset>
