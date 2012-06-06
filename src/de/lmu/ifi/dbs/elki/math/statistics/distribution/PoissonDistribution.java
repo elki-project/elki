@@ -220,7 +220,7 @@ public class PoissonDistribution implements Distribution {
    * @param lambda Lambda
    * @return pdf
    */
-  static protected double poissonPDFm1(double x_plus_1, double lambda) {
+  public static double poissonPDFm1(double x_plus_1, double lambda) {
     if(Double.isInfinite(lambda)) {
       return 0.;
     }
@@ -244,7 +244,7 @@ public class PoissonDistribution implements Distribution {
    * @param lambda Lambda
    * @return pdf
    */
-  static protected double logpoissonPDFm1(double x_plus_1, double lambda) {
+  public static double logpoissonPDFm1(double x_plus_1, double lambda) {
     if(Double.isInfinite(lambda)) {
       return Double.NEGATIVE_INFINITY;
     }
@@ -357,7 +357,7 @@ public class PoissonDistribution implements Distribution {
    * @param lambda lambda
    * @return Poisson distribution probability
    */
-  protected static double rawProbability(double x, double lambda) {
+  public static double rawProbability(double x, double lambda) {
     // Extreme lambda
     if(lambda == 0) {
       return ((x == 0) ? 1. : 0.);
@@ -388,7 +388,7 @@ public class PoissonDistribution implements Distribution {
    * @param log_p Flag to return log scale result
    * @return Poisson distribution probability
    */
-  protected static double rawLogProbability(double x, double lambda) {
+  public static double rawLogProbability(double x, double lambda) {
     // Extreme lambda
     if(lambda == 0) {
       return ((x == 0) ? 1. : Double.NEGATIVE_INFINITY);
