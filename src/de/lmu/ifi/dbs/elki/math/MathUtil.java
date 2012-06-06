@@ -80,6 +80,16 @@ public final class MathUtil {
   public static final double LOGPI = Math.log(Math.PI);
 
   /**
+   * Math.log(Math.PI) / 2
+   */
+  public static final double LOGPIHALF = LOGPI / 2.;
+
+  /**
+   * Math.log(Math.sqrt(2*Math.PI))
+   */
+  public static final double LOGSQRTTWOPI = Math.log(SQRTTWOPI);
+
+  /**
    * Fake constructor for static class.
    */
   private MathUtil() {
