@@ -174,7 +174,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
     for(DBID id : data.iterDBIDs()) {
-      String label = data.get(id).toString();
+      final Object val = data.get(id);
+      String label = (val != null) ? val.toString() : null;
       assign(labelMap, label, id);
     }
     return labelMap;
