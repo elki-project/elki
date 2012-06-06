@@ -101,7 +101,8 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
 
     for(DBID id : relation.iterDBIDs()) {
-      String label = relation.get(id).toString();
+      final Object val = relation.get(id);
+      String label = (val != null) ? val.toString() : null;
 
       if(labelmap.containsKey(label)) {
         labelmap.get(label).add(id);
