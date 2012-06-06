@@ -1,0 +1,410 @@
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
+
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * INCOMPLETE implementation of the poisson distribution.
+ * 
+ * TODO: continue implementing, CDF and nextRandom are missing
+ * 
+ * References:
+ * <p>
+ * Catherine Loader<br />
+ * Fast and Accurate Computation of Binomial Probabilities.
+ * </p>
+ * 
+ * @author Erich Schubert
+ */
+public class PoissonDistribution implements Distribution {
+  /**
+   * Number of tries
+   */
+  private int n;
+
+  /**
+   * Success probability
+   */
+  private double p;
+
+  /** Stirling error constants: 1./12 */
+  private final static double S0 = 0.08333333333333333333333d;
+
+  /** Stirling error constants: 1./360 */
+  private final static double S1 = 0.0027777777777777777777777777778d;
+
+  /** Stirling error constants: 1./1260 */
+  private final static double S2 = 0.00079365079365079365079365d;
+
+  /** Stirling error constants: 1./1680 */
+  private final static double S3 = 0.000595238095238095238095238095d;
+
+  /** Stirling error constants: 1./1188 */
+  private final static double S4 = 0.00084175084175084175084175084175d;
+
+  /**
+   * Exact table values for n <= 15 in steps of 0.5
+   * 
+   * sfe[n] = ln( (n!*e^n)/((n^n)*sqrt(2*pi*n)) )
+   */
+  private final static double STIRLING_EXACT_ERROR[] = {//
+  0.0, // 0.0
+  0.1534264097200273452913848, // 0.5
+  0.0810614667953272582196702, // 1.0
+  0.0548141210519176538961390, // 1.5
+  0.0413406959554092940938221, // 2.0
+  0.03316287351993628748511048, // 2.5
+  0.02767792568499833914878929, // 3.0
+  0.02374616365629749597132920, // 3.5
+  0.02079067210376509311152277, // 4.0
+  0.01848845053267318523077934, // 4.5
+  0.01664469118982119216319487, // 5.0
+  0.01513497322191737887351255, // 5.5
+  0.01387612882307074799874573, // 6.0
+  0.01281046524292022692424986, // 6.5
+  0.01189670994589177009505572, // 7.0
+  0.01110455975820691732662991, // 7.5
+  0.010411265261972096497478567, // 8.0
+  0.009799416126158803298389475, // 8.5
+  0.009255462182712732917728637, // 9.0
+  0.008768700134139385462952823, // 9.5
+  0.008330563433362871256469318, // 10.0
+  0.007934114564314020547248100, // 10.5
+  0.007573675487951840794972024, // 11.0
+  0.007244554301320383179543912, // 11.5
+  0.006942840107209529865664152, // 12.0
+  0.006665247032707682442354394, // 12.5
+  0.006408994188004207068439631, // 13.0
+  0.006171712263039457647532867, // 13.5
+  0.005951370112758847735624416, // 14.0
+  0.005746216513010115682023589, // 14.5
+  0.0055547335519628013710386900 // 15.0
+  };
+
+  /**
+   * Constructor.
+   * 
+   * Private: API not yet completely implemented!
+   * 
+   * @param n Number of tries
+   * @param p Success probability
+   */
+  public PoissonDistribution(int n, double p) {
+    super();
+    this.n = n;
+    this.p = p;
+  }
+
+  @Override
+  public double nextRandom() {
+    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  /**
+   * Poisson PMF for integer values.
+   * 
+   * @param x integer values
+   * @return Probability
+   */
+  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  public double pmf(int x) {
+    // Invalid values
+    if(x < 0 || x > n) {
+      return 0.0;
+    }
+    // Extreme probabilities
+    if(p <= 0d) {
+      return x == 0 ? 1.0 : 0.0;
+    }
+    if(p >= 1d) {
+      return x == n ? 1.0 : 0.0;
+    }
+    // Extreme values of x
+    if(x == 0) {
+      if(p < 0.1) {
+        return Math.exp(-devianceTerm(n, n * (1.0 - p)) - n * p);
+      }
+      else {
+        return Math.exp(n * Math.log(1.0 - p));
+      }
+    }
+    if(x == n) {
+      if(p > 0.9) {
+        return Math.exp(-devianceTerm(n, n * p) - n * (1 - p));
+      }
+      else {
+        return Math.exp(n * Math.log(p));
+      }
+    }
+
+    final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * (1.0 - p));
+    final double f = (MathUtil.TWOPI * x * (n - x)) / n;
+    return Math.exp(lc) / Math.sqrt(f);
+  }
+
+  @Override
+  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  public double pdf(double x) {
+    // Invalid values
+    if(x < 0 || x > n) {
+      return 0.0;
+    }
+    // Extreme probabilities
+    if(p <= 0d) {
+      return x == 0 ? 1.0 : 0.0;
+    }
+    if(p >= 1d) {
+      return x == n ? 1.0 : 0.0;
+    }
+    final double q = 1 - p;
+    // FIXME: check for x to be integer, return 0 otherwise?
+
+    // Extreme values of x
+    if(x == 0) {
+      if(p < 0.1) {
+        return Math.exp(-devianceTerm(n, n * q) - n * p);
+      }
+      else {
+        return Math.exp(n * Math.log(q));
+      }
+    }
+    if(x == n) {
+      if(p > 0.9) {
+        return Math.exp(-devianceTerm(n, n * p) - n * q);
+      }
+      else {
+        return Math.exp(n * Math.log(p));
+      }
+    }
+    final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * q);
+    final double f = (MathUtil.TWOPI * x * (n - x)) / n;
+    return Math.exp(lc) / Math.sqrt(f);
+  }
+
+  @Override
+  public double cdf(double val) {
+    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  /**
+   * Compute the poisson distribution PDF with an offset of + 1
+   * 
+   * pdf(x_plus_1 - 1, lambda)
+   * 
+   * @param x_plus_1 x+1
+   * @param lambda Lambda
+   * @return pdf
+   */
+  static protected double poissonPDFm1(double x_plus_1, double lambda) {
+    if(Double.isInfinite(lambda)) {
+      return 0.;
+    }
+    if(x_plus_1 > 1) {
+      return rawProbability(x_plus_1 - 1, lambda);
+    }
+    if(lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
+      return Math.exp(-lambda - GammaDistribution.logGamma(x_plus_1));
+    }
+    else {
+      return rawProbability(x_plus_1, lambda) * (x_plus_1 / lambda);
+    }
+  }
+
+  /**
+   * Compute the poisson distribution PDF with an offset of + 1
+   * 
+   * log pdf(x_plus_1 - 1, lambda)
+   * 
+   * @param x_plus_1 x+1
+   * @param lambda Lambda
+   * @return pdf
+   */
+  static protected double logpoissonPDFm1(double x_plus_1, double lambda) {
+    if(Double.isInfinite(lambda)) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if(x_plus_1 > 1) {
+      return rawLogProbability(x_plus_1 - 1, lambda);
+    }
+    if(lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
+      return -lambda - GammaDistribution.logGamma(x_plus_1);
+    }
+    else {
+      return rawLogProbability(x_plus_1, lambda) + Math.log(x_plus_1 / lambda);
+    }
+  }
+
+  /**
+   * Calculates the Striling Error
+   * 
+   * stirlerr(n) = ln(n!) - ln(sqrt(2*pi*n)*(n/e)^n)
+   * 
+   * @param n Parameter n
+   * @return Stirling error
+   */
+  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  private static double stirlingError(int n) {
+    // Try to use a table value:
+    if(n < 16) {
+      return STIRLING_EXACT_ERROR[n * 2];
+    }
+    final double nn = n * n;
+    // Use the appropriate number of terms
+    if(n > 500) {
+      return (S0 - S1 / nn) / n;
+    }
+    if(n > 80) {
+      return ((S0 - (S1 - S2 / nn)) / nn) / n;
+    }
+    if(n > 35) {
+      return ((S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n);
+    }
+    return ((S0 - (S1 - (S2 - (S3 - S4 / nn) / nn) / nn) / nn) / n);
+  }
+
+  /**
+   * Calculates the Striling Error
+   * 
+   * stirlerr(n) = ln(n!) - ln(sqrt(2*pi*n)*(n/e)^n)
+   * 
+   * @param n Parameter n
+   * @return Stirling error
+   */
+  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  private static double stirlingError(double n) {
+    if(n < 16.0) {
+      // Our table has a step size of 0.5
+      final double n2 = 2.0 * n;
+      if(Math.floor(n2) == n2) { // Exact match
+        return STIRLING_EXACT_ERROR[(int) n2];
+      }
+      else {
+        return GammaDistribution.logGamma(n + 1.0) - (n + 0.5) * Math.log(n) + n - MathUtil.LOGSQRTTWOPI;
+      }
+    }
+    final double nn = n * n;
+    if(n > 500.0) {
+      return (S0 - S1 / nn) / n;
+    }
+    if(n > 80.0) {
+      return ((S0 - (S1 - S2 / nn)) / nn) / n;
+    }
+    if(n > 35.0) {
+      return ((S0 - (S1 - (S2 - S3 / nn) / nn) / nn) / n);
+    }
+    return ((S0 - (S1 - (S2 - (S3 - S4 / nn) / nn) / nn) / nn) / n);
+  }
+
+  /**
+   * Evaluate the deviance term of the saddle point approximation.
+   * 
+   * bd0(x,np) = x*ln(x/np)+np-x
+   * 
+   * @param x probability density function position
+   * @param np product of trials and success probability: n*p
+   * @return Deviance term
+   */
+  @Reference(title = "Fast and accurate computation of binomial probabilities", authors = "C. Loader", booktitle = "", url = "http://projects.scipy.org/scipy/raw-attachment/ticket/620/loader2000Fast.pdf")
+  private static double devianceTerm(double x, double np) {
+    if(Math.abs(x - np) < 0.1 * (x + np)) {
+      final double v = (x - np) / (x + np);
+
+      double s = (x - np) * v;
+      double ej = 2.0d * x * v;
+      for(int j = 1;; j++) {
+        ej *= v * v;
+        final double s1 = s + ej / (2 * j + 1);
+        if(s1 == s) {
+          return s1;
+        }
+        s = s1;
+      }
+    }
+    return x * Math.log(x / np) + np - x;
+  }
+
+  /**
+   * Poisson distribution probability, but also for non-integer arguments.
+   * 
+   * lb^x exp(-lb) / x!
+   * 
+   * @param x X
+   * @param lambda lambda
+   * @return Poisson distribution probability
+   */
+  protected static double rawProbability(double x, double lambda) {
+    // Extreme lambda
+    if(lambda == 0) {
+      return ((x == 0) ? 1. : 0.);
+    }
+    // Extreme values
+    if(Double.isInfinite(lambda) || x < 0) {
+      return 0.;
+    }
+    if(x <= lambda * Double.MIN_NORMAL) {
+      return Math.exp(-lambda);
+    }
+    if(lambda < x * Double.MIN_NORMAL) {
+      double r = -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
+      return Math.exp(r);
+    }
+    final double f = MathUtil.TWOPI * x;
+    final double y = -stirlingError(x) - devianceTerm(x, lambda);
+    return Math.exp(y) / Math.sqrt(f);
+  }
+
+  /**
+   * Poisson distribution probability, but also for non-integer arguments.
+   * 
+   * lb^x exp(-lb) / x!
+   * 
+   * @param x X
+   * @param lambda lambda
+   * @param log_p Flag to return log scale result
+   * @return Poisson distribution probability
+   */
+  protected static double rawLogProbability(double x, double lambda) {
+    // Extreme lambda
+    if(lambda == 0) {
+      return ((x == 0) ? 1. : Double.NEGATIVE_INFINITY);
+    }
+    // Extreme values
+    if(Double.isInfinite(lambda) || x < 0) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if(x <= lambda * Double.MIN_NORMAL) {
+      return -lambda;
+    }
+    if(lambda < x * Double.MIN_NORMAL) {
+      return -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
+    }
+    final double f = MathUtil.TWOPI * x;
+    final double y = -stirlingError(x) - devianceTerm(x, lambda);
+    return -0.5 * Math.log(f) + y;
+  }
+}
