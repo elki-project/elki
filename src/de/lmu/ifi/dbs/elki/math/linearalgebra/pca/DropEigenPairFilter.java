@@ -26,10 +26,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -94,11 +92,9 @@ public class DropEigenPairFilter implements EigenPairFilter {
     // Now find the maximum contrast, scanning backwards.
     double prev_sum = ev[ev.length - 1];
     double prev_rel = 1.0;
-    double[] rels = new double[ev.length];
-    rels[ev.length - 1] = prev_rel;
     for(int i = 2; i <= ev.length; i++) {
       double curr_sum = prev_sum + ev[ev.length - i];
-      double curr_rel = ev[ev.length - i] / (curr_sum / i);
+      double curr_rel = ev[ev.length - i] / curr_sum * i;
       // not too weak?
       if(ev[ev.length - i] >= weakEigenvalue) {
         double contrast = curr_rel - prev_rel;
@@ -109,9 +105,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
       }
       prev_sum = curr_sum;
       prev_rel = curr_rel;
-      rels[ev.length - i] = curr_rel;
     }
-    //LoggingUtil.warning(FormatUtil.format(rels)+" selected: "+contrastMaximum);
 
     for(int i = 0; i <= contrastMaximum; i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
