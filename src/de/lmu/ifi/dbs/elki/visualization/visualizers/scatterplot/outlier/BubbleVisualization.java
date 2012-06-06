@@ -99,11 +99,13 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
    * 
    * @param task Visualization task
    * @param scaling Scaling function
+   * @param fill Fill flag
    */
-  public BubbleVisualization(VisualizationTask task, ScalingFunction scaling) {
+  public BubbleVisualization(VisualizationTask task, ScalingFunction scaling, boolean fill) {
     super(task);
     this.result = task.getResult();
     this.scaling = scaling;
+    this.fill = fill;
     context.addDataStoreListener(this);
     incrementalRedraw();
   }
@@ -275,7 +277,7 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
         final OutlierResult outlierResult = task.getResult();
         ((OutlierScalingFunction) this.scaling).prepare(outlierResult);
       }
-      return new BubbleVisualization(task, scaling);
+      return new BubbleVisualization(task, scaling, fill);
     }
 
     @Override
