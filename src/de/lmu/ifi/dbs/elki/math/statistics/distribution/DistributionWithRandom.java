@@ -1,5 +1,4 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,33 +23,15 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 
 /**
- * Interface for a simple distribution generator with a PDF, i.e. it can also
- * compute a density
+ * Distribution that also has support for generating random numbers.
  * 
  * @author Erich Schubert
  */
-public interface Distribution {
+public interface DistributionWithRandom extends Distribution {
   /**
-   * Return the density of an existing value
+   * Generate a new random value
    * 
-   * @param val existing value
-   * @return distribution density
+   * @return new random value
    */
-  public double pdf(double val);
-
-  /**
-   * Return the cumulative density function at the given value.
-   * 
-   * @param val existing value
-   * @return cumulative density
-   */
-  public double cdf(double val);
-
-  /**
-   * Describe the distribution
-   * 
-   * @return description
-   */
-  @Override
-  public String toString();
+  public double nextRandom();
 }

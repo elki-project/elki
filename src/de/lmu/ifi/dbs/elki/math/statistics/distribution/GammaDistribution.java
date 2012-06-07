@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  */
-public class GammaDistribution implements Distribution {
+public class GammaDistribution implements DistributionWithRandom {
   /**
    * LANCZOS-Coefficients for Gamma approximation.
    * 

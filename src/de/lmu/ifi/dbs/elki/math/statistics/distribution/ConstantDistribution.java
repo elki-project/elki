@@ -28,7 +28,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * 
  * @author Erich Schubert
  */
-public class ConstantDistribution implements Distribution {
+public class ConstantDistribution implements DistributionWithRandom {
   /**
    * The constant
    */

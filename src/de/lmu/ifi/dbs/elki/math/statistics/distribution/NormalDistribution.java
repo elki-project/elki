@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @author Erich Schubert
  */
-public class NormalDistribution implements Distribution {
+public class NormalDistribution implements DistributionWithRandom {
   /**
    * Coefficients for erf approximation.
    * 

@@ -28,7 +28,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * 
  * @author Erich Schubert
  */
-public class ChiDistribution implements Distribution {
+public class ChiDistribution implements DistributionWithRandom {
   /**
    * Degrees of freedom. Usually integer.
    */

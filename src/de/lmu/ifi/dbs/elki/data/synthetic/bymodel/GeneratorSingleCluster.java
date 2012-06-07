@@ -30,7 +30,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionWithRandom;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
@@ -47,7 +47,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
   /**
    * The distribution generators for each axis
    */
-  private List<Distribution> axes = new ArrayList<Distribution>();
+  private List<DistributionWithRandom> axes = new ArrayList<DistributionWithRandom>();
 
   /**
    * The transformation matrix
@@ -121,7 +121,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    * @throws UnableToComplyException thrown when no new generators may be added
    *         anymore
    */
-  public void addGenerator(Distribution gen) throws UnableToComplyException {
+  public void addGenerator(DistributionWithRandom gen) throws UnableToComplyException {
     if(trans != null) {
       throw new UnableToComplyException("Generators may no longer be added when transformations have been applied.");
     }
@@ -235,7 +235,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
     while(result.size() < count) {
       double[] d = new double[dim];
       int i = 0;
-      for(Distribution axis : axes) {
+      for(DistributionWithRandom axis : axes) {
         d[i] = axis.nextRandom();
         i++;
       }
@@ -269,7 +269,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
     double density = 1.0;
     int i = 0;
-    for(Distribution axis : axes) {
+    for(DistributionWithRandom axis : axes) {
       density = density * axis.pdf(o.get(i));
       i++;
     }
@@ -389,6 +389,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    * 
    * @return Model
    */
+  @Override
   public Model makeModel() {
     return this;
   }
@@ -399,7 +400,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    * @param i Generator axis i
    * @return Distribution
    */
-  public Distribution getDistribution(int i) {
+  public DistributionWithRandom getDistribution(int i) {
     return axes.get(i);
   }
 }
