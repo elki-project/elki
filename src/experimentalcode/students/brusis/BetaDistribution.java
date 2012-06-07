@@ -31,11 +31,8 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
  * function
  * 
  * @author Jan Brusis
- * 
  */
-
 public class BetaDistribution implements Distribution {
-
   /**
    * Numerical precision to use
    */
@@ -67,7 +64,6 @@ public class BetaDistribution implements Distribution {
   private final double b;
 
   /**
-   * 
    * Constructor.
    * 
    * @param a shape Parameter a
@@ -83,11 +79,9 @@ public class BetaDistribution implements Distribution {
     this.b = b;
   }
 
-  // TODO what's this?
   @Override
   public double nextRandom() {
-    // TODO Auto-generated method stub
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -97,16 +91,28 @@ public class BetaDistribution implements Distribution {
 
   @Override
   public double cdf(double val) {
+    return cdf(val, a, b);
+  }
+
+  /**
+   * Static version of the CDF of the beta distribution
+   * 
+   * @param val Value
+   * @param a Shape parameter a
+   * @param b Shape parameter b
+   * @return cumulative density
+   */
+  public static double cdf(double val, double a, double b) {
     return regularizedIncBeta(val, a, b);
   }
 
   /**
    * Static version of the PDF of the beta distribution
    * 
-   * @param val
-   * @param a
-   * @param b
-   * @return
+   * @param val Value
+   * @param a Shape parameter a
+   * @param b Shape parameter b
+   * @return probability density
    */
   public static double pdf(double val, double a, double b) {
     return Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b)) * Math.pow(val, a - 1) * Math.pow(1 - val, b - 1);
@@ -114,7 +120,7 @@ public class BetaDistribution implements Distribution {
 
   /**
    * Computes the regularized incomplete beta function I_x(a, b) which is also
-   * the CDF of the beta distribution Based on "Numerical Recipes"
+   * the CDF of the beta distribution. Based on the book "Numerical Recipes"
    * 
    * @param a Parameter a
    * @param b Parameter b
@@ -149,7 +155,7 @@ public class BetaDistribution implements Distribution {
    * @param x Parameter x
    * @return result
    */
-  private static double regularizedIncBetaCF(double a, double b, double x) {
+  protected static double regularizedIncBetaCF(double a, double b, double x) {
     final double FPMIN = Double.MIN_VALUE / NUM_PRECISION;
     double qab = a + b;
     double qap = a + 1.0;
@@ -202,7 +208,7 @@ public class BetaDistribution implements Distribution {
    * @param x Parameter x
    * @return result
    */
-  private static double regularizedIncBetaQuadrature(double a, double b, double x) {
+  protected static double regularizedIncBetaQuadrature(double a, double b, double x) {
     double a1 = a - 1.0;
     double b1 = b - 1.0;
     double mu = a / (a + b);

@@ -25,18 +25,21 @@ package experimentalcode.students.brusis;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 
+/**
+ * Student's t distribution.
+ * 
+ * @author Jan Brusis
+ */
 public class StudentsTDistribution implements Distribution {
-
   /**
    * Degrees of freedom
    */
   private final int v;
 
   /**
-   * 
    * Constructor.
    * 
-   * @param v
+   * @param v Degrees of freedom
    */
   public StudentsTDistribution(int v) {
     this.v = v;
@@ -44,8 +47,7 @@ public class StudentsTDistribution implements Distribution {
 
   @Override
   public double nextRandom() {
-    // TODO Auto-generated method stub
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -59,8 +61,9 @@ public class StudentsTDistribution implements Distribution {
   }
 
   /**
-   * Static version of the t distribution's PDF
-   * @param val value toe valuate
+   * Static version of the t distribution's PDF.
+   * 
+   * @param val value to evaluate
    * @param v degrees of freedom
    * @return f(val,v)
    */
@@ -79,5 +82,4 @@ public class StudentsTDistribution implements Distribution {
     double x = v / (val * val + v);
     return 1 - (0.5 * BetaDistribution.regularizedIncBeta(x, v / 2, 0.5));
   }
-
 }
