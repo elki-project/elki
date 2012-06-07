@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import java.util.Random;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,7 +34,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * 
  * @author Jan Brusis
  */
-public class BetaDistribution implements Distribution {
+public class BetaDistribution implements DistributionWithRandom {
   /**
    * Numerical precision to use
    */
@@ -64,12 +66,28 @@ public class BetaDistribution implements Distribution {
   private final double b;
 
   /**
+   * For random number generation
+   */
+  private Random random;
+
+  /**
    * Constructor.
    * 
    * @param a shape Parameter a
    * @param b shape Parameter b
    */
   public BetaDistribution(double a, double b) {
+    this(a, b, new Random());
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param a shape Parameter a
+   * @param b shape Parameter b
+   * @param random Random generator
+   */
+  public BetaDistribution(double a, double b, Random random) {
     super();
     if(a <= 0.0 || b <= 0.0) {
       throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
@@ -77,6 +95,7 @@ public class BetaDistribution implements Distribution {
 
     this.a = a;
     this.b = b;
+    this.random = random;
   }
 
   @Override
@@ -87,6 +106,13 @@ public class BetaDistribution implements Distribution {
   @Override
   public double cdf(double val) {
     return cdf(val, a, b);
+  }
+
+  @Override
+  public double nextRandom() {
+    double x = GammaDistribution.nextRandom(a, 1, random);
+    double y = GammaDistribution.nextRandom(b, 1, random);
+    return x / (x+y);
   }
 
   /**
