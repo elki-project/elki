@@ -44,11 +44,6 @@ public class StudentsTDistribution implements Distribution {
   }
 
   @Override
-  public double nextRandom() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public double pdf(double val) {
     return pdf(val, v);
   }

@@ -120,11 +120,6 @@ public class PoissonDistribution implements Distribution {
     this.p = p;
   }
 
-  @Override
-  public double nextRandom() {
-    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
   /**
    * Poisson PMF for integer values.
    * 

@@ -28,6 +28,8 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * Beta Distribution with implementation of the regularized incomplete beta
  * function
  * 
+ * TODO: add random generator.
+ * 
  * @author Jan Brusis
  */
 public class BetaDistribution implements Distribution {
@@ -75,11 +77,6 @@ public class BetaDistribution implements Distribution {
 
     this.a = a;
     this.b = b;
-  }
-
-  @Override
-  public double nextRandom() {
-    throw new UnsupportedOperationException();
   }
 
   @Override
