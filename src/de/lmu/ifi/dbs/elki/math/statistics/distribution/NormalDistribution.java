@@ -154,6 +154,16 @@ public class NormalDistribution implements DistributionWithRandom {
     return cdf(val, mean, stddev);
   }
 
+  /**
+   * Probit / erfinv function.
+   * 
+   * @param q
+   * @return
+   */
+  public double probit(double q) {
+    return probit(q, mean, stddev);
+  }
+
   @Override
   public double nextRandom() {
     return mean + random.nextGaussian() * stddev;

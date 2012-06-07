@@ -35,7 +35,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
    * @param dof Degrees of freedom.
    */
   public ChiSquaredDistribution(double dof) {
-    super(.5 * dof, 2.0);
+    super(.5 * dof, .5);
   }
 
   /**
@@ -69,4 +69,6 @@ public class ChiSquaredDistribution extends GammaDistribution {
     }
     return Math.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
   }
+  
+  
 }
