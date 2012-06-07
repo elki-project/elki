@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
@@ -101,6 +102,15 @@ public class GammaDistribution implements Distribution {
     return cdf(val, k, theta);
   }
 
+  /**
+   * Compute probit (inverse cdf) for Gamma distributions.
+   * 
+   * @param val Test probability
+   */
+  public double probit(double val) {
+    return probit(val, k, theta);
+  }
+
   @Override
   public double nextRandom() {
     return nextRandom(k, theta, random);
@@ -143,6 +153,18 @@ public class GammaDistribution implements Distribution {
   }
 
   /**
+   * The log CDF, static version.
+   * 
+   * @param val Value
+   * @param k Shape k
+   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @return cdf value
+   */
+  public static double logcdf(double val, double k, double theta) {
+    return logregularizedGammaP(k, val / theta);
+  }
+
+  /**
    * Gamma distribution PDF (with 0.0 for x &lt; 0)
    * 
    * @param x query value
@@ -167,6 +189,33 @@ public class GammaDistribution implements Distribution {
     }
 
     return Math.exp((k - 1.0) * Math.log(x * theta) - x * theta - logGamma(k)) * theta;
+  }
+
+  /**
+   * Gamma distribution PDF (with 0.0 for x &lt; 0)
+   * 
+   * @param x query value
+   * @param k Alpha
+   * @param theta Theta = 1 / Beta
+   * @return probability density
+   */
+  public static double logpdf(double x, double k, double theta) {
+    if(x < 0) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if(x == 0) {
+      if(k == 1.0) {
+        return Math.log(theta);
+      }
+      else {
+        return Double.NEGATIVE_INFINITY;
+      }
+    }
+    if(k == 1.0) {
+      return Math.log(theta) - x * theta;
+    }
+
+    return Math.log(theta) + (k - 1.0) * Math.log(x * theta) - x * theta - logGamma(k);
   }
 
   /**
@@ -249,6 +298,49 @@ public class GammaDistribution implements Distribution {
       return 1.0;
     }
     return Math.exp(-x + (a * Math.log(x)) - logGamma(a)) * sum;
+  }
+
+  /**
+   * Returns the regularized gamma function log P(a, x).
+   * 
+   * Includes the quadrature way of computing.
+   * 
+   * TODO: find "the" most accurate version of this. We seem to agree with
+   * others for the first 10+ digits, but diverge a bit later than that.
+   * 
+   * @param a Parameter a
+   * @param x Parameter x
+   * @return Gamma value
+   */
+  public static double logregularizedGammaP(final double a, final double x) {
+    // Special cases
+    if(Double.isNaN(a) || Double.isNaN(x) || (a <= 0.0) || (x < 0.0)) {
+      return Double.NaN;
+    }
+    if(x == 0.0) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if(x >= a + 1) {
+      // Expected to converge faster
+      // FIXME: and in log?
+      return Math.log(1.0 - regularizedGammaQ(a, x));
+    }
+    // Loosely following "Numerical Recipes"
+    double del = 1.0 / a;
+    double sum = del;
+    for(int n = 1; n < Integer.MAX_VALUE; n++) {
+      // compute next element in the series
+      del *= x / (a + n);
+      sum = sum + del;
+      if(Math.abs(del / sum) < NUM_PRECISION || sum >= Double.POSITIVE_INFINITY) {
+        break;
+      }
+    }
+    if(Double.isInfinite(sum)) {
+      return 0;
+    }
+    // TODO: reread numerical recipes, can we replace log(sum)?
+    return -x + (a * Math.log(x)) - logGamma(a) + Math.log(sum);
   }
 
   /**
@@ -482,5 +574,234 @@ public class GammaDistribution implements Distribution {
         }
       }
     }
+  }
+
+  /**
+   * Approximate probit for chi squared distribution
+   * 
+   * Based on first half of algorithm AS 91
+   * 
+   * @param p Probit value
+   * @param nu Shape parameter for Chi, nu = 2 * k
+   * @param g log(nu)
+   * @param eps Approximation quality
+   * @return Probit for chi squared
+   */
+  protected static double chisquaredProbitApproximation(final double p, double nu, double g) {
+    final double EPS1 = 1e-2; // Approximation quality
+    // Sanity checks
+    if(Double.isNaN(p) || Double.isNaN(nu)) {
+      return Double.NaN;
+    }
+    // Range check
+    if(p <= 0) {
+      return 0;
+    }
+    if(p >= 1) {
+      return Double.POSITIVE_INFINITY;
+    }
+    // Invalid parameters
+    if(nu <= 0) {
+      return Double.NaN;
+    }
+    // Shape of gamma distribution, "XX" in AS 91
+    final double k = 0.5 * nu;
+
+    // For small chi squared values - AS 91
+    final double logp = Math.log(p);
+    if(nu < -1.24 * logp) {
+      // FIXME: implement and use logGammap1 instead - more stable?
+      //
+      // final double lgam1pa = (alpha < 0.5) ? logGammap1(alpha) :
+      // (Math.log(alpha) + g);
+      // return Math.exp((lgam1pa + logp) / alpha + MathUtil.LOG2);
+      // This is literal AS 91, above is the GNU R variant.
+      return Math.pow(p * k * Math.exp(g + k * MathUtil.LOG2), 1 / k);
+    }
+    else if(nu > 0.32) {
+      // Wilson and Hilferty estimate: - AS 91 at 3
+      final double x = NormalDistribution.probit(p, 0, 1);
+      final double p1 = 2. / (9. * nu);
+      double ch = nu * Math.pow(x * Math.sqrt(p1) + 1 - p1, 3);
+
+      // Better approximation for p tending to 1:
+      if(ch > 2.2 * nu + 6) {
+        ch = -2 * (Math.log(1 - p) - (k - 1) * Math.log(0.5 * ch) + g);
+      }
+      return ch;
+    }
+    else {
+      // nu <= 0.32, AS 91 at 1
+      final double C7 = 4.67, C8 = 6.66, C9 = 6.73, C10 = 13.32;
+      final double ag = Math.log(1 - p) + g + (k - 1) * MathUtil.LOG2;
+      double ch = 0.4;
+      while(true) {
+        final double p1 = 1 + ch * (C7 + ch);
+        final double p2 = ch * (C9 + ch * (C8 + ch));
+        final double t = -0.5 + (C7 + 2 * ch) / p1 - (C9 + ch * (C10 + 3 * ch)) / p2;
+        final double delta = (1 - Math.exp(ag + 0.5 * ch) * p2 / p1) / t;
+        ch -= delta;
+        if(Math.abs(delta) > EPS1 * Math.abs(ch)) {
+          return ch;
+        }
+      }
+    }
+  }
+
+  /**
+   * Compute probit (inverse cdf) for Gamma distributions.
+   * 
+   * Based on algorithm AS 91
+   * 
+   * @param p Probability
+   * @param k k, alpha aka. "shape" parameter
+   * @param theta Theta = 1.0/Beta aka. "scaling" parameter
+   * @return Probit for Gamma distribution
+   */
+  public static double probit(double p, double k, double theta) {
+    final double EPS2 = 5e-7; // final precision of AS 91
+    final int MAXIT = 1000;
+
+    // Avoid degenerates
+    if(Double.isNaN(p) || Double.isNaN(k) || Double.isNaN(theta)) {
+      return Double.NaN;
+    }
+    // Range check
+    if(p <= 0) {
+      return 0;
+    }
+    if(p >= 1) {
+      return Double.POSITIVE_INFINITY;
+    }
+    // Shape parameter check
+    if(k < 0 || theta <= 0) {
+      return Double.NaN;
+    }
+    // Corner case - all at 0
+    if(k == 0) {
+      return 0.;
+    }
+
+    int max_newton_iterations = 1;
+    // For small values, ensure some refinement iterations
+    if(k < 1e-10) {
+      max_newton_iterations = 7;
+    }
+
+    final double g = logGamma(k); // == logGamma(v/2)
+
+    // Phase I, an initial rough approximation
+    // First half of AS 91
+    double ch = chisquaredProbitApproximation(p, 2 * k, g);
+    // Second hald of AS 91 follows:
+    // Refine ChiSquared approximation
+    chisq: {
+      if(Double.isInfinite(ch)) {
+        // Cannot refine infinity
+        max_newton_iterations = 0;
+        break chisq;
+      }
+      if(ch < EPS2) {
+        // Do not iterate, but refine with newton method
+        max_newton_iterations = 20;
+        break chisq;
+      }
+      if(p > 1 - 1e-14 || p < 1e-100) {
+        // Not in appropriate value range for AS 91
+        max_newton_iterations = 20;
+        break chisq;
+      }
+
+      // Phase II: Iteration
+      final double c = k - 1;
+      final double ch0 = ch; // backup initial approximation
+      for(int i = 1; i <= MAXIT; i++) {
+        final double q = ch; // previous approximation
+        final double p1 = 0.5 * ch;
+        final double p2 = p - regularizedGammaP(k, p1);
+        if(Double.isInfinite(p2) || ch <= 0) {
+          ch = ch0;
+          max_newton_iterations = 27;
+          break chisq;
+        }
+        { // Taylor series of AS 91: iteration via "goto 4"
+          final double t = p2 * Math.exp(k * MathUtil.LOG2 + g + p1 - c * Math.log(ch));
+          final double b = t / ch;
+          final double a = 0.5 * t - b * c;
+          final double s1 = (210. + a * (140. + a * (105. + a * (84. + a * (70. + 60. * a))))) / 420.;
+          final double s2 = (420. + a * (735. + a * (966. + a * (1141. + 1278 * a)))) / 2520.;
+          final double s3 = (210. + a * (462. + a * (707. + 932. * a))) / 2520.;
+          final double s4 = (252. + a * (672. + 1182. * a) + c * (294. + a * (889. + 1740. * a))) / 5040.;
+          final double s5 = (84. + 2264. * a + c * (1175. + 606. * a)) / 2520.;
+          final double s6 = (120. + c * (346. + 127. * c)) / 5040.;
+          ch += t * (1 + 0.5 * t * s1 - b * c * (s1 - b * (s2 - b * (s3 - b * (s4 - b * (s5 - b * s6))))));
+        }
+        if(Math.abs(q - ch) < EPS2 * ch) {
+          break chisq;
+        }
+        // Divergence treatment, from GNU R
+        if(Math.abs(q - ch) > 0.1 * Math.abs(ch)) {
+          ch = ((ch < q) ? 0.9 : 1.1) * q;
+        }
+      }
+      LoggingUtil.warning("No convergence in AS 91 Gamma probit.");
+      // no convergence in MAXIT iterations -- but we add Newton now...
+    }
+    double x = 0.5 * ch / theta;
+    if(max_newton_iterations > 0) {
+      // Refine result using final Newton steps.
+      // FIXME: this seems to reduce accuracy?!?
+      // x = gammaProbitNewtonRefinement(Math.log(p), k, theta, max_newton_iterations, x);
+    }
+    return x;
+  }
+
+  /**
+   * Refinement of ChiSquared probit using Newton iterations. A trick used by
+   * GNU R to improve precision.
+   * 
+   * @param logpt Target value of log p
+   * @param k Alpha
+   * @param theta Theta = 1 / Beta
+   * @param maxit Maximum number of iterations to do
+   * @param x Initial estimate
+   * @return Refined value
+   */
+  protected static double gammaProbitNewtonRefinement(final double logpt, final double k, final double theta, final int maxit, double x) {
+    final double EPS_N = 1e-15; // Precision threshold
+    // 0 is not possible, try MIN_NORMAL instead
+    if(x <= 0) {
+      x = Double.MIN_NORMAL;
+    }
+    // Current estimation
+    double logpc = logcdf(x, k, theta);
+    if(x == Double.MIN_NORMAL && logpc > logpt * (1. + 1e-7)) {
+      return 0.;
+    }
+    if(logpc == Double.NEGATIVE_INFINITY) {
+      return 0.;
+    }
+    // Refine by newton iterations
+    for(int i = 0; i < maxit; i++) {
+      // Error of current approximation
+      final double logpe = logpc - logpt;
+      if(Math.abs(logpe) < Math.abs(EPS_N * logpt)) {
+        break;
+      }
+      // Step size is controlled by PDF:
+      final double g = logpdf(x, k, theta);
+      if(g == Double.NEGATIVE_INFINITY) {
+        break;
+      }
+      final double newx = x - logpe * Math.exp(logpc - g);
+      // New estimate:
+      logpc = logcdf(newx, k, theta);
+      if(Math.abs(logpc - logpt) > Math.abs(logpe) || (i > 0 && Math.abs(logpc - logpt) == Math.abs(logpe))) {
+        // no further improvement
+        break;
+      }
+      x = newx;
+    }
+    return x;
   }
 }
