@@ -44,6 +44,7 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
    * Constructor.
    * 
    * @param dim
+   * @param seed
    */
   public DoubleVectorRandomProjectionFilter(int dim, long seed) {
     super(dim, seed);
