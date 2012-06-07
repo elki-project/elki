@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorStatic;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionWithRandom;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
@@ -334,7 +334,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     // *** new uniform generator
     Random random = cluster.getNewRandomGenerator();
-    Distribution generator = new UniformDistribution(min, max, random);
+    DistributionWithRandom generator = new UniformDistribution(min, max, random);
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
@@ -366,7 +366,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     // *** New normal distribution generator
     Random random = cluster.getNewRandomGenerator();
-    Distribution generator = new NormalDistribution(mean, stddev, random);
+    DistributionWithRandom generator = new NormalDistribution(mean, stddev, random);
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
@@ -398,7 +398,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     // *** New normal distribution generator
     Random random = cluster.getNewRandomGenerator();
-    Distribution generator = new GammaDistribution(k, theta, random);
+    DistributionWithRandom generator = new GammaDistribution(k, theta, random);
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
