@@ -1,4 +1,4 @@
-package experimentalcode.students.brusis;
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 /*
  This file is part of ELKI:
@@ -22,8 +22,6 @@ package experimentalcode.students.brusis;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 
 /**
  * Student's t distribution.
