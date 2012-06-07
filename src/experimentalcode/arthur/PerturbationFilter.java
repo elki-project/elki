@@ -275,7 +275,7 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
      * Key: {@code -perturbationfilter.seed}
      * </p>
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("perturbationfilter.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("perturbationfilter.seed", "Seed for random noise generation.");
 
     /**
      * Seed for randomly shuffling the rows of the database. If null, system time is used as seed.

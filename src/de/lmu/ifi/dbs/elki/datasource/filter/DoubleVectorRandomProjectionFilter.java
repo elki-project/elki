@@ -45,8 +45,8 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
    * 
    * @param dim
    */
-  public DoubleVectorRandomProjectionFilter(int dim) {
-    super(dim);
+  public DoubleVectorRandomProjectionFilter(int dim, long seed) {
+    super(dim, seed);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
 
     @Override
     protected DoubleVectorRandomProjectionFilter makeInstance() {
-      return new DoubleVectorRandomProjectionFilter(k);
+      return new DoubleVectorRandomProjectionFilter(k,seed);
     }
   }
 }

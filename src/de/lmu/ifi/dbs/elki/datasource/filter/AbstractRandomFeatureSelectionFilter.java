@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * <p>
@@ -74,6 +75,16 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
   public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("randomprojection.numberselected", "number of selected attributes");
 
   /**
+   * Optional parameter to specify a seed for random projection.
+   * If unused, system time is used as seed.
+   * <p>
+   * Key: {@code -randomprojection.seed}
+   * </p>
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("randomprojection.seed", "Seed for random selection of projection attributes.");
+
+  
+  /**
    * Holds the desired cardinality of the subset of attributes selected for
    * projection.
    */
@@ -82,7 +93,7 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
   /**
    * Holds a random object.
    */
-  protected final Random random = new Random();
+  protected final Random random;
 
   /**
    * Constructor.
@@ -92,6 +103,19 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
   public AbstractRandomFeatureSelectionFilter(int dim) {
     super();
     this.k = dim;
+    this.random = new Random();
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param dim dimensionality
+   * @param seed seed for random
+   */
+  public AbstractRandomFeatureSelectionFilter(int dim, long seed) {
+    super();
+    this.k = dim;
+    this.random = new Random(seed);
   }
   
   /**
@@ -115,6 +139,8 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
    */
   public static abstract class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     protected int k = 0;
+    
+    protected long seed = System.currentTimeMillis();
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -122,6 +148,10 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
       IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(1), 1);
       if(config.grab(kP)) {
         k = kP.getValue();
+      }
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
       }
     }
   }
