@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution;
 
 /**
  * Calculates a test statistic according to Welch's t test for two samples
