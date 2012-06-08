@@ -733,7 +733,7 @@ public class LinearEquationSystem {
     if(value < 10) {
       return 1;
     }
-    return (int) (Math.log(value) / Math.log(10) + 1);
+    return (int) Math.log10(value) + 1;
   }
 
   /**
