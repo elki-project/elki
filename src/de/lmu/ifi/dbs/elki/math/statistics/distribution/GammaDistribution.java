@@ -149,7 +149,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * @return cdf value
    */
   public static double cdf(double val, double k, double theta) {
-    return regularizedGammaP(k, val / theta);
+    return regularizedGammaP(k, val * theta);
   }
 
   /**
@@ -161,7 +161,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * @return cdf value
    */
   public static double logcdf(double val, double k, double theta) {
-    return logregularizedGammaP(k, val / theta);
+    return logregularizedGammaP(k, val * theta);
   }
 
   /**
