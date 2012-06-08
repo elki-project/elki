@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -68,5 +70,24 @@ public class ChiSquaredDistribution extends GammaDistribution {
       return Math.exp(-x * 2.0) * 2.0;
     }
     return Math.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
+  }
+
+  /**
+   * Return the quantile function for this distribution
+   * 
+   * Reference:
+   * <p>
+   * Algorithm AS 91: The percentage points of the $\chi$^2 distribution<br />
+   * D.J. Best, D. E. Roberts<br />
+   * Journal of the Royal Statistical Society. Series C (Applied Statistics)
+   * </p>
+   * 
+   * @param x Quantile
+   * @param dof Degrees of freedom
+   * @return quantile position
+   */
+  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
+  public static double quantile(double x, double dof) {
+    return GammaDistribution.quantile(x, .5 * dof, .5);
   }
 }

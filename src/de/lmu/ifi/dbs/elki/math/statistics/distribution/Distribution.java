@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 /**
  * Statistical distributions, with their common functions. See
- * {@link #DistributionWithRandom} for distributions that also have a random
+ * {@link DistributionWithRandom} for distributions that also have a random
  * generator included.
  * 
  * @author Erich Schubert
