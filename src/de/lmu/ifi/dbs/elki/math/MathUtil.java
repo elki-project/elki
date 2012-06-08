@@ -75,6 +75,11 @@ public final class MathUtil {
   public static final double LOG2 = Math.log(2);
 
   /**
+   * Natural logarithm of 10
+   */
+  public static final double LOG10 = Math.log(10);
+
+  /**
    * Math.log(Math.PI)
    */
   public static final double LOGPI = Math.log(Math.PI);
