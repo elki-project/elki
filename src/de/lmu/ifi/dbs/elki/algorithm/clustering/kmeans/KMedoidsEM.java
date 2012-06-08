@@ -180,9 +180,10 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
    * 
-   * @param relation the database to cluster
    * @param means a list of k means
+   * @param mdist Mean distances
    * @param clusters cluster assignment
+   * @param distQ distance query
    * @return true when the object was reassigned
    */
   protected boolean assignToNearestCluster(ArrayDBIDs means, Mean[] mdist, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {

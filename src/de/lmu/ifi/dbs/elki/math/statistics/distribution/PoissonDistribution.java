@@ -387,7 +387,6 @@ public class PoissonDistribution implements Distribution {
    * 
    * @param x X
    * @param lambda lambda
-   * @param log_p Flag to return log scale result
    * @return Poisson distribution probability
    */
   public static double rawLogProbability(double x, double lambda) {

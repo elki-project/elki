@@ -27,6 +27,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Gamma Distribution, with random generation and density functions.
@@ -577,12 +578,19 @@ public class GammaDistribution implements DistributionWithRandom {
    * 
    * Based on first half of algorithm AS 91
    * 
+   * Reference:
+   * <p>
+   * Algorithm AS 91: The percentage points of the $\chi$ 2 distribution<br />
+   * D.J. Best, D. E. Roberts<br />
+   * Journal of the Royal Statistical Society. Series C (Applied Statistics)
+   * </p>
+   * 
    * @param p Probit value
    * @param nu Shape parameter for Chi, nu = 2 * k
    * @param g log(nu)
-   * @param eps Approximation quality
    * @return Probit for chi squared
    */
+  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   protected static double chisquaredProbitApproximation(final double p, double nu, double g) {
     final double EPS1 = 1e-2; // Approximation quality
     // Sanity checks
@@ -647,13 +655,21 @@ public class GammaDistribution implements DistributionWithRandom {
   /**
    * Compute probit (inverse cdf) for Gamma distributions.
    * 
-   * Based on algorithm AS 91
+   * Based on algorithm AS 91:
+   * 
+   * Reference:
+   * <p>
+   * Algorithm AS 91: The percentage points of the $\chi$^2 distribution<br />
+   * D.J. Best, D. E. Roberts<br />
+   * Journal of the Royal Statistical Society. Series C (Applied Statistics)
+   * </p>
    * 
    * @param p Probability
    * @param k k, alpha aka. "shape" parameter
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
+  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi$^2 distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   public static double quantile(double p, double k, double theta) {
     final double EPS2 = 5e-7; // final precision of AS 91
     final int MAXIT = 1000;
@@ -753,8 +769,9 @@ public class GammaDistribution implements DistributionWithRandom {
   }
 
   /**
-   * Refinement of ChiSquared probit using Newton iterations. A trick used by
-   * GNU R to improve precision.
+   * Refinement of ChiSquared probit using Newton iterations.
+   * 
+   * A trick used by GNU R to improve precision.
    * 
    * @param logpt Target value of log p
    * @param k Alpha

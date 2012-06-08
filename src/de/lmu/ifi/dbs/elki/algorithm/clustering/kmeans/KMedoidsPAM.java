@@ -215,11 +215,12 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
    * 
-   * @param relation the database to cluster
+   * @param means Object centroids
    * @param ids Object ids
    * @param second Distance to second nearest medoid
    * @param clusters cluster assignment
-   * @return true when the object was reassigned
+   * @param distQ distance query
+   * @return true when any object was reassigned
    */
   protected boolean assignToNearestCluster(ArrayDBIDs means, DBIDs ids, WritableDoubleDataStore second, List<? extends ModifiableDBIDs> clusters, DistanceQuery<V, D> distQ) {
     boolean changed = false;
