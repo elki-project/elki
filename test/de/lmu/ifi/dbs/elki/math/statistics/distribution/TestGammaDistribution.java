@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  * @author Erich Schubert
  */
-public class TestGammaDistribution implements JUnit4Test {
+public class TestGammaDistribution extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //
   0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 1e-05, 1e-10, 0.1234567, 3.14159265359, 2.71828182846, 0.314159265359, 0.271828182846 //
   };
@@ -1230,76 +1230,44 @@ public class TestGammaDistribution implements JUnit4Test {
 
   @Test
   public void testPDF() {
-    checkPDF(1., 1., P_CDFPDF, SCIPY_GAMMA_PDF_1_1, 1e-12);
-    checkPDF(2., 1., P_CDFPDF, SCIPY_GAMMA_PDF_2_1, 1e-12);
-    checkPDF(4., 1., P_CDFPDF, SCIPY_GAMMA_PDF_4_1, 1e-12);
-    checkPDF(4., 10, P_CDFPDF, SCIPY_GAMMA_PDF_4_10, 1e-13);
-    checkPDF(.1, 10, P_CDFPDF, SCIPY_GAMMA_PDF_01_10, 1e-11);
-    checkPDF(.1, 20, P_CDFPDF, SCIPY_GAMMA_PDF_01_20, 1e-14);
-    checkPDF(.1, 4., P_CDFPDF, SCIPY_GAMMA_PDF_01_4, 1e-12);
-    checkPDF(.1, 1., P_CDFPDF, SCIPY_GAMMA_PDF_01_1, 1e-12);
-    checkPDF(1., 1., P_CDFPDF, GNUR_GAMMA_PDF_1_1, 1e-15);
-    checkPDF(2., 1., P_CDFPDF, GNUR_GAMMA_PDF_2_1, 1e-16);
-    checkPDF(4., 1., P_CDFPDF, GNUR_GAMMA_PDF_4_1, 1e-14);
-    checkPDF(4., 10, P_CDFPDF, GNUR_GAMMA_PDF_4_10, 1e-14);
-    checkPDF(.1, 10, P_CDFPDF, GNUR_GAMMA_PDF_01_10, 1e-15);
-    checkPDF(.1, 20, P_CDFPDF, GNUR_GAMMA_PDF_01_20, 1e-14);
-    checkPDF(.1, 4., P_CDFPDF, GNUR_GAMMA_PDF_01_4, 1e-15);
-    checkPDF(.1, 1., P_CDFPDF, GNUR_GAMMA_PDF_01_1, 1e-15);
+    checkPDF(new GammaDistribution(1., 1.), P_CDFPDF, SCIPY_GAMMA_PDF_1_1, 1e-12);
+    checkPDF(new GammaDistribution(2., 1.), P_CDFPDF, SCIPY_GAMMA_PDF_2_1, 1e-12);
+    checkPDF(new GammaDistribution(4., 1.), P_CDFPDF, SCIPY_GAMMA_PDF_4_1, 1e-12);
+    checkPDF(new GammaDistribution(4., 10), P_CDFPDF, SCIPY_GAMMA_PDF_4_10, 1e-13);
+    checkPDF(new GammaDistribution(.1, 10), P_CDFPDF, SCIPY_GAMMA_PDF_01_10, 1e-11);
+    checkPDF(new GammaDistribution(.1, 20), P_CDFPDF, SCIPY_GAMMA_PDF_01_20, 1e-14);
+    checkPDF(new GammaDistribution(.1, 4.), P_CDFPDF, SCIPY_GAMMA_PDF_01_4, 1e-12);
+    checkPDF(new GammaDistribution(.1, 1.), P_CDFPDF, SCIPY_GAMMA_PDF_01_1, 1e-12);
+    checkPDF(new GammaDistribution(1., 1.), P_CDFPDF, GNUR_GAMMA_PDF_1_1, 1e-15);
+    checkPDF(new GammaDistribution(2., 1.), P_CDFPDF, GNUR_GAMMA_PDF_2_1, 1e-16);
+    checkPDF(new GammaDistribution(4., 1.), P_CDFPDF, GNUR_GAMMA_PDF_4_1, 1e-14);
+    checkPDF(new GammaDistribution(4., 10), P_CDFPDF, GNUR_GAMMA_PDF_4_10, 1e-14);
+    checkPDF(new GammaDistribution(.1, 10), P_CDFPDF, GNUR_GAMMA_PDF_01_10, 1e-15);
+    checkPDF(new GammaDistribution(.1, 20), P_CDFPDF, GNUR_GAMMA_PDF_01_20, 1e-14);
+    checkPDF(new GammaDistribution(.1, 4.), P_CDFPDF, GNUR_GAMMA_PDF_01_4, 1e-15);
+    checkPDF(new GammaDistribution(.1, 1.), P_CDFPDF, GNUR_GAMMA_PDF_01_1, 1e-15);
   }
 
-  private void checkPDF(double alpha, double rate, double[] x, double[] expected, double err) {
-    GammaDistribution d = new GammaDistribution(alpha, rate);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.pdf(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int errlev = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
-  }
-  
   @Test
   public void testCDF() {
-    checkCDF(1., 1., P_CDFPDF, SCIPY_GAMMA_CDF_1_1, 1e-13);
-    checkCDF(2., 1., P_CDFPDF, SCIPY_GAMMA_CDF_2_1, 1e-12);
-    checkCDF(4., 1., P_CDFPDF, SCIPY_GAMMA_CDF_4_1, 1e-12);
-    checkCDF(4., 10, P_CDFPDF, SCIPY_GAMMA_CDF_4_10, 1e-12);
-    checkCDF(.1, 10, P_CDFPDF, SCIPY_GAMMA_CDF_01_10, 1e-14);
-    checkCDF(.1, 20, P_CDFPDF, SCIPY_GAMMA_CDF_01_20, 1e-15);
-    checkCDF(.1, 4., P_CDFPDF, SCIPY_GAMMA_CDF_01_4, 1e-13);
-    checkCDF(.1, 1., P_CDFPDF, SCIPY_GAMMA_CDF_01_1, 1e-13);
-    checkCDF(1., 1., P_CDFPDF, GNUR_GAMMA_CDF_1_1, 1e-15);
-    checkCDF(2., 1., P_CDFPDF, GNUR_GAMMA_CDF_2_1, 1e-15);
-    checkCDF(4., 1., P_CDFPDF, GNUR_GAMMA_CDF_4_1, 1e-14);
-    checkCDF(4., 10, P_CDFPDF, GNUR_GAMMA_CDF_4_10, 1e-15);
-    checkCDF(.1, 10, P_CDFPDF, GNUR_GAMMA_CDF_01_10, 1e-15);
-    checkCDF(.1, 20, P_CDFPDF, GNUR_GAMMA_CDF_01_20, 1e-15);
-    checkCDF(.1, 4., P_CDFPDF, GNUR_GAMMA_CDF_01_4, 1e-15);
-    checkCDF(.1, 1., P_CDFPDF, GNUR_GAMMA_CDF_01_1, 1e-15);
+    checkCDF(new GammaDistribution(1., 1.), P_CDFPDF, SCIPY_GAMMA_CDF_1_1, 1e-13);
+    checkCDF(new GammaDistribution(2., 1.), P_CDFPDF, SCIPY_GAMMA_CDF_2_1, 1e-12);
+    checkCDF(new GammaDistribution(4., 1.), P_CDFPDF, SCIPY_GAMMA_CDF_4_1, 1e-12);
+    checkCDF(new GammaDistribution(4., 10), P_CDFPDF, SCIPY_GAMMA_CDF_4_10, 1e-12);
+    checkCDF(new GammaDistribution(.1, 10), P_CDFPDF, SCIPY_GAMMA_CDF_01_10, 1e-14);
+    checkCDF(new GammaDistribution(.1, 20), P_CDFPDF, SCIPY_GAMMA_CDF_01_20, 1e-15);
+    checkCDF(new GammaDistribution(.1, 4.), P_CDFPDF, SCIPY_GAMMA_CDF_01_4, 1e-13);
+    checkCDF(new GammaDistribution(.1, 1.), P_CDFPDF, SCIPY_GAMMA_CDF_01_1, 1e-13);
+    checkCDF(new GammaDistribution(1., 1.), P_CDFPDF, GNUR_GAMMA_CDF_1_1, 1e-15);
+    checkCDF(new GammaDistribution(2., 1.), P_CDFPDF, GNUR_GAMMA_CDF_2_1, 1e-15);
+    checkCDF(new GammaDistribution(4., 1.), P_CDFPDF, GNUR_GAMMA_CDF_4_1, 1e-14);
+    checkCDF(new GammaDistribution(4., 10), P_CDFPDF, GNUR_GAMMA_CDF_4_10, 1e-15);
+    checkCDF(new GammaDistribution(.1, 10), P_CDFPDF, GNUR_GAMMA_CDF_01_10, 1e-15);
+    checkCDF(new GammaDistribution(.1, 20), P_CDFPDF, GNUR_GAMMA_CDF_01_20, 1e-15);
+    checkCDF(new GammaDistribution(.1, 4.), P_CDFPDF, GNUR_GAMMA_CDF_01_4, 1e-15);
+    checkCDF(new GammaDistribution(.1, 1.), P_CDFPDF, GNUR_GAMMA_CDF_01_1, 1e-15);
   }
 
-  private void checkCDF(double alpha, double rate, double[] x, double[] expected, double err) {
-    GammaDistribution d = new GammaDistribution(alpha, rate);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.cdf(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int errlev = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
-  }
-  
   @Test
   public void testProbit() {
     checkProbit(1., 1., P_PROBIT, SCIPY_GAMMA_PROBIT_1_1, 1e-14);
