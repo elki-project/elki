@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  * @author Erich Schubert
  */
-public class TestChiSquaredDistribution implements JUnit4Test {
+public class TestChiSquaredDistribution extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //
   0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 1e-05, 1e-10, 0.1234567, 3.14159265359, 2.71828182846, 0.314159265359, 0.271828182846 //
   };
@@ -786,68 +786,30 @@ public class TestChiSquaredDistribution implements JUnit4Test {
 
   @Test
   public void testPDF() {
-    checkPDF(1., P_CDFPDF, SCIPY_CHISQ_PDF_1, 1e-12);
-    checkPDF(2., P_CDFPDF, SCIPY_CHISQ_PDF_2, 1e-12);
-    checkPDF(4., P_CDFPDF, SCIPY_CHISQ_PDF_4, 1e-12);
-    checkPDF(10, P_CDFPDF, SCIPY_CHISQ_PDF_10, 1e-12);
-    checkPDF(.1, P_CDFPDF, SCIPY_CHISQ_PDF_01, 1e-6); // TODO: improve
-    checkPDF(1., P_CDFPDF, GNUR_CHISQ_PDF_1, 1e-10);
-    checkPDF(2., P_CDFPDF, GNUR_CHISQ_PDF_2, 1e-15);
-    checkPDF(4., P_CDFPDF, GNUR_CHISQ_PDF_4, 1e-15);
-    checkPDF(10, P_CDFPDF, GNUR_CHISQ_PDF_10, 1e-15);
-    checkPDF(.1, P_CDFPDF, GNUR_CHISQ_PDF_01, 1e-6); // TODO: improve
-  }
-
-  private void checkPDF(double nu, double[] x, double[] expected, double err) {
-    ChiSquaredDistribution d = new ChiSquaredDistribution(nu);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.pdf(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int e1 = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      final int e2 = (int) Math.ceil(Math.log(diff) / Math.log(10));
-      final int errlev = Math.max(e1, e2);
-      // System.err.println(nu+" "+errlev+" "+val+" "+expected[i]+" "+diff);
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
+    checkPDF(new ChiSquaredDistribution(1.), P_CDFPDF, SCIPY_CHISQ_PDF_1, 1e-12);
+    checkPDF(new ChiSquaredDistribution(2.), P_CDFPDF, SCIPY_CHISQ_PDF_2, 1e-12);
+    checkPDF(new ChiSquaredDistribution(4.), P_CDFPDF, SCIPY_CHISQ_PDF_4, 1e-12);
+    checkPDF(new ChiSquaredDistribution(10), P_CDFPDF, SCIPY_CHISQ_PDF_10, 1e-12);
+    checkPDF(new ChiSquaredDistribution(.1), P_CDFPDF, SCIPY_CHISQ_PDF_01, 1e-12);
+    checkPDF(new ChiSquaredDistribution(1.), P_CDFPDF, GNUR_CHISQ_PDF_1, 1e-14);
+    checkPDF(new ChiSquaredDistribution(2.), P_CDFPDF, GNUR_CHISQ_PDF_2, 1e-15);
+    checkPDF(new ChiSquaredDistribution(4.), P_CDFPDF, GNUR_CHISQ_PDF_4, 1e-15);
+    checkPDF(new ChiSquaredDistribution(10), P_CDFPDF, GNUR_CHISQ_PDF_10, 1e-15);
+    checkPDF(new ChiSquaredDistribution(.1), P_CDFPDF, GNUR_CHISQ_PDF_01, 1e-14);
   }
 
   @Test
   public void testCDF() {
-    checkCDF(1., P_CDFPDF, SCIPY_CHISQ_CDF_1, 1e-12);
-    checkCDF(2., P_CDFPDF, SCIPY_CHISQ_CDF_2, 1e-12);
-    checkCDF(4., P_CDFPDF, SCIPY_CHISQ_CDF_4, 1e-12);
-    checkCDF(10, P_CDFPDF, SCIPY_CHISQ_CDF_10, 1e-11);
-    checkCDF(.1, P_CDFPDF, SCIPY_CHISQ_CDF_01, 1e-13);
-    checkCDF(1., P_CDFPDF, GNUR_CHISQ_CDF_1, 1e-15);
-    checkCDF(2., P_CDFPDF, GNUR_CHISQ_CDF_2, 1e-15);
-    checkCDF(4., P_CDFPDF, GNUR_CHISQ_CDF_4, 1e-15);
-    checkCDF(10, P_CDFPDF, GNUR_CHISQ_CDF_10, 1e-15);
-    checkCDF(.1, P_CDFPDF, GNUR_CHISQ_CDF_01, 1e-14);
-  }
-
-  private void checkCDF(double nu, double[] x, double[] expected, double err) {
-    ChiSquaredDistribution d = new ChiSquaredDistribution(nu);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.cdf(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int e1 = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      final int e2 = (int) Math.ceil(Math.log(diff) / Math.log(10));
-      final int errlev = Math.max(e1, e2);
-      // System.err.println(nu+" "+errlev+" "+val+" "+expected[i]+" "+diff);
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
+    checkCDF(new ChiSquaredDistribution(1.), P_CDFPDF, SCIPY_CHISQ_CDF_1, 1e-12);
+    checkCDF(new ChiSquaredDistribution(2.), P_CDFPDF, SCIPY_CHISQ_CDF_2, 1e-12);
+    checkCDF(new ChiSquaredDistribution(4.), P_CDFPDF, SCIPY_CHISQ_CDF_4, 1e-12);
+    checkCDF(new ChiSquaredDistribution(10), P_CDFPDF, SCIPY_CHISQ_CDF_10, 1e-11);
+    checkCDF(new ChiSquaredDistribution(.1), P_CDFPDF, SCIPY_CHISQ_CDF_01, 1e-13);
+    checkCDF(new ChiSquaredDistribution(1.), P_CDFPDF, GNUR_CHISQ_CDF_1, 1e-15);
+    checkCDF(new ChiSquaredDistribution(2.), P_CDFPDF, GNUR_CHISQ_CDF_2, 1e-15);
+    checkCDF(new ChiSquaredDistribution(4.), P_CDFPDF, GNUR_CHISQ_CDF_4, 1e-15);
+    checkCDF(new ChiSquaredDistribution(10), P_CDFPDF, GNUR_CHISQ_CDF_10, 1e-15);
+    checkCDF(new ChiSquaredDistribution(.1), P_CDFPDF, GNUR_CHISQ_CDF_01, 1e-14);
   }
 
   @Test

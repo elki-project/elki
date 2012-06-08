@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  * @author Erich Schubert
  */
-public class TestNormalDistribution implements JUnit4Test {
+public class TestNormalDistribution extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //
   0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 1e-05, 1e-10, 0.1234567, 3.14159265359, 2.71828182846, 0.314159265359, 0.271828182846 //
   };
@@ -490,56 +490,22 @@ public class TestNormalDistribution implements JUnit4Test {
 
   @Test
   public void testPDF() {
-    checkPDF(0., 1., P_CDFPDF, SCIPY_NORM_PDF_0_1, 1e-11);
-    checkPDF(1., 3., P_CDFPDF, SCIPY_NORM_PDF_1_3, 1e-12);
-    checkPDF(.1, .1, P_CDFPDF, SCIPY_NORM_PDF_01_01, 1e-11);
-    checkPDF(0., 1., P_CDFPDF, GNUR_NORM_PDF_0_1, 1e-15);
-    checkPDF(1., 3., P_CDFPDF, GNUR_NORM_PDF_1_3, 1e-15);
-    checkPDF(.1, .1, P_CDFPDF, GNUR_NORM_PDF_01_01, 1e-15);
-  }
-
-  private void checkPDF(double mean, double var, double[] x, double[] expected, double err) {
-    NormalDistribution d = new NormalDistribution(mean, var);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.pdf(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int errlev = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      // System.err.println("PDF: "+mean+" "+var+" "+errlev);
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
+    checkPDF(new NormalDistribution(0., 1.), P_CDFPDF, SCIPY_NORM_PDF_0_1, 1e-11);
+    checkPDF(new NormalDistribution(1., 3.), P_CDFPDF, SCIPY_NORM_PDF_1_3, 1e-12);
+    checkPDF(new NormalDistribution(.1, .1), P_CDFPDF, SCIPY_NORM_PDF_01_01, 1e-11);
+    checkPDF(new NormalDistribution(0., 1.), P_CDFPDF, GNUR_NORM_PDF_0_1, 1e-15);
+    checkPDF(new NormalDistribution(1., 3.), P_CDFPDF, GNUR_NORM_PDF_1_3, 1e-15);
+    checkPDF(new NormalDistribution(.1, .1), P_CDFPDF, GNUR_NORM_PDF_01_01, 1e-15);
   }
 
   @Test
   public void testCDF() {
-    checkCDF(0., 1., P_CDFPDF, SCIPY_NORM_CDF_0_1, 1e-13);
-    checkCDF(1., 3., P_CDFPDF, SCIPY_NORM_CDF_1_3, 1e-12);
-    checkCDF(.1, .1, P_CDFPDF, SCIPY_NORM_CDF_01_01, 1e-13);
-    checkCDF(0., 1., P_CDFPDF, GNUR_NORM_CDF_0_1, 1e-15);
-    checkCDF(1., 3., P_CDFPDF, GNUR_NORM_CDF_1_3, 1e-15);
-    checkCDF(.1, .1, P_CDFPDF, GNUR_NORM_CDF_01_01, 1e-15);
-  }
-
-  private void checkCDF(double mean, double var, double[] x, double[] expected, double err) {
-    NormalDistribution d = new NormalDistribution(mean, var);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.cdf(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int errlev = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      // System.err.println("PDF: "+mean+" "+var+" "+errlev);
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
+    checkCDF(new NormalDistribution(0., 1.), P_CDFPDF, SCIPY_NORM_CDF_0_1, 1e-13);
+    checkCDF(new NormalDistribution(1., 3.), P_CDFPDF, SCIPY_NORM_CDF_1_3, 1e-12);
+    checkCDF(new NormalDistribution(.1, .1), P_CDFPDF, SCIPY_NORM_CDF_01_01, 1e-13);
+    checkCDF(new NormalDistribution(0., 1.), P_CDFPDF, GNUR_NORM_CDF_0_1, 1e-15);
+    checkCDF(new NormalDistribution(1., 3.), P_CDFPDF, GNUR_NORM_CDF_1_3, 1e-15);
+    checkCDF(new NormalDistribution(.1, .1), P_CDFPDF, GNUR_NORM_CDF_01_01, 1e-15);
   }
 
   @Test
