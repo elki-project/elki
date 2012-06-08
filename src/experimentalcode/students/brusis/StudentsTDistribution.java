@@ -1,4 +1,7 @@
-package de.lmu.ifi.dbs.elki.math.statistics.distribution;
+package experimentalcode.students.brusis;
+
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 
 /*
  This file is part of ELKI:
