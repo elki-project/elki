@@ -102,13 +102,9 @@ public class GammaDistribution implements DistributionWithRandom {
     return cdf(val, k, theta);
   }
 
-  /**
-   * Compute probit (inverse cdf) for Gamma distributions.
-   * 
-   * @param val Test probability
-   */
-  public double probit(double val) {
-    return probit(val, k, theta);
+  @Override
+  public double quantile(double val) {
+    return quantile(val, k, theta);
   }
 
   @Override
@@ -620,7 +616,7 @@ public class GammaDistribution implements DistributionWithRandom {
     }
     else if(nu > 0.32) {
       // Wilson and Hilferty estimate: - AS 91 at 3
-      final double x = NormalDistribution.probit(p, 0, 1);
+      final double x = NormalDistribution.quantile(p, 0, 1);
       final double p1 = 2. / (9. * nu);
       double ch = nu * Math.pow(x * Math.sqrt(p1) + 1 - p1, 3);
 
@@ -658,7 +654,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
-  public static double probit(double p, double k, double theta) {
+  public static double quantile(double p, double k, double theta) {
     final double EPS2 = 5e-7; // final precision of AS 91
     final int MAXIT = 1000;
 
@@ -751,7 +747,7 @@ public class GammaDistribution implements DistributionWithRandom {
     if(max_newton_iterations > 0) {
       // Refine result using final Newton steps.
       // TODO: add unit tests that show an improvement! Maybe in logscale only?
-      x = gammaProbitNewtonRefinement(Math.log(p), k, theta, max_newton_iterations, x);
+      x = gammaQuantileNewtonRefinement(Math.log(p), k, theta, max_newton_iterations, x);
     }
     return x;
   }
@@ -767,7 +763,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * @param x Initial estimate
    * @return Refined value
    */
-  protected static double gammaProbitNewtonRefinement(final double logpt, final double k, final double theta, final int maxit, double x) {
+  protected static double gammaQuantileNewtonRefinement(final double logpt, final double k, final double theta, final int maxit, double x) {
     final double EPS_N = 1e-15; // Precision threshold
     // 0 is not possible, try MIN_NORMAL instead
     if(x <= 0) {

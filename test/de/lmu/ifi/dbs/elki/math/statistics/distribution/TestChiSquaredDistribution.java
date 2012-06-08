@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -640,11 +638,11 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   6.20568843802768815945966954239487733957503223791718e-06, // 0.271828
   };
 
-  public static final double[] P_PROBIT = { //
+  public static final double[] P_QUANT = { //
   0.0001, 0.001, 0.01, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99, 0.999, 0.9999 //
   };
 
-  public static final double[] SCIPY_CHISQ_PROBIT_01 = { //
+  public static final double[] SCIPY_CHISQ_QUANT_01 = { //
   1.16892641156733644781219710813445996321826192936318e-80, // 0.000100
   1.16892641146821240352815603348024825656653422803765e-60, // 0.001000
   1.16892641145814869325987350586058419394529211182657e-40, // 0.010000
@@ -658,7 +656,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   9.24820164420099821711573895299807190895080566406250e+00, // 0.999900
   };
 
-  public static final double[] GNUR_CHISQ_PROBIT_01 = { //
+  public static final double[] GNUR_CHISQ_QUANT_01 = { //
   1.16892641145733484384707827779994069422035569294114e-80, // 0.000100
   1.16892641145731079523768921414073055688308402765104e-60, // 0.001000
   1.16892641145731997959243769324569198659341653028700e-40, // 0.010000
@@ -672,7 +670,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   9.24820164420099821711573895299807190895080566406250e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_CHISQ_PROBIT_1 = { //
+  public static final double[] SCIPY_CHISQ_QUANT_1 = { //
   1.57079633500628175845386844643181145642074625357054e-08, // 0.000100
   1.57079714926323284399762268692679612058782367967069e-06, // 0.001000
   1.57087857909697853949632095904576090106274932622910e-04, // 0.010000
@@ -686,7 +684,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   1.51367052266236044033576035872101783752441406250000e+01, // 0.999900
   };
 
-  public static final double[] GNUR_CHISQ_PROBIT_1 = { //
+  public static final double[] GNUR_CHISQ_QUANT_1 = { //
   1.57079633501956727170820513452345612570582034095423e-08, // 0.000100
   1.57079714926249020786111747910451796883535280358046e-06, // 0.001000
   1.57087857909702001022941852959036168613238260149956e-04, // 0.010000
@@ -700,7 +698,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   1.51367052266236044033576035872101783752441406250000e+01, // 0.999900
   };
 
-  public static final double[] SCIPY_CHISQ_PROBIT_2 = { //
+  public static final double[] SCIPY_CHISQ_QUANT_2 = { //
   2.00010000666460950081992908877737136208452284336090e-04, // 0.000100
   2.00100066716752279100122180466314603108912706375122e-03, // 0.001000
   2.01006717070028942395687465705123031511902809143066e-02, // 0.010000
@@ -714,7 +712,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   1.84206807439525839242833171738311648368835449218750e+01, // 0.999900
   };
 
-  public static final double[] GNUR_CHISQ_PROBIT_2 = { //
+  public static final double[] GNUR_CHISQ_QUANT_2 = { //
   2.00010000666716686269427927236108644137857481837273e-04, // 0.000100
   2.00100066716706699240790889859908929793164134025574e-03, // 0.001000
   2.01006717070028838312278907096697366796433925628662e-02, // 0.010000
@@ -728,7 +726,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   1.84206807439525839242833171738311648368835449218750e+01, // 0.999900
   };
 
-  public static final double[] SCIPY_CHISQ_PROBIT_4 = { //
+  public static final double[] SCIPY_CHISQ_QUANT_4 = { //
   2.84184752435540088910670419863890856504440307617188e-02, // 0.000100
   9.08040355389811981723369171959348022937774658203125e-02, // 0.001000
   2.97109480506531686838656014515436254441738128662109e-01, // 0.010000
@@ -742,7 +740,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   2.35127424449910797932261630194261670112609863281250e+01, // 0.999900
   };
 
-  public static final double[] GNUR_CHISQ_PROBIT_4 = { //
+  public static final double[] GNUR_CHISQ_QUANT_4 = { //
   2.84184752435549976834483487664329004473984241485596e-02, // 0.000100
   9.08040355389791442597413606563350185751914978027344e-02, // 0.001000
   2.97109480506531964394412170804571360349655151367188e-01, // 0.010000
@@ -756,7 +754,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   2.35127424449910762405124842189252376556396484375000e+01, // 0.999900
   };
 
-  public static final double[] SCIPY_CHISQ_PROBIT_10 = { //
+  public static final double[] SCIPY_CHISQ_QUANT_10 = { //
   8.88920357912773129172023800492752343416213989257812e-01, // 0.000100
   1.47874346383567578655515717400703579187393188476562e+00, // 0.001000
   2.55821216018720765106309045222587883472442626953125e+00, // 0.010000
@@ -770,7 +768,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   3.55640139419523890751406725030392408370971679687500e+01, // 0.999900
   };
 
-  public static final double[] GNUR_CHISQ_PROBIT_10 = { //
+  public static final double[] GNUR_CHISQ_QUANT_10 = { //
   8.88920357912895919838547342806123197078704833984375e-01, // 0.000100
   1.47874346383566490636951584747293964028358459472656e+00, // 0.001000
   2.55821216018720631879546090203803032636642456054688e+00, // 0.010000
@@ -813,35 +811,16 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
   }
 
   @Test
-  public void testProbit() {
-    checkProbit(1., P_PROBIT, SCIPY_CHISQ_PROBIT_1, 1e-13);
-    checkProbit(2., P_PROBIT, SCIPY_CHISQ_PROBIT_2, 1e-13);
-    checkProbit(4., P_PROBIT, SCIPY_CHISQ_PROBIT_4, 1e-13);
-    checkProbit(10, P_PROBIT, SCIPY_CHISQ_PROBIT_10, 1e-12);
-    checkProbit(.1, P_PROBIT, SCIPY_CHISQ_PROBIT_01, 1e-13);
-    checkProbit(1., P_PROBIT, GNUR_CHISQ_PROBIT_1, 1e-13);
-    checkProbit(2., P_PROBIT, GNUR_CHISQ_PROBIT_2, 1e-13);
-    checkProbit(4., P_PROBIT, GNUR_CHISQ_PROBIT_4, 1e-13);
-    checkProbit(10, P_PROBIT, GNUR_CHISQ_PROBIT_10, 1e-13);
-    checkProbit(.1, P_PROBIT, GNUR_CHISQ_PROBIT_01, 1e-13);
-  }
-
-  private void checkProbit(double nu, double[] x, double[] expected, double err) {
-    ChiSquaredDistribution d = new ChiSquaredDistribution(nu);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.probit(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int e1 = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      final int e2 = (int) Math.ceil(Math.log(diff) / Math.log(10));
-      final int errlev = Math.max(e1, e2);
-      // System.err.println(nu+" "+errlev+" "+val+" "+expected[i]+" "+diff);
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
+  public void testQuantile() {
+    checkQuantile(new ChiSquaredDistribution(1.), P_QUANT, SCIPY_CHISQ_QUANT_1, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(2.), P_QUANT, SCIPY_CHISQ_QUANT_2, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(4.), P_QUANT, SCIPY_CHISQ_QUANT_4, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(10), P_QUANT, SCIPY_CHISQ_QUANT_10, 1e-12);
+    checkQuantile(new ChiSquaredDistribution(.1), P_QUANT, SCIPY_CHISQ_QUANT_01, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(1.), P_QUANT, GNUR_CHISQ_QUANT_1, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(2.), P_QUANT, GNUR_CHISQ_QUANT_2, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(4.), P_QUANT, GNUR_CHISQ_QUANT_4, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(10), P_QUANT, GNUR_CHISQ_QUANT_10, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(.1), P_QUANT, GNUR_CHISQ_QUANT_01, 1e-13);
   }
 }

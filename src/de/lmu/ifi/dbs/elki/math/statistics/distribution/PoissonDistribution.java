@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 /**
  * INCOMPLETE implementation of the poisson distribution.
  * 
- * TODO: continue implementing, CDF and nextRandom are missing
+ * TODO: continue implementing, CDF, invcdf and nextRandom are missing
  * 
  * References:
  * <p>
@@ -201,8 +201,15 @@ public class PoissonDistribution implements Distribution {
     return Math.exp(lc) / Math.sqrt(f);
   }
 
+  // FIXME: implement!
   @Override
   public double cdf(double val) {
+    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
+  // FIXME: implement!
+  @Override
+  public double quantile(double val) {
     throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 

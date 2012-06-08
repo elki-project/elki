@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,8 +23,13 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+
 /**
  * Student's t distribution.
+ * 
+ * FIXME: add quantile function!
  * 
  * @author Jan Brusis
  */
@@ -54,6 +58,12 @@ public class StudentsTDistribution implements Distribution {
     return cdf(val, v);
   }
 
+  // FIXME: implement!
+  @Override
+  public double quantile(double val) {
+    throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+  }
+
   /**
    * Static version of the t distribution's PDF.
    * 
@@ -62,6 +72,7 @@ public class StudentsTDistribution implements Distribution {
    * @return f(val,v)
    */
   public static double pdf(double val, int v) {
+    // TODO: improve precision by computing "exp" last?
     return Math.exp(GammaDistribution.logGamma((v + 1) / 2) - GammaDistribution.logGamma(v / 2)) * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) / 2));
   }
 

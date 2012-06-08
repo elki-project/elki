@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -88,6 +90,12 @@ public class ChiDistribution implements DistributionWithRandom {
    */
   public static double cdf(double val, double dof) {
     return GammaDistribution.regularizedGammaP(dof / 2, val * val / 2);
+  }
+
+  // FIXME: implement!
+  @Override
+  public double quantile(double val) {
+    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   @Override

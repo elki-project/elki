@@ -129,7 +129,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
       ProxyView<V> proxy = new ProxyView<V>(relationx.getDatabase(), idview, relationx);
 
-      double phialpha = NormalDistribution.standardNormalProbit(1.0 - alpha / 2);
+      double phialpha = NormalDistribution.standardNormalQuantile(1.0 - alpha / 2);
       // Detect outliers while significant.
       while(true) {
         Pair<DBID, Double> candidate = singleIteration(proxy, relationy);

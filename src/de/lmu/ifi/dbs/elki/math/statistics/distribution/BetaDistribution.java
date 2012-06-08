@@ -153,7 +153,8 @@ public class BetaDistribution implements DistributionWithRandom {
     }
   }
 
-  public double probit(double x) {
+  @Override
+  public double quantile(double x) {
     // Valid parameters
     if(x < 0 || x > 1 || Double.isNaN(x)) {
       return Double.NaN;
@@ -166,10 +167,10 @@ public class BetaDistribution implements DistributionWithRandom {
     }
     // Simpler to compute inverse?
     if(x > 0.5) {
-      return 1 - rawProbit(1 - x, beta, alpha, logbab);
+      return 1 - rawQuantile(1 - x, beta, alpha, logbab);
     }
     else {
-      return rawProbit(x, alpha, beta, logbab);
+      return rawQuantile(x, alpha, beta, logbab);
     }
   }
 
@@ -367,14 +368,14 @@ public class BetaDistribution implements DistributionWithRandom {
   }
 
   /**
-   * Compute probit (inverse cdf) for Beta distributions.
+   * Compute quantile (inverse cdf) for Beta distributions.
    * 
    * @param p Probability
    * @param alpha Shape parameter a
    * @param beta Shape parameter b
    * @return Probit for Beta distribution
    */
-  public static double probit(double p, double alpha, double beta) {
+  public static double quantile(double p, double alpha, double beta) {
     // Valid parameters
     if(Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(p) || alpha < 0. || beta < 0.) {
       return Double.NaN;
@@ -390,15 +391,15 @@ public class BetaDistribution implements DistributionWithRandom {
     }
     // Simpler to compute inverse?
     if(p > 0.5) {
-      return 1 - rawProbit(1 - p, beta, alpha, logBeta(beta, alpha));
+      return 1 - rawQuantile(1 - p, beta, alpha, logBeta(beta, alpha));
     }
     else {
-      return rawProbit(p, alpha, beta, logBeta(alpha, beta));
+      return rawQuantile(p, alpha, beta, logBeta(alpha, beta));
     }
   }
 
   /**
-   * Raw probit function
+   * Raw quantile function
    * 
    * @param p P, must be 0 < p <= .5
    * @param alpha Alpha
@@ -406,7 +407,7 @@ public class BetaDistribution implements DistributionWithRandom {
    * @param logbeta log Beta(alpha, beta)
    * @return Position
    */
-  protected static double rawProbit(double p, double alpha, double beta, final double logbeta) {
+  protected static double rawQuantile(double p, double alpha, double beta, final double logbeta) {
     // Initial estimate for x
     double x;
     {

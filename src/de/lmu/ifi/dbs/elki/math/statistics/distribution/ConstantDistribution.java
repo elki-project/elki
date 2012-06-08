@@ -58,4 +58,9 @@ public class ConstantDistribution implements DistributionWithRandom {
   public double cdf(double val) {
     return (val >= c) ? 1.0 : 0.0;
   }
+
+  @Override
+  public double quantile(double val) {
+    return c;
+  }
 }

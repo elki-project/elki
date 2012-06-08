@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -1000,11 +998,11 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   2.58666872715738793697681785488384775817394256591797e-01, // 0.271828
   };
 
-  public static final double[] P_PROBIT = { //
+  public static final double[] P_QUANT = { //
   0.0001, 0.001, 0.01, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99, 0.999, 0.9999 //
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_1_1 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_1_1 = { //
   1.00005000333358370239768275755665172255248762667179e-04, // 0.000100
   1.00050033358353349620395444929954464896582067012787e-03, // 0.001000
   1.00503358535014367114435174244135851040482521057129e-02, // 0.010000
@@ -1018,7 +1016,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   9.21034037197629196214165858691558241844177246093750e+00, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_1_1 = { //
+  public static final double[] GNUR_GAMMA_QUANT_1_1 = { //
   1.00005000333358343134713963618054322068928740918636e-04, // 0.000100
   1.00050033358353349620395444929954464896582067012787e-03, // 0.001000
   1.00503358535014419156139453548348683398216962814331e-02, // 0.010000
@@ -1032,7 +1030,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   9.21034037197629196214165858691558241844177246093750e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_2_1 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_2_1 = { //
   1.42092376217775075153415542672519222833216190338135e-02, // 0.000100
   4.54020177694895513131889686064823763445019721984863e-02, // 0.001000
   1.48554740253265954441630469773372169584035873413086e-01, // 0.010000
@@ -1046,7 +1044,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.17563712224955398966130815097130835056304931640625e+01, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_2_1 = { //
+  public static final double[] GNUR_GAMMA_QUANT_2_1 = { //
   1.42092376217774988417241743832164502236992120742798e-02, // 0.000100
   4.54020177694895721298706803281675092875957489013672e-02, // 0.001000
   1.48554740253265982197206085402285680174827575683594e-01, // 0.010000
@@ -1060,7 +1058,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.17563712224955381202562421094626188278198242187500e+01, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_4_1 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_4_1 = { //
   2.31796895172818012698101597379718441516160964965820e-01, // 0.000100
   4.28552413628422945723883685786859132349491119384766e-01, // 0.001000
   8.23248686345385172202782086969818919897079467773438e-01, // 0.010000
@@ -1074,7 +1072,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.59138140006312944763067207532003521919250488281250e+01, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_4_1 = { //
+  public static final double[] GNUR_GAMMA_QUANT_4_1 = { //
   2.31796895172817957186950366121891420334577560424805e-01, // 0.000100
   4.28552413628423112257337379560340195894241333007812e-01, // 0.001000
   8.23248686345385172202782086969818919897079467773438e-01, // 0.010000
@@ -1088,7 +1086,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.59138140006312944763067207532003521919250488281250e+01, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_4_10 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_4_10 = { //
   2.31796895172818040453677213008631952106952667236328e-02, // 0.000100
   4.28552413628423001235034917044686153531074523925781e-02, // 0.001000
   8.23248686345385283225084549485472962260246276855469e-02, // 0.010000
@@ -1102,7 +1100,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.59138140006312944763067207532003521919250488281250e+00, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_4_10 = { //
+  public static final double[] GNUR_GAMMA_QUANT_4_10 = { //
   2.31796895172817971064738173936348175629973411560059e-02, // 0.000100
   4.28552413628423140012912995189253706485033035278320e-02, // 0.001000
   8.23248686345385283225084549485472962260246276855469e-02, // 0.010000
@@ -1116,7 +1114,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.59138140006312944763067207532003521919250488281250e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_01_10 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_01_10 = { //
   0.00000000000000000000000000000000000000000000000000e+00, // 0.000100
   0.00000000000000000000000000000000000000000000000000e+00, // 0.001000
   0.00000000000000000000000000000000000000000000000000e+00, // 0.010000
@@ -1130,7 +1128,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   5.31624347769055760615231065457919612526893615722656e-01, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_01_10 = { //
+  public static final double[] GNUR_GAMMA_QUANT_01_10 = { //
   6.07304836240800246013734290758296395601191608171445e-42, // 0.000100
   6.07304836240794013868566283512457787341965380549669e-32, // 0.001000
   6.07304836240792099284182672275736116917595330090291e-22, // 0.010000
@@ -1144,7 +1142,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   5.31624347769055760615231065457919612526893615722656e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_01_20 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_01_20 = { //
   0.00000000000000000000000000000000000000000000000000e+00, // 0.000100
   0.00000000000000000000000000000000000000000000000000e+00, // 0.001000
   0.00000000000000000000000000000000000000000000000000e+00, // 0.010000
@@ -1158,7 +1156,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   2.65812173884527880307615532728959806263446807861328e-01, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_01_20 = { //
+  public static final double[] GNUR_GAMMA_QUANT_01_20 = { //
   3.03652418120400123006867145379148197800595804085722e-42, // 0.000100
   3.03652418120397006934283141756228893670982690274834e-32, // 0.001000
   3.03652418120396049642091336137868058458797665045146e-22, // 0.010000
@@ -1172,7 +1170,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   2.65812173884527880307615532728959806263446807861328e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_01_4 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_01_4 = { //
   0.00000000000000000000000000000000000000000000000000e+00, // 0.000100
   0.00000000000000000000000000000000000000000000000000e+00, // 0.001000
   0.00000000000000000000000000000000000000000000000000e+00, // 0.010000
@@ -1186,7 +1184,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.32906086942263934602692643238697201013565063476562e+00, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_01_4 = { //
+  public static final double[] GNUR_GAMMA_QUANT_01_4 = { //
   1.51826209060200048758698283629955882669254719901167e-41, // 0.000100
   1.51826209060198492519497318340481080243853975684947e-31, // 0.001000
   1.51826209060198020119068264779783997354452683633590e-21, // 0.010000
@@ -1200,7 +1198,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   1.32906086942263934602692643238697201013565063476562e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_GAMMA_PROBIT_01_1 = { //
+  public static final double[] SCIPY_GAMMA_QUANT_01_1 = { //
   0.00000000000000000000000000000000000000000000000000e+00, // 0.000100
   0.00000000000000000000000000000000000000000000000000e+00, // 0.001000
   0.00000000000000000000000000000000000000000000000000e+00, // 0.010000
@@ -1214,7 +1212,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   5.31624347769055738410770572954788804054260253906250e+00, // 0.999900
   };
 
-  public static final double[] GNUR_GAMMA_PROBIT_01_1 = { //
+  public static final double[] GNUR_GAMMA_QUANT_01_1 = { //
   6.07304836240800195034793134519823530677018879604667e-41, // 0.000100
   6.07304836240793970077989273361924320975415902739790e-31, // 0.001000
   6.07304836240792080476273059119135989417810734534360e-21, // 0.010000
@@ -1270,37 +1268,21 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
 
   @Test
   public void testProbit() {
-    checkProbit(1., 1., P_PROBIT, SCIPY_GAMMA_PROBIT_1_1, 1e-14);
-    checkProbit(2., 1., P_PROBIT, SCIPY_GAMMA_PROBIT_2_1, 1e-12);
-    checkProbit(4., 1., P_PROBIT, SCIPY_GAMMA_PROBIT_4_1, 1e-13);
-    checkProbit(4., 10, P_PROBIT, SCIPY_GAMMA_PROBIT_4_10, 1e-13);
-    checkProbit(.1, 10, P_PROBIT, SCIPY_GAMMA_PROBIT_01_10, 1e-13);
-    checkProbit(.1, 20, P_PROBIT, SCIPY_GAMMA_PROBIT_01_20, 1e-14);
-    checkProbit(.1, 4., P_PROBIT, SCIPY_GAMMA_PROBIT_01_4, 1e-13);
-    checkProbit(.1, 1., P_PROBIT, SCIPY_GAMMA_PROBIT_01_1, 1e-13);
-    checkProbit(1., 1., P_PROBIT, GNUR_GAMMA_PROBIT_1_1, 1e-14);
-    checkProbit(2., 1., P_PROBIT, GNUR_GAMMA_PROBIT_2_1, 1e-13);
-    checkProbit(4., 1., P_PROBIT, GNUR_GAMMA_PROBIT_4_1, 1e-13);
-    checkProbit(4., 10, P_PROBIT, GNUR_GAMMA_PROBIT_4_10, 1e-13);
-    checkProbit(.1, 10, P_PROBIT, GNUR_GAMMA_PROBIT_01_10, 1e-13);
-    checkProbit(.1, 20, P_PROBIT, GNUR_GAMMA_PROBIT_01_20, 1e-14);
-    checkProbit(.1, 4., P_PROBIT, GNUR_GAMMA_PROBIT_01_4, 1e-13);
-    checkProbit(.1, 1., P_PROBIT, GNUR_GAMMA_PROBIT_01_1, 1e-13);
-  }
-
-  private void checkProbit(double alpha, double rate, double[] x, double[] expected, double err) {
-    GammaDistribution d = new GammaDistribution(alpha, rate);
-    for(int i = 0; i < x.length; i++) {
-      double val = d.probit(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      final int errlev = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
+    checkQuantile(new GammaDistribution(1., 1.), P_QUANT, SCIPY_GAMMA_QUANT_1_1, 1e-14);
+    checkQuantile(new GammaDistribution(2., 1.), P_QUANT, SCIPY_GAMMA_QUANT_2_1, 1e-12);
+    checkQuantile(new GammaDistribution(4., 1.), P_QUANT, SCIPY_GAMMA_QUANT_4_1, 1e-13);
+    checkQuantile(new GammaDistribution(4., 10), P_QUANT, SCIPY_GAMMA_QUANT_4_10, 1e-13);
+    checkQuantile(new GammaDistribution(.1, 10), P_QUANT, SCIPY_GAMMA_QUANT_01_10, 1e-13);
+    checkQuantile(new GammaDistribution(.1, 20), P_QUANT, SCIPY_GAMMA_QUANT_01_20, 1e-14);
+    checkQuantile(new GammaDistribution(.1, 4.), P_QUANT, SCIPY_GAMMA_QUANT_01_4, 1e-13);
+    checkQuantile(new GammaDistribution(.1, 1.), P_QUANT, SCIPY_GAMMA_QUANT_01_1, 1e-13);
+    checkQuantile(new GammaDistribution(1., 1.), P_QUANT, GNUR_GAMMA_QUANT_1_1, 1e-14);
+    checkQuantile(new GammaDistribution(2., 1.), P_QUANT, GNUR_GAMMA_QUANT_2_1, 1e-13);
+    checkQuantile(new GammaDistribution(4., 1.), P_QUANT, GNUR_GAMMA_QUANT_4_1, 1e-13);
+    checkQuantile(new GammaDistribution(4., 10), P_QUANT, GNUR_GAMMA_QUANT_4_10, 1e-13);
+    checkQuantile(new GammaDistribution(.1, 10), P_QUANT, GNUR_GAMMA_QUANT_01_10, 1e-13);
+    checkQuantile(new GammaDistribution(.1, 20), P_QUANT, GNUR_GAMMA_QUANT_01_20, 1e-14);
+    checkQuantile(new GammaDistribution(.1, 4.), P_QUANT, GNUR_GAMMA_QUANT_01_4, 1e-13);
+    checkQuantile(new GammaDistribution(.1, 1.), P_QUANT, GNUR_GAMMA_QUANT_01_1, 1e-13);
   }
 }
