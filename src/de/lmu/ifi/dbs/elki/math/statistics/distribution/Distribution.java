@@ -24,8 +24,9 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 
 /**
- * Interface for a simple distribution generator with a PDF, i.e. it can also
- * compute a density
+ * Statistical distributions, with their common functions. See
+ * {@link #DistributionWithRandom} for distributions that also have a random
+ * generator included.
  * 
  * @author Erich Schubert
  */
@@ -45,6 +46,14 @@ public interface Distribution {
    * @return cumulative density
    */
   public double cdf(double val);
+
+  /**
+   * Quantile aka probit (for normal) aka inverse CDF (invcdf, cdf^-1) function.
+   * 
+   * @param val Quantile to find
+   * @return Quantile position
+   */
+  public double quantile(double val);
 
   /**
    * Describe the distribution

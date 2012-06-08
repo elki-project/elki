@@ -101,7 +101,8 @@ public class UniformDistribution implements DistributionWithRandom {
     return (val - min) / len;
   }
   
-  public double probit(double val) {
+  @Override
+  public double quantile(double val) {
     return min + len * val; 
   }
 
@@ -110,11 +111,6 @@ public class UniformDistribution implements DistributionWithRandom {
     return min + random.nextDouble() * len;
   }
 
-  /**
-   * Simple toString explaining the distribution parameters.
-   * 
-   * Used in describing cluster models.
-   */
   @Override
   public String toString() {
     return "UniformDistribution(min=" + min + ", max=" + max + ")";

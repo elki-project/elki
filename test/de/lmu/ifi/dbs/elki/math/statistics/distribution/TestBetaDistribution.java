@@ -22,13 +22,9 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
 
 /**
  * Unit test for the Beta distribution in ELKI.
@@ -36,8 +32,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
- * 
- *         TODO: Add probit function and test.
  */
 public class TestBetaDistribution extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //
@@ -3044,11 +3038,11 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   0.00000000000000000000000000000000000000000000000000e+00, // 3.141593
   };
 
-  public static final double[] P_PROBIT = { //
+  public static final double[] P_QUANT = { //
   0.0001, 0.001, 0.01, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99, 0.999, 0.9999 //
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_01_01 = { //
+  public static final double[] SCIPY_BETA_QUANT_01_01 = { //
   8.86928065555026613565596956864396236737615274357892e-38, // 0.000100
   8.86928065555024393294670900210330809197198311562804e-28, // 0.001000
   8.86928065555025006242057470083821192914616784639358e-18, // 0.010000
@@ -3062,7 +3056,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999999999999888977697537484345957636833190917969e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_01_01 = { //
+  public static final double[] GNUR_BETA_QUANT_01_01 = { //
   8.86928065555028388448412252463067501937612992138827e-38, // 0.000100
   8.86928065555027263153925837435692060995384889311041e-28, // 0.001000
   8.86928065555026392911617428893635393218735445787027e-18, // 0.010000
@@ -3076,7 +3070,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   1.00000000000000000000000000000000000000000000000000e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_01_05 = { //
+  public static final double[] SCIPY_BETA_QUANT_01_05 = { //
   3.46456275607431455261002811459588941188867309477607e-40, // 0.000100
   3.46456275607431613825500469117221110902093083941640e-30, // 0.001000
   3.46456275607430439357088457229084493496058065920175e-20, // 0.010000
@@ -3090,7 +3084,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999679469315005952978481218451634049415588378906e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_01_05 = { //
+  public static final double[] GNUR_BETA_QUANT_01_05 = { //
   3.46456275607432760321896411164494283247689160787118e-40, // 0.000100
   3.46456275607431613825500469117221110902093083941640e-30, // 0.001000
   3.46456275607431342136749888745890613485718652604856e-20, // 0.010000
@@ -3104,7 +3098,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999679469315005952978481218451634049415588378906e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_01_1 = { //
+  public static final double[] SCIPY_BETA_QUANT_01_1 = { //
   1.00000000000000298802934877418851689778100883306864e-40, // 0.000100
   1.00000000000000218528411709481159173652571096174285e-30, // 0.001000
   1.00000000000000084793293288572637777171916428947207e-20, // 0.010000
@@ -3118,7 +3112,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99000449880021124116069586307276040315628051757812e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_01_1 = { //
+  public static final double[] GNUR_BETA_QUANT_01_1 = { //
   1.00000000000000665851311202335856317232144528987664e-40, // 0.000100
   1.00000000000000673950412615046707223864685665397028e-30, // 0.001000
   1.00000000000000445905157861179360225167780663621080e-20, // 0.010000
@@ -3132,7 +3126,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99000449880021124116069586307276040315628051757812e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_01_2 = { //
+  public static final double[] SCIPY_BETA_QUANT_01_2 = { //
   3.85543289429533451133658448963742592666926086214652e-41, // 0.000100
   3.85543289429532603687340095433216245505652506485049e-31, // 0.001000
   3.85543289429532404962034705548650193823057760610265e-21, // 0.010000
@@ -3146,7 +3140,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.57904427593739837831776640086900442838668823242188e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_01_2 = { //
+  public static final double[] GNUR_BETA_QUANT_01_2 = { //
   3.85543289429538701964597541526447679856717128592763e-41, // 0.000100
   3.85543289429535537655999775518958492064467519746949e-31, // 0.001000
   3.85543289429532931583503873933453763817026436176329e-21, // 0.010000
@@ -3160,7 +3154,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.57904427593739837831776640086900442838668823242188e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_01_4 = { //
+  public static final double[] SCIPY_BETA_QUANT_01_4 = { //
   1.70520173780031775915342203870768816354885853037205e-41, // 0.000100
   1.70520173780031788553917314540519037060879260315405e-31, // 0.001000
   1.70520173780031400068231169360407429564207370948071e-21, // 0.010000
@@ -3174,7 +3168,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   7.70239957250841489333481604262487962841987609863281e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_01_4 = { //
+  public static final double[] GNUR_BETA_QUANT_01_4 = { //
   1.70520173780032387662636078732443195444958595838538e-41, // 0.000100
   1.70520173780031000323531131830916642462988659737581e-31, // 0.001000
   1.70520173780030873446762000975603859570238695382007e-21, // 0.010000
@@ -3188,7 +3182,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   7.70239957250841489333481604262487962841987609863281e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_05_01 = { //
+  public static final double[] SCIPY_BETA_QUANT_05_01 = { //
   3.20530684976785390026245365149848431940426962682977e-07, // 0.000100
   3.20524582318020690016244222952934705972438678145409e-05, // 0.001000
   3.19915253991507426631346611145545466570183634757996e-03, // 0.010000
@@ -3202,7 +3196,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999999999999888977697537484345957636833190917969e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_05_01 = { //
+  public static final double[] GNUR_BETA_QUANT_05_01 = { //
   3.20530684976785442965804568543619623710583255160600e-07, // 0.000100
   3.20524582318020825541515783640988956904038786888123e-05, // 0.001000
   3.19915253991507513367520409985900187166407704353333e-03, // 0.010000
@@ -3216,7 +3210,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   1.00000000000000000000000000000000000000000000000000e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_05_05 = { //
+  public static final double[] SCIPY_BETA_QUANT_05_05 = { //
   2.46740107997877850811582013451292438865891654131701e-08, // 0.000100
   2.46739907091694248724746130196905369302839972078800e-06, // 0.001000
   2.46719817134221513794251068318885700136888772249222e-04, // 0.010000
@@ -3230,7 +3224,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999975325989165497730937204323709011077880859375e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_05_05 = { //
+  public static final double[] GNUR_BETA_QUANT_05_05 = { //
   2.46740107997877950073255519814613423434934702527244e-08, // 0.000100
   2.46739907091694375779688218341956229551215074025095e-06, // 0.001000
   2.46719817134221622214468316869329100882168859243393e-04, // 0.010000
@@ -3244,7 +3238,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999975325989165497730937204323709011077880859375e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_05_1 = { //
+  public static final double[] SCIPY_BETA_QUANT_05_1 = { //
   1.00000000000000018635868334073400764960837250328041e-08, // 0.000100
   1.00000000000000016650634863946134345269456389360130e-06, // 0.001000
   1.00000000000000004792173602385929598312941379845142e-04, // 0.010000
@@ -3258,7 +3252,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99800010000000072274417561857262626290321350097656e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_05_1 = { //
+  public static final double[] GNUR_BETA_QUANT_05_1 = { //
   1.00000000000000018635868334073400764960837250328041e-08, // 0.000100
   1.00000000000000037826458545303642821977518906351179e-06, // 0.001000
   1.00000000000000086107336538798762148871901445090771e-04, // 0.010000
@@ -3272,7 +3266,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99800010000000072274417561857262626290321350097656e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_05_2 = { //
+  public static final double[] SCIPY_BETA_QUANT_05_2 = { //
   4.44444445761316705817644639965255382030306918750284e-09, // 0.000100
   4.44444576131755449727476570478956752197063906351104e-07, // 0.001000
   4.44457613851590344110700780966283218731405213475227e-05, // 0.010000
@@ -3286,7 +3280,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.83714619081483720997027830890147015452384948730469e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_05_2 = { //
+  public static final double[] GNUR_BETA_QUANT_05_2 = { //
   4.44444445761315465046725810423743074917268813806004e-09, // 0.000100
   4.44444576131755290908798960297643176886595028918236e-07, // 0.001000
   4.44457613851590750686515463030445971526205539703369e-05, // 0.010000
@@ -3300,7 +3294,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.83714619081483720997027830890147015452384948730469e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_05_4 = { //
+  public static final double[] SCIPY_BETA_QUANT_05_4 = { //
   2.08979592710184102207603484900426404902162857979420e-09, // 0.000100
   2.08979679181727248935671503900224355021464361925609e-07, // 0.001000
   2.08988326860078756129837640465041204151930287480354e-05, // 0.010000
@@ -3314,7 +3308,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   8.63700924381154200304422374756541103124618530273438e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_05_4 = { //
+  public static final double[] GNUR_BETA_QUANT_05_4 = { //
   2.08979592710183854053419718992123943479555236990564e-09, // 0.000100
   2.08979679181727301875230707293995546791620654403232e-07, // 0.001000
   2.08988326860079027180380761841149706015130504965782e-05, // 0.010000
@@ -3328,7 +3322,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   8.63700924381154200304422374756541103124618530273438e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_1_01 = { //
+  public static final double[] SCIPY_BETA_QUANT_1_01 = { //
   9.99550119979002518744159999641851754859089851379395e-04, // 0.000100
   9.95511979025178947444452148829441284760832786560059e-03, // 0.001000
   9.56179249911954937113378605317848268896341323852539e-02, // 0.010000
@@ -3342,7 +3336,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999999999999888977697537484345957636833190917969e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_1_01 = { //
+  public static final double[] GNUR_BETA_QUANT_1_01 = { //
   9.99550119979002735584594496742738556349650025367737e-04, // 0.000100
   9.95511979025179120916799746510150725953280925750732e-03, // 0.001000
   9.56179249911955353447012839751550927758216857910156e-02, // 0.010000
@@ -3356,7 +3350,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   1.00000000000000000000000000000000000000000000000000e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_1_05 = { //
+  public static final double[] SCIPY_BETA_QUANT_1_05 = { //
   1.99989999999999987657234301607900306407827883958817e-04, // 0.000100
   1.99899999999999990890620082950590585824102163314819e-03, // 0.001000
   1.99000000000000010214051826551440171897411346435547e-02, // 0.010000
@@ -3370,7 +3364,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999989999999949752407246705843135714530944824219e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_1_05 = { //
+  public static final double[] GNUR_BETA_QUANT_1_05 = { //
   1.99989999999999987657234301607900306407827883958817e-04, // 0.000100
   1.99899999999999990890620082950590585824102163314819e-03, // 0.001000
   1.99000000000000010214051826551440171897411346435547e-02, // 0.010000
@@ -3384,7 +3378,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999989999999949752407246705843135714530944824219e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_1_1 = { //
+  public static final double[] SCIPY_BETA_QUANT_1_1 = { //
   1.00000000000000004792173602385929598312941379845142e-04, // 0.000100
   1.00000000000000002081668171172168513294309377670288e-03, // 0.001000
   1.00000000000000002081668171172168513294309377670288e-02, // 0.010000
@@ -3398,7 +3392,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99900000000000011013412404281552881002426147460938e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_1_1 = { //
+  public static final double[] GNUR_BETA_QUANT_1_1 = { //
   1.00000000000000086107336538798762148871901445090771e-04, // 0.000100
   1.00000000000000023765711620882257193443365395069122e-03, // 0.001000
   1.00000000000000036776137690708310401532799005508423e-02, // 0.010000
@@ -3412,7 +3406,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99900000000000011013412404281552881002426147460938e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_1_2 = { //
+  public static final double[] SCIPY_BETA_QUANT_1_2 = { //
   5.00012500625039114031909759372496182550094090402126e-05, // 0.000100
   5.00125062539089927649005318244235240854322910308838e-04, // 0.001000
   5.01256289338004520916847184253128943964838981628418e-03, // 0.010000
@@ -3426,7 +3420,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.90000000000000546229728115577017888426780700683594e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_1_2 = { //
+  public static final double[] GNUR_BETA_QUANT_1_2 = { //
   5.00012500625039249557181320060550433481694199144840e-05, // 0.000100
   5.00125062539089710808570821143348439363762736320496e-04, // 0.001000
   5.01256289338004520916847184253128943964838981628418e-03, // 0.010000
@@ -3440,7 +3434,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.90000000000000546229728115577017888426780700683594e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_1_4 = { //
+  public static final double[] SCIPY_BETA_QUANT_1_4 = { //
   2.50009375546912596263108424787802164246386382728815e-05, // 0.000100
   2.50093804725125897110704631387534391251392662525177e-04, // 0.001000
   2.50943006631889524785106182491745130391791462898254e-03, // 0.010000
@@ -3454,7 +3448,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.00000000000002797762022055394481867551803588867188e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_1_4 = { //
+  public static final double[] GNUR_BETA_QUANT_1_4 = { //
   2.50009375546912697907062095303842852445086464285851e-05, // 0.000100
   2.50093804725125951320813255662756091624032706022263e-04, // 0.001000
   2.50943006631889611521279981332099850988015532493591e-03, // 0.010000
@@ -3468,7 +3462,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.00000000000002686739719592878827825188636779785156e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_2_01 = { //
+  public static final double[] SCIPY_BETA_QUANT_2_01 = { //
   4.20955724062624797587872649273776914924383163452148e-02, // 0.000100
   1.29414177470200258968091588940296787768602371215820e-01, // 0.001000
   3.72851670751815522653060952507075853645801544189453e-01, // 0.010000
@@ -3482,7 +3476,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999999999999888977697537484345957636833190917969e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_2_01 = { //
+  public static final double[] GNUR_BETA_QUANT_2_01 = { //
   4.20955724062624728198933610201493138447403907775879e-02, // 0.000100
   1.29414177470200231212515973311383277177810668945312e-01, // 0.001000
   3.72851670751815578164212183764902874827384948730469e-01, // 0.010000
@@ -3496,7 +3490,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   1.00000000000000000000000000000000000000000000000000e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_2_05 = { //
+  public static final double[] SCIPY_BETA_QUANT_2_05 = { //
   1.62853809185172157536491965856839669868350028991699e-02, // 0.000100
   5.11919447158312862500295636891678441315889358520508e-02, // 0.001000
   1.58744712946928157037973505794070661067962646484375e-01, // 0.010000
@@ -3510,7 +3504,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999995555555520887480724923079833388328552246094e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_2_05 = { //
+  public static final double[] GNUR_BETA_QUANT_2_05 = { //
   1.62853809185172088147552926784555893391370773315430e-02, // 0.000100
   5.11919447158312793111356597819394664838910102844238e-02, // 0.001000
   1.58744712946928129282397890165157150477170944213867e-01, // 0.010000
@@ -3524,7 +3518,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999995555555520887480724923079833388328552246094e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_2_1 = { //
+  public static final double[] SCIPY_BETA_QUANT_2_1 = { //
   1.00000000000000002081668171172168513294309377670288e-02, // 0.000100
   3.16227766016837913420900463279394898563623428344727e-02, // 0.001000
   9.99999999999999916733273153113259468227624893188477e-02, // 0.010000
@@ -3538,7 +3532,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99949998749937507547258519480237737298011779785156e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_2_1 = { //
+  public static final double[] GNUR_BETA_QUANT_2_1 = { //
   9.99999999999999500399638918679556809365749359130859e-03, // 0.000100
   3.16227766016837982809839502351678675040602684020996e-02, // 0.001000
   1.00000000000000019428902930940239457413554191589355e-01, // 0.010000
@@ -3552,7 +3546,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99949998749937507547258519480237737298011779785156e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_2_2 = { //
+  public static final double[] SCIPY_BETA_QUANT_2_2 = { //
   5.78466759288776954245347994287840265315026044845581e-03, // 0.000100
   1.83702538588116116857751336510773398913443088531494e-02, // 0.001000
   5.89031357781952535912495250158826820552349090576172e-02, // 0.010000
@@ -3566,7 +3560,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.94215332407112573065433025476522743701934814453125e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_2_2 = { //
+  public static final double[] GNUR_BETA_QUANT_2_2 = { //
   5.78466759288776954245347994287840265315026044845581e-03, // 0.000100
   1.83702538588116116857751336510773398913443088531494e-02, // 0.001000
   5.89031357781952674690373328303394373506307601928711e-02, // 0.010000
@@ -3580,7 +3574,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.94215332407112573065433025476522743701934814453125e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_2_4 = { //
+  public static final double[] SCIPY_BETA_QUANT_2_4 = { //
   3.17233337277439495643927003243334183935075998306274e-03, // 0.000100
   1.01017878837377523409957191802277520764619112014771e-02, // 0.001000
   3.26821122006028808026911747219855897128582000732422e-02, // 0.010000
@@ -3594,7 +3588,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.32186920845740840668725013529183343052864074707031e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_2_4 = { //
+  public static final double[] GNUR_BETA_QUANT_2_4 = { //
   3.17233337277439452275840103823156823636963963508606e-03, // 0.000100
   1.01017878837377488715487672266135632526129484176636e-02, // 0.001000
   3.26821122006028738637972708147572120651602745056152e-02, // 0.010000
@@ -3608,7 +3602,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.32186920845740840668725013529183343052864074707031e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_4_01 = { //
+  public static final double[] SCIPY_BETA_QUANT_4_01 = { //
   2.29760042749164533626426987211743835359811782836914e-01, // 0.000100
   3.92411306264331405380119122128235176205635070800781e-01, // 0.001000
   6.41486304510298754877339888480491936206817626953125e-01, // 0.010000
@@ -3622,7 +3616,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999999999999888977697537484345957636833190917969e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_4_01 = { //
+  public static final double[] GNUR_BETA_QUANT_4_01 = { //
   2.29760042749164533626426987211743835359811782836914e-01, // 0.000100
   3.92411306264331349868967890870408155024051666259766e-01, // 0.001000
   6.41486304510298754877339888480491936206817626953125e-01, // 0.010000
@@ -3636,7 +3630,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   1.00000000000000000000000000000000000000000000000000e+00, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_4_05 = { //
+  public static final double[] SCIPY_BETA_QUANT_4_05 = { //
   1.36299075618849435675983272631128784269094467163086e-01, // 0.000100
   2.39415153269453812034939232944452669471502304077148e-01, // 0.001000
   4.15398314048022576638885539068724028766155242919922e-01, // 0.010000
@@ -3650,7 +3644,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999997910204108109155640704557299613952636718750e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_4_05 = { //
+  public static final double[] GNUR_BETA_QUANT_4_05 = { //
   1.36299075618849463431558888260042294859886169433594e-01, // 0.000100
   2.39415153269453950812817311089020222425460815429688e-01, // 0.001000
   4.15398314048022687661188001584378071129322052001953e-01, // 0.010000
@@ -3664,7 +3658,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99999997910204108109155640704557299613952636718750e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_4_1 = { //
+  public static final double[] SCIPY_BETA_QUANT_4_1 = { //
   1.00000000000000005551115123125782702118158340454102e-01, // 0.000100
   1.77827941003892292526344931502535473555326461791992e-01, // 0.001000
   3.16227766016837941176476078908308409154415130615234e-01, // 0.010000
@@ -3678,7 +3672,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99974999062445357722594962979201227426528930664062e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_4_1 = { //
+  public static final double[] GNUR_BETA_QUANT_4_1 = { //
   1.00000000000000019428902930940239457413554191589355e-01, // 0.000100
   1.77827941003892264770769315873621962964534759521484e-01, // 0.001000
   3.16227766016837941176476078908308409154415130615234e-01, // 0.010000
@@ -3692,7 +3686,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.99974999062445357722594962979201227426528930664062e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_4_2 = { //
+  public static final double[] SCIPY_BETA_QUANT_4_2 = { //
   6.78130791542610467104168492369353771209716796875000e-02, // 0.000100
   1.22013829611478455405837451053230324760079383850098e-01, // 0.001000
   2.22072283384998070410176751465769484639167785644531e-01, // 0.010000
@@ -3706,7 +3700,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.96827666627225772444376161729451268911361694335938e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_4_2 = { //
+  public static final double[] GNUR_BETA_QUANT_4_2 = { //
   6.78130791542610883437802726803056430071592330932617e-02, // 0.000100
   1.22013829611478469283625258867687080055475234985352e-01, // 0.001000
   2.22072283384998042654601135836855974048376083374023e-01, // 0.010000
@@ -3720,7 +3714,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.96827666627225772444376161729451268911361694335938e-01, // 0.999900
   };
 
-  public static final double[] SCIPY_BETA_PROBIT_4_4 = { //
+  public static final double[] SCIPY_BETA_QUANT_4_4 = { //
   4.21840560047029092261006155695213237777352333068848e-02, // 0.000100
   7.66545428268873701993513236629951279610395431518555e-02, // 0.001000
   1.42270377006857268176176489760109689086675643920898e-01, // 0.010000
@@ -3734,7 +3728,7 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   9.57815943995298235691393529123160988092422485351562e-01, // 0.999900
   };
 
-  public static final double[] GNUR_BETA_PROBIT_4_4 = { //
+  public static final double[] GNUR_BETA_QUANT_4_4 = { //
   4.21840560047029092261006155695213237777352333068848e-02, // 0.000100
   7.66545428268873701993513236629951279610395431518555e-02, // 0.001000
   1.42270377006857268176176489760109689086675643920898e-01, // 0.010000
@@ -3859,78 +3853,57 @@ public class TestBetaDistribution extends AbstractDistributionTest implements JU
   }
 
   @Test
-  public void testProbit() {
-    checkProbit(new BetaDistribution(1., 1.), P_PROBIT, SCIPY_BETA_PROBIT_1_1, 1e-15);
-    checkProbit(new BetaDistribution(2., 1.), P_PROBIT, SCIPY_BETA_PROBIT_2_1, 1e-15);
-    checkProbit(new BetaDistribution(4., 1.), P_PROBIT, SCIPY_BETA_PROBIT_4_1, 1e-15);
-    checkProbit(new BetaDistribution(.1, 1.), P_PROBIT, SCIPY_BETA_PROBIT_01_1, 1e-14);
-    checkProbit(new BetaDistribution(.5, 1.), P_PROBIT, SCIPY_BETA_PROBIT_05_1, 1e-14);
-    checkProbit(new BetaDistribution(1., 2.), P_PROBIT, SCIPY_BETA_PROBIT_1_2, 1e-14);
-    checkProbit(new BetaDistribution(2., 2.), P_PROBIT, SCIPY_BETA_PROBIT_2_2, 1e-15);
-    checkProbit(new BetaDistribution(4., 2.), P_PROBIT, SCIPY_BETA_PROBIT_4_2, 1e-15);
-    checkProbit(new BetaDistribution(.1, 2.), P_PROBIT, SCIPY_BETA_PROBIT_01_2, 1e-13);
-    checkProbit(new BetaDistribution(.5, 2.), P_PROBIT, SCIPY_BETA_PROBIT_05_2, 1e-14);
-    checkProbit(new BetaDistribution(1., 4.), P_PROBIT, SCIPY_BETA_PROBIT_1_4, 1e-14);
-    checkProbit(new BetaDistribution(2., 4.), P_PROBIT, SCIPY_BETA_PROBIT_2_4, 1e-15);
-    checkProbit(new BetaDistribution(4., 4.), P_PROBIT, SCIPY_BETA_PROBIT_4_4, 1e-15);
-    checkProbit(new BetaDistribution(.1, 4.), P_PROBIT, SCIPY_BETA_PROBIT_01_4, 1e-13);
-    checkProbit(new BetaDistribution(.5, 4.), P_PROBIT, SCIPY_BETA_PROBIT_05_4, 1e-14);
-    checkProbit(new BetaDistribution(1., .1), P_PROBIT, SCIPY_BETA_PROBIT_1_01, 1e-14);
-    checkProbit(new BetaDistribution(2., .1), P_PROBIT, SCIPY_BETA_PROBIT_2_01, 1e-15);
-    checkProbit(new BetaDistribution(4., .1), P_PROBIT, SCIPY_BETA_PROBIT_4_01, 1e-15);
-    checkProbit(new BetaDistribution(.1, .1), P_PROBIT, SCIPY_BETA_PROBIT_01_01, 1e-13);
-    checkProbit(new BetaDistribution(.5, .1), P_PROBIT, SCIPY_BETA_PROBIT_05_01, 1e-14);
-    checkProbit(new BetaDistribution(1., .5), P_PROBIT, SCIPY_BETA_PROBIT_1_05, 1e-14);
-    checkProbit(new BetaDistribution(2., .5), P_PROBIT, SCIPY_BETA_PROBIT_2_05, 1e-15);
-    checkProbit(new BetaDistribution(4., .5), P_PROBIT, SCIPY_BETA_PROBIT_4_05, 1e-15);
-    checkProbit(new BetaDistribution(.1, .5), P_PROBIT, SCIPY_BETA_PROBIT_01_05, 1e-14);
-    checkProbit(new BetaDistribution(.5, .5), P_PROBIT, SCIPY_BETA_PROBIT_05_05, 1e-14);
+  public void testQuantile() {
+    checkQuantile(new BetaDistribution(1., 1.), P_QUANT, SCIPY_BETA_QUANT_1_1, 1e-15);
+    checkQuantile(new BetaDistribution(2., 1.), P_QUANT, SCIPY_BETA_QUANT_2_1, 1e-15);
+    checkQuantile(new BetaDistribution(4., 1.), P_QUANT, SCIPY_BETA_QUANT_4_1, 1e-15);
+    checkQuantile(new BetaDistribution(.1, 1.), P_QUANT, SCIPY_BETA_QUANT_01_1, 1e-14);
+    checkQuantile(new BetaDistribution(.5, 1.), P_QUANT, SCIPY_BETA_QUANT_05_1, 1e-14);
+    checkQuantile(new BetaDistribution(1., 2.), P_QUANT, SCIPY_BETA_QUANT_1_2, 1e-14);
+    checkQuantile(new BetaDistribution(2., 2.), P_QUANT, SCIPY_BETA_QUANT_2_2, 1e-15);
+    checkQuantile(new BetaDistribution(4., 2.), P_QUANT, SCIPY_BETA_QUANT_4_2, 1e-15);
+    checkQuantile(new BetaDistribution(.1, 2.), P_QUANT, SCIPY_BETA_QUANT_01_2, 1e-13);
+    checkQuantile(new BetaDistribution(.5, 2.), P_QUANT, SCIPY_BETA_QUANT_05_2, 1e-14);
+    checkQuantile(new BetaDistribution(1., 4.), P_QUANT, SCIPY_BETA_QUANT_1_4, 1e-14);
+    checkQuantile(new BetaDistribution(2., 4.), P_QUANT, SCIPY_BETA_QUANT_2_4, 1e-15);
+    checkQuantile(new BetaDistribution(4., 4.), P_QUANT, SCIPY_BETA_QUANT_4_4, 1e-15);
+    checkQuantile(new BetaDistribution(.1, 4.), P_QUANT, SCIPY_BETA_QUANT_01_4, 1e-13);
+    checkQuantile(new BetaDistribution(.5, 4.), P_QUANT, SCIPY_BETA_QUANT_05_4, 1e-14);
+    checkQuantile(new BetaDistribution(1., .1), P_QUANT, SCIPY_BETA_QUANT_1_01, 1e-14);
+    checkQuantile(new BetaDistribution(2., .1), P_QUANT, SCIPY_BETA_QUANT_2_01, 1e-15);
+    checkQuantile(new BetaDistribution(4., .1), P_QUANT, SCIPY_BETA_QUANT_4_01, 1e-15);
+    checkQuantile(new BetaDistribution(.1, .1), P_QUANT, SCIPY_BETA_QUANT_01_01, 1e-13);
+    checkQuantile(new BetaDistribution(.5, .1), P_QUANT, SCIPY_BETA_QUANT_05_01, 1e-14);
+    checkQuantile(new BetaDistribution(1., .5), P_QUANT, SCIPY_BETA_QUANT_1_05, 1e-14);
+    checkQuantile(new BetaDistribution(2., .5), P_QUANT, SCIPY_BETA_QUANT_2_05, 1e-15);
+    checkQuantile(new BetaDistribution(4., .5), P_QUANT, SCIPY_BETA_QUANT_4_05, 1e-15);
+    checkQuantile(new BetaDistribution(.1, .5), P_QUANT, SCIPY_BETA_QUANT_01_05, 1e-14);
+    checkQuantile(new BetaDistribution(.5, .5), P_QUANT, SCIPY_BETA_QUANT_05_05, 1e-14);
 
-    checkProbit(new BetaDistribution(1., 1.), P_PROBIT, GNUR_BETA_PROBIT_1_1, 1e-15);
-    checkProbit(new BetaDistribution(2., 1.), P_PROBIT, GNUR_BETA_PROBIT_2_1, 1e-15);
-    checkProbit(new BetaDistribution(4., 1.), P_PROBIT, GNUR_BETA_PROBIT_4_1, 1e-15);
-    checkProbit(new BetaDistribution(.1, 1.), P_PROBIT, GNUR_BETA_PROBIT_01_1, 1e-13);
-    checkProbit(new BetaDistribution(.5, 1.), P_PROBIT, GNUR_BETA_PROBIT_05_1, 1e-14);
-    checkProbit(new BetaDistribution(1., 2.), P_PROBIT, GNUR_BETA_PROBIT_1_2, 1e-14);
-    checkProbit(new BetaDistribution(2., 2.), P_PROBIT, GNUR_BETA_PROBIT_2_2, 1e-15);
-    checkProbit(new BetaDistribution(4., 2.), P_PROBIT, GNUR_BETA_PROBIT_4_2, 1e-15);
-    checkProbit(new BetaDistribution(.1, 2.), P_PROBIT, GNUR_BETA_PROBIT_01_2, 1e-14);
-    checkProbit(new BetaDistribution(.5, 2.), P_PROBIT, GNUR_BETA_PROBIT_05_2, 1e-14);
-    checkProbit(new BetaDistribution(1., 4.), P_PROBIT, GNUR_BETA_PROBIT_1_4, 1e-14);
-    checkProbit(new BetaDistribution(2., 4.), P_PROBIT, GNUR_BETA_PROBIT_2_4, 1e-15);
-    checkProbit(new BetaDistribution(4., 4.), P_PROBIT, GNUR_BETA_PROBIT_4_4, 1e-15);
-    checkProbit(new BetaDistribution(.1, 4.), P_PROBIT, GNUR_BETA_PROBIT_01_4, 1e-13);
-    checkProbit(new BetaDistribution(.5, 4.), P_PROBIT, GNUR_BETA_PROBIT_05_4, 1e-14);
-    checkProbit(new BetaDistribution(1., .1), P_PROBIT, GNUR_BETA_PROBIT_1_01, 1e-14);
-    checkProbit(new BetaDistribution(2., .1), P_PROBIT, GNUR_BETA_PROBIT_2_01, 1e-15);
-    checkProbit(new BetaDistribution(4., .1), P_PROBIT, GNUR_BETA_PROBIT_4_01, 1e-15);
-    checkProbit(new BetaDistribution(.1, .1), P_PROBIT, GNUR_BETA_PROBIT_01_01, 1e-13);
-    checkProbit(new BetaDistribution(.5, .1), P_PROBIT, GNUR_BETA_PROBIT_05_01, 1e-14);
-    checkProbit(new BetaDistribution(1., .5), P_PROBIT, GNUR_BETA_PROBIT_1_05, 1e-14);
-    checkProbit(new BetaDistribution(2., .5), P_PROBIT, GNUR_BETA_PROBIT_2_05, 1e-15);
-    checkProbit(new BetaDistribution(4., .5), P_PROBIT, GNUR_BETA_PROBIT_4_05, 1e-15);
-    checkProbit(new BetaDistribution(.1, .5), P_PROBIT, GNUR_BETA_PROBIT_01_05, 1e-14);
-    checkProbit(new BetaDistribution(.5, .5), P_PROBIT, GNUR_BETA_PROBIT_05_05, 1e-14);
-  }
-
-  private void checkProbit(BetaDistribution d, double[] x, double[] expected, double err) {
-    int maxerrlev = Integer.MIN_VALUE;
-    for(int i = 0; i < x.length; i++) {
-      double val = d.probit(x[i]);
-      if(val == expected[i]) {
-        continue;
-      }
-      double diff = Math.abs(val - expected[i]);
-      final int errlev = (int) Math.ceil(Math.log10(diff / expected[i]));
-      maxerrlev = Math.max(errlev, maxerrlev);
-      if(diff < err || diff / expected[i] < err) {
-        continue;
-      }
-      assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-    }
-    int given = (int) Math.floor(Math.log10(err * 1.1));
-    // if (given > maxerrlev)
-    // System.err.println("Probit Error for "+d+" magnitude is not tight: expected "+maxerrlev+" got "+given);
-    assertTrue("Error magnitude is not tight: expected " + maxerrlev + " got " + given, given <= maxerrlev);
+    checkQuantile(new BetaDistribution(1., 1.), P_QUANT, GNUR_BETA_QUANT_1_1, 1e-15);
+    checkQuantile(new BetaDistribution(2., 1.), P_QUANT, GNUR_BETA_QUANT_2_1, 1e-15);
+    checkQuantile(new BetaDistribution(4., 1.), P_QUANT, GNUR_BETA_QUANT_4_1, 1e-15);
+    checkQuantile(new BetaDistribution(.1, 1.), P_QUANT, GNUR_BETA_QUANT_01_1, 1e-13);
+    checkQuantile(new BetaDistribution(.5, 1.), P_QUANT, GNUR_BETA_QUANT_05_1, 1e-14);
+    checkQuantile(new BetaDistribution(1., 2.), P_QUANT, GNUR_BETA_QUANT_1_2, 1e-14);
+    checkQuantile(new BetaDistribution(2., 2.), P_QUANT, GNUR_BETA_QUANT_2_2, 1e-15);
+    checkQuantile(new BetaDistribution(4., 2.), P_QUANT, GNUR_BETA_QUANT_4_2, 1e-15);
+    checkQuantile(new BetaDistribution(.1, 2.), P_QUANT, GNUR_BETA_QUANT_01_2, 1e-14);
+    checkQuantile(new BetaDistribution(.5, 2.), P_QUANT, GNUR_BETA_QUANT_05_2, 1e-14);
+    checkQuantile(new BetaDistribution(1., 4.), P_QUANT, GNUR_BETA_QUANT_1_4, 1e-14);
+    checkQuantile(new BetaDistribution(2., 4.), P_QUANT, GNUR_BETA_QUANT_2_4, 1e-15);
+    checkQuantile(new BetaDistribution(4., 4.), P_QUANT, GNUR_BETA_QUANT_4_4, 1e-15);
+    checkQuantile(new BetaDistribution(.1, 4.), P_QUANT, GNUR_BETA_QUANT_01_4, 1e-13);
+    checkQuantile(new BetaDistribution(.5, 4.), P_QUANT, GNUR_BETA_QUANT_05_4, 1e-14);
+    checkQuantile(new BetaDistribution(1., .1), P_QUANT, GNUR_BETA_QUANT_1_01, 1e-14);
+    checkQuantile(new BetaDistribution(2., .1), P_QUANT, GNUR_BETA_QUANT_2_01, 1e-15);
+    checkQuantile(new BetaDistribution(4., .1), P_QUANT, GNUR_BETA_QUANT_4_01, 1e-15);
+    checkQuantile(new BetaDistribution(.1, .1), P_QUANT, GNUR_BETA_QUANT_01_01, 1e-13);
+    checkQuantile(new BetaDistribution(.5, .1), P_QUANT, GNUR_BETA_QUANT_05_01, 1e-14);
+    checkQuantile(new BetaDistribution(1., .5), P_QUANT, GNUR_BETA_QUANT_1_05, 1e-14);
+    checkQuantile(new BetaDistribution(2., .5), P_QUANT, GNUR_BETA_QUANT_2_05, 1e-15);
+    checkQuantile(new BetaDistribution(4., .5), P_QUANT, GNUR_BETA_QUANT_4_05, 1e-15);
+    checkQuantile(new BetaDistribution(.1, .5), P_QUANT, GNUR_BETA_QUANT_01_05, 1e-14);
+    checkQuantile(new BetaDistribution(.5, .5), P_QUANT, GNUR_BETA_QUANT_05_05, 1e-14);
   }
 }

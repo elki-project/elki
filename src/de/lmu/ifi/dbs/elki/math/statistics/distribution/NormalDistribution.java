@@ -154,14 +154,9 @@ public class NormalDistribution implements DistributionWithRandom {
     return cdf(val, mean, stddev);
   }
 
-  /**
-   * Probit / erfinv function.
-   * 
-   * @param q
-   * @return
-   */
-  public double probit(double q) {
-    return probit(q, mean, stddev);
+  @Override
+  public double quantile(double q) {
+    return quantile(q, mean, stddev);
   }
 
   @Override
@@ -259,7 +254,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return erfinv(x)
    */
   public static double erfinv(double x) {
-    return standardNormalProbit(0.5 * (x + 1)) / MathUtil.SQRT2;
+    return standardNormalQuantile(0.5 * (x + 1)) / MathUtil.SQRT2;
   }
 
   /**
@@ -271,10 +266,13 @@ public class NormalDistribution implements DistributionWithRandom {
    * by Peter John Acklam
    * </p>
    * 
+   * FIXME: precision of this seems to be rather low, compared to our other
+   * functions. Only about 8-9 digits agree with SciPy/GNU R.
+   * 
    * @param d Quantile. Must be in [0:1], obviously.
    * @return Inverse erf.
    */
-  public static double standardNormalProbit(double d) {
+  public static double standardNormalQuantile(double d) {
     if(d == 0) {
       return Double.NEGATIVE_INFINITY;
     }
@@ -341,7 +339,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * @param sigma Standard deviation.
    * @return The probit of the normal given distribution at x.
    */
-  public static double probit(double x, double mu, double sigma) {
-    return mu + sigma * standardNormalProbit(x);
+  public static double quantile(double x, double mu, double sigma) {
+    return mu + sigma * standardNormalQuantile(x);
   }
 }
