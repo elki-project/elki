@@ -1,9 +1,7 @@
-package experimentalcode.students.brusis;
+package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionWithRandom;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 
 /*
  This file is part of ELKI:
@@ -28,14 +26,12 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Beta Distribution with implementation of the regularized incomplete beta
  * function
  * 
- * TODO: add random generator.
- * 
  * @author Jan Brusis
+ * @author Erich Schubert
  */
 public class BetaDistribution implements DistributionWithRandom {
   /**
@@ -61,17 +57,22 @@ public class BetaDistribution implements DistributionWithRandom {
   /**
    * Shape parameter of beta distribution
    */
-  private final double a;
+  private final double alpha;
 
   /**
    * Shape parameter of beta distribution
    */
-  private final double b;
+  private final double beta;
 
   /**
    * For random number generation
    */
   private Random random;
+
+  /**
+   * Log beta(a, b) cache
+   */
+  private double logbab;
 
   /**
    * Constructor.
@@ -96,79 +97,155 @@ public class BetaDistribution implements DistributionWithRandom {
       throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
     }
 
-    this.a = a;
-    this.b = b;
+    this.alpha = a;
+    this.beta = b;
+    this.logbab = logBeta(a, b);
     this.random = random;
   }
 
   @Override
   public double pdf(double val) {
-    return pdf(val, a, b);
+    if(val < 0. || val > 1.) {
+      return 0.;
+    }
+    if (val == 0.) {
+      if (alpha > 1.) {
+        return 0.;
+      }
+      if (alpha < 1.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      return beta;
+    }
+    if (val == 1.) {
+      if (beta > 1.) {
+        return 0.;
+      }
+      if (beta < 1.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      return alpha;
+    }
+    return Math.exp(-logbab + Math.log(val) * (alpha - 1) + Math.log(1 - val) * (beta - 1));
   }
 
   @Override
-  public double cdf(double val) {
-    return cdf(val, a, b);
+  public double cdf(double x) {
+    if(alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
+      return Double.NaN;
+    }
+    if(x <= 0.0) {
+      return 0.0;
+    }
+    if(x >= 1.0) {
+      return 1.0;
+    }
+    if(alpha > SWITCH && beta > SWITCH) {
+      return regularizedIncBetaQuadrature(alpha, beta, x);
+    }
+    double bt = Math.exp(-logbab + alpha * Math.log(x) + beta * Math.log(1.0 - x));
+    if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
+      return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
+    }
+    else {
+      return 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
+    }
   }
 
   @Override
   public double nextRandom() {
-    double x = GammaDistribution.nextRandom(a, 1, random);
-    double y = GammaDistribution.nextRandom(b, 1, random);
-    return x / (x+y);
+    double x = GammaDistribution.nextRandom(alpha, 1, random);
+    double y = GammaDistribution.nextRandom(beta, 1, random);
+    return x / (x + y);
   }
 
   /**
    * Static version of the CDF of the beta distribution
    * 
    * @param val Value
-   * @param a Shape parameter a
-   * @param b Shape parameter b
+   * @param alpha Shape parameter a
+   * @param beta Shape parameter b
    * @return cumulative density
    */
-  public static double cdf(double val, double a, double b) {
-    return regularizedIncBeta(val, a, b);
+  public static double cdf(double val, double alpha, double beta) {
+    return regularizedIncBeta(val, alpha, beta);
   }
 
   /**
    * Static version of the PDF of the beta distribution
    * 
    * @param val Value
-   * @param a Shape parameter a
-   * @param b Shape parameter b
+   * @param alpha Shape parameter a
+   * @param beta Shape parameter b
    * @return probability density
    */
-  public static double pdf(double val, double a, double b) {
-    // FIXME: per logBeta sollte die numerische qualität deutlich besser werden?
-    return Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b) + Math.log(val) * (a - 1) + Math.log(1 - val) * (b - 1));
+  public static double pdf(double val, double alpha, double beta) {
+    if(alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
+      return Double.NaN;
+    }
+    if(val < 0. || val > 1.) {
+      return 0.;
+    }
+    if (val == 0.) {
+      if (alpha > 1.) {
+        return 0.;
+      }
+      if (alpha < 1.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      return beta;
+    }
+    if (val == 1.) {
+      if (beta > 1.) {
+        return 0.;
+      }
+      if (beta < 1.) {
+        return Double.POSITIVE_INFINITY;
+      }
+      return alpha;
+    }
+    return Math.exp(-logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log(1 - val) * (beta - 1));
+  }
+
+  /**
+   * Compute log beta(a,b)
+   * 
+   * @param alpha Shape parameter a
+   * @param beta Shape parameter b
+   * @return Logarithm of result
+   */
+  public static double logBeta(double alpha, double beta) {
+    return GammaDistribution.logGamma(alpha) + GammaDistribution.logGamma(beta) - GammaDistribution.logGamma(alpha + beta);
   }
 
   /**
    * Computes the regularized incomplete beta function I_x(a, b) which is also
    * the CDF of the beta distribution. Based on the book "Numerical Recipes"
    * 
-   * @param a Parameter a
-   * @param b Parameter b
+   * @param alpha Parameter a
+   * @param beta Parameter b
    * @param x Parameter x
    * @return Value of the regularized incomplete beta function
    */
-  public static double regularizedIncBeta(double x, double a, double b) {
-    if(a <= 0.0 || b <= 0.0 || x < 0.0 || x > 1.0 || Double.isNaN(a) || Double.isNaN(b) || Double.isNaN(x)) {
+  public static double regularizedIncBeta(double x, double alpha, double beta) {
+    if(alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
       return Double.NaN;
     }
-    if(x == 0.0 || x == 1.0) {
-      return x;
+    if(x <= 0.0) {
+      return 0.0;
     }
-    if(a > SWITCH && b > SWITCH) {
-      return regularizedIncBetaQuadrature(a, b, x);
+    if(x >= 1.0) {
+      return 1.0;
     }
-    // FIXME: per logBeta sollte die numerische qualität deutlich besser werden?
-    double bt = Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b) + a * Math.log(x) + b * Math.log(1.0 - x));
-    if(x < (a + 1.0) / (a + b + 2.0)) {
-      return bt * regularizedIncBetaCF(a, b, x) / a;
+    if(alpha > SWITCH && beta > SWITCH) {
+      return regularizedIncBetaQuadrature(alpha, beta, x);
+    }
+    double bt = Math.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * Math.log(1.0 - x));
+    if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
+      return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
     }
     else {
-      return 1.0 - bt * regularizedIncBetaCF(b, a, 1.0 - x) / b;
+      return 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
     }
   }
 
@@ -176,16 +253,16 @@ public class BetaDistribution implements DistributionWithRandom {
    * Returns the regularized incomplete beta function I_x(a, b) Includes the
    * continued fraction way of computing, based on the book "Numerical Recipes".
    * 
-   * @param a Parameter a
-   * @param b Parameter b
+   * @param alpha Parameter a
+   * @param beta Parameter b
    * @param x Parameter x
    * @return result
    */
-  protected static double regularizedIncBetaCF(double a, double b, double x) {
+  protected static double regularizedIncBetaCF(double alpha, double beta, double x) {
     final double FPMIN = Double.MIN_VALUE / NUM_PRECISION;
-    double qab = a + b;
-    double qap = a + 1.0;
-    double qam = a - 1.0;
+    double qab = alpha + beta;
+    double qap = alpha + 1.0;
+    double qam = alpha - 1.0;
     double c = 1.0;
     double d = 1.0 - qab * x / qap;
     if(Math.abs(d) < FPMIN) {
@@ -195,7 +272,7 @@ public class BetaDistribution implements DistributionWithRandom {
     double h = d;
     for(int m = 1; m < 10000; m++) {
       int m2 = 2 * m;
-      double aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      double aa = m * (beta - m) * x / ((qam + m2) * (alpha + m2));
       d = 1.0 + aa * d;
       if(Math.abs(d) < FPMIN) {
         d = FPMIN;
@@ -206,7 +283,7 @@ public class BetaDistribution implements DistributionWithRandom {
       }
       d = 1.0 / d;
       h *= d * c;
-      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      aa = -(alpha + m) * (qab + m) * x / ((alpha + m2) * (qap + m2));
       d = 1.0 + aa * d;
       if(Math.abs(d) < FPMIN) {
         d = FPMIN;
@@ -229,20 +306,20 @@ public class BetaDistribution implements DistributionWithRandom {
    * Returns the regularized incomplete beta function I_x(a, b) by quadrature,
    * based on the book "Numerical Recipes".
    * 
-   * @param a Parameter a
-   * @param b Parameter b
+   * @param alpha Parameter a
+   * @param beta Parameter b
    * @param x Parameter x
    * @return result
    */
-  protected static double regularizedIncBetaQuadrature(double a, double b, double x) {
-    double a1 = a - 1.0;
-    double b1 = b - 1.0;
-    double mu = a / (a + b);
+  protected static double regularizedIncBetaQuadrature(double alpha, double beta, double x) {
+    double a1 = alpha - 1.0;
+    double b1 = beta - 1.0;
+    double mu = alpha / (alpha + beta);
     double lnmu = Math.log(mu);
     double lnmuc = Math.log(1.0 - mu);
-    double t = Math.sqrt(a * b / ((a + b) * (a + b) * (a + b + 1.0)));
+    double t = Math.sqrt(alpha * beta / ((alpha + beta) * (alpha + beta) * (alpha + beta + 1.0)));
     double xu;
-    if(x > a / (a + b)) {
+    if(x > alpha / (alpha + beta)) {
       if(x >= 1.0) {
         return 1.0;
       }
@@ -259,7 +336,7 @@ public class BetaDistribution implements DistributionWithRandom {
       t = x + (xu - x) * GAUSSLEGENDRE_Y[i];
       sum += GAUSSLEGENDRE_W[i] * Math.exp(a1 * (Math.log(t) - lnmu) + b1 * (Math.log(1 - t) - lnmuc));
     }
-    double ans = sum * (xu - x) * Math.exp(a1 * lnmu - GammaDistribution.logGamma(a) + b1 * lnmuc - GammaDistribution.logGamma(b1) + GammaDistribution.logGamma(a + b));
+    double ans = sum * (xu - x) * Math.exp(a1 * lnmu - GammaDistribution.logGamma(alpha) + b1 * lnmuc - GammaDistribution.logGamma(b1) + GammaDistribution.logGamma(alpha + beta));
     return ans > 0 ? 1.0 - ans : -ans;
   }
 }
