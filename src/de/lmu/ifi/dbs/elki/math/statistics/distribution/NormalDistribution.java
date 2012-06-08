@@ -148,7 +148,7 @@ public class NormalDistribution implements DistributionWithRandom {
   public double pdf(double val) {
     return pdf(val, mean, stddev);
   }
-  
+
   @Override
   public double cdf(double val) {
     return cdf(val, mean, stddev);
@@ -171,7 +171,7 @@ public class NormalDistribution implements DistributionWithRandom {
 
   @Override
   public String toString() {
-    return "Normal Distribution (mean="+mean+", stddev="+stddev+")";
+    return "Normal Distribution (mean=" + mean + ", stddev=" + stddev + ")";
   }
 
   /**
@@ -205,7 +205,7 @@ public class NormalDistribution implements DistributionWithRandom {
     if(Double.isInfinite(x)) {
       return (x < 0.0) ? 2 : 0;
     }
-  
+
     double result = Double.NaN;
     double absx = Math.abs(x);
     // First approximation interval
@@ -329,7 +329,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return The CDF of the normal given distribution at x.
    */
   public static double cdf(double x, double mu, double sigma) {
-    return (1 + erf(x / Math.sqrt(2))) / 2;
+    return .5 * (1 + erf((x - mu) / (MathUtil.SQRT2 * sigma)));
   }
 
   /**
