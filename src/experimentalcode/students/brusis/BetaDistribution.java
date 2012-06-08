@@ -139,6 +139,7 @@ public class BetaDistribution implements DistributionWithRandom {
    * @return probability density
    */
   public static double pdf(double val, double a, double b) {
+    // FIXME: per logBeta sollte die numerische qualität deutlich besser werden?
     return Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b) + Math.log(val) * (a - 1) + Math.log(1 - val) * (b - 1));
   }
 
@@ -161,6 +162,7 @@ public class BetaDistribution implements DistributionWithRandom {
     if(a > SWITCH && b > SWITCH) {
       return regularizedIncBetaQuadrature(a, b, x);
     }
+    // FIXME: per logBeta sollte die numerische qualität deutlich besser werden?
     double bt = Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b) + a * Math.log(x) + b * Math.log(1.0 - x));
     if(x < (a + 1.0) / (a + b + 2.0)) {
       return bt * regularizedIncBetaCF(a, b, x) / a;
