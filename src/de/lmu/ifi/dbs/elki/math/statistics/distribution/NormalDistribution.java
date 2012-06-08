@@ -171,7 +171,7 @@ public class NormalDistribution implements DistributionWithRandom {
 
   @Override
   public String toString() {
-    return "Normal Distribution (mean=" + mean + ", stddev=" + stddev + ")";
+    return "NormalDistribution(mean=" + mean + ", stddev=" + stddev + ")";
   }
 
   /**

@@ -123,7 +123,7 @@ public class GammaDistribution implements DistributionWithRandom {
    */
   @Override
   public String toString() {
-    return "Gamma Distribution (k=" + k + ", theta=" + theta + ")";
+    return "GammaDistribution(k=" + k + ", theta=" + theta + ")";
   }
 
   /**
@@ -626,14 +626,14 @@ public class GammaDistribution implements DistributionWithRandom {
 
       // Better approximation for p tending to 1:
       if(ch > 2.2 * nu + 6) {
-        ch = -2 * (Math.log(1 - p) - (k - 1) * Math.log(0.5 * ch) + g);
+        ch = -2 * (Math.log1p(-p) - (k - 1) * Math.log(0.5 * ch) + g);
       }
       return ch;
     }
     else {
       // nu <= 0.32, AS 91 at 1
       final double C7 = 4.67, C8 = 6.66, C9 = 6.73, C10 = 13.32;
-      final double ag = Math.log(1 - p) + g + (k - 1) * MathUtil.LOG2;
+      final double ag = Math.log1p(-p) + g + (k - 1) * MathUtil.LOG2;
       double ch = 0.4;
       while(true) {
         final double p1 = 1 + ch * (C7 + ch);

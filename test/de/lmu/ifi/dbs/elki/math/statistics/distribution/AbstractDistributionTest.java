@@ -25,7 +25,7 @@ public class AbstractDistributionTest {
       assertEquals("Error magnitude: 1e" + errlev+" at "+x[i], expected[i], val, err);
     }
     int given = (int)Math.floor(Math.log10(err*1.1));
-    if (given > maxerrlev)
+    // if (given > maxerrlev)
     // System.err.println("PDF Error for "+d+" magnitude is not tight: expected "+maxerrlev+" got "+given);
     assertTrue("Error magnitude is not tight: expected "+maxerrlev+" got "+given, given <= maxerrlev);
   }
@@ -46,7 +46,7 @@ public class AbstractDistributionTest {
       assertEquals("Error magnitude: 1e" + errlev+" at "+x[i], expected[i], val, err);
     }
     int given = (int)Math.floor(Math.log10(err*1.1));
-    if (given > maxerrlev)
+    // if (given > maxerrlev)
     // System.err.println("CDF Error for "+d+" magnitude is not tight: expected "+maxerrlev+" got "+given);
     assertTrue("Error magnitude is not tight: expected "+maxerrlev+" got "+given, given <= maxerrlev);
   }
