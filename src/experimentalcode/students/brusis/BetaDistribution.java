@@ -1,6 +1,9 @@
-package de.lmu.ifi.dbs.elki.math.statistics.distribution;
+package experimentalcode.students.brusis;
 
 import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionWithRandom;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 
 /*
  This file is part of ELKI:
@@ -136,7 +139,7 @@ public class BetaDistribution implements DistributionWithRandom {
    * @return probability density
    */
   public static double pdf(double val, double a, double b) {
-    return Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b)) * Math.pow(val, a - 1) * Math.pow(1 - val, b - 1);
+    return Math.exp(GammaDistribution.logGamma(a + b) - GammaDistribution.logGamma(a) - GammaDistribution.logGamma(b) + Math.log(val) * (a - 1) + Math.log(1 - val) * (b - 1));
   }
 
   /**
