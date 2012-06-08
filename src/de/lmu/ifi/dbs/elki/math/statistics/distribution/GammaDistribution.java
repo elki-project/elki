@@ -750,8 +750,8 @@ public class GammaDistribution implements DistributionWithRandom {
     double x = 0.5 * ch / theta;
     if(max_newton_iterations > 0) {
       // Refine result using final Newton steps.
-      // FIXME: this seems to reduce accuracy?!?
-      // x = gammaProbitNewtonRefinement(Math.log(p), k, theta, max_newton_iterations, x);
+      // TODO: add unit tests that show an improvement! Maybe in logscale only?
+      x = gammaProbitNewtonRefinement(Math.log(p), k, theta, max_newton_iterations, x);
     }
     return x;
   }
