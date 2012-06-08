@@ -511,28 +511,32 @@ public class TestNormalDistribution extends AbstractDistributionTest implements 
   @Test
   public void testProbit() {
     // TODO: improve our implementation, to get more significant digits!
-    checkProbit(0., 1., P_PROBIT, SCIPY_NORM_PROBIT_0_1, 1e-8);
-    checkProbit(1., 3., P_PROBIT, SCIPY_NORM_PROBIT_1_3, 1e-9);
-    checkProbit(.1, .1, P_PROBIT, SCIPY_NORM_PROBIT_01_01, 1e-9);
-    checkProbit(0., 1., P_PROBIT, GNUR_NORM_PROBIT_0_1, 1e-8);
-    checkProbit(1., 3., P_PROBIT, GNUR_NORM_PROBIT_1_3, 1e-9);
-    checkProbit(.1, .1, P_PROBIT, GNUR_NORM_PROBIT_01_01, 1e-9);
+    checkProbit(new NormalDistribution(0., 1.), P_PROBIT, SCIPY_NORM_PROBIT_0_1, 1e-8);
+    checkProbit(new NormalDistribution(1., 3.), P_PROBIT, SCIPY_NORM_PROBIT_1_3, 1e-9);
+    checkProbit(new NormalDistribution(.1, .1), P_PROBIT, SCIPY_NORM_PROBIT_01_01, 1e-9);
+    checkProbit(new NormalDistribution(0., 1.), P_PROBIT, GNUR_NORM_PROBIT_0_1, 1e-8);
+    checkProbit(new NormalDistribution(1., 3.), P_PROBIT, GNUR_NORM_PROBIT_1_3, 1e-9);
+    checkProbit(new NormalDistribution(.1, .1), P_PROBIT, GNUR_NORM_PROBIT_01_01, 1e-9);
   }
 
-  private void checkProbit(double mean, double var, double[] x, double[] expected, double err) {
-    NormalDistribution d = new NormalDistribution(mean, var);
+  private void checkProbit(NormalDistribution d, double[] x, double[] expected, double err) {
+    int maxerrlev = Integer.MIN_VALUE;
     for(int i = 0; i < x.length; i++) {
       double val = d.probit(x[i]);
       if(val == expected[i]) {
         continue;
       }
       double diff = Math.abs(val - expected[i]);
+      final int errlev = (int) Math.ceil(Math.log10(diff / expected[i]));
+      maxerrlev = Math.max(errlev, maxerrlev);
       if(diff < err || diff / expected[i] < err) {
         continue;
       }
-      final int errlev = (int) Math.ceil(Math.log(diff / expected[i]) / Math.log(10));
       assertEquals("Error magnitude: 1e" + errlev, expected[i], val, err);
-      // System.err.println(mean+" "+var+" "+errlev);
     }
+    int given = (int) Math.floor(Math.log10(err * 1.1));
+    // if (given > maxerrlev)
+    // System.err.println("Probit Error for "+d+" magnitude is not tight: expected "+maxerrlev+" got "+given);
+    assertTrue("Error magnitude is not tight: expected " + maxerrlev + " got " + given, given <= maxerrlev);
   }
 }

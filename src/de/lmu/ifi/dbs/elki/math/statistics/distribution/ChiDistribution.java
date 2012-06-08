@@ -89,4 +89,9 @@ public class ChiDistribution implements DistributionWithRandom {
   public static double cdf(double val, double dof) {
     return GammaDistribution.regularizedGammaP(dof / 2, val * val / 2);
   }
+
+  @Override
+  public String toString() {
+    return "ChiDistribution(dof=" + dof + ")";
+  }
 }

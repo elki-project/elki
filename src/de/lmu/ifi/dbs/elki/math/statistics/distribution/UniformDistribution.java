@@ -100,6 +100,10 @@ public class UniformDistribution implements DistributionWithRandom {
     }
     return (val - min) / len;
   }
+  
+  public double probit(double val) {
+    return min + len * val; 
+  }
 
   @Override
   public double nextRandom() {
@@ -113,7 +117,7 @@ public class UniformDistribution implements DistributionWithRandom {
    */
   @Override
   public String toString() {
-    return "Uniform Distribution (min=" + min + ", max=" + max + ")";
+    return "UniformDistribution(min=" + min + ", max=" + max + ")";
   }
 
   /**

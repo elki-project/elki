@@ -69,6 +69,4 @@ public class ChiSquaredDistribution extends GammaDistribution {
     }
     return Math.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
   }
-  
-  
 }

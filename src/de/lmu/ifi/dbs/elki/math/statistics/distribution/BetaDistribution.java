@@ -2,6 +2,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /*
  This file is part of ELKI:
@@ -108,25 +109,25 @@ public class BetaDistribution implements DistributionWithRandom {
     if(val < 0. || val > 1.) {
       return 0.;
     }
-    if (val == 0.) {
-      if (alpha > 1.) {
+    if(val == 0.) {
+      if(alpha > 1.) {
         return 0.;
       }
-      if (alpha < 1.) {
+      if(alpha < 1.) {
         return Double.POSITIVE_INFINITY;
       }
       return beta;
     }
-    if (val == 1.) {
-      if (beta > 1.) {
+    if(val == 1.) {
+      if(beta > 1.) {
         return 0.;
       }
-      if (beta < 1.) {
+      if(beta < 1.) {
         return Double.POSITIVE_INFINITY;
       }
       return alpha;
     }
-    return Math.exp(-logbab + Math.log(val) * (alpha - 1) + Math.log(1 - val) * (beta - 1));
+    return Math.exp(-logbab + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1));
   }
 
   @Override
@@ -143,7 +144,7 @@ public class BetaDistribution implements DistributionWithRandom {
     if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
-    double bt = Math.exp(-logbab + alpha * Math.log(x) + beta * Math.log(1.0 - x));
+    double bt = Math.exp(-logbab + alpha * Math.log(x) + beta * Math.log1p(-x));
     if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
       return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
     }
@@ -152,11 +153,36 @@ public class BetaDistribution implements DistributionWithRandom {
     }
   }
 
+  public double probit(double x) {
+    // Valid parameters
+    if(x < 0 || x > 1 || Double.isNaN(x)) {
+      return Double.NaN;
+    }
+    if(x == 0) {
+      return 0.0;
+    }
+    if(x == 1) {
+      return 1.0;
+    }
+    // Simpler to compute inverse?
+    if(x > 0.5) {
+      return 1 - rawProbit(1 - x, beta, alpha, logbab);
+    }
+    else {
+      return rawProbit(x, alpha, beta, logbab);
+    }
+  }
+
   @Override
   public double nextRandom() {
     double x = GammaDistribution.nextRandom(alpha, 1, random);
     double y = GammaDistribution.nextRandom(beta, 1, random);
     return x / (x + y);
+  }
+
+  @Override
+  public String toString() {
+    return "BetaDistribution(alpha=" + alpha + ", beta=" + beta + ")";
   }
 
   /**
@@ -186,25 +212,25 @@ public class BetaDistribution implements DistributionWithRandom {
     if(val < 0. || val > 1.) {
       return 0.;
     }
-    if (val == 0.) {
-      if (alpha > 1.) {
+    if(val == 0.) {
+      if(alpha > 1.) {
         return 0.;
       }
-      if (alpha < 1.) {
+      if(alpha < 1.) {
         return Double.POSITIVE_INFINITY;
       }
       return beta;
     }
-    if (val == 1.) {
-      if (beta > 1.) {
+    if(val == 1.) {
+      if(beta > 1.) {
         return 0.;
       }
-      if (beta < 1.) {
+      if(beta < 1.) {
         return Double.POSITIVE_INFINITY;
       }
       return alpha;
     }
-    return Math.exp(-logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log(1 - val) * (beta - 1));
+    return Math.exp(-logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1));
   }
 
   /**
@@ -240,7 +266,7 @@ public class BetaDistribution implements DistributionWithRandom {
     if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
-    double bt = Math.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * Math.log(1.0 - x));
+    double bt = Math.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * Math.log1p(-x));
     if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
       return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
     }
@@ -316,7 +342,7 @@ public class BetaDistribution implements DistributionWithRandom {
     double b1 = beta - 1.0;
     double mu = alpha / (alpha + beta);
     double lnmu = Math.log(mu);
-    double lnmuc = Math.log(1.0 - mu);
+    double lnmuc = Math.log1p(-mu);
     double t = Math.sqrt(alpha * beta / ((alpha + beta) * (alpha + beta) * (alpha + beta + 1.0)));
     double xu;
     if(x > alpha / (alpha + beta)) {
@@ -334,9 +360,139 @@ public class BetaDistribution implements DistributionWithRandom {
     double sum = 0.0;
     for(int i = 0; i < GAUSSLEGENDRE_Y.length; i++) {
       t = x + (xu - x) * GAUSSLEGENDRE_Y[i];
-      sum += GAUSSLEGENDRE_W[i] * Math.exp(a1 * (Math.log(t) - lnmu) + b1 * (Math.log(1 - t) - lnmuc));
+      sum += GAUSSLEGENDRE_W[i] * Math.exp(a1 * (Math.log(t) - lnmu) + b1 * (Math.log1p(-t) - lnmuc));
     }
     double ans = sum * (xu - x) * Math.exp(a1 * lnmu - GammaDistribution.logGamma(alpha) + b1 * lnmuc - GammaDistribution.logGamma(b1) + GammaDistribution.logGamma(alpha + beta));
     return ans > 0 ? 1.0 - ans : -ans;
+  }
+
+  /**
+   * Compute probit (inverse cdf) for Beta distributions.
+   * 
+   * @param p Probability
+   * @param alpha Shape parameter a
+   * @param beta Shape parameter b
+   * @return Probit for Beta distribution
+   */
+  public static double probit(double p, double alpha, double beta) {
+    // Valid parameters
+    if(Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(p) || alpha < 0. || beta < 0.) {
+      return Double.NaN;
+    }
+    if(p < 0 || p > 1) {
+      return Double.NaN;
+    }
+    if(p == 0) {
+      return 0.0;
+    }
+    if(p == 1) {
+      return 1.0;
+    }
+    // Simpler to compute inverse?
+    if(p > 0.5) {
+      return 1 - rawProbit(1 - p, beta, alpha, logBeta(beta, alpha));
+    }
+    else {
+      return rawProbit(p, alpha, beta, logBeta(alpha, beta));
+    }
+  }
+
+  /**
+   * Raw probit function
+   * 
+   * @param p P, must be 0 < p <= .5
+   * @param alpha Alpha
+   * @param beta Beta
+   * @param logbeta log Beta(alpha, beta)
+   * @return Position
+   */
+  protected static double rawProbit(double p, double alpha, double beta, final double logbeta) {
+    // Initial estimate for x
+    double x;
+    {
+      // Very fast approximation of y.
+      double tmp = Math.sqrt(-2 * Math.log(p));
+      double y = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
+
+      if(alpha > 1 && beta > 1) {
+        double r = (y * y - 3.) / 6.;
+        double s = 1. / (alpha + alpha - 1.);
+        double t = 1. / (beta + beta - 1.);
+        double h = 2. / (s + t);
+        double w = y * Math.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
+        x = alpha / (alpha + beta * Math.exp(w + w));
+      }
+      else {
+        double r = beta + beta;
+        double t = 1. / (9. * beta);
+        t = r * Math.pow(1. - t + y * Math.sqrt(t), 3.0);
+        if(t <= 0.) {
+          x = 1. - Math.exp((Math.log1p(-p) + Math.log(beta) + logbeta) / beta);
+        }
+        else {
+          t = (4. * alpha + r - 2.) / t;
+          if(t <= 1.) {
+            x = Math.exp((Math.log(p * alpha) + logbeta) / alpha);
+          }
+          else {
+            x = 1. - 2. / (t + 1.);
+          }
+        }
+      }
+      // Degenerate initial approximations
+      if(x < 3e-308 || x > 1 - 2.22e-16) {
+        x = 0.5;
+      }
+    }
+
+    // Newon-Raphson method using the CDF
+    {
+      final double ialpha = 1 - alpha;
+      final double ibeta = 1 - beta;
+
+      // Desired accuracy, as from GNU R adoption of AS 109
+      final double acu = Math.max(1e-300, Math.pow(10., -13 - 2.5 / (alpha * alpha) - .5 / (p * p)));
+      double prevstep = 0., y = 0., stepsize = 1;
+
+      for(int outer = 0; outer < 1000; outer++) {
+        // Current CDF value
+        double ynew = cdf(x, alpha, beta);
+        if(Double.isInfinite(ynew)) { // Degenerated.
+          return Double.NaN;
+        }
+        // Error gradient
+        ynew = (ynew - p) * Math.exp(logbeta + ialpha * Math.log(x) + ibeta * Math.log1p(-x));
+        if(ynew * y <= 0.) {
+          prevstep = Math.max(Math.abs(stepsize), 3e-308);
+        }
+        // Inner loop: try different step sizes: y * 3^-i
+        double g = 1, xnew = 0.;
+        for(int inner = 0; inner < 1000; inner++) {
+          stepsize = g * ynew;
+          if(Math.abs(stepsize) < prevstep) {
+            xnew = x - stepsize; // Candidate x
+            if(xnew >= 0. && xnew <= 1.) {
+              // Close enough
+              if(prevstep <= acu || Math.abs(ynew) <= acu) {
+                return x;
+              }
+              if(xnew != 0. && xnew != 1.) {
+                break;
+              }
+            }
+          }
+          g /= 3.;
+        }
+        // Convergence
+        if(Math.abs(xnew - x) < 1e-15 * x) {
+          return x;
+        }
+        // Iterate with new values
+        x = xnew;
+        y = ynew;
+      }
+    }
+    // Not converged in Newton-Raphson
+    throw new AbortException("Beta quantile computation did not converge.");
   }
 }
