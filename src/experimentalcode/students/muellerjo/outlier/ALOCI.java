@@ -97,9 +97,19 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
   public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
   /**
+   * Parameter to specify the the number of Levels to add under the sampling neighborhood.
+   */
+  public static final OptionID LUN_ID = OptionID.getOrCreateOptionID("loci.levelUnderNmin", "Number of Levels to add under the sampling neighborhood");
+  
+  /**
    * Parameter to specify the number of Grids to use.
    */
   public static final OptionID GRIDS_ID = OptionID.getOrCreateOptionID("loci.g", "The number of Grids to use.");
+  
+  /**
+   * Parameter to specify the seed to initialize Random.
+   */
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("loci.seed", "The seed to use for initializing Random.");
 
   /**
    * Holds the value of {@link #NMIN_ID}.
@@ -111,13 +121,19 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    */
   private int alpha;
   
-  private int levelUnderNmin = 4; //FIXME: Implement
+  /**
+   * Holds the value of {@link #LUN_ID}.
+   */
+  private int levelUnderNmin;
 
   /**
    * Holds the value of {@link #GRIDS_ID}.
    */
   private int g;
 
+  /**
+   * Holds the value of {@link #GRIDS_ID}.
+   */
   private Random random;
 
   private NumberVectorDistanceFunction<D> distFunc;
@@ -131,14 +147,14 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * @param alpha Alpha value
    * @param g Number of grids to use
    */
-  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g) {
+  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g, int lun, int seed) {
     super();
     this.distFunc = distanceFunction;
     this.nmin = nmin;
     this.alpha = alpha;
     this.g = g;
-    // FIXME: make seed parameterizable and optional.
-    this.random = new Random(0);
+    this.levelUnderNmin = lun;
+    this.random = new Random(seed);
   }
 
   @Override
@@ -403,6 +419,10 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     protected int alpha = 4;
 
     protected int g = 1;
+    
+    protected int seed = 0;
+    
+    protected int lun = alpha;
 
     private NumberVectorDistanceFunction<D> distanceFunction;
 
@@ -425,18 +445,28 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
         this.g = g.getValue();
       }
 
+      final IntParameter seedP = new IntParameter(SEED_ID, 0);
+      if(config.grab(seedP)) {
+        this.seed = seedP.getValue();
+      }
+      
       final IntParameter alphaP = new IntParameter(ALPHA_ID, 4);
       if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
-        if(alpha < 1) {
-          alpha = 1;
+        this.alpha = alphaP.getValue();
+        if(this.alpha < 1) {
+          this.alpha = 1;
         }
+      }
+      
+      final IntParameter lunP = new IntParameter(LUN_ID, alpha);
+      if(config.grab(lunP)) {
+        this.lun = lunP.getValue();
       }
     }
 
     @Override
     protected ALOCI<O, D> makeInstance() {
-      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g);
+      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g, lun, seed);
     }
   }
 }
