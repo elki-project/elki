@@ -36,6 +36,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 public class GammaDistribution implements DistributionWithRandom {
   /**
+   * Euler–Mascheroni constant
+   */
+  public static final double EULERS_CONST = 0.5772156649015328606065120900824024;
+
+  /**
    * LANCZOS-Coefficients for Gamma approximation.
    * 
    * These are said to have higher precision than those in "Numerical Recipes".
@@ -816,5 +821,71 @@ public class GammaDistribution implements DistributionWithRandom {
       x = newx;
     }
     return x;
+  }
+
+  /**
+   * Compute the Psi / Digamma function
+   * 
+   * Reference:
+   * <p>
+   * J. M. Bernando<br />
+   * Algorithm AS 103: Psi (Digamma) Function<br />
+   * Statistical Algorithms
+   * </p>
+   * 
+   * TODO: is there a more accurate version maybe in R?
+   * 
+   * @param x Position
+   * @return digamma value
+   */
+  @Reference(authors = "J. M. Bernando", title = "Algorithm AS 103: Psi (Digamma) Function", booktitle = "Statistical Algorithms")
+  public static double digamma(double x) {
+    if(!(x > 0)) {
+      return Double.NaN;
+    }
+    // Method of equation 5:
+    if(x <= 1e-5) {
+      return -EULERS_CONST - 1. / x;
+    }
+    // Method of equation 4:
+    else if(x > 49.) {
+      final double ix2 = 1. / (x * x);
+      // Partial series expansion
+      return Math.log(x) - 0.5 / x - ix2 * ((1.0 / 12.) + ix2 * (1.0 / 120. - ix2 / 252.));
+      // + O(x^8) error
+    }
+    else {
+      // Stirling expansion
+      return digamma(x + 1.) - 1. / x;
+    }
+  }
+
+  /**
+   * Compute the Trigamma function. Based on digamma.
+   * 
+   * TODO: is there a more accurate version maybe in R?
+   * 
+   * @param x Position
+   * @return trigamma value
+   */
+  public static double trigamma(double x) {
+    if(!(x > 0)) {
+      return Double.NaN;
+    }
+    // Method of equation 5:
+    if(x <= 1e-5) {
+      return 1. / (x * x);
+    }
+    // Method of equation 4:
+    else if(x > 49.) {
+      final double ix2 = 1. / (x * x);
+      // Partial series expansion
+      return 1 / x - ix2 / 2. + ix2 / x * (1.0 / 6. - ix2 * (1.0 / 30. + ix2 / 42.));
+      // + O(x^8) error
+    }
+    else {
+      // Stirling expansion
+      return trigamma(x + 1.) - 1. / (x * x);
+    }
   }
 }
