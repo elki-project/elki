@@ -67,7 +67,7 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME_GEN = "Score Tooltips";
+  public static final String NAME_GEN = " Tooltips";
 
   /**
    * Number format.
@@ -199,7 +199,7 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
       }
       List<Relation<?>> rrs = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> r : rrs) {
-        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation())) {
+        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
           continue;
         }
         // Skip if we already considered it above
@@ -213,7 +213,7 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
         if(add) {
           IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME_GEN, r, p.getRelation(), this);
+            final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
             task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
             baseResult.getHierarchy().add(r, task);
