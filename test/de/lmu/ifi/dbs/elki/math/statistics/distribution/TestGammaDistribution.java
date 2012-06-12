@@ -1269,7 +1269,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   @Test
   public void testProbit() {
     checkQuantile(new GammaDistribution(1., 1.), P_QUANT, SCIPY_GAMMA_QUANT_1_1, 1e-14);
-    checkQuantile(new GammaDistribution(2., 1.), P_QUANT, SCIPY_GAMMA_QUANT_2_1, 1e-12);
+    checkQuantile(new GammaDistribution(2., 1.), P_QUANT, SCIPY_GAMMA_QUANT_2_1, 1e-13);
     checkQuantile(new GammaDistribution(4., 1.), P_QUANT, SCIPY_GAMMA_QUANT_4_1, 1e-13);
     checkQuantile(new GammaDistribution(4., 10), P_QUANT, SCIPY_GAMMA_QUANT_4_10, 1e-13);
     checkQuantile(new GammaDistribution(.1, 10), P_QUANT, SCIPY_GAMMA_QUANT_01_10, 1e-13);
