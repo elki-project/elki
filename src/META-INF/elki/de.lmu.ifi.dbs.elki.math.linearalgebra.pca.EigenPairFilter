@@ -7,3 +7,4 @@ de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeakEigenPairFilter
 de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RelativeEigenPairFilter
 de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter
 de.lmu.ifi.dbs.elki.math.linearalgebra.pca.CompositeEigenPairFilter
+de.lmu.ifi.dbs.elki.math.linearalgebra.pca.DropEigenPairFilter

@@ -24,3 +24,4 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
+tutorial.outlier.DistanceStddevOutlier
