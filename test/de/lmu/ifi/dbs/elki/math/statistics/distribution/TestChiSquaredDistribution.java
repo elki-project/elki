@@ -818,7 +818,7 @@ public class TestChiSquaredDistribution extends AbstractDistributionTest impleme
     checkQuantile(new ChiSquaredDistribution(10), P_QUANT, SCIPY_CHISQ_QUANT_10, 1e-12);
     checkQuantile(new ChiSquaredDistribution(.1), P_QUANT, SCIPY_CHISQ_QUANT_01, 1e-13);
     checkQuantile(new ChiSquaredDistribution(1.), P_QUANT, GNUR_CHISQ_QUANT_1, 1e-13);
-    checkQuantile(new ChiSquaredDistribution(2.), P_QUANT, GNUR_CHISQ_QUANT_2, 1e-13);
+    checkQuantile(new ChiSquaredDistribution(2.), P_QUANT, GNUR_CHISQ_QUANT_2, 1e-14);
     checkQuantile(new ChiSquaredDistribution(4.), P_QUANT, GNUR_CHISQ_QUANT_4, 1e-13);
     checkQuantile(new ChiSquaredDistribution(10), P_QUANT, GNUR_CHISQ_QUANT_10, 1e-13);
     checkQuantile(new ChiSquaredDistribution(.1), P_QUANT, GNUR_CHISQ_QUANT_01, 1e-13);
