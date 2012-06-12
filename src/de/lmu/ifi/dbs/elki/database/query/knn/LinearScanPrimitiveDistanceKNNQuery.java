@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -63,7 +64,8 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
   protected void linearScanBatchKNN(List<O> objs, List<KNNHeap<D>> heaps) {
     final int size = objs.size();
     // Linear scan style KNN.
-    for(DBID candidateID : relation.iterDBIDs()) {
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      DBID candidateID = iter.getDBID();
       O candidate = relation.get(candidateID);
       for(int index = 0; index < size; index++) {
         O object = objs.get(index);
@@ -83,7 +85,8 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
     final int size = ids.size();
     final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(size);
     List<O> objs = new ArrayList<O>(size);
-    for(DBID id : ids) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       heaps.add(new KNNHeap<D>(k));
       objs.add(relation.get(id));
     }

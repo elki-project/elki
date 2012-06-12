@@ -53,6 +53,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> ext
 
   @Override
   public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
+    // Note: subtle optimization. Get "id" only once!
     return getRangeForObject(relation.get(id), range);
   }
 }

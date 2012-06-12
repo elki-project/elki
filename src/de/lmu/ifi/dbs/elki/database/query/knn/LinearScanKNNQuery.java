@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -64,12 +65,13 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
    */
   private void linearScanBatchKNN(ArrayDBIDs ids, List<KNNHeap<D>> heaps) {
     // The distance is computed on database IDs
-    for(DBID candidateID : relation.iterDBIDs()) {
-      Integer index = -1;
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      DBID candidateID = iter.getDBID();
+      int index = 0;
       for(DBID id : ids) {
-        index++;
         KNNHeap<D> heap = heaps.get(index);
         heap.add(distanceQuery.distance(id, candidateID), candidateID);
+        index++;
       }
     }
   }
@@ -79,12 +81,14 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     KNNHeap<D> heap = new KNNHeap<D>(k);
     if(PrimitiveDistanceQuery.class.isInstance(distanceQuery)) {
       O obj = relation.get(id);
-      for(DBID candidateID : relation.iterDBIDs()) {
+      for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+        DBID candidateID = iter.getDBID();
         heap.add(distanceQuery.distance(obj, relation.get(candidateID)), candidateID);
       }
     }
     else {
-      for(DBID candidateID : relation.iterDBIDs()) {
+      for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+        DBID candidateID = iter.getDBID();
         heap.add(distanceQuery.distance(id, candidateID), candidateID);
       }
     }
@@ -122,7 +126,8 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   @Override
   public KNNResult<D> getKNNForObject(O obj, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
-    for(DBID candidateID : relation.iterDBIDs()) {
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      DBID candidateID = iter.getDBID();
       O candidate = relation.get(candidateID);
       heap.add(distanceQuery.distance(obj, candidate), candidateID);
     }
