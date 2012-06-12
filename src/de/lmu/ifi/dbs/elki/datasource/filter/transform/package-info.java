@@ -1,5 +1,5 @@
 /**
- * <p>Data filtering, in particular for normalization and projection.</p> 
+ * <p>Data space transformations.</p> 
  */
 /*
 This file is part of ELKI:
