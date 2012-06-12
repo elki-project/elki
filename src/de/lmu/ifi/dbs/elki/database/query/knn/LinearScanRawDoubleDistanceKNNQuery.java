@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -67,7 +68,8 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
     // Optimization for double distances.
     final KNNHeap<DoubleDistance> heap = new KNNHeap<DoubleDistance>(k);
     double max = Double.POSITIVE_INFINITY;
-    for(DBID candidateID : relation.iterDBIDs()) {
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      DBID candidateID = iter.getDBID();
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(candidateID));
       if(doubleDistance <= max) {
         heap.add(new DoubleDistanceResultPair(doubleDistance, candidateID));
@@ -91,7 +93,8 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
 
     // The distance is computed on arbitrary vectors, we can reduce object
     // loading by working on the actual vectors.
-    for(DBID candidateID : relation.iterDBIDs()) {
+    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      DBID candidateID = iter.getDBID();
       O candidate = relation.get(candidateID);
       for(int index = 0; index < size; index++) {
         final KNNHeap<DoubleDistance> heap = heaps.get(index);

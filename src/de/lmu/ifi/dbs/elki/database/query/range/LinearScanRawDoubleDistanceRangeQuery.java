@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
@@ -63,7 +64,8 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
 
       O qo = relation.get(id);
       GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
-      for(DBID currentID : relation.iterDBIDs()) {
+      for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+        DBID currentID = iter.getDBID();
         double doubleDistance = rawdist.doubleDistance(qo, relation.get(currentID));
         if(doubleDistance <= epsilon) {
           result.add(new DoubleDistanceResultPair(doubleDistance, currentID));
@@ -85,7 +87,8 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
       double epsilon = range.doubleValue();
 
       GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
-      for(DBID currentID : relation.iterDBIDs()) {
+      for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+        DBID currentID = iter.getDBID();
         double doubleDistance = rawdist.doubleDistance(obj, relation.get(currentID));
         if(doubleDistance <= epsilon) {
           result.add(new DoubleDistanceResultPair(doubleDistance, currentID));
