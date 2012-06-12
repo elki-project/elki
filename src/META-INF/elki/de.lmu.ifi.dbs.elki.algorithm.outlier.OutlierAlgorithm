@@ -37,3 +37,4 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAllOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialNoOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialGeneratedOutlier
+tutorial.outlier.DistanceStddevOutlier
