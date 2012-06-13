@@ -32,9 +32,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.AbstractCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -65,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url="http://dx.doi.org/10.1145/358669.358692")
 public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends AbstractCovarianceMatrixBuilder<V> {
-  int iterations = 100;
+  int iterations = 1000;
 
   Random random = new Random(0);
 
@@ -79,23 +78,13 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends
     for(int i = 0; i < iterations; i++) {
       DBIDs sample = DBIDUtil.randomSample(ids, 2 * dim + 1, random.nextLong());
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
-      double[] centroid = cv.getMeanVector().getArrayRef();
-      EigenvalueDecomposition evd = new EigenvalueDecomposition(cv.destroyToSampleMatrix());
-      double[] eigenvalues = evd.getRealEigenvalues();
-      double[][] eigenvectors = evd.getV().getArrayRef();
+      Vector centroid = cv.getMeanVector();
+      Matrix p = cv.destroyToSampleMatrix().inverse();
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
-      double[] buffer = new double[dim];
       for(DBID id : ids) {
-        V vec = relation.get(id);
-        for(int d = 0; d < dim; d++) {
-          buffer[d] = vec.doubleValue(d + 1) - centroid[d];
-        }
-        double[] proj = VMath.transposeTimes(eigenvectors, buffer);
-        double sqlen = 0.0;
-        for(int d = 0; d < dim; d++) {
-          sqlen += proj[d] * proj[d] / eigenvalues[d];
-        }
+        Vector vec = relation.get(id).getColumnVector().minusEquals(centroid);
+        double sqlen = vec.transposeTimesTimes(p, vec);
         if(sqlen < tresh) {
           support.add(id);
         }
