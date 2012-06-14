@@ -39,8 +39,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -336,7 +337,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
 
     @Override
-    public List<DistanceResultPair<DoubleDistance>> getRangeForObject(V query, DoubleDistance range) {
+    public DistanceDBIDResult<DoubleDistance> getRangeForObject(V query, DoubleDistance range) {
       stats.issuedQueries++;
       long t = System.nanoTime();
 
@@ -370,7 +371,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       // create candidate list (all objects) and prune candidates w.r.t.
       // mindist (i.e. remove them from the list)
       // important: this structure contains the maxDist values for refinement!
-      List<DistanceResultPair<DoubleDistance>> result = new ArrayList<DistanceResultPair<DoubleDistance>>();
+      DistanceDBIDResult<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
       final double onebyp = 1.0 / p;
       int candidates = 0;
       for(VectorApproximation va : vectorApprox) {
