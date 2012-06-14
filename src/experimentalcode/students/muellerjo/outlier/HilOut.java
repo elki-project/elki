@@ -354,6 +354,13 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       hf.pf[i].ubound = newub;
     }
   }
+  
+  /**
+   * trueOutliers function updates n_star
+   * 
+   * @param h the HilberFeatures
+   * 
+   */
 
   private void trueOutliers(HilbertFeatures h) {
     n_star = 0;
