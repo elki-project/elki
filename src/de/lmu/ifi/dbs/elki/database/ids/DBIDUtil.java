@@ -354,7 +354,7 @@ public final class DBIDUtil {
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
     if(k <= 0 || k > source.size()) {
-      throw new IllegalArgumentException("Illegal value for size of random sample: " + k);
+      throw new IllegalArgumentException("Illegal value for size of random sample: " + k+ " > "+source.size()+" or < 0");
     }
     final Random random;
     if(seed != null) {
