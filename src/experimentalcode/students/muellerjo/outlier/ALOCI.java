@@ -293,9 +293,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     AbstractALOCIQuadTreeNode sn = getBestSamplingNode(qts, cg, level);
     // get the square sum of the counting neighborhoods box counts
     long sq = sn.getBoxCountSquareSum(alpha);
-    if (sq == -1){ // Nicht sicher ob der Fall überhaupt eintreten kann
-      return new DoubleIntPair(0.0, sn.getLevel());
-    }
     double mdef_norm;
     /*
      * if the square sum is equal to box count of the sampling Neighborhood then
@@ -314,9 +311,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     // calculation of mdef according to the paper and standardization as done in
     // LOCI
     long cb = sn.getBoxCountCubicSum(alpha);
-    if (cb == -1){ // Nicht sicher ob der Fall überhaupt eintreten kann
-      return new DoubleIntPair(0.0, sn.getLevel());
-    }
     double n_hat = (double) sq / (double) sn.getBucketCount();
     double sig_n_hat = java.lang.Math.sqrt(cb * sn.getBucketCount() - (sq * sq)) / sn.getBucketCount();
     // Avoid NaN - correct result 0.0?
