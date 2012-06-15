@@ -28,11 +28,16 @@ import java.util.Comparator;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * Utility functions for use with vectors.
@@ -270,6 +275,25 @@ public final class VectorUtil {
       result += d1.doubleValue(i) * d2.doubleValue(i);
     }
     return result;
+  }
+
+  /**
+   * Compute medoid for a given subset.
+   * 
+   * @param relation Relation to process
+   * @param sample Sample set
+   * @return Medoid vector
+   */
+  public static Vector computeMedoid(Relation<? extends NumberVector<?, ?>> relation, DBIDs sample) {
+    final int dim = DatabaseUtil.dimensionality(relation);
+    ArrayModifiableDBIDs mids = DBIDUtil.newArray(sample);
+    SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
+    Vector medoid = new Vector(dim);
+    for (int d = 0; d < dim; d++) {
+      s.setDimension(d + 1);
+      medoid.set(d, relation.get(QuickSelect.median(mids, s)).doubleValue(d + 1));
+    }
+    return medoid;
   }
 
   /**
