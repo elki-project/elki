@@ -137,6 +137,8 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
     tooltiparea.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
     tooltiparea.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
     svgp.addCSSClassOrLogError(tooltiparea);
+    
+    svgp.updateStyleElement();
   }
 
   /**
