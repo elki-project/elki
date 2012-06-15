@@ -888,4 +888,47 @@ public class GammaDistribution implements DistributionWithRandom {
       return trigamma(x + 1.) - 1. / (x * x);
     }
   }
+
+  /**
+   * Mean least squares estimateion of Gamma distribution to a set of
+   * observations.
+   * 
+   * Reference:
+   * <p>
+   * Maximum likelihood estimation of the parameters of the gamma distribution
+   * and their bias<br />
+   * S. C. Choi, R. Wette<br />
+   * in: Technometrics
+   * </p>
+   * 
+   * @param data Data
+   * @return Assumed distribution
+   */
+  @Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", authors = "S. C. Choi, R. Wette", booktitle = "Technometrics", url = "http://www.jstor.org/stable/10.2307/1266892")
+  public static GammaDistribution estimate(double[] data) {
+    double meanx = 0, meanlogx = 0;
+    for(int i = 0; i < data.length; i++) {
+      final double logx = Math.log(data[i]);
+      final double deltax = data[i] - meanx;
+      final double deltalogx = logx - meanlogx;
+      meanx += deltax / (i + 1.);
+      meanlogx += deltalogx / (i + 1.);
+    }
+    // Initial approximation
+    final double logmeanx = Math.log(meanx);
+    final double diff = logmeanx - meanlogx;
+    double k = (3 - diff + Math.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
+
+    // Refine via newton iteration, based on Choi and Wette equation
+    while(true) {
+      double kdelta = (Math.log(k) - digamma(k) - diff) / (1 / k - trigamma(k));
+      if(Math.abs(kdelta) < 1E-8 || Double.isNaN(kdelta)) {
+        break;
+      }
+      k += kdelta;
+    }
+    // Estimate theta:
+    final double theta = k / meanx;
+    return new GammaDistribution(k, theta);
+  }
 }
