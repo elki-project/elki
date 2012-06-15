@@ -890,7 +890,18 @@ public class GammaDistribution implements DistributionWithRandom {
   }
 
   /**
-   * Mean least squares estimateion of Gamma distribution to a set of
+   * Mean least squares estimation of Gamma distribution to a set of
+   * observations.
+   * 
+   * @param data Data
+   * @return Assumed distribution
+   */
+  public static GammaDistribution estimate(double[] data) {
+    return estimate(data, data.length);
+  }
+  
+  /**
+   * Mean least squares estimation of Gamma distribution to a set of
    * observations.
    * 
    * Reference:
@@ -902,12 +913,13 @@ public class GammaDistribution implements DistributionWithRandom {
    * </p>
    * 
    * @param data Data
+   * @param len Length of array
    * @return Assumed distribution
    */
   @Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", authors = "S. C. Choi, R. Wette", booktitle = "Technometrics", url = "http://www.jstor.org/stable/10.2307/1266892")
-  public static GammaDistribution estimate(double[] data) {
+  public static GammaDistribution estimate(double[] data, int len) {
     double meanx = 0, meanlogx = 0;
-    for(int i = 0; i < data.length; i++) {
+    for(int i = 0; i < len; i++) {
       final double logx = Math.log(data[i]);
       final double deltax = data[i] - meanx;
       final double deltalogx = logx - meanlogx;
