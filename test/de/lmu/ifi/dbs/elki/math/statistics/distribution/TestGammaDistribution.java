@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static org.junit.Assert.assertEquals;
+
+import java.util.Random;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -1284,5 +1288,17 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
     checkQuantile(new GammaDistribution(.1, 20), P_QUANT, GNUR_GAMMA_QUANT_01_20, 1e-14);
     checkQuantile(new GammaDistribution(.1, 4.), P_QUANT, GNUR_GAMMA_QUANT_01_4, 1e-13);
     checkQuantile(new GammaDistribution(.1, 1.), P_QUANT, GNUR_GAMMA_QUANT_01_1, 1e-13);
+  }
+
+  @Test
+  public void testRandomAndEstimation() {
+    GammaDistribution g = new GammaDistribution(1.2345, 0.12345, new Random(0));
+    double[] data = new double[10000];
+    for(int i = 0; i < data.length; i++) {
+      data[i] = g.nextRandom();
+    }
+    GammaDistribution g2 = GammaDistribution.estimate(data);
+    assertEquals("k does not match.", g.getK(), g2.getK(), 1E-2);
+    assertEquals("theta does not match.", g.getTheta(), g2.getTheta(), 1E-5);
   }
 }
