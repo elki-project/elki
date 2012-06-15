@@ -1,0 +1,151 @@
+package de.lmu.ifi.dbs.elki.evaluation.outlier;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
+import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+
+/**
+ * Pseudo clustering algorithm that builds clusters based on their outlier
+ * score. Useful for transforming a numeric outlier score into a 2-class
+ * dataset.
+ * 
+ * @author Erich Schubert
+ */
+public class OutlierThresholdClustering implements Evaluator {
+  /**
+   * Scaling function to use
+   */
+  ScalingFunction scaling = null;
+
+  /**
+   * Thresholds to use
+   */
+  double[] threshold;
+
+  /**
+   * Constructor.
+   * 
+   * @param scaling Scaling function
+   * @param threshold Threshold
+   */
+  public OutlierThresholdClustering(ScalingFunction scaling, double[] threshold) {
+    super();
+    this.scaling = scaling;
+    this.threshold = threshold;
+    Arrays.sort(this.threshold);
+  }
+
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    List<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
+    for(OutlierResult or : ors) {
+      baseResult.getHierarchy().add(or, split(or));
+    }
+  }
+
+  private Clustering<Model> split(OutlierResult or) {
+    Relation<Double> scores = or.getScores();
+    if(scaling instanceof OutlierScalingFunction) {
+      ((OutlierScalingFunction) scaling).prepare(or);
+    }
+    ArrayList<ModifiableDBIDs> idlists = new ArrayList<ModifiableDBIDs>(threshold.length + 1);
+    for(int i = 0; i <= threshold.length; i++) {
+      idlists.add(DBIDUtil.newHashSet());
+    }
+    for(DBID id : scores.getDBIDs()) {
+      double score = scores.get(id);
+      if(scaling != null) {
+        score = scaling.getScaled(score);
+      }
+      int i = 0;
+      for(; i < threshold.length; i++) {
+        if(score < threshold[i]) {
+          break;
+        }
+      }
+      idlists.get(i).add(id);
+    }
+    Clustering<Model> c = new Clustering<Model>("Outlier threshold clustering", "threshold-clustering");
+    for(int i = 0; i <= threshold.length; i++) {
+      String name = (i == 0) ? "Inlier" : "Outlier_" + threshold[i - 1];
+      c.addCluster(new Cluster<Model>(name, idlists.get(i), (i > 0)));
+    }
+    return c;
+  }
+
+  /**
+   * Parameterization helper
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify a scaling function to use.
+     * <p>
+     * Key: {@code -thresholdclust.scaling}
+     * </p>
+     */
+    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("thresholdclust.scaling", "Class to use as scaling function.");
+
+    /**
+     * Parameter to specify the threshold
+     * <p>
+     * Key: {@code -thresholdclust.threshold}
+     * </p>
+     */
+    public static final OptionID THRESHOLD_ID = OptionID.getOrCreateOptionID("thresholdclust.threshold", "Threshold(s) to apply.");
+
+    /**
+     * Scaling function to use
+     */
+    ScalingFunction scaling = null;
+
+    /**
+     * Threshold to use
+     */
+    double[] threshold;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
+
+      DoubleListParameter thresholdP = new DoubleListParameter(THRESHOLD_ID);
+      if(config.grab(thresholdP)) {
+        threshold = ArrayLikeUtil.toPrimitiveDoubleArray(thresholdP.getValue());
+      }
+    }
+
+    @Override
+    protected OutlierThresholdClustering makeInstance() {
+      return new OutlierThresholdClustering(scaling, threshold);
+    }
+  }
+}

@@ -5,4 +5,5 @@ de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram
 de.lmu.ifi.dbs.elki.evaluation.index.IndexPurity
 de.lmu.ifi.dbs.elki.evaluation.index.IndexStatistics
 de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores
+de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierThresholdClustering
 de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage
