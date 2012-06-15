@@ -43,7 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * RANSAC based approach to a more robust covariance matrix computation.
  * 
- * This is an adoption of RANSAC to this problem, not a generic RANSAC implementation!
+ * This is an adoption of RANSAC to this problem, not a generic RANSAC
+ * implementation!
  * 
  * Reference:
  * <p>
@@ -62,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @param <V> Vector type
  */
-@Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url="http://dx.doi.org/10.1145/358669.358692")
+@Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
 public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends AbstractCovarianceMatrixBuilder<V> {
   int iterations = 1000;
 
@@ -73,10 +74,10 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends
     final int dim = DatabaseUtil.dimensionality(relation);
 
     DBIDs best = DBIDUtil.EMPTYDBIDS;
-    double tresh = ChiSquaredDistribution.quantile(0.95, dim);
+    double tresh = ChiSquaredDistribution.quantile(0.85, dim);
 
     for(int i = 0; i < iterations; i++) {
-      DBIDs sample = DBIDUtil.randomSample(ids, 2 * dim + 1, random.nextLong());
+      DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random.nextLong());
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
       Vector centroid = cv.getMeanVector();
       Matrix p = cv.destroyToSampleMatrix().inverse();
