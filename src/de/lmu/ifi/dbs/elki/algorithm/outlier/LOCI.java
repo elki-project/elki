@@ -258,7 +258,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       progressLOCI.ensureCompleted(logger);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
-    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.POSITIVE_INFINITY, 0.0);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(new MaterializedRelation<Double>("LOCI MDEF Radius", "loci-critical-radius", TypeUtil.DOUBLE, mdef_radius, relation.getDBIDs()));
     return result;
