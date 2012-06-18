@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Class that turns sparse float vectors into a proper vector field, by setting
@@ -65,11 +66,13 @@ public class SparseVectorFieldFilter extends AbstractConversionFilter<SparseFloa
 
   @Override
   protected SimpleTypeInformation<? super SparseFloatVector> getInputTypeRestriction() {
-    return TypeUtil.SPARSE_FLOAT_FIELD;
+    return TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH;
   }
 
   @Override
   protected SimpleTypeInformation<? super SparseFloatVector> convertedType(SimpleTypeInformation<SparseFloatVector> in) {
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, maxdim, SparseFloatVector.STATIC);
+    VectorFieldTypeInformation<SparseFloatVector> ret = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, maxdim, SparseFloatVector.STATIC);
+    LoggingUtil.warning(ret.toString());
+    return ret;
   }
 }
