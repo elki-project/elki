@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
@@ -107,12 +108,14 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
     this.scaling = scaling;
     this.fill = fill;
     context.addDataStoreListener(this);
+    context.addResultListener(this);
     incrementalRedraw();
   }
 
   @Override
   public void destroy() {
     super.destroy();
+    context.removeResultListener(this);
     context.removeDataStoreListener(this);
   }
 
@@ -167,7 +170,8 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
 
   @Override
   public void resultChanged(Result current) {
-    if(sample == current) {
+    super.resultChanged(current);
+    if(sample == current || context.getStyleResult() == current) {
       synchronizedRedraw();
     }
   }
@@ -269,6 +273,7 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
       super();
       this.fill = fill;
       this.scaling = scaling;
+      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
     }
 
     @Override
