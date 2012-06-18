@@ -302,6 +302,9 @@ public class RectangleArranger<T> {
   }
 
   protected void splitRow(int bestey, double besthi) {
+    if (heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
+      return;
+    }
     logger.debugFine("Split row " + bestey);
     heights.add(bestey + 1, besthi);
     heights.set(bestey, heights.get(bestey) - besthi);
@@ -310,6 +313,9 @@ public class RectangleArranger<T> {
   }
 
   protected void splitCol(int bestex, double bestwi) {
+    if (heights.get(bestex) - bestwi <= Double.MIN_NORMAL) {
+      return;
+    }
     final int rows = heights.size();
     logger.debugFine("Split column " + bestex);
     widths.add(bestex + 1, bestwi);
@@ -371,7 +377,7 @@ public class RectangleArranger<T> {
     {
       double wsum = 0.0;
       for(int x = 0; x < cols; x++) {
-        assert (widths.get(x) > 0) : "Negative width: "+widths.get(x);
+        assert (widths.get(x) > 0) : "Non-positive width: "+widths.get(x);
         wsum += widths.get(x);
       }
       assert (Math.abs(wsum - twidth) < 1E-10);
@@ -379,7 +385,7 @@ public class RectangleArranger<T> {
     {
       double hsum = 0.0;
       for(int y = 0; y < rows; y++) {
-        assert (heights.get(y) > 0) : "Negative height: "+heights.get(y);
+        assert (heights.get(y) > 0) : "Non-positive height: "+heights.get(y);
         hsum += heights.get(y);
       }
       assert (Math.abs(hsum - theight) < 1E-10);
