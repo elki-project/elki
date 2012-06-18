@@ -76,7 +76,7 @@ public class ComputeROCCurve implements Evaluator {
   /**
    * The logger.
    */
-  static final Logging logger = Logging.getLogger(ComputeROCCurve.class);
+  private static final Logging logger = Logging.getLogger(ComputeROCCurve.class);
 
   /**
    * The pattern to identify positive classes.
