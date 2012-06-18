@@ -29,7 +29,9 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -37,6 +39,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * <p>
@@ -151,6 +155,14 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    * @apiviz.exclude
    */
   public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<SparseFloatVector> {
+    @Override
+    protected void getFactory(Parameterization config) {
+      ObjectParameter<SparseFloatVector> factoryP = new ObjectParameter<SparseFloatVector>(VECTOR_TYPE_ID, NumberVector.class, SparseFloatVector.class);
+      if(config.grab(factoryP)) {
+        factory = factoryP.instantiateClass(config);
+      }
+    }
+
     @Override
     protected SparseFloatVectorLabelParser makeInstance() {
       return new SparseFloatVectorLabelParser(colSep, quoteChar, labelIndices);
