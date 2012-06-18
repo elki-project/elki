@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.datasource.GeneratorXMLDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionWithRandom;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -186,7 +186,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
         outStream.write("## Density correction factor: " + cursclus.getDensityCorrection() + LINE_SEPARATOR);
         outStream.write("## Generators:" + LINE_SEPARATOR);
         for(int i = 0; i < cursclus.getDim(); i++) {
-          Distribution gen = cursclus.getDistribution(i);
+          DistributionWithRandom gen = cursclus.getDistribution(i);
           outStream.write("##   " + gen.toString() + LINE_SEPARATOR);
         }
         if(cursclus.getTransformation() != null && cursclus.getTransformation().getTransformation() != null) {
