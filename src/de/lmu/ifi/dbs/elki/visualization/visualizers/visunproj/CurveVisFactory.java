@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -31,6 +32,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -39,9 +41,10 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
+import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -66,6 +69,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  */
 public class CurveVisFactory extends AbstractVisFactory {
   /**
+   * Class logger
+   */
+  private static final Logging logger = Logging.getLogger(CurveVisFactory.class);
+
+  /**
    * Name for this visualizer.
    */
   private static final String NAME = "Curve";
@@ -86,7 +94,7 @@ public class CurveVisFactory extends AbstractVisFactory {
   public Visualization makeVisualization(VisualizationTask task) {
     VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
-    IterableResult<DoubleDoublePair> curve = task.getResult();
+    IterableResult<?> curve = task.getResult();
 
     setupCSS(context, svgp);
     double scale = StyleLibrary.SCALE;
@@ -100,17 +108,52 @@ public class CurveVisFactory extends AbstractVisFactory {
     // determine scaling
     DoubleMinMax minmaxx = new DoubleMinMax();
     DoubleMinMax minmaxy = new DoubleMinMax();
-    for(DoubleDoublePair pair : curve) {
-      minmaxx.put(pair.first);
-      minmaxy.put(pair.second);
+    for(Object pair : curve) {
+      if(pair instanceof DoubleDoublePair) {
+        minmaxx.put(((DoubleDoublePair) pair).first);
+        minmaxy.put(((DoubleDoublePair) pair).second);
+      }
+      else if(pair instanceof IntDoublePair) {
+        minmaxx.put(((IntDoublePair) pair).first);
+        minmaxy.put(((IntDoublePair) pair).second);
+      }
+      else if(pair instanceof DoubleIntPair) {
+        minmaxx.put(((DoubleIntPair) pair).first);
+        minmaxy.put(((DoubleIntPair) pair).second);
+      }
+      else if(pair instanceof IntIntPair) {
+        minmaxx.put(((IntIntPair) pair).first);
+        minmaxy.put(((IntIntPair) pair).second);
+      }
+      else {
+        logger.warning("Unsupported pair encountered.");
+      }
     }
     LinearScale scalex = new LinearScale(minmaxx.getMin(), minmaxx.getMax());
     LinearScale scaley = new LinearScale(minmaxy.getMin(), minmaxy.getMax());
     // plot the line
     SVGPath path = new SVGPath();
-    for(DoubleDoublePair pair : curve) {
-      final double x = scalex.getScaled(pair.first);
-      final double y = 1 - scaley.getScaled(pair.second);
+    for(Object pair : curve) {
+      final double x, y;
+      if(pair instanceof DoubleDoublePair) {
+        x = scalex.getScaled(((DoubleDoublePair) pair).first);
+        y = 1 - scaley.getScaled(((DoubleDoublePair) pair).second);
+      }
+      else if(pair instanceof IntDoublePair) {
+        x = scalex.getScaled(((IntDoublePair) pair).first);
+        y = 1 - scaley.getScaled(((IntDoublePair) pair).second);
+      }
+      else if(pair instanceof DoubleIntPair) {
+        x = scalex.getScaled(((DoubleIntPair) pair).first);
+        y = 1 - scaley.getScaled(((DoubleIntPair) pair).second);
+      }
+      else if(pair instanceof IntIntPair) {
+        x = scalex.getScaled(((IntIntPair) pair).first);
+        y = 1 - scaley.getScaled(((IntIntPair) pair).second);
+      }
+      else {
+        continue;
+      }
       path.drawTo(sizex * x, sizey * y);
     }
     Element line = path.makeElement(svgp);
@@ -173,64 +216,22 @@ public class CurveVisFactory extends AbstractVisFactory {
     svgp.addCSSClassOrLogError(csscls);
   }
 
-  /**
-   * Filter to only retrieve double-double-pair results.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  class CurveFilter extends AbstractFilteredIterator<IterableResult<?>, IterableResult<DoubleDoublePair>> implements IterableIterator<IterableResult<DoubleDoublePair>> {
-    /**
-     * Parent iterator to use
-     */
-    Iterator<IterableResult<?>> parent;
-
-    /**
-     * Constructor.
-     * 
-     * @param parent Parent iterator to decorate.
-     */
-    public CurveFilter(Iterator<IterableResult<?>> parent) {
-      super();
-      this.parent = parent;
-    }
-
-    @Override
-    protected Iterator<IterableResult<?>> getParentIterator() {
-      return parent;
-    }
-
-    @Override
-    protected IterableResult<DoubleDoublePair> testFilter(IterableResult<?> nextobj) {
-      Iterator<?> iterator = nextobj.iterator();
-      if(iterator.hasNext()) {
-        Object o = iterator.next();
-        if(o instanceof DoubleDoublePair) {
-          @SuppressWarnings("unchecked")
-          final IterableResult<DoubleDoublePair> ret = (IterableResult<DoubleDoublePair>) nextobj;
-          return ret;
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public Iterator<IterableResult<DoubleDoublePair>> iterator() {
-      return this;
-    }
-  }
-
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final IterableIterator<IterableResult<?>> iterableResults = ResultUtil.filteredResults(result, IterableResult.class);
-    final IterableIterator<IterableResult<DoubleDoublePair>> curves = new CurveFilter(iterableResults);
-    for (IterableResult<DoubleDoublePair> curve : curves) {
-      final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-      baseResult.getHierarchy().add(curve, task);
+    final ArrayList<IterableResult<?>> iterableResults = ResultUtil.filterResults(result, IterableResult.class);
+    for(IterableResult<?> curve : iterableResults) {
+      Iterator<?> iterator = curve.iterator();
+      if(!iterator.hasNext()) {
+        continue;
+      }
+      Object testobj = iterator.next();
+      if(testobj instanceof DoubleDoublePair || testobj instanceof IntDoublePair || testobj instanceof DoubleIntPair || testobj instanceof IntIntPair) {
+        final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
+        task.width = 1.0;
+        task.height = 1.0;
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+        baseResult.getHierarchy().add(curve, task);
+      }
     }
   }
 
