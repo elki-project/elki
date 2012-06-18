@@ -116,6 +116,11 @@ public final class TypeUtil {
   /**
    * Sparse float vector field.
    */
+  public static final SimpleTypeInformation<SparseFloatVector> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+
+  /**
+   * Sparse float vector field.
+   */
   public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class);
 
   /**
