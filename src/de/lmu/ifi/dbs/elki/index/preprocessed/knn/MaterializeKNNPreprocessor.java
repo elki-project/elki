@@ -150,8 +150,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   public void insertAll(DBIDs ids) {
     if(storage == null && ids.size() > 0) {
       preprocess();
+    } else {
+      objectsInserted(ids);
     }
-    objectsInserted(ids);
   }
 
   @Override
