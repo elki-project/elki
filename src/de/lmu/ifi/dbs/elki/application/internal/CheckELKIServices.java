@@ -60,7 +60,7 @@ public class CheckELKIServices {
   /**
    * Pattern to strip comments, while keeping commented class names.
    */
-  private Pattern strip = Pattern.compile("^[\\s#]*(.*?)[\\s]*$");
+  private Pattern strip = Pattern.compile("^[\\s#]*(?:deprecated:\\s*)?(.*?)[\\s]*$");
 
   /**
    * Package to skip matches in - unreleased code.

@@ -23,12 +23,10 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.impl.unmodifiable.TUnmodifiableIntFloatMap;
+import gnu.trove.impl.unmodifiable.TUnmodifiableIntDoubleMap;
 import gnu.trove.iterator.TIntDoubleIterator;
-import gnu.trove.iterator.TIntFloatIterator;
 import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.TIntFloatMap;
-import gnu.trove.map.hash.TIntFloatHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -41,20 +39,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * <p>
- * A SparseFloatVector is to store real values approximately as float values.
+ * A SparseDoubleVector is to store real values as double values.
  * </p>
  * 
- * A SparseFloatVector only requires storage for those attribute values that are
+ * A SparseDoubleVector only requires storage for those attribute values that are
  * non-zero.
  * 
  * @author Arthur Zimek
  */
-// TODO: implement ByteArraySerializer<SparseFloatVector>
-public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements SparseNumberVector<SparseFloatVector, Float> {
+// TODO: implement ByteArraySerializer<SparseDoubleVector>
+public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector, Double> implements SparseNumberVector<SparseDoubleVector, Double> {
   /**
    * Static instance
    */
-  public static final SparseFloatVector STATIC = new SparseFloatVector(new int[0], new float[0], -1);
+  public static final SparseDoubleVector STATIC = new SparseDoubleVector(new int[0], new double[0], -1);
 
   /**
    * Indexes of values
@@ -64,7 +62,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   /**
    * Stored values
    */
-  private float[] values;
+  private double[] values;
 
   /**
    * The dimensionality of this feature vector.
@@ -78,7 +76,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @param values Associated value.
    * @param dimensionality "true" dimensionality
    */
-  public SparseFloatVector(int[] indexes, float[] values, int dimensionality) {
+  public SparseDoubleVector(int[] indexes, double[] values, int dimensionality) {
     super();
     this.indexes = indexes;
     this.values = values;
@@ -86,7 +84,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   /**
-   * Provides a SparseFloatVector consisting of double values according to the
+   * Provides a SparseDoubleVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -95,19 +93,19 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseFloatVector(TIntFloatMap values, int dimensionality) throws IllegalArgumentException {
+  public SparseDoubleVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
     if(values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
     this.indexes = new int[values.size()];
-    this.values = new float[values.size()];
+    this.values = new double[values.size()];
     // Import and sort the indexes
     {
-      TIntFloatIterator iter = values.iterator();
-      for(int i = 0; iter.hasNext(); i++) {
-        this.indexes[i] = iter.key();
+      TIntDoubleIterator iter = values.iterator();
+      for (int i = 0; iter.hasNext(); i++) {
         iter.advance();
+        this.indexes[i] = iter.key();
       }
       Arrays.sort(this.indexes);
     }
@@ -139,7 +137,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   /**
-   * Provides a SparseFloatVector consisting of double values according to the
+   * Provides a SparseDoubleVector consisting of double values according to the
    * specified mapping of indices and values.
    * 
    * @param values the values to be set as values of the real vector
@@ -147,7 +145,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseFloatVector(float[] values) throws IllegalArgumentException {
+  public SparseDoubleVector(double[] values) throws IllegalArgumentException {
     this.dimensionality = values.length;
 
     // Count the number of non-zero entries
@@ -160,13 +158,13 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       }
     }
     this.indexes = new int[size];
-    this.values = new float[size];
+    this.values = new double[size];
 
     // Copy the values
     {
       int pos = 0;
       for(int i = 0; i < values.length; i++) {
-        float value = values[i];
+        double value = values[i];
         if(value != 0.0f) {
           this.indexes[pos] = i + 1;
           this.values[pos] = value;
@@ -199,13 +197,13 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
-  public Float getValue(int dimension) {
+  public Double getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
       return values[pos];
     }
     else {
-      return 0.0f;
+      return 0.0;
     }
   }
 
@@ -239,7 +237,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
 
   /**
    * <p>
-   * Provides a String representation of this SparseFloatVector as suitable for
+   * Provides a String representation of this SparseDoubleVector as suitable for
    * {@link SparseNumberVectorLabelParser}.
    * </p>
    * 
@@ -247,8 +245,8 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * The returned String is a single line with entries separated by
    * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
    * number of values actually not zero. Following entries are pairs of Integer
-   * and Float where the Integer gives the index of the dimensionality and the
-   * Float gives the corresponding value.
+   * and Double where the Integer gives the index of the dimensionality and the
+   * Double gives the corresponding value.
    * </p>
    * 
    * <p>
@@ -256,7 +254,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * <code>2 2 1.2 3 1.3</code><br>
    * </p>
    * 
-   * @return a String representation of this SparseFloatVector
+   * @return a String representation of this SparseDoubleVector
    */
   @Override
   public String toString() {
@@ -286,43 +284,30 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   }
 
   @Override
-  public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
+  public <A> SparseDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
     int dim = adapter.size(array);
-    float[] values = new float[dim];
+    double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
       values[i] = adapter.get(array, i);
     }
     // TODO: inefficient
-    return new SparseFloatVector(values);
+    return new SparseDoubleVector(values);
   }
 
   @Override
-  public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
-    float[] values = new float[dim];
+    double[] values = new double[dim];
     for(int i = 0; i < dim; i++) {
-      values[i] = adapter.getFloat(array, i);
+      values[i] = adapter.getDouble(array, i);
     }
     // TODO: inefficient
-    return new SparseFloatVector(values);
+    return new SparseDoubleVector(values);
   }
 
   @Override
-  public SparseFloatVector newNumberVector(TIntDoubleMap dvalues, int maxdim) {
-    int[] indexes = new int[dvalues.size()];
-    float[] values = new float[dvalues.size()];
-    // Import and sort the indexes
-    TIntDoubleIterator iter = dvalues.iterator();
-    for(int i = 0; iter.hasNext(); i++) {
-      iter.advance();
-      indexes[i] = iter.key();
-    }
-    Arrays.sort(indexes);
-    // Import the values accordingly
-    for(int i = 0; i < dvalues.size(); i++) {
-      values[i] = (float) dvalues.get(indexes[i]);
-    }
-    return new SparseFloatVector(indexes, values, maxdim);
+  public SparseDoubleVector newNumberVector(TIntDoubleMap values, int maxdim) {
+    return new SparseDoubleVector(values, maxdim);
   }
 
   @Override
@@ -343,13 +328,13 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected SparseFloatVector makeInstance() {
+    protected SparseDoubleVector makeInstance() {
       return STATIC;
     }
   }
-
+  
   /**
    * Empty map.
    */
-  public static final TIntFloatMap EMPTYMAP = new TUnmodifiableIntFloatMap(new TIntFloatHashMap());
+  public static final TIntDoubleMap EMPTYMAP = new TUnmodifiableIntDoubleMap(new TIntDoubleHashMap()); 
 }

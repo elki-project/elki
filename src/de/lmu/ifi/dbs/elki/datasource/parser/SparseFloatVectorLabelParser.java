@@ -23,23 +23,12 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.hash.TIntFloatHashMap;
-
 import java.util.BitSet;
-import java.util.List;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * <p>
@@ -73,22 +62,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.has SparseFloatVector
+ * 
+ * @deprecated Use {@link SparseNumberVectorLabelParser} instead!
  */
 // FIXME: Maxdim!
 @Title("Sparse Float Vector Label Parser")
-@Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored. Having the file parsed completely, the maximum occuring dimensionality is set as dimensionality to all created SparseFloatvectors.")
-public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<SparseFloatVector> {
-  /**
-   * Class logger
-   */
-  private static final Logging logger = Logging.getLogger(SparseFloatVectorLabelParser.class);
-
-  /**
-   * Holds the dimensionality of the parsed data which is the maximum occurring
-   * index of any attribute.
-   */
-  private int maxdim = -1;
-
+@Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored.")
+@Deprecated
+public class SparseFloatVectorLabelParser extends SparseNumberVectorLabelParser<SparseFloatVector> {
   /**
    * Constructor.
    * 
@@ -100,63 +81,6 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
     super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
   }
 
-  @Override
-  protected void parseLineInternal(String line) {
-    List<String> entries = tokenize(line);
-    int cardinality = Integer.parseInt(entries.get(0));
-
-    TIntFloatHashMap values = new TIntFloatHashMap(cardinality, 1);
-    LabelList labels = null;
-
-    for(int i = 1; i < entries.size() - 1; i++) {
-      if(!labelIndices.get(i)) {
-        try {
-          int index = Integer.valueOf(entries.get(i));
-          if(index > maxdim) {
-            maxdim = index;
-          }
-          float attribute = Float.valueOf(entries.get(i));
-          values.put(index, attribute);
-          i++;
-        }
-        catch(NumberFormatException e) {
-          if(labels == null) {
-            labels = new LabelList(1);
-          }
-          labels.add(entries.get(i));
-          continue;
-        }
-      }
-      else {
-        if(labels == null) {
-          labels = new LabelList(1);
-        }
-        labels.add(entries.get(i));
-      }
-    }
-    if (values.size() > maxdim) {
-      throw new AbortException("Invalid sparse vector seen: "+line);
-    }
-    curvec = new SparseFloatVector(values, maxdim);
-    curlbl = labels;
-  }
-
-  @Override
-  protected SimpleTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
-    if(dimensionality > 0) {
-      return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimensionality));
-    }
-    if(dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class);
-    }
-    throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return logger;
-  }
-
   /**
    * Parameterization class.
    * 
@@ -164,15 +88,7 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<SparseFloatVector> {
-    @Override
-    protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseFloatVector> factoryP = new ObjectParameter<SparseFloatVector>(VECTOR_TYPE_ID, NumberVector.class, SparseFloatVector.class);
-      if(config.grab(factoryP)) {
-        factory = factoryP.instantiateClass(config);
-      }
-    }
-
+  public static class Parameterizer extends SparseNumberVectorLabelParser.Parameterizer<SparseFloatVector> {
     @Override
     protected SparseFloatVectorLabelParser makeInstance() {
       return new SparseFloatVectorLabelParser(colSep, quoteChar, labelIndices);

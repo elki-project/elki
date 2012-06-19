@@ -23,16 +23,23 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+import gnu.trove.map.TIntDoubleMap;
 
 /**
  * Combines the SparseFeatureVector and NumberVector
  * 
  * @author Erich Schubert
- *
- * @param <V>
- * @param <N>
+ * 
+ * @param <V> Vector type number type
+ * @param <N> Number type
  */
 public interface SparseNumberVector<V extends SparseNumberVector<V, N>, N extends Number> extends NumberVector<V, N>, SparseFeatureVector<V, N> {
-  // Empty combination interface
+  /**
+   * Returns a new NumberVector of N for the given values.
+   * 
+   * @param values the values of the NumberVector
+   * @param maxdim Maximum dimensionality.
+   * @return a new NumberVector of N for the given values
+   */
+  V newNumberVector(TIntDoubleMap values, int maxdim);
 }
