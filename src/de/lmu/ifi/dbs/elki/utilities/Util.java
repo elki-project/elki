@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.hash.TIntFloatHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
@@ -174,14 +174,14 @@ public final class Util {
    *         an attribute as selected which is out of range for the given
    *         SparseFloatVector.
    */
-  public static SparseFloatVector project(SparseFloatVector v, BitSet selectedAttributes) {
-    TIntFloatHashMap values = new TIntFloatHashMap(selectedAttributes.cardinality(), 1);
+  public static <V extends SparseNumberVector<V, ?>> V project(V v, BitSet selectedAttributes) {
+    TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
     for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-      if(v.getValue(d + 1) != 0.0f) {
-        values.put(d, v.getValue(d + 1));
+      if(v.doubleValue(d + 1) != 0.0) {
+        values.put(d, v.doubleValue(d + 1));
       }
     }
-    SparseFloatVector projectedVector = new SparseFloatVector(values, selectedAttributes.cardinality());
+    V projectedVector = v.newNumberVector(values, selectedAttributes.cardinality());
     return projectedVector;
   }
 

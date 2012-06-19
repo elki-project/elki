@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.hash.TIntFloatHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 
 /**
  * Perform full TF-IDF Normalization as commonly used in text mining.
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
  * 
  * @author Erich Schubert
  */
-public class TFIDFNormalization extends InverseDocumentFrequencyNormalization {
+public class TFIDFNormalization<V extends SparseNumberVector<V, ?>> extends InverseDocumentFrequencyNormalization<V> {
   /**
    * Constructor.
    */
@@ -49,7 +49,7 @@ public class TFIDFNormalization extends InverseDocumentFrequencyNormalization {
   }
 
   @Override
-  protected SparseFloatVector filterSingleObject(SparseFloatVector featureVector) {
+  protected V filterSingleObject(V featureVector) {
     BitSet b = featureVector.getNotNullMask();
     double sum = 0.0;
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
@@ -58,10 +58,10 @@ public class TFIDFNormalization extends InverseDocumentFrequencyNormalization {
     if(sum <= 0) {
       sum = 1.0;
     }
-    TIntFloatHashMap vals = new TIntFloatHashMap();
+    TIntDoubleHashMap vals = new TIntDoubleHashMap();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       vals.put(i, (float) (featureVector.doubleValue(i) / sum * idf.get(i)));
     }
-    return new SparseFloatVector(vals, featureVector.getDimensionality());
+    return featureVector.newNumberVector(vals, featureVector.getDimensionality());
   }
 }

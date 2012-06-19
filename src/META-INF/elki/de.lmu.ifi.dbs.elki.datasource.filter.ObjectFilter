@@ -8,8 +8,8 @@ de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SortByLabelFilter
-de.lmu.ifi.dbs.elki.datasource.filter.SparseFloatVectorProjectionFilter
-de.lmu.ifi.dbs.elki.datasource.filter.SparseFloatVectorRandomProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorRandomProjectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SplitNumberVectorFilter
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization
