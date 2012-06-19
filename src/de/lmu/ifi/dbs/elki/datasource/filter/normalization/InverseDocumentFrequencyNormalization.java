@@ -26,11 +26,10 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.map.hash.TIntFloatHashMap;
 
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * 
  * @apiviz.uses SparseFloatVector
  */
-public class InverseDocumentFrequencyNormalization extends AbstractNormalization<SparseFloatVector> {
+public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<V, ?>> extends AbstractNormalization<V> {
   /**
    * The IDF storage
    */
@@ -61,7 +60,7 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   }
 
   @Override
-  protected boolean prepareStart(SimpleTypeInformation<SparseFloatVector> in) {
+  protected boolean prepareStart(SimpleTypeInformation<V> in) {
     if(idf.size() > 0) {
       throw new UnsupportedOperationException("This normalization may only be used once!");
     }
@@ -70,7 +69,7 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   }
 
   @Override
-  protected void prepareProcessInstance(SparseFloatVector featureVector) {
+  protected void prepareProcessInstance(V featureVector) {
     BitSet b = featureVector.getNotNullMask();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       if(featureVector.doubleValue(i) >= 0.0) {
@@ -98,27 +97,27 @@ public class InverseDocumentFrequencyNormalization extends AbstractNormalization
   }
 
   @Override
-  protected SparseFloatVector filterSingleObject(SparseFloatVector featureVector) {
+  protected V filterSingleObject(V featureVector) {
     BitSet b = featureVector.getNotNullMask();
-    TIntFloatHashMap vals = new TIntFloatHashMap();
+    TIntDoubleHashMap vals = new TIntDoubleHashMap();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       vals.put(i, (float) (featureVector.doubleValue(i) * idf.get(i)));
     }
-    return new SparseFloatVector(vals, featureVector.getDimensionality());
+    return featureVector.newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
-  public SparseFloatVector restore(SparseFloatVector featureVector) {
+  public V restore(V featureVector) {
     BitSet b = featureVector.getNotNullMask();
-    TIntFloatHashMap vals = new TIntFloatHashMap();
+    TIntDoubleHashMap vals = new TIntDoubleHashMap();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       vals.put(i, (float) (featureVector.doubleValue(i) / idf.get(i)));
     }
-    return new SparseFloatVector(vals, featureVector.getDimensionality());
+    return featureVector.newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
-  protected SimpleTypeInformation<? super SparseFloatVector> getInputTypeRestriction() {
-    return TypeUtil.SPARSE_FLOAT_FIELD;
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.SPARSE_VECTOR_FIELD;
   }
 }

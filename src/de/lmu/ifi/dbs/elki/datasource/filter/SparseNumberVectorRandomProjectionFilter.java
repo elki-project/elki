@@ -22,7 +22,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -35,30 +35,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  *
  * @author Arthur Zimek
  */
-public class SparseFloatVectorRandomProjectionFilter extends AbstractRandomFeatureSelectionFilter<SparseFloatVector> {
+public class SparseNumberVectorRandomProjectionFilter<V extends SparseNumberVector<V, ?>> extends AbstractRandomFeatureSelectionFilter<V> {
   /**
    * Constructor.
    *
    * @param dim
    */
-  public SparseFloatVectorRandomProjectionFilter(int dim) {
+  public SparseNumberVectorRandomProjectionFilter(int dim) {
     super(dim);
   }
 
   @Override
-  protected SparseFloatVector filterSingleObject(SparseFloatVector obj) {
+  protected V filterSingleObject(V obj) {
     return Util.project(obj, selectedAttributes);
   }
 
   @Override
-  protected SimpleTypeInformation<? super SparseFloatVector> getInputTypeRestriction() {
-    return TypeUtil.SPARSE_FLOAT_FIELD;
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
+    return TypeUtil.SPARSE_VECTOR_FIELD;
   }
 
   @Override
-  protected SimpleTypeInformation<? super SparseFloatVector> convertedType(SimpleTypeInformation<SparseFloatVector> in) {
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     initializeRandomAttributes(in);
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, k, new SparseFloatVector(SparseFloatVector.EMPTYMAP, k));
+    V factory = FilterUtil.guessFactory(in);
+    return new VectorFieldTypeInformation<V>(in.getRestrictionClass(), k, factory);
   }
   
   /**
@@ -68,15 +69,15 @@ public class SparseFloatVectorRandomProjectionFilter extends AbstractRandomFeatu
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractRandomFeatureSelectionFilter.Parameterizer<SparseFloatVector> {
+  public static class Parameterizer<V extends SparseNumberVector<V, ?>> extends AbstractRandomFeatureSelectionFilter.Parameterizer<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
     }
 
     @Override
-    protected SparseFloatVectorRandomProjectionFilter makeInstance() {
-      return new SparseFloatVectorRandomProjectionFilter(k);
+    protected SparseNumberVectorRandomProjectionFilter<V> makeInstance() {
+      return new SparseNumberVectorRandomProjectionFilter<V>(k);
     }
   }
 }

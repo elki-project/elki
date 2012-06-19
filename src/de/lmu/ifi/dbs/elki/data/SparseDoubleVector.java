@@ -188,6 +188,7 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
+  @Override
   public void setDimensionality(int dimensionality) throws IllegalArgumentException {
     final int maxdim = getMaxDim();
     if(maxdim > dimensionality) {

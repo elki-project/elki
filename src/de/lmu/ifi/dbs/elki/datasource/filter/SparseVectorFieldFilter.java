@@ -23,13 +23,10 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.lang.reflect.Field;
-
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Class that turns sparse float vectors into a proper vector field, by setting
@@ -72,18 +69,9 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector<V, ?>> extends
     return TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    V factory = null;
-    // FIXME: hack. Add factories to simple type information, too?
-    try {
-      Field f = in.getRestrictionClass().getField("STATIC");
-      factory = (V) f.get(null);
-    }
-    catch(Exception e) {
-      LoggingUtil.warning("Cannot determine factory for type " + in.getRestrictionClass());
-    }
+    V factory = FilterUtil.guessFactory(in);
     return new VectorFieldTypeInformation<V>(in.getRestrictionClass(), maxdim, factory);
   }
 }
