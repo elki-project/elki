@@ -46,7 +46,7 @@ public abstract class AbstractParser {
   /**
    * A pattern defining whitespace.
    */
-  public static final String WHITESPACE_PATTERN = "\\s+";
+  public static final String DEFAULT_SEPARATOR = "(\\s+|\\s*[,;]\\s*)";
 
   /**
    * A quote pattern
@@ -63,7 +63,7 @@ public abstract class AbstractParser {
 
   /**
    * OptionID for the column separator parameter (defaults to whitespace as in
-   * {@link #WHITESPACE_PATTERN}.
+   * {@link #DEFAULT_SEPARATOR}.
    */
   public static final OptionID COLUMN_SEPARATOR_ID = OptionID.getOrCreateOptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
 
@@ -210,7 +210,7 @@ public abstract class AbstractParser {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, WHITESPACE_PATTERN);
+      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, DEFAULT_SEPARATOR);
       if(config.grab(colParam)) {
         colSep = colParam.getValue();
       }
