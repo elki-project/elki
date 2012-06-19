@@ -42,4 +42,11 @@ public interface SparseNumberVector<V extends SparseNumberVector<V, N>, N extend
    * @return a new NumberVector of N for the given values
    */
   V newNumberVector(TIntDoubleMap values, int maxdim);
+  
+  /**
+   * Update the vector space dimensionality.
+   * 
+   * @param maxdim New dimensionality
+   */
+  void setDimensionality(int maxdim);
 }
