@@ -234,12 +234,20 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
 
   @Override
   public String toString() {
+    StringBuffer buf = new StringBuffer(getRestrictionClass().getSimpleName());
     if(mindim == maxdim) {
-      return getRestrictionClass().getSimpleName() + ",dim=" + mindim;
+      buf.append(",dim=").append(mindim);
     }
     else {
-      return super.toString();
+      buf.append(",field");
+      if(mindim >= 0) {
+        buf.append(",mindim=" + mindim);
+      }
+      if(maxdim < Integer.MAX_VALUE) {
+        buf.append(",maxdim=" + maxdim);
+      }
     }
+    return buf.toString();
   }
 
   /**

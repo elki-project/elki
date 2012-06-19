@@ -180,6 +180,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(super.toString());
+    buf.append(",variable");
     if (mindim >= 0) {
       buf.append(",mindim="+mindim);
     }
