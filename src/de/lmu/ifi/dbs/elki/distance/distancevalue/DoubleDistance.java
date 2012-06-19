@@ -157,6 +157,18 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
     return Double.compare(this.value, other.value);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) {
+      return true;
+    }
+    if(o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    double delta = Math.abs(value - ((DoubleDistance) o).value);
+    return delta < Double.MIN_NORMAL;
+  }
+
   /**
    * An infinite DoubleDistance is based on {@link Double#POSITIVE_INFINITY
    * Double.POSITIVE_INFINITY}.

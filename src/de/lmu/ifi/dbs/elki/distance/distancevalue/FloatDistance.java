@@ -162,6 +162,18 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
     return Float.compare(this.value, other.value);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if(this == o) {
+      return true;
+    }
+    if(o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    float delta = Math.abs(value - ((FloatDistance) o).value);
+    return delta < Float.MIN_NORMAL;
+  }
+
   /**
    * An infinite FloatDistance is based on {@link Float#POSITIVE_INFINITY
    * Float.POSITIVE_INFINITY}.
