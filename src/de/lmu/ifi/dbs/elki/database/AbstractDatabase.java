@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * Abstract base class for database API implementations. Provides default
- * management of relations, indexes and events as well as default query matching.
+ * management of relations, indexes and events as well as default query
+ * matching.
  * 
  * @author Erich Schubert
  * 
@@ -137,7 +139,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       throw e;
     }
   }
-  
+
   @Override
   public Collection<Relation<?>> getRelations() {
     return Collections.unmodifiableCollection(relations);
@@ -152,15 +154,11 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         return (Relation<O>) relation;
       }
     }
-    if (getLogger().isDebugging()) {
-      StringBuffer buf = new StringBuffer();
-      buf.append("No matching relation for type ").append(restriction.toString()).append(":\n");
-      for(Relation<?> relation : relations) {
-        buf.append(relation.getDataTypeInformation().toString()).append(",");
-      }
-      getLogger().debug(buf);
+    List<TypeInformation> types = new ArrayList<TypeInformation>(relations.size());
+    for(Relation<?> relation : relations) {
+      types.add(relation.getDataTypeInformation());
     }
-    throw new NoSupportedDataTypeException(restriction);
+    throw new NoSupportedDataTypeException(restriction, types);
   }
 
   @Override

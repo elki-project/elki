@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collection;
 
 /**
  * Exception thrown when no supported data type was found.
@@ -38,18 +39,40 @@ public class NoSupportedDataTypeException extends IllegalStateException {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Constructor.
+   * Available types
    */
-  public NoSupportedDataTypeException(TypeInformation type) {
+  private Collection<TypeInformation> types = null;
+
+  /**
+   * Constructor.
+   * 
+   * @param type Requested type
+   * @param types Available types.
+   */
+  public NoSupportedDataTypeException(TypeInformation type, Collection<TypeInformation> types) {
     super("No data type found satisfying: " + type.toString());
+    this.types = types;
   }
 
   /**
-   * Constructor with string message. If possible, use the type parameter instead!
-   *
+   * Constructor with string message. If possible, use the type parameter
+   * instead!
+   * 
    * @param string Error message
    */
   public NoSupportedDataTypeException(String string) {
     super(string);
+  }
+
+  @Override
+  public String getMessage() {
+    StringBuffer buf = new StringBuffer(super.getMessage());
+    if(types != null) {
+      buf.append("\nAvailable types:");
+      for(TypeInformation type : types) {
+        buf.append(" ").append(type.toString());
+      }
+    }
+    return buf.toString();
   }
 }
