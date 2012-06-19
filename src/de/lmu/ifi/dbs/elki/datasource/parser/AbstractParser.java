@@ -51,7 +51,7 @@ public abstract class AbstractParser {
   /**
    * A quote pattern
    */
-  public static final String QUOTE_CHAR = "\"";
+  public static final char QUOTE_CHAR = '\"';
 
   /**
    * A pattern catching most numbers that can be parsed using Double.parseDouble:
@@ -81,7 +81,7 @@ public abstract class AbstractParser {
   /**
    * Stores the quotation character
    */
-  protected char quoteChar = QUOTE_CHAR.charAt(0);
+  protected char quoteChar = QUOTE_CHAR;
 
   /**
    * The comment character.
@@ -205,7 +205,7 @@ public abstract class AbstractParser {
     /**
      * Stores the quotation character
      */
-    protected char quoteChar = QUOTE_CHAR.charAt(0);
+    protected char quoteChar = QUOTE_CHAR;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -214,7 +214,7 @@ public abstract class AbstractParser {
       if(config.grab(colParam)) {
         colSep = colParam.getValue();
       }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), QUOTE_CHAR);
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), ""+QUOTE_CHAR);
       if(config.grab(quoteParam)) {
         quoteChar = quoteParam.getValue().charAt(0);
       }

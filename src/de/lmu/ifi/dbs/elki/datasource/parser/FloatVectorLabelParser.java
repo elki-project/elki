@@ -51,7 +51,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * 
  * @apiviz.has FloatVector
+ * 
+ * @deprecated Use NumberVectorLabelParser instead, and use vector type FloatVector.
  */
+@Deprecated
 public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector> {
   /**
    * Class logger

@@ -153,6 +153,15 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   Event nextevent = null;
 
   /**
+   * Constructor with defaults
+   * 
+   * @param factory Vector factory
+   */
+  public NumberVectorLabelParser(V factory) {
+    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, null, factory);
+  }
+
+  /**
    * Constructor
    * 
    * @param colSep

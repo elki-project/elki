@@ -86,9 +86,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
  * Hough transform.
  * 
- * <b>Note:</b> CASH requires explicitly setting the input parser other than default to
- * {@link de.lmu.ifi.dbs.elki.datasource.parser.ParameterizationFunctionLabelParser}:
- * (in the MiniGui, set option: dbc.parser ParameterizationFunctionLabelParser).
+ * <b>Note:</b> CASH requires explicitly setting the input vector type to
+ * {@link ParameterizationFunction}:
+ * (in the MiniGui, set option: parser.vector-type ParameterizationFunction).
  * 
  * <p>
  * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek: Robust
