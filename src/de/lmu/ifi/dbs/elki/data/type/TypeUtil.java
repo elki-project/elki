@@ -27,9 +27,12 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
+import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -110,18 +113,39 @@ public final class TypeUtil {
 
   /**
    * Input type for algorithms that require number vector fields.
+   * 
+   * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
+   */
+  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = new VectorFieldTypeInformation<FloatVector>(FloatVector.class, FloatVector.STATIC);
+
+  /**
+   * Input type for algorithms that require number vector fields.
    */
   public static final VectorFieldTypeInformation<BitVector> BIT_VECTOR_FIELD = new VectorFieldTypeInformation<BitVector>(BitVector.class);
 
   /**
    * Sparse float vector field.
    */
-  public static final SimpleTypeInformation<SparseFloatVector> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+  public static final SimpleTypeInformation<SparseNumberVector<?, ?>> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<SparseNumberVector<?, ?>>(SparseNumberVector.class);
+
+  /**
+   * Sparse vector field.
+   */
+  public static final VectorFieldTypeInformation<SparseNumberVector<?, ?>> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<SparseNumberVector<?, ?>>(SparseNumberVector.class);
 
   /**
    * Sparse float vector field.
+   * 
+   * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
   public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+
+  /**
+   * Sparse double vector field.
+   * 
+   * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
+   */
+  public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = new VectorFieldTypeInformation<SparseDoubleVector>(SparseDoubleVector.class);
 
   /**
    * External ID type
