@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.datasource.filter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,10 +23,13 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
+import java.lang.reflect.Field;
+
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Class that turns sparse float vectors into a proper vector field, by setting
@@ -33,7 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * 
  * @author Erich Schubert
  */
-public class SparseVectorFieldFilter extends AbstractConversionFilter<SparseFloatVector, SparseFloatVector> {
+public class SparseVectorFieldFilter<V extends SparseNumberVector<V, ?>> extends AbstractConversionFilter<V, V> {
   /**
    * Maximum dimension
    */
@@ -47,29 +51,39 @@ public class SparseVectorFieldFilter extends AbstractConversionFilter<SparseFloa
   }
 
   @Override
-  protected boolean prepareStart(SimpleTypeInformation<SparseFloatVector> in) {
+  protected boolean prepareStart(SimpleTypeInformation<V> in) {
     return true;
   }
 
   @Override
-  protected void prepareProcessInstance(SparseFloatVector obj) {
+  protected void prepareProcessInstance(V obj) {
     maxdim = Math.max(maxdim, obj.getDimensionality());
   }
 
   @Override
-  protected SparseFloatVector filterSingleObject(SparseFloatVector obj) {
-    assert(maxdim > 0);
+  protected V filterSingleObject(V obj) {
+    assert (maxdim > 0);
     obj.setDimensionality(maxdim);
     return obj;
   }
 
   @Override
-  protected SimpleTypeInformation<? super SparseFloatVector> getInputTypeRestriction() {
+  protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
     return TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  protected SimpleTypeInformation<? super SparseFloatVector> convertedType(SimpleTypeInformation<SparseFloatVector> in) {
-    return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, maxdim, SparseFloatVector.STATIC);
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    V factory = null;
+    // FIXME: hack. Add factories to simple type information, too?
+    try {
+      Field f = in.getRestrictionClass().getField("STATIC");
+      factory = (V) f.get(null);
+    }
+    catch(Exception e) {
+      LoggingUtil.warning("Cannot determine factory for type " + in.getRestrictionClass());
+    }
+    return new VectorFieldTypeInformation<V>(in.getRestrictionClass(), maxdim, factory);
   }
 }
