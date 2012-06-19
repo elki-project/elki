@@ -53,9 +53,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * A line is expected in the following format: The first entry of each line is
  * the number of attributes with coordinate value not zero. Subsequent entries
- * are of the form (index, value), where index is the number of the
- * corresponding dimension, and value is the value of the corresponding
- * attribute.
+ * are of the form <code>index value </code> each, where index is the number of
+ * the corresponding dimension, and value is the value of the corresponding
+ * attribute. A complet line then could look like this:
+ * 
+ * <pre>
+ * 3 7 12.34 8 56.78 11 1.234 objectlabel
+ * </pre>
+ * 
+ * where <code>3</code> indicates there are three attributes set,
+ * <code>7,8,11</code> are the attributes indexes and there is a non-numerical
+ * object label.
  * </p>
  * <p>
  * An index can be specified to identify an entry to be treated as class label.
@@ -84,9 +92,9 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
-   * @param labelIndices
+   * @param colSep Column separator
+   * @param quoteChar Quotation character
+   * @param labelIndices Label indexes
    */
   public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
     super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
@@ -125,6 +133,9 @@ public class SparseFloatVectorLabelParser extends NumberVectorLabelParser<Sparse
         }
         labels.add(entries.get(i));
       }
+    }
+    if (values.size() > maxdim) {
+      throw new AbortException("Invalid sparse vector seen: "+line);
     }
     curvec = new SparseFloatVector(values, maxdim);
     curlbl = labels;
