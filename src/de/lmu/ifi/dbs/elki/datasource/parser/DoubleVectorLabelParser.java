@@ -70,7 +70,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
    * Constructor with default values.
    */
   public DoubleVectorLabelParser() {
-    this(Pattern.compile(WHITESPACE_PATTERN), QUOTE_CHAR.charAt(0), new BitSet());
+    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR.charAt(0), new BitSet());
   }
 
   @Override

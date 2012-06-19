@@ -142,7 +142,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   public OutlierResult run(Database database, Relation<?> relation) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
-    Pattern colSep = Pattern.compile(AbstractParser.WHITESPACE_PATTERN);
+    Pattern colSep = Pattern.compile(AbstractParser.DEFAULT_SEPARATOR);
     DoubleMinMax minmax = new DoubleMinMax();
     InputStream in;
     try {
