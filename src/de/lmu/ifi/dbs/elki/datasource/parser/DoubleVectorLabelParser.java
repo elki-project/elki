@@ -48,7 +48,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Arthur Zimek
  * 
  * @apiviz.has DoubleVector
+ * 
+ * @deprecated Use NumberVectorLabelParser instead, which defaults to DoubleVector.
  */
+@Deprecated
 public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVector> {
   /**
    * Class logger
@@ -70,7 +73,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
    * Constructor with default values.
    */
   public DoubleVectorLabelParser() {
-    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR.charAt(0), new BitSet());
+    this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, new BitSet());
   }
 
   @Override

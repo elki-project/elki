@@ -28,10 +28,10 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.parser.ParameterizationFunctionLabelParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -55,7 +55,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
   public void testCASHResults() {
     ListParameterization inp = new ListParameterization();
     // CASH input
-    inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);
+    inp.addParameter(NumberVectorLabelParser.VECTOR_TYPE_ID, ParameterizationFunction.class);
     // Input
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600, inp, null);
 
@@ -86,7 +86,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
   public void testCASHEmbedded() {
     // CASH input
     ListParameterization inp = new ListParameterization();
-    inp.addParameter(FileBasedDatabaseConnection.PARSER_ID, ParameterizationFunctionLabelParser.class);
+    inp.addParameter(NumberVectorLabelParser.VECTOR_TYPE_ID, ParameterizationFunction.class);
     Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600, inp, null);
 
     // CASH parameters
