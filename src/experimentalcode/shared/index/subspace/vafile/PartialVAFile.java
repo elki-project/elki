@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.vafile.VALPNormDistance;
 import de.lmu.ifi.dbs.elki.index.vafile.VectorApproximation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
@@ -145,7 +146,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       throw new IllegalStateException("Data already inserted.");
     }
 
-    if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
+    if((Math.log(partitions) / MathUtil.LOG2) != (int) (Math.log(partitions) / MathUtil.LOG2)) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
@@ -202,17 +203,18 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   protected VectorApproximation calculateFullApproximation(DBID id, V dv) {
     int approximation[] = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPartitions.length; d++) {
+      double[] split = daFiles.get(d).getSplitPositions();
       final double val = dv.doubleValue(d + 1);
-      final int lastBorderIndex = splitPartitions[d].length - 1;
+      final int lastBorderIndex = split.length - 1;
 
       // Value is below data grid
-      if(val < splitPartitions[d][0]) {
+      if(val < split[0]) {
         approximation[d] = 0;
         if(id != null) {
           logger.warning("Vector outside of VAFile grid!");
         }
       } // Value is above data grid
-      else if(val > splitPartitions[d][lastBorderIndex]) {
+      else if(val > split[lastBorderIndex]) {
         approximation[d] = lastBorderIndex - 1;
         if(id != null) {
           logger.warning("Vector outside of VAFile grid!");
@@ -220,7 +222,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       } // normal case
       else {
         // Search grid position
-        int pos = Arrays.binarySearch(splitPartitions[d], val);
+        int pos = Arrays.binarySearch(split, val);
         pos = (pos >= 0) ? pos : ((-pos) - 2);
         approximation[d] = pos;
       }
@@ -279,17 +281,18 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   }
 
   /**
+   * Calculate selectivity coefficients.
    * 
-   * @param daFileList
-   * @param query
-   * @param epsilon
+   * @param daFileList List of files to use
+   * @param query Query vector
+   * @param epsilon Epsilon radius
    */
   protected static void calculateSelectivityCoeffs(List<DoubleObjPair<DAFile>> daFiles, NumberVector<?, ?> query, double epsilon) {
     final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
   
-    VectorApproximation queryApprox = calculateApproximation(null, query, daFiles);
+    VectorApproximation queryApprox = calculatePartialApproximation(null, query, daFiles);
   
     for(int i = 0; i < dimensions; i++) {
       lowerVals[i] = query.doubleValue(i + 1) - epsilon;
@@ -297,10 +300,10 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
   
     Vector lowerEpsilon = new Vector(lowerVals);
-    VectorApproximation lowerEpsilonPartitions = calculateApproximation(null, lowerEpsilon, daFiles);
+    VectorApproximation lowerEpsilonPartitions = calculatePartialApproximation(null, lowerEpsilon, daFiles);
   
     Vector upperEpsilon = new Vector(upperVals);
-    VectorApproximation upperEpsilonPartitions = calculateApproximation(null, upperEpsilon, daFiles);
+    VectorApproximation upperEpsilonPartitions = calculatePartialApproximation(null, upperEpsilon, daFiles);
   
     for(int i = 0; i < daFiles.size(); i++) {
       int coeff = (queryApprox.getApproximation(i) - lowerEpsilonPartitions.getApproximation(i)) + (upperEpsilonPartitions.getApproximation(i) - queryApprox.getApproximation(i)) + 1;
@@ -308,7 +311,15 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
   }
 
-  protected static VectorApproximation calculateApproximation(DBID id, NumberVector<?, ?> dv, List<DoubleObjPair<DAFile>> daFiles) {
+  /**
+   * Calculate partial vector approximation
+   * 
+   * @param id Object ID
+   * @param dv Object vector
+   * @param daFiles List of approximations to use
+   * @return Vector approximation
+   */
+  protected static VectorApproximation calculatePartialApproximation(DBID id, NumberVector<?, ?> dv, List<DoubleObjPair<DAFile>> daFiles) {
     int[] approximation = new int[dv.getDimensionality()];
     for(int i = 0; i < daFiles.size(); i++) {
       double val = dv.doubleValue(i + 1);
@@ -675,13 +686,20 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       return sample.getIOCosts() * numberOfDAFiles;
     }
 
+    /**
+     * Order subspaces by their worst case distance.
+     * 
+     * @param dist Distance function
+     * @param subspace Subspace
+     * @return
+     */
     public List<DAFile> getWorstCaseDistOrder(VALPNormDistance dist, BitSet subspace) {
       int subspaceLength = subspace.cardinality();
       List<DAFile> result = new ArrayList<DAFile>(subspaceLength);
       for(int i = subspace.nextSetBit(0); i >= 0; i = subspace.nextSetBit(i + 1)) {
         result.add(daFiles.get(i));
       }
-      Collections.sort(result, new WorstCaseDistComparator<V>(dist));
+      Collections.sort(result, new WorstCaseDistComparator(dist));
       return result;
     }
 
@@ -702,7 +720,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
   }
 
-  static class WorstCaseDistComparator<V extends NumberVector<?, ?>> implements Comparator<DAFile> {
+  /**
+   * Compare DAfiles by their worst case distance.
+   * 
+   * @apiviz.exclude
+   */
+  protected static class WorstCaseDistComparator implements Comparator<DAFile> {
     private VALPNormDistance dist;
 
     public WorstCaseDistComparator(VALPNormDistance dist) {
