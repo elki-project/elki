@@ -302,6 +302,7 @@ public class RectangleArranger<T> {
   }
 
   protected void splitRow(int bestey, double besthi) {
+    assert(bestey < heights.size());
     if (heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
       return;
     }
@@ -313,7 +314,8 @@ public class RectangleArranger<T> {
   }
 
   protected void splitCol(int bestex, double bestwi) {
-    if (heights.get(bestex) - bestwi <= Double.MIN_NORMAL) {
+    assert(bestex < widths.size());
+    if (widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
       return;
     }
     final int rows = heights.size();
