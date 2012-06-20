@@ -591,10 +591,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
             int objectCell = va.getApproximation(dimension);
 
             va.minDistP += dist.getPartialMinDist(dimension, objectCell);
-            va.maxDistP -= dist.getPartialMaxMaxDist(dimension);
-            va.maxDistP += dist.getPartialMaxDist(dimension, objectCell);
+            va.maxDistP += dist.getPartialMaxDist(dimension, objectCell) - dist.getPartialMaxMaxDist(dimension);
 
-            distanceCheck(kMinMaxDists, k, va, candidates2);
+            if(kMinMaxDists.size() < k || va.minDistP <= kMinMaxDists.peek()) {
+              candidates2.add(va);
+              kMinMaxDists.add(va.maxDistP);
+            }
           }
 
           if(logger.isDebuggingFine()) {
@@ -624,10 +626,19 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
 
       for(VectorApproximation va : vectorApprox) {
         PartialVACandidate pva = new PartialVACandidate(va);
-
-        filter1Loop1(reducedDims, daFiles, pva, dist);
-        filter1Loop2(reducedDims, subspaceDims, pva, daFiles, dist);
-        distanceCheck(minmaxdist, k, pva, candidates1);
+        for(int d = 0; d < reducedDims; d++) {
+          int dimension = daFiles.get(d).getDimension();
+          int objectCell = pva.getApproximation(dimension);
+          pva.minDistP += dist.getPartialMinDist(dimension, objectCell);
+          pva.maxDistP += dist.getPartialMaxDist(dimension, objectCell);
+        }
+        for(int d = reducedDims; d < subspaceDims; d++) {
+          pva.maxDistP += dist.getPartialMaxMaxDist(daFiles.get(d).getDimension());
+        }
+        if(minmaxdist.size() < k || pva.minDistP <= minmaxdist.peek()) {
+          candidates1.add(pva);
+          minmaxdist.add(pva.maxDistP);
+        }
       }
       // Drop candidates that don't satisfy the latest minmaxdist
       final double minmax = minmaxdist.peek();
@@ -640,28 +651,6 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       }
 
       return candidates1;
-    }
-
-    private void distanceCheck(Heap<Double> kMinMaxDists, int k, PartialVACandidate va, LinkedList<PartialVACandidate> candList) {
-      if(kMinMaxDists.size() < k || va.minDistP <= kMinMaxDists.peek()) {
-        candList.add(va);
-        kMinMaxDists.add(va.maxDistP);
-      }
-    }
-
-    private void filter1Loop1(int reducedDims, List<DAFile> daFiles, PartialVACandidate va, VALPNormDistance dist) {
-      for(int d = 0; d < reducedDims; d++) {
-        int dimension = daFiles.get(d).getDimension();
-        int objectCell = va.getApproximation(dimension);
-        va.minDistP += dist.getPartialMinDist(dimension, objectCell);
-        va.maxDistP += dist.getPartialMaxDist(dimension, objectCell);
-      }
-    }
-
-    private void filter1Loop2(int reducedDims, int subspaceDims, PartialVACandidate va, List<DAFile> daFiles, VALPNormDistance dist) {
-      for(int d = reducedDims; d < subspaceDims; d++) {
-        va.maxDistP += dist.getPartialMaxMaxDist(daFiles.get(d).getDimension());
-      }
     }
 
     /**
