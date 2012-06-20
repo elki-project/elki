@@ -261,8 +261,6 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
       onum += ppair.getSecond().getSecond();
     }
     long bnum = inum + onum;
-    // Note: when full sampling is added, this assertion won't hold anymore.
-    assert (bnum == relation.size() * (relation.size() - 1));
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
     for(DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
