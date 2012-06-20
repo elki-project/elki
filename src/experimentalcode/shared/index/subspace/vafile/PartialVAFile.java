@@ -352,6 +352,58 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   }
 
   /**
+   * Object in a VA approximation.
+   * 
+   * @author Thomas Bernecker
+   * @author Erich Schubert
+   */
+  protected static class PartialVACandidate implements Comparable<PartialVACandidate> {
+    /**
+     * (Current) maximum distance of this candidate.
+     */
+    protected double maxDistP = 0.0;
+
+    /**
+     * (Current) minimum distance of this candidate.
+     */
+    protected double minDistP = 0.0;
+
+    /**
+     * The actual approximation
+     */
+    final private VectorApproximation approx;
+
+    /**
+     * 
+     * Constructor.
+     * 
+     * @param approx The actual approximation
+     */
+    public PartialVACandidate(VectorApproximation approx) {
+      super();
+      this.approx = approx;
+    }
+
+    public int getApproximation(int dimension) {
+      return approx.getApproximation(dimension);
+    }
+
+    public DBID getId() {
+      return approx.getId();
+    }
+
+    @Override
+    public String toString() {
+      return approx.toString() + ", bounds^p: [" + minDistP + ", " + maxDistP + "]";
+    }
+
+    @Override
+    public int compareTo(PartialVACandidate o) {
+      return Double.compare(this.minDistP, o.minDistP);
+    }
+  }
+
+  /**
    * Range query for this index.
    * 
    * @author Erich Schubert
