@@ -27,22 +27,27 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  * 
  * @author Robert Rödler
  */
-public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVector<?, ?>> implements MenuOwner {
+public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVector<?, ?>> implements MenuOwner {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
-  public static final String CLUSTERORDER = "Angle Dimension Order";
+  public static final String CLUSTERORDER = "HSM Dimension Order";
 
   private Clustering<Model> clustering;
+  
+  private int sum;
+  
+  private int mode = 3;
 
   /**
    * Constructor.
    * 
    * @param task VisualizationTask
    */
-  public AngleDimensionOrder(VisualizationTask task) {
+  public HSMDimensionOrder(VisualizationTask task) {
     super(task);
     clustering = task.getResult();
+    sum = 0;
     incrementalRedraw();
   }
 
@@ -52,9 +57,9 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
 
   private void arrange(int par) {
     int dim = DatabaseUtil.dimensionality(relation);
-    Matrix angmat = new Matrix(dim, dim, 0.);
+    Matrix hsmmat = new Matrix(dim, dim, 0.);
+    Matrix pic = new Matrix(500, 500);
 
-    int[] angles;
     DBIDs ids = null;
     
     switch(par){
@@ -71,73 +76,66 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
       }
     }
     
-    double temp;
+    int progress = 0;
+    int max = ((dim * dim) - dim) / 2;
     
     for (int i = 1; i < dim; i++){
-    //  if (!proj.isAxisVisible(i - 1)) { 
-    //    continue; 
-    //  }
+  //    if (!proj.isAxisVisible(i - 1)) { 
+  //      continue; 
+  //    }
       
       for (int j = i + 1; j <= dim; j++){
-    //    if (!proj.isAxisVisible(j - 1)) { continue; }
-        
-        angles = new int[40];
+  //      if (!proj.isAxisVisible(j - 1)) { continue; }
         
         for (DBID id : ids){
-          double dif = proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(j), j - 1) - proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(i), i - 1);
-          int div =(int) (dif / 5.);
-          
-          if (dif > 0.) {
-            if (div >= 20) { div = 19; }
-            angles[20 + div]++;
-          }
-          else {
-            if (div <= -20) { div = -19; }
-            angles[19 + div]++;
-          }
+          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
+          line(0, (int)(5. * yPos[i-1]), 499, (int)(5. * yPos[j-1]), pic);
         }
-        
-        double entropy = 0.;
-        
-        for (int l = 0; l < angles.length; l++){
-          temp = (double)angles[l] / (double)ids.size();
 
-          if (temp == 0.) { temp++; }
-           entropy += (temp * (Math.log(temp)));
-        }
-    
-        entropy /= Math.log(40);
+        Matrix hough = houghTransformation(pic);
         
-        angmat.set(i - 1, j - 1, 1 + entropy);
-        angmat.set(j - 1, i - 1, 1 + entropy);
+        double median;
+        
+        median = (double)sum / (double)(hough.getColumnDimensionality() * hough.getRowDimensionality());
+        
+        double bigCells = (double) sumMatrix(splitMatrixIntoCells(hough, mode, median));
+        
+    //    System.out.println("HSM Dim " + i + "x" + j + " mode 1: " + sumMatrix(splitMatrixIntoCells(hough, 1, median)) + "  mode 2: " + sumMatrix(splitMatrixIntoCells(hough, 2, median))
+    //        + "  mode 3: " + sumMatrix(splitMatrixIntoCells(hough, 3, median)));
+        
+        hsmmat.set(i - 1, j - 1, 1. - (bigCells / 2500.));
+        hsmmat.set(j - 1, i - 1, 1. - (bigCells / 2500.));
+        
+        progress++;
+        System.out.println("HSM Progress " + progress + " von " + max);
       }
     }
-    
+    System.out.println(hsmmat.toString());
     
     ArrayList<Integer> arrange = new ArrayList<Integer>();
 
-    int[] first = getMax(angmat);
+    int[] first = getMax(hsmmat);
     arrange.add(first[0]);
     arrange.add(1, first[1]);
     int[] pos;
     pos = first.clone();
 
-    blank(angmat, pos[0]);
-    blank(angmat, pos[1]);
+    blank(hsmmat, pos[0]);
+    blank(hsmmat, pos[1]);
     int tmp1, tmp2;
 
     for(int i = 2; i < dim; i++) {
-      tmp1 = getMax(angmat, pos[0]);
-      tmp2 = getMax(angmat, pos[1]);
+      tmp1 = getMax(hsmmat, pos[0]);
+      tmp2 = getMax(hsmmat, pos[1]);
 
-      if(Math.abs(angmat.get(pos[0], tmp1)) > Math.abs(angmat.get(pos[1], tmp2))) {
+      if(Math.abs(hsmmat.get(pos[0], tmp1)) > Math.abs(hsmmat.get(pos[1], tmp2))) {
         arrange.add(0, tmp1);
-        blank(angmat, tmp1);
+        blank(hsmmat, tmp1);
         pos[0] = tmp1;
       }
       else {
         arrange.add(arrange.size(), tmp2);
-        blank(angmat, tmp2);
+        blank(hsmmat, tmp2);
         pos[1] = tmp2;
       }
     }
@@ -148,6 +146,113 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
 
     for(int i = 0; i < dim; i++) {
       proj.moveAxis(proj.getAxisForDim(arrange.get(i)), i);
+    }
+  }
+  
+  private int sumMatrix(Matrix mat){
+    int ret = 0;
+    for (int i = 0; i < mat.getColumnDimensionality(); i++){
+      for (int j = 0; j < mat.getRowDimensionality(); j++){
+        if (mat.get(i, j) == 1.){
+          ret++;
+        }
+      }
+    }
+    return ret;
+  }
+  
+  private Matrix splitMatrixIntoCells(Matrix mat, int mode, double median){
+    
+    Matrix ret = new Matrix(50, 50, 0.);
+    
+    double stepX = mat.getColumnDimensionality() / 50.;
+    double stepY = mat.getRowDimensionality() / 50.;
+    
+    for (int i = 0; i < 50; i++){
+      for (int j = 0; j < 50; j++){
+        
+        double sum = 0.;
+        int cells = 0;
+        boolean bigger = true;
+        
+        for (int k = (int)(i * stepY); k < (int)((i + 1) * stepY); k++){
+          for (int l = (int) (j * stepX); l < (int)((j + 1) * stepX); l++){
+            
+            if (mode == 1 && mat.get(k, l) > median){
+              ret.set(i, j, 1.);
+              break;
+            }
+            if (mode == 2 && mat.get(k, l) <= median){
+              bigger = false;
+              break;
+            }
+            sum += mat.get(k, l);
+            cells++;
+          }
+        }
+        if (mode == 2 && bigger){
+          ret.set(i, j, 1.);
+        }
+        if (mode == 3 && ((sum /(double)cells) > median)){
+          ret.set(i, j, 1.);
+        }
+      }
+    } 
+    return ret;
+  }
+  
+  private Matrix houghTransformation(Matrix mat){
+    
+    Matrix ret;
+    double theta;
+    int d;
+    //int max = (int) Math.sqrt(Math.pow((double) mat.getRowDimensionality() / 2., 2.) + Math.pow((double) mat.getColumnDimensionality() / 2., 2.));
+    int max = (int) Math.sqrt(Math.pow((double) mat.getRowDimensionality(), 2.) + Math.pow((double) mat.getColumnDimensionality(), 2.));
+    
+    ret = new Matrix(max, 360, 0.);
+    sum = 0;
+    
+    for (int x = 0; x < mat.getRowDimensionality(); x++){
+      
+      for (int y = 0; y < mat.getColumnDimensionality(); y++){
+       
+        if (mat.get(x, y) > 0){
+          
+          for (int ang = 0; ang < 360; ang++){
+            
+            theta = Math.toRadians(ang);
+            
+          //  d = (int)(i * Math.cos(theta) + j * Math.sin(theta));
+            d = (int)(x * Math.cos(theta) + y * Math.sin(theta));
+            
+            if (d > 0 && d < max){
+              ret.set(d, ang, ret.get(d, ang) + 1.);
+              sum++;
+            }
+          }
+        }
+      }
+    }
+    
+    return ret;
+  }
+  
+  //Bresenham algorithm, copied from Wikipedia
+  private void line(int x0, int y0, int x1, int y1, Matrix mat)
+  {
+    if(y0 == 500){y0--;}
+    if(y1 == 500){y1--;}
+    int dx =  Math.abs(x1-x0), sx = x0<x1 ? 1 : -1;
+    int dy = -Math.abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+    int err = dx+dy, e2; /* error value e_xy */
+   
+    for(;;) { 
+      mat.set(x0, y0, 1.);
+      if (x0==x1 && y0==y1) break;
+      
+      e2 = 2*err;
+      if (e2 > dy) { err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+      if (e2 < dx) { err += dx; y0 += sy; } /* e_xy+e_y < 0 */
     }
   }
 
@@ -226,7 +331,7 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
     /**
      * A short name characterizing this Visualizer.
      */
-    private static final String NAME = "Angle Dimension Order";
+    private static final String NAME = "HSM Dimension Order";
 
     /**
      * Constructor, adhering to
@@ -238,7 +343,7 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
 
     @Override
     public Visualization makeVisualization(VisualizationTask task) {
-      return new AngleDimensionOrder(task);
+      return new HSMDimensionOrder(task);
     }
 
     @Override
@@ -259,3 +364,4 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
     }
   }
 }
+
