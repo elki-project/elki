@@ -1,0 +1,8 @@
+de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.DoubleVectorProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.DoubleVectorRandomProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter
+de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
+de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
+de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorRandomProjectionFilter

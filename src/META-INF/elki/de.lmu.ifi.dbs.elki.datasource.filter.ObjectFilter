@@ -6,6 +6,7 @@ de.lmu.ifi.dbs.elki.datasource.filter.ExternalIDFilter
 de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
+de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SortByLabelFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorProjectionFilter
