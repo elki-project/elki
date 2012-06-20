@@ -4,7 +4,11 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SparseEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SparseManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SparseLPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.SparseMaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
