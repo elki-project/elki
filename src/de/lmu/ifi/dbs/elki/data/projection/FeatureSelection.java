@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter
  * @param <V> Vector type
  * @param <F> Feature type
  */
-public class FeatureSelection<V extends FeatureVector<V, F>, F> extends AbstractFeatureSelection<V, F> {
+public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Projection<V, V> {
   /**
    * Minimum dimensionality required for projection
    */
@@ -56,13 +56,18 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> extends Abstract
   private int dimensionality;
 
   /**
+   * Array adapter
+   */
+  protected ArrayAdapter<F, V> adapter;
+  
+  /**
    * Constructor.
    * 
    * @param dims Dimensions
    * @param factory Object factory
    */
   public FeatureSelection(int[] dims, V factory) {
-    super(new SubsetArrayAdapter<F, V>(getAdapter(factory), dims));
+    this.adapter = new SubsetArrayAdapter<F, V>(getAdapter(factory), dims);
     this.factory = factory;
     this.dimensionality = dims.length;
 
@@ -73,6 +78,11 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> extends Abstract
     this.mindim = mindim;
   }
 
+  @Override
+  public V project(V data) {
+    return data.newFeatureVector(data, adapter);
+  }
+  
   /**
    * Choose the best adapter for this.
    * 

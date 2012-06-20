@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.projection;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,13 +23,12 @@ package de.lmu.ifi.dbs.elki.data.projection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.BitSet;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
 
 /**
  * Projection class for number vectors.
@@ -36,9 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter
  * @author Erich Schubert
  * 
  * @param <V> Vector type
- * @param <N> Number type
  */
-public class NumericalFeatureSelection<V extends NumberVector<V, N>, N extends Number> extends AbstractFeatureSelection<V, N> {
+public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements Projection<V, V> {
   /**
    * Minimum dimensionality required for projection
    */
@@ -55,37 +54,36 @@ public class NumericalFeatureSelection<V extends NumberVector<V, N>, N extends N
   private int dimensionality;
 
   /**
+   * Subspace
+   */
+  private BitSet bits;
+
+  /**
    * Constructor.
    * 
-   * @param dims Dimensions
+   * @param bits Dimensions
    * @param factory Object factory
    */
-  public NumericalFeatureSelection(int[] dims, V factory) {
-    super(new SubsetArrayAdapter<N, V>(getAdapter(factory), dims));
+  public NumericalFeatureSelection(BitSet bits, V factory) {
+    super();
+    this.bits = bits;
     this.factory = factory;
-    this.dimensionality = dims.length;
+    this.dimensionality = bits.cardinality();
 
     int mindim = 0;
-    for(int dim : dims) {
-      mindim = Math.max(mindim, dim + 1);
+    for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
+      mindim = Math.max(mindim, i + 1);
     }
     this.mindim = mindim;
   }
 
-  /**
-   * Choose the best adapter for this.
-   * 
-   * @param factory Object factory, for type inference
-   * @return Adapter
-   */
-  private static <V extends NumberVector<V, N>, N extends Number> NumberArrayAdapter<N, ? super V> getAdapter(V factory) {
-    return ArrayLikeUtil.numberVectorAdapter(factory);
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
   public V project(V data) {
-    return factory.newNumberVector(data, (NumberArrayAdapter<N, ? super V>) adapter);
+    double[] dbl = new double[dimensionality];
+    for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
+      dbl[j] = data.doubleValue(i + 1);
+    }
+    return factory.newNumberVector(dbl);
   }
 
   @Override

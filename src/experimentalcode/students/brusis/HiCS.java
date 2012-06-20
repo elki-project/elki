@@ -38,8 +38,11 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
+import de.lmu.ifi.dbs.elki.data.projection.NumericalFeatureSelection;
+import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
@@ -49,9 +52,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -93,7 +95,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
 @Reference(authors = "Fabian Keller, Emmanuel Müller, Klemens Böhm", title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)")
-public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The Logger for this class
    */
@@ -105,27 +107,27 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
   private static final int MAX_RETRIES = 100;
 
   /**
-   * Holds the value of {@link #M_ID}.
+   * Monte-Carlo iterations
    */
   private int m;
 
   /**
-   * Holds the value of {@link #ALPHA_ID}.
+   * Alpha threshold
    */
   private double alpha;
 
-  // /**
-  // * Holds the value of {@link #ALGO_ID}
-  // */
-  // private OutlierAlgorithm outlierAlgorithm;
+  /**
+   * Outlier detection algorithm
+   */
+  private OutlierAlgorithm outlierAlgorithm;
 
   /**
-   * Holds the value of{@link #TEST_ID}
+   * Statistical test to use
    */
   private GoodnessOfFitTest statTest;
 
   /**
-   * Holds the value of {@link #LIMIT_ID}
+   * Candidates limit
    */
   private int cutoff;
 
@@ -134,12 +136,15 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
    * 
    * @param m value of m
    * @param alpha value of alpha
+   * @param outlierAlgorithm Inner outlier detection algorithm
+   * @param statTest Test to use
+   * @param cutoff Candidate limit
    */
   public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, GoodnessOfFitTest statTest, int cutoff) {
     super();
     this.m = m;
     this.alpha = alpha;
-    // this.outlierAlgorithm = outlierAlgorithm;
+    this.outlierAlgorithm = outlierAlgorithm;
     this.statTest = statTest;
     this.cutoff = cutoff;
   }
@@ -152,13 +157,16 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
    *         outlier detection algorithm
    */
   public OutlierResult run(Relation<V> relation) {
+    final DBIDs ids = relation.getDBIDs();
+    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
     Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex);
 
     if(logger.isVerbose()) {
       logger.verbose("Number of high-contrast subspaces: " + subspaces.size());
     }
-    List<OutlierResult> results = new ArrayList<OutlierResult>();
+    List<Relation<Double>> results = new ArrayList<Relation<Double>>();
     FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), logger) : null;
 
     // run outlier detection and collect the result
@@ -169,12 +177,13 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
         logger.verbose("Performing outlier detection in subspace " + dimset);
       }
 
-      SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
-      LOF<V, DoubleDistance> lof = new LOF<V, DoubleDistance>(100, df, df);
+      ProxyDatabase pdb = new ProxyDatabase(ids);
+      Projection<V, V> proj = new NumericalFeatureSelection<V>(dimset, factory);
+      pdb.addRelation(new ProjectedView<V, V>(relation, proj));
 
       // run LOF and collect the result
-      OutlierResult result = lof.run(relation);
-      results.add(result);
+      OutlierResult result = outlierAlgorithm.run(pdb);
+      results.add(result.getScores());
       if(prog != null) {
         prog.incrementProcessed(logger);
       }
@@ -188,8 +197,8 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
 
     for(DBID id : relation.iterDBIDs()) {
       double sum = 0.0;
-      for(OutlierResult r : results) {
-        final Double s = r.getScores().get(id);
+      for(Relation<Double> r : results) {
+        final Double s = r.get(id);
         if(s != null && !Double.isNaN(s)) {
           sum += s;
         }
@@ -261,7 +270,7 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
       prog.ensureCompleted(logger);
     }
 
-    IndefiniteProgress qprog = logger.isVerbose() ? new IndefiniteProgress("Processing candidates", logger) : null;
+    IndefiniteProgress qprog = logger.isVerbose() ? new IndefiniteProgress("Testing subspace candidates", logger) : null;
     for(int d = 3; !dDimensionalList.isEmpty(); d++) {
       if(dprog != null) {
         dprog.setProcessed(d, logger);
@@ -506,7 +515,7 @@ public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Outlie
    * 
    * @param <V> vector type
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     /**
      * Parameter that specifies the number of iterations in the Monte-Carlo
      * process of identifying high contrast subspaces
