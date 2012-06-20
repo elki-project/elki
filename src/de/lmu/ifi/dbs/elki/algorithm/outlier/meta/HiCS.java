@@ -74,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -131,6 +132,11 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
    * Candidates limit
    */
   private int cutoff;
+  
+  /**
+   * Random generator
+   */
+  private Random random;
 
   /**
    * Constructor
@@ -140,14 +146,16 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
    * @param outlierAlgorithm Inner outlier detection algorithm
    * @param statTest Test to use
    * @param cutoff Candidate limit
+   * @param seed Random seed
    */
-  public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, GoodnessOfFitTest statTest, int cutoff) {
+  public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, GoodnessOfFitTest statTest, int cutoff, Long seed) {
     super();
     this.m = m;
     this.alpha = alpha;
     this.outlierAlgorithm = outlierAlgorithm;
     this.statTest = statTest;
     this.cutoff = cutoff;
+    this.random = (seed != null) ? new Random(seed) : new Random();
   }
 
   /**
@@ -335,7 +343,6 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     final int card = subspace.cardinality();
     final double alpha1 = Math.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
-    final Random random = new Random();
     final FiniteProgress prog = logger.isDebugging() ? new FiniteProgress("Monte-Carlo iterations", m, logger) : null;
 
     int retries = 0;
@@ -547,6 +554,11 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     public static final OptionID LIMIT_ID = OptionID.getOrCreateOptionID("hics.limit", "The threshold that determines how many d-dimensional subspace candidates to retain in each step of the generation");
 
     /**
+     * Parameter that specifies the random seed
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("hics.seed", "The random seed.");
+
+    /**
      * Holds the value of {@link #M_ID}.
      */
     private int m = 50;
@@ -570,6 +582,11 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
      * Holds the value of {@link #LIMIT_ID}
      */
     private int cutoff = 400;
+    
+    /**
+     * Random seed (optional)
+     */
+    private Long seed = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -598,11 +615,16 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       if(config.grab(cutoffP)) {
         cutoff = cutoffP.getValue();
       }
-    }
+
+      final LongParameter seedP = new LongParameter(SEED_ID, true);
+      if(config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+}
 
     @Override
     protected HiCS<V> makeInstance() {
-      return new HiCS<V>(m, alpha, outlierAlgorithm, statTest, cutoff);
+      return new HiCS<V>(m, alpha, outlierAlgorithm, statTest, cutoff, seed);
     }
   }
 }
