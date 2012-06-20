@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.subspace.vafile;
+package de.lmu.ifi.dbs.elki.index.vafile;
 
 /*
  This file is part of ELKI:
@@ -56,8 +56,6 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
-import de.lmu.ifi.dbs.elki.index.vafile.VALPNormDistance;
-import de.lmu.ifi.dbs.elki.index.vafile.VectorApproximation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;

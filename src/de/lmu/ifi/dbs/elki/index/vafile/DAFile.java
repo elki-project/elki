@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.subspace.vafile;
+package de.lmu.ifi.dbs.elki.index.vafile;
 
 /*
  This file is part of ELKI:
