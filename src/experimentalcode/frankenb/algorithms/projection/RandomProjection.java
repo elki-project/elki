@@ -15,14 +15,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.model.ifaces.IProjection;
 
 /**
  * No description given.
  * 
  * @author Florian Frankenberger
  */
-public class RandomProjection<V extends NumberVector<V, ?>> implements IProjection<V> {
+public class RandomProjection<V extends NumberVector<V, ?>> {
   /**
    * Logger
    */
@@ -50,7 +49,6 @@ public class RandomProjection<V extends NumberVector<V, ?>> implements IProjecti
     }
   }
 
-  @Override
   public Relation<V> project(Relation<V> dataSet) throws UnableToComplyException {
     if(DatabaseUtil.dimensionality(dataSet) <= this.newDimensionality) {
       throw new UnableToComplyException("New dimension is higher or equal to the old one!");

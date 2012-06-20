@@ -12,6 +12,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -44,7 +45,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   private Set<Integer> alreadyRequestedIDs = new HashSet<Integer>();
   
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getKNNForDBID(DBID id, int k) {
+  public KNNResult<DoubleDistance> getKNNForDBID(DBID id, int k) {
     NumberVector<?, ?> vector = dataBase.get(id);
     
     DistanceList projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);
@@ -77,8 +78,8 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   }
 
   @Override
-  public List<List<DistanceResultPair<DoubleDistance>>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    List<List<DistanceResultPair<DoubleDistance>>> results = new ArrayList<List<DistanceResultPair<DoubleDistance>>>();
+  public List<KNNResult<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    List<KNNResult<DoubleDistance>> results = new ArrayList<KNNResult<DoubleDistance>>();
     for (DBID dbid : ids) {
       results.add(getKNNForDBID(dbid, k));
     }
@@ -86,7 +87,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   }
 
   @Override
-  public List<DistanceResultPair<DoubleDistance>> getKNNForObject(NumberVector<?, ?> obj, int k) {
+  public KNNResult<DoubleDistance> getKNNForObject(NumberVector<?, ?> obj, int k) {
     // TODO Auto-generated method stub
     return null;
   }
