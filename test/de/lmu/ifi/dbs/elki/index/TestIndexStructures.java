@@ -58,6 +58,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistance
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile;
+import de.lmu.ifi.dbs.elki.index.vafile.VAFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -130,6 +132,32 @@ public class TestIndexStructures implements JUnit4Test {
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
   }
 
+  /**
+   * Test {@link VAFile} using a file based database connection.
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testVAFile() {
+    ListParameterization spatparams = new ListParameterization();
+    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, VAFile.Factory.class);
+    spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
+    testFileBasedDatabaseConnection(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
+  }
+  
+  /**
+   * Test {@link PartialVAFile} using a file based database connection.
+   * 
+   * @throws ParameterException on errors.
+   */
+  @Test
+  public void testPartialVAFile() {
+    ListParameterization spatparams = new ListParameterization();
+    spatparams.addParameter(StaticArrayDatabase.INDEX_ID, PartialVAFile.Factory.class);
+    spatparams.addParameter(PartialVAFile.Factory.PARTITIONS_ID, 4);
+    testFileBasedDatabaseConnection(spatparams, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
+  }
+  
   /**
    * Test {@link RStarTree} using a file based database connection. With "fast"
    * mode enabled on an extreme level (since this should only reduce
