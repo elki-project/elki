@@ -1,4 +1,4 @@
-package experimentalcode.frankenb.tests;
+package experimentalcode.students.frankenb;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +15,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import experimentalcode.frankenb.model.KDTree;
 
 /**
  * No description given.

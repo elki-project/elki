@@ -1,4 +1,4 @@
-package experimentalcode.frankenb.main;
+package experimentalcode.students.frankenb;
 
 import java.io.File;
 
@@ -22,9 +22,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import experimentalcode.frankenb.algorithms.projection.RandomProjection;
-import experimentalcode.frankenb.model.KDTree;
-import experimentalcode.frankenb.model.PINNKnnIndex;
 
 /**
  * A simple PINN implementation used as a comparison.

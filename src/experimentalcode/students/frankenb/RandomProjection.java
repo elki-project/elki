@@ -1,4 +1,4 @@
-package experimentalcode.frankenb.algorithms.projection;
+package experimentalcode.students.frankenb;
 
 import java.util.Random;
 

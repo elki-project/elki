@@ -5,4 +5,4 @@
  *  <p>Classes not scheduled for a release.</p>
  *  
  */
-package experimentalcode.frankenb;
+package experimentalcode.students.frankenb;

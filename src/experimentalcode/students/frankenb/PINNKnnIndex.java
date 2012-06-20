@@ -1,4 +1,4 @@
-package experimentalcode.frankenb.model;
+package experimentalcode.students.frankenb;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;

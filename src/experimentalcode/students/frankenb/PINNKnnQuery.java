@@ -1,4 +1,4 @@
-package experimentalcode.frankenb.model;
+package experimentalcode.students.frankenb;
 
 import java.util.ArrayList;
 import java.util.HashSet;
