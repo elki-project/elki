@@ -23,77 +23,75 @@ package experimentalcode.students.brusis;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Calculates a test statistic according to Welch's t test for two samples
  * Supplies methods for calculating the degrees of freedom according to the
- * Welch-Satterthwaite Equation. Also directly calculates a two-sided p-value for the
- * underlying t-distribution
+ * Welch-Satterthwaite Equation. Also directly calculates a two-sided p-value
+ * for the underlying t-distribution
  * 
  * @author Jan Brusis
- * 
+ * @author Erich Schubert
  */
-public class WelchTTest implements StatisticalTest {
+public class WelchTTest implements GoodnessOfFitTest {
+  /**
+   * Static instance.
+   */
+  public static final WelchTTest STATIC = new WelchTTest();
 
-  public static void main(String... args) {
-//    double[] sample1 = { 498, 510, 505, 495, 491, 488, 493, 501, 502, 501 };
-//    double[] sample2 = { 495, 510, 507, 500, 498, 492, 498, 501 };
-    double[] sample1 = new double[610];
-    double[] sample2 = new double[192];
-    try {
-      BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-      String line = reader.readLine();
-      String[] split = line.split("\\s");
-      for(int i = 0; i<split.length;i++) {
-        sample1[i] = Double.parseDouble(split[i]);
-      }
-      reader = new BufferedReader(new FileReader(args[1]));
-      line = reader.readLine();
-      split = line.split("\\s");
-      for(int i = 0; i<split.length;i++) {
-        sample2[i] = Double.parseDouble(split[i]);
-      }
-      reader.close();
-    }
-    catch(FileNotFoundException e) {
-      // TODO Auto-generated catch block
-      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-    }
-    catch(IOException e) {
-      // TODO Auto-generated catch block
-      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
-    }
-
-    new WelchTTest().deviation(sample1, sample2);
+  /**
+   * Constructor.
+   */
+  public WelchTTest() {
+    super();
   }
 
   @Override
-  /**
-   * The deviation as needed for HiCS
-   * Returns the contrast value as defined by HiCS
-   */
   public double deviation(double[] sample1, double[] sample2) {
-    MeanVariance MV1 = new MeanVariance();
-    MeanVariance MV2 = new MeanVariance();
-
+    MeanVariance mv1 = new MeanVariance(), mv2 = new MeanVariance();
     for(double d : sample1) {
-      MV1.put(d);
+      mv1.put(d);
     }
     for(double d : sample2) {
-      MV2.put(d);
+      mv2.put(d);
     }
 
-    double t = calculateTestStatistic(MV1.getMean(), MV2.getMean(), MV1.getSampleVariance(), MV2.getSampleVariance(), sample1.length, sample2.length);
-    int v = calculateDG(MV1.getSampleVariance(), MV2.getSampleVariance(), sample1.length, sample2.length);
-//     System.out.println("t : "+t+"\tv: "+v+"\tpVal: "+(1-calculatePValue(t, v)));
+    final double t = calculateTestStatistic(mv1, mv2);
+    final int v = calculateDOF(mv1, mv2);
     return 1 - calculatePValue(t, v);
+  }
+
+  /**
+   * Calculate the statistic of Welch's t test using statistical moments of the
+   * provided data samples
+   * 
+   * @param mv1 Mean and variance of first sample
+   * @param mv2 Mean and variance of second sample
+   * @return Welch's t statistic
+   */
+  public static double calculateTestStatistic(MeanVariance mv1, MeanVariance mv2) {
+    final double delta = mv1.getMean() - mv2.getMean();
+    final double relvar1 = mv1.getSampleVariance() / mv1.getCount();
+    final double relvar2 = mv2.getSampleVariance() / mv2.getCount();
+    return delta / Math.sqrt(relvar1 + relvar2);
+  }
+
+  /**
+   * Calculates the degree of freedom according to Welch-Satterthwaite
+   * 
+   * @param mv1 Mean and variance of first sample
+   * @param mv2 Mean and variance of second sample
+   * @return Estimated degrees of freedom.
+   */
+  public static int calculateDOF(MeanVariance mv1, MeanVariance mv2) {
+    final double relvar1 = mv1.getSampleVariance() / mv1.getCount();
+    final double relvar2 = mv2.getSampleVariance() / mv2.getCount();
+    final double wvariance = relvar1 + relvar2;
+    final double div = relvar1 * relvar1 / (mv1.getCount() - 1) + relvar2 * relvar2 / (mv2.getCount() - 1);
+    return (int) (wvariance * wvariance / div);
   }
 
   /**
@@ -105,53 +103,20 @@ public class WelchTTest implements StatisticalTest {
    * @return p-Value
    */
   public static double calculatePValue(double t, int v) {
-    double pVal;
-    if(t > 0) {
-      pVal = 2 * (1 - StudentsTDistribution.cdf(t, v));
-    }
-    else {
-      pVal = 2 * (1 - StudentsTDistribution.cdf(-t, v)); // Approximation of CDF
-                                                         // only works for
-                                                         // positive t
-    }
-    return pVal;
+    return 2 * (1 - StudentsTDistribution.cdf(Math.abs(t), v));
   }
 
   /**
-   * Calculate the statistic of Welch's t test using statistical moments of the provided data samples
+   * Parameterizer, to use the static instance.
    * 
-   * @param mean1
-   * @param mean2
-   * @param var1
-   * @param var2
-   * @param size1
-   * @param size2
-   * @return
-   */
-  public static double calculateTestStatistic(double mean1, double mean2, double var1, double var2, int size1, int size2) {
-
-//    System.err.println("Mean of sample 1: " + mean1);
-//    System.err.println("Mean of sample 2: " + mean2);
-//    System.err.println("Variance of sample 1: " + var1);
-//    System.err.println("Variance of sample 2: " + var2);
-    double t = (mean1 - mean2) / Math.sqrt(var1 / size1 + var2 / size2);
-    // System.err.println("Test Statistic: " + t);
-    return t;
-  }
-
-  /**
-   * Calculates the degree of freedom according to Welch-Satterthwaite
+   * @author Erich Schubert
    * 
-   * @param sample1
-   * @param sample2
-   * @return
+   * @apiviz.exclude
    */
-  public static int calculateDG(double var1, double var2, int size1, int size2) {
-    int v1 = size1 - 1;
-    int v2 = size2 - 1;
-    double v = Math.pow((var1 / size1) + (var2 / size2), 2) / ((Math.pow(var1, 2) / (Math.pow(size1, 2) * v1)) + (Math.pow(var2, 2) / (Math.pow(size2, 2) * v2)));
-    // System.err.println("Degrees of Freedom: " + (int) v);
-    return (int) v;
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected WelchTTest makeInstance() {
+      return STATIC;
+    }
   }
-
 }

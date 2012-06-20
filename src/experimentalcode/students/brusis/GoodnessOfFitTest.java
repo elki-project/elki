@@ -23,14 +23,27 @@ package experimentalcode.students.brusis;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
+
 /**
- * Interface for the statistical test used by HiCS
- * Provides a single method that calculates the deviation between two data samples, given as arrays of double values 
+ * Interface for the statistical test used by HiCS.
+ * 
+ * Provides a single method that calculates the deviation between two data
+ * samples, given as arrays of double values
  * 
  * @author Jan Brusis
- *
+ * @author Erich Schubert
  */
-public interface StatisticalTest {
-
+public interface GoodnessOfFitTest extends Parameterizable {
+  /**
+   * Measure the deviation of a full sample from a conditional sample.
+   * 
+   * Sample arrays *may* be modified, e.g. sorted, by the test.
+   * 
+   * @param fullSample Full sample
+   * @param conditionalSample Conditional sample
+   * 
+   * @return Deviation
+   */
   public double deviation(double[] fullSample, double[] conditionalSample);
 }
