@@ -409,7 +409,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    * @author Erich Schubert
    * @author Thomas Bernecker
    */
-  class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
+  public class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
     /**
      * Lp-Norm p
      */
@@ -517,7 +517,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    * @author Erich Schubert
    * @author Thomas Bernecker
    */
-  class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
+  public class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
     /**
      * Lp-Norm p
      */

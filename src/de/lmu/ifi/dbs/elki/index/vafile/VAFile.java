@@ -289,7 +289,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * 
    * @author Erich Schubert
    */
-  class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
+  public class VAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
     /**
      * LP Norm p parameter.
      */
@@ -348,7 +348,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * 
    * @author Erich Schubert
    */
-  class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
+  public class VAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
     /**
      * LP Norm p parameter.
      */
