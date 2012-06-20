@@ -438,7 +438,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       stats.issuedQueries++;
       long t = System.nanoTime();
 
-      final double epsilon = ((DoubleDistance) range).doubleValue();
+      final double epsilonP = Math.pow(range.doubleValue(), p);
 
       // generate query approximation and lookup table
       final VectorApproximation queryApprox = calculateFullApproximation(null, query);
@@ -454,7 +454,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
         DAFile daFile = daFiles.get(d);
         subspaceDAFiles.add(new DoubleObjPair<DAFile>(-1, daFile));
       }
-      calculateSelectivityCoeffs(subspaceDAFiles, query, epsilon);
+      calculateSelectivityCoeffs(subspaceDAFiles, query, range.doubleValue());
       // sort DA files by selectivity
       // TODO: validate that this is the correct order
       Collections.sort(subspaceDAFiles, Collections.reverseOrder());
@@ -463,7 +463,6 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       // mindist (i.e. remove them from the list)
       // important: this structure contains the maxDist values for refinement!
       DistanceDBIDResult<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
-      final double onebyp = 1.0 / p;
       int candidates = 0;
       for(VectorApproximation va : vectorApprox) {
         DBID id = va.getId();
@@ -475,14 +474,14 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
           int objectCell = va.getApproximation(dimension);
           pva.minDistP += dist.getPartialMinDist(dimension, objectCell);
           pva.maxDistP += dist.getPartialMaxDist(dimension, objectCell);
-          if(Math.pow(pva.minDistP, onebyp) > epsilon) {
+          if(pva.minDistP > epsilonP) {
             pruned = true;
             break;
           }
         }
         if(!pruned) {
           candidates++;
-          if(Math.pow(pva.maxDistP, onebyp) <= epsilon) {
+          if(pva.maxDistP <= epsilonP) {
             // candidate cannot be dropped
             // TODO: actually: no refinement needed - need API that allows
             // reporting maxdists only.
@@ -491,7 +490,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
           else { // refine candidate - true refinement
             DoubleDistance dis = refine(id, query);
             stats.refinements += 1;
-            if(dis.doubleValue() <= epsilon) {
+            if(dis.doubleValue() <= range.doubleValue()) {
               result.add(new DoubleDistanceResultPair(dis.doubleValue(), id));
             }
           }
