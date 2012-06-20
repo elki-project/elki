@@ -35,16 +35,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-
 /**
  * Unit test to ensure that our heap is not significantly worse than SUN javas
  * regular PriorityQueue.
  * 
  * @author Erich Schubert
  */
-public class TestHeapPerformance implements JUnit4Test {
+public class TestHeapPerformance {
   final private int queueSize = 100000;
 
   final private int iterations = 20;

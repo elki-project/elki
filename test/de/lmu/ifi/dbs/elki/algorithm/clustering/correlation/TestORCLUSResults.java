@@ -56,7 +56,6 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     ListParameterization params = new ListParameterization();
-    // these parameters are not picked too smartly - room for improvement.
     params.addParameter(ORCLUS.K_ID, 3);
     params.addParameter(ORCLUS.L_ID, 1);
     params.addParameter(ORCLUS.SEED_ID, 2);
@@ -68,8 +67,8 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasure(db, result, 0.640306); // Hierarchical pairs scored: 0.789113
-    testClusterSizes(result, new int[] { 22, 27, 401 });
+    testFMeasure(db, result, 0.6361108); // Hierarchical pairs scored: 0.789113
+    testClusterSizes(result, new int[] { 19, 33, 398 });
   }
 
   /**
