@@ -1,4 +1,4 @@
-package experimentalcode.students.brusis;
+package de.lmu.ifi.dbs.elki.math.statistics.tests;
 
 /*
  This file is part of ELKI:
