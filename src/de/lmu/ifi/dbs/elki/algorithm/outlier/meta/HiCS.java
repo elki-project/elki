@@ -1,4 +1,4 @@
-package experimentalcode.students.brusis;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
 
 /*
  This file is part of ELKI:
@@ -89,6 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Jan Brusis
+ * @author Erich Schubert
  * 
  * @param <V> vector type
  */
