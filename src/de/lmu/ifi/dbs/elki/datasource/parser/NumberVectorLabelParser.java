@@ -138,6 +138,16 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   protected BundleMeta meta = null;
 
   /**
+   * Column names
+   */
+  protected List<String> columnnames = null;
+
+  /**
+   * Bitset to indicate which columns are numeric
+   */
+  protected BitSet labelcolumns = null;
+
+  /**
    * Current vector
    */
   protected V curvec = null;
@@ -180,6 +190,8 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     reader = new BufferedReader(new InputStreamReader(in));
     lineNumber = 1;
     dimensionality = DIMENSIONALITY_UNKNOWN;
+    columnnames = null;
+    labelcolumns = new BitSet();
   }
 
   @Override
@@ -198,6 +210,10 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           parseLineInternal(line);
+          // Maybe a header column?
+          if(curvec == null) {
+            continue;
+          }
           if(dimensionality == DIMENSIONALITY_UNKNOWN) {
             dimensionality = curvec.getDimensionality();
             buildMeta();
@@ -268,6 +284,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
         }
         catch(NumberFormatException e) {
           // Ignore attempt, add to labels below.
+          labelcolumns.set(i);
         }
       }
       if(labels == null) {
@@ -275,7 +292,15 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       }
       labels.add(ent);
     }
-
+    // Maybe a label row?
+    if(lineNumber == 1 && attributes.size() == 0) {
+      columnnames = labels;
+      labelcolumns.clear();
+      curvec = null;
+      curlbl = null;
+      return;
+    }
+    // Pass outside via class variables
     curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
     curlbl = labels;
   }
@@ -302,14 +327,26 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
     if(dimensionality > 0) {
+      String[] colnames = null;
+      if(columnnames != null) {
+        if(columnnames.size() - labelcolumns.cardinality() == dimensionality) {
+          colnames = new String[dimensionality];
+          for(int i = 0, j = 0; i < columnnames.size(); i++) {
+            if(labelcolumns.get(i) == false) {
+              colnames[j] = columnnames.get(i);
+              j++;
+            }
+          }
+        }
+      }
       V f = factory.newNumberVector(new double[dimensionality]);
       if(f instanceof ByteBufferSerializer) {
         // TODO: Remove, once we have serializers for all types
         @SuppressWarnings("unchecked")
         final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
-        return new VectorFieldTypeInformation<V>(cls, ser, dimensionality, f);
+        return new VectorFieldTypeInformation<V>(cls, ser, dimensionality, colnames, f);
       }
-      return new VectorFieldTypeInformation<V>(cls, dimensionality, f);
+      return new VectorFieldTypeInformation<V>(cls, dimensionality, colnames, f);
     }
     // Variable dimensionality - return non-vector field type
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
