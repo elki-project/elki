@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * distribution functions. The KS statistic is defined as the maximum absolute
  * difference of the empirical CDFs.
  * 
- * @author Jan Brusis
  * @author Erich Schubert
  */
 public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
@@ -56,40 +55,7 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
   public double deviation(double[] fullSample, double[] conditionalSample) {
     Arrays.sort(fullSample);
     Arrays.sort(conditionalSample);
-    double[] fullCDF = empiricalCDF(fullSample);
-    double[] conditionalCDF = empiricalCDF(conditionalSample);
-    return calculateTestStatistic(fullSample, conditionalSample, fullCDF, conditionalCDF);
-  }
-
-  /**
-   * For every value x in the sample, calculates the percentage of values <= x
-   * (the empirical cumulative density function, CDF)
-   * 
-   * @param sample array with the sample values
-   * @return array with the percentages
-   */
-  public static double[] empiricalCDF(double[] sample) {
-    final int size = sample.length;
-    final double[] F = new double[size];
-
-    for(int i = 0; i < size;) {
-      // Count ties:
-      int count = 1;
-      final double x = sample[i];
-      for(int j = i + 1; j < size; j++) {
-        if(sample[j] != x) {
-          break;
-        }
-        count++;
-      }
-
-      for(int j = 0; j < count; j++) {
-        F[i + j] = ((double) i + count) / size;
-      }
-      i += count; // Advance
-    }
-
-    return F;
+    return calculateTestStatistic(fullSample, conditionalSample);
   }
 
   /**
@@ -102,7 +68,7 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
    * @param f2 array of percentages for second sample
    * @return the largest distance between both functions
    */
-  public static double calculateTestStatistic(double[] sample1, double[] sample2, double[] f1, double[] f2) {
+  public static double calculateTestStatistic(double[] sample1, double[] sample2) {
     double maximum = 0.0;
 
     int index1 = 0, index2 = 0;
@@ -111,15 +77,25 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
     // Parallel iteration over both curves. We can stop if we reach either end,
     // As the difference can then only decrease!
     while(index1 < sample1.length && index2 < sample2.length) {
-      if(sample1[index1] <= sample2[index2]) {
-        // Advance on first curve
-        cdf1 = sample1[index1];
+      // Next (!) positions
+      final double x1 = sample1[index1], x2 = sample2[index2];
+      // Advance on first curve
+      if(x1 <= x2) {
         index1++;
+        // Handle multiple points with same x:
+        while(index1 < sample1.length && sample1[index1] == x1) {
+          index1++;
+        }
+        cdf1 = ((double) index1) / sample1.length;
       }
-      else {
-        // Advance on second curve
-        cdf2 = sample2[index2];
+      // Advance on second curve
+      if(x1 >= x2) {
         index2++;
+        // Handle multiple points with same x:
+        while(index2 < sample2.length && sample2[index2] == x2) {
+          index2++;
+        }
+        cdf2 = ((double) index2) / sample2.length;
       }
       maximum = Math.max(maximum, Math.abs(cdf1 - cdf2));
     }
