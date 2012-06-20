@@ -7,3 +7,4 @@ de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
 de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorProjectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorRandomProjectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization
