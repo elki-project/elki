@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector type
  */
-public class LengthNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
+public class LengthNormalization<V extends NumberVector<V, ?>> extends AbstractStreamNormalization<V> {
   /**
    * Norm to use
    */

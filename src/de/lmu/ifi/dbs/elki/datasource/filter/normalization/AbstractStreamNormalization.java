@@ -25,21 +25,21 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 
 /**
  * Abstract super class for all normalizations.
  * 
- * @author Elke Achtert
+ * @author Erich Schubert
  * 
  * @param <O> Object type processed
  */
-public abstract class AbstractNormalization<O> extends AbstractConversionFilter<O, O> implements Normalization<O> {
+public abstract class AbstractStreamNormalization<O> extends AbstractStreamConversionFilter<O, O> implements Normalization<O> {
   /**
    * Initializes the option handler and the parameter map.
    */
-  protected AbstractNormalization() {
+  protected AbstractStreamNormalization() {
     super();
   }
 
@@ -47,7 +47,7 @@ public abstract class AbstractNormalization<O> extends AbstractConversionFilter<
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
     return in;
   }
-
+  
   @Override
   public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException {
     return super.filter(objects);
