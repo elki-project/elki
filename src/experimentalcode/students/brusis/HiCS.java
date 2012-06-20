@@ -137,7 +137,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
   /**
    * Holds the value of{@link #TEST_ID}
    */
-  private StatisticalTest statTest;
+  private GoodnessOfFitTest statTest;
 
   /**
    * Holds the value of {@link #LIMIT_ID}
@@ -155,7 +155,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    * @param m value of m
    * @param alpha value of alpha
    */
-  public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, StatisticalTest statTest, int cutoff) {
+  public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, GoodnessOfFitTest statTest, int cutoff) {
     super();
     this.m = m;
     this.alpha = alpha;
@@ -485,7 +485,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     /**
      * Holds the value of {@link #TEST_ID}.
      */
-    private StatisticalTest statTest;
+    private GoodnessOfFitTest statTest;
 
     /**
      * Holds the value of {@link #LIMIT_ID}
@@ -510,7 +510,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
         outlierAlgorithm = algoP.instantiateClass(config);
       }
 
-      final ClassParameter<StatisticalTest> testP = new ClassParameter<StatisticalTest>(TEST_ID, StatisticalTest.class, KolmogorovSmirnovTest.class);
+      final ClassParameter<GoodnessOfFitTest> testP = new ClassParameter<GoodnessOfFitTest>(TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
       if(config.grab(testP)) {
         statTest = testP.instantiateClass(config);
       }
