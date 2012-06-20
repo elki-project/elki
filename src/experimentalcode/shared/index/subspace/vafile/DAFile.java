@@ -24,16 +24,15 @@ package experimentalcode.shared.index.subspace.vafile;
  */
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.vafile.VectorApproximation;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Dimension approximation file, a one-dimensional part of the
@@ -65,11 +64,6 @@ public class DAFile {
   private double[] splitPositions;
 
   /**
-   * Selectivity coefficient
-   */
-  private int selectivityCoeff;
-
-  /**
    * Constructor.
    * 
    * @param dimension Dimension of this file
@@ -93,8 +87,6 @@ public class DAFile {
     }
     // make sure that last object will be included
     splitPositions[partitions] = tempdata[size - 1] + 0.000001;
-
-    this.selectivityCoeff = -1;
   }
 
   /**
@@ -119,22 +111,6 @@ public class DAFile {
   }
 
   /**
-   * @return the selectivityCoeff
-   */
-  public int getSelectivityCoeff() {
-    return selectivityCoeff;
-  }
-
-  /**
-   * Set the computed selectivity coefficient.
-   * 
-   * @param val New value.
-   */
-  private void setSelectivityCoeff(int val) {
-    selectivityCoeff = val;
-  }
-
-  /**
    * Estimate the IO costs for this index.
    * 
    * @return IO costs
@@ -149,7 +125,7 @@ public class DAFile {
    * @param query
    * @param epsilon
    */
-  public static void calculateSelectivityCoeffs(List<DAFile> daFiles, NumberVector<?, ?> query, double epsilon) {
+  public static void calculateSelectivityCoeffs(List<DoubleObjPair<DAFile>> daFiles, NumberVector<?, ?> query, double epsilon) {
     final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
@@ -161,23 +137,23 @@ public class DAFile {
       upperVals[i] = query.doubleValue(i + 1) + epsilon;
     }
 
-    DoubleVector lowerEpsilon = new DoubleVector(lowerVals);
+    Vector lowerEpsilon = new Vector(lowerVals);
     VectorApproximation lowerEpsilonPartitions = calculateApproximation(null, lowerEpsilon, daFiles);
 
-    DoubleVector upperEpsilon = new DoubleVector(upperVals);
+    Vector upperEpsilon = new Vector(upperVals);
     VectorApproximation upperEpsilonPartitions = calculateApproximation(null, upperEpsilon, daFiles);
 
     for(int i = 0; i < daFiles.size(); i++) {
       int coeff = (queryApprox.getApproximation(i) - lowerEpsilonPartitions.getApproximation(i)) + (upperEpsilonPartitions.getApproximation(i) - queryApprox.getApproximation(i)) + 1;
-      daFiles.get(i).setSelectivityCoeff(coeff);
+      daFiles.get(i).first = coeff;
     }
   }
 
-  public static VectorApproximation calculateApproximation(DBID id, NumberVector<?, ?> dv, List<DAFile> daFiles) {
+  public static VectorApproximation calculateApproximation(DBID id, NumberVector<?, ?> dv, List<DoubleObjPair<DAFile>> daFiles) {
     int[] approximation = new int[dv.getDimensionality()];
     for(int i = 0; i < daFiles.size(); i++) {
       double val = dv.doubleValue(i + 1);
-      double[] borders = daFiles.get(i).getSplitPositions();
+      double[] borders = daFiles.get(i).second.getSplitPositions();
       assert borders != null : "borders are null";
       int lastBorderIndex = borders.length - 1;
 
@@ -197,33 +173,5 @@ public class DAFile {
       }
     }
     return new VectorApproximation(id, approximation);
-  }
-
-  /**
-   * Sort a list of DA files by selectivity.
-   * 
-   * @param daFiles List of directory approximation files.
-   */
-  public static void sortBySelectivity(List<DAFile> daFiles) {
-    Collections.sort(daFiles, selectivityComparator);
-  }
-  
-  /**
-   * Static instance of selectivity comparator.
-   */
-  private static final DAFileSelectivityComparator selectivityComparator = new DAFileSelectivityComparator();
-
-  /**
-   * Class to compare DAFiles by selectivity.
-   * 
-   * @author Thomas Bernecker
-   *
-   * @apiviz.exclude
-   */
-  private static class DAFileSelectivityComparator implements Comparator<DAFile> {
-    @Override
-    public int compare(DAFile a, DAFile b) {
-      return Double.compare(a.getSelectivityCoeff(), b.getSelectivityCoeff());
-    }
   }
 }
