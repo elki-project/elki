@@ -3,12 +3,14 @@ package experimentalcode.frankenb.model;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -17,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -48,8 +51,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   public KNNResult<DoubleDistance> getKNNForDBID(DBID id, int k) {
     NumberVector<?, ?> vector = dataBase.get(id);
     
-    DistanceList projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);
-    List<DistanceResultPair<DoubleDistance>> list = new ArrayList<DistanceResultPair<DoubleDistance>>();
+    KNNResult<DoubleDistance> projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);
     
     if (!alreadyRequestedIDs.contains(id.getIntegerID())) {
       //calculations += tree.getLastMeasure().getCalculations();
@@ -59,22 +61,17 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
       }
     }
     
-    DistanceList newDistanceList = new DistanceList(id, k);
-    for (Pair<DBID, Double> distance : projectedDistanceList) {
-      NumberVector<?, ?> otherVector = dataBase.get(distance.first);
-      newDistanceList.addDistance(distance.first, EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector));
-    }
-    
-    for (Pair<DBID, Double> distance : newDistanceList) {
-      list.add(new GenericDistanceResultPair<DoubleDistance>(new DoubleDistance(distance.second), distance.first));
+    KNNHeap<DoubleDistance> newDistanceList = new KNNHeap<DoubleDistance>(k);
+    for (DistanceResultPair<DoubleDistance> distance : projectedDistanceList) {
+      NumberVector<?, ?> otherVector = dataBase.get(distance.getDBID());
+      newDistanceList.add(new DoubleDistanceResultPair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance.getDBID()));
     }
     
     if (++requested % 100000 == 0) {
       logger.debug(String.format("%d distances requested from index", requested));
     }
     
-    
-    return list;
+    return newDistanceList.toKNNList();
   }
 
   @Override
@@ -90,5 +87,11 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   public KNNResult<DoubleDistance> getKNNForObject(NumberVector<?, ?> obj, int k) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<DoubleDistance>> heaps) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException();
   }
 }

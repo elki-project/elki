@@ -9,12 +9,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.IntegerVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.frankenb.model.DistanceList;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import experimentalcode.frankenb.model.KDTree;
 
 /**
@@ -41,19 +41,19 @@ public class KDTreeTest {
 
     KDTree tree = new KDTree(dataSet);
 
-    DistanceList list = tree.findNearestNeighbors(DBIDUtil.importInteger(1), 3, EuclideanDistanceFunction.STATIC);
+    KNNResult<DoubleDistance> list = tree.findNearestNeighbors(DBIDUtil.importInteger(1), 3, EuclideanDistanceFunction.STATIC);
 
     int counter = 0;
-    assertEquals(3, list.getSize());
-    for(Pair<DBID, Double> distanceEntry : list) {
+    assertEquals(3, list.size());
+    for(DistanceResultPair<DoubleDistance> distanceEntry : list) {
       if(counter == 0) {
-        assertEquals(1, distanceEntry.first.getIntegerID());
+        assertEquals(1, distanceEntry.getDBID().getIntegerID());
       }
       else if(counter == 1) {
-        assertEquals(5, distanceEntry.first.getIntegerID());
+        assertEquals(5, distanceEntry.getDBID().getIntegerID());
       }
       else if(counter == 2) {
-        assertEquals(0, distanceEntry.first.getIntegerID());
+        assertEquals(0, distanceEntry.getDBID().getIntegerID());
       }
       counter++;
     }

@@ -8,9 +8,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * No description given.
@@ -53,38 +57,37 @@ public class KDTree<V extends NumberVector<?, ?>> {
    * @param distanceFunction
    * @return
    */
-  public DistanceList findNearestNeighbors(DBID id, int k, PrimitiveDoubleDistanceFunction<V> distanceFunction) {
+  public KNNResult<DoubleDistance> findNearestNeighbors(DBID id, int k, PrimitiveDoubleDistanceFunction<V> distanceFunction) {
     V vector = this.relation.get(id);
     KDTreeNode node = searchNodeFor(vector, this.root);
 
-    DistanceList distanceList = new DistanceList(id, k);
+    KNNHeap<DoubleDistance> distanceList = new KNNHeap<DoubleDistance>(k);
     Set<KDTreeNode> alreadyVisited = new HashSet<KDTreeNode>();
 
     findNeighbors(k, distanceFunction, vector, node, distanceList, alreadyVisited);
-    return distanceList;
+    return distanceList.toKNNList();
   }
 
-  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, DistanceList distanceList, Set<KDTreeNode> alreadyVisited) {
+  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, KNNHeap<DoubleDistance> distanceList, Set<KDTreeNode> alreadyVisited) {
+    double maxdist = distanceList.getKNNDistance().doubleValue();
     for(DBID id : currentNode.ids) {
-      double maxDistance = (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY);
       double distanceToId = distanceFunction.doubleDistance(queryVector, relation.get(id));
-
-      if(distanceToId <= maxDistance) {
-        distanceList.addDistance(id, distanceToId);
+      if (distanceToId < maxdist) {
+        distanceList.add(new DoubleDistanceResultPair(distanceToId, id));
+        maxdist = distanceList.getKNNDistance().doubleValue();
       }
-
     }
 
     alreadyVisited.add(currentNode);
     if(!currentNode.isLeaf()) {
       double splitDistance = Math.abs(currentNode.splitPoint - queryVector.doubleValue(currentNode.dimension));
 
-      if(splitDistance <= (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY)) {
+      if(splitDistance <= maxdist) {
         if(currentNode.leftChild != null && !alreadyVisited.contains(currentNode.leftChild)) {
           findNeighbors(k, distanceFunction, queryVector, currentNode.leftChild, distanceList, alreadyVisited);
         }
       }
-      if(splitDistance <= (distanceList.getSize() >= k ? distanceList.getLast().second : Double.POSITIVE_INFINITY)) {
+      if(splitDistance <= maxdist) {
         if(currentNode.rightChild != null && !alreadyVisited.contains(currentNode.rightChild)) {
           findNeighbors(k, distanceFunction, queryVector, currentNode.rightChild, distanceList, alreadyVisited);
         }
