@@ -1,4 +1,4 @@
-package experimentalcode.marisa.tests;
+package experimentalcode.shared.index.xtree.test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

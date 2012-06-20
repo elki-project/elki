@@ -1,7 +1,7 @@
 /*
  * Created on Feb 21, 2005
  */
-package experimentalcode.marisa.utils;
+package experimentalcode.shared.index.xtree.test;
 
 import java.text.DateFormat;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package experimentalcode.marisa.tests;
+package experimentalcode.shared.index.xtree.test;
 
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -13,7 +13,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
-import experimentalcode.marisa.utils.Zeit;
 import experimentalcode.shared.index.xtree.XTree;
 
 public class XTreeIO {
@@ -60,7 +59,7 @@ public class XTreeIO {
         throw new RuntimeException("numInstances = " + numInstances + " is too large for this framework! Can only deal with at most " + Integer.MAX_VALUE + " entries");
       if(i == numInstances)
         break;
-      xTree.insert(DBIDUtil.importInteger((int)i), readNext(in));
+      // FIXME: xTree.insert(DBIDUtil.importInteger((int)i), readNext(in));
       if(VERBOSE && i % VERBOSE_STEP == 0)
         System.out.println("Inserted " + i + " elements: " + (((double) i) / 1000000) + "% in " + ((double) (System.currentTimeMillis() - t1)) / 60000 + " minutes");
     }
@@ -78,7 +77,7 @@ public class XTreeIO {
     SerializedParameterization config = new SerializedParameterization(Arrays.asList(split));
     XTree xt = ClassGenericsUtil.parameterizeOrAbort(XTree.class, config);
     config.failOnErrors();
-    xt.initializeFromFile();
+    // FIXME: xt.initializeFromFile();
     return xt;
   }
 
@@ -118,7 +117,7 @@ public class XTreeIO {
               if(VERBOSE)
                 System.out.println(xt.toString());
               xt.commit();
-              xt.close();
+              // FIXME: xt.close();
             }
           }
         }
