@@ -24,15 +24,11 @@ package experimentalcode.shared.index.subspace.vafile;
  */
 
 import java.util.Arrays;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.index.vafile.VectorApproximation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Dimension approximation file, a one-dimensional part of the
@@ -50,18 +46,17 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @author Thomas Bernecker
  * @author Erich Schubert
  */
-// FIXME: does not allow multiple queries in parallel, because of the selectivity coefficient handling!
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
 public class DAFile {
   /**
    * Dimension of this approximation file
    */
-  private int dimension;
+  final private int dimension;
 
   /**
    * Splitting grid
    */
-  private double[] splitPositions;
+  final private double[] splitPositions;
 
   /**
    * Constructor.
@@ -104,74 +99,11 @@ public class DAFile {
   }
 
   /**
-   * @param dimension the dimension to set
-   */
-  public void setDimension(int dimension) {
-    this.dimension = dimension;
-  }
-
-  /**
    * Estimate the IO costs for this index.
    * 
    * @return IO costs
    */
   public int getIOCosts() {
     return splitPositions.length * 8 + 4;
-  }
-
-  /**
-   * 
-   * @param daFileList
-   * @param query
-   * @param epsilon
-   */
-  public static void calculateSelectivityCoeffs(List<DoubleObjPair<DAFile>> daFiles, NumberVector<?, ?> query, double epsilon) {
-    final int dimensions = query.getDimensionality();
-    double[] lowerVals = new double[dimensions];
-    double[] upperVals = new double[dimensions];
-
-    VectorApproximation queryApprox = calculateApproximation(null, query, daFiles);
-
-    for(int i = 0; i < dimensions; i++) {
-      lowerVals[i] = query.doubleValue(i + 1) - epsilon;
-      upperVals[i] = query.doubleValue(i + 1) + epsilon;
-    }
-
-    Vector lowerEpsilon = new Vector(lowerVals);
-    VectorApproximation lowerEpsilonPartitions = calculateApproximation(null, lowerEpsilon, daFiles);
-
-    Vector upperEpsilon = new Vector(upperVals);
-    VectorApproximation upperEpsilonPartitions = calculateApproximation(null, upperEpsilon, daFiles);
-
-    for(int i = 0; i < daFiles.size(); i++) {
-      int coeff = (queryApprox.getApproximation(i) - lowerEpsilonPartitions.getApproximation(i)) + (upperEpsilonPartitions.getApproximation(i) - queryApprox.getApproximation(i)) + 1;
-      daFiles.get(i).first = coeff;
-    }
-  }
-
-  public static VectorApproximation calculateApproximation(DBID id, NumberVector<?, ?> dv, List<DoubleObjPair<DAFile>> daFiles) {
-    int[] approximation = new int[dv.getDimensionality()];
-    for(int i = 0; i < daFiles.size(); i++) {
-      double val = dv.doubleValue(i + 1);
-      double[] borders = daFiles.get(i).second.getSplitPositions();
-      assert borders != null : "borders are null";
-      int lastBorderIndex = borders.length - 1;
-
-      // value is lower outlier
-      if(val < borders[0]) {
-        approximation[i] = 0;
-      } // value is upper outlier
-      else if(val > borders[lastBorderIndex]) {
-        approximation[i] = lastBorderIndex - 1;
-      } // normal case
-      else {
-        for(int s = 0; s < lastBorderIndex; s++) {
-          if(val >= borders[s] && val < borders[s + 1] && approximation[i] != -1) {
-            approximation[i] = s;
-          }
-        }
-      }
-    }
-    return new VectorApproximation(id, approximation);
   }
 }
