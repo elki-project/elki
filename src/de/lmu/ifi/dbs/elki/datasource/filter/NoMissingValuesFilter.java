@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
 
 import java.util.ArrayList;
 
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -34,17 +35,58 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class NoMissingValuesFilter implements ObjectFilter {
+public class NoMissingValuesFilter extends AbstractStreamFilter {
   /**
    * Class logger
    */
   private static final Logging logger = Logging.getLogger(NoMissingValuesFilter.class);
 
   /**
+   * Number of columns
+   */
+  private int cols = 0;
+
+  /**
    * Constructor.
    */
   public NoMissingValuesFilter() {
     super();
+  }
+
+  @Override
+  public BundleMeta getMeta() {
+    return source.getMeta();
+  }
+
+  @Override
+  public Object data(int rnum) {
+    return source.data(rnum);
+  }
+
+  @Override
+  public Event nextEvent() {
+    while(true) {
+      Event ev = source.nextEvent();
+      switch(ev){
+      case END_OF_STREAM:
+        return ev;
+      case META_CHANGED:
+        cols = source.getMeta().size();
+        return ev;
+      case NEXT_OBJECT:
+        boolean good = true;
+        for(int j = 0; j < cols; j++) {
+          if(source.data(j) == null) {
+            good = false;
+            break;
+          }
+        }
+        if(good) {
+          return ev;
+        }
+        continue;
+      }
+    }
   }
 
   @Override
