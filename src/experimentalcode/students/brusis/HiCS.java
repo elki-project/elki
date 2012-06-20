@@ -27,11 +27,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -39,8 +37,9 @@ import java.util.TreeSet;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
+import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -52,7 +51,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -60,13 +58,12 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
-
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -79,47 +76,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Algorithm to compute High Contrast Subspaces for Density-Based Outlier
  * Ranking.
- * <p/>
+ * 
+ * Reference:
+ * <p>
+ * Fabian Keller, Emmanuel Müller, Klemens Böhm:<br />
+ * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking<br />
+ * in: Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012), Washington,
+ * DC, USA
+ * </p>
  * 
  * @author Jan Brusis
+ * 
+ * @param <V> vector type
  */
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
-public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-
+@Reference(authors = "Fabian Keller, Emmanuel Müller, Klemens Böhm", title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)")
+public class HiCS<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The Logger for this class
    */
   private static final Logging logger = Logging.getLogger(HiCS.class);
-
-  /**
-   * Parameter that specifies the number of iterations in the Monte-Carlo
-   * process of identifying high contrast subspaces
-   */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("hics.m", "The number of iterations in the Monte-Carlo processing.");
-
-  /**
-   * Parameter that determines the size of the test statistic during the
-   * Monte-Carlo iteration
-   */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hics.alpha", "The discriminance value that determines the size of the test statistic .");
-
-  /**
-   * Parameter that specifies which outlier detection algorithm to use on the
-   * resulting set of high contrast subspaces
-   */
-  public static final OptionID ALGO_ID = OptionID.getOrCreateOptionID("hics.algo", "The Algorithm that performs the actual outlier detection on the resulting set of subspace");
-
-  /**
-   * Parameter that specifies which statistical test to use in order to
-   * calculate the deviation of two given data samples
-   */
-  public static final OptionID TEST_ID = OptionID.getOrCreateOptionID("hics.test", "The statistical test that is used to calculate the deviation of two data samples");
-
-  /**
-   * Parameter that specifies the candidate_cutoff
-   */
-  public static final OptionID LIMIT_ID = OptionID.getOrCreateOptionID("hics.limit", "The threshold that determines how many d-dimensional subspace candidates to retain in each step of the generation");
 
   /**
    * Holds the value of {@link #M_ID}.
@@ -131,10 +108,10 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    */
   private double alpha;
 
-//  /**
-//   * Holds the value of {@link #ALGO_ID}
-//   */
-//  private OutlierAlgorithm outlierAlgorithm;
+  // /**
+  // * Holds the value of {@link #ALGO_ID}
+  // */
+  // private OutlierAlgorithm outlierAlgorithm;
 
   /**
    * Holds the value of{@link #TEST_ID}
@@ -149,7 +126,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
   /**
    * Holds sorted indices for every attribute of the relation
    */
-  private Map<Integer, ArrayModifiableDBIDs> subspaceIndex;
+  private ArrayList<ArrayModifiableDBIDs> subspaceIndex;
 
   /**
    * Constructor
@@ -161,7 +138,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     super();
     this.m = m;
     this.alpha = alpha;
-//    this.outlierAlgorithm = outlierAlgorithm;
+    // this.outlierAlgorithm = outlierAlgorithm;
     this.statTest = statTest;
     this.cutoff = cutoff;
   }
@@ -173,22 +150,22 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    * @return The aggregated resulting scores that were assigned by the given
    *         outlier detection algorithm
    */
-  public OutlierResult run(Relation<NumberVector<?, ?>> relation) {
-
+  public OutlierResult run(Relation<V> relation) {
     this.subspaceIndex = calculateIndices(relation);
 
     Set<BitSet> subspaces = calculateSubspaces(relation);
-    
+
     System.out.println("Number of high-contrast subspaces: " + subspaces.size());
     List<OutlierResult> results = new ArrayList<OutlierResult>();
     FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), logger) : null;
 
     // run outlier detection and collect the result
-    //TODO extend so that any outlierAlgorithm can be used (use materialized relation instead of SubspaceEuclideanDistanceFunction?)
-    LOF<NumberVector<?, ?>, DoubleDistance> lof;
+    // TODO extend so that any outlierAlgorithm can be used (use materialized
+    // relation instead of SubspaceEuclideanDistanceFunction?)
+    LOF<V, DoubleDistance> lof;
     for(BitSet dimset : subspaces) {
       SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
-      lof = new LOF<NumberVector<?, ?>, DoubleDistance>(100, df, df);
+      lof = new LOF<V, DoubleDistance>(100, df, df);
 
       // run LOF and collect the result
       OutlierResult result = lof.run(relation);
@@ -230,16 +207,17 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    * @param relation
    * @return
    */
-  private Map<Integer, ArrayModifiableDBIDs> calculateIndices(Relation<NumberVector<?, ?>> relation) {
-    Map<Integer, ArrayModifiableDBIDs> subspaceIndex = new HashMap<Integer, ArrayModifiableDBIDs>();
-    ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(relation.size());
-    amDBIDs.addDBIDs(relation.getDBIDs());
-    SubspaceIndexComparator comparator = new SubspaceIndexComparator(0, relation);
+  private ArrayList<ArrayModifiableDBIDs> calculateIndices(Relation<? extends NumberVector<?, ?>> relation) {
+    final int dim = DatabaseUtil.dimensionality(relation);
+    ArrayList<ArrayModifiableDBIDs> subspaceIndex = new ArrayList<ArrayModifiableDBIDs>(dim + 1);
+    subspaceIndex.add(null); // dimension 0 does not exist
 
-    for(int i = 1; i <= DatabaseUtil.dimensionality(relation); i++) {
-      comparator.changeDimension(i);
-      amDBIDs.sort(comparator);
-      subspaceIndex.put(i, DBIDUtil.newArray(amDBIDs));
+    SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
+    for(int i = 1; i <= dim; i++) {
+      ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(relation.getDBIDs());
+      comp.setDimension(i);
+      amDBIDs.sort(comp);
+      subspaceIndex.add(amDBIDs);
     }
 
     return subspaceIndex;
@@ -251,7 +229,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    * @param relation the relation the HiCS should be evaluated for
    * @return a set of high contrast subspaces
    */
-  private Set<BitSet> calculateSubspaces(Relation<NumberVector<?, ?>> relation) {
+  private Set<BitSet> calculateSubspaces(Relation<? extends NumberVector<?, ?>> relation) {
     final int dbdim = DatabaseUtil.dimensionality(relation);
 
     Set<BitSet> subspaces = new HashSet<BitSet>();
@@ -393,7 +371,7 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
    * @param subspace
    * @return
    */
-  private double calculateHiCS(Relation<NumberVector<?, ?>> relation, ArrayList<Integer> subspace) {
+  private double calculateHiCS(Relation<? extends NumberVector<?, ?>> relation, ArrayList<Integer> subspace) {
     double deviationSum = 0.0;
     double alpha1 = Math.pow(alpha, (1.0 / subspace.size()));
     int error = 1;
@@ -406,8 +384,8 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
       ArrayModifiableDBIDs sample;
 
       Collections.shuffle(subspace);
-      ModifiableDBIDs conditionalSample = subspaceIndex.get(1); // initialize
-                                                                // sample
+      // initialize sample
+      ModifiableDBIDs conditionalSample = subspaceIndex.get(1);
 
       for(int j = 0; j < subspace.size() - 1; j++) {
         int start = random.nextInt(relation.size() - size);
@@ -467,7 +445,44 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     return logger;
   }
 
-  public static class Parameterizer extends AbstractParameterizer {
+  /**
+   * Parameterization class
+   * 
+   * @author Jan Brusis
+   * 
+   * @apiviz.exclude
+   * 
+   * @param <V> vector type
+   */
+  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParameterizer {
+    /**
+     * Parameter that specifies the number of iterations in the Monte-Carlo
+     * process of identifying high contrast subspaces
+     */
+    public static final OptionID M_ID = OptionID.getOrCreateOptionID("hics.m", "The number of iterations in the Monte-Carlo processing.");
+
+    /**
+     * Parameter that determines the size of the test statistic during the
+     * Monte-Carlo iteration
+     */
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hics.alpha", "The discriminance value that determines the size of the test statistic .");
+
+    /**
+     * Parameter that specifies which outlier detection algorithm to use on the
+     * resulting set of high contrast subspaces
+     */
+    public static final OptionID ALGO_ID = OptionID.getOrCreateOptionID("hics.algo", "The Algorithm that performs the actual outlier detection on the resulting set of subspace");
+
+    /**
+     * Parameter that specifies which statistical test to use in order to
+     * calculate the deviation of two given data samples
+     */
+    public static final OptionID TEST_ID = OptionID.getOrCreateOptionID("hics.test", "The statistical test that is used to calculate the deviation of two data samples");
+
+    /**
+     * Parameter that specifies the candidate_cutoff
+     */
+    public static final OptionID LIMIT_ID = OptionID.getOrCreateOptionID("hics.limit", "The threshold that determines how many d-dimensional subspace candidates to retain in each step of the generation");
 
     /**
      * Holds the value of {@link #M_ID}.
@@ -524,10 +539,8 @@ public class HiCS extends AbstractAlgorithm<OutlierResult> implements OutlierAlg
     }
 
     @Override
-    protected Object makeInstance() {
-      return new HiCS(m, alpha, outlierAlgorithm, statTest, cutoff);
+    protected HiCS<V> makeInstance() {
+      return new HiCS<V>(m, alpha, outlierAlgorithm, statTest, cutoff);
     }
-
   }
-
 }
