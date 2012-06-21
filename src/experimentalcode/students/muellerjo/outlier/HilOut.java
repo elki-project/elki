@@ -62,6 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Jonathan von Brünken
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf HilbertFeatures
+ * @apiviz.uses HilFeature
+ * 
  * @param <O> Object type
  */
 @Title("Fast Outlier Detection in High Dimensional Spaces")
@@ -74,17 +77,17 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   private static final Logging logger = Logging.getLogger(HilOut.class);
 
   /**
-   * Holds the value of {@link #K_ID}.
+   * Number of nearest neighbors
    */
   private int k;
 
   /**
-   * Holds the value of {@link #N_ID}.
+   * Number of outliers to compute exactly
    */
   private int n;
 
   /**
-   * Holds the value of {@link #H_ID}.
+   * Hilbert precision
    */
   private int h;
 
@@ -94,20 +97,40 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   private double t;
 
   /**
-   * Holds the value of {@link #TN_ID}.
+   * Reporting mode: exact (top n) only, or all
    */
-  private Enum<Selection> tn;
+  private Enum<ScoreType> tn;
 
   /**
    * Distance function for HilOut
    */
   private LPNormDistanceFunction distfunc;
 
+  /**
+   * Distance query
+   */
   private DistanceQuery<O, DoubleDistance> distq;
 
+  /**
+   * Set sizes, total and current iteration
+   */
   private int capital_n, n_star, capital_n_star, d;
 
+  /**
+   * Outlier threshold
+   */
   private double omega_star;
+
+  /**
+   * Type of output: all scores (upper bounds) or top n only
+   * 
+   * @author Jonathan von Brünken
+   * 
+   * @apiviz.exclude
+   */
+  public static enum ScoreType {
+    All, TopN
+  }
 
   /**
    * Constructor.
@@ -118,13 +141,12 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param t p of LP-NormDistance - 1.0-Infinity
    * @param tn TopN or All Outlier Rank to return
    */
-  protected HilOut(int k, int n, int h, double t, Enum<Selection> tn) {
+  protected HilOut(int k, int n, int h, double t, Enum<ScoreType> tn) {
     super();
     this.n = n;
-    this.k = k - 1; // HilOut does not count the object itself. We do in
-                    // KNNWeightOutlier.
+    // HilOut does not count the object itself. We do in KNNWeightOutlier.
+    this.k = k - 1;
     this.h = h;
-    this.t = t;
     this.tn = tn;
     // TODO: Make parameterizable with any LP norm, get t from the LP norm
     if(t == 1.0) {
@@ -136,13 +158,12 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     else {
       this.distfunc = new LPNormDistanceFunction(t);
     }
+    this.t = distfunc.getP();
     this.n_star = 0;
     this.omega_star = 0.0;
   }
 
-  @Override
-  public OutlierResult run(Database database) throws IllegalStateException {
-    Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
+  public OutlierResult run(Database database, Relation<O> relation) {
     distq = database.getDistanceQuery(relation, distfunc);
     d = DatabaseUtil.dimensionality(relation);
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -165,16 +186,17 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         min[i] -= diff;
         max[i] += diff;
       }
-      if (logger.isVerbose()) {
-        logger.verbose("Rescaling dataset by " + (1 / diameter)+" to fit the unit cube.");
+      if(logger.isVerbose()) {
+        logger.verbose("Rescaling dataset by " + (1 / diameter) + " to fit the unit cube.");
       }
     }
 
     // Initialization part
     capital_n_star = capital_n = relation.size();
-    HilbertFeatures h = new HilbertFeatures(relation, capital_n, min, diameter);
+    HilbertFeatures h = new HilbertFeatures(relation, min, diameter);
 
-    FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut scores", relation.size(), logger) : null;
+    FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut iterations", d + 1, logger) : null;
+    FiniteProgress progressTrueOut = logger.isVerbose() ? new FiniteProgress("True outliers found", n, logger) : null;
     // Main part: 1. Phase max. d+1 loops
     for(int j = 0; j <= d && n_star < n; j++) {
       // initialize (clear) out and wlb - not 100% clear in the paper
@@ -186,7 +208,9 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       scan(h, (int) (k * capital_n / (double) capital_n_star));
       // determine the true outliers (n_star)
       trueOutliers(h);
-      logger.verbose("True outliers found: " + n_star);
+      if(progressTrueOut != null) {
+        progressTrueOut.setProcessed(n_star, logger);
+      }
       // Build the top Set as out + wlb
       h.top.clear();
       HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(h.out.size());
@@ -212,11 +236,16 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       scan(h, capital_n);
     }
     if(progressHilOut != null) {
+      progressHilOut.setProcessed(d, logger);
       progressHilOut.ensureCompleted(logger);
+    }
+    if(progressTrueOut != null) {
+      progressTrueOut.setProcessed(n, logger);
+      progressTrueOut.ensureCompleted(logger);
     }
     DoubleMinMax minmax = new DoubleMinMax();
     // Return weights in out
-    if(tn == Selection.TopN) {
+    if(tn == ScoreType.TopN) {
       minmax.put(0.0);
       for(DBID id : relation.iterDBIDs()) {
         hilout_weight.putDouble(id, 0.0);
@@ -247,7 +276,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    */
   private void scan(HilbertFeatures hf, int k0) {
     final int mink0 = Math.min(2 * k0, capital_n - 1);
-    if (logger.isDebuggingFine()) {
+    if(logger.isDebuggingFine()) {
       logger.debugFine("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
     }
     for(int i = 0; i < hf.pf.length; i++) {
@@ -322,6 +351,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         c = b;
       }
       if(!hf.pf[i].nn_keys.contains(hf.pf[c].id)) {
+        // hf.distcomp ++;
         hf.pf[i].insert(hf.pf[c].id, distq.distance(p, hf.pf[c].id).doubleValue(), k);
         if(hf.pf[i].nn.size() == k) {
           if(hf.pf[i].sum_nn < omega_star) {
@@ -354,7 +384,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       hf.pf[i].ubound = newub;
     }
   }
-  
+
   /**
    * trueOutliers function updates n_star
    * 
@@ -381,109 +411,69 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     return TypeUtil.array(new LPNormDistanceFunction(t).getInputTypeRestriction());
   }
 
-  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
-    protected int k = 5;
-
-    protected int n = 10;
-
-    protected int h = 32;
-
-    protected double t = 2.0;
-
-    protected Enum<Selection> tn;
-
-    /**
-     * Parameter to specify how many next neighbors should be used in the
-     * computation
-     */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("HilOut.k", "Compute up to k next neighbors");
-
-    /**
-     * Parameter to specify how many outliers should be computed
-     */
-    public static final OptionID N_ID = OptionID.getOrCreateOptionID("HilOut.n", "Compute n outliers");
-
-    /**
-     * Parameter to specify the maximum Hilbert-Level
-     */
-    public static final OptionID H_ID = OptionID.getOrCreateOptionID("HilOut.h", "Max. Hilbert-Level");
-
-    /**
-     * Parameter to specify p of LP-NormDistance
-     */
-    public static final OptionID T_ID = OptionID.getOrCreateOptionID("HilOut.t", "t of Lt Metric");
-
-    /**
-     * Parameter to specify if only the Top n, or also approximations for the
-     * other elements, should be returned
-     */
-    public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output of Top n or all elements");
-
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-
-      final IntParameter kP = new IntParameter(K_ID, 5);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-
-      final IntParameter nP = new IntParameter(N_ID, 10);
-      if(config.grab(nP)) {
-        n = nP.getValue();
-      }
-
-      final IntParameter hP = new IntParameter(H_ID, 32);
-      if(config.grab(hP)) {
-        h = hP.getValue();
-      }
-
-      final DoubleParameter tP = new DoubleParameter(T_ID, 2.0);
-      if(config.grab(tP)) {
-        t = Math.abs(tP.getValue());
-        t = (t >= 1.0) ? t : 1.0;
-      }
-
-      final EnumParameter<Selection> tnP = new EnumParameter<Selection>(TN_ID, Selection.class, Selection.TopN);
-      if(config.grab(tnP)) {
-        tn = tnP.getValue();
-      }
-    }
-
-    @Override
-    protected HilOut<O> makeInstance() {
-      return new HilOut<O>(k, n, h, t, tn);
-    }
-  }
-
-  public static enum Selection {
-    All, TopN
-  }
-
+  /**
+   * Class organizing the data points along a hilbert curve.
+   * 
+   * @author Jonathan von Brünken
+   * 
+   * @apiviz.composedOf HilFeature
+   */
   class HilbertFeatures {
+    // public int distcomp = 1;
+
+    /**
+     * Relation indexed
+     */
     Relation<O> relation;
 
+    /**
+     * Hilbert representation ("point features")
+     */
     HilFeature[] pf;
 
+    /**
+     * Data space minimums
+     */
     double[] min;
 
+    /**
+     * Data space diameter
+     */
     double diameter;
 
+    /**
+     * Current curve shift
+     */
     double shift;
 
+    /**
+     * Top candidates
+     */
     private Set<HilFeature> top;
 
+    /**
+     * "OUT"
+     */
     private Heap<HilFeature> out;
 
+    /**
+     * "WLB"
+     */
     private Heap<HilFeature> wlb;
 
-    // todo add "n"
-    public HilbertFeatures(Relation<O> relation, int capital_n, double[] min, double diameter) {
+    /**
+     * Constructor.
+     * 
+     * @param relation Relation to index
+     * @param min Minimums for data space
+     * @param diameter Diameter of data space
+     */
+    public HilbertFeatures(Relation<O> relation, double[] min, double diameter) {
       super();
       this.relation = relation;
       this.min = min;
       this.diameter = diameter;
-      this.pf = new HilFeature[capital_n];
+      this.pf = new HilFeature[relation.size()];
 
       int pos = 0;
       for(DBID id : relation.iterDBIDs()) {
@@ -513,13 +503,12 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     private void initialize(double shift) {
       this.shift = shift;
       // FIXME: 64 bit mode untested - sign bit is tricky to handle correctly
-      // with
-      // the rescaling. 63 bit should be fine. The sign bit probably needs to be
-      // handled differently, or at least needs careful unit testing of the API
+      // with the rescaling. 63 bit should be fine. The sign bit probably needs
+      // to be handled differently, or at least needs careful testing of the API
       if(h >= 32) { // 32 to 63 bit
         final long scale = Long.MAX_VALUE; // = 63 bits
         for(int i = 0; i < pf.length; i++) {
-          O obj = relation.get(pf[i].id);
+          NumberVector<?, ?> obj = relation.get(pf[i].id);
           long[] coord = new long[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (long) (getDimForObject(obj, dim) * .5 * scale);
@@ -530,7 +519,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       else if(h >= 16) { // 16-31 bit
         final int scale = ~1 >>> 1;
         for(int i = 0; i < pf.length; i++) {
-          O obj = relation.get(pf[i].id);
+          NumberVector<?, ?> obj = relation.get(pf[i].id);
           int[] coord = new int[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (int) (getDimForObject(obj, dim) * .5 * scale);
@@ -541,7 +530,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       else if(h >= 8) { // 8-15 bit
         final int scale = ~1 >>> 16;
         for(int i = 0; i < pf.length; i++) {
-          O obj = relation.get(pf[i].id);
+          NumberVector<?, ?> obj = relation.get(pf[i].id);
           short[] coord = new short[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (short) (getDimForObject(obj, dim) * .5 * scale);
@@ -552,7 +541,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       else { // 1-7 bit
         final int scale = ~1 >>> 8;
         for(int i = 0; i < pf.length; i++) {
-          O obj = relation.get(pf[i].id);
+          NumberVector<?, ?> obj = relation.get(pf[i].id);
           byte[] coord = new byte[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (byte) (getDimForObject(obj, dim) * .5 * scale);
@@ -645,7 +634,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @param level Level of the corresponding r-region
      */
     private double minDistLevel(DBID id, int level) {
-      final O obj = relation.get(id);
+      final NumberVector<?, ?> obj = relation.get(id);
       // level 1 is supposed to have r=1 as in the original publication
       // 2 ^ - (level - 1)
       final double r = 1.0 / (1 << (level - 1));
@@ -665,7 +654,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @param level Level of the corresponding r-region
      */
     private double maxDistLevel(DBID id, int level) {
-      final O obj = relation.get(id);
+      final NumberVector<?, ?> obj = relation.get(id);
       // level 1 is supposed to have r=1 as in the original publication
       final double r = 1.0 / (1 << (level - 1));
       double dist;
@@ -786,28 +775,68 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      * @param dim Dimension
      * @return Projected and shifted position
      */
-    private double getDimForObject(O obj, int dim) {
+    private double getDimForObject(NumberVector<?, ?> obj, int dim) {
       return (obj.doubleValue(dim + 1) - min[dim]) / diameter + shift;
     }
   }
 
+  /**
+   * Hilbert representation of a single object.
+   * 
+   * Details of this representation are discussed in the main HilOut
+   * publication, see "point features".
+   * 
+   * @author Jonathan von Brünken
+   */
   final static class HilFeature implements Comparable<HilFeature> {
+    /**
+     * Object ID
+     */
     public DBID id;
 
+    /**
+     * Hilbert representation
+     * 
+     * TODO: use byte[] to save some memory, but slower?
+     */
     public long[] hilbert = null;
 
+    /**
+     * Object level
+     */
     public int level = 0;
 
+    /**
+     * Upper bound for object
+     */
     public double ubound = Double.POSITIVE_INFINITY;
 
+    /**
+     * Lower bound of object
+     */
     public double lbound = 0.0;
 
+    /**
+     * Heap with the nearest known neighbors
+     */
     public Heap<DoubleDistanceResultPair> nn;
 
+    /**
+     * Set representation of the nearest neighbors for faster lookups
+     */
     public HashSetModifiableDBIDs nn_keys = DBIDUtil.newHashSet();
 
+    /**
+     * Current weight (sum of nn distances)
+     */
     public double sum_nn = 0.0;
 
+    /**
+     * Constructor.
+     * 
+     * @param id Object ID
+     * @param nn Heap for neighbors
+     */
     public HilFeature(DBID id, Heap<DoubleDistanceResultPair> nn) {
       super();
       this.id = id;
@@ -851,6 +880,81 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
         }
       }
 
+    }
+  }
+
+  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
+    protected int k = 5;
+
+    protected int n = 10;
+
+    protected int h = 32;
+
+    protected double t = 2.0;
+
+    protected Enum<ScoreType> tn;
+
+    /**
+     * Parameter to specify how many next neighbors should be used in the
+     * computation
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("HilOut.k", "Compute up to k next neighbors");
+
+    /**
+     * Parameter to specify how many outliers should be computed
+     */
+    public static final OptionID N_ID = OptionID.getOrCreateOptionID("HilOut.n", "Compute n outliers");
+
+    /**
+     * Parameter to specify the maximum Hilbert-Level
+     */
+    public static final OptionID H_ID = OptionID.getOrCreateOptionID("HilOut.h", "Max. Hilbert-Level");
+
+    /**
+     * Parameter to specify p of LP-NormDistance
+     */
+    public static final OptionID T_ID = OptionID.getOrCreateOptionID("HilOut.t", "t of Lt Metric");
+
+    /**
+     * Parameter to specify if only the Top n, or also approximations for the
+     * other elements, should be returned
+     */
+    public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output of Top n or all elements");
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      final IntParameter kP = new IntParameter(K_ID, 5);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+
+      final IntParameter nP = new IntParameter(N_ID, 10);
+      if(config.grab(nP)) {
+        n = nP.getValue();
+      }
+
+      final IntParameter hP = new IntParameter(H_ID, 32);
+      if(config.grab(hP)) {
+        h = hP.getValue();
+      }
+
+      final DoubleParameter tP = new DoubleParameter(T_ID, 2.0);
+      if(config.grab(tP)) {
+        t = Math.abs(tP.getValue());
+        t = (t >= 1.0) ? t : 1.0;
+      }
+
+      final EnumParameter<ScoreType> tnP = new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TopN);
+      if(config.grab(tnP)) {
+        tn = tnP.getValue();
+      }
+    }
+
+    @Override
+    protected HilOut<O> makeInstance() {
+      return new HilOut<O>(k, n, h, t, tn);
     }
   }
 }
