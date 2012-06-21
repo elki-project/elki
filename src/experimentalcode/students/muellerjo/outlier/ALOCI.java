@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -101,11 +100,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
   private int alpha;
 
   /**
-   * Holds the value of {@link #LUN_ID}.
-   */
-  private int levelUnderNmin;
-
-  /**
    * Holds the value of {@link #GRIDS_ID}.
    */
   private int g;
@@ -125,16 +119,14 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    * @param g Number of grids to use
-   * @param lun extra levels
    * @param seed Random generator seed.
    */
-  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g, int lun, Long seed) {
+  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g, Long seed) {
     super();
     this.distFunc = distanceFunction;
     this.nmin = nmin;
     this.alpha = alpha;
     this.g = g;
-    this.levelUnderNmin = lun;
     this.random = (seed != null) ? new Random(seed) : new Random(0);
   }
 
@@ -165,7 +157,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     List<ALOCIQuadTree<O>> qts = new ArrayList<ALOCIQuadTree<O>>(g);
 
     double[] nshift = new double[dim];
-    ALOCIQuadTree<O> qt = new ALOCIQuadTree<O>(0, min, max, nshift, nmin, levelUnderNmin, relation);
+    ALOCIQuadTree<O> qt = new ALOCIQuadTree<O>(0, min, max, nshift, nmin, relation);
     qts.add(qt);
     if(progressPreproc != null) {
       progressPreproc.incrementProcessed(logger);
@@ -180,7 +172,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       for(int i = 0; i < dim; i++) {
         svec[i] = random.nextDouble() * (max[i] - min[i]);
       }
-      qt = new ALOCIQuadTree<O>(shift, min, max, svec, nmin, levelUnderNmin, relation);
+      qt = new ALOCIQuadTree<O>(shift, min, max, svec, nmin, relation);
       qts.add(qt);
       if(progressPreproc != null) {
         progressPreproc.incrementProcessed(logger);
@@ -193,52 +185,54 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     // aLOCI main loop: evaluate
     FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("Compute aLOCI scores", relation.size(), logger) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore mdef_level = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBID id : relation.iterDBIDs()) {
-      /*
-       * Get the lowest Counting Neighborhood whose center is closest to the
-       * Object getBestCountingNode can not be used in this case, as the the
-       * lowest level is not necessarily the same across different QuadTrees.
-       */
-      AbstractALOCIQuadTreeNode cg = null;
       final O obj = relation.get(id);
-      for(int i = 0; i < g; i++) {
-        AbstractALOCIQuadTreeNode cg2 = qts.get(i).getCountingNode(obj);
-        // TODO: statt distFunc evtl. Manhattan direkt - bei Würfeln sollte es
-        // keinen unterschied machen, welche LP norm!
-        if(cg == null || distFunc.distance(cg.getCenter(), obj).compareTo(distFunc.distance(cg2.getCenter(), obj)) > 0) {
-          cg = cg2;
-        }
-      }
-      /*
-       * Calculate the MDEF value for the Counting Neighborhood cg and the best
-       * matching Sampling Neighborhood alpha levels over cg.
-       */
-      int level = cg.getLevel() - alpha;
 
-      // find the best Sampling Neighborhood for cg on the right level in qts
-      AbstractALOCIQuadTreeNode sn = getBestSamplingNode(qts, cg, (level > 0) ? level : 0);
-      double maxmdefnorm = calculate_MDEF_norm(sn, cg);
-      double radius = sn.getLevel();
-      /*
-       * While the Sampling Neighborhood has not reached the root level,
-       * calculate MDEF for these levels
-       */
-      while(level > 0) {
-        level--;
-        cg = getBestCountingNode(qts, cg.getParent(), obj);
-        sn = getBestSamplingNode(qts, cg.getParent(), level);
-        double newnorm = calculate_MDEF_norm(sn, cg);
-        if(maxmdefnorm < newnorm) {
-          maxmdefnorm = newnorm;
-          radius = sn.getLevel();
+      double maxmdefnorm = Double.NEGATIVE_INFINITY;
+      // For each level
+      for(int l = 0;; l++) {
+        // Find the closest C_i
+        AbstractALOCIQuadTreeNode ci = null;
+        for(int i = 0; i < g; i++) {
+          AbstractALOCIQuadTreeNode ci2 = qts.get(i).getClosestNode(obj, l);
+          if(ci2.getLevel() != l) {
+            continue;
+          }
+          // TODO: always use manhattan?
+          if(ci == null || distFunc.distance(ci.getCenter(), obj).compareTo(distFunc.distance(ci2.getCenter(), obj)) > 0) {
+            ci = ci2;
+          }
         }
+        // logger.warning("level:" + (ci != null ? ci.getLevel() : -1) +" l:"+l);
+        if(ci == null) {
+          break; // no matching tree for this level.
+        }
+
+        // Find the closest C_j
+        AbstractALOCIQuadTreeNode cj = null;
+        for(int i = 0; i < g; i++) {
+          AbstractALOCIQuadTreeNode cj2 = qts.get(i).getClosestNode(ci.getCenter(), l - alpha);
+          // TODO: allow higher levels or not?
+          if(cj != null && cj2.getLevel() < cj.getLevel()) {
+            continue;
+          }
+          // TODO: always use manhattan?
+          if(cj == null || distFunc.distance(cj.getCenter(), ci.getCenter()).compareTo(distFunc.distance(cj2.getCenter(), ci.getCenter())) > 0) {
+            cj = cj2;
+          }
+        }
+        // logger.warning("level:" + (cj != null ? cj.getLevel() : -1) +" l:"+l);
+        if(cj == null) {
+          continue; // no matching tree for this level.
+        }
+        double mdefnorm = calculate_MDEF_norm(cj, ci);
+        // logger.warning("level:" + ci.getLevel()+"/"+cj.getLevel()+" mdef: "+mdefnorm);
+        maxmdefnorm = Math.max(maxmdefnorm, mdefnorm);
       }
       // Store results
       mdef_norm.putDouble(id, maxmdefnorm);
-      mdef_level.putDouble(id, radius);
       minmax.put(maxmdefnorm);
       if(progressLOCI != null) {
         progressLOCI.incrementProcessed(logger);
@@ -248,10 +242,8 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       progressLOCI.ensureCompleted(logger);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("aLOCI normalized MDEF", "aloci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
-    Relation<Double> levelResult = new MaterializedRelation<Double>("aLOCI Sampling Level", "aloci-sampling-level", TypeUtil.DOUBLE, mdef_level, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(levelResult);
     return result;
   }
 
@@ -263,9 +255,9 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * 
    * @return MDEF norm
    */
-  private double calculate_MDEF_norm(AbstractALOCIQuadTreeNode sn, AbstractALOCIQuadTreeNode cg) {
+  private static double calculate_MDEF_norm(AbstractALOCIQuadTreeNode sn, AbstractALOCIQuadTreeNode cg) {
     // get the square sum of the counting neighborhoods box counts
-    long sq = sn.getBoxCountSquareSum(alpha);
+    long sq = sn.getBoxCountSquareSum(cg.getLevel() - sn.getLevel());
     /*
      * if the square sum is equal to box count of the sampling Neighborhood then
      * n_hat is equal one, and as cg needs to have at least one Element mdef
@@ -282,7 +274,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     }
     // calculation of mdef according to the paper and standardization as done in
     // LOCI
-    long cb = sn.getBoxCountCubicSum(alpha);
+    long cb = sn.getBoxCountCubicSum(cg.getLevel() - sn.getLevel());
     double n_hat = (double) sq / (double) sn.getBucketCount();
     double sig_n_hat = java.lang.Math.sqrt(cb * sn.getBucketCount() - (sq * sq)) / sn.getBucketCount();
     // Avoid NaN - correct result 0.0?
@@ -291,74 +283,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     }
     double mdef = n_hat - cg.getBucketCount();
     return mdef / sig_n_hat;
-  }
-
-  /**
-   * Method for retrieving the best matching Sampling Node
-   * 
-   * @param qts List of (shifted) QuadTrees
-   * @param cg Node containing the counting Neighborhood found to fit best for
-   *        the Object
-   * @param level Target Level of the Sampling Neighborhood
-   */
-  private AbstractALOCIQuadTreeNode getBestSamplingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode cg, int level) {
-    Vector center = cg.getCenter();
-    int qti = cg.getIndex();
-    /*
-     * get the Sampling Node of cg in the same QuadTree as a base case This
-     * choice is usually quite bad, but is always present.
-     */
-    AbstractALOCIQuadTreeNode sn = cg.getParent();
-    while(sn.getLevel() != level) {
-      sn = sn.getParent();
-    }
-    // look through the other QuadTrees and choose the one with the lowest
-    // distance to the counting Neighborhoods center.
-    for(int i = 0; i < g; i++) {
-      if(i == qti) {
-        continue;
-      }
-      // getSamplingNode(O int) returns null if there is no node containing the
-      // coordinates given, or if the node does not have at least nmin Elements.
-      AbstractALOCIQuadTreeNode sn2 = qts.get(i).getSamplingNode(center, level);
-      if(sn2 == null) {
-        continue;
-      }
-      if(distFunc.distance(center, sn.getCenter()).doubleValue() > distFunc.distance(center, sn2.getCenter()).doubleValue()) {
-        sn = sn2;
-      }
-    }
-    return sn;
-  }
-
-  /**
-   * Method for retrieving the best matching counting Node
-   * 
-   * @param qts List of (shifted) QuadTrees
-   * @param cg Node containing a possible counting Neighborhood
-   * @param center location of the Object and therefore best possible center of
-   *        the counting node
-   */
-  private AbstractALOCIQuadTreeNode getBestCountingNode(List<ALOCIQuadTree<O>> qts, AbstractALOCIQuadTreeNode cg, O center) {
-    AbstractALOCIQuadTreeNode cn = cg;
-    int qti = cg.getIndex();
-    // compare the other counting nodes at the right level in the QuadTrees and
-    // choose the one closest to center.
-    for(int i = 0; i < g; i++) {
-      if(i == qti) {
-        continue;
-      }
-      // getCountingNode(O, int) returns null if the Object has not reached the
-      // right level in the Tree
-      AbstractALOCIQuadTreeNode cn2 = qts.get(i).getCountingNode(center, cn.getLevel());
-      if(cn2 == null) {
-        continue;
-      }
-      if(distFunc.distance(center, cn.getCenter()).doubleValue() > distFunc.distance(center, cn2.getCenter()).doubleValue()) {
-        cn = cn2;
-      }
-    }
-    return cn;
   }
 
   @Override
@@ -390,12 +314,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
     /**
-     * Parameter to specify the the number of Levels to add under the sampling
-     * neighborhood.
-     */
-    public static final OptionID LUN_ID = OptionID.getOrCreateOptionID("loci.levelUnderNmin", "Number of Levels to add under the sampling neighborhood");
-
-    /**
      * Parameter to specify the number of Grids to use.
      */
     public static final OptionID GRIDS_ID = OptionID.getOrCreateOptionID("loci.g", "The number of Grids to use.");
@@ -424,11 +342,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
      * Random generator seed
      */
     protected Long seed = null;
-
-    /**
-     * Pseudo level to create for neighborhoods
-     */
-    protected int lun = alpha;
 
     /**
      * The distance function
@@ -466,16 +379,11 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
           this.alpha = 1;
         }
       }
-
-      final IntParameter lunP = new IntParameter(LUN_ID, alpha);
-      if(config.grab(lunP)) {
-        this.lun = lunP.getValue();
-      }
     }
 
     @Override
     protected ALOCI<O, D> makeInstance() {
-      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g, lun, seed);
+      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g, seed);
     }
   }
 }
