@@ -66,9 +66,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.landmark
  * @apiviz.has VisualizerContext
  * @apiviz.composedOf RectangleArranger
+ * @apiviz.composedOf LayerMap
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
- * @apiviz.uses Projector
  */
 // FIXME: there still is a synchronization issue, that causes the initialization
 // to be run twice in parallel.

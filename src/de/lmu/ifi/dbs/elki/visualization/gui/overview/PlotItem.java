@@ -40,6 +40,8 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf Projection
+ * @apiviz.composedOf VisualizationTask
+ * @apiviz.composedOf PlotItem
  */
 public class PlotItem {
   /**

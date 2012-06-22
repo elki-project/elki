@@ -28,6 +28,9 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * Result to encapsulate active styling rules.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * @apiviz.composedOf StylingPolicy
  */
 // TODO: pull style library etc. from VisualizerContext here?
 public class StyleResult implements Result {

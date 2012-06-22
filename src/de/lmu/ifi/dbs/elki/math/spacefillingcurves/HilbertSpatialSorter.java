@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses HilbertRef
+ * @apiviz.composedOf HilbertRef
  */
 @Reference(authors = "D. Hilbert", title = "Über die stetige Abbildung einer Linie auf ein Flächenstück", booktitle = "Mathematische Annalen, 38(3)")
 public class HilbertSpatialSorter extends AbstractSpatialSorter {

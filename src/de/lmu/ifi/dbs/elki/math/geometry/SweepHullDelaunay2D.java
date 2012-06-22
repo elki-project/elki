@@ -46,6 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Note: This implementation does not check or handle duplicate points!
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has Polygon
  */
 @Reference(authors = "David Sinclair", title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", booktitle = "Online: http://s-hull.org/")
 public class SweepHullDelaunay2D {
@@ -680,6 +682,8 @@ public class SweepHullDelaunay2D {
    * Class representing a triangle, by referencing points in a list.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   public static class Triangle {
     /**

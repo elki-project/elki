@@ -35,6 +35,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Jan Brusis
  * @author Erich Schubert
+ * 
+ * @apiviz.uses StudentsTDistribution
  */
 public class WelchTTest implements GoodnessOfFitTest {
   /**

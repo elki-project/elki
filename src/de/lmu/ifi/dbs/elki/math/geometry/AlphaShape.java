@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Compute the alpha-Shape of a point set, using Delaunay triangulation.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses SweepHullDelaunay2D
+ * @apiviz.has Polygon
  */
 public class AlphaShape {
   /**

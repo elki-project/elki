@@ -69,6 +69,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Segment
  */
 @Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://elki.dbs.ifi.lmu.de/wiki/PairSegments")
 public class Segments extends BasicResult implements Iterable<Segment> {

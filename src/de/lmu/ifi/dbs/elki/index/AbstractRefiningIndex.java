@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -45,6 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
  * The number of refinements will be counted as individual page accesses.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has AbstractRangeQuery
+ * @apiviz.has AbstractKNNQuery
  * 
  * @param <O> Object type
  */
@@ -165,7 +167,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
    * 
    * @author Erich Schubert
    */
-  abstract public class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> implements KNNQuery<O, D> {
+  abstract public class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
     /**
      * Constructor.
      * 
