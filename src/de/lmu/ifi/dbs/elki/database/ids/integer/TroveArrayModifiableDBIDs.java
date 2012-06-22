@@ -141,4 +141,9 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
       store.set(i, data[i].getIntegerID());
     }
   }
+
+  @Override
+  public void swap(int a, int b) {
+    store.set(a, store.set(b, store.get(a)));
+  }
 }

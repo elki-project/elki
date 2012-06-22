@@ -124,4 +124,9 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   public boolean contains(DBID o) {
     return super.contains(o);
   }
+
+  @Override
+  public void swap(int a, int b) {
+    set(a, set(b, get(a)));
+  }
 }

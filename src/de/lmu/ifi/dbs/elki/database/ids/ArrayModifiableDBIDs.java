@@ -59,4 +59,12 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @return previous value
    */
   public DBID set(int i, DBID newval);
+  
+  /**
+   * Swap DBIDs add positions a and b.
+   * 
+   * @param a First position
+   * @param b Second position
+   */
+  public void swap(int a, int b);
 }

@@ -782,17 +782,6 @@ public class QuickSelect {
   }
 
   /**
-   * The usual swap method.
-   * 
-   * @param data Array
-   * @param a First index
-   * @param b Second index
-   */
-  private static final void swap(ArrayModifiableDBIDs data, int a, int b) {
-    data.set(b, data.set(a, data.get(b)));
-  }
-
-  /**
    * QuickSelect is essentially quicksort, except that we only "sort" that half
    * of the array that we are interested in.
    * 
@@ -904,20 +893,20 @@ public class QuickSelect {
     // Since we compare them, we can also just "bubble sort" them.
     final int middle = (start + end) / 2;
     if(comparator.compare(data.get(start), data.get(middle)) > 0) {
-      swap(data, start, middle);
+      data.swap(start, middle);
     }
     if(comparator.compare(data.get(start), data.get(end - 1)) > 0) {
-      swap(data, start, end - 1);
+      data.swap(start, end - 1);
     }
     if(comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
-      swap(data, middle, end - 1);
+      data.swap(middle, end - 1);
     }
     // TODO: use more candidates for larger arrays?
 
     final DBID pivot = data.get(middle);
     // Move middle element out of the way, just before end
     // (Since we already know that "end" is bigger)
-    swap(data, middle, end - 2);
+    data.swap(middle, end - 2);
 
     // Begin partitioning
     int i = start + 1, j = end - 3;
@@ -932,11 +921,11 @@ public class QuickSelect {
       if(i >= j) {
         break;
       }
-      swap(data, i, j);
+      data.swap(i, j);
     }
 
     // Move pivot (former middle element) back into the appropriate place
-    swap(data, i, end - 2);
+    data.swap(i, end - 2);
 
     // In contrast to quicksort, we only need to recurse into the half we are
     // interested in.
@@ -958,7 +947,7 @@ public class QuickSelect {
   private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int start, int end) {
     for(int i = start + 1; i < end; i++) {
       for(int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
-        swap(data, j, j - 1);
+        data.swap(j, j - 1);
       }
     }
   }
