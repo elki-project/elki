@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -23,7 +23,6 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -41,9 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -70,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Fast Outlier Detection in High Dimensional Spaces")
 @Description("Algorithm to compute outliers using Hilbert space filling curves")
 @Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", url = "http://dx.doi.org/10.1145/375663.375668")
-public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -92,7 +91,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
   private int h;
 
   /**
-   * Holds the value of {@link #T_ID}.
+   * LPNorm p parameter
    */
   private double t;
 
@@ -100,11 +99,6 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * Reporting mode: exact (top n) only, or all
    */
   private Enum<ScoreType> tn;
-
-  /**
-   * Distance function for HilOut
-   */
-  private LPNormDistanceFunction distfunc;
 
   /**
    * Distance query
@@ -138,33 +132,22 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
    * @param k Number of Next Neighbors
    * @param n Number of Outlier
    * @param h Number of Bits for precision to use - max 32
-   * @param t p of LP-NormDistance - 1.0-Infinity
    * @param tn TopN or All Outlier Rank to return
    */
-  protected HilOut(int k, int n, int h, double t, Enum<ScoreType> tn) {
-    super();
+  protected HilOut(LPNormDistanceFunction distfunc, int k, int n, int h, Enum<ScoreType> tn) {
+    super(distfunc);
     this.n = n;
     // HilOut does not count the object itself. We do in KNNWeightOutlier.
     this.k = k - 1;
     this.h = h;
     this.tn = tn;
-    // TODO: Make parameterizable with any LP norm, get t from the LP norm
-    if(t == 1.0) {
-      this.distfunc = ManhattanDistanceFunction.STATIC;
-    }
-    else if(t == 2.0) {
-      this.distfunc = EuclideanDistanceFunction.STATIC;
-    }
-    else {
-      this.distfunc = new LPNormDistanceFunction(t);
-    }
     this.t = distfunc.getP();
     this.n_star = 0;
     this.omega_star = 0.0;
   }
 
   public OutlierResult run(Database database, Relation<O> relation) {
-    distq = database.getDistanceQuery(relation, distfunc);
+    distq = database.getDistanceQuery(relation, getDistanceFunction());
     d = DatabaseUtil.dimensionality(relation);
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
@@ -883,17 +866,16 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
     }
   }
 
+  /**
+   * Parameterization class
+   * 
+   * @author Jonathan von Brünken
+   * 
+   * @apiviz.exclude
+   *
+   * @param <O> Vector type
+   */
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
-    protected int k = 5;
-
-    protected int n = 10;
-
-    protected int h = 32;
-
-    protected double t = 2.0;
-
-    protected Enum<ScoreType> tn;
-
     /**
      * Parameter to specify how many next neighbors should be used in the
      * computation
@@ -921,6 +903,31 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
      */
     public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output of Top n or all elements");
 
+    /**
+     * Neighborhood size
+     */
+    protected int k = 5;
+
+    /**
+     * Top-n candidates to compute exactly
+     */
+    protected int n = 10;
+
+    /**
+     * Hilbert curve precision
+     */
+    protected int h = 32;
+
+    /**
+     * LPNorm distance function
+     */
+    protected LPNormDistanceFunction distfunc;
+
+    /**
+     * Scores to report: all or top-n only
+     */
+    protected Enum<ScoreType> tn;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -939,11 +946,10 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
       if(config.grab(hP)) {
         h = hP.getValue();
       }
-
-      final DoubleParameter tP = new DoubleParameter(T_ID, 2.0);
-      if(config.grab(tP)) {
-        t = Math.abs(tP.getValue());
-        t = (t >= 1.0) ? t : 1.0;
+      
+      ObjectParameter<LPNormDistanceFunction> distP = AbstractDistanceBasedAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, LPNormDistanceFunction.class);
+      if (config.grab(distP)) {
+        distfunc = distP.instantiateClass(config);
       }
 
       final EnumParameter<ScoreType> tnP = new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TopN);
@@ -954,7 +960,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractAlgorithm<Outl
 
     @Override
     protected HilOut<O> makeInstance() {
-      return new HilOut<O>(k, n, h, t, tn);
+      return new HilOut<O>(distfunc, k, n, h, tn);
     }
   }
 }
