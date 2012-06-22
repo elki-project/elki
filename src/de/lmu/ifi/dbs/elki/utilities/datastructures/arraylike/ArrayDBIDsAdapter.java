@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Use a DBID array in a generic array-like context.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ArrayDBIDs
  */
 public class ArrayDBIDsAdapter implements ArrayAdapter<DBID, ArrayDBIDs> {
   /**

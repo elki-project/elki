@@ -63,6 +63,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ *
+ * @apiviz.uses OutlierResult
  * @apiviz.uses ROC
  * @apiviz.has ROCResult oneway - - «create»
  */

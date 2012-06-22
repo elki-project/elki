@@ -55,6 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * Scale another outlier score using the given scaling function.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf OutlierAlgorithm
  */
 public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

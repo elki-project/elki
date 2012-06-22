@@ -37,6 +37,15 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
  * Class storing the contingency table and related data on two clusterings.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ *
+ * @apiviz.uses Clustering
+ * @apiviz.composedOf PairCounting
+ * @apiviz.composedOf Entropy
+ * @apiviz.composedOf EditDistance
+ * @apiviz.composedOf BCubed
+ * @apiviz.composedOf SetMatchingPurity
  */
 public class ClusterContingencyTable {
   /**

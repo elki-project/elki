@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ * @apiviz.uses OutlierResult
  * @apiviz.has ScalingFunction
  * @apiviz.has HistogramResult oneway - - «create»
  */

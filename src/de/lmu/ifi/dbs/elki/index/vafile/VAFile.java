@@ -77,6 +77,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * 
  * @author Thomas Bernecker
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.composedOf VectorApproximation
+ * @apiviz.has VAFileRangeQuery
+ * @apiviz.has VAFileKNNQuery
+ * @apiviz.uses VALPNormDistance
  */
 @Title("An approximation based data structure for similarity search")
 @Reference(authors = "Weber, R. and Blott, S.", title = "An approximation based data structure for similarity search", booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
@@ -434,6 +441,9 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * Index factory class
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.stereotype «factory»
+   * @apiviz.has VAFile
    * 
    * @param <V> Vector type
    */

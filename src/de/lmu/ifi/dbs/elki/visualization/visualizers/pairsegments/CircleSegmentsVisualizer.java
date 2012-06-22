@@ -74,6 +74,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.uses Segments
+ * @apiviz.has SegmentsStylingPolicy
  */
 @Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://elki.dbs.ifi.lmu.de/wiki/PairSegments")
 public class CircleSegmentsVisualizer extends AbstractVisualization implements ResultListener {
@@ -612,6 +617,8 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
    * Proxy element to connect signals.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
   private class SegmentListenerProxy implements EventListener {
     /**

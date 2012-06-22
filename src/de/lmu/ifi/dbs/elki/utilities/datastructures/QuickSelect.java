@@ -38,6 +38,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Charles Antony Richard Hoare
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses ArrayModifiableDBIDs
+ * @apiviz.uses List
+ * @apiviz.uses Comparator
  */
 public class QuickSelect {
   /**

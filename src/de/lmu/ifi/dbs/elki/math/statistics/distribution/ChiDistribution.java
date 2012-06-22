@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * Chi distribution.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf ChiSquaredDistribution
  */
 public class ChiDistribution implements DistributionWithRandom {
   /**

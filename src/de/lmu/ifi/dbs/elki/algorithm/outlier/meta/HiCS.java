@@ -92,6 +92,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Jan Brusis
  * @author Erich Schubert
  * 
+ * @apiviz.composedOf GoodnessOfFitTest
+ * @apiviz.composedOf OutlierAlgorithm
+ * 
  * @param <V> vector type
  */
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")

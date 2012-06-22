@@ -40,6 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * classic Grahams scan. Also computes a bounding box.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has Polygon
  */
 @Reference(authors = "Paul Graham", title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", booktitle = "Information Processing Letters 1")
 public class GrahamScanConvexHull2D {
