@@ -43,7 +43,7 @@ public class ParametersModel extends AbstractTableModel {
    * Logger
    */
   private static final Logging logger = Logging.getLogger(ParametersModel.class);
-  
+
   /**
    * Parameter storage
    */
@@ -112,12 +112,20 @@ public class ParametersModel extends AbstractTableModel {
   public boolean isCellEditable(int rowIndex, int columnIndex) {
     return (columnIndex == 1) || (rowIndex > parameters.size());
   }
-  
+
   @Override
   public void setValueAt(Object value, int rowIndex, int columnIndex) {
     if(value instanceof String) {
       String s = (String) value;
       if(columnIndex == 1) {
+        // Unchanged?
+        if(s.equals(parameters.getNode(rowIndex).value)) {
+          return;
+        }
+        // Default value:
+        if((DynamicParameters.STRING_USE_DEFAULT + s).equals(parameters.getNode(rowIndex).value)) {
+          return;
+        }
         parameters.getNode(rowIndex).value = s;
         fireTableCellUpdated(rowIndex, columnIndex);
       }

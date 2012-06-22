@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ClassParameter
+ * @apiviz.uses Parameter
  */
 // FIXME: update on focus loss?
 // FIXME: restrictions for number input?

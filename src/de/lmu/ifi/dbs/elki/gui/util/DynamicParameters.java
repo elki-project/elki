@@ -72,7 +72,7 @@ public class DynamicParameters {
   /**
    * Pseudo-value used in dropdowns for options that have a default value
    */
-  public static final String STRING_USE_DEFAULT = "Default:";
+  public static final String STRING_USE_DEFAULT = "Default: ";
 
   /**
    * Pseudo-value used in options that are optional, to unset.
@@ -146,7 +146,7 @@ public class DynamicParameters {
       String value = null;
       if(option.isDefined()) {
         if(option.tookDefaultValue()) {
-          value = DynamicParameters.STRING_USE_DEFAULT + " " + option.getDefaultValueAsString();
+          value = DynamicParameters.STRING_USE_DEFAULT + option.getDefaultValueAsString();
         }
         else {
           value = option.getValueAsString();
