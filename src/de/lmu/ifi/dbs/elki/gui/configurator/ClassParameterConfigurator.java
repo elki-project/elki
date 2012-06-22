@@ -75,7 +75,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
     // For parameters with a default value, offer using the default
     // For optional parameters, offer not specifying them.
     if(cp.hasDefaultValue()) {
-      value.addItem(DynamicParameters.STRING_USE_DEFAULT + " " + cp.getDefaultValueAsString());
+      value.addItem(DynamicParameters.STRING_USE_DEFAULT + cp.getDefaultValueAsString());
     }
     else if(cp.isOptional()) {
       value.addItem(DynamicParameters.STRING_OPTIONAL);

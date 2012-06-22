@@ -237,7 +237,7 @@ public class ParameterTable extends JTable {
           // For parameters with a default value, offer using the default
           // For optional parameters, offer not specifying them.
           if(cp.hasDefaultValue()) {
-            comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + " " + cp.getDefaultValueAsString());
+            comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + cp.getDefaultValueAsString());
           }
           else if(cp.isOptional()) {
             comboBox.addItem(DynamicParameters.STRING_OPTIONAL);
@@ -257,14 +257,15 @@ public class ParameterTable extends JTable {
           }
         }
         // and for Enum parameters.
-        else if (option instanceof EnumParameter<?>) {
+        else if(option instanceof EnumParameter<?>) {
           EnumParameter<?> ep = (EnumParameter<?>) option;
-          for (String s : ep.getPossibleValues()) {
-            if (ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
-              if (!(DynamicParameters.STRING_USE_DEFAULT + " " + ep.getDefaultValueAsString()).equals(val)) {
-                comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + " " + s);
+          for(String s : ep.getPossibleValues()) {
+            if(ep.hasDefaultValue() && ep.getDefaultValueAsString().equals(s)) {
+              if(!(DynamicParameters.STRING_USE_DEFAULT + ep.getDefaultValueAsString()).equals(val)) {
+                comboBox.addItem(DynamicParameters.STRING_USE_DEFAULT + s);
               }
-            } else if (!s.equals(val)) {
+            }
+            else if(!s.equals(val)) {
               comboBox.addItem(s);
             }
           }
@@ -534,7 +535,7 @@ public class ParameterTable extends JTable {
         }
         if(option.isDefined()) {
           if(option.tookDefaultValue()) {
-            textfield.setText(DynamicParameters.STRING_USE_DEFAULT + " " + option.getDefaultValueAsString());
+            textfield.setText(DynamicParameters.STRING_USE_DEFAULT + option.getDefaultValueAsString());
           }
           else {
             textfield.setText(option.getValueAsString());
@@ -612,6 +613,12 @@ public class ParameterTable extends JTable {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+      if(value instanceof String) {
+        String s = (String) value;
+        if(s.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
+          value = s.substring(DynamicParameters.STRING_USE_DEFAULT.length());
+        }
+      }
       if(row < parameters.size()) {
         Parameter<?, ?> option = parameters.getNode(row).param;
         if(option instanceof Flag) {
