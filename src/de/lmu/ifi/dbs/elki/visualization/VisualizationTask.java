@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * @apiviz.has SVGPlot
  * @apiviz.has VisFactory
  * @apiviz.has Projection oneway - 0:1
- * @apiviz.has Visualization oneway
  */
 public class VisualizationTask extends AnyMap<String> implements Cloneable, Result, Comparable<VisualizationTask> {
   /**

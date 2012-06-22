@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf Distribution
+ * @apiviz.composedOf DistributionWithRandom
  * @apiviz.composedOf AffineTransformation
  */
 public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model {

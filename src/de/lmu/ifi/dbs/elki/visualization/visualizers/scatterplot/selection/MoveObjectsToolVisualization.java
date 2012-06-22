@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -79,6 +80,11 @@ public class MoveObjectsToolVisualization extends AbstractScatterplotVisualizati
    */
   private Element rtag;
 
+  /**
+   * Constructor.
+   *
+   * @param task Task
+   */
   public MoveObjectsToolVisualization(VisualizationTask task) {
     super(task);
     incrementalRedraw();
@@ -113,6 +119,7 @@ public class MoveObjectsToolVisualization extends AbstractScatterplotVisualizati
    */
   // TODO: move to DatabaseUtil?
   private void updateDB(DBIDs dbids, Vector movingVector) {
+    NumberVector<?, ?> nv = null;
     throw new AbortException("FIXME: INCOMPLETE TRANSITION");
     /*
      * database.accumulateDataStoreEvents();

@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * Collection of objects and their distances.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf DistanceResultPair
  *
  * @param <D> Distance type
  */

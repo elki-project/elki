@@ -81,6 +81,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Pleintinger Viktoria
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf KernelDensityEstimator
+ * 
+ * @param <V> vector type
  */
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", title = "Adaptive outlierness for subspace outlier ranking", booktitle = "Proc. 19th ACM International Conference on Information and knowledge management")
 public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {

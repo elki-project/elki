@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @author Elke Achtert
  * @author Erich Schubert
  * 
- * @apiviz.uses MatrixLike oneway - - reads
  * @apiviz.uses Vector
  * @apiviz.landmark
  */

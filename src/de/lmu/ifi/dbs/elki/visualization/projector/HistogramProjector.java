@@ -45,7 +45,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has LinearScale
+ * @apiviz.uses ScalesResult
+ * @apiviz.uses Projection1D
  * 
  * @param <V> Vector type
  */

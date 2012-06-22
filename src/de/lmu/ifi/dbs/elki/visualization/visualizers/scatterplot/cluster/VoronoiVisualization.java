@@ -229,7 +229,7 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses VoronoiVisualisation oneway - - «create»
+   * @apiviz.uses VoronoiVisualization oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**

@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @apiviz.has SelectionResult oneway - - visualizes
  * @apiviz.has DBIDSelection oneway - - visualizes
- * @apiviz.uses ConvexHull2D
+ * @apiviz.uses GrahamScanConvexHull2D
  */
 public class SelectionConvexHullVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
   /**

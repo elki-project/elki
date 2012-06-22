@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.ReplacingHistogram.Adapter
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.histograms.ReplacingHistogram.Adapter
  * 
  * @param <T> Histogram data type.
  */

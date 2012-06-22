@@ -73,6 +73,8 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * supported) data sets that satisfy a given specification file.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf GeneratorMain
  */
 public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**

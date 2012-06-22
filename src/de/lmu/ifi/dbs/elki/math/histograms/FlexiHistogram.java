@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.FlexiHistogram.Adapter
+ * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram.Adapter
  * 
  * @param <T> Type of data in histogram
  * @param <D> Type of input data

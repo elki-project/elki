@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * 
  * @apiviz.has MedoidModel
+ * @apiviz.composedOf KMedoidsInitialization
  * 
  * @param <V> vector datatype
  * @param <D> distance value type

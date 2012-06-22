@@ -31,7 +31,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf Thumbnailer
  * @apiviz.uses Listener oneway - - signals
  */
 public class ThumbnailThread extends Thread {

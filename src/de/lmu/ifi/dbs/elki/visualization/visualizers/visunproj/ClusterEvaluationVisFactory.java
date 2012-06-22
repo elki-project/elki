@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualization oneway - - «create»
- * @apiviz.has EvaluateClustering.ScoreResult oneway - - visualizes
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult oneway - - visualizes
  */
 public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   /**

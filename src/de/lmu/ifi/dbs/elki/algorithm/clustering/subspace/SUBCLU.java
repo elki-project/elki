@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Elke Achtert
  * 
  * @apiviz.uses DBSCAN
- * @apiviz.uses DimensionsSelectingEuclideanDistanceFunction
+ * @apiviz.uses AbstractDimensionsSelectingDoubleDistanceFunction
  * @apiviz.has SubspaceModel
  * 
  * @param <V> the type of FeatureVector handled by this Algorithm
