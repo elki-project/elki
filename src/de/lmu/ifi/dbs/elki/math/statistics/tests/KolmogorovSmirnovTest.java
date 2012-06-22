@@ -64,8 +64,6 @@ public class KolmogorovSmirnovTest implements GoodnessOfFitTest {
    * 
    * @param sample1 first data sample positions
    * @param sample2 second data sample positions
-   * @param f1 array of percentages for first sample
-   * @param f2 array of percentages for second sample
    * @return the largest distance between both functions
    */
   public static double calculateTestStatistic(double[] sample1, double[] sample2) {

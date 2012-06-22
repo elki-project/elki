@@ -281,7 +281,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   /**
    * Calculate selectivity coefficients.
    * 
-   * @param daFileList List of files to use
+   * @param daFiles List of files to use
    * @param query Query vector
    * @param epsilon Epsilon radius
    */
@@ -541,7 +541,8 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
      * Constructor.
      * 
      * @param ddq Distance query
-     * @param df Distance function
+     * @param p LP-norm p
+     * @param subspace Subspace to query
      */
     public PartialVAFileKNNQuery(DistanceQuery<V, DoubleDistance> ddq, double p, BitSet subspace) {
       super(ddq);
@@ -689,7 +690,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
      * 
      * @param dist Distance function
      * @param subspace Subspace
-     * @return
+     * @return Ordered list of dimension files
      */
     public List<DAFile> getWorstCaseDistOrder(VALPNormDistance dist, BitSet subspace) {
       int subspaceLength = subspace.cardinality();

@@ -634,7 +634,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * minDist function calculate the minimal Distance from Vector p to the
      * border of the corresponding r-region at the given level
      * 
-     * @param p Point as Vector
+     * @param id Object ID
      * @param level Level of the corresponding r-region
      */
     private double minDistLevel(DBID id, int level) {
@@ -654,7 +654,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * maxDist function calculate the maximal Distance from Vector p to the
      * border of the corresponding r-region at the given level
      * 
-     * @param p Point as Vector
+     * @param id Object ID
      * @param level Level of the corresponding r-region
      */
     private double maxDistLevel(DBID id, int level) {
@@ -752,7 +752,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * @param a index of second point
      * @param b index of third point
      * 
-     * @return
+     * @return box radius
      */
     private double boxRadius(int i, int a, int b) {
       // level are inversely ordered to box sizes. min -> max
@@ -856,9 +856,9 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * insert function inserts a nearest neighbor into a features nn list and
      * its distance
      * 
-     * @param i index of the feature in pf
      * @param id DBID of the nearest neighbor
      * @param dt distance or the neighbor to the features position
+     * @param k K
      */
     protected void insert(DBID id, double dt, int k) {
       // assert (!nn_keys.contains(id));
