@@ -36,7 +36,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -45,6 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -59,8 +62,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import experimentalcode.students.muellerjo.index.ALOCIQuadTree;
-import experimentalcode.students.muellerjo.index.AbstractALOCIQuadTreeNode;
 
 /**
  * Fast Outlier Detection Using the "approximate Local Correlation Integral".
@@ -76,6 +77,7 @@ import experimentalcode.students.muellerjo.index.AbstractALOCIQuadTreeNode;
  * </p>
  * 
  * @author Jonathan von Bruenken
+ * @author Erich Schubert
  * 
  * @param <O> Object type
  * @param <D> Distance type
@@ -90,25 +92,28 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
   private static final Logging logger = Logging.getLogger(ALOCI.class);
 
   /**
-   * Holds the value of {@link #NMIN_ID}.
+   * Minimum size for a leaf.
    */
   private int nmin;
 
   /**
-   * Holds the value of {@link #ALPHA_ID}.
+   * Alpha (level difference of sampling and counting neighborhoods)
    */
   private int alpha;
 
   /**
-   * Holds the value of {@link #GRIDS_ID}.
+   * Number of trees to generate (forest size)
    */
   private int g;
 
   /**
-   * Holds the value of {@link #GRIDS_ID}.
+   * Random generator
    */
   private Random random;
 
+  /**
+   * Distance function
+   */
   private NumberVectorDistanceFunction<D> distFunc;
 
   /**
@@ -154,10 +159,10 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       }
     }
 
-    List<ALOCIQuadTree<O>> qts = new ArrayList<ALOCIQuadTree<O>>(g);
+    List<ALOCIQuadTree> qts = new ArrayList<ALOCIQuadTree>(g);
 
     double[] nshift = new double[dim];
-    ALOCIQuadTree<O> qt = new ALOCIQuadTree<O>(0, min, max, nshift, nmin, relation);
+    ALOCIQuadTree qt = new ALOCIQuadTree(min, max, nshift, nmin, relation);
     qts.add(qt);
     if(progressPreproc != null) {
       progressPreproc.incrementProcessed(logger);
@@ -172,7 +177,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       for(int i = 0; i < dim; i++) {
         svec[i] = random.nextDouble() * (max[i] - min[i]);
       }
-      qt = new ALOCIQuadTree<O>(shift, min, max, svec, nmin, relation);
+      qt = new ALOCIQuadTree(min, max, svec, nmin, relation);
       qts.add(qt);
       if(progressPreproc != null) {
         progressPreproc.incrementProcessed(logger);
@@ -190,13 +195,13 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     for(DBID id : relation.iterDBIDs()) {
       final O obj = relation.get(id);
 
-      double maxmdefnorm = Double.NEGATIVE_INFINITY;
+      double maxmdefnorm = 0;
       // For each level
       for(int l = 0;; l++) {
         // Find the closest C_i
-        AbstractALOCIQuadTreeNode ci = null;
+        Node ci = null;
         for(int i = 0; i < g; i++) {
-          AbstractALOCIQuadTreeNode ci2 = qts.get(i).getClosestNode(obj, l);
+          Node ci2 = qts.get(i).findClosestNode(obj, l);
           if(ci2.getLevel() != l) {
             continue;
           }
@@ -205,15 +210,15 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
             ci = ci2;
           }
         }
-        // logger.warning("level:" + (ci != null ? ci.getLevel() : -1) +" l:"+l);
+        // logger.debug("level:" + (ci != null ? ci.getLevel() : -1) +" l:"+l);
         if(ci == null) {
           break; // no matching tree for this level.
         }
 
         // Find the closest C_j
-        AbstractALOCIQuadTreeNode cj = null;
+        Node cj = null;
         for(int i = 0; i < g; i++) {
-          AbstractALOCIQuadTreeNode cj2 = qts.get(i).getClosestNode(ci.getCenter(), l - alpha);
+          Node cj2 = qts.get(i).findClosestNode(ci.getCenter(), l - alpha);
           // TODO: allow higher levels or not?
           if(cj != null && cj2.getLevel() < cj.getLevel()) {
             continue;
@@ -223,12 +228,13 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
             cj = cj2;
           }
         }
-        // logger.warning("level:" + (cj != null ? cj.getLevel() : -1) +" l:"+l);
+        // logger.debug("level:" + (cj != null ? cj.getLevel() : -1) +" l:"+l);
         if(cj == null) {
           continue; // no matching tree for this level.
         }
         double mdefnorm = calculate_MDEF_norm(cj, ci);
-        // logger.warning("level:" + ci.getLevel()+"/"+cj.getLevel()+" mdef: "+mdefnorm);
+        // logger.warning("level:" + ci.getLevel() + "/" + cj.getLevel() +
+        // " mdef: " + mdefnorm);
         maxmdefnorm = Math.max(maxmdefnorm, mdefnorm);
       }
       // Store results
@@ -255,9 +261,9 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * 
    * @return MDEF norm
    */
-  private static double calculate_MDEF_norm(AbstractALOCIQuadTreeNode sn, AbstractALOCIQuadTreeNode cg) {
+  private static double calculate_MDEF_norm(Node sn, Node cg) {
     // get the square sum of the counting neighborhoods box counts
-    long sq = sn.getBoxCountSquareSum(cg.getLevel() - sn.getLevel());
+    long sq = sn.getSquareSum(cg.getLevel() - sn.getLevel());
     /*
      * if the square sum is equal to box count of the sampling Neighborhood then
      * n_hat is equal one, and as cg needs to have at least one Element mdef
@@ -269,19 +275,19 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
      * uniform, a mdef_norm value of zero ( = no outlier) is appropriate and
      * circumvents the problem of undefined values.
      */
-    if(sq == sn.getBucketCount()) {
+    if(sq == sn.getCount()) {
       return 0.0;
     }
     // calculation of mdef according to the paper and standardization as done in
     // LOCI
-    long cb = sn.getBoxCountCubicSum(cg.getLevel() - sn.getLevel());
-    double n_hat = (double) sq / (double) sn.getBucketCount();
-    double sig_n_hat = java.lang.Math.sqrt(cb * sn.getBucketCount() - (sq * sq)) / sn.getBucketCount();
+    long cb = sn.getCubicSum(cg.getLevel() - sn.getLevel());
+    double n_hat = (double) sq / sn.getCount();
+    double sig_n_hat = java.lang.Math.sqrt(cb * sn.getCount() - (sq * sq)) / sn.getCount();
     // Avoid NaN - correct result 0.0?
     if(sig_n_hat < Double.MIN_NORMAL) {
       return 0.0;
     }
-    double mdef = n_hat - cg.getBucketCount();
+    double mdef = n_hat - cg.getCount();
     return mdef / sig_n_hat;
   }
 
@@ -293,6 +299,337 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(distFunc.getInputTypeRestriction());
+  }
+
+  /**
+   * Simple quadtree for ALOCI. Not storing the actual objects, just the counts.
+   * 
+   * Furthermore, the quadtree can be shifted by a specified vector, wrapping
+   * around min/max
+   * 
+   * @author Jonathan von Bruenken
+   * @author Erich Schubert
+   * 
+   * @apiviz.composedOf Node
+   */
+  static class ALOCIQuadTree {
+    /**
+     * Tree parameters
+     */
+    private double[] shift, min, width;
+
+    /**
+     * Maximum fill for a page before splitting
+     */
+    private int nmin;
+
+    /**
+     * Tree root
+     */
+    Node root;
+
+    /**
+     * Relation indexed.
+     */
+    private Relation<? extends NumberVector<?, ?>> relation;
+
+    /**
+     * Constructor.
+     * 
+     * @param min Minimum coordinates
+     * @param max Maximum coordinates
+     * @param shift Tree shift offset
+     * @param nmin Maximum size for a page to split
+     * @param relation Relation to index
+     */
+    public ALOCIQuadTree(double[] min, double[] max, double[] shift, int nmin, Relation<? extends NumberVector<?, ?>> relation) {
+      super();
+      assert (min.length <= 32) : "Quadtrees are only supported for up to 32 dimensions";
+      this.shift = shift;
+      this.nmin = nmin;
+      this.min = min;
+      this.width = new double[min.length];
+      for(int d = 0; d < min.length; d++) {
+        width[d] = max[d] - min[d];
+        if(width[d] <= 0) {
+          width[d] = 1;
+        }
+      }
+      double[] center = new double[min.length];
+      for(int d = 0; d < min.length; d++) {
+        if(shift[d] < width[d] * .5) {
+          center[d] = min[d] + shift[d] + width[d] * .5;
+        }
+        else {
+          center[d] = min[d] + shift[d] - width[d] * .5;
+        }
+      }
+      this.relation = relation;
+      ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
+      List<Node> children = new ArrayList<Node>();
+      bulkLoad(min.clone(), max.clone(), children, ids, 0, ids.size(), 0, 0, 0);
+      this.root = new Node(0, new Vector(center), ids.size(), -1, children);
+    }
+
+    /**
+     * Bulk load the tree
+     * 
+     * @param lmin Subtree minimum (unshifted, will be modified)
+     * @param lmax Subtree maximum (unshifted, will be modified)
+     * @param children List of children for current parent
+     * @param ids IDs to process
+     * @param start Start of ids subinterval
+     * @param end End of ids subinterval
+     * @param dim Current dimension
+     * @param level Current tree level
+     * @param code Bit code of node position
+     */
+    private void bulkLoad(double[] lmin, double[] lmax, List<Node> children, ArrayModifiableDBIDs ids, int start, int end, int dim, int level, int code) {
+      // logger.warning(FormatUtil.format(lmin)+" "+FormatUtil.format(lmax)+" "+start+"->"+end+" "+(end-start));
+      // Hack: Check degenerate cases that won't split
+      if(dim == 0) {
+        NumberVector<?, ?> first = relation.get(ids.get(start));
+        boolean degenerate = true;
+        loop: for(int pos = start + 1; pos < end; pos++) {
+          NumberVector<?, ?> other = relation.get(ids.get(pos));
+          for(int d = 1; d <= lmin.length; d++) {
+            if(Math.abs(first.doubleValue(d) - other.doubleValue(d)) > 1E-15) {
+              degenerate = false;
+              break loop;
+            }
+          }
+        }
+        if(degenerate) {
+          double[] center = new double[lmin.length];
+          for(int d = 0; d < lmin.length; d++) {
+            center[d] = lmin[d] * .5 + lmax[d] * .5 + shift[d];
+            if(center[d] > min[d] + width[d]) {
+              center[d] -= width[d];
+            }
+          }
+          children.add(new Node(code, new Vector(center), end - start, level, null));
+          return;
+        }
+      }
+      // Complete level
+      if(dim == lmin.length) {
+        double[] center = new double[lmin.length];
+        for(int d = 0; d < lmin.length; d++) {
+          center[d] = lmin[d] * .5 + lmax[d] * .5 + shift[d];
+          if(center[d] > min[d] + width[d]) {
+            center[d] -= width[d];
+          }
+        }
+        if(end - start < nmin) {
+          children.add(new Node(code, new Vector(center), end - start, level, null));
+          return;
+        }
+        else {
+          List<Node> newchildren = new ArrayList<Node>();
+          bulkLoad(lmin, lmax, newchildren, ids, start, end, 0, level + 1, 0);
+          children.add(new Node(code, new Vector(center), end - start, level, newchildren));
+          return;
+        }
+      }
+      else {
+        // Partially sort data, by dimension dim < mid
+        int spos = start, epos = end;
+        while(spos < epos) {
+          if(getShiftedDim(relation.get(ids.get(spos)), dim, level) <= .5) {
+            spos++;
+            continue;
+          }
+          if(getShiftedDim(relation.get(ids.get(epos - 1)), dim, level) > 0.5) {
+            epos--;
+            continue;
+          }
+          ids.swap(spos, epos - 1);
+          spos++;
+          epos--;
+        }
+        if(start < spos) {
+          final double tmp = lmax[dim];
+          lmax[dim] = lmax[dim] * .5 + lmin[dim] * .5;
+          bulkLoad(lmin, lmax, children, ids, start, spos, dim + 1, level, code);
+          lmax[dim] = tmp; // Restore
+        }
+        if(spos < end) {
+          final double tmp = lmin[dim];
+          lmin[dim] = lmax[dim] * .5 + lmin[dim] * .5;
+          bulkLoad(lmin, lmax, children, ids, spos, end, dim + 1, level, code | (1 << dim));
+          lmin[dim] = tmp; // Restore
+        }
+      }
+    }
+
+    /**
+     * Shift and wrap a single dimension.
+     * 
+     * @param obj Object
+     * @param dim Dimension
+     * @param level Level (controls scaling/wraping!)
+     * @return Shifted position
+     */
+    private double getShiftedDim(NumberVector<?, ?> obj, int dim, int level) {
+      double pos = obj.doubleValue(dim + 1) + shift[dim];
+      pos = (pos - min[dim]) / width[dim] * (1 + level);
+      return pos - Math.floor(pos);
+    }
+
+    /**
+     * Find the closest node (of depth tlevel or above, if there is no node at
+     * this depth) for the given vector.
+     * 
+     * @param vec Query vector
+     * @param tlevel Target level
+     * @return Node
+     */
+    public Node findClosestNode(NumberVector<?, ?> vec, int tlevel) {
+      Node cur = root;
+      for(int level = 0; level <= tlevel; level++) {
+        if(cur.children == null) {
+          break;
+        }
+        int code = 0;
+        for(int d = 0; d < min.length; d++) {
+          if(getShiftedDim(vec, d, level) > .5) {
+            code |= 1 << d;
+          }
+        }
+        boolean found = false;
+        for(Node child : cur.children) {
+          if(child.code == code) {
+            cur = child;
+            found = true;
+            break;
+          }
+        }
+        if(!found) {
+          break; // Do not descend
+        }
+      }
+      return cur;
+    }
+  }
+
+  /**
+   * Node of the ALOCI Quadtree
+   * 
+   * @author Erich Schubert
+   */
+  static class Node {
+    /**
+     * Position code
+     */
+    final int code;
+
+    /**
+     * Number of elements
+     */
+    final int count;
+
+    /**
+     * Level of node
+     */
+    final int level;
+
+    /**
+     * Child nodes, may be null
+     */
+    List<Node> children;
+
+    /**
+     * Parent node
+     */
+    Node parent = null;
+
+    /**
+     * Center vector
+     */
+    Vector center;
+
+    /**
+     * Constructor.
+     * 
+     * @param code Node code
+     * @param center Center vector
+     * @param count Element count
+     * @param level Node level
+     * @param children Children list
+     */
+    protected Node(int code, Vector center, int count, int level, List<Node> children) {
+      this.code = code;
+      this.center = center;
+      this.count = count;
+      this.level = level;
+      this.children = children;
+      if(children != null) {
+        for(Node child : children) {
+          child.parent = this;
+        }
+      }
+    }
+
+    /**
+     * Get level of node.
+     * 
+     * @return Level of node
+     */
+    public int getLevel() {
+      return level;
+    }
+
+    /**
+     * Get count of subtree
+     * 
+     * @return subtree count
+     */
+    public int getCount() {
+      return count;
+    }
+
+    /**
+     * Return center vector
+     * 
+     * @return center vector
+     */
+    public Vector getCenter() {
+      return center;
+    }
+
+    /**
+     * Get sum of squares, recursively
+     * 
+     * @param levels Depth to collect
+     * @return Sum of squares
+     */
+    public long getSquareSum(int levels) {
+      if(levels <= 0 || children == null) {
+        return ((long) count) * ((long) count);
+      }
+      long agg = 0;
+      for(Node child : children) {
+        agg += child.getSquareSum(levels - 1);
+      }
+      return agg;
+    }
+
+    /**
+     * Get cubic sum.
+     * 
+     * @param levels Level to collect
+     * @return sum of cubes
+     */
+    public long getCubicSum(int levels) {
+      if(levels <= 0 || children == null) {
+        return ((long) count) * ((long) count) * ((long) count);
+      }
+      long agg = 0;
+      for(Node child : children) {
+        agg += child.getCubicSum(levels - 1);
+      }
+      return agg;
+    }
   }
 
   /**
