@@ -38,8 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Provides a LP-Norm for FeatureVectors.
  * 
  * @author Erich Schubert
- * 
- * @param <V> the type of FeatureVector to compute the distances in between
  */
 // TODO: implement SpatialDistanceFunction
 public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector<?, ?>, DoubleDistance> implements DoubleNorm<SparseNumberVector<?, ?>> {

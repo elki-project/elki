@@ -119,7 +119,6 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * Constructor.
    * 
    * @param distanceFunction Distance function
-   * @param rmax Maximum radius
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    * @param g Number of grids to use
