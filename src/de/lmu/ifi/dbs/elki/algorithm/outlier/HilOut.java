@@ -1,4 +1,4 @@
-package experimentalcode.students.muellerjo.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
