@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses SparseFloatVector
+ * @apiviz.uses SparseNumberVector
  */
 public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<V, ?>> extends AbstractNormalization<V> {
   /**

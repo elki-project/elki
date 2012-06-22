@@ -206,7 +206,7 @@ public class DensityEstimationOverlay extends AbstractScatterplotVisualization {
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses DensityEstimation2DVisualization oneway - - «create»
+   * @apiviz.uses DensityEstimationOverlay oneway - - «create»
    */
   public static class Factory extends AbstractVisFactory {
     /**

@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGCloneVisible;
  * Clone an SVG document, inlining temporary and in-memory linked images.
  * 
  * @author Erich Schubert
- * 
  */
 public class CloneInlineImages extends SVGCloneVisible {
   @Override

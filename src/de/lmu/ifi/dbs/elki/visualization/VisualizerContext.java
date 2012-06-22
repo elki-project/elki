@@ -64,11 +64,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  *         TODO: remove this class
  * 
  * @apiviz.landmark
- * @apiviz.uses ContextChangedEvent oneway - - «emit»
  * @apiviz.composedOf StyleLibrary
  * @apiviz.composedOf SelectionResult
  * @apiviz.composedOf ResultHierarchy
  * @apiviz.composedOf EventListenerList
+ * @apiviz.composedOf StyleResult
+ * @apiviz.composedOf ProjectorFactory
+ * @apiviz.composedOf VisFactory
  */
 public class VisualizerContext implements DataStoreListener, Result {
   /**

@@ -67,7 +67,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Elke Achtert
  * 
  * @apiviz.has LOF.LOFResult oneway - - updates
- * @apiviz.composedOf OnlineLOF.LOFKNNListener
  */
 // TODO: related to publication? 
 public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
@@ -170,6 +169,10 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * Encapsulates a listener for changes of kNNs used in the online LOF
    * algorithm.
+   * 
+   * @author Elke Achtert
+   * 
+   * @apiviz.exclude
    */
   private class LOFKNNListener implements KNNListener {
     /**

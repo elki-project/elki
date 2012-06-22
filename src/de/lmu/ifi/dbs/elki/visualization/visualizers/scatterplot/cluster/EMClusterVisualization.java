@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Robert Rödler
  * 
  * @apiviz.has EMModel oneway - - visualizes
- * @apiviz.uses ConvexHull2D
+ * @apiviz.uses GrahamScanConvexHull2D
  * 
  * @param <NV> Type of the NumberVector being visualized.
  */

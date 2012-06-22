@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * @apiviz.uses CSSClassManager
  * @apiviz.uses LinearScale
  * @apiviz.uses StyleLibrary
- * @apiviz.uses STYLE
  * @apiviz.uses Element oneway - - «create»
  */
 public class SVGSimpleLinearAxis {
@@ -51,14 +50,14 @@ public class SVGSimpleLinearAxis {
    * 
    * @apiviz.exclude
    */
-  private enum ALIGNMENT {
+  private enum Alignment {
     LL, RL, LC, RC, LR, RR
   }
 
   /**
    * Labeling style: left-handed, right-handed, no ticks, labels at ends
    * 
-   * @author Erich Schubert
+   * @apiviz.exclude
    */
   public enum LabelStyle {
     LEFTHAND, RIGHTHAND, NOLABELS, NOTHING, ENDLABEL
@@ -152,24 +151,24 @@ public class SVGSimpleLinearAxis {
       labels = false;
       ticks = false;
     }
-    ALIGNMENT pos = ALIGNMENT.LL;
+    Alignment pos = Alignment.LL;
     if(labels) {
       double angle = Math.atan2(ty, tx);
       // System.err.println(tx + " " + (-ty) + " " + angle);
       if(angle > 2.6) { // pi .. 2.6 = 180 .. 150
-        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RC : ALIGNMENT.LC;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? Alignment.RC : Alignment.LC;
       }
       else if(angle > 0.5) { // 2.3 .. 0.7 = 130 .. 40
-        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RR : ALIGNMENT.LL;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? Alignment.RR : Alignment.LL;
       }
       else if(angle > -0.5) { // 0.5 .. -0.5 = 30 .. -30
-        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RC : ALIGNMENT.LC;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? Alignment.RC : Alignment.LC;
       }
       else if(angle > -2.6) { // -0.5 .. -2.6 = -30 .. -150
-        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RL : ALIGNMENT.LR;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? Alignment.RL : Alignment.LR;
       }
       else { // -2.6 .. -pi = -150 .. -180
-        pos = labelstyle == LabelStyle.RIGHTHAND ? ALIGNMENT.RC : ALIGNMENT.LC;
+        pos = labelstyle == LabelStyle.RIGHTHAND ? Alignment.RC : Alignment.LC;
       }
     }
     // vertical text offset; align approximately with middle instead of

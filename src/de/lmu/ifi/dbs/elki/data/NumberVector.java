@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @param <N> the type of the attribute values
  * 
  * @apiviz.landmark
- * @apiviz.has Matrix
  * @apiviz.has Vector
  */
 public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialComparable, Parameterizable {

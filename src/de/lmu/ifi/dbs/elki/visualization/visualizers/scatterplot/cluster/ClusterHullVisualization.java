@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Erich Schubert
  * 
  * @apiviz.has Clustering oneway - - visualizes
- * @apiviz.uses ConvexHull2D
+ * @apiviz.uses GrahamScanConvexHull2D
  * @apiviz.uses AlphaShape
  */
 public class ClusterHullVisualization extends AbstractScatterplotVisualization {

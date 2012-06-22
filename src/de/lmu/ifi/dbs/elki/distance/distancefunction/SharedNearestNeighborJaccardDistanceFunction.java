@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf SharedNearestNeighborIndex.Factory
+ * @apiviz.uses de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
  * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - - «create»
  * 
  * @param <O> object type

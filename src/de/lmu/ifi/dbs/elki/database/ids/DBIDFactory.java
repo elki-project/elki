@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * @apiviz.uses DBIDRange oneway - - «create»
  * @apiviz.uses ArrayModifiableDBIDs oneway - - «create»
  * @apiviz.uses HashSetModifiableDBIDs oneway - - «create»
- * @apiviz.uses TreeSetModifiableDBIDs oneway - - «create»
+ * @apiviz.uses HashSetModifiableDBIDs oneway - - «create»
  * @apiviz.has ByteBufferSerializer oneway - - provides
  */
 public interface DBIDFactory {

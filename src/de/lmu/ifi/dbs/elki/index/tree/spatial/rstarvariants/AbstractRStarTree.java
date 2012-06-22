@@ -68,10 +68,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.landmark
  * @apiviz.has AbstractRStarTreeNode oneway - - contains
- * @apiviz.uses Enlargement
  * @apiviz.composedOf BulkSplit
  * @apiviz.composedOf SplitStrategy
  * @apiviz.composedOf InsertionStrategy
+ * @apiviz.composedOf OverflowTreatment
  * 
  * @param <N> Node type
  * @param <E> Entry type

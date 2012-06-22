@@ -332,7 +332,7 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
-   * @apiviz.uses P1DHistogramVisualizer oneway - - «create»
+   * @apiviz.uses ColoredHistogramVisualizer oneway - - «create»
    * 
    * @param <NV> Number vector type
    */
