@@ -98,13 +98,14 @@ public class KeyVisualization extends AbstractVisualization {
     SVGPlot svgp = task.getPlot();
     final List<Cluster<Model>> allcs = clustering.getAllClusters();
 
-    MarkerLibrary ml = context.getStyleLibrary().markers();
+    StyleLibrary style = context.getStyleLibrary();
+    MarkerLibrary ml = style.markers();
     layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
     // Add a label for the clustering.
     {
       Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
-      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.4");
+      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.4; fill: "+style.getTextColor(StyleLibrary.DEFAULT));
       layer.appendChild(label);
     }
 
@@ -113,7 +114,7 @@ public class KeyVisualization extends AbstractVisualization {
     for(Cluster<Model> c : allcs) {
       ml.useMarker(svgp, layer, 0.3, i + 1.5, i, 0.3);
       Element label = svgp.svgText(0.7, i + 1.7, c.getNameAutomatic());
-      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
+      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; fill: "+style.getTextColor(StyleLibrary.DEFAULT));
       layer.appendChild(label);
       i++;
     }
@@ -146,7 +147,7 @@ public class KeyVisualization extends AbstractVisualization {
 
     int rows = i + 2;
     int cols = Math.max(6, (int) (rows * task.getHeight() / task.getWidth()));
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = style.getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
   }
