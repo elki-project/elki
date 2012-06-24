@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @author Sascha Goldhofer
  * @author Erich Schubert
  */
-public class SegmentsStylingPolicy implements ClassStylingPolicy {
+public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   /**
    * The segments we use for visualization
    */
@@ -70,17 +71,16 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
    * Color library (only used in compatibility mode)
    */
   // TODO: move to abstract super class?
-  ColorLibrary colorset;
+  ColorLibrary colorset = null;
 
   /**
    * Constructor.
    * 
    * @param segments Segments
    */
-  public SegmentsStylingPolicy(Segments segments, StyleLibrary style) {
+  public SegmentsStylingPolicy(Segments segments) {
     super();
     this.segments = segments;
-    this.colorset = style.getColorSet(StyleLibrary.PLOT);
 
     // get all selectable segments
     for(Segment segment : segments) {
@@ -92,6 +92,17 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
         }
       }
     }
+  }
+
+  /**
+   * Assign the style library, for compatibility color styling.
+   * 
+   * FIXME: handle this more generally
+   * 
+   * @param style Style library
+   */
+  public void setStyleLibrary(StyleLibrary style) {
+    this.colorset = style.getColorSet(StyleLibrary.PLOT);
   }
 
   /**
@@ -120,8 +131,12 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
   @Override
   public int getColorForDBID(DBID id) {
     int style = getStyleForDBID(id);
-    // FIXME: slow
-    return SVGUtil.stringToColor(colorset.getColor(style)).getRGB();
+    if (colorset != null) {
+      // FIXME: add caching
+      return SVGUtil.stringToColor(colorset.getColor(style)).getRGB();
+    } else {
+      return 0;
+    }
   }
 
   @Override
@@ -283,5 +298,15 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
    */
   public int indexOfSegment(Segment segment) {
     return selectedSegments.indexOf(segment);
+  }
+
+  @Override
+  public String getLongName() {
+    return "Pair segments styling policy";
+  }
+
+  @Override
+  public String getShortName() {
+    return "pairsegments-styling";
   }
 }
