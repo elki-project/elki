@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -58,6 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer to draw circle segments of clusterings and enable interactive
@@ -195,8 +197,10 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
    */
   public CircleSegmentsVisualizer(VisualizationTask task) {
     super(task);
-    segments = task.getResult();
-    policy = new SegmentsStylingPolicy(segments, context.getStyleLibrary());
+    policy = task.getResult();
+    segments = policy.segments;
+    // FIXME: handle this more generally.
+    policy.setStyleLibrary(context.getStyleLibrary());
     // Listen for result changes (Selection changed)
     context.addResultListener(this);
   }
@@ -691,6 +695,7 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
      */
     public Factory() {
       super();
+      this.thumbmask |= ThumbnailVisualization.ON_STYLE;
     }
 
     @Override
@@ -703,8 +708,16 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       // If no comparison result found abort
       List<Segments> segments = ResultUtil.filterResults(result, Segments.class);
       for(Segments segmentResult : segments) {
+        SegmentsStylingPolicy policy;
+        Iterator<SegmentsStylingPolicy> iter = ResultUtil.filteredResults(segmentResult, SegmentsStylingPolicy.class);
+        if (iter.hasNext()) {
+          policy = iter.next();
+        } else {
+          policy = new SegmentsStylingPolicy(segmentResult);
+          baseResult.getHierarchy().add(segmentResult, policy);
+        }
         // create task for visualization
-        final VisualizationTask task = new VisualizationTask(NAME, segmentResult, null, this);
+        final VisualizationTask task = new VisualizationTask(NAME, policy, null, this);
         task.width = 2.0;
         task.height = 2.0;
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
