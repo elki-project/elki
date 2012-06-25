@@ -76,6 +76,12 @@ public class ErrorFormatter extends Formatter {
     return buf.toString();
   }
 
+  /**
+   * Append (pruned) stack traces for associated exceptions.
+   * 
+   * @param buf Buffer to append to
+   * @param thrown Throwable to format.
+   */
   private void appendCauses(StringBuffer buf, Throwable thrown) {
     buf.append(thrown.toString()).append(OutputStreamLogger.NEWLINE);
     StackTraceElement[] stack = thrown.getStackTrace();
@@ -99,7 +105,7 @@ public class ErrorFormatter extends Formatter {
       buf.append("\tat [...]").append(OutputStreamLogger.NEWLINE);
     }
     if(thrown.getCause() != null) {
-      buf.append("Caused by: ").append(OutputStreamLogger.NEWLINE);
+      buf.append("Caused by: ");
       appendCauses(buf, thrown.getCause());
     }
   }
