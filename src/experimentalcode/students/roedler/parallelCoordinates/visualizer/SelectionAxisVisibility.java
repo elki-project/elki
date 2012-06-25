@@ -23,11 +23,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
- * interactive SVG-Element for selecting visible axis.
+ * Layer for controlling axis visbility in parallel coordinates.
  * 
  * @author Robert Rödler
- * 
- * @apiviz.uses SVGSimpleLinearAxis
  */
 public class SelectionAxisVisibility extends AbstractParallelVisualization<NumberVector<?, ?>> {
   /**
@@ -90,27 +88,25 @@ public class SelectionAxisVisibility extends AbstractParallelVisualization<Numbe
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(relation);
 
-    Element back = svgp.svgRect(0.0, getSizeY() + getMarginTop() * 1.5, getSizeX(), getSizeY() / 35.);
+    Element back = svgp.svgRect(-hs / 2, getSizeY() + getMarginTop() * 1.5, getSizeX() + hs, hs);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
 
-    int notvis = 0;
     int lastvis = 0;
-    boolean ls = true;
     c = 0;
     rect = new Element[dim];
 
-    for(int i = 0; i <= dim; i++) {
+    for(int i = 0, j = 0; i <= dim; i++) {
       if(i == dim || proj.isAxisVisible(i)) {
-        if(notvis != 0) {
-          addEmptyButton(lastvis, i, notvis, dim, ls);
+        if(i - lastvis > 1) {
+          addEmptyButton(lastvis, i, dim);
         }
 
         if(i == dim) {
           break;
         }
 
-        double xpos = getVisibleAxisX(i) - bhs / 2.;
+        double xpos = getVisibleAxisX(j) - bhs / 2.;
 
         border = svgp.svgRect(xpos, ypos, bhs, bhs);
         SVGUtil.addCSSClass(border, SAV_BORDER);
@@ -130,18 +126,15 @@ public class SelectionAxisVisibility extends AbstractParallelVisualization<Numbe
         layer.appendChild(rect[c]);
 
         lastvis = i;
-        notvis = 0;
-        ls = false;
         c++;
-      }
-      else {
-        notvis++;
+        j++;
       }
     }
   }
 
-  private void addEmptyButton(int last, int vis, int notvis, int dim, boolean ls) {
-    if(notvis > 2 && ((last == 0 && ls) || vis == dim)) {
+  private void addEmptyButton(int last, int vis, int dim) {
+    int notvis = (vis - last) - 1;
+    if(notvis > 2 && (vis == 0 || vis == dim)) {
       double dist = (cs + qs) * 2.;
 
       if(vis == dim) {
