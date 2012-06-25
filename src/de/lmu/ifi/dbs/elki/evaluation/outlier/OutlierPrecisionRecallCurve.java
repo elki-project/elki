@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -46,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * Compute a curve containing the precision values for an outlier detection
@@ -100,9 +98,8 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       Iterator<DBID> iter = o.getOrdering().iter(o.getOrdering().getDBIDs());
-      List<DoubleDoublePair> curve = computePrecisionResult(o.getScores().size(), positiveids, iter, o.getScores());
-      final CollectionResult<DoubleDoublePair> cresult = new CollectionResult<DoubleDoublePair>("Precision-Recall-Curve", "pr-curve", curve);
-      db.getHierarchy().add(o, cresult);
+      XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, iter, o.getScores());
+      db.getHierarchy().add(o, curve);
       // Process them only once.
       orderings.remove(o.getOrdering());
     }
@@ -111,23 +108,22 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Iterator<DBID> iter = or.iter(or.getDBIDs());
-      List<DoubleDoublePair> curve = computePrecisionResult(or.getDBIDs().size(), positiveids, iter, null);
-      final CollectionResult<DoubleDoublePair> cresult = new CollectionResult<DoubleDoublePair>("Precision-Recall-Curve", "pr-curve", curve);
-      db.getHierarchy().add(or, cresult);
+      XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, iter, null);
+      db.getHierarchy().add(or, curve);
     }
   }
 
-  private List<DoubleDoublePair> computePrecisionResult(int size, SetDBIDs ids, Iterator<DBID> iter, Relation<Double> scores) {
+  private XYCurve computePrecisionResult(int size, SetDBIDs ids, Iterator<DBID> iter, Relation<Double> scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
-    ArrayList<DoubleDoublePair> res = new ArrayList<DoubleDoublePair>(postot + 2);
+    XYCurve curve = new XYCurve("Recall", "Precision", postot + 2);
 
     double prevscore = Double.NaN;
     while(iter.hasNext()) {
       // Previous precision rate - y axis
-      double curprec = ((double) poscnt) / total;
+      final double curprec = ((double) poscnt) / total;
       // Previous recall rate - x axis
-      double curreca = ((double) poscnt) / postot;
+      final double curreca = ((double) poscnt) / postot;
 
       // Analyze next point
       DBID cur = iter.next();
@@ -148,37 +144,12 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
         }
         prevscore = curscore;
       }
-      // simplify curve when possible:
-      if(res.size() >= 2) {
-        DoubleDoublePair last1 = res.get(res.size() - 2);
-        DoubleDoublePair last2 = res.get(res.size() - 1);
-        final double ldx = last2.first - last1.first;
-        final double cdx = curreca - last2.first;
-        final double ldy = last2.second - last1.second;
-        final double cdy = curprec - last2.second;
-        // vertical simplification
-        if((ldx == 0) && (cdx == 0)) {
-          res.remove(res.size() - 1);
-        }
-        // horizontal simplification
-        else if((ldy == 0) && (cdy == 0)) {
-          res.remove(res.size() - 1);
-        }
-        // diagonal simplification
-        else if(ldy > 0 && cdy > 0) {
-          if(Math.abs((ldx / ldy) - (cdx / cdy)) < 1E-15) {
-            res.remove(res.size() - 1);
-          }
-        }
-      }
-      // Add a new point (for the previous entry!)
-      res.add(new DoubleDoublePair(curreca, curprec));
+      // Add a new point (for the previous entry - because of tie handling!)
+      curve.addAndSimplify(curreca, curprec);
     }
     // End curve - always at all positives found.
-    {
-      res.add(new DoubleDoublePair(1.0, postot / total));
-    }
-    return res;
+    curve.addAndSimplify(1.0, postot / total);
+    return curve;
   }
 
   /**
