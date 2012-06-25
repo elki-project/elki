@@ -127,11 +127,11 @@ public class SVGSimpleLinearAxis {
     SVGUtil.setCSSClass(line, CSS_AXIS);
     parent.appendChild(line);
 
-    double tx = x2 - x1;
-    double ty = y2 - y1;
+    final double tx = x2 - x1;
+    final double ty = y2 - y1;
     // ticks are orthogonal
-    double tw = ty * 0.01;
-    double th = -tx * 0.01;
+    final double tw = ty * 0.01;
+    final double th = -tx * 0.01;
 
     // choose where to print labels.
     final boolean labels, ticks;
@@ -177,7 +177,28 @@ public class SVGSimpleLinearAxis {
 
     // draw ticks on x axis
     if(ticks || labels) {
-      for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += scale.getRes()) {
+      int sw = 1;
+      { // Compute how many ticks to draw
+        int numticks = (int) ((scale.getMax() - scale.getMin()) / scale.getRes());
+        double tlen = Math.sqrt(tx * tx + ty * ty);
+        double minl = 10 * style.getLineWidth(StyleLibrary.AXIS_TICK);
+        // Try proper divisors first.
+        if(sw * tlen / numticks < minl) {
+          for(int i = 2; i <= (numticks >> 1); i++) {
+            if(numticks % i == 0) {
+              if(i * tlen / numticks >= minl) {
+                sw = i;
+                break;
+              }
+            }
+          }
+        }
+        // Otherwise, also allow non-divisors.
+        if(sw * tlen / numticks < minl) {
+          sw = (int)Math.floor(minl * numticks / tlen);
+        }
+      }
+      for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += sw * scale.getRes()) {
         double x = x1 + tx * scale.getScaled(tick);
         double y = y1 + ty * scale.getScaled(tick);
         if(ticks) {
