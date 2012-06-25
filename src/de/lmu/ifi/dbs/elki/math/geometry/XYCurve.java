@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.geometry;
  */
 
 import gnu.trove.list.array.TDoubleArrayList;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve.Itr;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
@@ -108,10 +109,10 @@ public class XYCurve implements Result {
   public XYCurve(int size) {
     this("X", "Y", size);
   }
-  
+
   /**
    * Constructor, cloning an existing curve.
-   *
+   * 
    * @param curve Curve to clone.
    */
   public XYCurve(XYCurve curve) {
@@ -260,7 +261,25 @@ public class XYCurve implements Result {
   public int size() {
     return data.size() >> 1;
   }
-  
+
+  /**
+   * Get an iterator for the curve.
+   * 
+   * Note: this is <em>not</em> a Java style iterator, since the only way to get
+   * positions is using "next" in Java style. Here, we can have two getters for current values!
+   * 
+   * Instead, use this style of iteration: <code><pre>{@code 
+   * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
+   *   doSomethingWith(it.getX(), it.getY());
+   * }
+   * }</pre></code>
+   * 
+   * @return Iterator
+   */
+  public Itr iterator() {
+    return new Itr();
+  }
+
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer();
