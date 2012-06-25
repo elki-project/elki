@@ -31,7 +31,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.SimpleFormatter;
 
 import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
@@ -66,12 +65,12 @@ public class CLISmartHandler extends Handler {
   /**
    * Formatter for debugging messages
    */
-  private Formatter debugformat = new SimpleFormatter();
+  private Formatter debugformat = new ErrorFormatter();
 
   /**
    * Formatter for error messages
    */
-  private Formatter errformat = new SimpleFormatter();
+  private Formatter errformat = new ErrorFormatter();
 
   /**
    * Tracker for progress messages
