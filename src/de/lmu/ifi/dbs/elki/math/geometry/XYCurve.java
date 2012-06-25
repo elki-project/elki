@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.geometry;
  */
 
 import gnu.trove.list.array.TDoubleArrayList;
-import de.lmu.ifi.dbs.elki.math.geometry.XYCurve.Itr;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
@@ -266,13 +265,20 @@ public class XYCurve implements Result {
    * Get an iterator for the curve.
    * 
    * Note: this is <em>not</em> a Java style iterator, since the only way to get
-   * positions is using "next" in Java style. Here, we can have two getters for current values!
+   * positions is using "next" in Java style. Here, we can have two getters for
+   * current values!
    * 
-   * Instead, use this style of iteration: <code><pre>{@code 
+   * Instead, use this style of iteration: <blockquote>
+   * 
+   * <pre>
+   * {@code 
    * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
    *   doSomethingWith(it.getX(), it.getY());
    * }
-   * }</pre></code>
+   * }
+   * </pre>
+   * 
+   * </blockquote>
    * 
    * @return Iterator
    */
@@ -338,11 +344,17 @@ public class XYCurve implements Result {
    * operations, which does not work consistently with Java's
    * <code>next()</code> style of iterations.
    * 
-   * Instead, use this style of iteration <code> 
+   * Instead, use this style of iteration: <blockquote>
+   * 
+   * <pre>
+   * {@code 
    * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
    *   doSomethingWith(it.getX(), it.getY());
    * }
-   * </code>
+   * }
+   * </pre>
+   * 
+   * </blockquote>
    * 
    * @author Erich Schubert
    * 
