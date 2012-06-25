@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearson
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
@@ -395,7 +396,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       scores[d] = new DoubleIntPair(vec.doubleValue(d + 1), d);
     }
     Arrays.sort(scores, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
-    return ROC.computeAUC(ROC.materializeROC(dim, positive, Arrays.asList(scores).iterator()));
+    return XYCurve.areaUnderCurve(ROC.materializeROC(dim, positive, Arrays.asList(scores).iterator()));
   }
 
   double gain(double score, double ref, double optimal) {

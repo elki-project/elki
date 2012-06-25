@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixIm
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -153,7 +154,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           combined[d].second = d;
         }
         Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
-        double auc = ROC.computeAUC(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
+        double auc = XYCurve.areaUnderCurve(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
         data[a][a] = auc;
         // minmax.put(auc);
         // logger.verbose(auc + " " + labels.get(ids.get(a)));
@@ -166,7 +167,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
           combined[d].second = d;
         }
         Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
-        double auc = ROC.computeAUC(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
+        double auc = XYCurve.areaUnderCurve(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
         // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
         // labels.get(ids.get(b)));
         data[a][b] = auc;

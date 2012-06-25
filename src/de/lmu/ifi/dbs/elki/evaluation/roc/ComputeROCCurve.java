@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -36,18 +34,19 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * Compute a ROC curve to evaluate a ranking algorithm and compute the
@@ -63,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- *
+ * 
  * @apiviz.uses OutlierResult
  * @apiviz.uses ROC
  * @apiviz.has ROCResult oneway - - «create»
@@ -118,29 +117,25 @@ public class ComputeROCCurve implements Evaluator {
     if(order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    List<DoubleDoublePair> roccurve = ROC.materializeROC(size, positiveids, new ROC.SimpleAdapter(order.iterator()));
-    double rocauc = ROC.computeAUC(roccurve);
+    XYCurve roccurve = ROC.materializeROC(size, positiveids, new ROC.SimpleAdapter(order.iterator()));
+    double rocauc = XYCurve.areaUnderCurve(roccurve);
     if(logger.isVerbose()) {
-      logger.verbose(ROCAUC_LABEL +": " + rocauc);
+      logger.verbose(ROCAUC_LABEL + ": " + rocauc);
     }
 
-    List<String> header = new ArrayList<String>(1);
-    header.add(ROCAUC_LABEL+": " + rocauc);
-    final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
+    final ROCResult rocresult = new ROCResult(roccurve, rocauc);
 
     return rocresult;
   }
 
   private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
-    List<DoubleDoublePair> roccurve = ROC.materializeROC(size, positiveids, new ROC.OutlierScoreAdapter(or));
-    double rocauc = ROC.computeAUC(roccurve);
+    XYCurve roccurve = ROC.materializeROC(size, positiveids, new ROC.OutlierScoreAdapter(or));
+    double rocauc = XYCurve.areaUnderCurve(roccurve);
     if(logger.isVerbose()) {
-      logger.verbose(ROCAUC_LABEL+": " + rocauc);
+      logger.verbose(ROCAUC_LABEL + ": " + rocauc);
     }
 
-    List<String> header = new ArrayList<String>(1);
-    header.add(ROCAUC_LABEL+": " + rocauc);
-    final ROCResult rocresult = new ROCResult(roccurve, header, rocauc);
+    final ROCResult rocresult = new ROCResult(roccurve, rocauc);
 
     return rocresult;
   }
@@ -150,8 +145,8 @@ public class ComputeROCCurve implements Evaluator {
     Database db = ResultUtil.findDatabase(baseResult);
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
-    
-    if (positiveids.size() == 0) {
+
+    if(positiveids.size() == 0) {
       logger.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
@@ -186,7 +181,7 @@ public class ComputeROCCurve implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public static class ROCResult extends CollectionResult<DoubleDoublePair> {
+  public static class ROCResult extends XYCurve implements TextWriteable {
     /**
      * AUC value
      */
@@ -196,11 +191,10 @@ public class ComputeROCCurve implements Evaluator {
      * Constructor.
      * 
      * @param col roc curve
-     * @param header header
      * @param rocauc ROC AUC value
      */
-    public ROCResult(Collection<DoubleDoublePair> col, Collection<String> header, double rocauc) {
-      super("ROC Curve", "roc", col, header);
+    public ROCResult(XYCurve col, double rocauc) {
+      super(col);
       this.auc = rocauc;
     }
 
@@ -209,6 +203,16 @@ public class ComputeROCCurve implements Evaluator {
      */
     public double getAUC() {
       return auc;
+    }
+
+    @Override
+    public void writeToText(TextWriterStream out, String label) {
+      out.commentPrintLn(ROCAUC_LABEL + ": " + auc);
+      out.flush();
+      for(int pos = 0; pos < data.size(); pos++) {
+        out.inlinePrint(getX(pos) + " " + getY(pos));
+        out.flush();
+      }
     }
   }
 
@@ -220,6 +224,9 @@ public class ComputeROCCurve implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Pattern for positive class.
+     */
     protected Pattern positiveClassName = null;
 
     @Override
