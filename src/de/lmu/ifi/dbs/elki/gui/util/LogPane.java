@@ -29,12 +29,12 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.SimpleFormatter;
 
 import javax.swing.JTextPane;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
+import de.lmu.ifi.dbs.elki.logging.ErrorFormatter;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.MessageFormatter;
 import de.lmu.ifi.dbs.elki.logging.OutputStreamLogger;
@@ -84,12 +84,12 @@ public class LogPane extends JTextPane {
   /**
    * Formatter for debugging messages
    */
-  private Formatter debugformat = new SimpleFormatter();
+  private Formatter debugformat = new ErrorFormatter();
 
   /**
    * Formatter for error messages
    */
-  private Formatter errformat = new SimpleFormatter();
+  private Formatter errformat = new ErrorFormatter();
 
   /**
    * Last newline position
