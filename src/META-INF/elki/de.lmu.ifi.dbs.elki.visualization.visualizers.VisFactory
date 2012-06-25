@@ -33,7 +33,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolLi
 de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.ClusterEvaluationVisFactory
-de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.CurveVisFactory
+de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.XYCurveVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.PixmapVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer$Factory
