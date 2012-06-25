@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.math.geometry;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * An XYCurve is an ordered collection of 2d points, meant for chart generation.
@@ -33,7 +35,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * 
  * @author Erich Schubert
  */
-public class XYCurve implements Result {
+public class XYCurve implements Result, TextWriteable {
   /**
    * Simplification threshold
    */
@@ -284,6 +286,19 @@ public class XYCurve implements Result {
    */
   public Itr iterator() {
     return new Itr();
+  }
+
+  @Override
+  public void writeToText(TextWriterStream out, String label) {
+    out.commentPrint(labelx);
+    out.commentPrint(" ");
+    out.commentPrint(labely);
+    out.flush();
+    for(int pos = 0; pos < data.size(); pos+=2) {
+      out.inlinePrint(data.get(pos));
+      out.inlinePrint(data.get(pos + 1));
+      out.flush();
+    }
   }
 
   @Override

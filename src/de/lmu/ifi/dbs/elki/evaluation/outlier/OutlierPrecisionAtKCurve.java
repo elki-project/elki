@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.outlier;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,7 +23,6 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,19 +35,19 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
 
 /**
  * Compute a curve containing the precision values for an outlier detection
@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntDoublePair;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has PrecisionAtKCurve
  */
 public class OutlierPrecisionAtKCurve implements Evaluator {
   /**
@@ -131,7 +132,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     }
   }
 
-  private CollectionResult<IntDoublePair> computePrecisionResult(int size, SetDBIDs positiveids, Iterator<DBID> iter) {
+  private XYCurve computePrecisionResult(int size, SetDBIDs positiveids, Iterator<DBID> iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(size);
     while(iter.hasNext()) {
       Object o = iter.next();
@@ -146,7 +147,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
     int lastk = Math.min(size, maxk);
-    List<IntDoublePair> roccurve = new ArrayList<IntDoublePair>(lastk);
+    XYCurve curve = new PrecisionAtKCurve("k", "Precision", lastk);
 
     int pos = 0;
     DBIDIter i = order.iter();
@@ -154,18 +155,55 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       if(positiveids.contains(i.getDBID())) {
         pos++;
       }
-      roccurve.add(new IntDoublePair(k, (pos * 1.0) / k));
+      curve.addAndSimplify(k, pos / (double) k);
     }
-    String name = "Precision @ " + lastk + " " + ((pos * 1.0) / lastk);
     if(logger.isVerbose()) {
-      logger.verbose(name);
+      logger.verbose("Precision @ " + lastk + " " + ((pos * 1.0) / lastk));
+    }
+    return curve;
+  }
+
+  /**
+   * Precision at K curve.
+   * 
+   * @author Erich Schubert
+   */
+  public static class PrecisionAtKCurve extends XYCurve {
+    /**
+     * Constructor.
+     * 
+     * @param size Size estimation
+     */
+    public PrecisionAtKCurve(String labelx, String labely, int size) {
+      super("k", "Precision", size);
     }
 
-    List<String> header = new ArrayList<String>(1);
-    header.add(name);
-    final CollectionResult<IntDoublePair> rocresult = new CollectionResult<IntDoublePair>(name, "precisionatk", roccurve, header);
+    @Override
+    public String getLongName() {
+      return "Precision @ k Curve";
+    }
 
-    return rocresult;
+    @Override
+    public String getShortName() {
+      return "precision-at-k";
+    }
+
+    @Override
+    public void writeToText(TextWriterStream out, String label) {
+      final int last = size() - 1;
+      out.commentPrintLn("Precision @ " + ((int) getX(last)) + ": " + getY(last));
+      out.commentPrintSeparator();
+      out.flush();
+      out.commentPrint(labelx);
+      out.commentPrint(" ");
+      out.commentPrint(labely);
+      out.flush();
+      for(int pos = 0; pos < data.size(); pos+=2) {
+        out.inlinePrint((int)data.get(pos));
+        out.inlinePrint(data.get(pos + 1));
+        out.flush();
+      }
+    }
   }
 
   /**
