@@ -182,6 +182,11 @@ public interface StyleLibrary {
   final static String OPACITY = "opacity";
 
   /**
+   * XY curve styling.
+   */
+  static final String XYCURVE = "xycurve";
+
+  /**
    * Retrieve a color for an item
    * 
    * @param name Reference name
