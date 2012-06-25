@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -40,6 +42,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -126,7 +129,15 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
   protected void redraw() {
     makeLayerElement();
     addCSSClasses();
-    drawClusters(clus.getToplevelClusters(), 1);
+    
+    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+    HashMap<Cluster<?>, String> colormap = new HashMap<Cluster<?>, String>();
+    int cnum = 0;
+    for (Cluster<?> c : clus.getAllClusters()) {
+      colormap.put(c, colors.getColor(cnum));
+      cnum++;
+    }
+    drawClusters(clus.getToplevelClusters(), 1, colormap);
   }
 
   /**
@@ -134,9 +145,11 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
    * 
    * @param clusters Current set of clusters
    * @param depth Recursion depth
+   * @param colormap Color mapping
    */
-  private void drawClusters(List<Cluster<OPTICSModel>> clusters, int depth) {
+  private void drawClusters(List<Cluster<OPTICSModel>> clusters, int depth, Map<Cluster<?>,String> colormap) {
     final double scale = StyleLibrary.SCALE;
+
     for(Cluster<OPTICSModel> cluster : clusters) {
       try {
         OPTICSModel model = cluster.getModel();
@@ -145,6 +158,10 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
         final double y = plotheight + depth * scale * 0.01;
         Element e = svgp.svgLine(x1, y, x2, y);
         SVGUtil.addCSSClass(e, CSS_BRACKET);
+        String color = colormap.get(cluster);
+        if (color != null) {
+          SVGUtil.setAtt(e, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY+":"+color);
+        }
         layer.appendChild(e);
       }
       catch(ClassCastException e) {
@@ -153,7 +170,7 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
       // Descend
       final List<Cluster<OPTICSModel>> children = cluster.getChildren();
       if(children != null) {
-        drawClusters(children, depth + 1);
+        drawClusters(children, depth + 1, colormap);
       }
     }
   }
