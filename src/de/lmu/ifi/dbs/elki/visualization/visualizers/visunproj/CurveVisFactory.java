@@ -30,12 +30,11 @@ import java.util.Iterator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -169,15 +168,15 @@ public class CurveVisFactory extends AbstractVisFactory {
     }
 
     // Add AUC value when found
-    if(curve instanceof ROCResult) {
-      Collection<String> header = ((ROCResult) curve).getHeader();
+    if(curve instanceof CollectionResult) {
+      Collection<String> header = ((CollectionResult<?>) curve).getHeader();
       for(String str : header) {
         String[] parts = str.split(":\\s*");
-        if(parts[0].equals(ComputeROCCurve.ROCAUC_LABEL) && parts.length == 2) {
+        if(parts.length == 2) {
           double rocauc = Double.parseDouble(parts[1]);
           StyleLibrary style = context.getStyleLibrary();
           CSSClass cls = new CSSClass(svgp, "unmanaged");
-          String lt = "ROC AUC: " + FormatUtil.NF8.format(rocauc);
+          String lt = parts[0] + ": " + FormatUtil.NF8.format(rocauc);
           double fontsize = style.getTextSize("curve.labels");
           cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("curve.labels"));
