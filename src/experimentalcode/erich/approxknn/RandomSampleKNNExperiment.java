@@ -49,13 +49,13 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 
 /**
  * Simple experiment to estimate the effects of approximating the kNN distances.
@@ -108,8 +108,8 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-          double auc = ROC.computeAUC(roccurve);
+          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][0] = auc;
           if(prog != null) {
             prog.incrementProcessed(logger);
@@ -126,8 +126,8 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, distanceFunction, distanceFunction);
           OutlierResult res = lof.run(rel);
-          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-          double auc = ROC.computeAUC(roccurve);
+          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][3] = auc;
           if(prog != null) {
             prog.incrementProcessed(logger);
@@ -164,32 +164,32 @@ public class RandomSampleKNNExperiment {
         {
           KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, maxk);
           OutlierResult res = knn.run(database, rel);
-          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-          double auc = ROC.computeAUC(roccurve);
+          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][1] = auc;
         }
         // Scaled k kNNOutlier run
         {
           KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-          double auc = ROC.computeAUC(roccurve);
+          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][2] = auc;
         }
         // Max k LOF run
         {
           LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(maxk, distanceFunction, distanceFunction);
           OutlierResult res = lof.run(rel);
-          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-          double auc = ROC.computeAUC(roccurve);
+          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][4] = auc;
         }
         // Scaled k LOF run
         {
           LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, distanceFunction, distanceFunction);
           OutlierResult res = lof.run(rel);
-          List<DoubleDoublePair> roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
-          double auc = ROC.computeAUC(roccurve);
+          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][5] = auc;
         }
         // Remove preprocessor
