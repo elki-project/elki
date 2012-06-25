@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -181,7 +180,7 @@ public class ComputeROCCurve implements Evaluator {
    * 
    * @author Erich Schubert
    */
-  public static class ROCResult extends XYCurve implements TextWriteable {
+  public static class ROCResult extends XYCurve {
     /**
      * AUC value
      */
@@ -206,13 +205,20 @@ public class ComputeROCCurve implements Evaluator {
     }
 
     @Override
+    public String getLongName() {
+      return "ROC Curve";
+    }
+
+    @Override
+    public String getShortName() {
+      return "roc-curve";
+    }
+
+    @Override
     public void writeToText(TextWriterStream out, String label) {
       out.commentPrintLn(ROCAUC_LABEL + ": " + auc);
       out.flush();
-      for(int pos = 0; pos < data.size(); pos++) {
-        out.inlinePrint(getX(pos) + " " + getY(pos));
-        out.flush();
-      }
+      super.writeToText(out, label);
     }
   }
 

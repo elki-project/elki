@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -51,6 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * method.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has PRCurve
  */
 public class OutlierPrecisionRecallCurve implements Evaluator {
   /**
@@ -116,7 +119,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   private XYCurve computePrecisionResult(int size, SetDBIDs ids, Iterator<DBID> iter, Relation<Double> scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
-    XYCurve curve = new XYCurve("Recall", "Precision", postot + 2);
+    XYCurve curve = new PRCurve(postot + 2);
 
     double prevscore = Double.NaN;
     while(iter.hasNext()) {
@@ -150,6 +153,32 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // End curve - always at all positives found.
     curve.addAndSimplify(1.0, postot / total);
     return curve;
+  }
+
+  /**
+   * P/R Curve
+   * 
+   * @author Erich Schubert
+   */
+  public static class PRCurve extends XYCurve {
+    /**
+     * Constructor.
+     * 
+     * @param size Size estimation
+     */
+    public PRCurve(int size) {
+      super("Recall", "Precision", size);
+    }
+
+    @Override
+    public String getLongName() {
+      return "Precision-Recall-Curve";
+    }
+
+    @Override
+    public String getShortName() {
+      return "pr-curve";
+    }
   }
 
   /**
