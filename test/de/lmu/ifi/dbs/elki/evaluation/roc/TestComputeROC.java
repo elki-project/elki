@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
  */
 
 import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -34,8 +33,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -67,11 +65,11 @@ public class TestComputeROC implements JUnit4Test {
     distances.add(new Pair<Double, DBID>(5.0, DBIDUtil.importInteger(9)));
     distances.add(new Pair<Double, DBID>(6.0, DBIDUtil.importInteger(5)));
 
-    List<DoubleDoublePair> roccurve = ROC.materializeROC(9, positive, distances.iterator());
-    // System.out.println(roccurve);
+    XYCurve roccurve = ROC.materializeROC(9, positive, distances.iterator());
+    System.out.println(roccurve);
     Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
 
-    double auc = ROC.computeAUC(roccurve);
+    double auc = XYCurve.areaUnderCurve(roccurve);
     Assert.assertEquals("ROC AUC not right.", 0.6, auc, 0.0001);
   }
 }

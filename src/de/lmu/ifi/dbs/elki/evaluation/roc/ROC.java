@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -37,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
@@ -81,23 +80,16 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>, T> List<DoubleDoublePair> materializeROC(int size, Set<? super T> ids, Iterator<? extends PairInterface<C, T>> nei) {
-    int postot = ids.size();
-    int negtot = size - postot;
-    int poscnt = 0;
-    int negcnt = 0;
-    ArrayList<DoubleDoublePair> res = new ArrayList<DoubleDoublePair>(postot + 2);
+  public static <C extends Comparable<? super C>, T> XYCurve materializeROC(int size, Set<? super T> ids, Iterator<? extends PairInterface<C, T>> nei) {
+    final int postot = ids.size(), negtot = size - postot;
+    int poscnt = 0, negcnt = 0;
+    XYCurve curve = new XYCurve("True Negative Rate", "True Positive Rate", postot + 2);
 
     // start in bottom left
-    res.add(new DoubleDoublePair(0.0, 0.0));
+    curve.add(0.0, 0.0);
 
-    PairInterface<C, T> prev = null;
+    C prevval = null;
     while(nei.hasNext()) {
-      // Previous positive rate - y axis
-      double curpos = ((double) poscnt) / postot;
-      // Previous negative rate - x axis
-      double curneg = ((double) negcnt) / negtot;
-
       // Analyze next point
       PairInterface<C, T> cur = nei.next();
       // positive or negative match?
@@ -108,46 +100,17 @@ public class ROC {
         negcnt += 1;
       }
       // defer calculation for ties
-      if((prev != null) && (prev.getFirst().compareTo(cur.getFirst()) == 0)) {
+      if((prevval != null) && (prevval.compareTo(cur.getFirst()) == 0)) {
         continue;
       }
-      // simplify curve when possible:
-      if(res.size() >= 2) {
-        DoubleDoublePair last1 = res.get(res.size() - 2);
-        DoubleDoublePair last2 = res.get(res.size() - 1);
-        final double ldx = last2.first - last1.first;
-        final double cdx = curneg - last2.first;
-        final double ldy = last2.second - last1.second;
-        final double cdy = curpos - last2.second;
-        // vertical simplification
-        if((ldx == 0) && (cdx == 0)) {
-          res.remove(res.size() - 1);
-        }
-        // horizontal simplification
-        else if((ldy == 0) && (cdy == 0)) {
-          res.remove(res.size() - 1);
-        }
-        // diagonal simplification
-        else if(ldy > 0 && cdy > 0) {
-          if(Math.abs((ldx / ldy) - (cdx / cdy)) < 1E-10) {
-            res.remove(res.size() - 1);
-          }
-        }
-      }
-      // Add a new point (for the previous entry!)
-      res.add(new DoubleDoublePair(curneg, curpos));
-      prev = cur;
+      // Add a new point.
+      curve.addAndSimplify(negcnt / (double) negtot, poscnt / (double) postot);
+      prevval = cur.getFirst();
     }
-    // ensure we end up in the top right corner.
-    // Since we didn't add a point for the last entry yet, this likely is
-    // needed.
-    {
-      DoubleDoublePair last = res.get(res.size() - 1);
-      if(last.first < 1.0 || last.second < 1.0) {
-        res.add(new DoubleDoublePair(1.0, 1.0));
-      }
-    }
-    return res;
+    // Ensure we end up in the top right corner.
+    // Simplification will skip this if we already were.
+    curve.addAndSimplify(1.0, 1.0);
+    return curve;
   }
 
   /**
@@ -162,23 +125,19 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>> List<DoubleDoublePair> materializeROC(int size, SetDBIDs ids, Iterator<? extends PairInterface<C, DBID>> nei) {
-    int postot = ids.size();
-    int negtot = size - postot;
-    int poscnt = 0;
-    int negcnt = 0;
-    ArrayList<DoubleDoublePair> res = new ArrayList<DoubleDoublePair>(postot + 2);
+  public static <C extends Comparable<? super C>> XYCurve materializeROC(int size, SetDBIDs ids, Iterator<? extends PairInterface<C, DBID>> nei) {
+    final int postot = ids.size(), negtot = size - postot;
+    int poscnt = 0, negcnt = 0;
+    XYCurve curve = new XYCurve("True Negative Rate", "True Positive Rate", postot + 2);
 
     // start in bottom left
-    res.add(new DoubleDoublePair(0.0, 0.0));
+    curve.add(0.0, 0.0);
 
-    PairInterface<C, DBID> prev = null;
+    C prevval = null;
     while(nei.hasNext()) {
-      // Previous positive rate - y axis
-      double curpos = ((double) poscnt) / postot;
-      // Previous negative rate - x axis
-      double curneg = ((double) negcnt) / negtot;
-
+      // Rates at *previous* data point. Because of tie handling strategy!
+      final double trueneg = negcnt / (double) negtot;
+      final double truepos = poscnt / (double) postot;
       // Analyze next point
       PairInterface<C, DBID> cur = nei.next();
       // positive or negative match?
@@ -189,46 +148,17 @@ public class ROC {
         negcnt += 1;
       }
       // defer calculation for ties
-      if((prev != null) && (prev.getFirst().compareTo(cur.getFirst()) == 0)) {
+      if((prevval != null) && (prevval.compareTo(cur.getFirst()) == 0)) {
         continue;
       }
-      // simplify curve when possible:
-      if(res.size() >= 2) {
-        DoubleDoublePair last1 = res.get(res.size() - 2);
-        DoubleDoublePair last2 = res.get(res.size() - 1);
-        final double ldx = last2.first - last1.first;
-        final double cdx = curneg - last2.first;
-        final double ldy = last2.second - last1.second;
-        final double cdy = curpos - last2.second;
-        // vertical simplification
-        if((ldx == 0) && (cdx == 0)) {
-          res.remove(res.size() - 1);
-        }
-        // horizontal simplification
-        else if((ldy == 0) && (cdy == 0)) {
-          res.remove(res.size() - 1);
-        }
-        // diagonal simplification
-        else if(ldy > 0 && cdy > 0) {
-          if(Math.abs((ldx / ldy) - (cdx / cdy)) < 1E-10) {
-            res.remove(res.size() - 1);
-          }
-        }
-      }
-      // Add a new point (for the previous entry!)
-      res.add(new DoubleDoublePair(curneg, curpos));
-      prev = cur;
+      // Add point for *previous* result (since we are no longer tied with it)
+      curve.addAndSimplify(trueneg, truepos);
+      prevval = cur.getFirst();
     }
-    // ensure we end up in the top right corner.
-    // Since we didn't add a point for the last entry yet, this likely is
-    // needed.
-    {
-      DoubleDoublePair last = res.get(res.size() - 1);
-      if(last.first < 1.0 || last.second < 1.0) {
-        res.add(new DoubleDoublePair(1.0, 1.0));
-      }
-    }
-    return res;
+    // Ensure we end up in the top right corner.
+    // Simplification will skip this if we already were.
+    curve.addAndSimplify(1.0, 1.0);
+    return curve;
   }
 
   /**
@@ -424,8 +354,8 @@ public class ROC {
    */
   public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, Iterable<? extends DistanceResultPair<D>> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    List<DoubleDoublePair> roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iterator()));
-    return computeAUC(roc);
+    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iterator()));
+    return XYCurve.areaUnderCurve(roc);
   }
 
   /**
@@ -438,7 +368,7 @@ public class ROC {
    */
   public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    List<DoubleDoublePair> roc = materializeROC(size, DBIDUtil.ensureSet(ids), new SimpleAdapter(nei.iterator()));
-    return computeAUC(roc);
+    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new SimpleAdapter(nei.iterator()));
+    return XYCurve.areaUnderCurve(roc);
   }
 }
