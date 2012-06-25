@@ -510,7 +510,7 @@ public final class DatabaseUtil {
     }
     ArrayModifiableDBIDs ret = DBIDUtil.newArray();
     for(DBID objid : relation.iterDBIDs()) {
-      if(name_pattern.matcher(relation.get(objid)).matches()) {
+      if(name_pattern.matcher(relation.get(objid)).find()) {
         ret.add(objid);
       }
     }
