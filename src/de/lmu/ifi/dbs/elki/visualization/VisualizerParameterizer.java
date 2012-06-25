@@ -165,7 +165,6 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return New context
    */
   public VisualizerContext newContext(HierarchicalResult result) {
-    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories);
     if(samplesize > 0) {
       Iterator<Relation<?>> iter = ResultUtil.filteredResults(result, Relation.class);
       while(iter.hasNext()) {
@@ -181,6 +180,7 @@ public class VisualizerParameterizer implements Parameterizable {
         }
       }
     }
+    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories);
     return context;
   }
 
