@@ -45,9 +45,9 @@ public class ErrorFormatter extends Formatter {
   "java.awt.event.", //
   "java.awt.EventDispatchThread",//
   "java.awt.EventQueue",//
-  "java.security",//
+  "java.security.",//
   "java.lang.Thread",//
-  "java.util.concurrent.ThreadPoolExecutor",//
+  "java.util.concurrent.",//
   "javax.swing.SwingWorker", //
   "java.util.concurrent.FutureTask", //
   "org.apache.batik.", //
