@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
@@ -295,38 +294,6 @@ public class ROC {
     public void remove() {
       throw new UnsupportedOperationException();
     }
-  }
-
-  /**
-   * compute the Area Under Curve (difference to y axis) for an arbitrary
-   * polygon
-   * 
-   * @param curve Iterable list of points (x,y)
-   * @return area und curve
-   */
-  public static double computeAUC(Iterable<DoubleDoublePair> curve) {
-    double result = 0.0;
-    Iterator<DoubleDoublePair> iter = curve.iterator();
-    // it doesn't make sense to speak about the "area under a curve" when there
-    // is no curve.
-    if(!iter.hasNext()) {
-      return Double.NaN;
-    }
-    // starting point
-    DoubleDoublePair prev = iter.next();
-    // check there is at least a second point
-    if(!iter.hasNext()) {
-      return Double.NaN;
-    }
-    while(iter.hasNext()) {
-      DoubleDoublePair next = iter.next();
-      // width * height at half way.
-      double width = next.first - prev.first;
-      double meanheight = (next.second + prev.second) / 2;
-      result += width * meanheight;
-      prev = next;
-    }
-    return result;
   }
 
   /**
