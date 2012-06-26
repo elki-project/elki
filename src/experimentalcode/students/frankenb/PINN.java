@@ -12,7 +12,7 @@ import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
+import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -42,7 +42,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
 
   private final RandomProjection<V> randomProjection;
 
-  private final ComputeROCCurve rocComputer;
+  private final OutlierROCCurve rocComputer;
 
   private final int k;
 
@@ -61,7 +61,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
    * @param kFactor
    * @param outputFile
    */
-  public PINN(boolean verbose, Database database, RandomProjection<V> randomProjection, ComputeROCCurve rocComputer, int k, int kFactor, File outputFile) {
+  public PINN(boolean verbose, Database database, RandomProjection<V> randomProjection, OutlierROCCurve rocComputer, int k, int kFactor, File outputFile) {
     super(verbose);
     this.database = database;
     this.randomProjection = randomProjection;
@@ -127,7 +127,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
 
     private RandomProjection<V> randomProjection;
 
-    private ComputeROCCurve rocComputer;
+    private OutlierROCCurve rocComputer;
 
     private int k;
 
@@ -153,7 +153,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
       randomProjection = new RandomProjection<V>(config);
 
       database = config.tryInstantiate(HashmapDatabase.class);
-      rocComputer = config.tryInstantiate(ComputeROCCurve.class);
+      rocComputer = config.tryInstantiate(OutlierROCCurve.class);
     }
 
     @Override
