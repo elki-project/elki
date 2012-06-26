@@ -10,3 +10,4 @@ de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve
 de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierSmROCCurve
 de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores
 de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage
+# de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve
