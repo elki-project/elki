@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @author Erich Schubert
  */
-public final class XMLNodeListIterator implements Iterator<Node>, Iterable<Node> {
+public final class XMLNodeListIterator implements Iterator<Node> {
   /**
    * Store the next node
    */
@@ -82,12 +82,4 @@ public final class XMLNodeListIterator implements Iterator<Node>, Iterable<Node>
   public void remove() {
     throw new UnsupportedOperationException(this.getClass().getSimpleName()+": "+ExceptionMessages.UNSUPPORTED_REMOVE);
   }
-
-  /**
-   * Iterable interface adapter - clone.
-   */
-  @Override
-  public Iterator<Node> iterator() {
-    return new XMLNodeListIterator(this.nodelist);
-  }  
 }
