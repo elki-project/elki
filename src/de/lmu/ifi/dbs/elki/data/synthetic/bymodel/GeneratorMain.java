@@ -154,6 +154,13 @@ public class GeneratorMain {
               cursclus.incrementDiscarded();
             }
           }
+        } else {
+          // Keep all.
+          for (Vector p : newp) {
+            DoubleVector dv = new DoubleVector(p);
+            bundle.appendSimple(dv, l, model);
+            ++kept;
+          }
         }
       }
     }
