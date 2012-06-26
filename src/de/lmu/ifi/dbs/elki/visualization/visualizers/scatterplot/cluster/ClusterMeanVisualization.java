@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -235,15 +236,13 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find clusterings we can visualize:
-      Iterator<Clustering<?>> clusterings = ResultUtil.filteredResults(result, Clustering.class);
-      while(clusterings.hasNext()) {
-        Clustering<?> c = clusterings.next();
+      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+      for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
           if(testMeanModel(c)) {
-            Iterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
-            while(ps.hasNext()) {
-              ScatterPlotProjector<?> p = ps.next();
+            Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+            for(ScatterPlotProjector<?> p : ps) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
               baseResult.getHierarchy().add(c, task);

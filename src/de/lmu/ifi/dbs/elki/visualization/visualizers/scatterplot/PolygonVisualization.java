@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -163,11 +162,11 @@ public class PolygonVisualization extends AbstractScatterplotVisualization imple
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      ArrayList<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
+      Collection<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> rel : results) {
         if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
           // Assume that a 2d projector is using the same coordinates as the polygons.
-          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
             if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
               final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);

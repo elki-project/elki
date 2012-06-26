@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -269,7 +268,7 @@ public class VoronoiVisualization extends AbstractScatterplotVisualization {
         if(c.getAllClusters().size() > 0) {
           // Does the cluster have a model with cluster means?
           if(testMeanModel(c)) {
-            IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+            Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
             for(ScatterPlotProjector<?> p : ps) {
               if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
                 final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
