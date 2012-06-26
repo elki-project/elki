@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
+import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -49,9 +49,8 @@ public class ParallelPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Iterator<Relation<?>> rels = ResultUtil.filteredResults(newResult, Relation.class);
-    while (rels.hasNext()) {
-      Relation<?> rel = rels.next();
+    Collection<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
+    for(Relation<?> rel : rels) {
       // TODO: multi-relational parallel plots
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")

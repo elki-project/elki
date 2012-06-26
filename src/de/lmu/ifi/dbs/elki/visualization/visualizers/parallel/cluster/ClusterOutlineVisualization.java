@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -38,7 +39,6 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -234,11 +234,10 @@ public class ClusterOutlineVisualization extends AbstractParallelVisualization<N
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find clusterings we can visualize:
-      Iterator<Clustering<?>> clusterings = ResultUtil.filteredResults(result, Clustering.class);
-      while(clusterings.hasNext()) {
-        Clustering<?> c = clusterings.next();
+      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+      for(Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
-          IterableIterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ParallelPlotProjector.class);
+          Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
           for(ParallelPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);

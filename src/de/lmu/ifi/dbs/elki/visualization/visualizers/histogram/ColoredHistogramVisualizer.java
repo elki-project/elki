@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -41,7 +42,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -391,9 +391,9 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       // Find a style result to visualize:
-      IterableIterator<StyleResult> styleres = ResultUtil.filteredResults(result, StyleResult.class);
+      Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
       for(StyleResult c : styleres) {
-        IterableIterator<HistogramProjector<?>> ps = ResultUtil.filteredResults(baseResult, HistogramProjector.class);
+        Collection<HistogramProjector<?>> ps = ResultUtil.filterResults(baseResult, HistogramProjector.class);
         for(HistogramProjector<?> p : ps) {
           // register self
           final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);

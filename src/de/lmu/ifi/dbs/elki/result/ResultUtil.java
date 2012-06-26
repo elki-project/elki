@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -275,9 +274,9 @@ public class ResultUtil {
    * @return selection result
    */
   public static SelectionResult ensureSelectionResult(final Database db) {
-    Iterator<SelectionResult> selections = ResultUtil.filteredResults(db, SelectionResult.class);
-    if(selections.hasNext()) {
-      return selections.next();
+    List<SelectionResult> selections = ResultUtil.filterResults(db, SelectionResult.class);
+    if(!selections.isEmpty()) {
+      return selections.get(0);
     }
     SelectionResult sel = new SelectionResult();
     addChildResult(db, sel);
@@ -333,9 +332,9 @@ public class ResultUtil {
    * @return Database
    */
   public static Database findDatabase(Result baseResult) {
-    final IterableIterator<Database> iter = filteredResults(baseResult, Database.class);
-    if(iter.hasNext()) {
-      return iter.next();
+    final List<Database> dbs = filterResults(baseResult, Database.class);
+    if(!dbs.isEmpty()) {
+      return dbs.get(0);
     }
     else {
       return null;

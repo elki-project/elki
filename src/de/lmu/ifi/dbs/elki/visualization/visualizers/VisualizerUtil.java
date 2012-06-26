@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  */
 
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -53,9 +54,9 @@ public final class VisualizerUtil {
    * @return Visualizer context
    */
   public static VisualizerContext getContext(HierarchicalResult baseResult) {
-    IterableIterator<VisualizerContext> iter = ResultUtil.filteredResults(baseResult, VisualizerContext.class);
-    if(iter.hasNext()) {
-      return iter.next();
+    List<VisualizerContext> contexts = ResultUtil.filterResults(baseResult, VisualizerContext.class);
+    if(!contexts.isEmpty()) {
+      return contexts.get(0);
     }
     else {
       return null;
@@ -106,7 +107,7 @@ public final class VisualizerUtil {
   public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
     // Hide other tools
     if(visibility && VisualizerUtil.isTool(task)) {
-      final Iterable<VisualizationTask> visualizers = ResultUtil.filteredResults(context.getResult(), VisualizationTask.class);
+      final List<VisualizationTask> visualizers = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
       for(VisualizationTask other : visualizers) {
         if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.put(VisualizationTask.META_VISIBLE, false);
@@ -150,8 +151,8 @@ public final class VisualizerUtil {
    */
   // TODO: move to DatabaseUtil?
   public static IterableIterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
-    Iterator<Relation<?>> parent = ResultUtil.filteredResults(result, Relation.class);
-    return new VectorspaceIterator(parent);
+    List<Relation<?>> parent = ResultUtil.filterResults(result, Relation.class);
+    return new VectorspaceIterator(parent.iterator());
   }
   
   /**
