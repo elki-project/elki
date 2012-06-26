@@ -204,6 +204,9 @@ public class Entropy {
    * @return Sqrt Normalized Mutual information
    */
   public double entropyNMISqrt() {
+    if (entropyFirst() * entropySecond() <= 0) {
+      return entropyMutualInformation();
+    }
     return (entropyMutualInformation() / Math.sqrt(entropyFirst() * entropySecond()));
   }
 
