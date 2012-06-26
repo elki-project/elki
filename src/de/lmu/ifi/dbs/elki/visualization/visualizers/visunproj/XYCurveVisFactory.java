@@ -135,7 +135,7 @@ public class XYCurveVisFactory extends AbstractVisFactory {
       double rocauc = ((ROCResult) curve).getAUC();
       String lt = OutlierROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF8.format(rocauc);
       if(rocauc <= 0.5) {
-        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.5, lt);
+        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
       }
@@ -146,10 +146,10 @@ public class XYCurveVisFactory extends AbstractVisFactory {
       }
     }
     if(curve instanceof PRCurve) {
-      double rocauc = ((PRCurve) curve).getAUC();
-      String lt = PRCurve.PRAUC_LABEL + ": " + FormatUtil.NF8.format(rocauc);
-      if(rocauc <= 0.5) {
-        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.5, lt);
+      double prauc = ((PRCurve) curve).getAUC();
+      String lt = PRCurve.PRAUC_LABEL + ": " + FormatUtil.NF8.format(prauc);
+      if(prauc <= 0.5) {
+        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
       }
