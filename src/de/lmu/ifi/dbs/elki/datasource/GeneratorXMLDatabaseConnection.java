@@ -239,7 +239,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
       testAgainstModel = (Integer.valueOf(testmod) != 0);
     }
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeName() == "cluster") {
         processElementCluster(gen, child);
       }
@@ -287,7 +289,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     GeneratorSingleCluster cluster = new GeneratorSingleCluster(name, size, overweight, newRand);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeName() == "uniform") {
         processElementUniform(cluster, child);
       }
@@ -340,7 +344,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
@@ -372,7 +378,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
@@ -404,7 +412,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
@@ -449,7 +459,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     cluster.addRotation(axis1 - 1, axis2 - 1, Math.toRadians(angle));
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
@@ -477,7 +489,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     cluster.addTranslation(offset);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
@@ -511,7 +525,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     cluster.setClipping(cmin, cmax);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
@@ -533,7 +549,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
     ArrayList<Vector> points = new ArrayList<Vector>();
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeName() == "point") {
         processElementPoint(points, child);
       }
@@ -571,7 +589,9 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     points.add(point);
 
     // TODO: check for unknown attributes.
-    for(Node child : new XMLNodeIterator(cur.getFirstChild())) {
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while(iter.hasNext()) {
+      Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
         logger.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
