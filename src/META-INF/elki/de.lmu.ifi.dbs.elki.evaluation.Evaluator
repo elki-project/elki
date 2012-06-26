@@ -7,5 +7,6 @@ de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve
 de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierThresholdClustering
 de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionAtKCurve
 de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve
+de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierSmROCCurve
 de.lmu.ifi.dbs.elki.evaluation.outlier.JudgeOutlierScores
 de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage
