@@ -1,6 +1,6 @@
 package experimentalcode.students.roedler;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -255,9 +254,9 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      final ArrayList<AbstractMaterializeKNNPreprocessor<?, D, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
+      Collection<AbstractMaterializeKNNPreprocessor<?, D, ?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
       for(AbstractMaterializeKNNPreprocessor<?, D, ?> kNN : kNNIndex) {
-        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
