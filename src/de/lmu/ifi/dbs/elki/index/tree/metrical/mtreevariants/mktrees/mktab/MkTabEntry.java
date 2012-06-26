@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * Additionally to an entry in an M-Tree an MkTabEntry holds a list of knn distances
  * for for parameters k <= k_max of the underlying data object or MkTab-Tree node.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 interface MkTabEntry<D extends Distance<D>> extends MTreeEntry<D> {
   /**

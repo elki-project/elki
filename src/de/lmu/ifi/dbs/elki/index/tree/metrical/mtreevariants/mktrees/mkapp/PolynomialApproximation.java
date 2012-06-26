@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * Provides an polynomial approximation bo + b1*k + b2*k^2 + ... + bp*k^p
  * for knn-distances consisting of parameters b0, ..., bp.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class PolynomialApproximation implements Externalizable {
   private static final long serialVersionUID = 1;

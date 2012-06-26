@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * 
  * @author Erich Schubert
  * @author Franz Graf
- * @author Marisa Petri
+ * @author Marisa Thoma
  */
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
 public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInsertionStrategy {

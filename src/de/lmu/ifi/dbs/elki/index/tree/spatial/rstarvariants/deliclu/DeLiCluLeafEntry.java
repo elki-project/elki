@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
  * Additionally to a leaf entry in an R*-Tree two boolean flags that indicate whether this entry's node
  * contains handled or unhandled data objects.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  */
 public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEntry {
   private static final long serialVersionUID = 1;
