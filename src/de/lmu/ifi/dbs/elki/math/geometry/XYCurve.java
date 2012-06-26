@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * An XYCurve is an ordered collection of 2d points, meant for chart generation.
- * Of key interest is the method {@link #addAndSimpify} which tries to simplify
+ * Of key interest is the method {@link #addAndSimplify} which tries to simplify
  * the curve while adding points.
  * 
  * @author Erich Schubert
