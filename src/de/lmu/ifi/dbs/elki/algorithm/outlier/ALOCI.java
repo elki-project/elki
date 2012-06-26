@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * India, 2003.
  * </p>
  * 
- * @author Jonathan von Bruenken
+ * @author Jonathan von Brünken
  * @author Erich Schubert
  * 
  * @param <O> Object type
@@ -305,7 +305,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * Furthermore, the quadtree can be shifted by a specified vector, wrapping
    * around min/max
    * 
-   * @author Jonathan von Bruenken
+   * @author Jonathan von Brünken
    * @author Erich Schubert
    * 
    * @apiviz.composedOf Node

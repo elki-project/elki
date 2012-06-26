@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 /**
  * A collection of math related utility functions.
  * 
- * @author Arthur Zimekt
+ * @author Arthur Zimek
  * @author Erich Schubert
  * 
  * @apiviz.landmark
@@ -45,7 +45,7 @@ public final class MathUtil {
   public static final double TWOPI = 2 * Math.PI;
 
   /**
-   * Squre root of two times Pi.
+   * Square root of two times Pi.
    */
   public static final double SQRTTWOPI = Math.sqrt(TWOPI);
 
@@ -60,7 +60,7 @@ public final class MathUtil {
   public static final double SQRT5 = Math.sqrt(5);
 
   /**
-   * Square root of 0.5 == 1 / Sqrt(2)
+   * Square root of 0.5 == 1 / sqrt(2)
    */
   public static final double SQRTHALF = Math.sqrt(.5);
 

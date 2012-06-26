@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * management
  * </p>
  * 
- * @author Pleintinger Viktoria
+ * @author Viktoria Pleintinger
  * @author Erich Schubert
  * 
  * @apiviz.composedOf KernelDensityEstimator

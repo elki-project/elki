@@ -30,8 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 /**
  * Runnable wrapper for appending XML-Elements to existing Elements.
  * 
- * @author Remigius Wojdanowski.
- * 
+ * @author Remigius Wojdanowski
  */
 public class NodeAppendChild implements Runnable {
   /**
@@ -45,7 +44,7 @@ public class NodeAppendChild implements Runnable {
   protected Element child;
 
   /**
-   * The plot (for ID updates). May be {code null}.
+   * The plot (for ID updates). May be {@code null}.
    */
   protected SVGPlot plot;
 

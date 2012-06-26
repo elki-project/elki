@@ -31,9 +31,9 @@ import java.util.List;
  * Encapsulates weak and strong eigenpairs that have been filtered out
  * by an eigenpair filter.
  *
- * @author Elke Achtert 
+ * @author Elke Achtert
  * 
- * @apiviz.has de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair
+ * @apiviz.has EigenPair
  */
 public class FilteredEigenPairs {
   /**
