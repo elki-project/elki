@@ -28,15 +28,13 @@ import java.util.Iterator;
 import org.w3c.dom.Node;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Simple adapter class to iterate over a DOM tree nodes children.
  * 
  * @author Erich Schubert
- *
  */
-public final class XMLNodeIterator implements IterableIterator<Node> {
+public final class XMLNodeIterator implements Iterator<Node>, Iterable<Node> {
   /**
    * Store the next node
    */

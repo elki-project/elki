@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.AbstractFilteredIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
@@ -150,7 +149,7 @@ public final class VisualizerUtil {
    * @return Iterator over suitable representations
    */
   // TODO: move to DatabaseUtil?
-  public static IterableIterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
+  public static Iterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
     List<Relation<?>> parent = ResultUtil.filterResults(result, Relation.class);
     return new VectorspaceIterator(parent.iterator());
   }
@@ -162,7 +161,7 @@ public final class VisualizerUtil {
    * 
    * @apiviz.exclude
    */
-  private static class VectorspaceIterator extends AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?, ?>>> implements IterableIterator<Relation<? extends NumberVector<?, ?>>> {
+  private static class VectorspaceIterator extends AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?, ?>>> {
     /** Parent iterator */
     private Iterator<Relation<?>> parent;
 
@@ -187,11 +186,6 @@ public final class VisualizerUtil {
         return null;
       }
       return (Relation<? extends NumberVector<?, ?>>) nextobj;
-    }
-
-    @Override
-    public Iterator<Relation<? extends NumberVector<?, ?>>> iterator() {
-      return this;
     }
   };
 

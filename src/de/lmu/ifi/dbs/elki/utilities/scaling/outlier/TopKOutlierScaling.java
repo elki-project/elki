@@ -23,10 +23,11 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Iterator;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -98,7 +99,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
     if(k <= 0) {
       LoggingUtil.warning("No k configured for Top-k outlier scaling!");
     }
-    IterableIterator<DBID> order = or.getOrdering().iter(or.getOrdering().getDBIDs());
+    Iterator<DBID> order = or.getOrdering().iter(or.getOrdering().getDBIDs());
     for(int i = 0; i < k; i++) {
       // stop if no more results.
       if(!order.hasNext()) {
