@@ -322,6 +322,9 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         LoggingUtil.warning("Visualization returned empty layer: " + vis);
       }
       else {
+        if (VisualizerUtil.isNoExport(task)) {
+          vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
+        }
         parent.appendChild(vis.getLayer());
       }
       return vis;

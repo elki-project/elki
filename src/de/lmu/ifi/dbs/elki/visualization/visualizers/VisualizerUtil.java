@@ -131,6 +131,18 @@ public final class VisualizerUtil {
   }
 
   /**
+   * Utility function to test for a visualizer being "no export".
+   * 
+   * @param vis Visualizer to test
+   * @return true when not to export
+   */
+  public static boolean isNoExport(VisualizationTask vis) {
+    // Currently enabled?
+    Boolean noexport = vis.getGenerics(VisualizationTask.META_NOEXPORT, Boolean.class);
+    return (noexport != null) && noexport;
+  }
+
+  /**
    * Utility function to test for a visualizer having options.
    * 
    * @param vis Visualizer to test
