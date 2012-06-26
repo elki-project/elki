@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -709,9 +708,9 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       List<Segments> segments = ResultUtil.filterResults(result, Segments.class);
       for(Segments segmentResult : segments) {
         SegmentsStylingPolicy policy;
-        Iterator<SegmentsStylingPolicy> iter = ResultUtil.filteredResults(segmentResult, SegmentsStylingPolicy.class);
-        if (iter.hasNext()) {
-          policy = iter.next();
+        List<SegmentsStylingPolicy> styles = ResultUtil.filterResults(segmentResult, SegmentsStylingPolicy.class);
+        if (!styles.isEmpty()) {
+          policy = styles.get(0);
         } else {
           policy = new SegmentsStylingPolicy(segmentResult);
           baseResult.getHierarchy().add(segmentResult, policy);

@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -106,9 +105,8 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
    */
   @SuppressWarnings("unchecked")
   protected static Clustering<OPTICSModel> findOPTICSClustering(Result result) {
-    Iterator<Clustering<?>> cs = ResultUtil.filteredResults(result, Clustering.class);
-    while (cs.hasNext()) {
-      Clustering<?> clus = cs.next();
+    Collection<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
+    for(Clustering<?> clus : cs) {
       if(clus.getToplevelClusters().size() == 0) {
         continue;
       }
@@ -207,7 +205,7 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      IterableIterator<OPTICSProjector<?>> ops = ResultUtil.filteredResults(result, OPTICSProjector.class);
+      Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
       for(OPTICSProjector<?> p : ops) {
         final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
         if(ocl != null) {

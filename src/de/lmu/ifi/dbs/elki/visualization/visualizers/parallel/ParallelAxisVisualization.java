@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -178,9 +178,8 @@ public class ParallelAxisVisualization extends AbstractParallelVisualization<Num
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Iterator<ParallelPlotProjector<?>> ps = ResultUtil.filteredResults(result, ParallelPlotProjector.class);
-      while(ps.hasNext()) {
-        ParallelPlotProjector<?> p = ps.next();
+      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
+      for(ParallelPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
         baseResult.getHierarchy().add(p, task);
