@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Hierarchy implementation with a per-object representation.
@@ -88,7 +87,7 @@ public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hiera
   }
 
   @Override
-  public IterableIterator<O> iterDescendants(O self) {
+  public Iterator<O> iterDescendants(O self) {
     if(owner != self) {
       return EmptyIterator.STATIC();
     }
@@ -121,7 +120,7 @@ public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hiera
   }
 
   @Override
-  public IterableIterator<O> iterAncestors(O self) {
+  public Iterator<O> iterAncestors(O self) {
     if(owner != self) {
       throw new UnsupportedOperationException("Decentral hierarchy queried for wrong object!");
     }
@@ -138,7 +137,7 @@ public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hiera
    * 
    * @apiviz.exclude
    */
-  private class ItrDesc implements IterableIterator<O> {
+  private class ItrDesc implements Iterator<O> {
     /**
      * Iterator over children
      */
@@ -179,11 +178,6 @@ public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hiera
     public void remove() {
       throw new UnsupportedOperationException();
     }
-
-    @Override
-    public Iterator<O> iterator() {
-      return new ItrDesc(owner);
-    }
   }
 
   /**
@@ -193,7 +187,7 @@ public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hiera
    * 
    * @apiviz.exclude
    */
-  private class ItrAnc implements IterableIterator<O> {
+  private class ItrAnc implements Iterator<O> {
     /**
      * Iterator over parents
      */
@@ -233,11 +227,6 @@ public class HierarchyReferenceLists<O extends Hierarchical<O>> implements Hiera
     @Override
     public void remove() {
       throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Iterator<O> iterator() {
-      return new ItrAnc(owner);
     }
   }
 }
