@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -287,9 +286,9 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+      Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
       for(OutlierResult o : ors) {
-        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         boolean vis = true;
         // Quick and dirty hack: hide if parent result is also an outlier result
         // Since that probably is already visible and we're redundant.

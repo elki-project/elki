@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -37,7 +38,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
@@ -126,7 +126,7 @@ public class ToolBox2DVisualization extends AbstractScatterplotVisualization {
     deleteChildren(container);
 
     ArrayList<VisualizationTask> vis = new ArrayList<VisualizationTask>();
-    final Iterable<VisualizationTask> visualizers = ResultUtil.filteredResults(task.getResult(), VisualizationTask.class);
+    Collection<VisualizationTask> visualizers = ResultUtil.filterResults(task.getResult(), VisualizationTask.class);
     for(VisualizationTask task : visualizers) {
       if(VisualizerUtil.isTool(task) && !vis.contains(task)) {
         vis.add(task);
@@ -292,7 +292,7 @@ public class ToolBox2DVisualization extends AbstractScatterplotVisualization {
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(result, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);

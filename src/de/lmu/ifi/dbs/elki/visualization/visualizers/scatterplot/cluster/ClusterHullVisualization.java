@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -225,7 +224,7 @@ public class ClusterHullVisualization extends AbstractScatterplotVisualization {
       // Find clusterings we can visualize:
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
       for(Clustering<?> c : clusterings) {
-        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);

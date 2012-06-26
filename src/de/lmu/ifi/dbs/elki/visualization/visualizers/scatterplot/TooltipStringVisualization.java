@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -174,10 +173,10 @@ public class TooltipStringVisualization extends AbstractTooltipVisualization {
 
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
-      ArrayList<Relation<?>> reps = ResultUtil.filterResults(result, Relation.class);
+      Collection<Relation<?>> reps = ResultUtil.filterResults(result, Relation.class);
       for(Relation<?> rep : reps) {
         if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
@@ -187,7 +186,7 @@ public class TooltipStringVisualization extends AbstractTooltipVisualization {
           }
         }
         if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
@@ -197,7 +196,7 @@ public class TooltipStringVisualization extends AbstractTooltipVisualization {
           }
         }
         if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);
@@ -207,7 +206,7 @@ public class TooltipStringVisualization extends AbstractTooltipVisualization {
           }
         }
         if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), this);
             task.put(VisualizationTask.META_TOOL, true);

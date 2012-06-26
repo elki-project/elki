@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -138,7 +137,7 @@ public class SettingsVisFactory extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final IterableIterator<SettingsResult> settingsResults = ResultUtil.filteredResults(newResult, SettingsResult.class);
+    Collection<SettingsResult> settingsResults = ResultUtil.filterResults(newResult, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = 1.0;

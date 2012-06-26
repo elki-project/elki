@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -126,7 +125,7 @@ public class ReferencePointsVisualization extends AbstractScatterplotVisualizati
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
       for(ReferencePointsResult<?> rp : rps) {
-        IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
           task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);

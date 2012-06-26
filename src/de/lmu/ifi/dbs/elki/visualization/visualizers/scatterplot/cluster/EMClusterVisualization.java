@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -442,7 +441,7 @@ public class EMClusterVisualization<NV extends NumberVector<NV, ?>> extends Abst
           // Does the cluster have a model with cluster means?
           Clustering<MeanModel<NV>> mcls = findMeanModel(c);
           if(mcls != null) {
-            IterableIterator<ScatterPlotProjector<?>> ps = ResultUtil.filteredResults(baseResult, ScatterPlotProjector.class);
+            Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
             for(ScatterPlotProjector<?> p : ps) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
