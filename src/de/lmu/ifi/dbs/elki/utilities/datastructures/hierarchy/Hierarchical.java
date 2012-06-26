@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Iterator;
 import java.util.List;
-
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 
 /**
@@ -65,7 +64,7 @@ public interface Hierarchical<O> {
    * 
    * @return iterator for descendants
    */
-  public IterableIterator<O> iterDescendants();
+  public Iterator<O> iterDescendants();
   
   /**
    * Get number of parents
@@ -87,5 +86,5 @@ public interface Hierarchical<O> {
    * 
    * @return iterator for ancestors
    */
-  public IterableIterator<O> iterAncestors();
+  public Iterator<O> iterAncestors();
 }

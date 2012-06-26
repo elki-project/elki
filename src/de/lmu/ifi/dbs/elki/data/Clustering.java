@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -105,8 +106,8 @@ public class Clustering<M extends Model> extends BasicResult {
     for(Cluster<M> rc : toplevelclusters) {
       if(!clu.contains(rc)) {
         clu.add(rc);
-        for (Cluster<M> c : rc.iterDescendants()) {
-          clu.add(c);
+        for (Iterator<Cluster<M>> iter = rc.iterDescendants(); iter.hasNext(); ) {
+          clu.add(iter.next());
         }
       }
     }

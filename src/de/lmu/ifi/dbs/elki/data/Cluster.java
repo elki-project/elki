@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -37,12 +38,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchical;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyReferenceLists;
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Generic cluster class, that may or not have hierarchical information. Note
- * that every cluster MUST have a DBIDs, since it implements the
- * interface, too. Calls to the interface are proxied to the inner group object.
+ * that every cluster MUST have a DBIDs, since it implements the interface, too.
+ * Calls to the interface are proxied to the inner group object.
  * 
  * A hierarchy object of class SimpleHierarchy will be created automatically
  * when a list of parents and children is provided. Alternatively, a
@@ -271,7 +271,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
    * Delegate to hierarchy object
    */
   @Override
-  public IterableIterator<Cluster<M>> iterDescendants() {
+  public Iterator<Cluster<M>> iterDescendants() {
     if(hierarchy == null) {
       return EmptyIterator.STATIC();
     }
@@ -286,8 +286,8 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
   public Set<Cluster<M>> getDescendants() {
     HashSet<Cluster<M>> set = new HashSet<Cluster<M>>();
     // add all
-    for (Cluster<M> c : iterDescendants()) {
-      set.add(c);
+    for(Iterator<Cluster<M>> iter = iterDescendants(); iter.hasNext();) {
+      set.add(iter.next());
     }
     return set;
   }
@@ -318,7 +318,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
    * Delegate to hierarchy object
    */
   @Override
-  public IterableIterator<Cluster<M>> iterAncestors() {
+  public Iterator<Cluster<M>> iterAncestors() {
     if(hierarchy == null) {
       return EmptyIterator.STATIC();
     }
@@ -520,6 +520,6 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
   public String toString() {
     String mstr = (model == null) ? "null" : model.toString();
     String nstr = noise ? ",noise" : "";
-    return "Cluster(size="+size()+",model="+mstr+nstr+")";
+    return "Cluster(size=" + size() + ",model=" + mstr + nstr + ")";
   }
 }

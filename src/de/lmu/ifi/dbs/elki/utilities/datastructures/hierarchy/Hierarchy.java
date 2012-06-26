@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Iterator;
 import java.util.List;
-
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * This interface represents an (external) hierarchy of objects. It can contain
@@ -63,7 +62,7 @@ public interface Hierarchy<O> {
    * @param self object to get descendants for
    * @return iterator for descendants
    */
-  public IterableIterator<O> iterDescendants(O self);
+  public Iterator<O> iterDescendants(O self);
 
   /**
    * Get number of (direct) parents
@@ -88,5 +87,5 @@ public interface Hierarchy<O> {
    * @param self object to get ancestors for
    * @return iterator for ancestors
    */
-  public IterableIterator<O> iterAncestors(O self);
+  public Iterator<O> iterAncestors(O self);
 }
