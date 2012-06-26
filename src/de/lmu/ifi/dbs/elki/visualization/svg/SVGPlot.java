@@ -50,8 +50,10 @@ import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
@@ -82,6 +84,11 @@ public class SVGPlot {
    * Default JPEG quality setting
    */
   public static final double DEFAULT_QUALITY = 0.85;
+
+  /**
+   * Attribute to block export of element.
+   */
+  public static final String NO_EXPORT_ATTRIBUTE = "noexport";
 
   /**
    * SVG document we plot to.
@@ -295,7 +302,7 @@ public class SVGPlot {
       cssman.addClass(cls);
     }
     catch(CSSNamingConflict e) {
-      //de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      // de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
     }
   }
 
@@ -366,7 +373,7 @@ public class SVGPlot {
    * @return cloned document
    */
   protected SVGDocument cloneDocument() {
-    return (SVGDocument) new CloneInlineImages().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
+    return (SVGDocument) new CloneNoExport().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
   }
 
   /**
@@ -639,5 +646,27 @@ public class SVGPlot {
    */
   public void setDisableInteractions(boolean disable) {
     disableInteractions = disable;
+  }
+
+  /**
+   * Class to skip nodes during cloning that have the "noexport" attribute set.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected class CloneNoExport extends CloneInlineImages {
+    @Override
+    public Node cloneNode(Document doc, Node eold) {
+      // Skip elements with noexport attribute set
+      if(eold instanceof Element) {
+        Element eeold = (Element) eold;
+        String vis = eeold.getAttribute(NO_EXPORT_ATTRIBUTE);
+        if(vis != null && vis.length() > 0) {
+          return null;
+        }
+      }
+      return super.cloneNode(doc, eold);
+    }
   }
 }

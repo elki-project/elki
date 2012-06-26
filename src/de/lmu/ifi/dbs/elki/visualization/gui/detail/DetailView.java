@@ -149,6 +149,9 @@ public class DetailView extends SVGPlot implements ResultListener {
       if(VisualizerUtil.isVisible(task)) {
         try {
           Visualization v = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
+          if (VisualizerUtil.isNoExport(task)) {
+            v.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
+          }
           layers.add(v);
           layermap.put(task, v);
         }
@@ -291,10 +294,14 @@ public class DetailView extends SVGPlot implements ResultListener {
       if(VisualizerUtil.isVisible(task)) {
         // LoggingUtil.warning("Need to recreate a missing layer for " + v);
         vis = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
+        if (VisualizerUtil.isNoExport(task)) {
+          vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
+        }
         layermap.put(task, vis);
         this.scheduleUpdate(new InsertVisualization(vis));
       }
     }
+    // FIXME: ensure layers are ordered correctly!
   }
 
   @Override
