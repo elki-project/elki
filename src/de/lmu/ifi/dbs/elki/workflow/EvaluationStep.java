@@ -23,9 +23,11 @@ package de.lmu.ifi.dbs.elki.workflow;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -154,10 +156,13 @@ public class EvaluationStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      List<Class<? extends Evaluator>> def = new ArrayList<Class<? extends Evaluator>>(1);
+      def.add(AutomaticEvaluation.class);
       // evaluator parameter
-      final ObjectListParameter<Evaluator> ealuatorP = new ObjectListParameter<Evaluator>(OptionID.EVALUATOR, Evaluator.class, true);
-      if(config.grab(ealuatorP)) {
-        evaluators = ealuatorP.instantiateClasses(config);
+      final ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<Evaluator>(OptionID.EVALUATOR, Evaluator.class);
+      evaluatorP.setDefaultValue(def);
+      if(config.grab(evaluatorP)) {
+        evaluators = evaluatorP.instantiateClasses(config);
       }
     }
 
