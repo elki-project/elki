@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -172,9 +172,8 @@ public class KeyVisualization extends AbstractVisualization {
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result newResult) {
       // Find clusterings we can visualize:
-      Iterator<Clustering<?>> clusterings = ResultUtil.filteredResults(newResult, Clustering.class);
-      while(clusterings.hasNext()) {
-        Clustering<?> c = clusterings.next();
+      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
+      for (Clustering<?> c : clusterings) {
         if(c.getAllClusters().size() > 0) {
           final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
           task.width = 1.0;
