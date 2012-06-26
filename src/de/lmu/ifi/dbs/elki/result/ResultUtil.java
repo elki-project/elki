@@ -39,11 +39,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.OneItemIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.TypeFilterIterator;
 
 /**
  * Utilities for handling result objects
@@ -201,48 +196,6 @@ public class ResultUtil {
       }
     }
     return res;
-  }
-
-  /**
-   * Return only results of the given restriction class
-   * 
-   * @param <C> Class type
-   * @param restrictionClass Class restriction
-   * @return filtered results iterator
-   * 
-   * @deprecated Not reliable, due to concurrent modifications!
-   */
-  @Deprecated
-  @SuppressWarnings("unchecked")
-  public static <C extends Result> IterableIterator<C> filteredResults(Result r, Class<?> restrictionClass) {
-    final Class<C> rc = (Class<C>) restrictionClass;
-    // Include the current item
-    IterableIterator<C> curIter;
-    if(rc.isInstance(r)) {
-      curIter = new OneItemIterator<C>(rc.cast(r));
-    }
-    else {
-      curIter = null;
-    }
-    if(r instanceof HierarchicalResult) {
-      ResultHierarchy hier = ((HierarchicalResult) r).getHierarchy();
-      final Iterable<Result> iterDescendants = hier.iterDescendants(r);
-      final IterableIterator<C> others = new TypeFilterIterator<Result, C>(rc, iterDescendants);
-      if(curIter != null) {
-        return new MergedIterator<C>(curIter, others);
-      }
-      else {
-        return others;
-      }
-    }
-    else {
-      if(curIter != null) {
-        return curIter;
-      }
-      else {
-        return EmptyIterator.STATIC();
-      }
-    }
   }
 
   /**
