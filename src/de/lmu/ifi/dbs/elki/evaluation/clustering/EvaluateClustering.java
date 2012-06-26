@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -115,9 +115,8 @@ public class EvaluateClustering implements Evaluator {
     Clustering<?> refc = null;
     // Try to find an existing reference clustering (globally)
     if(refc == null) {
-      Iterator<Clustering<?>> cs = ResultUtil.filteredResults(baseResult, Clustering.class);
-      while(cs.hasNext()) {
-        Clustering<?> test = cs.next();
+      Collection<Clustering<?>> cs = ResultUtil.filterResults(baseResult, Clustering.class);
+      for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {
           refc = test;
           break;
@@ -126,9 +125,8 @@ public class EvaluateClustering implements Evaluator {
     }
     // Try to find an existing reference clustering (locally)
     if(refc == null) {
-      Iterator<Clustering<?>> cs = ResultUtil.filteredResults(result, Clustering.class);
-      while(cs.hasNext()) {
-        Clustering<?> test = cs.next();
+      Collection<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
+      for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {
           refc = test;
           break;

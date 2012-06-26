@@ -204,6 +204,16 @@ public class ResultUtil {
     return res;
   }
 
+  /**
+   * Return only results of the given restriction class
+   * 
+   * @param <C> Class type
+   * @param restrictionClass Class restriction
+   * @return filtered results iterator
+   * 
+   * @deprecated Not reliable, due to concurrent modifications!
+   */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public static <C extends Result> IterableIterator<C> filteredResults(Result r, Class<?> restrictionClass) {
     final Class<C> rc = (Class<C>) restrictionClass;

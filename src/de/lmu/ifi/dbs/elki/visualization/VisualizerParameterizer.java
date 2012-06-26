@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -166,10 +165,9 @@ public class VisualizerParameterizer implements Parameterizable {
    */
   public VisualizerContext newContext(HierarchicalResult result) {
     if(samplesize > 0) {
-      Iterator<Relation<?>> iter = ResultUtil.filteredResults(result, Relation.class);
-      while(iter.hasNext()) {
-        Relation<?> rel = iter.next();
-        if(ResultUtil.filteredResults(rel, SamplingResult.class).hasNext()) {
+      Collection<Relation<?>> rels = ResultUtil.filterResults(result, Relation.class);
+      for(Relation<?> rel : rels) {
+        if(!ResultUtil.filterResults(rel, SamplingResult.class).isEmpty()) {
           continue;
         }
         int size = rel.size();

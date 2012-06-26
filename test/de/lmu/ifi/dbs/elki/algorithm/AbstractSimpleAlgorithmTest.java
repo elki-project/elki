@@ -29,8 +29,8 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
@@ -217,10 +217,10 @@ public abstract class AbstractSimpleAlgorithmTest {
     // Compute ROC and AUC:
     rocCurve.processNewResult(db, result);
     // Find the ROC results
-    Iterator<OutlierROCCurve.ROCResult> iter = ResultUtil.filteredResults(result, OutlierROCCurve.ROCResult.class);
-    org.junit.Assert.assertTrue("No ROC result found.", iter.hasNext());
-    double auc = iter.next().getAUC();
-    org.junit.Assert.assertFalse("More than one ROC result found.", iter.hasNext());
+    Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(result, OutlierROCCurve.ROCResult.class);
+    org.junit.Assert.assertTrue("No ROC result found.", !rocs.isEmpty());
+    double auc = rocs.iterator().next().getAUC();
+    org.junit.Assert.assertFalse("More than one ROC result found.", rocs.size() > 1);
     org.junit.Assert.assertEquals("ROC value does not match.", expected, auc, 0.0001);
   }
 
