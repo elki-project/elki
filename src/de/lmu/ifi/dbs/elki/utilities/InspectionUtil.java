@@ -41,7 +41,6 @@ import java.util.jar.JarFile;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -253,7 +252,7 @@ public class InspectionUtil {
    * 
    * @apiviz.exclude
    */
-  static class JarClassIterator implements IterableIterator<String> {
+  static class JarClassIterator implements Iterator<String> {
     private Enumeration<JarEntry> jarentries;
 
     private String ne;
@@ -321,11 +320,6 @@ public class InspectionUtil {
     public void remove() {
       throw new UnsupportedOperationException();
     }
-
-    @Override
-    public Iterator<String> iterator() {
-      return this;
-    }
   }
 
   /**
@@ -335,7 +329,7 @@ public class InspectionUtil {
    * 
    * @apiviz.exclude
    */
-  static class DirClassIterator implements IterableIterator<String> {
+  static class DirClassIterator implements Iterator<String> {
     private static final String CLASS_EXT = ".class";
 
     private static final String FACTORY_FILE_EXT = ClassParameter.FACTORY_POSTFIX + CLASS_EXT;
@@ -426,11 +420,6 @@ public class InspectionUtil {
     @Override
     public void remove() {
       throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Iterator<String> iterator() {
-      return this;
     }
   }
 
