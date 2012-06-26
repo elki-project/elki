@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
+import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve.PRCurve;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve;
-import de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -133,7 +133,7 @@ public class XYCurveVisFactory extends AbstractVisFactory {
     // Add AUC value when found
     if(curve instanceof ROCResult) {
       double rocauc = ((ROCResult) curve).getAUC();
-      String lt = ComputeROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF8.format(rocauc);
+      String lt = OutlierROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF8.format(rocauc);
       if(rocauc <= 0.5) {
         Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.5, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);

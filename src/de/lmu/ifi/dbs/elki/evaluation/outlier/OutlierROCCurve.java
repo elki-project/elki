@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.evaluation.roc;
+package de.lmu.ifi.dbs.elki.evaluation.outlier;
 
 /*
  This file is part of ELKI:
@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -67,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.has ROCResult oneway - - «create»
  */
 // TODO: maybe add a way to process clustering results as well?
-public class ComputeROCCurve implements Evaluator {
+public class OutlierROCCurve implements Evaluator {
   /**
    * The label we use for marking ROCAUC values.
    */
@@ -76,7 +77,7 @@ public class ComputeROCCurve implements Evaluator {
   /**
    * The logger.
    */
-  private static final Logging logger = Logging.getLogger(ComputeROCCurve.class);
+  private static final Logging logger = Logging.getLogger(OutlierROCCurve.class);
 
   /**
    * The pattern to identify positive classes.
@@ -97,7 +98,7 @@ public class ComputeROCCurve implements Evaluator {
    * 
    * @param positive_class_name Positive class name pattern
    */
-  public ComputeROCCurve(Pattern positive_class_name) {
+  public OutlierROCCurve(Pattern positive_class_name) {
     super();
     this.positiveClassName = positive_class_name;
   }
@@ -245,8 +246,8 @@ public class ComputeROCCurve implements Evaluator {
     }
 
     @Override
-    protected ComputeROCCurve makeInstance() {
-      return new ComputeROCCurve(positiveClassName);
+    protected OutlierROCCurve makeInstance() {
+      return new OutlierROCCurve(positiveClassName);
     }
   }
 }
