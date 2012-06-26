@@ -1,3 +1,4 @@
+de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation
 de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering
 de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram
