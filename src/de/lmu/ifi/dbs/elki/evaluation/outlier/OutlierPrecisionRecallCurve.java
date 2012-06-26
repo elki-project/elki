@@ -162,6 +162,16 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
    */
   public static class PRCurve extends XYCurve {
     /**
+     * AUC value for PR curve
+     */
+    public static final String PRAUC_LABEL = "PR-AUC";
+
+    /**
+     * Area under curve
+     */
+    double auc = Double.NaN;
+
+    /**
      * Constructor.
      * 
      * @param size Size estimation
@@ -178,6 +188,25 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     @Override
     public String getShortName() {
       return "pr-curve";
+    }
+
+    /**
+     * Get AUC value
+     * 
+     * @return AUC value
+     */
+    public double getAUC() {
+      if(Double.isNaN(auc)) {
+        auc = areaUnderCurve(this);
+      }
+      return auc;
+    }
+
+    @Override
+    public void writeToText(TextWriterStream out, String label) {
+      out.commentPrintLn(PRAUC_LABEL + ": " + getAUC());
+      out.flush();
+      super.writeToText(out, label);
     }
   }
 
