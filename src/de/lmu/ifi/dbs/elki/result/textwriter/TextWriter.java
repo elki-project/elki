@@ -233,7 +233,8 @@ public class TextWriter {
 
     // collect other results
     {
-      for(Result res : ResultUtil.filteredResults(r, Result.class)) {
+      List<Result> results = ResultUtil.filterResults(r, Result.class);
+      for(Result res : results) {
         if(res instanceof Database) {
           continue;
         }
