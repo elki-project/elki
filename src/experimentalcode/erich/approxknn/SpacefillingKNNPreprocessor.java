@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -149,7 +150,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
       curves.add(new ArrayList<SpatialRef>(size));
     }
 
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final NumberVector<?, ?> v = relation.get(id);
       SpatialRef ref = new SpatialRef(id, v);
       for(List<SpatialRef> curve : curves) {

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -117,7 +118,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
       curves.add(new ArrayList<SpatialRef>(size));
     }
 
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final O v = relation.get(id);
       SpatialRef ref = new SpatialRef(id, v);
       for(List<SpatialRef> curve : curves) {
@@ -158,7 +160,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     KNNHeap<D> heap = new KNNHeap<D>(k);
     HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final D n = distanceQuery.getDistanceFactory().nullDistance();
       heap.add(n, id);
 
