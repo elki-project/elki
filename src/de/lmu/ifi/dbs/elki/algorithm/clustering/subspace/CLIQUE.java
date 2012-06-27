@@ -392,13 +392,14 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
     // identify dense units
     double total = database.size();
-    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+    for(DBIDIter it = database.iterDBIDs(); it.valid();) {
       final DBID id = it.getDBID();
+      it.advance();
       V featureVector = database.get(id);
       for(CLIQUEUnit<V> unit : units) {
         unit.addFeatureVector(id, featureVector);
         // unit is a dense unit
-        if(unit.selectivity(total) >= tau) {
+        if(!it.valid() && unit.selectivity(total) >= tau) {
           denseUnits.add(unit);
           // add the dense unit to its subspace
           int dim = unit.getIntervals().iterator().next().getDimension();
