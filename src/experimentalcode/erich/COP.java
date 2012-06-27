@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -128,7 +129,8 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), logger) : null;
       double sqrt2 = Math.sqrt(2.0);
-      for(DBID id : data.iterDBIDs()) {
+      for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.asDBIDs());
         nids.remove(id);
