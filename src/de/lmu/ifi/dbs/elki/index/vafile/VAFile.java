@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
@@ -159,7 +160,8 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     for(int d = 0; d < dimensions; d++) {
       double[] tempdata = new double[size];
       int j = 0;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         tempdata[j] = relation.get(id).doubleValue(d + 1);
         j += 1;
       }

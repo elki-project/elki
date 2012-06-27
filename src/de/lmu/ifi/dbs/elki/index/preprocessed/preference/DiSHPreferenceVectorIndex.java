@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -162,9 +162,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       // epsilons as string
       RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(relation, dim);
 
-      for(Iterator<DBID> it = relation.iterDBIDs(); it.hasNext();) {
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         StringBuffer msg = new StringBuffer();
-        final DBID id = it.next();
+        final DBID id = it.getDBID();
 
         if(logger.isDebugging()) {
           msg.append("\nid = ").append(id);
@@ -261,8 +261,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     // database for apriori
     UpdatableDatabase apriori_db = new HashmapDatabase();
     SimpleTypeInformation<?> bitmeta = VectorFieldTypeInformation.get(BitVector.class, dimensionality);
-    for(Iterator<DBID> it = relation.iterDBIDs(); it.hasNext();) {
-      DBID id = it.next();
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      DBID id = it.getDBID();
       Bit[] bits = new Bit[dimensionality];
       boolean allFalse = true;
       for(int d = 0; d < dimensionality; d++) {

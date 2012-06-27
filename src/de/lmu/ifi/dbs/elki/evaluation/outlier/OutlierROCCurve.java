@@ -23,14 +23,12 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -103,17 +101,7 @@ public class OutlierROCCurve implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private ROCResult computeROCResult(int size, SetDBIDs positiveids, Iterator<DBID> iter) {
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(size);
-    while(iter.hasNext()) {
-      Object o = iter.next();
-      if(!(o instanceof DBID)) {
-        throw new IllegalStateException("Iterable result contained non-DBID - result didn't satisfy requirements");
-      }
-      else {
-        order.add((DBID) o);
-      }
-    }
+  private ROCResult computeROCResult(int size, SetDBIDs positiveids, DBIDs order) {
     if(order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
@@ -165,8 +153,8 @@ public class OutlierROCCurve implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<DBID> iter = or.iter(or.getDBIDs());
-      db.getHierarchy().add(or, computeROCResult(or.getDBIDs().size(), positiveids, iter));
+      DBIDs sorted = or.iter(or.getDBIDs());
+      db.getHierarchy().add(or, computeROCResult(or.getDBIDs().size(), positiveids, sorted));
       nonefound = false;
     }
 

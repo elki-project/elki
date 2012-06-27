@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -189,7 +190,8 @@ public class ResultUtil {
       res.add((C) restrictionClass.cast(r));
     }
     if(r instanceof HierarchicalResult) {
-      for(Result result : ((HierarchicalResult) r).getHierarchy().iterDescendants(r)) {
+      for(Iterator<Result> iter = ((HierarchicalResult) r).getHierarchy().iterDescendants(r); iter.hasNext(); ) {
+        Result result = iter.next();
         if(restrictionClass.isInstance(result)) {
           res.add((C) restrictionClass.cast(result));
         }

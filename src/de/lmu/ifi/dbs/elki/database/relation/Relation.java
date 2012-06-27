@@ -26,10 +26,10 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * An object representation from a database
@@ -91,7 +91,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * 
    * @return iterator for the DBIDs.
    */
-  public IterableIterator<DBID> iterDBIDs();
+  public DBIDIter iterDBIDs();
 
   /**
    * Get the number of DBIDs.

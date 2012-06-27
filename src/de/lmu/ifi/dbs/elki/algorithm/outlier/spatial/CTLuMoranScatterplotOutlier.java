@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -98,7 +99,8 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
 
     // Compute the global mean and variance
     MeanVariance globalmv = new MeanVariance();
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       globalmv.put(relation.get(id).doubleValue(1));
     }
 
@@ -107,7 +109,8 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
 
     // calculate normalized attribute values
     // calculate neighborhood average of normalized attribute values.
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       // Compute global z score
       final double globalZ = (relation.get(id).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev();
       // Compute local average z score

@@ -28,11 +28,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Pseudo-representation that is the object ID itself.
@@ -99,8 +98,8 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   }
 
   @Override
-  public IterableIterator<DBID> iterDBIDs() {
-    return IterableUtil.fromIterable(ids);
+  public DBIDIter iterDBIDs() {
+    return ids.iter();
   }
 
   @Override

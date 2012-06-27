@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -115,7 +116,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final Database database = inputstep.getDatabase();
     final Relation<NumberVector<?, ?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
-    final DBID firstid = labels.iterDBIDs().next();
+    final DBID firstid = labels.iterDBIDs().getDBID();
     final String firstlabel = labels.get(firstid);
     if(!firstlabel.matches("bylabel")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
@@ -138,7 +139,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final int[] outliers_seen = new int[dim];
     // Find the top-k for each ensemble member
     {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         // Skip "by label", obviously
         if(firstid.equals(id)) {
           continue;
@@ -175,7 +177,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Build the naive ensemble:
     final double[] naiveensemble = new double[dim];
     {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(firstid.equals(id)) {
           continue;
         }
@@ -200,7 +203,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     double bestest = Double.POSITIVE_INFINITY;
     {
       // Compute individual scores
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(firstid.equals(id)) {
           continue;
         }

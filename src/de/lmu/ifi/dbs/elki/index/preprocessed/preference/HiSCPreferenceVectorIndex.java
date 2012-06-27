@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  */
 
 import java.util.BitSet;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -32,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -107,9 +107,8 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
-    Iterator<DBID> it = relation.iterDBIDs();
-    while(it.hasNext()) {
-      DBID id = it.next();
+    for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      DBID id = it.getDBID();
 
       if(logger.isDebugging()) {
         msg.append("\n\nid = ").append(id);

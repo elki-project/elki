@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Interface for a result providing an object ordering.
@@ -46,5 +45,5 @@ public interface OrderingResult extends Result {
    * @param ids Collection of ids.
    * @return iterator for sorted array of ids
    */
-  public IterableIterator<DBID> iter(DBIDs ids);
+  public ArrayModifiableDBIDs iter(DBIDs ids);
 }

@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -296,15 +297,17 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     double rprob = ((double) randomsize) / size;
     ArrayModifiableDBIDs randomset = DBIDUtil.newArray(randomsize);
 
-    Iterator<DBID> iter = database.iterDBIDs();
-    if(!iter.hasNext()) {
+    DBIDIter iter = database.iterDBIDs();
+    if(!iter.valid()) {
       throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
     }
-    DBID firstid = iter.next();
+    DBID firstid = iter.getDBID();
+    iter.advance();
     minhotset.add(new FCPair<Double, DBID>(Double.MAX_VALUE, firstid));
     maxhotset.add(new FCPair<Double, DBID>(Double.MIN_VALUE, firstid));
-    while(iter.hasNext()) {
-      DBID id1 = iter.next();
+    while(iter.valid()) {
+      DBID id1 = iter.getDBID();
+      iter.advance();
       // generate candidates for min distance.
       ArrayList<FCPair<Double, DBID>> np = new ArrayList<FCPair<Double, DBID>>(k * 2 + randomsize * 2);
       for(FCPair<Double, DBID> pair : minhotset) {
@@ -359,8 +362,10 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   private DoubleMinMax exactMinMax(Relation<O> database, DistanceQuery<O, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
-    for(DBID id1 : database.iterDBIDs()) {
-      for(DBID id2 : database.iterDBIDs()) {
+    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id1  = iditer.getDBID();
+      for(DBIDIter iditer2 = database.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
+        DBID id2  = iditer2.getDBID();
         // skip the point itself.
         if(id1.compareTo(id2) == 0) {
           continue;

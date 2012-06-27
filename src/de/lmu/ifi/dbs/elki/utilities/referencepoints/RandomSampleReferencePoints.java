@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -84,7 +85,8 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
       LoggingUtil.warning("Sample size is larger than database size!");
 
       ArrayList<V> selection = new ArrayList<V>(db.size());
-      for(DBID id : db.iterDBIDs()) {
+      for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         selection.add(db.get(id));
       }
       return selection;

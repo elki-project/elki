@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -128,7 +129,8 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OutRank scores", relation.size(), logger) : null;
 
-    for(DBID object : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID object  = iditer.getDBID();
       subspace.clear();
       double score = outresScore(0, subspace, object, kernel);
       ranks.putDouble(object, score);

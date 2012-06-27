@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -119,7 +120,8 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
 
     int matrixsize = 0;
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
       if(id.getIntegerID() < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
@@ -134,8 +136,10 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(DBID id1 : relation.iterDBIDs()) {
-      for(DBID id2 : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id1  = iditer.getDBID();
+      for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
+        DBID id2  = iditer2.getDBID();
         if(id2.getIntegerID() >= id1.getIntegerID()) {
           double d = distanceQuery.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {

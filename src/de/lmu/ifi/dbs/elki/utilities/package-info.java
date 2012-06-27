@@ -35,7 +35,6 @@
  * </ul></li>
  * <li>Specialized:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.data.images.ImageUtil}: image handling.</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil}: Converting iterators and iterables.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.InspectionUtil}: class and classpath inspection.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil}: documentation extraction from annotations.</li>

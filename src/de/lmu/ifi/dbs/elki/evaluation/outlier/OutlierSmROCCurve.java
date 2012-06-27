@@ -23,12 +23,12 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -107,7 +107,8 @@ public class OutlierSmROCCurve implements Evaluator {
 
     // Compute mean, for inversion
     double mean = 0.0;
-    for(DBID id : scores.iterDBIDs()) {
+    for(DBIDIter iditer = scores.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       mean += scores.get(id) / size;
     }
 
@@ -118,11 +119,10 @@ public class OutlierSmROCCurve implements Evaluator {
 
     int poscnt = 0, negcnt = 0;
     double prevscore = Double.NaN;
-    Iterator<DBID> nei = or.getOrdering().iter(or.getOrdering().getDBIDs());
     double x = 0, y = 0;
-    while(nei.hasNext()) {
+    for (DBIDIter nei = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
       // Analyze next point
-      final DBID curid = nei.next();
+      final DBID curid = nei.getDBID();
       final double curscore = scores.get(curid);
       // defer calculation for ties
       if(!Double.isNaN(prevscore) && (Double.compare(prevscore, curscore) == 0)) {

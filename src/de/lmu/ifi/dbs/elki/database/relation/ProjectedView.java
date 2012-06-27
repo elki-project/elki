@@ -4,9 +4,9 @@ import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /*
  This file is part of ELKI:
@@ -103,7 +103,7 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
   }
 
   @Override
-  public IterableIterator<DBID> iterDBIDs() {
+  public DBIDIter iterDBIDs() {
     return inner.iterDBIDs();
   }
 

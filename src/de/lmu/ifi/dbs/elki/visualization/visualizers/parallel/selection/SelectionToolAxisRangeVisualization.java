@@ -32,6 +32,7 @@ import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -236,7 +237,8 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
 
       selection.clear();
       boolean idIn = true;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         NumberVector<?, ?> dbTupel = relation.get(id);
         idIn = true;
         for(int i = 0; i < dim; i++) {

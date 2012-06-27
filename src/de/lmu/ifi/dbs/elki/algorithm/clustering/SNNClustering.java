@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
@@ -154,7 +155,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(relation.size());
     if(relation.size() >= minpts) {
-      for(DBID id : snnInstance.getRelation().iterDBIDs()) {
+      for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(!processedIDs.contains(id)) {
           expandCluster(snnInstance, id, objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
@@ -168,7 +170,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       }
     }
     else {
-      for(DBID id : snnInstance.getRelation().iterDBIDs()) {
+      for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
@@ -202,7 +205,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    */
   protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
     ArrayModifiableDBIDs neighbors = DBIDUtil.newArray();
-    for(DBID id : snnInstance.getRelation().iterDBIDs()) {
+    for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       if(snnInstance.similarity(queryObject, id).compareTo(epsilon) >= 0) {
         neighbors.add(id);
       }

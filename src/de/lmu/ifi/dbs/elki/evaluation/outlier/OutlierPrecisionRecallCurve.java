@@ -23,13 +23,14 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
@@ -100,8 +101,8 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      Iterator<DBID> iter = o.getOrdering().iter(o.getOrdering().getDBIDs());
-      XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, iter, o.getScores());
+      DBIDs sorted = o.getOrdering().iter(o.getOrdering().getDBIDs());
+      XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
       db.getHierarchy().add(o, curve);
       // Process them only once.
       orderings.remove(o.getOrdering());
@@ -110,26 +111,26 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
-      Iterator<DBID> iter = or.iter(or.getDBIDs());
-      XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, iter, null);
+      DBIDs sorted = or.iter(or.getDBIDs());
+      XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
       db.getHierarchy().add(or, curve);
     }
   }
 
-  private XYCurve computePrecisionResult(int size, SetDBIDs ids, Iterator<DBID> iter, Relation<Double> scores) {
+  private XYCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, Relation<Double> scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
     XYCurve curve = new PRCurve(postot + 2);
 
     double prevscore = Double.NaN;
-    while(iter.hasNext()) {
+    for(; iter.valid(); iter.advance()) {
       // Previous precision rate - y axis
       final double curprec = ((double) poscnt) / total;
       // Previous recall rate - x axis
       final double curreca = ((double) poscnt) / postot;
 
       // Analyze next point
-      DBID cur = iter.next();
+      DBID cur = iter.getDBID();
       // positive or negative match?
       if(ids.contains(cur)) {
         poscnt += 1;

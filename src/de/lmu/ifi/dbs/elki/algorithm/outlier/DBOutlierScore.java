@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -80,7 +81,8 @@ public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
     // TODO: use bulk when implemented.
-    for(DBID id : distFunc.getRelation().iterDBIDs()) {
+    for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       // compute percentage of neighbors in the given neighborhood with size d
       double n = (rangeQuery.getRangeForDBID(id, d).size()) / size;
       scores.putDouble(id, 1.0 - n);

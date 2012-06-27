@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -108,7 +109,8 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     // Compute densities
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double avg = 0;
       for(DBID n : neighbors) {
@@ -122,7 +124,8 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
     }
 
     // Compute density quotients
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double avg = 0;
       for(DBID n : neighbors) {

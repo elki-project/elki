@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -132,7 +133,8 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
 
       // Expand multiple steps
       FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), logger) : null;
-      for(final DBID id : database.iterDBIDs()) {
+      for(DBIDIter iter = database.iterDBIDs(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         HashSetModifiableDBIDs res = DBIDUtil.newHashSet(id);
         DBIDs todo = id;
         for(int i = 0; i < steps; i++) {

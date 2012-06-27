@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -375,7 +376,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
-      for(DBID objID : data.iterDBIDs()) {
+      for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID objID  = iditer.getDBID();
         O vec = data.get(objID);
         DoubleMinMax mm = VectorUtil.getRangeDouble(vec);
         min = Math.min(min, mm.getMin());
@@ -408,7 +410,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       svgCanvas.setPlot(plot);
 
       DefaultListModel m = new DefaultListModel();
-      for(DBID dbid : data.iterDBIDs()) {
+      for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID dbid  = iditer.getDBID();
         m.addElement(dbid);
       }
       seriesList.setModel(m);

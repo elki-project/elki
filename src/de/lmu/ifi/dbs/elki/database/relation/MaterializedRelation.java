@@ -30,12 +30,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Represents a single representation. This is attached to a DBIDs object, which
@@ -183,8 +182,8 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   }
 
   @Override
-  public IterableIterator<DBID> iterDBIDs() {
-    return IterableUtil.fromIterable(ids);
+  public DBIDIter iterDBIDs() {
+    return ids.iter();
   }
 
   @Override

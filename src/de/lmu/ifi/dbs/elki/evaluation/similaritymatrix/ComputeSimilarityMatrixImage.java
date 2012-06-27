@@ -27,7 +27,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -37,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -124,10 +123,10 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
    * @param iter DBID iterator
    * @return result object
    */
-  private SimilarityMatrix computeSimilarityMatrixImage(Relation<O> relation, Iterator<DBID> iter) {
+  private SimilarityMatrix computeSimilarityMatrixImage(Relation<O> relation, DBIDIter iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(relation.size());
-    while(iter.hasNext()) {
-      Object o = iter.next();
+    for(; iter.valid(); iter.advance()) {
+      Object o = iter.getDBID();
       if(!(o instanceof DBID)) {
         throw new IllegalStateException("Iterable result contained non-DBID - result didn't satisfy requirements");
       }
@@ -199,54 +198,27 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     return new SimilarityMatrix(img, relation, order);
   }
 
-  /**
-   * Wrap the uncheckable cast with the manual check.
-   * 
-   * @param ir Interable result
-   * @return Iterator if Integer iterable, null otherwise.
-   */
-  @SuppressWarnings("unchecked")
-  private Iterator<DBID> getDBIDIterator(IterableResult<?> ir) {
-    Iterator<?> testit = ir.iterator();
-    if(testit.hasNext() && (testit.next() instanceof DBID)) {
-      // note: we DO want a fresh iterator here!
-      return (Iterator<DBID>) ir.iterator();
-    }
-    return null;
-  }
-
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Database db = ResultUtil.findDatabase(baseResult);
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
-    List<IterableResult<?>> iterables = ResultUtil.getIterableResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
       Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
-      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, or.iter(relation.getDBIDs())));
+      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, or.iter(relation.getDBIDs()).iter()));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
     }
 
-    // try iterable results first
-    // FIXME: find the appropriate place to call addDerivedResult
-    for(IterableResult<?> ir : iterables) {
-      Iterator<DBID> iter = getDBIDIterator(ir);
-      if(iter != null) {
-        Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
-        db.getHierarchy().add(ir, computeSimilarityMatrixImage(relation, iter));
-        nonefound = false;
-      }
-    }
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
-      Iterator<DBID> iter = or.iter(relation.getDBIDs());
+      DBIDIter iter = or.iter(relation.getDBIDs()).iter();
       db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, iter));
       nonefound = false;
     }

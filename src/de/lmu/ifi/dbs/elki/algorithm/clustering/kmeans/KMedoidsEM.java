@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -191,7 +192,8 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     boolean changed = false;
 
     double[] dists = new double[k];
-    for(DBID id : distQ.getRelation().iterDBIDs()) {
+    for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
       for(int i = 0; i < k; i++) {

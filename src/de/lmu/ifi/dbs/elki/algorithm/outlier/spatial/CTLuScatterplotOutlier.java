@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -102,7 +103,8 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // Calculate average of neighborhood for each object and perform a linear
     // regression using the covariance matrix
     CovarianceMatrix covm = new CovarianceMatrix(2);
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final double local = relation.get(id).doubleValue(1);
       // Compute mean of neighbors
       Mean mean = new Mean();
@@ -139,7 +141,8 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // calculate mean and variance for error
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     MeanVariance mv = new MeanVariance();
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       // Compute the error from the linear regression
       double y_i = relation.get(id).doubleValue(1);
       double e = means.doubleValue(id) - (slope * y_i + inter);
@@ -152,7 +155,8 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     {
       final double mean = mv.getMean();
       final double variance = mv.getNaiveStddev();
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double score = Math.abs((scores.doubleValue(id) - mean) / variance);
         minmax.put(score);
         scores.putDouble(id, score);

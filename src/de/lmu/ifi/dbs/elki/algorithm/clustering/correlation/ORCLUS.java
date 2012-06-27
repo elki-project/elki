@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -243,9 +244,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     }
 
     // for each data point o do
-    Iterator<DBID> it = database.iterDBIDs();
-    while(it.hasNext()) {
-      DBID id = it.next();
+    for (DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+      DBID id = it.getDBID();
       V o = database.get(id);
 
       DoubleDistance minDist = null;

@@ -27,9 +27,9 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Representation adapter that uses toString() to produce a string
@@ -79,7 +79,7 @@ public class ConvertToStringView extends AbstractHierarchicalResult implements R
   }
 
   @Override
-  public IterableIterator<DBID> iterDBIDs() {
+  public DBIDIter iterDBIDs() {
     return existing.iterDBIDs();
   }
 

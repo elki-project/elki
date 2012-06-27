@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
@@ -419,9 +420,8 @@ public class TextWriter {
     TextWriterStream out = new TextWriterStream(outStream, writers);
     printSettings(out, sr);
 
-    Iterator<DBID> i = or.iter(or.getDBIDs());
-    while(i.hasNext()) {
-      printObject(out, db, i.next(), ra);
+    for (DBIDIter i = or.iter(or.getDBIDs()).iter(); i.valid(); i.advance()) {
+      printObject(out, db, i.getDBID(), ra);
     }
     out.commentPrintSeparator();
     out.flush();
