@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -150,7 +151,8 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", relation.size(), logger) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(id, rmax);
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
@@ -194,7 +196,8 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     WritableDoubleDataStore mdef_radius = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final List<DoubleIntPair> cdist = interestingDistances.get(id);
       final double maxdist = cdist.get(cdist.size() - 1).first;
       final int maxneig = cdist.get(cdist.size() - 1).second;

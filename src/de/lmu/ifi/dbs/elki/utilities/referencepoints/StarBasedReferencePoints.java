@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -100,7 +101,8 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for(DBID objID : database.iterDBIDs()) {
+    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID objID  = iditer.getDBID();
       V obj = database.get(objID);
       for(int d = 0; d < dim; d++) {
         double val = obj.doubleValue(d + 1);

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -182,14 +183,16 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     }
     // compute maximum density
     double maxDensity = 0.0;
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double dens = rbod_score.doubleValue(id);
       if(dens > maxDensity) {
         maxDensity = dens;
       }
     }
     // compute ROS
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double score = 1 - (rbod_score.doubleValue(id) / maxDensity);
       rbod_score.putDouble(id, score);
     }
@@ -218,7 +221,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
   protected List<DistanceResultPair<D>> computeDistanceVector(V refPoint, Relation<V> database, DistanceQuery<V, D> distFunc) {
     // TODO: optimize for double distances?
     List<DistanceResultPair<D>> referenceDists = new ArrayList<DistanceResultPair<D>>(database.size());
-    for(DBID id : database.iterDBIDs()) {
+    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final D distance = distFunc.distance(id, refPoint);
       referenceDists.add(new GenericDistanceResultPair<D>(distance, id));
     }

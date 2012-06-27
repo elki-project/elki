@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -45,6 +44,7 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -298,8 +298,8 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       minima[d] = Double.MAX_VALUE;
     }
     // update minima and maxima
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-      V featureVector = database.get(it.next());
+    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+      V featureVector = database.get(it.getDBID());
       updateMinMax(featureVector, minima, maxima);
     }
     for(int i = 0; i < maxima.length; i++) {
@@ -392,13 +392,13 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
     // identify dense units
     double total = database.size();
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-      final DBID id = it.next();
+    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+      final DBID id = it.getDBID();
       V featureVector = database.get(id);
       for(CLIQUEUnit<V> unit : units) {
         unit.addFeatureVector(id, featureVector);
         // unit is a dense unit
-        if(!it.hasNext() && unit.selectivity(total) >= tau) {
+        if(unit.selectivity(total) >= tau) {
           denseUnits.add(unit);
           // add the dense unit to its subspace
           int dim = unit.getIntervals().iterator().next().getDimension();

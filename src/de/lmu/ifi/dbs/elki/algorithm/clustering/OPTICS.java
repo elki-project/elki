@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -142,7 +143,8 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction && DoubleDistance.class.isInstance(epsilon)) {
       // Optimized codepath for double-based distances. Avoids Java
       // boxing/unboxing.
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(!processedIDs.contains(id)) {
           // We need to do some ugly casts to be able to run the optimized version, unfortunately.
           @SuppressWarnings("unchecked")
@@ -155,7 +157,8 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       }
     }
     else {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(!processedIDs.contains(id)) {
           expandClusterOrder(clusterOrder, database, rangeQuery, id, epsilon, progress);
         }

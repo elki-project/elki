@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -149,7 +150,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       {
         Relation<LabelList> olq = database.getDatabase().getRelation(TypeUtil.LABELLIST);
         Relation<ExternalID> eidq = database.getDatabase().getRelation(TypeUtil.EXTERNALID);
-        for(DBID id : database.iterDBIDs()) {
+        for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+          DBID id  = iditer.getDBID();
           if(eidq != null) {
             ExternalID eid = eidq.get(id);
             if(eid != null) {

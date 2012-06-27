@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -61,7 +62,8 @@ public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction 
     MeanVariance mv = new MeanVariance();
     DoubleMinMax minmax = new DoubleMinMax();
 
-    for(DBID id : or.getScores().iterDBIDs()) {
+    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double val = or.getScores().get(id);
       if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);

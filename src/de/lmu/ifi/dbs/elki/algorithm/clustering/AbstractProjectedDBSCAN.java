@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -184,7 +185,8 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
 
     if(relation.size() >= minpts) {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(!processedIDs.contains(id)) {
           expandCluster(distFunc, rangeQuery, id, objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
@@ -198,7 +200,8 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
       }
     }
     else {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), getLogger());

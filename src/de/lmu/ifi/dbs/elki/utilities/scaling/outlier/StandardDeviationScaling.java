@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
@@ -115,7 +116,8 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
-      for(DBID id : or.getScores().iterDBIDs()) {
+      for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double val = or.getScores().get(id);
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
@@ -131,7 +133,8 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
       mean = fixedmean;
       double sqsum = 0;
       int cnt = 0;
-      for(DBID id : or.getScores().iterDBIDs()) {
+      for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double val = or.getScores().get(id);
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum += (val - mean) * (val - mean);

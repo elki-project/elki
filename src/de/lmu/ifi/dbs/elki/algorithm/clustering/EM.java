@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -225,7 +226,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
 
       // weights and means
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double[] clusterProbabilities = probClusterIGivenX.get(id);
 
         for(int i = 0; i < k; i++) {
@@ -241,7 +243,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         means.set(i, newMean);
       }
       // covariance matrices
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double[] clusterProbabilities = probClusterIGivenX.get(id);
         Vector instance = relation.get(id).getColumnVector();
         for(int i = 0; i < k; i++) {
@@ -272,7 +275,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     }
 
     // provide a hard clustering
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double[] clusterProbabilities = probClusterIGivenX.get(id);
       int maxIndex = 0;
       double currentMax = 0.0;
@@ -315,7 +319,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
   protected double assignProbabilitiesToInstances(Relation<V> database, double[] normDistrFactor, List<Vector> means, List<Matrix> invCovMatr, double[] clusterWeights, WritableDataStore<double[]> probClusterIGivenX) {
     double emSum = 0.0;
 
-    for(DBID id : database.iterDBIDs()) {
+    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       Vector x = database.get(id).getColumnVector();
       double[] probabilities = new double[k];
       for(int i = 0; i < k; i++) {

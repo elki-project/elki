@@ -31,8 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
 
 /**
  * Ordering obtained from an outlier score.
@@ -79,10 +77,10 @@ public class OrderingFromRelation implements OrderingResult {
   }
 
   @Override
-  public IterableIterator<DBID> iter(DBIDs ids) {
+  public ArrayModifiableDBIDs iter(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     sorted.sort(new ImpliedComparator());
-    return new IterableIteratorAdapter<DBID>(sorted);
+    return sorted;
   }
 
   @Override

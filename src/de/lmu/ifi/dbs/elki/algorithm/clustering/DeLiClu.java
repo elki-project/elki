@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -201,11 +201,11 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @return the id of the start object for the run method
    */
   private DBID getStartObject(Relation<NV> relation) {
-    Iterator<DBID> it = relation.iterDBIDs();
-    if(!it.hasNext()) {
+    DBIDIter it = relation.iterDBIDs();
+    if(!it.valid()) {
       return null;
     }
-    return it.next();
+    return it.getDBID();
   }
 
   /**

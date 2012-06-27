@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -189,7 +190,8 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
     FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), logger) : null;
     int processed = 1;
 
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       Integer corrdim = preprocin.getLocalProjection(id).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {

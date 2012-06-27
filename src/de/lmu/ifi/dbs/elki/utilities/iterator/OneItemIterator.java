@@ -34,7 +34,7 @@ import java.util.Iterator;
  *
  * @param <T> Object type to return
  */
-public class OneItemIterator<T> implements IterableIterator<T> {
+public class OneItemIterator<T> implements Iterator<T> {
   /**
    * Object to return.
    */
@@ -65,10 +65,5 @@ public class OneItemIterator<T> implements IterableIterator<T> {
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Iterator<T> iterator() {
-    return this;
   }
 }

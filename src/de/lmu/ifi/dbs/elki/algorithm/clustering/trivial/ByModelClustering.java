@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -102,7 +103,8 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   public Clustering<Model> run(Relation<Model> relation) {
     // Build model mapping
     HashMap<Model, ModifiableDBIDs> modelMap = new HashMap<Model, ModifiableDBIDs>();
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       Model model = relation.get(id);
       ModifiableDBIDs modelids = modelMap.get(model);
       if(modelids == null) {

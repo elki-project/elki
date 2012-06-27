@@ -30,8 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Result class providing an ordering backed by a hashmap.
@@ -118,7 +116,7 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
   }
 
   @Override
-  public IterableIterator<DBID> iter(DBIDs ids) {
+  public ArrayModifiableDBIDs iter(DBIDs ids) {
     ArrayModifiableDBIDs sorted = DBIDUtil.newArray(ids);
     if(comparator != null) {
       sorted.sort(new DerivedComparator());
@@ -126,7 +124,7 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
     else {
       sorted.sort(new ImpliedComparator());
     }
-    return IterableUtil.fromIterable(sorted);
+    return sorted;
   }
 
   /**

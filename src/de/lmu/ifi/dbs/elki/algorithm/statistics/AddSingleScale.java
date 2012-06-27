@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -73,7 +74,8 @@ public class AddSingleScale implements Algorithm {
   private ScalesResult run(Relation<? extends NumberVector<?, ?>> rel) {
     final int dim = DatabaseUtil.dimensionality(rel);
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : rel.iterDBIDs()) {
+    for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       NumberVector<?, ?> vec = rel.get(id);
       for(int d = 1; d <= dim; d++) {
         minmax.put(vec.doubleValue(d));

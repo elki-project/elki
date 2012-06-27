@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -235,7 +236,8 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         stepprog.beginStep(3, "Computing pdists", logger);
       }
       FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", relation.size(), logger) : null;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         final KNNResult<D> neighbors = knnReach.getKNNForDBID(id, kreach);
         double sqsum = 0.0;
         // use first kref neighbors as reference set
@@ -266,7 +268,8 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
 
       FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), logger) : null;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         final KNNResult<D> neighbors = knnComp.getKNNForDBID(id, kcomp);
         MeanVariance mv = new MeanVariance();
         // use first kref neighbors as comparison set.
@@ -306,7 +309,8 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
 
       FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), logger) : null;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         loops.putDouble(id, NormalDistribution.erf((plofs.doubleValue(id) - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {

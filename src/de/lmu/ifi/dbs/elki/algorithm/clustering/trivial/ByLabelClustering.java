@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -173,7 +174,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   private HashMap<String, ModifiableDBIDs> singleAssignment(Relation<?> data) {
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
-    for(DBID id : data.iterDBIDs()) {
+    for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final Object val = data.get(id);
       String label = (val != null) ? val.toString() : null;
       assign(labelMap, label, id);
@@ -191,7 +193,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   private HashMap<String, ModifiableDBIDs> multipleAssignment(Relation<?> data) {
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
-    for(DBID id : data.iterDBIDs()) {
+    for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       String[] labels = data.get(id).toString().split(" ");
       for(String label : labels) {
         assign(labelMap, label, id);

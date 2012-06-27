@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
@@ -50,7 +51,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -163,14 +163,14 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     DoubleMinMax minmax = new DoubleMinMax();
     if(breadth) {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
-      Pair<IterableIterator<DBID>, Relation<Double>>[] IDVectorOntoScoreVector = Pair.newPairArray(results.size());
+      Pair<DBIDIter, Relation<Double>>[] IDVectorOntoScoreVector = Pair.newPairArray(results.size());
 
       // Mapping score-sorted DBID-Iterators onto their corresponding scores.
       // We need to initialize them now be able to iterate them "in parallel".
       {
         int i = 0;
         for(OutlierResult r : results) {
-          IDVectorOntoScoreVector[i] = new Pair<IterableIterator<DBID>, Relation<Double>>(r.getOrdering().iter(relation.getDBIDs()), r.getScores());
+          IDVectorOntoScoreVector[i] = new Pair<DBIDIter, Relation<Double>>(r.getOrdering().iter(relation.getDBIDs()).iter(), r.getScores());
           i++;
         }
       }
@@ -178,17 +178,18 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       // Iterating over the *lines* of the AS_t(i)-matrix.
       for(int i = 0; i < relation.size(); i++) {
         // Iterating over the elements of a line (breadth-first).
-        for(Pair<IterableIterator<DBID>, Relation<Double>> pair : IDVectorOntoScoreVector) {
-          IterableIterator<DBID> iter = pair.first;
+        for(Pair<DBIDIter, Relation<Double>> pair : IDVectorOntoScoreVector) {
+          DBIDIter iter = pair.first;
           // Always true if every algorithm returns a complete result (one score
           // for every DBID).
-          if(iter.hasNext()) {
-            DBID tmpID = iter.next();
+          if(iter.valid()) {
+            DBID tmpID = iter.getDBID();
             double score = pair.second.get(tmpID);
             if(Double.isNaN(scores.doubleValue(tmpID))) {
               scores.putDouble(tmpID, score);
               minmax.put(score);
             }
+            iter.advance();
           }
           else {
             logger.warning("Incomplete result: Iterator does not contain |DB| DBIDs");
@@ -205,7 +206,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     }
     else {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         double sum = 0.0;
         for(OutlierResult r : results) {
           final Double s = r.getScores().get(id);

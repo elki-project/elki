@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -196,7 +197,8 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
       // Actual data distribution.
       double[] inc = new double[cols];
       inc[0] = frac;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
         histogram.aggregate(pos, inc);
       }

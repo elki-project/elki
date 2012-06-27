@@ -25,15 +25,14 @@ package de.lmu.ifi.dbs.elki.utilities.iterator;
 
 import java.util.Iterator;
 
-
 /**
- * Empty iterator, that never returns any data.
+ * Empty iterator/iterable, that never returns any data.
  * 
  * @author Erich Schubert
  *
  * @param <T> Data type
  */
-public final class EmptyIterator<T> implements IterableIterator<T>, Iterator<T>, Iterable<T> {
+public final class EmptyIterator<T> implements Iterator<T>, Iterable<T> {
   @Override
   public boolean hasNext() {
     return false;
@@ -50,7 +49,7 @@ public final class EmptyIterator<T> implements IterableIterator<T>, Iterator<T>,
   }
   
   @Override
-  public IterableIterator<T> iterator() {
+  public Iterator<T> iterator() {
     return STATIC();
   }
 
@@ -66,7 +65,7 @@ public final class EmptyIterator<T> implements IterableIterator<T>, Iterator<T>,
    * @return Cast static instance. 
    */
   @SuppressWarnings("unchecked")
-  public static <T> IterableIterator<T> STATIC() {
-    return (IterableIterator<T>) STATIC_INSTANCE;
+  public static <T> EmptyIterator<T> STATIC() {
+    return (EmptyIterator<T>) STATIC_INSTANCE;
   }
 }

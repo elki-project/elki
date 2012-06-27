@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -99,7 +100,8 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?, ?>> extends
 
     CovarianceMatrix covmaker = new CovarianceMatrix(DatabaseUtil.dimensionality(attributes));
     WritableDataStore<Vector> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
-    for(DBID id : attributes.iterDBIDs()) {
+    for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       final O obj = attributes.get(id);
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
       // TODO: remove object itself from neighbors?
@@ -117,7 +119,8 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?, ?>> extends
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for(DBID id : attributes.iterDBIDs()) {
+    for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       Vector temp = deltas.get(id).minus(mean);
       final double score = temp.transposeTimesTimes(cmati, temp);
       minmax.put(score);

@@ -32,6 +32,7 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
@@ -193,7 +194,8 @@ public class SelectionToolDotVisualization extends AbstractScatterplotVisualizat
     else {
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
-    for(DBID id : rel.iterDBIDs()) {
+    for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double[] vec = proj.fastProjectDataToRenderSpace(rel.get(id));
       if(vec[0] >= Math.min(p1.getX(), p2.getX()) && vec[0] <= Math.max(p1.getX(), p2.getX()) && vec[1] >= Math.min(p1.getY(), p2.getY()) && vec[1] <= Math.max(p1.getY(), p2.getY())) {
         if(mode == Mode.INVERT) {

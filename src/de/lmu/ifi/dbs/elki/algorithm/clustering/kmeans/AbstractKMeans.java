@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -101,7 +102,8 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
     if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       @SuppressWarnings("unchecked")
       final PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>>) getDistanceFunction();
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double mindist = Double.POSITIVE_INFINITY;
         V fv = relation.get(id);
         int minIndex = 0;
@@ -128,7 +130,8 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
     }
     else {
       final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         D mindist = df.getDistanceFactory().infiniteDistance();
         V fv = relation.get(id);
         int minIndex = 0;
@@ -257,7 +260,8 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
       final PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>>) getDistanceFunction();
 
       // Incremental update
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         double mindist = Double.POSITIVE_INFINITY;
         V fv = relation.get(id);
         int minIndex = 0;
@@ -289,7 +293,8 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
       final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
 
       // Incremental update
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         D mindist = df.getDistanceFactory().infiniteDistance();
         V fv = relation.get(id);
         int minIndex = 0;

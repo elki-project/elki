@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
  */
 
 import java.util.BitSet;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -38,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
@@ -62,8 +62,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -149,8 +147,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), logger) : null;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
-    for(Iterator<DBID> iter = relation.iterDBIDs(); iter.hasNext();) {
-      DBID queryObject = iter.next();
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      DBID queryObject = iter.getDBID();
       if(progress != null) {
         progress.incrementProcessed(logger);
       }
@@ -186,7 +184,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBID queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
     Heap<DoubleObjPair<DBID>> nearestNeighbors = new TiedTopBoundedHeap<DoubleObjPair<DBID>>(knn);
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       if(!id.equals(queryObject)) {
         double sim = simQ.similarity(queryObject, id).doubleValue();
         if(sim > 0) {
@@ -381,8 +380,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     }
 
     @Override
-    public IterableIterator<DBID> iterDBIDs() {
-      return IterableUtil.fromIterator(dbids.iterator());
+    public DBIDIter iterDBIDs() {
+      return dbids.iter();
     }
 
     @Override

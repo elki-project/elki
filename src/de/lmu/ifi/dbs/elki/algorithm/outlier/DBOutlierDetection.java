@@ -23,14 +23,13 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -117,7 +116,8 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
     if(knnQuery != null) {
-      for(DBID id : distFunc.getRelation().iterDBIDs()) {
+      for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         counter++;
         final KNNResult<D> knns = knnQuery.getKNNForDBID(id, m);
         if(logger.isDebugging()) {
@@ -138,12 +138,12 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     }
     else {
       // range query for each object. stop if m objects are found
-      for(DBID id : distFunc.getRelation().iterDBIDs()) {
+      for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         counter++;
-        Iterator<DBID> iterator = distFunc.getRelation().iterDBIDs();
         int count = 0;
-        while(iterator.hasNext() && count < m) {
-          DBID currentID = iterator.next();
+        for (DBIDIter iterator = distFunc.getRelation().iterDBIDs(); iterator.valid() && count < m; iterator.advance()) {
+          DBID currentID = iterator.getDBID();
           D currentDistance = distFunc.distance(id, currentID);
 
           if(currentDistance.compareTo(neighborhoodSize) <= 0) {

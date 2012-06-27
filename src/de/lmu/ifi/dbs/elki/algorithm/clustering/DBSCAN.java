@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -141,7 +142,8 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(size);
     if(size >= minpts) {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         if(!processedIDs.contains(id)) {
           expandCluster(relation, rangeQuery, id, objprog, clusprog);
         }
@@ -155,7 +157,8 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       }
     }
     else {
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);

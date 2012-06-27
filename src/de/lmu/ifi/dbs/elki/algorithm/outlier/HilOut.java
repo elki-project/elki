@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
@@ -251,7 +252,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
     // Return weights in out
     if(tn == ScoreType.TopN) {
       minmax.put(0.0);
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         hilout_weight.putDouble(id, 0.0);
       }
       for(HilFeature ent : h.out) {
@@ -480,7 +482,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       this.pf = new HilFeature[relation.size()];
 
       int pos = 0;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         pf[pos++] = new HilFeature(id, new Heap<DoubleDistanceResultPair>(k, Collections.reverseOrder()));
       }
       this.out = new Heap<HilFeature>(n, new Comparator<HilFeature>() {

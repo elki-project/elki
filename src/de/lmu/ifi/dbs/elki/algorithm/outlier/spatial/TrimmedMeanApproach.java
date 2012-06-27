@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -116,7 +117,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), logger) : null;
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       int num = 0;
       double[] values = new double[neighbors.size()];
@@ -161,7 +163,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       double[] ei = new double[relation.size()];
       {
         int i = 0;
-        for(DBID id : relation.iterDBIDs()) {
+        for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+          DBID id  = iditer.getDBID();
           ei[i] = errors.doubleValue(id);
           i++;
         }
@@ -180,7 +183,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     }
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double score = Math.abs(errors.doubleValue(id)) * 0.6745 / median_dev_from_median;
       scores.putDouble(id, score);
       minmax.put(score);

@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -99,8 +100,8 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
     StylingPolicy sp = context.getStyleResult().getStylingPolicy();
     addCSSClasses(svgp, sp);
 
-    Iterator<DBID> ids = sample.getSample().iterator();
-    if(ids == null || !ids.hasNext()) {
+    DBIDIter ids = sample.getSample().iter();
+    if(ids == null || !ids.valid()) {
       ids = relation.iterDBIDs();
     }
     if(sp instanceof ClassStylingPolicy) {
@@ -124,8 +125,8 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
       }
     }
     else {
-      while(ids.hasNext()) {
-        DBID id = ids.next();
+      for(; ids.valid(); ids.advance()) {
+        DBID id = ids.getDBID();
         SVGPath path = new SVGPath();
         double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
         for(int i = 0; i < yPos.length; i++) {

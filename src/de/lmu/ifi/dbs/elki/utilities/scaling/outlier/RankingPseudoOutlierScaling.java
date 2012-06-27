@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -56,7 +57,8 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
     if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
       inverted = true;
     }
-    for(DBID id : or.getScores().iterDBIDs()) {
+    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       scores[pos] = or.getScores().get(id);
       pos++;
     }

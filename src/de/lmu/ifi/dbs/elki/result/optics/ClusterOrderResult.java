@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -43,9 +44,6 @@ import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIteratorAdapter;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
@@ -181,16 +179,14 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * Implementation of the {@link OrderingResult} interface.
      */
     @Override
-    public IterableIterator<DBID> iter(DBIDs ids) {
+    public ArrayModifiableDBIDs iter(DBIDs ids) {
       ArrayModifiableDBIDs res = DBIDUtil.newArray(ids.size());
       for(ClusterOrderEntry<D> e : clusterOrder) {
         if(ids.contains(e.getID())) {
           res.add(e.getID());
         }
       }
-
-      // TODO: elements in ids that are not in clusterOrder are lost!
-      return new IterableIteratorAdapter<DBID>(res);
+      return res;
     }
 
     @Override
@@ -253,8 +249,8 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     }
 
     @Override
-    public IterableIterator<DBID> iterDBIDs() {
-      return IterableUtil.fromIterator(dbids.iterator());
+    public DBIDIter iterDBIDs() {
+      return dbids.iter();
     }
 
     @Override
@@ -342,8 +338,8 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     }
 
     @Override
-    public IterableIterator<DBID> iterDBIDs() {
-      return IterableUtil.fromIterator(dbids.iterator());
+    public DBIDIter iterDBIDs() {
+      return dbids.iter();
     }
 
     @Override

@@ -31,7 +31,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
 
 /**
  * Centralized hierarchy implementation, using a HashMap of Lists.
@@ -149,7 +148,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   }
 
   @Override
-  public IterableIterator<O> iterDescendants(O obj) {
+  public Iterator<O> iterDescendants(O obj) {
     return new ItrDesc(obj);
   }
 
@@ -172,7 +171,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   }
 
   @Override
-  public IterableIterator<O> iterAncestors(O obj) {
+  public Iterator<O> iterAncestors(O obj) {
     return new ItrAnc(obj);
   }
 
@@ -183,7 +182,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
    * 
    * @apiviz.exclude
    */
-  private class ItrDesc implements IterableIterator<O> {
+  private class ItrDesc implements Iterator<O> {
     /**
      * Starting object (for cloning);
      */
@@ -235,11 +234,6 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     public void remove() {
       throw new UnsupportedOperationException();
     }
-
-    @Override
-    public Iterator<O> iterator() {
-      return new ItrDesc(start);
-    }
   }
 
   /**
@@ -249,7 +243,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
    * 
    * @apiviz.exclude
    */
-  private class ItrAnc implements IterableIterator<O> {
+  private class ItrAnc implements Iterator<O> {
     /**
      * Starting object (for cloning);
      */
@@ -300,11 +294,6 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     @Override
     public void remove() {
       throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Iterator<O> iterator() {
-      return new ItrAnc(start);
     }
   }
 }

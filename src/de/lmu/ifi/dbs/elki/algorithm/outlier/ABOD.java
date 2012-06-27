@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -186,7 +187,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     assert (k == this.k);
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
 
-    for(DBID objKey : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID objKey  = iditer.getDBID();
       MeanVariance s = new MeanVariance();
 
       // System.out.println("Processing: " +objKey);
@@ -246,7 +248,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
     Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(relation.size(), Collections.reverseOrder());
     // get Candidate Ranking
-    for(DBID aKey : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID aKey  = iditer.getDBID();
       HashMap<DBID, Double> dists = new HashMap<DBID, Double>(relation.size());
       // determine kNearestNeighbors and pairwise distances
       Heap<DoubleObjPair<DBID>> nn;
@@ -291,11 +294,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // }
       // v++;
       MeanVariance s = new MeanVariance();
-      for(DBID bKey : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID bKey  = iditer.getDBID();
         if(bKey.equals(aKey)) {
           continue;
         }
-        for(DBID cKey : relation.iterDBIDs()) {
+        for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
+          DBID cKey  = iditer2.getDBID();
           if(cKey.equals(aKey)) {
             continue;
           }
@@ -434,7 +439,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
   private Heap<DoubleObjPair<DBID>> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
     Heap<DoubleObjPair<DBID>> nn = new Heap<DoubleObjPair<DBID>>(sampleSize);
-    for(DBID bKey : data.iterDBIDs()) {
+    for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID bKey  = iditer.getDBID();
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(nn.size() < sampleSize) {
@@ -454,7 +460,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     Heap<DoubleObjPair<DBID>> nn = new Heap<DoubleObjPair<DBID>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
-    for(DBID bKey : data.iterDBIDs()) {
+    for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID bKey  = iditer.getDBID();
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.put(bKey, val);
       if(counter % step == 0) {
@@ -477,23 +484,22 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     Heap<DoubleObjPair<DBID>> pq = new Heap<DoubleObjPair<DBID>>(data.size(), Collections.reverseOrder());
     HashMap<DBID, DBIDs> explaintab = new HashMap<DBID, DBIDs>();
     // test all objects
-    for(DBID objKey : data.iterDBIDs()) {
+    for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID objKey  = iditer.getDBID();
       MeanVariance s = new MeanVariance();
       // Queue for the best explanation
       Heap<DoubleObjPair<DBID>> explain = new Heap<DoubleObjPair<DBID>>();
       // determine Object
       // for each pair of other objects
-      Iterator<DBID> iter = data.iterDBIDs();
+      for (DBIDIter iter = data.iterDBIDs(); iter.valid(); iter.advance()) {
       // Collect Explanation Vectors
-      while(iter.hasNext()) {
         MeanVariance s2 = new MeanVariance();
-        DBID key1 = iter.next();
-        Iterator<DBID> iter2 = data.iterDBIDs();
+        DBID key1 = iter.getDBID();
         if(objKey.equals(key1)) {
           continue;
         }
-        while(iter2.hasNext()) {
-          DBID key2 = iter2.next();
+        for (DBIDIter iter2 = data.iterDBIDs(); iter2.valid(); iter2.advance()) {
+          DBID key2 = iter2.getDBID();
           if(key2.equals(key1) || objKey.equals(key2)) {
             continue;
           }

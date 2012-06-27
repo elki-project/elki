@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -129,7 +130,8 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     final double minscore = expect / (expect + 1);
     
     HashSet<GeneratorSingleCluster> generators = new HashSet<GeneratorSingleCluster>();
-    for(DBID id : models.iterDBIDs()) {
+    for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       Model model = models.get(id);
       if(model instanceof GeneratorSingleCluster) {
         generators.add((GeneratorSingleCluster) model);
@@ -139,7 +141,8 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       logger.warning("No generator models found for dataset - all points will be considered outliers.");
     }
 
-    for(DBID id : models.iterDBIDs()) {
+    for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       double score = 0.0;
       // Convert to a math vector
       Vector v = vecs.get(id).getColumnVector();

@@ -26,11 +26,10 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableIterator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.IterableUtil;
 
 /**
  * A virtual partitioning of the database. For the accepted DBIDs, access is
@@ -109,8 +108,8 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
   }
 
   @Override
-  public IterableIterator<DBID> iterDBIDs() {
-    return IterableUtil.fromIterable(idview);
+  public DBIDIter iterDBIDs() {
+    return idview.iter();
   }
 
   @Override

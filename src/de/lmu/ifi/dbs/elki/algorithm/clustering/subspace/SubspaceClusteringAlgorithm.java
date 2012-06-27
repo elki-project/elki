@@ -22,9 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 
 /**
  * Interface for subspace clustering algorithms that use a model derived from

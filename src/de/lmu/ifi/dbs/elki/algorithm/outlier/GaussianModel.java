@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -115,7 +116,8 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     final double fakt = (1.0 / (Math.sqrt(Math.pow(MathUtil.TWOPI, DatabaseUtil.dimensionality(relation)) * covarianceMatrix.det())));
 
     // for each object compute Mahalanobis distance
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       Vector x = relation.get(id).getColumnVector().minusEquals(mean);
       // Gaussian PDF
       final double mDist = x.transposeTimesTimes(covarianceTransposed, x);
@@ -128,7 +130,8 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     final OutlierScoreMeta meta;
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
-      for(DBID id : relation.iterDBIDs()) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DBID id  = iditer.getDBID();
         oscores.putDouble(id, (max - oscores.doubleValue(id)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);

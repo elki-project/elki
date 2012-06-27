@@ -28,6 +28,7 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -261,7 +262,7 @@ public class ROC {
     /**
      * Original Iterator
      */
-    private Iterator<DBID> iter;
+    private DBIDIter iter;
 
     /**
      * Outlier score
@@ -275,18 +276,19 @@ public class ROC {
      */
     public OutlierScoreAdapter(OutlierResult o) {
       super();
-      this.iter = o.getOrdering().iter(o.getScores().getDBIDs());
+      this.iter = o.getOrdering().iter(o.getScores().getDBIDs()).iter();
       this.scores = o.getScores();
     }
 
     @Override
     public boolean hasNext() {
-      return this.iter.hasNext();
+      return this.iter.valid();
     }
 
     @Override
     public DoubleObjPair<DBID> next() {
-      DBID id = this.iter.next();
+      DBID id = this.iter.getDBID();
+      iter.advance();
       return new DoubleObjPair<DBID>(scores.get(id), id);
     }
 

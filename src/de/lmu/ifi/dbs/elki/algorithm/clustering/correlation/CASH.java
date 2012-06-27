@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -662,7 +663,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
     double d_min = Double.POSITIVE_INFINITY;
     double d_max = Double.NEGATIVE_INFINITY;
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       ParameterizationFunction f = relation.get(id);
       HyperBoundingBox minMax = f.determineAlphaMinMax(box);
       double f_min = f.function(SpatialUtil.getMin(minMax));
@@ -709,7 +711,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
     ids.addDBIDs(interval.getIDs());
     // Search for nearby vectors in original database
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       DoubleVector v = new DoubleVector(relation.get(id).getColumnVector().getArrayRef());
       DoubleDistance d = df.distance(v, centroid);
       if(d.compareTo(eps) < 0) {

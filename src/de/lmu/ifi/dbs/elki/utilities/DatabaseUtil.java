@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
@@ -181,8 +182,8 @@ public final class DatabaseUtil {
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.doubleValue(d);
 
-      for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-        NumberVector<?, ?> o = database.get(it.next());
+      for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+        NumberVector<?, ?> o = database.get(it.getDBID());
         double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
       }
@@ -247,7 +248,8 @@ public final class DatabaseUtil {
       mins[i] = Double.MAX_VALUE;
       maxs[i] = -Double.MAX_VALUE;
     }
-    for(DBID it : database.iterDBIDs()) {
+    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID it  = iditer.getDBID();
       NV o = database.get(it);
       for(int d = 0; d < dim; d++) {
         double v = o.doubleValue(d + 1);
@@ -398,8 +400,8 @@ public final class DatabaseUtil {
    */
   public static SortedSet<ClassLabel> getClassLabels(Relation<? extends ClassLabel> database) {
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
-    for(Iterator<DBID> iter = database.iterDBIDs(); iter.hasNext();) {
-      labels.add(database.get(iter.next()));
+    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+      labels.add(database.get(it.getDBID()));
     }
     return labels;
   }
@@ -425,10 +427,8 @@ public final class DatabaseUtil {
    */
   @SuppressWarnings("unchecked")
   public static <O> Class<? extends O> guessObjectClass(Relation<O> database) {
-    for(DBID id : database.iterDBIDs()) {
-      return (Class<? extends O>) database.get(id).getClass();
-    }
-    return null;
+    DBID id  = database.iterDBIDs().getDBID();
+    return (Class<? extends O>) database.get(id).getClass();
   }
 
   /**
@@ -445,16 +445,17 @@ public final class DatabaseUtil {
    */
   public static <O> Class<?> getBaseObjectClassExpensive(Relation<O> database) {
     List<Class<?>> candidates = new ArrayList<Class<?>>();
-    Iterator<DBID> iditer = database.iterDBIDs();
+    DBIDIter iditer = database.iterDBIDs();
     // empty database?!
-    if(!iditer.hasNext()) {
+    if(!iditer.valid()) {
       return null;
     }
     // put first class into result set.
-    candidates.add(database.get(iditer.next()).getClass());
+    candidates.add(database.get(iditer.getDBID()).getClass());
+    iditer.advance();
     // other objects
-    while(iditer.hasNext()) {
-      Class<?> newcls = database.get(iditer.next()).getClass();
+    for(; iditer.valid(); iditer.advance()) {
+      Class<?> newcls = database.get(iditer.getDBID()).getClass();
       // validate all candidates
       Iterator<Class<?>> ci = candidates.iterator();
       while(ci.hasNext()) {
@@ -509,7 +510,8 @@ public final class DatabaseUtil {
       return DBIDUtil.newArray();
     }
     ArrayModifiableDBIDs ret = DBIDUtil.newArray();
-    for(DBID objid : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID objid  = iditer.getDBID();
       if(name_pattern.matcher(relation.get(objid)).find()) {
         ret.add(objid);
       }
@@ -556,7 +558,7 @@ public final class DatabaseUtil {
     /**
      * The real iterator.
      */
-    final Iterator<DBID> iter;
+    final DBIDIter iter;
 
     /**
      * The database we use
@@ -569,7 +571,7 @@ public final class DatabaseUtil {
      * @param iter Original iterator.
      * @param database Database
      */
-    public RelationObjectIterator(Iterator<DBID> iter, Relation<? extends O> database) {
+    public RelationObjectIterator(DBIDIter iter, Relation<? extends O> database) {
       super();
       this.iter = iter;
       this.database = database;
@@ -588,18 +590,19 @@ public final class DatabaseUtil {
 
     @Override
     public boolean hasNext() {
-      return iter.hasNext();
+      return iter.valid();
     }
 
     @Override
     public O next() {
-      DBID id = iter.next();
+      DBID id = iter.getDBID();
+      iter.advance();
       return database.get(id);
     }
 
     @Override
     public void remove() {
-      iter.remove();
+      throw new UnsupportedOperationException();
     }
   }
 

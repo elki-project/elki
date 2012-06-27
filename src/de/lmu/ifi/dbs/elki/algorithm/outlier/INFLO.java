@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -139,7 +140,8 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // density
     WritableDoubleDataStore density = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // init knns and rnns
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       knns.put(id, DBIDUtil.newArray());
       rnns.put(id, DBIDUtil.newArray());
     }
@@ -147,7 +149,8 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // TODO: use kNN preprocessor?
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       // if not visited count=0
       int count = rnns.get(id).size();
       ModifiableDBIDs s;
@@ -187,7 +190,8 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // IF Object is pruned INFLO=1.0
     DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      DBID id  = iditer.getDBID();
       if(!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);

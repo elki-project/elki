@@ -28,7 +28,6 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -45,6 +44,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -561,8 +561,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       clusterIDs.put(m_i, DBIDUtil.newHashSet());
     }
 
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-      DBID p_id = it.next();
+    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+      DBID p_id = it.getDBID();
       V p = database.get(p_id);
       DistanceResultPair<DoubleDistance> minDist = null;
       for(DBID m_i : dimensions.keySet()) {
@@ -611,8 +611,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       clusterIDs.put(i, DBIDUtil.newHashSet());
     }
 
-    for(Iterator<DBID> it = database.iterDBIDs(); it.hasNext();) {
-      DBID p_id = it.next();
+    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+      DBID p_id = it.getDBID();
       V p = database.get(p_id);
       Pair<DoubleDistance, Integer> minDist = null;
       for(int i = 0; i < dimensions.size(); i++) {

@@ -33,7 +33,7 @@ import java.util.Iterator;
  * @param <IN> Input datatype
  * @param <OUT> Output datatype
  */
-public class TypeFilterIterator<IN, OUT extends IN> extends AbstractFilteredIterator<IN, OUT> implements IterableIterator<OUT> {
+public class TypeFilterIterator<IN, OUT extends IN> extends AbstractFilteredIterator<IN, OUT> implements Iterator<OUT> {
   /**
    * Class restriction
    */
@@ -82,10 +82,5 @@ public class TypeFilterIterator<IN, OUT extends IN> extends AbstractFilteredIter
     catch(ClassCastException e) {
       return null;
     }
-  }
-
-  @Override
-  public Iterator<OUT> iterator() {
-    return this;
   }
 }
