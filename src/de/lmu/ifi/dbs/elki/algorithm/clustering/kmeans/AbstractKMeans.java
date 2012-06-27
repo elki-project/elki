@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
@@ -179,11 +178,12 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
       Vector mean = null;
       if(list.size() > 0) {
         double s = 1.0 / list.size();
-        Iterator<DBID> iter = list.iterator();
-        assert (iter.hasNext());
-        mean = database.get(iter.next()).getColumnVector().timesEquals(s);
-        while(iter.hasNext()) {
-          mean.plusTimesEquals(database.get(iter.next()).getColumnVector(), s);
+        DBIDIter iter = list.iter();
+        assert (iter.valid());
+        mean = database.get(iter.getDBID()).getColumnVector().timesEquals(s);
+        iter.advance();
+        for(; iter.valid(); iter.advance()) {
+          mean.plusTimesEquals(database.get(iter.getDBID()).getColumnVector(), s);
         }
       }
       else {

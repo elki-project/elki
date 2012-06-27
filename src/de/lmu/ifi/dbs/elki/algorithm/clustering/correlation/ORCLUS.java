@@ -215,7 +215,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     DBIDs randomSample = DBIDUtil.randomSample(database.getDBIDs(), k, seed);
     V factory = DatabaseUtil.assumeVectorField(database).getFactory();
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
-    for(DBID id : randomSample) {
+    for(DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       seeds.add(new ORCLUSCluster(database.get(id), id, factory));
     }
     return seeds;
@@ -288,8 +289,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     // covariance matrix of cluster
     // Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
     List<DistanceResultPair<DoubleDistance>> results = new ArrayList<DistanceResultPair<DoubleDistance>>(cluster.objectIDs.size());
-    for(Iterator<DBID> it = cluster.objectIDs.iterator(); it.hasNext();) {
-      DBID id = it.next();
+    for(DBIDIter it = cluster.objectIDs.iter(); it.valid(); it.advance()) {
+      DBID id = it.getDBID();
       DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(id));
       DistanceResultPair<DoubleDistance> qr = new GenericDistanceResultPair<DoubleDistance>(distance, id);
       results.add(qr);
@@ -410,8 +411,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
     DoubleDistance sum = getDistanceFunction().getDistanceFactory().nullDistance();
     V c_proj = projection(c_ij, c_ij.centroid, factory);
-    for(DBID id : c_ij.objectIDs) {
-      V o = database.get(id);
+    for(DBIDIter iter = c_ij.objectIDs.iter(); iter.valid(); iter.advance()) {
+      V o = database.get(iter.getDBID());
       V o_proj = projection(c_ij, o, factory);
       DoubleDistance dist = distFunc.distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));

@@ -374,15 +374,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     double sum = 0.0;
     double sqrSum = 0.0;
     double partCounter = 0;
-    Iterator<DBID> iter = neighbors.iterator();
-    while(iter.hasNext()) {
-      DBID bKey = iter.next();
+    for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+      DBID bKey = iter.getDBID();
       if(bKey.equals(aKey)) {
         continue;
       }
-      Iterator<DBID> iter2 = neighbors.iterator();
-      while(iter2.hasNext()) {
-        DBID cKey = iter2.next();
+      for(DBIDIter iter2 = neighbors.iter(); iter2.valid(); iter2.advance()) {
+        DBID cKey = iter2.getDBID();
         if(cKey.equals(aKey)) {
           continue;
         }
@@ -524,7 +522,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
           continue;
         }
         double max = Double.MIN_VALUE;
-        for(DBID exp : expList) {
+        for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
+          DBID exp = iter.getDBID();
           if(exp.equals(objKey) || nextKey.equals(exp)) {
             continue;
           }
@@ -558,10 +557,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
   private void generateExplanation(Relation<V> data, DBID key, DBIDs expList) {
     Vector vect1 = data.get(key).getColumnVector();
-    Iterator<DBID> iter = expList.iterator();
-    while(iter.hasNext()) {
+    for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
       System.out.println("Outlier: " + vect1);
-      Vector exp = data.get(iter.next()).getColumnVector();
+      Vector exp = data.get(iter.getDBID()).getColumnVector();
       System.out.println("Most common neighbor: " + exp);
       // determine difference Vector
       Vector vals = exp.minus(vect1);

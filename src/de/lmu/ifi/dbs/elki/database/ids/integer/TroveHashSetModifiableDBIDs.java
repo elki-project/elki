@@ -7,6 +7,7 @@ import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.set.hash.TIntHashSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 
@@ -76,7 +77,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDMIter iter() {
     return new DBIDItr(store);
   }
 
@@ -153,7 +154,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr extends THashPrimitiveIterator implements DBIDIter {
+  protected static class DBIDItr extends THashPrimitiveIterator implements DBIDMIter {
     /**
      * The has we access
      */

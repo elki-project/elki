@@ -103,7 +103,8 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
         double[] fi = new double[neighbors.size()];
         // calculate and store Median of neighborhood
         int c = 0;
-        for(DBID n : neighbors) {
+        for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+          DBID n = iter.getDBID();
           if(id.equals(n)) {
             continue;
           }

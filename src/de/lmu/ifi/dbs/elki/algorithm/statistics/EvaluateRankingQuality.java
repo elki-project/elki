@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -147,7 +148,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       Vector av = averages.get(clus).getColumnVector();
       Matrix covm = covmats.get(clus);
 
-      for(DBID i1 : clus.getIDs()) {
+      for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
+        DBID i1 = iter.getDBID();
         Double d = MathUtil.mahalanobisDistance(covm, av.minus(relation.get(i1).getColumnVector()));
         cmem.add(new FCPair<Double, DBID>(d, i1));
       }

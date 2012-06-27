@@ -30,6 +30,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -99,8 +100,10 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
       final double weight = computeWeight(i);
       // Collect newly discovered IDs
       ModifiableDBIDs add = DBIDUtil.newHashSet();
-      for(DBID id : cur) {
-        for(DBID nid : inner.getNeighborDBIDs(id)) {
+      for(DBIDIter iter = cur.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
+        for(DBIDIter iter2 = inner.getNeighborDBIDs(id).iter(); iter2.valid(); iter2.advance()) {
+          DBID nid = iter2.getDBID();
           // Seen before?
           if(seen.contains(nid)) {
             continue;

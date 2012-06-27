@@ -27,15 +27,15 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -141,8 +141,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implement
     // determine standard deviation
     double variance = 0;
     DBIDs ids = db.getDBIDs();
-    for (DBID id : ids) {
-      double distance = distance(db.get(id).getColumnVector());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      double distance = distance(db.get(iter).getColumnVector());
       variance += distance * distance;
     }
     standardDeviation = Math.sqrt(variance / ids.size());

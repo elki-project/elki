@@ -29,7 +29,7 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -111,7 +111,7 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDMIter iter() {
     return new DBIDIterAdapter(iterator());
   }
 

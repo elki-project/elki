@@ -64,6 +64,11 @@ public class ConvertToStringView extends AbstractHierarchicalResult implements R
   }
 
   @Override
+  public String get(DBIDIter iter) {
+    return existing.get(iter).toString();
+  }
+
+  @Override
   public void set(DBID id, String val) {
     throw new UnsupportedOperationException("Covnersion representations are not writable!");
   }

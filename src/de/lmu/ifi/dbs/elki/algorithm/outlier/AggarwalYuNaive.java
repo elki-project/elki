@@ -148,7 +148,8 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
       final double sparsityC = sparsity(ids.size(), size, k);
 
       if(sparsityC < 0) {
-        for(DBID id : ids) {
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          DBID id = iter.getDBID();
           double prev = sparsity.doubleValue(id);
           if(Double.isNaN(prev) || sparsityC < prev) {
             sparsity.putDouble(id, sparsityC);

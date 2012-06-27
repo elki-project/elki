@@ -209,6 +209,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     /**
      * Access reference.
      */
+    // FIXME: Use DataStore
     private HashMap<DBID, ClusterOrderEntry<D>> map;
 
     /**
@@ -231,6 +232,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     @Override
     public D get(DBID objID) {
       return map.get(objID).getReachability();
+    }
+
+    @Override
+    public D get(DBIDIter objID) {
+      return map.get(objID.getDBID()).getReachability();
     }
 
     @Override
@@ -298,6 +304,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     /**
      * Access reference.
      */
+    // FIXME: use DataStore
     private HashMap<DBID, ClusterOrderEntry<D>> map;
 
     /**
@@ -320,6 +327,11 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     @Override
     public DBID get(DBID objID) {
       return map.get(objID).getPredecessorID();
+    }
+
+    @Override
+    public DBID get(DBIDIter objID) {
+      return map.get(objID.getDBID()).getPredecessorID();
     }
 
     @Override

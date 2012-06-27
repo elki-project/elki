@@ -67,4 +67,22 @@ public interface ModifiableDBIDs extends DBIDs {
    * Clear this collection.
    */
   void clear();
+  
+  /**
+   * Get a <em>modifiable</em> DBID iterator (a more efficient API).
+   * 
+   * usage example:
+   * 
+   * <pre>
+   * {@code
+   * for(DBIDMIter iter = ids.iter(); iter.valid(); iter.advance()) {
+   *   DBID id = iter.getDBID();
+   *   iter.remove();
+   * }
+   * </pre>
+   * 
+   * @return modifiable iterator
+   */
+  @Override
+  DBIDMIter iter();
 }

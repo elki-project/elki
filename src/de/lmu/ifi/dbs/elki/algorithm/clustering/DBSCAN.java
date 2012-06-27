@@ -261,9 +261,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       resultList.add(currentCluster);
     }
     else {
-      for(DBID id : currentCluster) {
-        noise.add(id);
-      }
+      noise.addDBIDs(currentCluster);
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }

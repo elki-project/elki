@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -144,8 +145,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
       }
 
       // Remaining objects are inliers
-      for(DBID id : idview) {
-        scores.putDouble(id, 0.0);
+      for (DBIDIter iter = idview.iter(); iter.valid(); iter.advance()) {
+        scores.putDouble(iter.getDBID(), 0.0);
       }
     }
 
@@ -213,8 +214,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
         F.set(i, i, 1.0);
         final int nweight = -1 / neighborhood.size();
         // We need to find the index positions of the neighbors, unfortunately.
-        for(DBID nid : neighborhood) {
-          int pos = ids.binarySearch(nid);
+        for (DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+          int pos = ids.binarySearch(iter.getDBID());
           assert (pos >= 0);
           F.set(pos, i, nweight);
         }

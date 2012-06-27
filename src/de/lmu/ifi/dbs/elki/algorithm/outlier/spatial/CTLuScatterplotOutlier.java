@@ -109,7 +109,8 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       // Compute mean of neighbors
       Mean mean = new Mean();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
-      for(DBID n : neighbors) {
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        DBID n = iter.getDBID();
         if(id.equals(n)) {
           continue;
         }

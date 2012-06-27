@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -54,8 +54,8 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
   public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, seed);
     List<V> means = new ArrayList<V>(k);
-    for(DBID id : ids) {
-      means.add(relation.get(id));
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      means.add(relation.get(iter.getDBID()));
     }
     return means;
   }

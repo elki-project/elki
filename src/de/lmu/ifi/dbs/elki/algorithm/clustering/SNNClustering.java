@@ -241,7 +241,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    for(DBID seed : seeds) {
+    for(DBIDIter iter = seeds.iter(); iter.valid(); iter.advance()) {
+      DBID seed = iter.getDBID();
       if(!processedIDs.contains(seed)) {
         currentCluster.add(seed);
         processedIDs.add(seed);
@@ -257,7 +258,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       ArrayModifiableDBIDs neighborhood = findSNNNeighbors(snnInstance, o);
 
       if(neighborhood.size() >= minpts) {
-        for(DBID p : neighborhood) {
+        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+          DBID p = iter.getDBID();
           boolean inNoise = noise.contains(p);
           boolean unclassified = !processedIDs.contains(p);
           if(inNoise || unclassified) {
@@ -287,9 +289,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       resultList.add(currentCluster);
     }
     else {
-      for(DBID id : currentCluster) {
-        noise.add(id);
-      }
+      noise.addDBIDs(currentCluster);
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
     }

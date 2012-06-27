@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
+ * @apiviz.uses DBIDs
  */
 public class MaskedDBIDs implements DBIDs {
   /**
@@ -253,7 +253,7 @@ public class MaskedDBIDs implements DBIDs {
 
     @Override
     public boolean valid() {
-      return pos >= 0;
+      return (pos >= 0) && (pos < data.size());
     }
 
     @Override

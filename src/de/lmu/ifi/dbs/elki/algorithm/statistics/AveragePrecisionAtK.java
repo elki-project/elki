@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -122,7 +123,8 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     }
     FiniteProgress objloop = logger.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), logger) : null;
     // sort neighbors
-    for(DBID id : ids) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
       Object label = lrelation.get(id);
 

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -208,7 +209,8 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
       DBID id = ids.get(i);
       double gmean = 1.0;
       int cnt = 0;
-      for(DBID n : neighbors.get(id)) {
+      for(DBIDIter iter = neighbors.get(id).iter(); iter.valid(); iter.advance()) {
+        DBID n = iter.getDBID();
         if(id.equals(n)) {
           continue;
         }

@@ -504,7 +504,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
     proxy.addRelation(prep);
     
     // Project
-    for(DBID id : ids) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       ParameterizationFunction f = project(basis, relation.get(id));
       prep.set(id, f);
     }
@@ -738,13 +739,14 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
   private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, CASHInterval interval) throws UnableToComplyException {
     DBIDs ids = interval.getIDs();
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = relation.get(ids.iterator().next()).getDimensionality();
+    int dim = DatabaseUtil.dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
-    for(DBID id : ids) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       DoubleVector v = new DoubleVector(relation.get(id).getColumnVector().getArrayRef());
       prep.set(id, v);
     }
@@ -803,13 +805,14 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    */
   private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) throws UnableToComplyException {
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = relation.get(ids.iterator().next()).getDimensionality();
+    int dim = DatabaseUtil.dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
-    for(DBID id : ids) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       DoubleVector v = new DoubleVector(relation.get(id).getColumnVector().getArrayRef());
       prep.set(id, v);
     }

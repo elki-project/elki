@@ -29,6 +29,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -63,7 +64,8 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
   public Collection<DoubleObjPair<DBID>> getWeightedNeighbors(DBID reference) {
     DBIDs neighbors = inner.getNeighborDBIDs(reference);
     ArrayList<DoubleObjPair<DBID>> adapted = new ArrayList<DoubleObjPair<DBID>>(neighbors.size());
-    for(DBID id : neighbors) {
+    for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       adapted.add(new DoubleObjPair<DBID>(1.0, id));
     }
     return adapted;

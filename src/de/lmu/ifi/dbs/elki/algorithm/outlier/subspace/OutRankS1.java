@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -110,8 +111,8 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     Clustering<? extends SubspaceModel<?>> clustering = clusteralg.run(database);
 
     WritableDoubleDataStore score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT);
-    for(DBID id : ids) {
-      score.putDouble(id, 0);
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      score.putDouble(iter.getDBID(), 0);
     }
 
     int maxdim = 0, maxsize = 0;
@@ -126,7 +127,8 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
       double relsize = cluster.size() / (double) maxsize;
       double reldim = cluster.getModel().getDimensions().cardinality() / (double) maxdim;
       // Process objects in the cluster
-      for(DBID id : cluster.getIDs()) {
+      for(DBIDIter iter = cluster.getIDs().iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         double newscore = score.doubleValue(id) + alpha * relsize + (1 - alpha) * reldim;
         score.putDouble(id, newscore);
         minmax.put(newscore);
