@@ -175,26 +175,27 @@ public class ROC {
     /**
      * Original Iterator
      */
-    private Iterator<DBID> iter;
+    private DBIDIter iter;
 
     /**
      * Constructor
      * 
      * @param iter Iterator for object IDs
      */
-    public SimpleAdapter(Iterator<DBID> iter) {
+    public SimpleAdapter(DBIDIter iter) {
       super();
       this.iter = iter;
     }
 
     @Override
     public boolean hasNext() {
-      return this.iter.hasNext();
+      return this.iter.valid();
     }
 
     @Override
     public DBIDPair next() {
-      DBID id = this.iter.next();
+      DBID id = this.iter.getDBID();
+      this.iter.advance();
       return DBIDUtil.newPair(id, id);
     }
 
@@ -337,7 +338,7 @@ public class ROC {
    */
   public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new SimpleAdapter(nei.iterator()));
+    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new SimpleAdapter(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 }

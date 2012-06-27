@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -141,8 +142,10 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     }
 
     // check if all distance values are specified
-    for(DBID id1 : ids) {
-      for(DBID id2 : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id1 = iter.getDBID();
+      for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        DBID id2 = iter2.getDBID();
         if(id2.getIntegerID() < id1.getIntegerID()) {
           continue;
         }
@@ -159,8 +162,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     // This is unusual for ELKI, but here we really need an ArrayList, not a
     // DBIDs object. So convert.
     List<DBID> objects = new ArrayList<DBID>(ids.size());
-    for(DBID id : ids) {
-      objects.add(id);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      objects.add(iter.getDBID());
     }
     return new DistanceParsingResult<D>(MultipleObjectsBundle.makeSimple(TypeUtil.DBID, objects), distanceCache);
   }

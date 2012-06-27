@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
@@ -150,14 +151,14 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
     // Make an example leaf
     if(canBulkLoad()) {
       List<DeLiCluEntry> leafs = new ArrayList<DeLiCluEntry>(ids.size());
-      for(DBID id : ids) {
-        leafs.add(createNewLeafEntry(id));
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        leafs.add(createNewLeafEntry(iter.getDBID()));
       }
       bulkLoad(leafs);
     }
     else {
-      for(DBID id : ids) {
-        insert(id);
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        insert(iter.getDBID());
       }
     }
 
@@ -184,8 +185,8 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
 
   @Override
   public void deleteAll(DBIDs ids) {
-    for(DBID id : ids) {
-      delete(id);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      delete(iter.getDBID());
     }
   }
 

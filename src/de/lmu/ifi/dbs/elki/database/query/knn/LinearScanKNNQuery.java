@@ -68,9 +68,9 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       DBID candidateID = iter.getDBID();
       int index = 0;
-      for(DBID id : ids) {
+      for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
         KNNHeap<D> heap = heaps.get(index);
-        heap.add(distanceQuery.distance(id, candidateID), candidateID);
+        heap.add(distanceQuery.distance(iter2.getDBID(), candidateID), candidateID);
         index++;
       }
     }

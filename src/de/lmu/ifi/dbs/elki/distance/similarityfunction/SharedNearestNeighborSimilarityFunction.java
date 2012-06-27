@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -70,22 +69,26 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
    */
   static protected int countSharedNeighbors(DBIDs neighbors1, DBIDs neighbors2) {
     int intersection = 0;
-    Iterator<DBID> iter1 = neighbors1.iterator();
-    Iterator<DBID> iter2 = neighbors2.iterator();
-    DBID neighbors1ID = iter1.hasNext() ? iter1.next() : null;
-    DBID neighbors2ID = iter2.hasNext() ? iter2.next() : null;
-    while((iter1.hasNext() || iter2.hasNext()) && neighbors1ID != null && neighbors2ID != null) {
+    DBIDIter iter1 = neighbors1.iter();
+    DBIDIter iter2 = neighbors2.iter();
+    DBID neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
+    DBID neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
+    while(iter1.valid() && iter2.valid()) {
       if(neighbors1ID.equals(neighbors2ID)) {
         intersection++;
-        neighbors1ID = iter1.hasNext() ? iter1.next() : null;
-        neighbors2ID = iter2.hasNext() ? iter2.next() : null;
+        iter1.advance();
+        neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
+        iter2.advance();
+        neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
       }
       else if(neighbors2ID.compareTo(neighbors1ID) > 0) {
-        neighbors1ID = iter1.hasNext() ? iter1.next() : null;
+        iter1.advance();
+        neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
       }
       else // neighbors1ID > neighbors2ID
       {
-        neighbors2ID = iter2.hasNext() ? iter2.next() : null;
+        iter2.advance();
+        neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
       }
     }
     return intersection;

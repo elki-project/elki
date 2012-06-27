@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -88,7 +89,8 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
   @Override
   public void insertAll(DBIDs ids) {
     List<MTreeEntry<D>> objs = new ArrayList<MTreeEntry<D>>(ids.size());
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       final O object = relation.get(id);
       objs.add(createNewLeafEntry(id, object, getDistanceFactory().undefinedDistance()));
     }

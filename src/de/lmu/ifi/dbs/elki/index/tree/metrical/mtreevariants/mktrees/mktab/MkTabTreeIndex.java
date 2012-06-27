@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -115,7 +116,8 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
   @Override
   public void insertAll(DBIDs ids) {
     List<MkTabEntry<D>> objs = new ArrayList<MkTabEntry<D>>(ids.size());
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       final O object = relation.get(id);
       objs.add(createNewLeafEntry(id, object, getDistanceFactory().undefinedDistance()));
     }

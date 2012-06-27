@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -97,12 +98,14 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
     final long iseed = (seed != null) ? seed : (new Random()).nextLong();
 
     int i = 0;
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
 
       long rseed = i * 0x7FFFFFFFFFFFFFE7L + iseed;
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rseed);
-      for(DBID oid : rsamp) {
+      for (DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
+        DBID oid = iter2.getDBID();
         D dist = distanceQuery.distance(id, oid);
         kNN.add(new GenericDistanceResultPair<D>(dist, oid));
       }

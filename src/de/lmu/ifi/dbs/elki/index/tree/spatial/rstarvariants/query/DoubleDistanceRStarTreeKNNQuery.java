@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -214,8 +215,8 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     for(int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
       double minMinDist = Double.MAX_VALUE;
-      for(DBID id : ids) {
-        double minDist = distanceFunction.doubleMinDist(entry, relation.get(id));
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        double minDist = distanceFunction.doubleMinDist(entry, relation.get(iter));
         tree.distanceCalcs++;
         minMinDist = Math.min(minDist, minMinDist);
       }
@@ -285,14 +286,16 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
     // While this works, it seems to be slow at least for large sets!
     final Map<DBID, KNNHeap<DoubleDistance>> knnLists = new HashMap<DBID, KNNHeap<DoubleDistance>>(ids.size());
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       knnLists.put(id, new KNNHeap<DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
     batchNN(tree.getRoot(), knnLists);
 
     List<KNNResult<DoubleDistance>> result = new ArrayList<KNNResult<DoubleDistance>>();
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       result.add(knnLists.get(id).toKNNList());
     }
     return result;

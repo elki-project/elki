@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -109,9 +110,11 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
         ids.add(aids.get(i * partitions + part));
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
-      for(DBID id : ids) {
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
-        for(DBID id2 : ids) {
+        for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+          DBID id2 = iter2.getDBID();
           DBIDPair key = DBIDUtil.newPair(id, id2);
           D d = cache.remove(key);
           if(d != null) {

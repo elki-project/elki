@@ -221,8 +221,8 @@ public final class DatabaseUtil {
     for(int d = 1; d <= centroid.getDimensionality(); d++) {
       double mu = centroid.doubleValue(d);
 
-      for(DBID id : ids) {
-        NumberVector<?, ?> o = database.get(id);
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        NumberVector<?, ?> o = database.get(iter);
         double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
       }
@@ -302,8 +302,8 @@ public final class DatabaseUtil {
   public static <V extends NumberVector<?, ?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
     final double[] vals = new double[ids.size()];
     int i = 0;
-    for(DBID id : ids) {
-      vals[i] = relation.get(id).doubleValue(dimension);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      vals[i] = relation.get(iter).doubleValue(dimension);
       i++;
     }
     Arrays.sort(vals);

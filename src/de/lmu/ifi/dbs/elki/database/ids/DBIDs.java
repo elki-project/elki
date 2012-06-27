@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import java.util.Iterator;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -34,7 +36,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 public interface DBIDs extends Iterable<DBID> {
   /**
-   * Get a DBIDIterator (a more efficient API).
+   * Get a DBID iterator (a more efficient API).
    * 
    * usage example:
    * 
@@ -70,4 +72,13 @@ public interface DBIDs extends Iterable<DBID> {
    * @return true when empty.
    */
   public boolean isEmpty();
+  
+  /**
+   * Classic iterator.
+   * 
+   * @deprecated Use {@link DBIDIter} API instead.
+   */
+  @Override
+  @Deprecated
+  public Iterator<DBID> iterator();
 }

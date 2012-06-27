@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -227,7 +228,8 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         writeNewlineOnDebug(out);
       }
     }
-    for(DBID id : outlierResult.getOrdering().iter(ids)) {
+    for (DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       Double score = scores.get(id);
       PolygonsObject poly = polys.get(id);
       String label = labels.get(id);

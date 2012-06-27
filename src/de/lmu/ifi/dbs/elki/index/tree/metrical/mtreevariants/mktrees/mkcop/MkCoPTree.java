@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -182,8 +183,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // refinement of candidates
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
-    for(DBID cid : candidates) {
-      knnLists.put(cid, new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
+    for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+      knnLists.put(iter.getDBID(), new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
     }
     batchNN(getRoot(), candidates, knnLists);
 
@@ -193,7 +194,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     rkNNStatistics.addCandidates(candidates.size());
     rkNNStatistics.addTrueHits(result.size());
 
-    for(DBID cid : candidates) {
+    for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
+      DBID cid = iter.getDBID();
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
         if(qr.getDBID().equals(id)) {
           result.add(new GenericDistanceResultPair<D>(qr.getDistance(), cid));

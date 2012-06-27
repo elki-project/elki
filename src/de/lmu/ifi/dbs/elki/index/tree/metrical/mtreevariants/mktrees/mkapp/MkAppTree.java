@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -296,7 +297,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
   private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNList<D>> knnLists) {
     double[] means = new double[k_max];
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       KNNList<D> knns = knnLists.get(id);
       List<D> knnDists = knns.asDistanceList();
       for(int k = 0; k < k_max; k++) {
