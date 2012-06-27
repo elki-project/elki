@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -32,6 +31,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -97,8 +97,11 @@ public class MarkerVisualization extends AbstractScatterplotVisualization implem
     if(spol instanceof ClassStylingPolicy) {
       ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
       for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
-        for(Iterator<DBID> iter = cspol.iterateClass(cnum); iter.hasNext();) {
-          DBID cur = iter.next();
+        for(DBIDIter iter = cspol.iterateClass(cnum); iter.valid(); iter.advance()) {
+          DBID cur = iter.getDBID();
+          if(!sample.getSample().contains(cur)) {
+            continue; // TODO: can we test more efficiently than this?
+          }
           try {
             final NumberVector<?, ?> vec = rel.get(cur);
             double[] v = proj.fastProjectDataToRenderSpace(vec);

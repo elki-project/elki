@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -151,17 +152,17 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   }
 
   @Override
-  public Iterator<DBID> iterateClass(int cnum) {
+  public DBIDIter iterateClass(int cnum) {
     // unselected
     if(cnum == -2) {
-      return unselectedObjects.iterator();
+      return unselectedObjects.iter();
     }
     else if(cnum == -1) {
-      return DBIDUtil.EMPTYDBIDS.iterator();
+      return DBIDUtil.EMPTYDBIDS.iter();
     }
     // colors
     DBIDs ids = selectedSegments.get(cnum).getDBIDs();
-    return (ids != null) ? ids.iterator() : DBIDUtil.EMPTYDBIDS.iterator();
+    return (ids != null) ? ids.iter() : DBIDUtil.EMPTYDBIDS.iter();
   }
 
   /**
