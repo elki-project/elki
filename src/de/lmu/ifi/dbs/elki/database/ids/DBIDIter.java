@@ -30,11 +30,14 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * with Java, but at the same time, the syntax is much more compatible with for
  * loops.
  * 
- * Usage example: <blockquote><code>{@code 
+ * Usage example:
+ * 
+ * <pre>
+ * {@code 
  * for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
  *   iter.getDBID();
  * }
- * }</code></blockquote>
+ * </pre>
  * 
  * We list some fundamental differences.
  * <ul>

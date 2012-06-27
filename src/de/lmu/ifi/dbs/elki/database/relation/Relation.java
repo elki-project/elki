@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * An object representation from a database
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
  */
 public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
@@ -47,7 +47,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @return Database
    */
   public Database getDatabase();
-  
+
   /**
    * Get the representation of an object.
    * 
@@ -55,7 +55,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @return object instance
    */
   public O get(DBID id);
-  
+
   /**
    * Set an object representation.
    * 
@@ -78,7 +78,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @return Data type
    */
   public SimpleTypeInformation<O> getDataTypeInformation();
-  
+
   /**
    * Get the IDs the query is defined for.
    * 
@@ -88,6 +88,15 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
 
   /**
    * Get an iterator access to the DBIDs.
+   * 
+   * To iterate over all IDs, use the following code fragment:
+   * 
+   * <pre>
+   * {@code
+   * for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+   *    DBID id = iter.getDBID();
+   * }
+   * </pre>
    * 
    * @return iterator for the DBIDs.
    */
