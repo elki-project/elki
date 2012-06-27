@@ -115,7 +115,8 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
       final double globalZ = (relation.get(id).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev();
       // Compute local average z score
       Mean localm = new Mean();
-      for(DBID n : npred.getNeighborDBIDs(id)) {
+      for(DBIDIter iter = npred.getNeighborDBIDs(id).iter(); iter.valid(); iter.advance()) {
+        DBID n = iter.getDBID();
         if(id.equals(n)) {
           continue;
         }

@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 
@@ -114,7 +114,7 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDMIter iter() {
     return new DBIDIterAdapter(iterator());
   }
 

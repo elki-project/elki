@@ -30,6 +30,7 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -112,8 +113,8 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
     }
     List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(ids.size());
     if(k < preprocessor.getK()) {
-      for(DBID id : ids) {
-        KNNResult<D> dr = preprocessor.get(id);
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
+        KNNResult<D> dr = preprocessor.get(iter.getDBID());
         int subk = k;
         D kdist = dr.get(subk - 1).getDistance();
         while(subk < dr.size()) {
@@ -135,8 +136,8 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
       }
     }
     else {
-      for(DBID id : ids) {
-        result.add(preprocessor.get(id));
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
+        result.add(preprocessor.get(iter.getDBID()));
       }
     }
     return result;

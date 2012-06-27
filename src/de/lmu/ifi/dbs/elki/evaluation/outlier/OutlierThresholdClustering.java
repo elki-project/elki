@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -96,7 +97,8 @@ public class OutlierThresholdClustering implements Evaluator {
     for(int i = 0; i <= threshold.length; i++) {
       idlists.add(DBIDUtil.newHashSet());
     }
-    for(DBID id : scores.getDBIDs()) {
+    for(DBIDIter iter = scores.getDBIDs().iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       double score = scores.get(id);
       if(scaling != null) {
         score = scaling.getScaled(score);

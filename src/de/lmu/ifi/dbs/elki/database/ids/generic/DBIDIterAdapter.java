@@ -1,10 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.generic;
 
-import java.util.Iterator;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,12 +23,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Iterator;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+
 /**
  * Iterator for classic collections.
  * 
  * @author Erich Schubert
  */
-public class DBIDIterAdapter implements DBIDIter {
+public class DBIDIterAdapter implements DBIDMIter {
   /**
    * Current DBID
    */
@@ -78,5 +78,10 @@ public class DBIDIterAdapter implements DBIDIter {
   @Override
   public DBID getDBID() {
     return cur;
+  }
+
+  @Override
+  public void remove() {
+    iter.remove();
   }
 }

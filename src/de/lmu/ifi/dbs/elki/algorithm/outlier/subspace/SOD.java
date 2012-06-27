@@ -245,8 +245,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         // TODO: store database link?
         centerValues = new double[DatabaseUtil.dimensionality(relation)];
         variances = new double[centerValues.length];
-        for(DBID id : neighborhood) {
-          V databaseObject = relation.get(id);
+        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+          V databaseObject = relation.get(iter);
           for(int d = 0; d < centerValues.length; d++) {
             centerValues[d] += databaseObject.doubleValue(d + 1);
           }
@@ -254,8 +254,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         for(int d = 0; d < centerValues.length; d++) {
           centerValues[d] /= neighborhood.size();
         }
-        for(DBID id : neighborhood) {
-          V databaseObject = relation.get(id);
+        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+          V databaseObject = relation.get(iter);
           for(int d = 0; d < centerValues.length; d++) {
             // distance
             double distance = centerValues[d] - databaseObject.doubleValue(d + 1);
@@ -362,6 +362,11 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     @Override
     public Double get(DBID objID) {
       return models.get(objID).getSod();
+    }
+
+    @Override
+    public Double get(DBIDIter iter) {
+      return models.get(iter.getDBID()).getSod();
     }
 
     @Override

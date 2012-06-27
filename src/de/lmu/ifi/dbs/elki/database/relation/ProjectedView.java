@@ -83,6 +83,11 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
   }
 
   @Override
+  public OUT get(DBIDIter id) {
+    return projection.project(inner.get(id));
+  }
+
+  @Override
   public void set(DBID id, OUT val) {
     throw new UnsupportedOperationException("Projections are read-only.");
   }

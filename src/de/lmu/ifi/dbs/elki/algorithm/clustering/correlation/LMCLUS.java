@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -175,7 +176,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
             break;
           }
           ModifiableDBIDs subset = DBIDUtil.newArray(current.size());
-          for(DBID id : current) {
+          for(DBIDIter iter = current.iter(); iter.valid(); iter.advance()) {
+            DBID id = iter.getDBID();
             if(deviation(relation.get(id).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
               subset.add(id);
             }
@@ -265,16 +267,17 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     int remaining_retries = 100;
     for(int i = 1; i <= samples; i++) {
       DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r.nextLong());
-      final Iterator<DBID> iter = sample.iterator();
+      final DBIDIter iter = sample.iter();
       // Use first as origin
-      DBID origin = iter.next();
+      DBID origin = iter.getDBID();
+      iter.advance();
       Vector originV = relation.get(origin).getColumnVector();
       // Build orthogonal basis from remainder
       Matrix basis;
       {
         List<Vector> vectors = new ArrayList<Vector>(sample.size() - 1);
-        while(iter.hasNext()) {
-          Vector vec = relation.get(iter.next()).getColumnVector();
+        for(;iter.valid(); iter.advance()) {
+          Vector vec = relation.get(iter.getDBID()).getColumnVector();
           vectors.add(vec.minusEquals(originV));
         }
         // generate orthogonal basis
@@ -292,7 +295,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       // Generate and fill a histogram.
       FlexiHistogram<Double, Double> histogram = FlexiHistogram.DoubleSumHistogram(BINS);
       double w = 1.0 / currentids.size();
-      for(DBID point : currentids) {
+      for(DBIDIter iter2 = currentids.iter(); iter2.valid(); iter2.advance()) {
+        DBID point = iter2.getDBID();
         // Skip sampled points
         if(sample.contains(point)) {
           continue;

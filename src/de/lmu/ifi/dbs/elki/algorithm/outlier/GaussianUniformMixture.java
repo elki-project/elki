@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs;
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
@@ -211,9 +213,9 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     if(objids.isEmpty()) {
       return 0;
     }
-    double prob = 0;
-    Vector mean = DatabaseUtil.centroid(database, objids).getColumnVector();
-    Matrix covarianceMatrix = DatabaseUtil.covarianceMatrix(database, objids);
+    CovarianceMatrix builder = CovarianceMatrix.make(database, objids);
+    Vector mean = builder.getMeanVector();
+    Matrix covarianceMatrix = builder.destroyToSampleMatrix();
 
     // test singulaere matrix
     Matrix covInv = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
@@ -221,8 +223,9 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     double covarianceDet = covarianceMatrix.det();
     double fakt = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, DatabaseUtil.dimensionality(database)) * covarianceDet);
     // for each object compute probability and sum
-    for(DBID id : objids) {
-      Vector x = database.get(id).getColumnVector().minusEquals(mean);
+    double prob = 0;
+    for (DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
+      Vector x = database.get(iter).getColumnVector().minusEquals(mean);
       double mDist = x.transposeTimesTimes(covInv, x);
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }

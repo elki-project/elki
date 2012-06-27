@@ -151,7 +151,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     for(Individuum ind : individuums) {
       DBIDs ids = computeSubspaceForGene(ind.getGene(), ranges);
       double sparsityC = sparsity(ids.size(), dbsize, k);
-      for(DBID id : ids) {
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         double prev = outlierScore.doubleValue(id);
         if(Double.isNaN(prev) || sparsityC < prev) {
           outlierScore.putDouble(id, sparsityC);

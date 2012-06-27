@@ -139,10 +139,11 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
         DBIDs todo = id;
         for(int i = 0; i < steps; i++) {
           ModifiableDBIDs ntodo = DBIDUtil.newHashSet();
-          for(final DBID oid : todo) {
-            DBIDs add = innerinst.getNeighborDBIDs(oid);
+          for(DBIDIter iter2 = todo.iter(); iter2.valid(); iter2.advance()) {
+            DBIDs add = innerinst.getNeighborDBIDs(iter2.getDBID());
             if(add != null) {
-              for(DBID nid : add) {
+              for(DBIDIter iter3 = add.iter(); iter.valid(); iter.advance()) {
+                DBID nid = iter3.getDBID();
                 if(res.contains(nid)) {
                   continue;
                 }

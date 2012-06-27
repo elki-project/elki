@@ -57,6 +57,14 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
   public O get(DBID id);
 
   /**
+   * Get the representation of an object.
+   * 
+   * @param iter Iterator pointing to the object
+   * @return object instance
+   */
+  public O get(DBIDIter iter);
+
+  /**
    * Set an object representation.
    * 
    * @param id Object ID

@@ -186,7 +186,8 @@ public final class DBIDUtil {
       return intersection(second, first);
     }
     ModifiableDBIDs inter = newHashSet(first.size());
-    for(DBID id : first) {
+    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
+      DBID id = it.getDBID();
       if(second.contains(id)) {
         inter.add(id);
       }
@@ -214,7 +215,8 @@ public final class DBIDUtil {
     assert(secondonly.size() == 0) : "OUTPUT set should be empty!";
     // Initialize with second
     secondonly.addDBIDs(second);
-    for(DBID id : first) {
+    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
+      DBID id = it.getDBID();
       // Try to remove
       if(secondonly.remove(id)) {
         intersection.add(id);

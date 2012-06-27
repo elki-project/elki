@@ -392,8 +392,8 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       double[] sampleValues = new double[conditionalSample.size()];
       {
         int l = 0;
-        for(DBID id : conditionalSample) {
-          sampleValues[l] = relation.get(id).doubleValue(chosen + 1);
+        for (DBIDIter iter = conditionalSample.iter(); iter.valid(); iter.advance()) {
+          sampleValues[l] = relation.get(iter.getDBID()).doubleValue(chosen + 1);
           l++;
         }
       }
@@ -401,8 +401,8 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       double[] fullValues = new double[relation.size()];
       {
         int l = 0;
-        for(DBID id : subspaceIndex.get(chosen)) {
-          fullValues[l] = relation.get(id).doubleValue(chosen + 1);
+        for (DBIDIter iter = subspaceIndex.get(chosen).iter(); iter.valid(); iter.advance()) {
+          fullValues[l] = relation.get(iter.getDBID()).doubleValue(chosen + 1);
           l++;
         }
       }

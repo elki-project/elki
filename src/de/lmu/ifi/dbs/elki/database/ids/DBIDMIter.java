@@ -1,5 +1,4 @@
 package de.lmu.ifi.dbs.elki.database.ids;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,50 +23,16 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 
 /**
- * Interface for a collection of database references (IDs).
+ * Modifiable DBID iterator.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.landmark
- * @apiviz.composedOf DBID
- * @apiviz.has DBIDIter
  */
-public interface DBIDs extends Iterable<DBID> {
+public interface DBIDMIter extends DBIDIter {
   /**
-   * Get a DBIDIterator (a more efficient API).
+   * Remove the object the iterator currently points to.
    * 
-   * usage example:
-   * 
-   * <pre>
-   * {@code
-   * for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-   *   DBID id = iter.getDBID();
-   * }
-   * </pre>
-   * 
-   * @return iterator
+   * Subsequent calls to {@link #getDBID} may return a different element.
+   * Call {@link #advance()} to advance the iterator to the next element for further processing.
    */
-  public DBIDIter iter();
-
-  /**
-   * Retrieve the collection / data size.
-   * 
-   * @return collection size
-   */
-  public int size();
-
-  /**
-   * Test whether an ID is contained.
-   * 
-   * @param o object to test
-   * @return true when contained
-   */
-  public boolean contains(DBID o);
-
-  /**
-   * Test for an empty DBID collection.
-   * 
-   * @return true when empty.
-   */
-  public boolean isEmpty();
+  void remove();
 }

@@ -106,7 +106,8 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
       int cnt = 0;
 
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
-      for(DBID neighbor : neighbors) {
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        DBID neighbor = iter.getDBID();
         if(id.equals(neighbor)) {
           continue;
         }
@@ -135,7 +136,8 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
       int cnt = 0;
 
       final DBIDs neighbors = npred.getNeighborDBIDs(id);
-      for(DBID neighbor : neighbors) {
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        DBID neighbor = iter.getDBID();
         if(neighbor.equals(id)) {
           continue;
         }
@@ -149,7 +151,8 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         double avg = sum / cnt;
 
         double beta = 0;
-        for(DBID neighbor : neighbors) {
+        for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+          DBID neighbor = iter.getDBID();
           final double dist = modifiedDistance.doubleValue(neighbor);
           if(dist > avgPlus) {
             beta += 1;

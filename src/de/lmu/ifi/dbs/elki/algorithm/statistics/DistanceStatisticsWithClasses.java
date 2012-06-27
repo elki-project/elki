@@ -69,7 +69,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -191,12 +190,14 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
     final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
     for(Cluster<?> c1 : split) {
-      for(DBID id1 : c1.getIDs()) {
+      for(DBIDIter iter = c1.getIDs().iter(); iter.valid(); iter.advance()) {
+        DBID id1 = iter.getDBID();
         // in-cluster distances
         DoubleMinMax iminmax = new DoubleMinMax();
-        for(DBID id2 : c1.getIDs()) {
+        for(DBIDIter iter2 = c1.getIDs().iter(); iter2.valid(); iter2.advance()) {
+          DBID id2 = iter2.getDBID();
           // skip the point itself.
-          if(id1 == id2) {
+          if(id1.equals(id2)) {
             continue;
           }
           double d = distFunc.distance(id1, id2).doubleValue();
@@ -219,9 +220,10 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
           if(c2 == c1) {
             continue;
           }
-          for(DBID id2 : c2.getIDs()) {
+          for(DBIDIter iter2 = c2.getIDs().iter(); iter2.valid(); iter2.advance()) {
+            DBID id2 = iter2.getDBID();
             // skip the point itself (shouldn't happen though)
-            if(id1 == id2) {
+            if(id1.equals(id2)) {
               continue;
             }
             double d = distFunc.distance(id1, id2).doubleValue();
@@ -290,8 +292,8 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     Random rnd = new Random();
     // estimate minimum and maximum.
     int k = (int) Math.max(25, Math.pow(database.size(), 0.2));
-    TreeSet<FCPair<Double, DBID>> minhotset = new TreeSet<FCPair<Double, DBID>>();
-    TreeSet<FCPair<Double, DBID>> maxhotset = new TreeSet<FCPair<Double, DBID>>(Collections.reverseOrder());
+    TreeSet<DoubleObjPair<DBID>> minhotset = new TreeSet<DoubleObjPair<DBID>>();
+    TreeSet<DoubleObjPair<DBID>> maxhotset = new TreeSet<DoubleObjPair<DBID>>(Collections.reverseOrder());
 
     int randomsize = (int) Math.max(25, Math.pow(database.size(), 0.2));
     double rprob = ((double) randomsize) / size;
@@ -303,47 +305,49 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
     DBID firstid = iter.getDBID();
     iter.advance();
-    minhotset.add(new FCPair<Double, DBID>(Double.MAX_VALUE, firstid));
-    maxhotset.add(new FCPair<Double, DBID>(Double.MIN_VALUE, firstid));
+    minhotset.add(new DoubleObjPair<DBID>(Double.MAX_VALUE, firstid));
+    maxhotset.add(new DoubleObjPair<DBID>(Double.MIN_VALUE, firstid));
     while(iter.valid()) {
       DBID id1 = iter.getDBID();
       iter.advance();
       // generate candidates for min distance.
-      ArrayList<FCPair<Double, DBID>> np = new ArrayList<FCPair<Double, DBID>>(k * 2 + randomsize * 2);
-      for(FCPair<Double, DBID> pair : minhotset) {
+      ArrayList<DoubleObjPair<DBID>> np = new ArrayList<DoubleObjPair<DBID>>(k * 2 + randomsize * 2);
+      for(DoubleObjPair<DBID> pair : minhotset) {
         DBID id2 = pair.getSecond();
         // skip the object itself
         if(id1.compareTo(id2) == 0) {
           continue;
         }
         double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new FCPair<Double, DBID>(d, id1));
-        np.add(new FCPair<Double, DBID>(d, id2));
+        np.add(new DoubleObjPair<DBID>(d, id1));
+        np.add(new DoubleObjPair<DBID>(d, id2));
       }
-      for(DBID id2 : randomset) {
+      for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
+        DBID id2 = iter2.getDBID();
         double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new FCPair<Double, DBID>(d, id1));
-        np.add(new FCPair<Double, DBID>(d, id2));
+        np.add(new DoubleObjPair<DBID>(d, id1));
+        np.add(new DoubleObjPair<DBID>(d, id2));
       }
       minhotset.addAll(np);
       shrinkHeap(minhotset, k);
 
       // generate candidates for max distance.
-      ArrayList<FCPair<Double, DBID>> np2 = new ArrayList<FCPair<Double, DBID>>(k * 2 + randomsize * 2);
-      for(FCPair<Double, DBID> pair : minhotset) {
+      ArrayList<DoubleObjPair<DBID>> np2 = new ArrayList<DoubleObjPair<DBID>>(k * 2 + randomsize * 2);
+      for(DoubleObjPair<DBID> pair : minhotset) {
         DBID id2 = pair.getSecond();
         // skip the object itself
         if(id1.compareTo(id2) == 0) {
           continue;
         }
         double d = distFunc.distance(id1, id2).doubleValue();
-        np2.add(new FCPair<Double, DBID>(d, id1));
-        np2.add(new FCPair<Double, DBID>(d, id2));
+        np2.add(new DoubleObjPair<DBID>(d, id1));
+        np2.add(new DoubleObjPair<DBID>(d, id2));
       }
-      for(DBID id2 : randomset) {
+      for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
+        DBID id2 = iter2.getDBID();
         double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new FCPair<Double, DBID>(d, id1));
-        np.add(new FCPair<Double, DBID>(d, id2));
+        np.add(new DoubleObjPair<DBID>(d, id1));
+        np.add(new DoubleObjPair<DBID>(d, id2));
       }
       maxhotset.addAll(np2);
       shrinkHeap(maxhotset, k);
@@ -356,7 +360,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         randomset.set((int) Math.floor(rnd.nextDouble() * randomsize), id1);
       }
     }
-    return new DoubleMinMax(minhotset.first().getFirst(), maxhotset.first().getFirst());
+    return new DoubleMinMax(minhotset.first().first, maxhotset.first().first);
   }
 
   private DoubleMinMax exactMinMax(Relation<O> database, DistanceQuery<O, D> distFunc) {
@@ -377,12 +381,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     return minmax;
   }
 
-  private void shrinkHeap(TreeSet<FCPair<Double, DBID>> hotset, int k) {
+  private void shrinkHeap(TreeSet<DoubleObjPair<DBID>> hotset, int k) {
     // drop duplicates
     ModifiableDBIDs seenids = DBIDUtil.newHashSet(2 * k);
     int cnt = 0;
-    for(Iterator<FCPair<Double, DBID>> i = hotset.iterator(); i.hasNext();) {
-      FCPair<Double, DBID> p = i.next();
+    for(Iterator<DoubleObjPair<DBID>> i = hotset.iterator(); i.hasNext();) {
+      DoubleObjPair<DBID> p = i.next();
       if(cnt > k || seenids.contains(p.getSecond())) {
         i.remove();
       }

@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -170,8 +170,7 @@ public class Centroid extends Vector {
   public static Centroid make(Relation<? extends NumberVector<?, ?>> relation) {
     Centroid c = new Centroid(DatabaseUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      c.put(relation.get(id));
+      c.put(relation.get(iditer));
     }
     return c;
   }
@@ -182,10 +181,10 @@ public class Centroid extends Vector {
    * @param relation Relation to use
    * @param ids IDs to use
    */
-  public static Centroid make(Relation<? extends NumberVector<?, ?>> relation, Iterable<DBID> ids) {
+  public static Centroid make(Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
     Centroid c = new Centroid(DatabaseUtil.dimensionality(relation));
-    for(DBID id : ids) {
-      c.put(relation.get(id));
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      c.put(relation.get(iter));
     }
     return c;
   }

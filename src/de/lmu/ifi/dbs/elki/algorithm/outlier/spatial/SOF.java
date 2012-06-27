@@ -113,8 +113,8 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       DBID id  = iditer.getDBID();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double avg = 0;
-      for(DBID n : neighbors) {
-        avg += distFunc.distance(id, n).doubleValue();
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        avg += distFunc.distance(id, iter.getDBID()).doubleValue();
       }
       double lrd = 1 / (avg / neighbors.size());
       if (Double.isNaN(lrd)) {
@@ -128,8 +128,8 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
       DBID id  = iditer.getDBID();
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       double avg = 0;
-      for(DBID n : neighbors) {
-        avg += lrds.doubleValue(n);
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        avg += lrds.doubleValue(iter.getDBID());
       }
       final double lrd = (avg / neighbors.size()) / lrds.doubleValue(id);
       if (!Double.isNaN(lrd)) {

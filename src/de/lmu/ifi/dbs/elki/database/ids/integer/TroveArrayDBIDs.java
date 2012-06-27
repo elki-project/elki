@@ -29,7 +29,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 
 /**
  * Abstract base class for GNU Trove array based lists.
@@ -53,7 +53,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDMIter iter() {
     return new DBIDItr(getStore());
   }
 
@@ -89,7 +89,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements DBIDIter {
+  protected static class DBIDItr implements DBIDMIter {
     /**
      * Current position
      */
@@ -128,6 +128,12 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     @Override
     public DBID getDBID() {
       return new IntegerDBID(store.get(pos));
+    }
+
+    @Override
+    public void remove() {
+      store.removeAt(pos);
+      pos--;
     }
   }
 }

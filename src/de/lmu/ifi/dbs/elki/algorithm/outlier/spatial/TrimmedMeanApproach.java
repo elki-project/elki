@@ -123,8 +123,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       int num = 0;
       double[] values = new double[neighbors.size()];
       // calculate trimmedMean
-      for(DBID n : neighbors) {
-        values[num] = relation.get(n).doubleValue(1);
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        values[num] = relation.get(iter).doubleValue(1);
         num++;
       }
 

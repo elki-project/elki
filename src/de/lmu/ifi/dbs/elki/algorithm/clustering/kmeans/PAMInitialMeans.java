@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -78,8 +79,8 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
     final DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
     DBIDs medids = chooseInitialMedoids(k, distQ);
     List<V> medoids = new ArrayList<V>(k);
-    for(DBID id : medids) {
-      medoids.add(relation.get(id));
+    for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
+      medoids.add(relation.get(iter));
     }
     return medoids;
   }
@@ -102,10 +103,12 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
     {
       DBID bestid = null;
       WritableDoubleDataStore bestd = null;
-      for(DBID id : ids) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         mean.reset();
-        for(DBID other : ids) {
+        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+          DBID other = iter2.getDBID();
           double d = distQ.distance(id, other).doubleValue();
           mean.put(d);
           newd.putDouble(other, d);
@@ -131,13 +134,15 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
     for(int i = 1; i < k; i++) {
       DBID bestid = null;
       WritableDoubleDataStore bestd = null;
-      for(DBID id : ids) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         if(medids.contains(id)) {
           continue;
         }
         WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         mean.reset();
-        for(DBID other : ids) {
+        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+          DBID other = iter2.getDBID();
           double dn = distQ.distance(id, other).doubleValue();
           double v = Math.min(dn, mindist.doubleValue(other));
           mean.put(v);

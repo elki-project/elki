@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -114,7 +115,8 @@ public class CASHIntervalSplit {
       f_maxima.put(interval, maxima);
     }
 
-    for(DBID id : superSetIDs) {
+    for(DBIDIter iter = superSetIDs.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       Double f_min = minima.get(id);
       Double f_max = maxima.get(id);
 

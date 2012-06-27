@@ -156,6 +156,11 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   }
 
   @Override
+  public O get(DBIDIter iter) {
+    return content.get(iter.getDBID());
+  }
+
+  @Override
   public void set(DBID id, O val) {
     assert (ids.contains(id));
     if(content instanceof WritableDataStore) {

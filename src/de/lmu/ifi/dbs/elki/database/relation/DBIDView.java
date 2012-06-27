@@ -73,6 +73,11 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   }
 
   @Override
+  public DBID get(DBIDIter id) {
+    return get(id.getDBID());
+  }
+
+  @Override
   public void set(DBID id, DBID val) {
     throw new UnsupportedOperationException("DBIDs cannot be changed.");
   }

@@ -108,13 +108,12 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       DBIDs neighbors = npred.getNeighborDBIDs(id);
       // Compute Mean of neighborhood
       Mean localmean = new Mean();
-      for(DBID n : neighbors) {
+      for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+        DBID n = iter.getDBID();
         if(id.equals(n)) {
           continue;
         }
-        else {
-          localmean.put(relation.get(n).doubleValue(1));
-        }
+        localmean.put(relation.get(n).doubleValue(1));
       }
       final double localdiff;
       if(localmean.getCount() > 0) {

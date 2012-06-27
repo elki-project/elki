@@ -119,9 +119,9 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
         double[][] data = new double[dim][neighbors.size()];
         int i = 0;
         // Load data
-        for(DBID n : neighbors) {
+        for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
           // TODO: skip object itself within neighbors?
-          O nobj = attributes.get(n);
+          O nobj = attributes.get(iter);
           for(int d = 0; d < dim; d++) {
             data[d][i] = nobj.doubleValue(d + 1);
           }
