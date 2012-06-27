@@ -24,13 +24,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -89,8 +88,8 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
     distribution = new double[getLabels().size()];
     int[] occurences = new int[getLabels().size()];
     Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
-    for(Iterator<DBID> iter = crep.iterDBIDs(); iter.hasNext();) {
-      ClassLabel label = crep.get(iter.next());
+    for(DBIDIter iter = crep.iterDBIDs(); iter.valid(); iter.advance()) {
+      ClassLabel label = crep.get(iter.getDBID());
       int index = Collections.binarySearch(getLabels(), label);
       if(index > -1) {
         occurences[index]++;
