@@ -10,6 +10,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -75,7 +76,8 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
     DoubleMinMax minmax = new DoubleMinMax();
 
     // Iterate over all objects
-    for(DBID id : relation.iterDBIDs()) {
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       KNNResult<D> neighbors = knnq.getKNNForDBID(id, k);
       // Aggregate distances
       MeanVariance mv = new MeanVariance();
