@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -147,13 +147,13 @@ public class JudgeOutlierScores implements Evaluator {
     double posscore = 0.0;
     double negscore = 0.0;
     // fill histogram with values of each object
-    for(DBID id : ids) {
-      double result = or.getScores().get(id);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      double result = or.getScores().get(iter);
       result = innerScaling.getScaled(scaling.getScaled(result));
       posscore += (1.0 - result);
     }
-    for(DBID id : outlierIds) {
-      double result = or.getScores().get(id);
+    for (DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
+      double result = or.getScores().get(iter);
       result = innerScaling.getScaled(scaling.getScaled(result));
       negscore += result;
     }

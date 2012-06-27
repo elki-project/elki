@@ -284,7 +284,8 @@ public final class KNNUtil {
 
     @Override
     public boolean contains(DBID o) {
-      for(DBID id : this) {
+      for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         if(id.equals(o)) {
           return true;
         }

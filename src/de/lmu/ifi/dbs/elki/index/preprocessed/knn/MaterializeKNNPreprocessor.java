@@ -128,7 +128,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
       }
     }
     else {
-      for(DBID id : ids) {
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
         storage.put(id, knn);
         if(progress != null) {
@@ -215,12 +216,14 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   private ArrayDBIDs updateKNNsAfterInsertion(DBIDs ids) {
     ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
-    for(DBID id1 : oldids) {
+    for (DBIDIter iter = oldids.iter(); iter.valid(); iter.advance()) {
+      DBID id1 = iter.getDBID();
       KNNResult<D> kNNs = storage.get(id1);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
       // look for new kNNs
       KNNHeap<D> heap = null;
-      for(DBID id2 : ids) {
+      for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        DBID id2 = iter2.getDBID();
         D dist = distanceQuery.distance(id1, id2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
@@ -283,8 +286,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     if(stepprog != null) {
       stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs.", getLogger());
     }
-    for(DBID id : ids) {
-      storage.delete(id);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      storage.delete(iter.getDBID());
     }
 
     // update the affected kNNs
@@ -355,8 +358,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
         ids.add(drp.getDBID());
       }
     }
-    for(DBID id : remove) {
-      ids.remove(id);
+    for (DBIDIter iter = remove.iter(); iter.valid(); iter.advance()) {
+      ids.remove(iter.getDBID());
     }
     // Convert back to array
     return DBIDUtil.newArray(ids);

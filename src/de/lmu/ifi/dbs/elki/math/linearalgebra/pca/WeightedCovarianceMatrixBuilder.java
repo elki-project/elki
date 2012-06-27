@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
@@ -123,8 +123,8 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     double maxdist = 0.0;
     double stddev = 0.0;
     {
-      for(Iterator<DBID> it = ids.iterator(); it.hasNext();) {
-        V obj = database.get(it.next());
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        V obj = database.get(iter);
         double distance = weightDistance.distance(centroid, obj).doubleValue();
         stddev += distance * distance;
         if(distance > maxdist) {
@@ -138,8 +138,8 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
       stddev = Math.sqrt(stddev / ids.size());
     }
 
-    for(Iterator<DBID> it = ids.iterator(); it.hasNext();) {
-      V obj = database.get(it.next());
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      V obj = database.get(iter);
       double distance = weightDistance.distance(centroid, obj).doubleValue();
       double weight = weightfunction.getWeight(distance, maxdist, stddev);
       cmat.put(obj, weight);

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
@@ -185,7 +186,8 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     {
       try {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        for(DBID id : ids) {
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          DBID id = iter.getDBID();
           md.update(" ".getBytes());
           md.update(id.toString().getBytes());
         }
@@ -330,8 +332,8 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
   void writeResult(PrintStream out, DBIDs ids, OutlierResult result, ScalingFunction scaling, String label) {
     out.append(label);
     Relation<Double> scores = result.getScores();
-    for(DBID id : ids) {
-      final double value = scaling.getScaled(scores.get(id));
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      final double value = scaling.getScaled(scores.get(iter));
       out.append(" ").append(FormatUtil.format(value, FormatUtil.NF8));
     }
     out.append(FormatUtil.NEWLINE);

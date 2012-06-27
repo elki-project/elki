@@ -28,7 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -165,8 +165,8 @@ public class ClusterContingencyTable {
         for(int i2 = 0; it2.hasNext(); i2++) {
           final Cluster<?> c2 = it2.next();
           int count = 0;
-          for(DBID id : c2.getIDs()) {
-            if(ids.contains(id)) {
+          for (DBIDIter iter = c2.getIDs().iter(); iter.valid(); iter.advance()) {
+            if(ids.contains(iter.getDBID())) {
               count++;
             }
           }

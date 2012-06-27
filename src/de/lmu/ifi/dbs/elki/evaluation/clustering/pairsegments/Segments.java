@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -31,6 +32,7 @@ import java.util.TreeMap;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -178,7 +180,8 @@ public class Segments extends BasicResult implements Iterable<Segment> {
       HashSetModifiableDBIDs ndelta1 = DBIDUtil.newHashSet(first);
       HashSetModifiableDBIDs ndelta2 = DBIDUtil.newHashSet();
       HashSetModifiableDBIDs nsecond = DBIDUtil.newHashSet(second.size());
-      for(DBID id : clust.getIDs()) {
+      for(DBIDIter iter2 = clust.getIDs().iter(); iter2.valid(); iter2.advance()) {
+        DBID id = iter2.getDBID();
         if(ndelta1.remove(id)) {
           nfirstp.add(id);
         }

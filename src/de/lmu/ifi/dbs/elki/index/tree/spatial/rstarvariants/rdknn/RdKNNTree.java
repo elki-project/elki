@@ -32,6 +32,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -151,7 +152,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     }
 
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       knnLists.put(id, new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance()));
     }
     knnQuery.getKNNForBulkHeaps(knnLists);
@@ -209,7 +211,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     knnQuery.getKNNForBulkHeaps(knnLists);
 
     List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
-    for(DBID id : candidateIDs) {
+    for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
         if(oid.equals(qr.getDBID())) {
           result.add(new GenericDistanceResultPair<T>((T) qr.getDistance(), id));
@@ -231,7 +234,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
 
     // get candidates
     Map<DBID, List<DistanceResultPair<D>>> candidateMap = new HashMap<DBID, List<DistanceResultPair<D>>>();
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       candidateMap.put(id, new ArrayList<DistanceResultPair<D>>());
     }
     doBulkReverseKNN(getRoot(), ids, candidateMap);
@@ -461,7 +465,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry<D> entry = (RdKNNLeafEntry<D>) node.getEntry(i);
-        for(DBID id : ids) {
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          DBID id = iter.getDBID();
           D distance = distanceQuery.distance(entry.getDBID(), id);
           if(distance.compareTo(entry.getKnnDistance()) <= 0) {
             result.get(id).add(new GenericDistanceResultPair<D>(distance, entry.getDBID()));
@@ -474,7 +479,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       for(int i = 0; i < node.getNumEntries(); i++) {
         RdKNNDirectoryEntry<D> entry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
         ModifiableDBIDs candidates = DBIDUtil.newArray();
-        for(DBID id : ids) {
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          DBID id = iter.getDBID();
           D minDist = distanceQuery.minDist(entry, id);
           if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
             candidates.add(id);
@@ -601,14 +607,14 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     // Make an example leaf
     if(canBulkLoad()) {
       List<RdKNNEntry<D>> leafs = new ArrayList<RdKNNEntry<D>>(ids.size());
-      for(DBID id : ids) {
-        leafs.add(createNewLeafEntry(id));
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        leafs.add(createNewLeafEntry(iter.getDBID()));
       }
       bulkLoad(leafs);
     }
     else {
-      for(DBID id : ids) {
-        insert(id);
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        insert(iter.getDBID());
       }
     }
 
@@ -635,8 +641,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
 
   @Override
   public void deleteAll(DBIDs ids) {
-    for(DBID id : ids) {
-      delete(id);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      delete(iter.getDBID());
     }
   }
 

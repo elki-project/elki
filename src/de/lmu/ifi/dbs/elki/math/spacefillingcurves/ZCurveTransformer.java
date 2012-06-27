@@ -27,7 +27,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -67,8 +67,8 @@ public class ZCurveTransformer {
     // Compute scaling of vector space
     Arrays.fill(minValues, Double.POSITIVE_INFINITY);
     Arrays.fill(maxValues, Double.NEGATIVE_INFINITY);
-    for(DBID id : ids) {
-      NumberVector<?, ?> vector = relation.get(id);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      NumberVector<?, ?> vector = relation.get(iter);
       for(int dim = 0; dim < dimensionality; ++dim) {
         double dimValue = vector.doubleValue(dim + 1);
         minValues[dim] = Math.min(minValues[dim], dimValue);

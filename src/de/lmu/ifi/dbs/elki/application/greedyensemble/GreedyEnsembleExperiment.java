@@ -255,7 +255,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
       final int heapsize = enscands.size();
       TopBoundedHeap<DoubleObjPair<DBID>> heap = new TopBoundedHeap<DoubleObjPair<DBID>>(heapsize, Collections.reverseOrder());
-      for(DBID id : enscands) {
+      for (DBIDIter iter = enscands.iter(); iter.valid(); iter.advance()) {
+        DBID id = iter.getDBID();
         final NumberVector<?, ?> vec = relation.get(id);
         double diversity = wdist.doubleDistance(vec, greedyvec);
         heap.add(new DoubleObjPair<DBID>(diversity, id));
@@ -306,11 +307,11 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Build the improved ensemble:
     StringBuffer greedylbl = new StringBuffer();
     {
-      for(DBID id : ensemble) {
+      for (DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
         if(greedylbl.length() > 0) {
           greedylbl.append(" ");
         }
-        greedylbl.append(labels.get(id));
+        greedylbl.append(labels.get(iter));
       }
     }
     NumberVector<?, ?> greedyvec = refvec.newNumberVector(greedyensemble);
@@ -345,7 +346,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         final double[] randomensemble = new double[dim];
         {
           DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), (long)i);
-          for(DBID id : random) {
+          for (DBIDIter iter = random.iter(); iter.valid(); iter.advance()) {
+            DBID id = iter.getDBID();
             assert (!firstid.equals(id));
             // logger.verbose("Using: "+labels.get(id));
             final NumberVector<?, ?> vec = relation.get(id);

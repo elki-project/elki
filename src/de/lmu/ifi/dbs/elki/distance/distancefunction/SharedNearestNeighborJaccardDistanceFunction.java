@@ -23,9 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -39,8 +38,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex.Factory
- * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - - «create»
+ * @apiviz.uses 
+ *              de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex
+ *              .Factory
+ * @apiviz.has SharedNearestNeighborJaccardDistanceFunction.Instance oneway - -
+ *             «create»
  * 
  * @param <O> object type
  */
@@ -92,33 +94,35 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
     static protected double jaccardCoefficient(DBIDs neighbors1, DBIDs neighbors2) {
       int intersection = 0;
       int union = 0;
-      Iterator<DBID> iter1 = neighbors1.iterator();
-      Iterator<DBID> iter2 = neighbors2.iterator();
-      DBID neighbors1ID = iter1.hasNext() ? iter1.next() : null;
-      DBID neighbors2ID = iter2.hasNext() ? iter2.next() : null;
-      while(neighbors1ID != null && neighbors2ID != null) {
+      DBIDIter iter1 = neighbors1.iter();
+      DBIDIter iter2 = neighbors2.iter();
+      DBID neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
+      DBID neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
+      while(iter1.valid() && iter2.valid()) {
         union++;
         if(neighbors1ID.equals(neighbors2ID)) {
           intersection++;
-          neighbors1ID = iter1.hasNext() ? iter1.next() : null;
-          neighbors2ID = iter2.hasNext() ? iter2.next() : null;
+          iter1.advance();
+          neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
+          iter2.advance();
+          neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
         }
         else if(neighbors2ID.compareTo(neighbors1ID) > 0) {
-          neighbors1ID = iter1.hasNext() ? iter1.next() : null;
+          iter1.advance();
+          neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
         }
         else // neighbors1ID > neighbors2ID
         {
-          neighbors2ID = iter2.hasNext() ? iter2.next() : null;
+          iter2.advance();
+          neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
         }
       }
       // Count remaining objects
-      while(neighbors1ID != null) {
+      for(; iter1.valid(); iter1.advance()) {
         union++;
-        neighbors1ID = iter1.hasNext() ? iter1.next() : null;
       }
-      while(neighbors2ID != null) {
+      for(; iter2.valid(); iter2.advance()) {
         union++;
-        neighbors2ID = iter2.hasNext() ? iter2.next() : null;
       }
       return ((double) intersection) / union;
     }

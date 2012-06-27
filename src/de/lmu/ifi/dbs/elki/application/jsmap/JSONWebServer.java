@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -274,8 +275,8 @@ public class JSONWebServer implements HttpHandler {
           DBIDs neighbors = pred.getNeighborDBIDs(id);
           re.appendKeyValue("DBID", id);
           re.appendKeyArray("neighbors");
-          for(DBID nid : neighbors) {
-            re.appendString(nid.toString());
+          for (DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+            re.appendString(iter.toString());
           }
           re.closeArray();
           return;
@@ -316,12 +317,12 @@ public class JSONWebServer implements HttpHandler {
 
           re.appendKeyArray("scores");
           Relation<Double> scores = or.getScores();
-          Iterator<DBID> iter = or.getOrdering().iter(scores.getDBIDs()).iterator();
-          for(int i = 0; i < offset && iter.hasNext(); i++) {
-            iter.next();
+          DBIDIter iter = or.getOrdering().iter(scores.getDBIDs()).iter();
+          for(int i = 0; i < offset && iter.valid(); i++) {
+            iter.advance();
           }
-          for(int i = 0; i < pagesize && iter.hasNext(); i++) {
-            DBID id = iter.next();
+          for(int i = 0; i < pagesize && iter.valid(); i++, iter.advance()) {
+            DBID id = iter.getDBID();
             re.startHash();
             bundleToJSON(re, id);
             final Double val = scores.get(id);

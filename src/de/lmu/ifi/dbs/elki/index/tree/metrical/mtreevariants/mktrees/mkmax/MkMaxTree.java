@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -115,7 +116,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     batchNN(getRoot(), candidateIDs, knnLists);
 
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
-    for(DBID cid : candidateIDs) {
+    for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
+      DBID cid = iter.getDBID();
       for(DistanceResultPair<D> qr : knnLists.get(cid)) {
         if(id.equals(qr.getDBID())) {
           result.add(new GenericDistanceResultPair<D>(qr.getDistance(), cid));

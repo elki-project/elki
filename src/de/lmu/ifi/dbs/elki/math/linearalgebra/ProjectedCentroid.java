@@ -28,6 +28,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -149,11 +150,11 @@ public class ProjectedCentroid extends Centroid {
    * @param relation Relation to process
    * @param ids IDs to process
    */
-  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation, Iterable<DBID> ids) {
+  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
     ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
     assert (dims.size() <= DatabaseUtil.dimensionality(relation));
-    for(DBID id : ids) {
-      c.put(relation.get(id));
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      c.put(relation.get(iter));
     }
     return c;
   }

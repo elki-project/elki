@@ -29,6 +29,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -76,7 +77,8 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
     List<? extends KNNResult<D>> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
-    for(DBID qid : allIDs) {
+    for (DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      DBID qid = iter.getDBID();
       KNNResult<D> knn = kNNLists.get(i);
       int last = Math.min(k - 1, knn.size() - 1);
       D dist = distanceQuery.distance(obj, qid);
@@ -105,11 +107,13 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
     List<? extends KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
 
     int i = 0;
-    for(DBID qid : allIDs) {
+    for (DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
+      DBID qid = iter.getDBID();
       KNNResult<D> knn = kNNList.get(i);
       for(DistanceResultPair<D> n : knn) {
         int j = 0;
-        for(DBID id : ids) {
+        for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+          DBID id = iter2.getDBID();
           if(n.getDBID().equals(id)) {
             List<DistanceResultPair<D>> rNN = rNNList.get(j);
             rNN.add(new GenericDistanceResultPair<D>(n.getDistance(), qid));

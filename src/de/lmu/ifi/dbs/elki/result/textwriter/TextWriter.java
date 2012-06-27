@@ -378,10 +378,8 @@ public class TextWriter {
 
     // print ids.
     DBIDs ids = clus.getIDs();
-    Iterator<DBID> iter = ids.iterator();
-
-    while(iter.hasNext()) {
-      printObject(out, db, iter.next(), ra);
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      printObject(out, db, iter.getDBID(), ra);
     }
     out.commentPrintSeparator();
     out.flush();

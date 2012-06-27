@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -246,13 +247,14 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for(Relation<?> relation : relations) {
       ArrayList<Object> data = new ArrayList<Object>(ids.size());
-      for(DBID id : ids) {
-        data.add(relation.get(id));
+      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        data.add(relation.get(iter));
       }
       bundle.appendColumn(relation.getDataTypeInformation(), data);
     }
     // remove from db
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       doDelete(id);
     }
     // Remove from indexes

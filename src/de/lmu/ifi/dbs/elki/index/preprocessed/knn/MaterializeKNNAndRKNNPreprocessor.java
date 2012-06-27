@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
@@ -104,7 +105,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    */
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
     // add an empty list to each rknn
-    for(DBID id : ids) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       if(materialized_RkNN.get(id) == null) {
         materialized_RkNN.put(id, new TreeSet<DistanceResultPair<D>>());
       }
@@ -169,12 +171,14 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
   private ArrayDBIDs updateKNNsAndRkNNs(DBIDs ids) {
     ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
-    for(DBID id1 : oldids) {
+    for (DBIDIter iter = oldids.iter(); iter.valid(); iter.advance()) {
+      DBID id1 = iter.getDBID();
       KNNResult<D> kNNs = storage.get(id1);
       D knnDist = kNNs.getKNNDistance();
       // look for new kNNs
       KNNHeap<D> heap = null;
-      for(DBID id2 : ids) {
+      for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        DBID id2 = iter2.getDBID();
         D dist = distanceQuery.distance(id1, id2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
@@ -237,7 +241,8 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
     }
     List<KNNResult<D>> kNNs = new ArrayList<KNNResult<D>>(ids.size());
     List<List<DistanceResultPair<D>>> rkNNs = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
-    for(DBID id : aids) {
+    for (DBIDIter iter = aids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       kNNs.add(storage.get(id));
       storage.delete(id);
       rkNNs.add(new ArrayList<DistanceResultPair<D>>(materialized_RkNN.get(id)));

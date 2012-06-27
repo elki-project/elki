@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
@@ -166,7 +167,8 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
 
     vectorApprox = new ArrayList<VectorApproximation>();
-    for(DBID id : relation.getDBIDs()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       V dv = relation.get(id);
       VectorApproximation va = calculateFullApproximation(id, dv);
       vectorApprox.add(va);

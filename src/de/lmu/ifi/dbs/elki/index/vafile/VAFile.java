@@ -137,7 +137,8 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
   @Override
   protected void initialize(Relation<V> relation, DBIDs ids) {
     setPartitions(relation);
-    for(DBID id : relation.getDBIDs()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      DBID id = iter.getDBID();
       vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }
   }

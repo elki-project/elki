@@ -64,6 +64,7 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
     return inner.isEmpty();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Iterator<DBID> iterator() {
     return new UnmodifiableIterator<DBID>(inner.iterator());
