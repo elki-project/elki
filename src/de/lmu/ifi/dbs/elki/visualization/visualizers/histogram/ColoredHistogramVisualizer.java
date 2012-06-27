@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -41,6 +40,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -112,6 +112,11 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
   private StyleResult style;
 
   /**
+   * Sampling result
+   */
+  private SamplingResult sample;
+
+  /**
    * Constructor.
    * 
    * @param task Visualization task
@@ -124,6 +129,7 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
     this.bins = bins;
     this.relation = task.getRelation();
     this.style = task.getResult();
+    this.sample = ResultUtil.getSamplingResult(relation);
     context.addResultListener(this);
   }
 
@@ -181,8 +187,11 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
         double[] inc = new double[cols];
         inc[0] = frac;
         inc[snum + 1] = frac;
-        for(Iterator<DBID> iter = cspol.iterateClass(snum + off); iter.hasNext();) {
-          DBID id = iter.next();
+        for(DBIDIter iter = cspol.iterateClass(snum + off); iter.valid(); iter.advance()) {
+          DBID id = iter.getDBID();
+          if(!sample.getSample().contains(id)) {
+            continue; // TODO: can we test more efficiently than this?
+          }
           try {
             double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
             histogram.aggregate(pos, inc);

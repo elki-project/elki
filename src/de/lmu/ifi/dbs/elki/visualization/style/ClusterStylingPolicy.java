@@ -33,6 +33,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -122,8 +123,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   }
 
   @Override
-  public Iterator<DBID> iterateClass(int cnum) {
-    return ids.get(cnum).iterator();
+  public DBIDIter iterateClass(int cnum) {
+    return ids.get(cnum).iter();
   }
 
   /**

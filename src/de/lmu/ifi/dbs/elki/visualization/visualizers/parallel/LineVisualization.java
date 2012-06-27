@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  */
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -108,8 +107,8 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
       ClassStylingPolicy csp = (ClassStylingPolicy) sp;
       for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
         String key = DATALINE + "_" + c;
-        for(Iterator<DBID> iter = csp.iterateClass(c); iter.hasNext();) {
-          DBID id = iter.next();
+        for(DBIDIter iter = csp.iterateClass(c); iter.valid(); iter.advance()) {
+          DBID id = iter.getDBID();
           if(!sample.getSample().contains(id)) {
             continue; // TODO: can we test more efficiently than this?
           }
