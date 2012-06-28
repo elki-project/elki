@@ -187,9 +187,8 @@ public final class DBIDUtil {
     }
     ModifiableDBIDs inter = newHashSet(first.size());
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-      if(second.contains(id)) {
-        inter.add(id);
+      if(second.contains(it)) {
+        inter.add(it.getDBID());
       }
     }
     return inter;
@@ -234,7 +233,7 @@ public final class DBIDUtil {
    * @return the union of ids1 and ids2 without duplicates
    */
   public static ModifiableDBIDs union(DBIDs ids1, DBIDs ids2) {
-    ModifiableDBIDs result = DBIDUtil.newHashSet();
+    ModifiableDBIDs result = DBIDUtil.newHashSet(Math.max(ids1.size(), ids2.size()));
     result.addDBIDs(ids1);
     result.addDBIDs(ids2);
     return result;
@@ -248,8 +247,7 @@ public final class DBIDUtil {
    * @return the difference of ids1 minus ids2
    */
   public static ModifiableDBIDs difference(DBIDs ids1, DBIDs ids2) {
-    ModifiableDBIDs result = DBIDUtil.newHashSet();
-    result.addDBIDs(ids1);
+    ModifiableDBIDs result = DBIDUtil.newHashSet(ids1);
     result.removeDBIDs(ids2);
     return result;
   }

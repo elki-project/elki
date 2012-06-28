@@ -22,6 +22,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
+
 /**
  * Iterator for DBIDs.
  * 
@@ -50,33 +53,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @author Erich Schubert
  */
-public interface DBIDIter {
-  /**
-   * Returns true if the iterator currently points to a valid object.
-   * 
-   * @return a <code>boolean</code> value
-   */
-  public boolean valid();
-
-  /**
-   * Moves the iterator forward to the next entry.
-   * 
-   * @throws java.util.NoSuchElementException if the iterator is already
-   *         exhausted
-   */
-  public void advance();
-
-  /**
-   * Return the integer value of the object ID, if possible.
-   * 
-   * @return integer id
-   */
-  public int getIntegerID();
-
-  /**
-   * Get the current DBID.
-   * 
-   * @return current DBID
-   */
-  public DBID getDBID();
+public interface DBIDIter extends DBIDRef, Iter {
+  // Empty - combination of Iter and DBIDRef.
 }

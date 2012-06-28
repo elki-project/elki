@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using the stored Array.
@@ -73,7 +73,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    * @return current value
    */
   @SuppressWarnings("unchecked")
-  protected <T> T get(DBID id, int index) {
+  protected <T> T get(DBIDRef id, int index) {
     try {
       return (T) data[idmap.map(id)][index];
     }
@@ -97,7 +97,7 @@ public class ArrayRecordStore implements WritableRecordStore {
    * @return old value
    */
   @SuppressWarnings("unchecked")
-  protected <T> T set(DBID id, int index, T value) {
+  protected <T> T set(DBIDRef id, int index, T value) {
     T ret = (T) data[idmap.map(id)][index];
     data[idmap.map(id)][index] = value;
     return ret;
@@ -128,12 +128,12 @@ public class ArrayRecordStore implements WritableRecordStore {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T get(DBID id) {
+    public T get(DBIDRef id) {
       return (T) ArrayRecordStore.this.get(id, index);
     }
 
     @Override
-    public T put(DBID id, T value) {
+    public T put(DBIDRef id, T value) {
       return ArrayRecordStore.this.set(id, index, value);
     }
 
@@ -143,7 +143,7 @@ public class ArrayRecordStore implements WritableRecordStore {
     }
 
     @Override
-    public void delete(DBID id) {
+    public void delete(DBIDRef id) {
       throw new UnsupportedOperationException("ArrayStore record values cannot be deleted.");
     }
 
@@ -159,7 +159,7 @@ public class ArrayRecordStore implements WritableRecordStore {
   }
 
   @Override
-  public boolean remove(DBID id) {
+  public boolean remove(DBIDRef id) {
     throw new UnsupportedOperationException("ArrayStore records cannot be removed.");
   }
 }

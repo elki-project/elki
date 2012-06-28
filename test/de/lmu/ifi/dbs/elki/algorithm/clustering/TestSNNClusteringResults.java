@@ -66,7 +66,7 @@ public class TestSNNClusteringResults extends AbstractSimpleAlgorithmTest implem
 
     // run SNN on database
     Clustering<Model> result = snn.run(db);
-    testFMeasure(db, result, 0.835000);
-    testClusterSizes(result, new int[] { 76, 213, 219, 225, 231, 236 });
+    testFMeasure(db, result, 0.832371422);
+    testClusterSizes(result, new int[] { 73, 228, 213, 219, 231, 236 });
   }
 }

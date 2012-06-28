@@ -83,7 +83,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
       MeanVariance mv = new MeanVariance();
       for(DistanceResultPair<D> neighbor : neighbors) {
         // Skip the object itself. The 0 is not very informative.
-        if(id.equals(neighbor.getDBID())) {
+        if(id.sameDBID(neighbor.getDBID())) {
           continue;
         }
         mv.put(neighbor.getDistance().doubleValue());

@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.
@@ -123,6 +125,24 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
       return new IntegerDBID(ids[pos]);
     }
 
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return ids[pos] == other.getIntegerID();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof DBID) {
+        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
+      }
+      return super.equals(other);
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      int anotherVal = o.getIntegerID();
+      return (ids[pos] < anotherVal ? -1 : (ids[pos] == anotherVal ? 0 : 1));
+    }
   }
 
   @Override
@@ -131,7 +151,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     final int oid = o.getIntegerID();
     for(int i = 0; i < ids.length; i++) {
       if(ids[i] == oid) {
@@ -164,7 +184,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
   }
 
   @Override
-  public int binarySearch(DBID key) {
+  public int binarySearch(DBIDRef key) {
     return Arrays.binarySearch(ids, key.getIntegerID());
   }
 }

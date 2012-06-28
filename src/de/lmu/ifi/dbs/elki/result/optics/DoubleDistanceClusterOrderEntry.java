@@ -80,7 +80,7 @@ public class DoubleDistanceClusterOrderEntry implements Comparable<ClusterOrderE
 
     final ClusterOrderEntry<?> that = (ClusterOrderEntry<?>) o;
     // Compare by ID only, for UpdatableHeap!
-    return objectID.equals(that.getID());
+    return objectID.sameDBID(that.getID());
   }
 
   /**

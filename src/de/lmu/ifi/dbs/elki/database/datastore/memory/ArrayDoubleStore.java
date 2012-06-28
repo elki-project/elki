@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using the stored Array.
@@ -75,7 +75,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double get(DBID id) {
+  public Double get(DBIDRef id) {
     try {
       return data[idmap.map(id)];
     }
@@ -86,7 +86,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double put(DBID id, Double value) {
+  public Double put(DBIDRef id, Double value) {
     final int off = idmap.map(id);
     double ret = data[off];
     data[off] = value;
@@ -94,12 +94,12 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
-  public double doubleValue(DBID id) {
+  public double doubleValue(DBIDRef id) {
     return data[idmap.map(id)];
   }
 
   @Override
-  public double putDouble(DBID id, double value) {
+  public double putDouble(DBIDRef id, double value) {
     final int off = idmap.map(id);
     final double ret = data[off];
     data[off] = value;
@@ -107,7 +107,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
-  public double put(DBID id, double value) {
+  public double put(DBIDRef id, double value) {
     final int off = idmap.map(id);
     final double ret = data[off];
     data[off] = value;
@@ -121,7 +121,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     throw new UnsupportedOperationException("Can't delete from a static array storage.");
   }
 

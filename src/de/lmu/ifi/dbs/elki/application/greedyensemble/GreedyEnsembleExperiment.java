@@ -142,7 +142,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         DBID id  = iditer.getDBID();
         // Skip "by label", obviously
-        if(firstid.equals(id)) {
+        if(firstid.sameDBID(id)) {
           continue;
         }
         final NumberVector<?, ?> vec = relation.get(id);

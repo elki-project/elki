@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Interface to map DBIDs to integer record ids for use in storage.
@@ -37,5 +37,5 @@ public interface DataStoreIDMap {
    * @param dbid DBID
    * @return record id {@code id >= 0}
    */
-  public int map(DBID dbid);
+  public int map(DBIDRef dbid);
 }

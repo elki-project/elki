@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using a map and an index within the
@@ -47,6 +48,7 @@ public class MapRecordStore implements WritableRecordStore {
   /**
    * Storage Map
    */
+  // TODO: Use trove maps?
   private final Map<DBID, Object[]> data;
 
   /**
@@ -84,8 +86,8 @@ public class MapRecordStore implements WritableRecordStore {
    * @return current value
    */
   @SuppressWarnings("unchecked")
-  protected <T> T get(DBID id, int index) {
-    Object[] d = data.get(id);
+  protected <T> T get(DBIDRef id, int index) {
+    Object[] d = data.get(id.getDBID());
     if(d == null) {
       return null;
     }
@@ -109,11 +111,11 @@ public class MapRecordStore implements WritableRecordStore {
    * @return previous value
    */
   @SuppressWarnings("unchecked")
-  protected <T> T set(DBID id, int index, T value) {
-    Object[] d = data.get(id);
+  protected <T> T set(DBIDRef id, int index, T value) {
+    Object[] d = data.get(id.getDBID());
     if(d == null) {
       d = new Object[rlen];
-      data.put(id, d);
+      data.put(id.getDBID(), d);
     }
     T ret = (T) d[index];
     d[index] = value;
@@ -145,12 +147,12 @@ public class MapRecordStore implements WritableRecordStore {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T get(DBID id) {
+    public T get(DBIDRef id) {
       return (T) MapRecordStore.this.get(id, index);
     }
 
     @Override
-    public T put(DBID id, T value) {
+    public T put(DBIDRef id, T value) {
       return MapRecordStore.this.set(id, index, value);
     }
 
@@ -160,7 +162,7 @@ public class MapRecordStore implements WritableRecordStore {
     }
 
     @Override
-    public void delete(DBID id) {
+    public void delete(DBIDRef id) {
       throw new UnsupportedOperationException("Record storage values cannot be deleted.");
     }
 
@@ -176,7 +178,7 @@ public class MapRecordStore implements WritableRecordStore {
   }
 
   @Override
-  public boolean remove(DBID id) {
+  public boolean remove(DBIDRef id) {
     return data.remove(id) != null;
   }
 

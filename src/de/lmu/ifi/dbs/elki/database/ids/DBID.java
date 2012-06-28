@@ -37,11 +37,67 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @apiviz.landmark
  */
-public interface DBID extends Comparable<DBID>, ArrayDBIDs {
+public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
   /**
-   * Return the integer value of the object ID, if possible.
+   * Compare the <em>current</em> value of two referenced DBIDs.
    * 
-   * @return integer id
+   * @param other Other DBID reference (or DBID)
+   * @return {@code true} when the references <em>currently</em> refer to the same.
    */
-  public int getIntegerID();  
+  @Override
+  public boolean sameDBID(DBIDRef other);
+  
+  /**
+   * Compare two objects by the value of the referenced DBID.
+   * 
+   * @param other Other DBID or object
+   * @return -1, 0 or +1
+   */
+  @Override
+  public int compareDBID(DBIDRef other);
+
+  /**
+   * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
+   * stable hash code. However, it is generally preferred to use optimized
+   * storage classes instead of Java collections!
+   * 
+   * @return hash code
+   */
+  @Override
+  public int hashCode();
+
+  /**
+   * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
+   * stable equals for other DBIDs.
+   * 
+   * Yet, {@link #sameDBID} is more type safe and explicit.
+   * 
+   * @return true when the object is the same DBID.
+   */
+  @Override
+  public boolean equals(Object obj);
+
+  /**
+   * Part of the DBIDRef API, this <em>must</em> return {@code this} for an
+   * actual DBID.
+   * 
+   * @return {@code this}
+   * @deprecated When the object is known to be a DBID, the usage of this method
+   *             is pointless, therefore it is marked as deprecated to cause a
+   *             warning.
+   */
+  @Deprecated
+  @Override
+  public DBID getDBID();
+
+  /**
+   * Compare two DBIDs for ordering.
+   * 
+   * Consider using {@link #compareDBIDs}, which is more explicit.
+   * 
+   * @param other Other DBID object
+   * @return Comparison result
+   */
+  @Override
+  public int compareTo(DBIDRef other);
 }

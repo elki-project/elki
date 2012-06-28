@@ -64,7 +64,7 @@ public interface DBIDs extends Iterable<DBID> {
    * @param o object to test
    * @return true when contained
    */
-  public boolean contains(DBID o);
+  public boolean contains(DBIDRef o);
 
   /**
    * Test for an empty DBID collection.

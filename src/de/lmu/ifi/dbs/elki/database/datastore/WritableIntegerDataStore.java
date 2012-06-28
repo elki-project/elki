@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.datastore;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,15 +23,22 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+
 /**
  * Data store specialized for doubles. Avoids boxing/unboxing.
  * 
  * @author Erich Schubert
  */
 public interface WritableIntegerDataStore extends IntegerDataStore, WritableDataStore<Integer> {
+  /**
+   * Setter, but using objects.
+   * 
+   * @deprecated Use {@link #putInt} instead, to avoid boxing/unboxing cost.
+   */
   @Override
   @Deprecated
-  public Integer put(DBID id, Integer value);
+  public Integer put(DBIDRef id, Integer value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -44,7 +49,7 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    * @param value Value to store.
    * @return previous value
    */
-  public int putInt(DBID id, int value);
+  public int putInt(DBIDRef id, int value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -55,5 +60,5 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    * @param value Value to store.
    * @return previous value
    */
-  public int put(DBID id, int value);
+  public int put(DBIDRef id, int value);
 }

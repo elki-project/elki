@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.datastore;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,15 +23,22 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+
 /**
  * Double-valued data store (avoids boxing/unboxing).
  * 
  * @author Erich Schubert
  */
 public interface DoubleDataStore extends DataStore<Double> {
+  /**
+   * Getter, but using objects.
+   * 
+   * @deprecated Use {@link #doubleValue} instead, to avoid boxing/unboxing cost.
+   */
   @Override
   @Deprecated
-  public Double get(DBID id);
+  public Double get(DBIDRef id);
 
   /**
    * Retrieves an object from the storage.
@@ -41,5 +46,5 @@ public interface DoubleDataStore extends DataStore<Double> {
    * @param id Database ID.
    * @return Double value
    */
-  public double doubleValue(DBID id);
+  public double doubleValue(DBIDRef id);
 }

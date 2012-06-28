@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 
@@ -78,22 +78,17 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
   }
 
   @Override
-  public OUT get(DBID id) {
+  public OUT get(DBIDRef id) {
     return projection.project(inner.get(id));
   }
 
   @Override
-  public OUT get(DBIDIter id) {
-    return projection.project(inner.get(id));
-  }
-
-  @Override
-  public void set(DBID id, OUT val) {
+  public void set(DBIDRef id, OUT val) {
     throw new UnsupportedOperationException("Projections are read-only.");
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     inner.delete(id);
   }
 

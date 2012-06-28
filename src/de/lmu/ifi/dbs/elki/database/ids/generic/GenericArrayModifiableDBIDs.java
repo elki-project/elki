@@ -30,6 +30,7 @@ import java.util.Comparator;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -116,12 +117,12 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   }
 
   @Override
-  public int binarySearch(DBID key) {
-    return Collections.binarySearch(this, key);
+  public int binarySearch(DBIDRef key) {
+    return Collections.binarySearch(this, key.getDBID());
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return super.contains(o);
   }
 

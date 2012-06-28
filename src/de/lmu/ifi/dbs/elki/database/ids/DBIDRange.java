@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Static DBID range.
  * 
@@ -39,5 +38,5 @@ public interface DBIDRange extends ArrayStaticDBIDs {
    * @param dbid ID to compute index for
    * @return index
    */
-  public int getOffset(DBID dbid);
+  public int getOffset(DBIDRef dbid);
 }

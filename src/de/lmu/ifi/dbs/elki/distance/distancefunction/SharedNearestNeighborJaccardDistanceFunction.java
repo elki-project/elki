@@ -96,25 +96,20 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
       int union = 0;
       DBIDIter iter1 = neighbors1.iter();
       DBIDIter iter2 = neighbors2.iter();
-      DBID neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
-      DBID neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
       while(iter1.valid() && iter2.valid()) {
+        final int comp = iter1.compareDBID(iter2);
         union++;
-        if(neighbors1ID.equals(neighbors2ID)) {
+        if(comp == 0) {
           intersection++;
           iter1.advance();
-          neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
           iter2.advance();
-          neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
         }
-        else if(neighbors2ID.compareTo(neighbors1ID) > 0) {
+        else if(comp < 0) {
           iter1.advance();
-          neighbors1ID = iter1.valid() ? iter1.getDBID() : null;
         }
-        else // neighbors1ID > neighbors2ID
+        else // iter2 < iter1
         {
           iter2.advance();
-          neighbors2ID = iter2.valid() ? iter2.getDBID() : null;
         }
       }
       // Count remaining objects

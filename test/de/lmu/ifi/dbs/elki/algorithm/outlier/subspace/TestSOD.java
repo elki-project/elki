@@ -57,7 +57,7 @@ public class TestSOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     // run SOD on database
     OutlierResult result = sod.run(db);
 
-    testSingleScore(result, 1293, 1.7277777);
-    testAUC(db, "Noise", result, 0.94956862);
+    testSingleScore(result, 1293, 1.5167500);
+    testAUC(db, "Noise", result, 0.949131652);
   }
 }

@@ -29,8 +29,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
@@ -151,17 +151,12 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
   }
 
   @Override
-  public O get(DBID id) {
+  public O get(DBIDRef id) {
     return content.get(id);
   }
 
   @Override
-  public O get(DBIDIter iter) {
-    return content.get(iter.getDBID());
-  }
-
-  @Override
-  public void set(DBID id, O val) {
+  public void set(DBIDRef id, O val) {
     assert (ids.contains(id));
     if(content instanceof WritableDataStore) {
       ((WritableDataStore<O>) content).put(id, val);
@@ -174,7 +169,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * @param id ID to delete
    */
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     assert (!ids.contains(id));
     if(content instanceof WritableDataStore) {
       ((WritableDataStore<O>) content).delete(id);

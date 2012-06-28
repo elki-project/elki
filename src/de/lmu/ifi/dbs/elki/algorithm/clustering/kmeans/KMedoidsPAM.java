@@ -153,7 +153,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
         DBID med = medoids.get(i);
         for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
           DBID cand = iter.getDBID();
-          if(med.equals(cand)) {
+          if(med.sameDBID(cand)) {
             continue;
           }
           // double disti = distQ.distance(id, med).doubleValue();

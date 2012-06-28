@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Mapping a static DBID range to storage IDs.
@@ -47,7 +47,7 @@ public class RangeIDMap implements DataStoreIDMap {
   }
 
   @Override
-  public int map(DBID dbid) {
+  public int map(DBIDRef dbid) {
     return range.getOffset(dbid);
   }
 }

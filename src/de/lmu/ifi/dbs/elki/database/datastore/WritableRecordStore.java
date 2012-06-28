@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Represents a storage which stores multiple values per object in a record fashion.
@@ -52,5 +52,5 @@ public interface WritableRecordStore extends RecordStore {
    * @param id object ID to remove
    * @return success code
    */
-  public boolean remove(DBID id);
+  public boolean remove(DBIDRef id);
 }

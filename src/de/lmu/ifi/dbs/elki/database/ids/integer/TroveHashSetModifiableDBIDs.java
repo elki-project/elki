@@ -8,6 +8,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 
@@ -143,7 +144,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return store.contains(o.getIntegerID());
   }
 
@@ -189,6 +190,18 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
     @Override
     public DBID getDBID() {
       return new IntegerDBID(hash._set[_index]);
+    }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return getIntegerID() == other.getIntegerID();
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      final int thisVal = hash._set[_index];
+      final int anotherVal = o.getIntegerID();
+      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }
 }

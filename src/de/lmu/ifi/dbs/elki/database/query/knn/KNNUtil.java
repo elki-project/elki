@@ -30,6 +30,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -239,6 +240,18 @@ public final class KNNUtil {
     public DBID getDBID() {
       return cur.getDBID();
     }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return getIntegerID() == other.getIntegerID();
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      final int thisVal = getIntegerID();
+      final int anotherVal = o.getIntegerID();
+      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    }
   }
 
   /**
@@ -283,10 +296,9 @@ public final class KNNUtil {
     }
 
     @Override
-    public boolean contains(DBID o) {
+    public boolean contains(DBIDRef o) {
       for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
-        if(id.equals(o)) {
+        if(iter.sameDBID(o)) {
           return true;
         }
       }
@@ -304,7 +316,7 @@ public final class KNNUtil {
      */
     @Override
     @Deprecated
-    public int binarySearch(DBID key) {
+    public int binarySearch(DBIDRef key) {
       throw new UnsupportedOperationException("Since the result is usually not sorted, a binary Search does not make sense!");
     }
   }

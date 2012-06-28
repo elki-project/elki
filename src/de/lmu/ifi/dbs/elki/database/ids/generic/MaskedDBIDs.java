@@ -29,6 +29,7 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -99,10 +100,10 @@ public class MaskedDBIDs implements DBIDs {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     // TODO: optimize.
     for(DBID id : this) {
-      if(id.equals(o)) {
+      if(id.sameDBID(o)) {
         return true;
       }
     }
@@ -191,6 +192,18 @@ public class MaskedDBIDs implements DBIDs {
     public DBID getDBID() {
       return data.get(pos);
     }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return getIntegerID() == other.getIntegerID();
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      final int thisVal = getIntegerID();
+      final int anotherVal = o.getIntegerID();
+      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    }
   }
 
   /**
@@ -269,6 +282,18 @@ public class MaskedDBIDs implements DBIDs {
     @Override
     public DBID getDBID() {
       return data.get(pos);
+    }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return getIntegerID() == other.getIntegerID();
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      final int thisVal = getIntegerID();
+      final int anotherVal = o.getIntegerID();
+      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }
 }

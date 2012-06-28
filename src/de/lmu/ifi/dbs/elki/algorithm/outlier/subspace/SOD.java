@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
@@ -72,6 +73,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
+ * Subspace Outlier Degree. Outlier detection method for axis-parallel subspaces.
+ * 
+ * Reference:
+ * <p>
+ * * H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek:<br />
+ * Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data<br />
+ * In: Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery
+ * and Data Mining (PAKDD), Bangkok, Thailand, 2009
+ * </p>
+ * 
  * @author Arthur Zimek
  * 
  * @apiviz.has SODModel oneway - - computes
@@ -186,7 +197,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     Heap<DoubleObjPair<DBID>> nearestNeighbors = new TiedTopBoundedHeap<DoubleObjPair<DBID>>(knn);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = iter.getDBID();
-      if(!id.equals(queryObject)) {
+      if(!id.sameDBID(queryObject)) {
         double sim = simQ.similarity(queryObject, id).doubleValue();
         if(sim > 0) {
           nearestNeighbors.add(new DoubleObjPair<DBID>(sim, id));
@@ -360,13 +371,8 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     }
 
     @Override
-    public Double get(DBID objID) {
+    public Double get(DBIDRef objID) {
       return models.get(objID).getSod();
-    }
-
-    @Override
-    public Double get(DBIDIter iter) {
-      return models.get(iter.getDBID()).getSod();
     }
 
     @Override
@@ -395,12 +401,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     }
 
     @Override
-    public void set(DBID id, Double val) {
+    public void set(DBIDRef id, Double val) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public void delete(DBID id) {
+    public void delete(DBIDRef id) {
       throw new UnsupportedOperationException();
     }
 

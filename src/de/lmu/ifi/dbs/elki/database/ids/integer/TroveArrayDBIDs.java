@@ -30,6 +30,8 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Abstract base class for GNU Trove array based lists.
@@ -73,12 +75,12 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return getStore().contains(o.getIntegerID());
   }
 
   @Override
-  public int binarySearch(DBID key) {
+  public int binarySearch(DBIDRef key) {
     return getStore().binarySearch(key.getIntegerID());
   }
 
@@ -134,6 +136,26 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     public void remove() {
       store.removeAt(pos);
       pos--;
+    }
+    
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return store.get(pos) == other.getIntegerID();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof DBID) {
+        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
+      }
+      return super.equals(other);
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      final int thisVal = store.get(pos);
+      final int anotherVal = o.getIntegerID();
+      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }
 }

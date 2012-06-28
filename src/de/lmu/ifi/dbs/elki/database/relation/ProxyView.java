@@ -25,8 +25,8 @@ package de.lmu.ifi.dbs.elki.database.relation;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
@@ -86,24 +86,19 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
   }
 
   @Override
-  public O get(DBID id) {
+  public O get(DBIDRef id) {
     assert (idview.contains(id)) : "Accessing object not included in view.";
     return inner.get(id);
   }
   
   @Override
-  public O get(DBIDIter iter) {
-    return get(iter.getDBID());
-  }
-
-  @Override
-  public void set(DBID id, O val) {
+  public void set(DBIDRef id, O val) {
     assert (idview.contains(id)) : "Accessing object not included in view.";
     inner.set(id, val);
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     throw new UnsupportedOperationException("Semantics of 'delete-from-virtual-partition' are not uniquely defined. Delete from IDs or from underlying data, please!");
   }
 

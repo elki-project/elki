@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Writable data store for double values.
@@ -61,12 +61,12 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double get(DBID id) {
+  public Double get(DBIDRef id) {
     return map.get(id.getIntegerID());
   }
 
   @Override
-  public double doubleValue(DBID id) {
+  public double doubleValue(DBIDRef id) {
     return map.get(id.getIntegerID());
   }
 
@@ -82,7 +82,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
 
   @Override
   @Deprecated
-  public Double put(DBID id, Double value) {
+  public Double put(DBIDRef id, Double value) {
     return map.put(id.getIntegerID(), value);
   }
 
@@ -93,17 +93,17 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     map.remove(id.getIntegerID());
   }
 
   @Override
-  public double putDouble(DBID id, double value) {
+  public double putDouble(DBIDRef id, double value) {
     return map.put(id.getIntegerID(), value);
   }
 
   @Override
-  public double put(DBID id, double value) {
+  public double put(DBIDRef id, double value) {
     return map.put(id.getIntegerID(), value);
   }
 }

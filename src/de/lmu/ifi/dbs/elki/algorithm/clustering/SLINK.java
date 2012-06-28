@@ -393,7 +393,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       }
       // right child
       DBID rightID = pi.get(leftID);
-      if(leftID.equals(rightID)) {
+      if(leftID.sameDBID(rightID)) {
         break;
       }
       Cluster<DendrogramModel<D>> right = nodes.get(rightID);
