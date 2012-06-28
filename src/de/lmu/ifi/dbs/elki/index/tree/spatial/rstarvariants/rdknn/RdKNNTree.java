@@ -123,6 +123,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceQuery;
+    this.initialize();
   }
 
   /**
