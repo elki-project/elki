@@ -26,8 +26,8 @@ package de.lmu.ifi.dbs.elki.database.relation;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 
@@ -59,22 +59,17 @@ public class ConvertToStringView extends AbstractHierarchicalResult implements R
   }
 
   @Override
-  public String get(DBID id) {
+  public String get(DBIDRef id) {
     return existing.get(id).toString();
   }
 
   @Override
-  public String get(DBIDIter iter) {
-    return existing.get(iter).toString();
-  }
-
-  @Override
-  public void set(DBID id, String val) {
+  public void set(DBIDRef id, String val) {
     throw new UnsupportedOperationException("Covnersion representations are not writable!");
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     throw new UnsupportedOperationException("Covnersion representations are not writable!");
   }
 

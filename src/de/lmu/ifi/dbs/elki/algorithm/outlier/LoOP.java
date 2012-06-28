@@ -243,7 +243,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         // use first kref neighbors as reference set
         int ks = 0;
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || !neighbor.getDBID().equals(id)) {
+          if(objectIsInKNN || !neighbor.getDBID().sameDBID(id)) {
             double d = neighbor.getDistance().doubleValue();
             sqsum += d * d;
             ks++;
@@ -275,7 +275,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         // use first kref neighbors as comparison set.
         int ks = 0;
         for(DistanceResultPair<D> neighbor1 : neighbors) {
-          if(objectIsInKNN || !neighbor1.getDBID().equals(id)) {
+          if(objectIsInKNN || !neighbor1.getDBID().sameDBID(id)) {
             mv.put(pdists.doubleValue(neighbor1.getDBID()));
             ks++;
             if(ks >= kcomp) {

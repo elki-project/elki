@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
@@ -55,7 +56,7 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return inner.contains(o);
   }
 

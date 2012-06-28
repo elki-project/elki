@@ -81,7 +81,7 @@ public class GenericClusterOrderEntry<D extends Distance<D>> implements Comparab
 
     final ClusterOrderEntry<?> that = (ClusterOrderEntry<?>) o;
     // Compare by ID only, for UpdatableHeap!
-    return objectID.equals(that.getID());
+    return objectID.sameDBID(that.getID());
   }
 
   /**

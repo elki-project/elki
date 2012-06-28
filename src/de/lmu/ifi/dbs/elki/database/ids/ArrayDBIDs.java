@@ -63,5 +63,5 @@ public interface ArrayDBIDs extends DBIDs {
    * @param key Key to search for
    * @return Offset of key
    */
-  public int binarySearch(DBID key);
+  public int binarySearch(DBIDRef key);
 }

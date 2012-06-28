@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
@@ -40,5 +41,5 @@ public interface DataStore<T> extends Result {
    * @param id Database ID.
    * @return Object or {@code null}
    */
-  public T get(DBID id);
+  public T get(DBIDRef id);
 }

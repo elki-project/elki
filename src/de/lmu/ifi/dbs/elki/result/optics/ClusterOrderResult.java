@@ -24,16 +24,20 @@ package de.lmu.ifi.dbs.elki.result.optics;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -68,7 +72,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
   /**
    * Map of object IDs to their cluster order entry
    */
-  private HashMap<DBID, ClusterOrderEntry<D>> map;
+  private WritableDataStore<ClusterOrderEntry<D>> map;
 
   /**
    * The DBIDs we are defined for
@@ -84,8 +88,8 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
   public ClusterOrderResult(String name, String shortname) {
     super(name, shortname);
     clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
-    map = new HashMap<DBID, ClusterOrderEntry<D>>();
     dbids = DBIDUtil.newHashSet();
+    map = DataStoreUtil.makeStorage(dbids, DataStoreFactory.HINT_DB, ClusterOrderEntry.class);
 
     addChildResult(new ClusterOrderAdapter(clusterOrder));
     addChildResult(new ReachabilityDistanceAdapter(map, dbids));
@@ -172,7 +176,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     public DBIDs getDBIDs() {
       return dbids;
     }
-    
+
     /**
      * Use the cluster order to sort the given collection ids.
      * 
@@ -209,8 +213,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     /**
      * Access reference.
      */
-    // FIXME: Use DataStore
-    private HashMap<DBID, ClusterOrderEntry<D>> map;
+    private DataStore<ClusterOrderEntry<D>> map;
 
     /**
      * DBIDs
@@ -223,20 +226,15 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * @param map Map that stores the results.
      * @param dbids DBIDs we are defined for.
      */
-    public ReachabilityDistanceAdapter(HashMap<DBID, ClusterOrderEntry<D>> map, DBIDs dbids) {
+    public ReachabilityDistanceAdapter(DataStore<ClusterOrderEntry<D>> map, DBIDs dbids) {
       super();
       this.map = map;
       this.dbids = dbids;
     }
 
     @Override
-    public D get(DBID objID) {
+    public D get(DBIDRef objID) {
       return map.get(objID).getReachability();
-    }
-
-    @Override
-    public D get(DBIDIter objID) {
-      return map.get(objID.getDBID()).getReachability();
     }
 
     @Override
@@ -270,12 +268,12 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     }
 
     @Override
-    public void set(DBID id, D val) {
+    public void set(DBIDRef id, D val) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public void delete(DBID id) {
+    public void delete(DBIDRef id) {
       throw new UnsupportedOperationException();
     }
 
@@ -304,8 +302,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     /**
      * Access reference.
      */
-    // FIXME: use DataStore
-    private HashMap<DBID, ClusterOrderEntry<D>> map;
+    private DataStore<ClusterOrderEntry<D>> map;
 
     /**
      * Database IDs
@@ -318,20 +315,15 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
      * @param map Map that stores the results.
      * @param dbids DBIDs we are defined for
      */
-    public PredecessorAdapter(HashMap<DBID, ClusterOrderEntry<D>> map, DBIDs dbids) {
+    public PredecessorAdapter(DataStore<ClusterOrderEntry<D>> map, DBIDs dbids) {
       super();
       this.map = map;
       this.dbids = dbids;
     }
 
     @Override
-    public DBID get(DBID objID) {
+    public DBID get(DBIDRef objID) {
       return map.get(objID).getPredecessorID();
-    }
-
-    @Override
-    public DBID get(DBIDIter objID) {
-      return map.get(objID.getDBID()).getPredecessorID();
     }
 
     @Override
@@ -365,12 +357,12 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
     }
 
     @Override
-    public void set(DBID id, DBID val) {
+    public void set(DBIDRef id, DBID val) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public void delete(DBID id) {
+    public void delete(DBIDRef id) {
       throw new UnsupportedOperationException();
     }
 

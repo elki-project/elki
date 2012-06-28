@@ -127,10 +127,10 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
     }
     if(obj instanceof DoubleDistanceResultPair) {
       DoubleDistanceResultPair ddrp = (DoubleDistanceResultPair) obj;
-      return distance == ddrp.distance && id.equals(ddrp.id);
+      return distance == ddrp.distance && id.sameDBID(ddrp.id);
     }
     DistanceResultPair<?> other = (DistanceResultPair<?>) obj;
-    return other.getDistance().equals(distance) && id.equals(other.getDBID());
+    return other.getDistance().equals(distance) && id.sameDBID(other.getDBID());
   }
 
   /**

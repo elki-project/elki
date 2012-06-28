@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using a map. Basically, it is just a
@@ -70,12 +70,12 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
   }
 
   @Override
-  public T get(DBID id) {
+  public T get(DBIDRef id) {
     return data.get(id.getIntegerID());
   }
 
   @Override
-  public T put(DBID id, T value) {
+  public T put(DBIDRef id, T value) {
     if(value == null) {
       return data.remove(id.getIntegerID());
     }
@@ -88,7 +88,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     data.remove(id.getIntegerID());
   }
 

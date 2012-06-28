@@ -201,7 +201,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
         // PriorityQueue best = new PriorityQueue(false, k);
         while(iter2.hasNext()) {
           DBID key2 = iter2.next().getDBID();
-          if(key2.equals(key1) || key1.equals(objKey) || key2.equals(objKey)) {
+          if(key2.sameDBID(key1) || key1.sameDBID(objKey) || key2.sameDBID(objKey)) {
             continue;
           }
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
@@ -240,8 +240,10 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @return result
    */
   public OutlierResult getFastRanking(Relation<V> relation, int k, int sampleSize) {
+    final DBIDs ids = relation.getDBIDs();
     // Fix a static set of IDs
-    staticids = DBIDUtil.newArray(relation.getDBIDs());
+    // TODO: add a DBIDUtil.ensureSorted?
+    staticids = DBIDUtil.newArray(ids);
     staticids.sort();
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
@@ -250,7 +252,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     // get Candidate Ranking
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBID aKey  = iditer.getDBID();
-      HashMap<DBID, Double> dists = new HashMap<DBID, Double>(relation.size());
+      WritableDoubleDataStore dists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
       // determine kNearestNeighbors and pairwise distances
       Heap<DoubleObjPair<DBID>> nn;
       if(!useRNDSample) {
@@ -262,7 +264,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
 
       // get normalization
-      double[] counter = calcFastNormalization(aKey, dists);
+      double[] counter = calcFastNormalization(aKey, dists, staticids);
       // System.out.println(counter[0] + " " + counter2[0] + " " + counter[1] +
       // " " + counter2[1]);
       // umsetzen von Pq zu list
@@ -296,12 +298,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       MeanVariance s = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         DBID bKey  = iditer.getDBID();
-        if(bKey.equals(aKey)) {
+        if(bKey.sameDBID(aKey)) {
           continue;
         }
         for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
           DBID cKey  = iditer2.getDBID();
-          if(cKey.equals(aKey)) {
+          if(cKey.sameDBID(aKey)) {
             continue;
           }
           // double nenner = dists[y]*dists[z];
@@ -330,62 +332,62 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     }
     // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
     DoubleMinMax minmaxabod = new DoubleMinMax();
-    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     for(DoubleObjPair<DBID> pair : pq) {
       abodvalues.putDouble(pair.getSecond(), pair.first);
       minmaxabod.put(pair.first);
     }
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Angle-based Outlier Detection", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Angle-based Outlier Detection", "abod-outlier", TypeUtil.DOUBLE, abodvalues, ids);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }
 
-  private double[] calcFastNormalization(DBID x, HashMap<DBID, Double> dists) {
+  private double[] calcFastNormalization(DBID x, WritableDoubleDataStore dists, DBIDs ids) {
     double[] result = new double[2];
 
     double sum = 0;
     double sumF = 0;
-    for(DBID yKey : dists.keySet()) {
-      if(dists.get(yKey) != 0) {
-        double tmp = 1 / Math.sqrt(dists.get(yKey));
+    for (DBIDIter yKey = ids.iter(); yKey.valid(); yKey.advance()) {
+      if(dists.doubleValue(yKey) != 0) {
+        double tmp = 1 / Math.sqrt(dists.doubleValue(yKey));
         sum += tmp;
-        sumF += (1 / dists.get(yKey)) * tmp;
+        sumF += (1 / dists.doubleValue(yKey)) * tmp;
       }
     }
     double sofar = 0;
     double sofarF = 0;
-    for(DBID zKey : dists.keySet()) {
-      if(dists.get(zKey) != 0) {
-        double tmp = 1 / Math.sqrt(dists.get(zKey));
+    for (DBIDIter zKey = ids.iter(); zKey.valid(); zKey.advance()) {
+      if(dists.doubleValue(zKey) != 0) {
+        double tmp = 1 / Math.sqrt(dists.doubleValue(zKey));
         sofar += tmp;
         double rest = sum - sofar;
         result[0] += tmp * rest;
 
-        sofarF += (1 / dists.get(zKey)) * tmp;
+        sofarF += (1 / dists.doubleValue(zKey)) * tmp;
         double restF = sumF - sofarF;
-        result[1] += (1 / dists.get(zKey)) * tmp * restF;
+        result[1] += (1 / dists.doubleValue(zKey)) * tmp * restF;
       }
     }
     return result;
   }
 
-  private double getAbofFilter(KernelMatrix kernelMatrix, DBID aKey, HashMap<DBID, Double> dists, double fulCounter, double counter, DBIDs neighbors) {
+  private double getAbofFilter(KernelMatrix kernelMatrix, DBID aKey, WritableDoubleDataStore dists, double fulCounter, double counter, DBIDs neighbors) {
     double sum = 0.0;
     double sqrSum = 0.0;
     double partCounter = 0;
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
       DBID bKey = iter.getDBID();
-      if(bKey.equals(aKey)) {
+      if(bKey.sameDBID(aKey)) {
         continue;
       }
       for(DBIDIter iter2 = neighbors.iter(); iter2.valid(); iter2.advance()) {
         DBID cKey = iter2.getDBID();
-        if(cKey.equals(aKey)) {
+        if(cKey.sameDBID(aKey)) {
           continue;
         }
         if(bKey.compareTo(cKey) > 0) {
-          double nenner = dists.get(bKey).doubleValue() * dists.get(cKey).doubleValue();
+          double nenner = dists.doubleValue(bKey) * dists.doubleValue(cKey);
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;
             double sqrtNenner = Math.sqrt(nenner);
@@ -435,12 +437,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return (kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, ci) - kernelMatrix.getDistance(ai, ci) - kernelMatrix.getDistance(ai, bi));
   }
 
-  private Heap<DoubleObjPair<DBID>> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+  private Heap<DoubleObjPair<DBID>> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, WritableDoubleDataStore dists) {
     Heap<DoubleObjPair<DBID>> nn = new Heap<DoubleObjPair<DBID>>(sampleSize);
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBID bKey  = iditer.getDBID();
       double val = calcCos(kernelMatrix, aKey, bKey);
-      dists.put(bKey, val);
+      dists.putDouble(bKey, val);
       if(nn.size() < sampleSize) {
         nn.add(new DoubleObjPair<DBID>(val, bKey));
       }
@@ -454,14 +456,14 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     return nn;
   }
 
-  private Heap<DoubleObjPair<DBID>> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, HashMap<DBID, Double> dists) {
+  private Heap<DoubleObjPair<DBID>> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBID aKey, WritableDoubleDataStore dists) {
     Heap<DoubleObjPair<DBID>> nn = new Heap<DoubleObjPair<DBID>>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBID bKey  = iditer.getDBID();
       double val = calcCos(kernelMatrix, aKey, bKey);
-      dists.put(bKey, val);
+      dists.putDouble(bKey, val);
       if(counter % step == 0) {
         nn.add(new DoubleObjPair<DBID>(val, bKey));
       }
@@ -493,12 +495,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // Collect Explanation Vectors
         MeanVariance s2 = new MeanVariance();
         DBID key1 = iter.getDBID();
-        if(objKey.equals(key1)) {
+        if(objKey.sameDBID(key1)) {
           continue;
         }
         for (DBIDIter iter2 = data.iterDBIDs(); iter2.valid(); iter2.advance()) {
           DBID key2 = iter2.getDBID();
-          if(key2.equals(key1) || objKey.equals(key2)) {
+          if(key2.sameDBID(key1) || objKey.sameDBID(key2)) {
             continue;
           }
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
@@ -518,13 +520,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       expList.add(explain.remove().getSecond());
       while(!explain.isEmpty()) {
         DBID nextKey = explain.remove().getSecond();
-        if(nextKey.equals(objKey)) {
+        if(nextKey.sameDBID(objKey)) {
           continue;
         }
         double max = Double.MIN_VALUE;
         for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
           DBID exp = iter.getDBID();
-          if(exp.equals(objKey) || nextKey.equals(exp)) {
+          if(exp.sameDBID(objKey) || nextKey.sameDBID(exp)) {
             continue;
           }
           double nenner = Math.sqrt(calcCos(kernelMatrix, objKey, nextKey)) * Math.sqrt(calcCos(kernelMatrix, objKey, exp));

@@ -26,12 +26,15 @@ package de.lmu.ifi.dbs.elki.database.ids;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
 
 /**
  * Empty DBID collection.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf EmptyDBIDIterator
  */
 public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   /**
@@ -47,7 +50,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return false;
   }
 
@@ -77,7 +80,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
-  public int binarySearch(DBID key) {
+  public int binarySearch(DBIDRef key) {
     return -1; // Not found
   }
 
@@ -105,6 +108,24 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     @Override
     public DBID getDBID() {
       throw new NoSuchElementException();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof DBID) {
+        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
+      }
+      return super.equals(other);
+    }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return false;
+    }
+
+    @Override
+    public int compareDBID(DBIDRef other) {
+      throw new UnsupportedOperationException("Invalid iterator position. Cannot compare.");
     }
   }
 }

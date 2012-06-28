@@ -27,7 +27,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using a map and an index within the
@@ -93,7 +93,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    * @return current value
    */
   @SuppressWarnings("unchecked")
-  protected <T> T get(DBID id, int index) {
+  protected <T> T get(DBIDRef id, int index) {
     Object[] d = data.get(id.getIntegerID());
     if(d == null) {
       return null;
@@ -118,7 +118,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    * @return previous value
    */
   @SuppressWarnings("unchecked")
-  protected <T> T set(DBID id, int index, T value) {
+  protected <T> T set(DBIDRef id, int index, T value) {
     Object[] d = data.get(id.getIntegerID());
     if(d == null) {
       d = new Object[rlen];
@@ -154,12 +154,12 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T get(DBID id) {
+    public T get(DBIDRef id) {
       return (T) MapIntegerDBIDRecordStore.this.get(id, index);
     }
 
     @Override
-    public T put(DBID id, T value) {
+    public T put(DBIDRef id, T value) {
       return MapIntegerDBIDRecordStore.this.set(id, index, value);
     }
 
@@ -169,7 +169,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
     }
 
     @Override
-    public void delete(DBID id) {
+    public void delete(DBIDRef id) {
       throw new UnsupportedOperationException("Record storage values cannot be deleted.");
     }
 
@@ -185,7 +185,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
   }
 
   @Override
-  public boolean remove(DBID id) {
+  public boolean remove(DBIDRef id) {
     return data.remove(id.getIntegerID()) != null;
   }
 }

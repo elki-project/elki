@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
@@ -196,11 +196,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @return the path to the leaf entry of the specified subtree that represents
    *         the data object with the specified mbr and id
    */
-  protected IndexTreePath<E> findPathToObject(IndexTreePath<E> subtree, SpatialComparable mbr, DBID id) {
+  protected IndexTreePath<E> findPathToObject(IndexTreePath<E> subtree, SpatialComparable mbr, DBIDRef id) {
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        if(((LeafEntry) node.getEntry(i)).getDBID().equals(id)) {
+        if(((LeafEntry) node.getEntry(i)).getDBID().sameDBID(id)) {
           return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
         }
       }

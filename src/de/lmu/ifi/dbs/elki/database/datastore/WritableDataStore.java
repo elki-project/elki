@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Writable data store.
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * 
  * @apiviz.landmark
  * 
- * @param <T>
+ * @param <T> Data type
  */
 public interface WritableDataStore<T> extends DataStore<T> {
   /**
@@ -44,7 +44,7 @@ public interface WritableDataStore<T> extends DataStore<T> {
    * @param value Value to store.
    * @return previous value
    */
-  public T put(DBID id, T value);
+  public T put(DBIDRef id, T value);
 
   /**
    * Deallocate the storage, freeing the memory and notifies the registered
@@ -58,5 +58,5 @@ public interface WritableDataStore<T> extends DataStore<T> {
    * 
    * @param id Database ID.
    */
-  public void delete(DBID id);
+  public void delete(DBIDRef id);
 }

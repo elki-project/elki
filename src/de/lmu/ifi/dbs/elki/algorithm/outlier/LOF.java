@@ -300,7 +300,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       KNNResult<D> neighbors = knnReach.getKNNForDBID(id, k);
       int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
       for(DistanceResultPair<D> neighbor : neighbors) {
-        if(objectIsInKNN || !neighbor.getDBID().equals(id)) {
+        if(objectIsInKNN || !neighbor.getDBID().sameDBID(id)) {
           KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getDBID(), k);
           sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
         }
@@ -344,7 +344,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         // neighbors.remove(0);
         double sum = 0;
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || !neighbor.getDBID().equals(id)) {
+          if(objectIsInKNN || !neighbor.getDBID().sameDBID(id)) {
             sum += lrds.get(neighbor.getDBID());
           }
         }

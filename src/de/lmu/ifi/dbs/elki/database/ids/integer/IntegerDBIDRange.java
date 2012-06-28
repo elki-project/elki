@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Representing a DBID range allocation
@@ -134,10 +135,25 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
       return new IntegerDBID(start + pos);
     }
 
+    @Override
+    public boolean equals(Object other) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return start + pos == other.getIntegerID();
+    }
+    
+    @Override
+    public int compareDBID(DBIDRef o) {
+      int anotherVal = o.getIntegerID();
+      return (start + pos < anotherVal ? -1 : (start + pos == anotherVal ? 0 : 1));
+    }
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     int oid = o.getIntegerID();
     if(oid < start) {
       return false;
@@ -180,12 +196,12 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
    * @return array offset
    */
   @Override
-  public int getOffset(DBID dbid) {
+  public int getOffset(DBIDRef dbid) {
     return dbid.getIntegerID() - start;
   }
 
   @Override
-  public int binarySearch(DBID key) {
+  public int binarySearch(DBIDRef key) {
     int keyid = key.getIntegerID();
     if(keyid < start) {
       return -1;

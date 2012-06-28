@@ -197,7 +197,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         for(DBIDIter iter2 = c1.getIDs().iter(); iter2.valid(); iter2.advance()) {
           DBID id2 = iter2.getDBID();
           // skip the point itself.
-          if(id1.equals(id2)) {
+          if(id1.sameDBID(id2)) {
             continue;
           }
           double d = distFunc.distance(id1, id2).doubleValue();
@@ -223,7 +223,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
           for(DBIDIter iter2 = c2.getIDs().iter(); iter2.valid(); iter2.advance()) {
             DBID id2 = iter2.getDBID();
             // skip the point itself (shouldn't happen though)
-            if(id1.equals(id2)) {
+            if(id1.sameDBID(id2)) {
               continue;
             }
             double d = distFunc.distance(id1, id2).doubleValue();

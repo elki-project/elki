@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 
@@ -119,7 +120,7 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return super.contains(o);
   }
 }

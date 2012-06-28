@@ -105,7 +105,7 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
       return false;
     }
     DistanceResultPair<?> other = (DistanceResultPair<?>) obj;
-    return first.equals(other.getDistance()) && second.equals(other.getDBID());
+    return first.equals(other.getDistance()) && second.sameDBID(other.getDBID());
   }
 
   @Override

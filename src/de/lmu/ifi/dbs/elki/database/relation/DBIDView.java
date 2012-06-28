@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
@@ -67,25 +68,21 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   }
 
   @Override
-  public DBID get(DBID id) {
+  public DBID get(DBIDRef id) {
     assert (ids.contains(id));
-    return id;
+    return id.getDBID();
   }
 
   @Override
-  public DBID get(DBIDIter id) {
-    return get(id.getDBID());
-  }
-
-  @Override
-  public void set(DBID id, DBID val) {
+  public void set(DBIDRef id, DBID val) {
     throw new UnsupportedOperationException("DBIDs cannot be changed.");
   }
 
   @Override
-  public void delete(DBID id) {
+  public void delete(DBIDRef id) {
     if(database instanceof UpdatableDatabase) {
-      ((UpdatableDatabase) database).delete(id);
+      // TODO: skip getDBID()
+      ((UpdatableDatabase) database).delete(id.getDBID());
     }
     else {
       throw new UnsupportedOperationException("Deletions are not supported.");

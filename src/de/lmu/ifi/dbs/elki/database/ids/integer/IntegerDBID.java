@@ -28,6 +28,8 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
@@ -49,7 +51,7 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * @apiviz.composedOf DynamicSerializer
  * @apiviz.composedOf StaticSerializer
  */
-class IntegerDBID implements DBID {
+final class IntegerDBID implements DBID {
   /**
    * The actual object ID.
    */
@@ -75,6 +77,11 @@ class IntegerDBID implements DBID {
     this.id = id;
   }
 
+  @Override
+  public DBID getDBID() {
+    return this;
+  }
+
   /**
    * Return the integer value of the object ID.
    * 
@@ -98,14 +105,29 @@ class IntegerDBID implements DBID {
   @Override
   public boolean equals(Object obj) {
     if(!(obj instanceof IntegerDBID)) {
+      if (obj instanceof DBIDRef) {
+        LoggingUtil.warning("Programming error: DBID.equals(DBIDRef) is not well-defined. use sameDBID!", new Throwable());
+      }
       return false;
     }
     IntegerDBID other = (IntegerDBID) obj;
     return this.id == other.id;
   }
+  
+    @Override
+  public boolean sameDBID(DBIDRef other) {
+    return this.id == other.getIntegerID();
+  }
 
   @Override
-  public int compareTo(DBID o) {
+  public int compareTo(DBIDRef o) {
+    int thisVal = this.id;
+    int anotherVal = o.getIntegerID();
+    return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+  }
+
+  @Override
+  public int compareDBID(DBIDRef o) {
     int thisVal = this.id;
     int anotherVal = o.getIntegerID();
     return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
@@ -130,7 +152,7 @@ class IntegerDBID implements DBID {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     return o.getIntegerID() == id;
   }
 
@@ -140,8 +162,8 @@ class IntegerDBID implements DBID {
   }
 
   @Override
-  public int binarySearch(DBID key) {
-    return equals(key) ? 0 : -1;
+  public int binarySearch(DBIDRef key) {
+    return (id == key.getIntegerID()) ? 0 : -1;
   }
 
   /**
@@ -206,6 +228,25 @@ class IntegerDBID implements DBID {
     @Override
     public boolean valid() {
       return first;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+      if (other instanceof DBID) {
+        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
+      }
+      return super.equals(other);
+    }
+
+    @Override
+    public boolean sameDBID(DBIDRef other) {
+      return id == other.getIntegerID();
+    }
+
+    @Override
+    public int compareDBID(DBIDRef o) {
+      int anotherVal = o.getIntegerID();
+      return (id < anotherVal ? -1 : (id == anotherVal ? 0 : 1));
     }
   }
 

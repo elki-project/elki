@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -79,7 +80,7 @@ public class MergedDBIDs implements DBIDs {
   }
 
   @Override
-  public boolean contains(DBID o) {
+  public boolean contains(DBIDRef o) {
     for(DBIDs child : childs) {
       if(child.contains(o)) {
         return true;
