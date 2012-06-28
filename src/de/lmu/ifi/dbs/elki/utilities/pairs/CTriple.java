@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <SECOND> second type
  * @param <THIRD> second type
  */
-public final class CTriple<FIRST extends Comparable<FIRST>, SECOND extends Comparable<SECOND>, THIRD extends Comparable<THIRD>> extends Triple<FIRST, SECOND, THIRD> implements Comparable<CTriple<FIRST, SECOND, THIRD>> {
+public final class CTriple<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>, THIRD extends Comparable<? super THIRD>> extends Triple<FIRST, SECOND, THIRD> implements Comparable<CTriple<FIRST, SECOND, THIRD>> {
   /**
    * Constructor with fields
    * 
