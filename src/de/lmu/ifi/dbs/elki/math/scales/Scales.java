@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.scales;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -59,8 +58,7 @@ public class Scales {
   
     // analyze data
     for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID objId  = iditer.getDBID();
-      O v = db.get(objId);
+      O v = db.get(iditer);
       for(int d = 0; d < dim; d++) {
         minmax[d].put(v.doubleValue(d+1));
       }

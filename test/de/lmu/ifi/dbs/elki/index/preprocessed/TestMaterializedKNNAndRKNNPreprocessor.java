@@ -167,7 +167,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {
-        assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).getDBID().sameDBID(pre_knn.get(j).getDBID()));
+        assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).sameDBID(pre_knn.get(j)));
         assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).getDistance().equals(pre_knn.get(j).getDistance()));
       }
     }
@@ -188,7 +188,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
       }
       assertEquals("rkNN sizes do not agree for k=" + k, lin_rknn.size(), pre_rknn.size());
       for(int j = 0; j < lin_rknn.size(); j++) {
-        assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getDBID().sameDBID(pre_rknn.get(j).getDBID()));
+        assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).sameDBID(pre_rknn.get(j)));
         assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).getDistance().equals(pre_rknn.get(j).getDistance()));
       }
     }

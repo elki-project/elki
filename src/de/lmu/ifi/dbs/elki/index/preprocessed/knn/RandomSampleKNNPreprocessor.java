@@ -28,11 +28,9 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -99,18 +97,16 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
     int i = 0;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
       KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
 
       long rseed = i * 0x7FFFFFFFFFFFFFE7L + iseed;
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rseed);
       for (DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
-        DBID oid = iter2.getDBID();
-        D dist = distanceQuery.distance(id, oid);
-        kNN.add(new GenericDistanceResultPair<D>(dist, oid));
+        D dist = distanceQuery.distance(iter, iter2);
+        kNN.add(dist, iter2);
       }
 
-      storage.put(id, kNN.toKNNList());
+      storage.put(iter, kNN.toKNNList());
       if(progress != null) {
         progress.incrementProcessed(getLogger());
       }

@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -137,8 +136,7 @@ public class ProjectedCentroid extends Centroid {
     ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
     assert (dims.size() <= DatabaseUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      c.put(relation.get(id));
+      c.put(relation.get(iditer));
     }
     return c;
   }

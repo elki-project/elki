@@ -204,7 +204,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
         dist = res.getDistance().doubleValue();
       }
 
-      V obj = database.get(res.getDBID());
+      V obj = database.get(res);
       double weight = weightfunction.getWeight(dist, maxdist, stddev);
       cmat.put(obj, weight);
     }

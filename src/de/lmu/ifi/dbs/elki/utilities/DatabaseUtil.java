@@ -183,7 +183,7 @@ public final class DatabaseUtil {
       double mu = centroid.doubleValue(d);
 
       for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-        NumberVector<?, ?> o = database.get(it.getDBID());
+        NumberVector<?, ?> o = database.get(it);
         double diff = o.doubleValue(d) - mu;
         variances[d - 1] += diff * diff;
       }
@@ -249,10 +249,9 @@ public final class DatabaseUtil {
       maxs[i] = -Double.MAX_VALUE;
     }
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID it  = iditer.getDBID();
-      NV o = database.get(it);
+      final NV o = database.get(iditer);
       for(int d = 0; d < dim; d++) {
-        double v = o.doubleValue(d + 1);
+        final double v = o.doubleValue(d + 1);
         mins[d] = Math.min(mins[d], v);
         maxs[d] = Math.max(maxs[d], v);
       }
@@ -401,7 +400,7 @@ public final class DatabaseUtil {
   public static SortedSet<ClassLabel> getClassLabels(Relation<? extends ClassLabel> database) {
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-      labels.add(database.get(it.getDBID()));
+      labels.add(database.get(it));
     }
     return labels;
   }
@@ -427,8 +426,7 @@ public final class DatabaseUtil {
    */
   @SuppressWarnings("unchecked")
   public static <O> Class<? extends O> guessObjectClass(Relation<O> database) {
-    DBID id  = database.iterDBIDs().getDBID();
-    return (Class<? extends O>) database.get(id).getClass();
+    return (Class<? extends O>) database.get(database.iterDBIDs()).getClass();
   }
 
   /**
@@ -451,11 +449,11 @@ public final class DatabaseUtil {
       return null;
     }
     // put first class into result set.
-    candidates.add(database.get(iditer.getDBID()).getClass());
+    candidates.add(database.get(iditer).getClass());
     iditer.advance();
     // other objects
     for(; iditer.valid(); iditer.advance()) {
-      Class<?> newcls = database.get(iditer.getDBID()).getClass();
+      Class<?> newcls = database.get(iditer).getClass();
       // validate all candidates
       Iterator<Class<?>> ci = candidates.iterator();
       while(ci.hasNext()) {
@@ -511,9 +509,8 @@ public final class DatabaseUtil {
     }
     ArrayModifiableDBIDs ret = DBIDUtil.newArray();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID objid  = iditer.getDBID();
-      if(name_pattern.matcher(relation.get(objid)).find()) {
-        ret.add(objid);
+      if(name_pattern.matcher(relation.get(iditer)).find()) {
+        ret.add(iditer);
       }
     }
     return ret;
@@ -595,9 +592,9 @@ public final class DatabaseUtil {
 
     @Override
     public O next() {
-      DBID id = iter.getDBID();
+      O ret = database.get(iter);
       iter.advance();
-      return database.get(id);
+      return ret;
     }
 
     @Override
