@@ -26,7 +26,7 @@ package experimentalcode.erich.pca;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -83,7 +83,7 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends
       Matrix p = cv.destroyToSampleMatrix().inverse();
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
-      for(DBID id : ids) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         Vector vec = relation.get(id).getColumnVector().minusEquals(centroid);
         double sqlen = vec.transposeTimesTimes(p, vec);
         if(sqlen < tresh) {

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -156,7 +156,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
     }
 
     @Override
-    public DBIDs getNeighbors(DBID reference) {
+    public DBIDs getNeighbors(DBIDRef reference) {
       List<DistanceResultPair<D>> res = rq.getRangeForDBID(reference, epsilon);
       // Throw away the actual distance values ...
       ModifiableDBIDs neighbors = DBIDUtil.newHashSet(res.size());
@@ -213,7 +213,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
     }
 
     @Override
-    public DistanceDBIDResult<D> getNeighbors(DBID reference) {
+    public DistanceDBIDResult<D> getNeighbors(DBIDRef reference) {
       return rq.getRangeForDBID(reference, epsilon);
     }
 

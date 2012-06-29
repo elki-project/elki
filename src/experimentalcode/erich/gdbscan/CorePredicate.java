@@ -25,7 +25,7 @@ package experimentalcode.erich.gdbscan;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Predicate for GeneralizedDBSCAN to evaluate whether a point is a core point
@@ -75,6 +75,6 @@ public interface CorePredicate {
      * @param neighbors Neighbors
      * @return core point property
      */
-    public boolean isCorePoint(DBID point, T neighbors);
+    public boolean isCorePoint(DBIDRef point, T neighbors);
   }
 }

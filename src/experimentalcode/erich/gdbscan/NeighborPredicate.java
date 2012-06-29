@@ -26,7 +26,7 @@ package experimentalcode.erich.gdbscan;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
@@ -74,7 +74,7 @@ public interface NeighborPredicate {
      * @param reference Reference object
      * @return Neighborhood
      */
-    public T getNeighbors(DBID reference);
+    public T getNeighbors(DBIDRef reference);
 
     /**
      * Get the IDs the predicate is defined for.
