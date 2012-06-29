@@ -242,9 +242,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * 
      * @return cluster size;
      */
-    protected int setbasedExpandCluster(final Integer clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
+    protected int setbasedExpandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
       int clustersize = 0;
-      // TODO: can we sometimes save this copy?
       final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
       npred.addDBIDs(activeSet, neighbors);
       // run expandCluster as long as this set is non-empty (non-recursive
