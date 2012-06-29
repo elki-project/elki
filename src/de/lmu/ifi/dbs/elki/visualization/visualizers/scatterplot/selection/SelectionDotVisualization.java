@@ -29,7 +29,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -93,9 +93,9 @@ public class SelectionDotVisualization extends AbstractScatterplotVisualization 
     DBIDSelection selContext = context.getSelection();
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
-      for(DBID i : selection) {
+      for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
         try {
-          double[] v = proj.fastProjectDataToRenderSpace(rel.get(i));
+          double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
           Element dot = svgp.svgCircle(v[0], v[1], size);
           SVGUtil.addCSSClass(dot, MARKER);
           layer.appendChild(dot);

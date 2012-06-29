@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -92,9 +92,9 @@ public class SelectionConvexHullVisualization extends AbstractScatterplotVisuali
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
-      for(DBID i : selection) {
+      for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
         try {
-          hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(i))));
+          hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(iter))));
         }
         catch(ObjectNotFoundException e) {
           // ignore

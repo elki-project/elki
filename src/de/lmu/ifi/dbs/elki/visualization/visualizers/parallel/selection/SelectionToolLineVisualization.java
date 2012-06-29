@@ -33,7 +33,7 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -194,23 +194,23 @@ public class SelectionToolLineVisualization extends AbstractParallelVisualizatio
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
     int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
-    DBIDs objIds = ResultUtil.getSamplingResult(relation).getSample();
-    for(DBID objId : objIds){
-      double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(objId));
+    DBIDs ids = ResultUtil.getSamplingResult(relation).getSample();
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
       if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {
         if(mode == Mode.INVERT) {
-          if(!selection.contains(objId)) {
-            selection.add(objId);
+          if(!selection.contains(iter)) {
+            selection.add(iter);
           }
           else {
-            selection.remove(objId);
+            selection.remove(iter);
           }
         }
         else {
           // In REPLACE and ADD, add objects.
           // The difference was done before by not re-using the selection.
           // Since we are using a set, we can just add in any case.
-          selection.add(objId);
+          selection.add(iter);
         }
       }
     }

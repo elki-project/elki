@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -93,8 +93,8 @@ public class SelectionLineVisualization extends AbstractParallelVisualization<Nu
     if(selContext != null) {
       DBIDs selection = selContext.getSelectedIds();
 
-      for(DBID objId : selection) {
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(objId));
+      for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
+        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
 
         SVGPath path = new SVGPath();
         for(int i = 0; i < proj.getVisibleDimensions(); i++) {

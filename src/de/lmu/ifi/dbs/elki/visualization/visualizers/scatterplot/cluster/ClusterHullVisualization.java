@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
@@ -124,8 +124,8 @@ public class ClusterHullVisualization extends AbstractScatterplotVisualization {
       if(alpha >= Double.POSITIVE_INFINITY) {
         GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
 
-        for(DBID clpnum : ids) {
-          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
+        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
           hull.add(new Vector(projP));
         }
         Polygon chres = hull.getHull();
@@ -147,8 +147,8 @@ public class ClusterHullVisualization extends AbstractScatterplotVisualization {
       }
       else {
         ArrayList<Vector> ps = new ArrayList<Vector>(ids.size());
-        for(DBID clpnum : ids) {
-          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(clpnum));
+        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
           ps.add(new Vector(projP));
         }
         List<Polygon> polys = (new AlphaShape(ps, alpha * Projection.SCALE)).compute();

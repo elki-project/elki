@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -105,10 +105,10 @@ public class TestOnlineLOF implements JUnit4Test {
     Relation<Double> scores1 = result1.getScores();
     Relation<Double> scores2 = result2.getScores();
 
-    for(DBID id : scores1.getDBIDs()) {
+    for(DBIDIter id = scores1.getDBIDs().iter(); id.valid(); id.advance()) {
       Double lof1 = scores1.get(id);
       Double lof2 = scores2.get(id);
-      assertTrue("lof(" + id + ") != lof(" + id + "): " + lof1 + " != " + lof2, lof1.equals(lof2));
+      assertTrue("lof(" + id.getDBID() + ") != lof(" + id.getDBID() + "): " + lof1 + " != " + lof2, lof1.equals(lof2));
     }
   }
 
