@@ -1,4 +1,4 @@
-package experimentalcode.erich.gdbscan;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
 /*
  This file is part of ELKI:
@@ -24,14 +24,12 @@ package experimentalcode.erich.gdbscan;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
- * Get the neighbors of an object
+ * Predicate for GeneralizedDBSCAN to evaluate whether a point is a core point
+ * or not.
  * 
  * Note the Factory/Instance split of this interface.
  * 
@@ -39,56 +37,44 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * 
  * @apiviz.has Instance
  */
-public interface NeighborPredicate {
+public interface CorePredicate {
+  /**
+   * Constant for the generic type {@code List<? extends DistanceResultPair<?>>}
+   */
+  public static final String NEIGHBOR_LIST = "neighborhood-list";
+  
   /**
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
+   * @param type Type to instantiate for
    * @return Instance
    */
   public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type);
 
   /**
-   * Input data type restriction.
+   * Test whether the neighborhood type T is accepted by this predicate.
    * 
-   * @return Type restriction
+   * @param type Type information
+   * @return true when the type is accepted
    */
-  public TypeInformation getInputTypeRestriction();
-
-  /**
-   * Output data type information.
-   * 
-   * @return Type information
-   */
-  public SimpleTypeInformation<?>[] getOutputType();
-
+  public boolean acceptsType(SimpleTypeInformation<?> type);
+  
   /**
    * Instance for a particular data set.
    * 
    * @author Erich Schubert
+   * 
+   * @param <T> actual type
    */
   public static interface Instance<T> {
     /**
-     * Get the neighbors of a reference object for DBSCAN.
+     * Decide whether the point is a core point, based on its neighborhood.
      * 
-     * @param reference Reference object
-     * @return Neighborhood
+     * @param point Query point
+     * @param neighbors Neighbors
+     * @return core point property
      */
-    public T getNeighbors(DBIDRef reference);
-
-    /**
-     * Get the IDs the predicate is defined for.
-     * 
-     * @return Database ids
-     */
-    public DBIDs getIDs();
-    
-    /**
-     * Add the neighbors to a DBID set
-     * 
-     * @param ids ID set
-     * @param neighbors Neighbors to add
-     */
-    public void addDBIDs(ModifiableDBIDs ids, T neighbors);
+    public boolean isCorePoint(DBIDRef point, T neighbors);
   }
 }

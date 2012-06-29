@@ -1,4 +1,4 @@
-package experimentalcode.erich.gdbscan;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
 /*
  This file is part of ELKI:
