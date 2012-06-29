@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -282,8 +281,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
       int distc = 0;
       KNNHeap<D> heap = new KNNHeap<D>(k);
       final O vec = relation.get(id);
-      for(DBID cand : cands) {
-        heap.add(new GenericDistanceResultPair<D>(distq.distance(vec, cand), cand));
+      for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
+        heap.add(distq.distance(vec, iter), iter.getDBID());
         distc++;
       }
       mean.put(distc / (double) k);

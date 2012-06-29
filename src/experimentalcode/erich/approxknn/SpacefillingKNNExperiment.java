@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -76,9 +77,9 @@ public class SpacefillingKNNExperiment {
     List<SpatialRef> ps = new ArrayList<SpatialRef>(ids.size());
     List<SpatialRef> hs = new ArrayList<SpatialRef>(ids.size());
     {
-      for(DBID id : ids) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?, ?> v = rel.get(id);
-        SpatialRef ref = new SpatialRef(id, v);
+        SpatialRef ref = new SpatialRef(id.getDBID(), v);
         zs.add(ref);
         ps.add(ref);
         hs.add(ref);
@@ -127,7 +128,7 @@ public class SpacefillingKNNExperiment {
     for(int i = 0; i < maxoff; i++) {
       mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance(), new MeanVariance() });
     }
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final KNNResult<DoubleDistance> trueNN = knnq.getKNNForDBID(id, k);
       DBIDs trueIds = DBIDUtil.ensureSet(trueNN.asDBIDs());
       int[] posi = positions.get(id);

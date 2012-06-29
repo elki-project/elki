@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -82,7 +82,7 @@ public class RandomSampleKNNExperiment {
     {
       Pattern p = Pattern.compile("Outlier", Pattern.CASE_INSENSITIVE);
       Relation<String> srel = DatabaseUtil.guessLabelRepresentation(database);
-      for(DBID id : ids) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         String s = srel.get(id);
         if(s == null) {
           logger.warning("Object without label: " + id);
