@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- *
+ * 
  * @apiviz.uses Clustering
  * @apiviz.composedOf PairCounting
  * @apiviz.composedOf Entropy
@@ -165,7 +165,7 @@ public class ClusterContingencyTable {
         for(int i2 = 0; it2.hasNext(); i2++) {
           final Cluster<?> c2 = it2.next();
           int count = 0;
-          for (DBIDIter iter = c2.getIDs().iter(); iter.valid(); iter.advance()) {
+          for(DBIDIter iter = c2.getIDs().iter(); iter.valid(); iter.advance()) {
             if(ids.contains(iter.getDBID())) {
               count++;
             }
@@ -313,7 +313,12 @@ public class ClusterContingencyTable {
      */
     public static double fMeasure(double precision, double recall, double beta) {
       final double beta2 = beta * beta;
-      return (1 + beta2) * precision * recall / (beta2 * precision + recall);
+      final double div = beta2 * precision + recall;
+      if (div > 0) {
+        return (1 + beta2) * precision * recall / div;
+      } else {
+        return 0;
+      }
     }
 
     /**
@@ -324,7 +329,13 @@ public class ClusterContingencyTable {
      * @return F-Measure
      */
     public static double f1Measure(double precision, double recall) {
-      return 2 * precision * recall / (precision + recall);
+      final double div = precision + recall;
+      if(div > 0) {
+        return 2 * precision * recall / div;
+      }
+      else {
+        return 0;
+      }
     }
   }
 }

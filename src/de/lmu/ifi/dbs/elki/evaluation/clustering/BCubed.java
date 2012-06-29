@@ -69,7 +69,6 @@ public class BCubed {
         bCubedRecall += (recall * table.contingency[i1][i2]);
       }
     }
-
     bCubedPrecision = bCubedPrecision / table.contingency[table.size1][table.size2];
     bCubedRecall = bCubedRecall / table.contingency[table.size1][table.size2];
   }
