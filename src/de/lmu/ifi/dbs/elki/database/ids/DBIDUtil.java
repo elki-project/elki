@@ -327,7 +327,7 @@ public final class DBIDUtil {
    * 
    * @return DBID pair
    */
-  public static DBIDPair newPair(DBID id1, DBID id2) {
+  public static DBIDPair newPair(DBIDRef id1, DBIDRef id2) {
     return DBIDFactory.FACTORY.makePair(id1, id2);
   }
 
