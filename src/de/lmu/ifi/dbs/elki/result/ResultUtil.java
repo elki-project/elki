@@ -30,12 +30,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -190,7 +188,7 @@ public class ResultUtil {
       res.add((C) restrictionClass.cast(r));
     }
     if(r instanceof HierarchicalResult) {
-      for(Iterator<Result> iter = ((HierarchicalResult) r).getHierarchy().iterDescendants(r); iter.hasNext(); ) {
+      for(Iterator<Result> iter = ((HierarchicalResult) r).getHierarchy().iterDescendants(r); iter.hasNext();) {
         Result result = iter.next();
         if(restrictionClass.isInstance(result)) {
           res.add((C) restrictionClass.cast(result));
@@ -210,15 +208,9 @@ public class ResultUtil {
   public static <O> void ensureClusteringResult(final Database db, final Result result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     if(clusterings.size() == 0) {
-      try {
-        ClusteringAlgorithm<Clustering<Model>> split = new ByLabelHierarchicalClustering();
-        Clustering<Model> c = split.run(db);
-        addChildResult(db, c);
-      }
-      catch(NoSupportedDataTypeException e) {
-        Clustering<Model> c = (new TrivialAllInOne()).run(db);
-        addChildResult(db, c);
-      }
+      ClusteringAlgorithm<Clustering<Model>> split = new ByLabelOrAllInOneClustering();
+      Clustering<Model> c = split.run(db);
+      addChildResult(db, c);
     }
   }
 

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -108,7 +108,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    Collection<Cluster<Model>> split = (new ByLabelClustering()).run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(numbins, 0.0, 1.0);
 

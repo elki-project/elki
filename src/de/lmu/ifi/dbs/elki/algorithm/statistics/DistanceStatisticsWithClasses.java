@@ -31,12 +31,10 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -144,14 +142,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     DoubleMinMax gminmax = new DoubleMinMax();
 
     // Cluster by labels
-    Collection<Cluster<Model>> split;
-    try {
-      Relation<?> rel = database.getRelation(TypeUtil.GUESSED_LABEL);
-      split = (new ByLabelClustering()).run(rel).getAllClusters();
-    }
-    catch(NoSupportedDataTypeException e) {
-      split = (new TrivialAllInOne()).run(database).getAllClusters();
-    }
+    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
     // global in-cluster min/max
     DoubleMinMax giminmax = new DoubleMinMax();
