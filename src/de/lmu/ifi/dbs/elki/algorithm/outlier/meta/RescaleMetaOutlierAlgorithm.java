@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -109,10 +108,8 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = scores.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double val = scores.get(id);
-      val = scaling.getScaled(val);
-      scaledscores.putDouble(id, val);
+      double val = scaling.getScaled(scores.get(iditer));
+      scaledscores.putDouble(iditer, val);
       minmax.put(val);
     }
 

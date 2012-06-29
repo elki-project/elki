@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -130,10 +131,9 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OutRank scores", relation.size(), logger) : null;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID object  = iditer.getDBID();
       subspace.clear();
-      double score = outresScore(0, subspace, object, kernel);
-      ranks.putDouble(object, score);
+      double score = outresScore(0, subspace, iditer, kernel);
+      ranks.putDouble(iditer, score);
       minmax.put(score);
       if(progress != null) {
         progress.incrementProcessed(logger);
@@ -157,7 +157,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
    * @param kernel Kernel
    * @return Score
    */
-  public double outresScore(final int s, BitSet subspace, DBID id, KernelDensityEstimator kernel) {
+  public double outresScore(final int s, BitSet subspace, DBIDRef id, KernelDensityEstimator kernel) {
     double score = 1.0; // Initial score is 1.0
 
     for(int i = s; i < kernel.dim; i++) {
@@ -239,10 +239,9 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
     List<DoubleDistanceResultPair> n = new ArrayList<DoubleDistanceResultPair>(neighc.size());
     V query = kernel.relation.get(dbid);
     for(DistanceResultPair<DoubleDistance> p : neighc) {
-      final DBID pid = p.getDBID();
-      double dist = df.doubleDistance(query, kernel.relation.get(pid));
+      double dist = df.doubleDistance(query, kernel.relation.get(p));
       if(dist <= adjustedEps) {
-        n.add(new DoubleDistanceResultPair(dist, pid));
+        n.add(new DoubleDistanceResultPair(dist, p.getDBID()));
       }
     }
     return n;

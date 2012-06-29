@@ -159,13 +159,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID queryObject = iter.getDBID();
       if(progress != null) {
         progress.incrementProcessed(logger);
       }
-      DBIDs knnList = getNearestNeighbors(relation, snnInstance, queryObject);
-      SODModel<V> model = new SODModel<V>(relation, knnList, alpha, relation.get(queryObject));
-      sod_models.put(queryObject, model);
+      DBIDs knnList = getNearestNeighbors(relation, snnInstance, iter);
+      SODModel<V> model = new SODModel<V>(relation, knnList, alpha, relation.get(iter));
+      sod_models.put(iter, model);
       minmax.put(model.getSod());
     }
     if(progress != null) {
@@ -192,15 +191,14 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * @return the k nearest neighbors in terms of the shared nearest neighbor
    *         distance without the query object
    */
-  private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBID queryObject) {
+  private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBIDRef queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
     Heap<DoubleObjPair<DBID>> nearestNeighbors = new TiedTopBoundedHeap<DoubleObjPair<DBID>>(knn);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      if(!id.sameDBID(queryObject)) {
-        double sim = simQ.similarity(queryObject, id).doubleValue();
+      if(!iter.sameDBID(queryObject)) {
+        double sim = simQ.similarity(queryObject, iter).doubleValue();
         if(sim > 0) {
-          nearestNeighbors.add(new DoubleObjPair<DBID>(sim, id));
+          nearestNeighbors.add(new DoubleObjPair<DBID>(sim, iter.getDBID()));
         }
       }
     }

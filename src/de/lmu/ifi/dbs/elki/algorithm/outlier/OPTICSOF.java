@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -124,48 +123,43 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // N_minpts(id) and core-distance(id)
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      KNNResult<D> minptsNeighbours = knnQuery.getKNNForDBID(id, minpts);
+      KNNResult<D> minptsNeighbours = knnQuery.getKNNForDBID(iditer, minpts);
       D d = minptsNeighbours.getKNNDistance();
-      nMinPts.put(id, minptsNeighbours);
-      coreDistance.putDouble(id, d.doubleValue());
-      minPtsNeighborhoodSize.put(id, rangeQuery.getRangeForDBID(id, d).size());
+      nMinPts.put(iditer, minptsNeighbours);
+      coreDistance.putDouble(iditer, d.doubleValue());
+      minPtsNeighborhoodSize.put(iditer, rangeQuery.getRangeForDBID(iditer, d).size());
     }
 
     // Pass 2
     WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
-      for(DistanceResultPair<D> neighPair : nMinPts.get(id)) {
-        DBID idN = neighPair.getDBID();
-        double coreDist = coreDistance.doubleValue(idN);
-        double dist = distQuery.distance(id, idN).doubleValue();
-        Double rd = Math.max(coreDist, dist);
+      for(DistanceResultPair<D> neighPair : nMinPts.get(iditer)) {
+        double coreDist = coreDistance.doubleValue(neighPair);
+        double dist = distQuery.distance(iditer, neighPair).doubleValue();
+        double rd = Math.max(coreDist, dist);
         lrd = rd + lrd;
         core.add(rd);
       }
-      lrd = minPtsNeighborhoodSize.intValue(id) / lrd;
-      reachDistance.put(id, core);
-      lrds.putDouble(id, lrd);
+      lrd = minPtsNeighborhoodSize.intValue(iditer) / lrd;
+      reachDistance.put(iditer, core);
+      lrds.putDouble(iditer, lrd);
     }
 
     // Pass 3
     DoubleMinMax ofminmax = new DoubleMinMax();
     WritableDoubleDataStore ofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       double of = 0;
-      for(DistanceResultPair<D> pair : nMinPts.get(id)) {
-        DBID idN = pair.getDBID();
-        double lrd = lrds.doubleValue(id);
-        double lrdN = lrds.doubleValue(idN);
+      for(DistanceResultPair<D> pair : nMinPts.get(iditer)) {
+        double lrd = lrds.doubleValue(iditer);
+        double lrdN = lrds.doubleValue(pair);
         of = of + lrdN / lrd;
       }
-      of = of / minPtsNeighborhoodSize.intValue(id);
-      ofs.putDouble(id, of);
+      of = of / minPtsNeighborhoodSize.intValue(iditer);
+      ofs.putDouble(iditer, of);
       // update minimum and maximum
       ofminmax.put(of);
     }

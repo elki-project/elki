@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -117,11 +116,10 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     WritableDoubleDataStore knno_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     // compute distance to the k nearest neighbor.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       // distance to the kth nearest neighbor
-      final KNNResult<D> knns = knnQuery.getKNNForDBID(id, k);
+      final KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, k);
       double dkn = knns.getKNNDistance().doubleValue();
-      knno_score.putDouble(id, dkn);
+      knno_score.putDouble(iditer, dkn);
 
       minmax.put(dkn);
 

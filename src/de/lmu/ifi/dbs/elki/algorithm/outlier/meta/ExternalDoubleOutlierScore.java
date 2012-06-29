@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -212,10 +211,9 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     }
     DoubleMinMax mm = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double val = scoresult.get(id); // scores.get(id);
+      double val = scoresult.get(iditer);
       val = scaling.getScaled(val);
-      scores.putDouble(id, val);
+      scores.putDouble(iditer, val);
       mm.put(val);
     }
     meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax());

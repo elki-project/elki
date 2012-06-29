@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -43,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -133,30 +133,26 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
     FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", relation.size(), logger) : null;
 
+    Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k);
-      int nsize = neighbors.size() - 1;
+      KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
       // skip the point itself
-      double dxp = 0;
-      double Dxp = 0;
+      dxp.reset(); Dxp.reset();
       for(DistanceResultPair<D> neighbor1 : neighbors) {
-        if(!neighbor1.getDBID().sameDBID(id)) {
-          dxp += neighbor1.getDistance().doubleValue();
+        if(!neighbor1.sameDBID(iditer)) {
+          dxp.put(neighbor1.getDistance().doubleValue());
           for(DistanceResultPair<D> neighbor2 : neighbors) {
-            if(!neighbor1.getDBID().sameDBID(neighbor2.getDBID()) && !neighbor2.getDBID().sameDBID(id)) {
-              Dxp += distFunc.distance(neighbor1.getDBID(), neighbor2.getDBID()).doubleValue();
+            if(!neighbor1.sameDBID(neighbor2) && !neighbor2.sameDBID(iditer)) {
+              Dxp.put(distFunc.distance(neighbor1, neighbor2).doubleValue());
             }
           }
         }
       }
-      dxp /= nsize;
-      Dxp /= (nsize * (nsize - 1));
-      Double ldof = dxp / Dxp;
-      if(ldof.isNaN() || ldof.isInfinite()) {
+      double ldof = dxp.getMean() / Dxp.getMean();
+      if(Double.isNaN(ldof) || Double.isInfinite(ldof)) {
         ldof = 1.0;
       }
-      ldofs.putDouble(id, ldof);
+      ldofs.putDouble(iditer, ldof);
       // update maximum
       ldofminmax.put(ldof);
 

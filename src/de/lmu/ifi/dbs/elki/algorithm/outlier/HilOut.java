@@ -253,8 +253,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
     if(tn == ScoreType.TopN) {
       minmax.put(0.0);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        hilout_weight.putDouble(id, 0.0);
+        hilout_weight.putDouble(iditer, 0.0);
       }
       for(HilFeature ent : h.out) {
         minmax.put(ent.ubound);
@@ -483,8 +482,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
 
       int pos = 0;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        pf[pos++] = new HilFeature(id, new Heap<DoubleDistanceResultPair>(k, Collections.reverseOrder()));
+        pf[pos++] = new HilFeature(iditer.getDBID(), new Heap<DoubleDistanceResultPair>(k, Collections.reverseOrder()));
       }
       this.out = new Heap<HilFeature>(n, new Comparator<HilFeature>() {
         @Override

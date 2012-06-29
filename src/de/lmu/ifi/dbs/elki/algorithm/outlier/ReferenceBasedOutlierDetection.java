@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -165,7 +164,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
       for(int l = 0; l < firstReferenceDists.size(); l++) {
         double density = computeDensity(firstReferenceDists, l);
         // Initial value
-        rbod_score.putDouble(firstReferenceDists.get(l).getDBID(), density);
+        rbod_score.putDouble(firstReferenceDists.get(l), density);
       }
       // compute density values for all remaining reference points
       while(iter.hasNext()) {
@@ -175,8 +174,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
         for(int l = 0; l < referenceDists.size(); l++) {
           double density = computeDensity(referenceDists, l);
           // Update minimum
-          if(density < rbod_score.doubleValue(referenceDists.get(l).getDBID())) {
-            rbod_score.putDouble(referenceDists.get(l).getDBID(), density);
+          if(density < rbod_score.doubleValue(referenceDists.get(l))) {
+            rbod_score.putDouble(referenceDists.get(l), density);
           }
         }
       }
@@ -184,17 +183,15 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     // compute maximum density
     double maxDensity = 0.0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double dens = rbod_score.doubleValue(id);
+      double dens = rbod_score.doubleValue(iditer);
       if(dens > maxDensity) {
         maxDensity = dens;
       }
     }
     // compute ROS
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double score = 1 - (rbod_score.doubleValue(id) / maxDensity);
-      rbod_score.putDouble(id, score);
+      double score = 1 - (rbod_score.doubleValue(iditer) / maxDensity);
+      rbod_score.putDouble(iditer, score);
     }
 
     // adds reference points to the result. header information for the
@@ -222,9 +219,8 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
     // TODO: optimize for double distances?
     List<DistanceResultPair<D>> referenceDists = new ArrayList<DistanceResultPair<D>>(database.size());
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final D distance = distFunc.distance(id, refPoint);
-      referenceDists.add(new GenericDistanceResultPair<D>(distance, id));
+      final D distance = distFunc.distance(iditer, refPoint);
+      referenceDists.add(new GenericDistanceResultPair<D>(distance, iditer.getDBID()));
     }
     Collections.sort(referenceDists);
     return referenceDists;

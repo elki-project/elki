@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -44,6 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -141,16 +141,14 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     WritableDoubleDataStore density = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // init knns and rnns
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      knns.put(id, DBIDUtil.newArray());
-      rnns.put(id, DBIDUtil.newArray());
+      knns.put(iditer, DBIDUtil.newArray());
+      rnns.put(iditer, DBIDUtil.newArray());
     }
 
     // TODO: use kNN preprocessor?
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
+    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       // if not visited count=0
       int count = rnns.get(id).size();
       ModifiableDBIDs s;
@@ -166,8 +164,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       else {
         s = knns.get(id);
       }
-      for (DBIDIter iter = s.iter(); iter.valid(); iter.advance()) {
-        DBID q = iter.getDBID();
+      for (DBIDIter q = s.iter(); q.valid(); q.advance()) {
         if(!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors?
           KNNResult<D> listQ = knnQuery.getKNNForDBID(q, k);
@@ -191,21 +188,18 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // IF Object is pruned INFLO=1.0
     DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
+    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       if(!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);
 
         double denP = density.doubleValue(id);
         knn.addDBIDs(rnn);
-        double den = 0;
+        Mean mean = new Mean();
         for (DBIDIter iter = knn.iter(); iter.valid(); iter.advance()) {
-          double denQ = density.doubleValue(iter.getDBID());
-          den = den + denQ;
+          mean.put(density.doubleValue(iter));
         }
-        den = den / rnn.size();
-        den = den / denP;
+        double den = mean.getMean() / denP;
         inflos.putDouble(id, den);
         // update minimum and maximum
         inflominmax.put(den);

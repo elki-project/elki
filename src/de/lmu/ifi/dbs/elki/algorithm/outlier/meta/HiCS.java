@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -209,15 +208,14 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       double sum = 0.0;
       for(Relation<Double> r : results) {
-        final Double s = r.get(id);
+        final Double s = r.get(iditer);
         if(s != null && !Double.isNaN(s)) {
           sum += s;
         }
       }
-      scores.putDouble(id, sum);
+      scores.putDouble(iditer, sum);
       minmax.put(sum);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
