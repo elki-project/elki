@@ -29,7 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -125,7 +125,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
       logger.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
-    Collection<Cluster<Model>> split = (new ByLabelClustering()).run(database).getAllClusters();
+    Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(split.size());
