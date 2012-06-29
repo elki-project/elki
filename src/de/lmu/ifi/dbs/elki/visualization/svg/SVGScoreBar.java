@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -111,16 +112,16 @@ public class SVGScoreBar {
     bar.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#a0a0a0");
     bar.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
     bar.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "" + height * 0.01);
+    barchart.appendChild(bar);
 
     double fpos = (fill / size) * (width - (0.04 * height));
-    Element chart = svgp.svgRect(x + 0.02 * height, y + 0.02 * height, fpos, height - 0.04 * height);
-    chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
-    chart.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
-    chart.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "" + height * 0.01);
-
-    barchart = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    barchart.appendChild(bar);
-    barchart.appendChild(chart);
+    if(fpos > 0 && fpos <= 1) { // Also ensure this is not NaN.
+      Element chart = svgp.svgRect(x + 0.02 * height, y + 0.02 * height, fpos, height - 0.04 * height);
+      chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
+      chart.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
+      chart.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "" + height * 0.01);
+      barchart.appendChild(chart);
+    }
 
     // Draw the values:
     if(format != null) {
