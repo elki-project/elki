@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.visualization.style;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Styling policy that is based on <em>classes</em>, for example clusters or
@@ -40,7 +40,7 @@ public interface ClassStylingPolicy extends StylingPolicy {
    * @param id Object ID
    * @return Style number
    */
-  public int getStyleForDBID(DBID id);
+  public int getStyleForDBID(DBIDRef id);
 
   /**
    * Get the minimum style in use.

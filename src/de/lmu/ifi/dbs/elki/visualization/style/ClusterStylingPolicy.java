@@ -32,8 +32,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -93,7 +93,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   }
 
   @Override
-  public int getStyleForDBID(DBID id) {
+  public int getStyleForDBID(DBIDRef id) {
     for(int i = 0; i < ids.size(); i++) {
       if(ids.get(i).contains(id)) {
         return i;
@@ -103,7 +103,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   }
 
   @Override
-  public int getColorForDBID(DBID id) {
+  public int getColorForDBID(DBIDRef id) {
     for(int i = 0; i < ids.size(); i++) {
       if(ids.get(i).contains(id)) {
         return colors.get(i);

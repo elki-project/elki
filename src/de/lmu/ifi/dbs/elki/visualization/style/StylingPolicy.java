@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.style;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,6 +23,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+
 /**
  * Styling policy.
  * 
@@ -43,5 +43,5 @@ public interface StylingPolicy {
    * @param id Object ID
    * @return Color value
    */
-  public int getColorForDBID(DBID id);
+  public int getColorForDBID(DBIDRef id);
 }

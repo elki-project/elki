@@ -30,7 +30,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -127,7 +128,7 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
       ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
       setupCSS(svgp, colors);
       // draw data
-      for(DBID objId : sample.getSample()) {
+      for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
         final Double radius = getScaledForId(objId);
         if(radius > 0.01 && !Double.isInfinite(radius)) {
           final NumberVector<?, ?> vec = rel.get(objId);
@@ -142,7 +143,7 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
     }
     else {
       // draw data
-      for(DBID objId : sample.getSample()) {
+      for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
         final Double radius = getScaledForId(objId);
         if(radius > 0.01 && !Double.isInfinite(radius)) {
           final NumberVector<?, ?> vec = rel.get(objId);
@@ -212,7 +213,7 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
    * @return a Double representing a outlierness-score, after it has modified by
    *         the given scales.
    */
-  protected double getScaledForId(DBID id) {
+  protected double getScaledForId(DBIDRef id) {
     double d = result.getScores().get(id).doubleValue();
     if(Double.isNaN(d) || Double.isInfinite(d)) {
       return 0.0;

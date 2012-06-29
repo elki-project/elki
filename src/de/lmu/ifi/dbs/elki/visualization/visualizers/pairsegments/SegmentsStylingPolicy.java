@@ -28,8 +28,8 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -117,7 +117,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   }
 
   @Override
-  public int getStyleForDBID(DBID id) {
+  public int getStyleForDBID(DBIDRef id) {
     Iterator<Segment> s = selectedSegments.iterator();
     for(int i = 0; s.hasNext(); i++) {
       Segment seg = s.next();
@@ -130,7 +130,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   }
 
   @Override
-  public int getColorForDBID(DBID id) {
+  public int getColorForDBID(DBIDRef id) {
     int style = getStyleForDBID(id);
     if (colorset != null) {
       // FIXME: add caching

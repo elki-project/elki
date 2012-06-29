@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -98,12 +97,11 @@ public class MarkerVisualization extends AbstractScatterplotVisualization implem
       ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
       for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
         for(DBIDIter iter = cspol.iterateClass(cnum); iter.valid(); iter.advance()) {
-          DBID cur = iter.getDBID();
-          if(!sample.getSample().contains(cur)) {
+          if(!sample.getSample().contains(iter)) {
             continue; // TODO: can we test more efficiently than this?
           }
           try {
-            final NumberVector<?, ?> vec = rel.get(cur);
+            final NumberVector<?, ?> vec = rel.get(iter);
             double[] v = proj.fastProjectDataToRenderSpace(vec);
             ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
           }
@@ -116,12 +114,12 @@ public class MarkerVisualization extends AbstractScatterplotVisualization implem
     else {
       final String FILL = SVGConstants.CSS_FILL_PROPERTY + ":";
       // Color-based styling. Fall back to dots
-      for(DBID id : sample.getSample()) {
+      for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
         try {
-          double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
+          double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
           Element dot = svgp.svgCircle(v[0], v[1], marker_size);
           SVGUtil.addCSSClass(dot, DOTMARKER);
-          int col = spol.getColorForDBID(id);
+          int col = spol.getColorForDBID(iter);
           SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
           layer.appendChild(dot);
         }

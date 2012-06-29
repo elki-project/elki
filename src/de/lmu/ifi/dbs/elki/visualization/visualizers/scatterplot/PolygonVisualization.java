@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -110,9 +109,8 @@ public class PolygonVisualization extends AbstractScatterplotVisualization imple
 
     // draw data
     for(DBIDIter iditer = rep.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       try {
-        PolygonsObject poly = rep.get(id);
+        PolygonsObject poly = rep.get(iditer);
         if(poly == null) {
           continue;
         }
