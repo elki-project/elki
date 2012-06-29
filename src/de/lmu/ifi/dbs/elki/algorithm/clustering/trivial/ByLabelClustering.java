@@ -38,9 +38,12 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -138,12 +141,12 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @param relation The data input we use
    */
   public Clustering<Model> run(Relation<?> relation) {
-    HashMap<String, ModifiableDBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);
+    HashMap<String, DBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);
 
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
     Clustering<Model> result = new Clustering<Model>("By Label Clustering", "bylabel-clustering");
-    for(Entry<String, ModifiableDBIDs> entry : labelMap.entrySet()) {
-      ModifiableDBIDs ids = entry.getValue();
+    for(Entry<String, DBIDs> entry : labelMap.entrySet()) {
+      DBIDs ids = entry.getValue();
       if(ids.size() <= 1) {
         noiseids.addDBIDs(ids);
         continue;
@@ -171,8 +174,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @param data the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, ModifiableDBIDs> singleAssignment(Relation<?> data) {
-    HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
+  private HashMap<String, DBIDs> singleAssignment(Relation<?> data) {
+    HashMap<String, DBIDs> labelMap = new HashMap<String, DBIDs>();
 
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final Object val = data.get(iditer);
@@ -189,8 +192,8 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @param data the database storing the objects
    * @return a mapping of labels to ids
    */
-  private HashMap<String, ModifiableDBIDs> multipleAssignment(Relation<?> data) {
-    HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
+  private HashMap<String, DBIDs> multipleAssignment(Relation<?> data) {
+    HashMap<String, DBIDs> labelMap = new HashMap<String, DBIDs>();
 
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
       String[] labels = data.get(iditer).toString().split(" ");
@@ -208,9 +211,19 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @param label the label of the object to be assigned
    * @param id the id of the object to be assigned
    */
-  private void assign(HashMap<String, ModifiableDBIDs> labelMap, String label, DBIDRef id) {
+  private void assign(HashMap<String, DBIDs> labelMap, String label, DBIDRef id) {
     if(labelMap.containsKey(label)) {
-      labelMap.get(label).add(id);
+      DBIDs exist = labelMap.get(label);
+      if (exist instanceof DBID) {
+        ModifiableDBIDs n = DBIDUtil.newHashSet();
+        n.add((DBID)exist);
+        n.add(id);
+        labelMap.put(label, n);
+      } else {
+        assert(exist instanceof HashSetModifiableDBIDs);
+        assert (exist.size() > 1);
+        ((ModifiableDBIDs)exist).add(id);
+      }
     }
     else {
       ModifiableDBIDs n = DBIDUtil.newHashSet();
