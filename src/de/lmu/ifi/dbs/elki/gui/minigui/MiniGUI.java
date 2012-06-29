@@ -379,7 +379,7 @@ public class MiniGUI extends JPanel {
           logger.debug("Task completed successfully.");
         }
         catch(Throwable e) {
-          logger.exception(e);
+          logger.exception("Task failed", e);
         }
         return null;
       }
