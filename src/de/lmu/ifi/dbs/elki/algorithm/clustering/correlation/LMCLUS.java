@@ -269,15 +269,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r.nextLong());
       final DBIDIter iter = sample.iter();
       // Use first as origin
-      DBID origin = iter.getDBID();
+      Vector originV = relation.get(iter).getColumnVector();
       iter.advance();
-      Vector originV = relation.get(origin).getColumnVector();
       // Build orthogonal basis from remainder
       Matrix basis;
       {
         List<Vector> vectors = new ArrayList<Vector>(sample.size() - 1);
         for(;iter.valid(); iter.advance()) {
-          Vector vec = relation.get(iter.getDBID()).getColumnVector();
+          Vector vec = relation.get(iter).getColumnVector();
           vectors.add(vec.minusEquals(originV));
         }
         // generate orthogonal basis

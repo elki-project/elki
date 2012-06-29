@@ -104,7 +104,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         DBID id  = iditer.getDBID();
         double mindist = Double.POSITIVE_INFINITY;
-        V fv = relation.get(id);
+        V fv = relation.get(iditer);
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
           double dist = df.doubleDistance(fv, means.get(i));
@@ -130,9 +130,8 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
     else {
       final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
         D mindist = df.getDistanceFactory().infiniteDistance();
-        V fv = relation.get(id);
+        V fv = relation.get(iditer);
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
           D dist = df.distance(fv, means.get(i));
@@ -141,13 +140,13 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
             mindist = dist;
           }
         }
-        if(clusters.get(minIndex).add(id)) {
+        if(clusters.get(minIndex).add(iditer)) {
           changed = true;
           // Remove from previous cluster
           // TODO: keep a list of cluster assignments to save this search?
           for(int i = 0; i < k; i++) {
             if(i != minIndex) {
-              if(clusters.get(i).remove(id)) {
+              if(clusters.get(i).remove(iditer)) {
                 break;
               }
             }
@@ -180,10 +179,10 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
         double s = 1.0 / list.size();
         DBIDIter iter = list.iter();
         assert (iter.valid());
-        mean = database.get(iter.getDBID()).getColumnVector().timesEquals(s);
+        mean = database.get(iter).getColumnVector().timesEquals(s);
         iter.advance();
         for(; iter.valid(); iter.advance()) {
-          mean.plusTimesEquals(database.get(iter.getDBID()).getColumnVector(), s);
+          mean.plusTimesEquals(database.get(iter).getColumnVector(), s);
         }
       }
       else {
@@ -261,9 +260,8 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
 
       // Incremental update
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
         double mindist = Double.POSITIVE_INFINITY;
-        V fv = relation.get(id);
+        V fv = relation.get(iditer);
         int minIndex = 0;
         for(int i = 0; i < k; i++) {
           double dist = df.doubleDistance(fv, means.get(i));
@@ -276,13 +274,13 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
         for(int i = 0; i < k; i++) {
           ModifiableDBIDs ci = clusters.get(i);
           if(i == minIndex) {
-            if(ci.add(id)) {
-              incrementalUpdateMean(means.get(i), relation.get(id), ci.size(), +1);
+            if(ci.add(iditer)) {
+              incrementalUpdateMean(means.get(i), fv, ci.size(), +1);
               changed = true;
             }
           }
-          else if(ci.remove(id)) {
-            incrementalUpdateMean(means.get(i), relation.get(id), ci.size() + 1, -1);
+          else if(ci.remove(iditer)) {
+            incrementalUpdateMean(means.get(i), fv, ci.size() + 1, -1);
             changed = true;
           }
         }

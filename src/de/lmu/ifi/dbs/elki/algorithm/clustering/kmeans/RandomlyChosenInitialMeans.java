@@ -55,7 +55,7 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, seed);
     List<V> means = new ArrayList<V>(k);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      means.add(relation.get(iter.getDBID()));
+      means.add(relation.get(iter));
     }
     return means;
   }

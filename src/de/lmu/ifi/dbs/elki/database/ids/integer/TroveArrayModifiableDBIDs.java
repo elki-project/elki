@@ -31,6 +31,7 @@ import java.util.Comparator;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -96,12 +97,12 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
-  public boolean add(DBID e) {
+  public boolean add(DBIDRef e) {
     return store.add(e.getIntegerID());
   }
 
   @Override
-  public boolean remove(DBID o) {
+  public boolean remove(DBIDRef o) {
     return store.remove(o.getIntegerID());
   }
 

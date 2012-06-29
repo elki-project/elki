@@ -412,8 +412,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     DoubleDistance sum = getDistanceFunction().getDistanceFactory().nullDistance();
     V c_proj = projection(c_ij, c_ij.centroid, factory);
     for(DBIDIter iter = c_ij.objectIDs.iter(); iter.valid(); iter.advance()) {
-      V o = database.get(iter.getDBID());
-      V o_proj = projection(c_ij, o, factory);
+      V o_proj = projection(c_ij, database.get(iter), factory);
       DoubleDistance dist = distFunc.distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
     }

@@ -101,12 +101,12 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   }
 
   @Override
-  public boolean add(DBID e) {
+  public boolean add(DBIDRef e) {
     return store.add(e.getIntegerID());
   }
 
   @Override
-  public boolean remove(DBID o) {
+  public boolean remove(DBIDRef o) {
     return store.remove(o.getIntegerID());
   }
 

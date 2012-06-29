@@ -393,7 +393,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       {
         int l = 0;
         for (DBIDIter iter = conditionalSample.iter(); iter.valid(); iter.advance()) {
-          sampleValues[l] = relation.get(iter.getDBID()).doubleValue(chosen + 1);
+          sampleValues[l] = relation.get(iter).doubleValue(chosen + 1);
           l++;
         }
       }
@@ -402,7 +402,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       {
         int l = 0;
         for (DBIDIter iter = subspaceIndex.get(chosen).iter(); iter.valid(); iter.advance()) {
-          fullValues[l] = relation.get(iter.getDBID()).doubleValue(chosen + 1);
+          fullValues[l] = relation.get(iter).doubleValue(chosen + 1);
           l++;
         }
       }

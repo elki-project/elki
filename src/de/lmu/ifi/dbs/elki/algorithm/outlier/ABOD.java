@@ -561,7 +561,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     Vector vect1 = data.get(key).getColumnVector();
     for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
       System.out.println("Outlier: " + vect1);
-      Vector exp = data.get(iter.getDBID()).getColumnVector();
+      Vector exp = data.get(iter).getColumnVector();
       System.out.println("Most common neighbor: " + exp);
       // determine difference Vector
       Vector vals = exp.minus(vect1);

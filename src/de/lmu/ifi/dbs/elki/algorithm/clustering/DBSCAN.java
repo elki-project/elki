@@ -143,9 +143,8 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     processedIDs = DBIDUtil.newHashSet(size);
     if(size >= minpts) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        if(!processedIDs.contains(id)) {
-          expandCluster(relation, rangeQuery, id, objprog, clusprog);
+        if(!processedIDs.contains(iditer)) {
+          expandCluster(relation, rangeQuery, iditer.getDBID(), objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);
@@ -158,8 +157,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
     else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        noise.add(id);
+        noise.add(iditer);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
           clusprog.setProcessed(resultList.size(), logger);
