@@ -9,6 +9,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -48,7 +49,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   private Set<Integer> alreadyRequestedIDs = new HashSet<Integer>();
   
   @Override
-  public KNNResult<DoubleDistance> getKNNForDBID(DBID id, int k) {
+  public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
     NumberVector<?, ?> vector = dataBase.get(id);
     
     KNNResult<DoubleDistance> projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);

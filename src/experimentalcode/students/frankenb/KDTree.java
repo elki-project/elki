@@ -6,6 +6,7 @@ import java.util.Set;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
@@ -57,7 +58,7 @@ public class KDTree<V extends NumberVector<?, ?>> {
    * @param distanceFunction
    * @return
    */
-  public KNNResult<DoubleDistance> findNearestNeighbors(DBID id, int k, PrimitiveDoubleDistanceFunction<V> distanceFunction) {
+  public KNNResult<DoubleDistance> findNearestNeighbors(DBIDRef id, int k, PrimitiveDoubleDistanceFunction<V> distanceFunction) {
     V vector = this.relation.get(id);
     KDTreeNode node = searchNodeFor(vector, this.root);
 

@@ -1,6 +1,7 @@
 package experimentalcode.students.frankenb;
 
 import java.io.File;
+import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -99,7 +100,9 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
     this.outputFile.mkdirs();
     ResultWriter resultWriter = getResultWriter(this.outputFile);
 
-    for(Result aResult : totalResult.getHierarchy().iterDescendants(result)) {
+    Iterator<Result> iter = totalResult.getHierarchy().iterDescendants(result);
+    while(iter.hasNext()) {
+      Result aResult = iter.next();
       resultWriter.processNewResult(database, aResult);
     }
     logger.verbose("Writing results to dir " + this.outputFile);
