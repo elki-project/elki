@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DBIDDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -47,7 +48,7 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
   }
 
   @Override
-  abstract public D distance(DBID o1, DBID o2);
+  abstract public D distance(DBIDRef o1, DBIDRef o2);
 
   @Override
   abstract public D getDistanceFactory();

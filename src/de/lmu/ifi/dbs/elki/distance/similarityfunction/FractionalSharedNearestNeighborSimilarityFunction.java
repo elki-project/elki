@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -114,7 +114,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
     }
 
     @Override
-    public DoubleDistance similarity(DBID id1, DBID id2) {
+    public DoubleDistance similarity(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       int intersection = countSharedNeighbors(neighbors1, neighbors2);

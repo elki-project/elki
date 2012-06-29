@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -117,7 +117,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     }
 
     @Override
-    public IntegerDistance similarity(DBID id1, DBID id2) {
+    public IntegerDistance similarity(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       return new IntegerDistance(countSharedNeighbors(neighbors1, neighbors2));

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -90,7 +91,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
@@ -209,7 +210,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param node the root of the subtree
    * @param result the list holding the query result
    */
-  private void doReverseKNNQuery(int k, DBID q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<DistanceResultPair<D>> result) {
+  private void doReverseKNNQuery(int k, DBIDRef q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<DistanceResultPair<D>> result) {
     // data node
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

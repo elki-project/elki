@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -64,8 +64,8 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
   }
 
   @Override
-  public DoubleDistance distance(DBID o1, DBID o2) {
-    int c = o1.compareTo(o2);
+  public DoubleDistance distance(DBIDRef o1, DBIDRef o2) {
+    int c = o1.compareDBID(o2);
     if(c == 0) {
       return DoubleDistance.FACTORY.nullDistance();
     }
@@ -73,7 +73,7 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     if(c > 0) {
       return distance(o2, o1);
     }
-    return new DoubleDistance(pseudoRandom(seed, Util.mixHashCodes(o1.hashCode(), o2.hashCode(), (int) seed)));
+    return new DoubleDistance(pseudoRandom(seed, Util.mixHashCodes(o1.getDBID().hashCode(), o2.getDBID().hashCode(), (int) seed)));
   }
 
   /**

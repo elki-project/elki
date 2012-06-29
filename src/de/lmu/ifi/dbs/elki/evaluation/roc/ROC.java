@@ -194,9 +194,9 @@ public class ROC {
 
     @Override
     public DBIDPair next() {
-      DBID id = this.iter.getDBID();
+      DBIDPair pair = DBIDUtil.newPair(iter, iter);
       this.iter.advance();
-      return DBIDUtil.newPair(id, id);
+      return pair;
     }
 
     @Override

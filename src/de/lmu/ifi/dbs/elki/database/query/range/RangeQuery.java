@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -47,7 +47,7 @@ public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range);
+  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range);
 
   /**
    * Get the nearest neighbors for a particular object in a given query range

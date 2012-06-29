@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -61,20 +61,20 @@ public class PrimitiveDistanceSimilarityQuery<O, D extends Distance<D>> extends 
   }
 
   @Override
-  public D similarity(DBID id1, DBID id2) {
+  public D similarity(DBIDRef id1, DBIDRef id2) {
     O o1 = relation.get(id1);
     O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(O o1, DBID id2) {
+  public D similarity(O o1, DBIDRef id2) {
     O o2 = relation.get(id2);
     return similarity(o1, o2);
   }
 
   @Override
-  public D similarity(DBID id1, O o2) {
+  public D similarity(DBIDRef id1, O o2) {
     O o1 = relation.get(id1);
     return similarity(o1, o2);
   }

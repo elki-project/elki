@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -75,7 +75,7 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k) {
+  public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }

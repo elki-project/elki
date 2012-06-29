@@ -27,6 +27,7 @@ import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
@@ -56,7 +57,7 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
   }
 
   @Override
-  public DistanceDBIDResult<DoubleDistance> getRangeForDBID(DBID id, DoubleDistance range) {
+  public DistanceDBIDResult<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
     if(distanceQuery instanceof PrimitiveDistanceQuery && distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       @SuppressWarnings("unchecked")
       PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();

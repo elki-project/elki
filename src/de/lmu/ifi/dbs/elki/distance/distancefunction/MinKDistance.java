@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -155,7 +155,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
     }
 
     @Override
-    public D distance(DBID id1, DBID id2) {
+    public D distance(DBIDRef id1, DBIDRef id2) {
       KNNResult<D> neighborhood = knnQuery.getKNNForDBID(id1, k);
       D truedist = parentDistanceQuery.distance(id1, id2);
       return computeReachdist(neighborhood, truedist);

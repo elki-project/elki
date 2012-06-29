@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
@@ -200,7 +201,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         while(i < kNNs.size() && j < newKNNs.size()) {
           DistanceResultPair<D> drp1 = kNNs.get(i);
           DistanceResultPair<D> drp2 = newKNNs.get(j);
-          if(!drp1.equals(drp2)) {
+          if(!drp1.sameDBID(drp2)) {
             added.add(drp2);
             j++;
           }
@@ -305,7 +306,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    * @param id the query id
    * @return the RkNNs
    */
-  public List<DistanceResultPair<D>> getRKNN(DBID id) {
+  public List<DistanceResultPair<D>> getRKNN(DBIDRef id) {
     SortedSet<DistanceResultPair<D>> rKNN = materialized_RkNN.get(id);
     if(rKNN == null)
       return null;

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -46,7 +47,7 @@ public abstract class AbstractDatabaseDistanceQuery<O, D extends Distance<D>> ex
   }
 
   @Override
-  public D distance(O o1, DBID id2) {
+  public D distance(O o1, DBIDRef id2) {
     if(o1 instanceof DBID) {
       return distance((DBID) o1, id2);
     }
@@ -54,7 +55,7 @@ public abstract class AbstractDatabaseDistanceQuery<O, D extends Distance<D>> ex
   }
 
   @Override
-  public D distance(DBID id1, O o2) {
+  public D distance(DBIDRef id1, O o2) {
     if(o2 instanceof DBID) {
       return distance(id1, (DBID) o2);
     }

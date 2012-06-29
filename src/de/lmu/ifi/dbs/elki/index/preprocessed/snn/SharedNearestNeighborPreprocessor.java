@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -139,7 +140,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
   }
 
   @Override
-  public ArrayDBIDs getNearestNeighborSet(DBID objid) {
+  public ArrayDBIDs getNearestNeighborSet(DBIDRef objid) {
     if(storage == null) {
       preprocess();
     }

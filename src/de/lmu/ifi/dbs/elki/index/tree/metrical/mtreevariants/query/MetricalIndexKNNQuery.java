@@ -28,6 +28,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -155,7 +156,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   }
 
   @Override
-  public KNNResult<D> getKNNForDBID(DBID id, int k) {
+  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 

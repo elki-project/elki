@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -68,6 +69,21 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
   @Override
   public DBID getDBID() {
     return id;
+  }
+
+  @Override
+  public int getIntegerID() {
+    return id.getIntegerID();
+  }
+
+  @Override
+  public boolean sameDBID(DBIDRef other) {
+    return id.sameDBID(other);
+  }
+
+  @Override
+  public int compareDBID(DBIDRef other) {
+    return id.compareDBID(other);
   }
 
   @Override

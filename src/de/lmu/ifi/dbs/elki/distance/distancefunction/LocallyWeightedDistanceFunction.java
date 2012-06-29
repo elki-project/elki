@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
@@ -122,7 +122,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
      *         distance function
      */
     @Override
-    public DoubleDistance distance(DBID id1, DBID id2) {
+    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
       Matrix m1 = index.getLocalProjection(id1).similarityMatrix();
       Matrix m2 = index.getLocalProjection(id2).similarityMatrix();
 

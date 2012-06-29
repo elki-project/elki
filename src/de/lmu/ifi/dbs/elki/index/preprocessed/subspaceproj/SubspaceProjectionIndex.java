@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
@@ -46,7 +46,7 @@ public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extend
    * @return Matrix
    */
   @Override
-  public P getLocalProjection(DBID objid);
+  public P getLocalProjection(DBIDRef objid);
 
   /**
    * Factory interface

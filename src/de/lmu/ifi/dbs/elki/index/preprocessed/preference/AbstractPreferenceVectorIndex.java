@@ -28,7 +28,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -56,7 +56,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
   abstract protected void preprocess();
 
   @Override
-  public BitSet getPreferenceVector(DBID objid) {
+  public BitSet getPreferenceVector(DBIDRef objid) {
     if(storage == null) {
       preprocess();
     }

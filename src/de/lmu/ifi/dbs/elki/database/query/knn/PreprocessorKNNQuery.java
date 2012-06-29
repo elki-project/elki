@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -78,7 +79,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
   }
 
   @Override
-  public KNNResult<D> getKNNForDBID(DBID id, int k) {
+  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }

@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.snn;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -38,10 +38,10 @@ public interface SharedNearestNeighborIndex<O> extends Index {
   /**
    * Get the precomputed nearest neighbors
    * 
-   * @param objid Object ID
+   * @param id Object ID
    * @return Neighbor DBIDs
    */
-  public ArrayDBIDs getNearestNeighborSet(DBID objid);
+  public ArrayDBIDs getNearestNeighborSet(DBIDRef id);
 
   /**
    * Get the number of neighbors

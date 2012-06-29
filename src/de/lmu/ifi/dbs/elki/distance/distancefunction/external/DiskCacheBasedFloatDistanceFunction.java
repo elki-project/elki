@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.File;
 import java.io.IOException;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
@@ -94,7 +94,7 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(DBID id1, DBID id2) {
+  public FloatDistance distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
@@ -35,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
  * 
  * @param <D> Distance type
  */
-public interface DistanceResultPair<D extends Distance<?>> extends PairInterface<D, DBID>, Comparable<DistanceResultPair<D>> {
+public interface DistanceResultPair<D extends Distance<?>> extends PairInterface<D, DBID>, Comparable<DistanceResultPair<D>>, DBIDRef {
   /**
    * Getter for first
    * 
@@ -49,13 +50,6 @@ public interface DistanceResultPair<D extends Distance<?>> extends PairInterface
    * @param first new value for first element
    */
   public void setDistance(D first);
-
-  /**
-   * Getter for second element in pair
-   * 
-   * @return second element in pair
-   */
-  public DBID getDBID();
 
   /**
    * Setter for second

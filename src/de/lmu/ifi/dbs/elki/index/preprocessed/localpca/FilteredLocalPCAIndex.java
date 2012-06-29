@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -44,7 +44,7 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector<?, ?>> extends Lo
    * @return Matrix
    */
   @Override
-  public PCAFilteredResult getLocalProjection(DBID objid);
+  public PCAFilteredResult getLocalProjection(DBIDRef objid);
 
   /**
    * Factory interface
