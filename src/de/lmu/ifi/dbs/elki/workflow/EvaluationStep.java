@@ -69,7 +69,7 @@ public class EvaluationStep implements WorkflowStep {
   public void runEvaluators(HierarchicalResult r, Database db) {
     // Run evaluation helpers
     if(evaluators != null) {
-      new Evaluation(db, evaluators).update(r);
+      new Evaluation(r, evaluators).update(r);
     }
     this.result = r;
   }
@@ -85,7 +85,7 @@ public class EvaluationStep implements WorkflowStep {
     /**
      * Database
      */
-    private Database database;
+    private HierarchicalResult baseResult;
 
     /**
      * Evaluators to run.
@@ -95,14 +95,14 @@ public class EvaluationStep implements WorkflowStep {
     /**
      * Constructor.
      * 
-     * @param database Database
+     * @param baseResult base result
      * @param evaluators Evaluators
      */
-    public Evaluation(Database database, List<Evaluator> evaluators) {
-      this.database = database;
+    public Evaluation(HierarchicalResult baseResult, List<Evaluator> evaluators) {
+      this.baseResult = baseResult;
       this.evaluators = evaluators;
 
-      database.getHierarchy().addResultListener(this);
+      baseResult.getHierarchy().addResultListener(this);
     }
 
     /**
@@ -115,7 +115,7 @@ public class EvaluationStep implements WorkflowStep {
         /*
          * if(normalizationUndo) { evaluator.setNormalization(normalization); }
          */
-        evaluator.processNewResult(database, r);
+        evaluator.processNewResult(baseResult, r);
       }
     }
 
