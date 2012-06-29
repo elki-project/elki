@@ -89,12 +89,12 @@ public interface DBIDFactory {
   /**
    * Make a DBID pair from two existing DBIDs.
    * 
-   * @param first first DBID
-   * @param second second DBID
+   * @param id1 first DBID
+   * @param id2 second DBID
    * 
    * @return new pair.
    */
-  public DBIDPair makePair(DBID first, DBID second);
+  public DBIDPair makePair(DBIDRef id1, DBIDRef id2);
   
   /**
    * Make a new (modifiable) array of DBIDs.

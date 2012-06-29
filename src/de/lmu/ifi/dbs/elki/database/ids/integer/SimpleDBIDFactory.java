@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -132,7 +133,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public DBIDPair makePair(DBID first, DBID second) {
+  public DBIDPair makePair(DBIDRef first, DBIDRef second) {
     return new IntegerDBIDPair(first.getIntegerID(), second.getIntegerID());
   }
 
