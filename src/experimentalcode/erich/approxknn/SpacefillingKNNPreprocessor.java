@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -264,7 +265,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
     }
 
     @Override
-    public KNNResult<D> getKNNForDBID(DBID id, int k) {
+    public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
       final int wsize = (int) (window * k);
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * curves.size());
