@@ -303,7 +303,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     @Override
     protected void makeOptions(Parameterization config) {
       // Neighborhood predicate
-      ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<NeighborPredicate>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborhood.class);
+      ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<NeighborPredicate>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
       if(config.grab(npredOpt)) {
         npred = npredOpt.instantiateClass(config);
       }

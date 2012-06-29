@@ -1,5 +1,6 @@
 de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.EM
+de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd

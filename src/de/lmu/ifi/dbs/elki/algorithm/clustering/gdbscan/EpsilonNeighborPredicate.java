@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> Distance type
  */
 @Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
-public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPredicate {
+public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements NeighborPredicate {
   /**
    * Range to query with
    */
@@ -83,7 +83,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
-  public EpsilonNeighborhood(D epsilon, DistanceFunction<O, D> distFunc) {
+  public EpsilonNeighborPredicate(D epsilon, DistanceFunction<O, D> distFunc) {
     super();
     this.epsilon = epsilon;
     this.distFunc = distFunc;
@@ -261,8 +261,8 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
     }
 
     @Override
-    protected EpsilonNeighborhood<O, D> makeInstance() {
-      return new EpsilonNeighborhood<O, D>(epsilon, distfun);
+    protected EpsilonNeighborPredicate<O, D> makeInstance() {
+      return new EpsilonNeighborPredicate<O, D>(epsilon, distfun);
     }
   }
 }
