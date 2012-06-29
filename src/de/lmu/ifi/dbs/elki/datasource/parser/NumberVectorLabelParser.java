@@ -227,6 +227,10 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
               nextevent = Event.NEXT_OBJECT;
               return Event.META_CHANGED;
             }
+          } else if (curlbl != null && meta != null && meta.size() == 1) {
+            buildMeta();
+            nextevent = Event.NEXT_OBJECT;
+            return Event.META_CHANGED;
           }
           return Event.NEXT_OBJECT;
         }
@@ -244,9 +248,15 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * Update the meta element.
    */
   protected void buildMeta() {
-    meta = new BundleMeta(2);
-    meta.add(getTypeInformation(dimensionality));
-    meta.add(TypeUtil.LABELLIST);
+    if(labelcolumns.cardinality() > 0) {
+      meta = new BundleMeta(2);
+      meta.add(getTypeInformation(dimensionality));
+      meta.add(TypeUtil.LABELLIST);
+    }
+    else {
+      meta = new BundleMeta(1);
+      meta.add(getTypeInformation(dimensionality));
+    }
   }
 
   @Override
