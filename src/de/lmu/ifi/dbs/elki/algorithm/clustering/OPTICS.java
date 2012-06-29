@@ -195,7 +195,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         D coreDistance = last.getDistance();
 
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(processedIDs.contains(neighbor.getDBID())) {
+          if(processedIDs.contains(neighbor)) {
             continue;
           }
           D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
@@ -235,7 +235,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
           double coreDistance = ((DoubleDistanceResultPair) last).getDoubleDistance();
 
           for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
-            if(processedIDs.contains(neighbor.getDBID())) {
+            if(processedIDs.contains(neighbor)) {
               continue;
             }
             double reachability = Math.max(((DoubleDistanceResultPair) neighbor).getDoubleDistance(), coreDistance);
@@ -248,7 +248,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
           double coreDistance = last.getDistance().doubleValue();
 
           for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
-            if(processedIDs.contains(neighbor.getDBID())) {
+            if(processedIDs.contains(neighbor)) {
               continue;
             }
             double reachability = Math.max(neighbor.getDistance().doubleValue(), coreDistance);

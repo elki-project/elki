@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -266,8 +265,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
     }
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      BitVector bv = database.get(id);
+      BitVector bv = database.get(iditer);
       for(BitSet bitSet : candidates) {
         if(bv.contains(bitSet)) {
           support.put(bitSet, support.get(bitSet) + 1);

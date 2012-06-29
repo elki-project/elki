@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -82,11 +81,10 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
     KNNQuery<O, DoubleDistance> knnQuery = database.getKNNQuery(distQuery, 10);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       // Get the actual object from the database (but discard the result)
-      relation.get(id);
+      relation.get(iditer);
       // run a 10NN query for each point (but discard the result)
-      knnQuery.getKNNForDBID(id, 10);
+      knnQuery.getKNNForDBID(iditer, 10);
     }
     return null;
   }

@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -177,9 +176,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
           }
           ModifiableDBIDs subset = DBIDUtil.newArray(current.size());
           for(DBIDIter iter = current.iter(); iter.valid(); iter.advance()) {
-            DBID id = iter.getDBID();
-            if(deviation(relation.get(id).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
-              subset.add(id);
+            if(deviation(relation.get(iter).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
+              subset.add(iter);
             }
           }
           // logger.verbose("size:"+subset.size());
@@ -295,12 +293,11 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       FlexiHistogram<Double, Double> histogram = FlexiHistogram.DoubleSumHistogram(BINS);
       double w = 1.0 / currentids.size();
       for(DBIDIter iter2 = currentids.iter(); iter2.valid(); iter2.advance()) {
-        DBID point = iter2.getDBID();
         // Skip sampled points
-        if(sample.contains(point)) {
+        if(sample.contains(iter2)) {
           continue;
         }
-        Vector vec = relation.get(point).getColumnVector().minusEquals(originV);
+        Vector vec = relation.get(iter2).getColumnVector().minusEquals(originV);
         final double distance = deviation(vec, basis);
         histogram.aggregate(distance, w);
       }

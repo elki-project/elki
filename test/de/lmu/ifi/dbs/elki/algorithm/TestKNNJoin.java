@@ -103,8 +103,7 @@ public class TestKNNJoin implements JUnit4Test {
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        KNNResult<DoubleDistance> knnlist = knnq.getKNNForDBID(id, 2);
+        KNNResult<DoubleDistance> knnlist = knnq.getKNNForDBID(iditer, 2);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
@@ -117,8 +116,7 @@ public class TestKNNJoin implements JUnit4Test {
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        KNNResult<DoubleDistance> knnlist = knnq.getKNNForDBID(id, 2);
+        KNNResult<DoubleDistance> knnlist = knnq.getKNNForDBID(iditer, 2);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);

@@ -31,7 +31,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -117,9 +116,8 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
     final Random random = new Random();
     List<D> knnDistances = new ArrayList<D>(relation.size());
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       if(random.nextDouble() < percentage) {
-        final KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k);
+        final KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
         knnDistances.add(neighbors.getKNNDistance());
       }
     }

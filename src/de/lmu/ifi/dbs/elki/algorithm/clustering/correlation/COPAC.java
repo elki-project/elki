@@ -191,14 +191,13 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
     int processed = 1;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      Integer corrdim = preprocin.getLocalProjection(id).getCorrelationDimension();
+      int corrdim = preprocin.getLocalProjection(iditer).getCorrelationDimension();
 
       if(!partitionMap.containsKey(corrdim)) {
         partitionMap.put(corrdim, DBIDUtil.newArray());
       }
 
-      partitionMap.get(corrdim).add(id);
+      partitionMap.get(corrdim).add(iditer);
       if(partitionProgress != null) {
         partitionProgress.setProcessed(processed++, logger);
       }

@@ -104,18 +104,16 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
       DBID bestid = null;
       WritableDoubleDataStore bestd = null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
         WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         mean.reset();
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          DBID other = iter2.getDBID();
-          double d = distQ.distance(id, other).doubleValue();
+          double d = distQ.distance(iter, iter2).doubleValue();
           mean.put(d);
-          newd.putDouble(other, d);
+          newd.putDouble(iter2, d);
         }
         if(mean.getMean() < best) {
           best = mean.getMean();
-          bestid = id;
+          bestid = iter.getDBID();
           if(bestd != null) {
             bestd.destroy();
           }

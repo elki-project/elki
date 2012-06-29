@@ -479,11 +479,11 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), logger) : null;
 
     for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
-      DBID cur = it.getDBID();
-      DBID dest = pi.get(cur);
-      D l = lambda.get(cur);
+      DBID dest = pi.get(it);
+      D l = lambda.get(it);
       // logger.debugFine("DBID " + cur.toString() + " dist: " + l.toString());
       if(stopdist != null && stopdist.compareTo(l) > 0) {
+        DBID cur = it.getDBID();
         ModifiableDBIDs curset = cids.remove(cur);
         ModifiableDBIDs destset = cids.get(dest);
         if(destset == null) {
@@ -519,11 +519,10 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             // Collect child clusters and clean up the cluster ids, keeping only
             // "new" objects.
             for(DBIDMIter iter = clusids.iter(); iter.valid(); iter.advance()) {
-              DBID child = iter.getDBID();
-              Cluster<Model> chiclus = clusters.get(child);
+              Cluster<Model> chiclus = clusters.get(iter);
               if(chiclus != null) {
                 hier.add(cluster, chiclus);
-                clusters.remove(child);
+                clusters.remove(iter);
                 iter.remove();
               }
             }
@@ -551,7 +550,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             cids.put(dest, destset);
             destset.add(dest);
           }
-          destset.add(cur);
+          destset.add(it);
         }
       }
       // Decrement counter

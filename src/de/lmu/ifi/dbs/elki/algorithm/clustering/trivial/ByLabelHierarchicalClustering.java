@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -102,16 +101,15 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final Object val = relation.get(id);
+      final Object val = relation.get(iditer);
       String label = (val != null) ? val.toString() : null;
 
       if(labelmap.containsKey(label)) {
-        labelmap.get(label).add(id);
+        labelmap.get(label).add(iditer);
       }
       else {
         ModifiableDBIDs n = DBIDUtil.newHashSet();
-        n.add(id);
+        n.add(iditer);
         labelmap.put(label, n);
       }
     }

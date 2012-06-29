@@ -155,17 +155,15 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
           if(med.sameDBID(iter)) {
             continue;
           }
-          DBID cand = iter.getDBID();
           // double disti = distQ.distance(id, med).doubleValue();
           double cost = 0;
           for(int j = 0; j < k; j++) {
             for(DBIDIter iter2 = clusters.get(j).iter(); iter2.valid(); iter2.advance()) {
-              DBID other = iter2.getDBID();
-              double distcur = distQ.distance(other, medoids.get(j)).doubleValue();
-              double distnew = distQ.distance(other, cand).doubleValue();
+              double distcur = distQ.distance(iter2, medoids.get(j)).doubleValue();
+              double distnew = distQ.distance(iter2, iter).doubleValue();
               if(j == i) {
                 // Cases 1 and 2.
-                double distsec = second.doubleValue(other);
+                double distsec = second.doubleValue(iter2);
                 if(distcur > distsec) {
                   // Case 1, other would switch to a third medoid
                   cost += distsec - distcur; // Always positive!
@@ -187,7 +185,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
           }
           if (cost < best) {
             best = cost;
-            bestid = cand;
+            bestid = iter.getDBID();
             bestcluster = i;
           }
         }
@@ -230,12 +228,11 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     boolean changed = false;
 
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
       double mindist2 = Double.POSITIVE_INFINITY;
       for(int i = 0; i < k; i++) {
-        double dist = distQ.distance(id, means.get(i)).doubleValue();
+        double dist = distQ.distance(iditer, means.get(i)).doubleValue();
         if(dist < mindist) {
           minIndex = i;
           mindist2 = mindist;
@@ -245,19 +242,19 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
           mindist2 = dist;
         }
       }
-      if(clusters.get(minIndex).add(id)) {
+      if(clusters.get(minIndex).add(iditer)) {
         changed = true;
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for(int i = 0; i < k; i++) {
           if(i != minIndex) {
-            if(clusters.get(i).remove(id)) {
+            if(clusters.get(i).remove(iditer)) {
               break;
             }
           }
         }
       }
-      second.put(id, mindist2);
+      second.put(iditer, mindist2);
     }
     return changed;
   }

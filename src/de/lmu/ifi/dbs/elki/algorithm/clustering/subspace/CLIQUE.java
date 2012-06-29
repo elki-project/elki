@@ -299,7 +299,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     }
     // update minima and maxima
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-      V featureVector = database.get(it.getDBID());
+      V featureVector = database.get(it);
       updateMinMax(featureVector, minima, maxima);
     }
     for(int i = 0; i < maxima.length; i++) {
@@ -393,12 +393,13 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     // identify dense units
     double total = database.size();
     for(DBIDIter it = database.iterDBIDs(); it.valid();) {
+      V featureVector = database.get(it);
       final DBID id = it.getDBID();
       it.advance();
-      V featureVector = database.get(id);
       for(CLIQUEUnit<V> unit : units) {
         unit.addFeatureVector(id, featureVector);
         // unit is a dense unit
+        // FIXME: why it.valid()?
         if(!it.valid() && unit.selectivity(total) >= tau) {
           denseUnits.add(unit);
           // add the dense unit to its subspace

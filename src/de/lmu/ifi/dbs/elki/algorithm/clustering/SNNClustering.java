@@ -155,10 +155,9 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(relation.size());
     if(relation.size() >= minpts) {
-      for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
+      for(DBIDIter id = snnInstance.getRelation().iterDBIDs(); id.valid(); id.advance()) {
         if(!processedIDs.contains(id)) {
-          expandCluster(snnInstance, id, objprog, clusprog);
+          expandCluster(snnInstance, id.getDBID(), objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }
@@ -170,8 +169,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       }
     }
     else {
-      for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
+      for(DBIDIter id = snnInstance.getRelation().iterDBIDs(); id.valid(); id.advance()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(noise.size(), logger);
@@ -206,9 +204,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   protected ArrayModifiableDBIDs findSNNNeighbors(SimilarityQuery<O, IntegerDistance> snnInstance, DBID queryObject) {
     ArrayModifiableDBIDs neighbors = DBIDUtil.newArray();
     for(DBIDIter iditer = snnInstance.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      if(snnInstance.similarity(queryObject, id).compareTo(epsilon) >= 0) {
-        neighbors.add(id);
+      if(snnInstance.similarity(queryObject, iditer).compareTo(epsilon) >= 0) {
+        neighbors.add(iditer);
       }
     }
     return neighbors;
@@ -241,8 +238,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    for(DBIDIter iter = seeds.iter(); iter.valid(); iter.advance()) {
-      DBID seed = iter.getDBID();
+    for(DBIDIter seed = seeds.iter(); seed.valid(); seed.advance()) {
       if(!processedIDs.contains(seed)) {
         currentCluster.add(seed);
         processedIDs.add(seed);

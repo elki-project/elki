@@ -79,15 +79,13 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
     Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id1  = iditer.getDBID();
       for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
-        DBID id2  = iditer2.getDBID();
         // skip inverted pairs
-        if(id2.compareTo(id1) > 0) {
+        if(iditer2.compareDBID(iditer) > 0) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).doubleValue();
-        r.add(new CTriple<DBID, DBID, Double>(id1, id2, d));
+        double d = distFunc.distance(iditer, iditer2).doubleValue();
+        r.add(new CTriple<DBID, DBID, Double>(iditer.getDBID(), iditer2.getDBID(), d));
       }
     }
     return new CollectionResult<CTriple<DBID, DBID, Double>>("Distance Matrix", "distance-matrix", r);

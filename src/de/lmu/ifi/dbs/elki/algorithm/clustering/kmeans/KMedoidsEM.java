@@ -145,17 +145,15 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
         DBID best = null;
         Mean bestm = mdists[i];
         for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
-          DBID id = iter.getDBID();
-          if(med.sameDBID(id)) {
+          if(med.sameDBID(iter)) {
             continue;
           }
           Mean mdist = new Mean();
           for(DBIDIter iter2 = clusters.get(i).iter(); iter2.valid(); iter2.advance()) {
-            DBID other = iter2.getDBID();
-            mdist.put(distQ.distance(id, other).doubleValue());
+            mdist.put(distQ.distance(iter, iter2).doubleValue());
           }
           if(mdist.getMean() < bestm.getMean()) {
-            best = id;
+            best = iter.getDBID();
             bestm = mdist;
           }
         }
@@ -195,24 +193,23 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
 
     double[] dists = new double[k];
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
       for(int i = 0; i < k; i++) {
-        dists[i] = distQ.distance(id, means.get(i)).doubleValue();
+        dists[i] = distQ.distance(iditer, means.get(i)).doubleValue();
         if(dists[i] < mindist) {
           minIndex = i;
           mindist = dists[i];
         }
       }
-      if(clusters.get(minIndex).add(id)) {
+      if(clusters.get(minIndex).add(iditer)) {
         changed = true;
         mdist[minIndex].put(mindist);
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for(int i = 0; i < k; i++) {
           if(i != minIndex) {
-            if(clusters.get(i).remove(id)) {
+            if(clusters.get(i).remove(iditer)) {
               mdist[minIndex].put(dists[i], -1);
               break;
             }

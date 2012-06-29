@@ -216,8 +216,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     V factory = DatabaseUtil.assumeVectorField(database).getFactory();
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
     for(DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      seeds.add(new ORCLUSCluster(database.get(id), id, factory));
+      seeds.add(new ORCLUSCluster(database.get(iter), iter.getDBID(), factory));
     }
     return seeds;
   }
@@ -246,8 +245,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
     // for each data point o do
     for (DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-      V o = database.get(id);
+      V o = database.get(it);
 
       DoubleDistance minDist = null;
       ORCLUSCluster minCluster = null;
@@ -264,7 +262,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       }
       // add p to the cluster with the least value of projected distance
       assert minCluster != null;
-      minCluster.objectIDs.add(id);
+      minCluster.objectIDs.add(it);
     }
 
     // recompute the seed in each clusters
@@ -290,9 +288,8 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     // Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
     List<DistanceResultPair<DoubleDistance>> results = new ArrayList<DistanceResultPair<DoubleDistance>>(cluster.objectIDs.size());
     for(DBIDIter it = cluster.objectIDs.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-      DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(id));
-      DistanceResultPair<DoubleDistance> qr = new GenericDistanceResultPair<DoubleDistance>(distance, id);
+      DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(it));
+      DistanceResultPair<DoubleDistance> qr = new GenericDistanceResultPair<DoubleDistance>(distance, it.getDBID());
       results.add(qr);
     }
     Collections.sort(results);
