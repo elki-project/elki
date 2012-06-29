@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -227,8 +228,8 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     // Unselect first ...
     context.setSelection(new DBIDSelection(remain));
     // Now delete them.
-    for(DBID id : todel) {
-      upd.delete(id);
+    for(DBIDIter iter = todel.iter(); iter.valid(); iter.advance()) {
+      upd.delete(iter.getDBID());
     }
   }
 

@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-import java.util.Iterator;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +22,8 @@ import java.util.Iterator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Iterator;
 
 /**
  * Interface for a collection of database references (IDs).
@@ -72,7 +72,7 @@ public interface DBIDs extends Iterable<DBID> {
    * @return true when empty.
    */
   public boolean isEmpty();
-  
+
   /**
    * Classic iterator.
    * 
