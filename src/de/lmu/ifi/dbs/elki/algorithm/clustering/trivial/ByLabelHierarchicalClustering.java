@@ -40,7 +40,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -98,8 +101,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
    * @param relation The data input to use
    */
   public Clustering<Model> run(Relation<?> relation) {
-    HashMap<String, DBID> singlemap = new HashMap<String, DBID>();
-    HashMap<String, ModifiableDBIDs> labelmap = new HashMap<String, ModifiableDBIDs>();
+    HashMap<String, DBIDs> labelmap = new HashMap<String, DBIDs>();
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -110,29 +112,16 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
       }
       String label = val.toString();
 
-      if(labelmap.containsKey(label)) {
-        labelmap.get(label).add(iditer);
-      }
-      else {
-        DBID prev = singlemap.remove(label);
-        if(prev != null) {
-          ModifiableDBIDs n = DBIDUtil.newHashSet();
-          n.add(prev);
-          n.add(iditer);
-          labelmap.put(label, n);
-        }
-        else {
-          singlemap.put(label, iditer.getDBID());
-        }
-      }
+      assign(labelmap, label, iditer);
     }
 
-    for(DBID id : singlemap.values()) {
-      noiseids.add(id);
-    }
     ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
-    for(Entry<String, ModifiableDBIDs> entry : labelmap.entrySet()) {
-      ModifiableDBIDs ids = entry.getValue();
+    for(Entry<String, DBIDs> entry : labelmap.entrySet()) {
+      DBIDs ids = entry.getValue();
+      if(ids instanceof DBID) {
+        noiseids.add((DBID) ids);
+        continue;
+      }
       Cluster<Model> clus = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
       clusters.add(clus);
     }
@@ -164,6 +153,35 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     assert (rootclusters.size() > 0) : "No clusters found by bylabel clustering. Empty database?";
 
     return new Clustering<Model>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
+  }
+
+  /**
+   * Assigns the specified id to the labelMap according to its label
+   * 
+   * @param labelMap the mapping of label to ids
+   * @param label the label of the object to be assigned
+   * @param id the id of the object to be assigned
+   */
+  private void assign(HashMap<String, DBIDs> labelMap, String label, DBIDRef id) {
+    if(labelMap.containsKey(label)) {
+      DBIDs exist = labelMap.get(label);
+      if(exist instanceof DBID) {
+        ModifiableDBIDs n = DBIDUtil.newHashSet();
+        n.add((DBID) exist);
+        n.add(id);
+        labelMap.put(label, n);
+      }
+      else {
+        assert (exist instanceof HashSetModifiableDBIDs);
+        assert (exist.size() > 1);
+        ((ModifiableDBIDs) exist).add(id);
+      }
+    }
+    else {
+      ModifiableDBIDs n = DBIDUtil.newHashSet();
+      n.add(id);
+      labelMap.put(label, n);
+    }
   }
 
   @Override

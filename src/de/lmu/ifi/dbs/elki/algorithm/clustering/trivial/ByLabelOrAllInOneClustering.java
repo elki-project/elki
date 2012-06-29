@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * 
  * @author Erich Schubert
  */
-public class ByLabelOrAllInOneClustering extends ByLabelHierarchicalClustering {
+public class ByLabelOrAllInOneClustering extends ByLabelClustering {
   /**
    * Constructor.
    */
