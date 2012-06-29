@@ -227,12 +227,11 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
 
       // weights and means
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double[] clusterProbabilities = probClusterIGivenX.get(id);
+        double[] clusterProbabilities = probClusterIGivenX.get(iditer);
 
         for(int i = 0; i < k; i++) {
           sumOfClusterProbabilities[i] += clusterProbabilities[i];
-          Vector summand = relation.get(id).getColumnVector().timesEquals(clusterProbabilities[i]);
+          Vector summand = relation.get(iditer).getColumnVector().timesEquals(clusterProbabilities[i]);
           meanSums.get(i).plusEquals(summand);
         }
       }
@@ -244,9 +243,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
       // covariance matrices
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double[] clusterProbabilities = probClusterIGivenX.get(id);
-        Vector instance = relation.get(id).getColumnVector();
+        double[] clusterProbabilities = probClusterIGivenX.get(iditer);
+        Vector instance = relation.get(iditer).getColumnVector();
         for(int i = 0; i < k; i++) {
           Vector difference = instance.minus(means.get(i));
           covarianceMatrices.get(i).plusEquals(difference.timesTranspose(difference).timesEquals(clusterProbabilities[i]));
@@ -276,8 +274,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
 
     // provide a hard clustering
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double[] clusterProbabilities = probClusterIGivenX.get(id);
+      double[] clusterProbabilities = probClusterIGivenX.get(iditer);
       int maxIndex = 0;
       double currentMax = 0.0;
       for(int i = 0; i < k; i++) {
@@ -286,7 +283,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
           currentMax = clusterProbabilities[i];
         }
       }
-      hardClusters.get(maxIndex).add(id);
+      hardClusters.get(maxIndex).add(iditer);
     }
     final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
     Clustering<EMModel<V>> result = new Clustering<EMModel<V>>("EM Clustering", "em-clustering");
@@ -320,8 +317,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     double emSum = 0.0;
 
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      Vector x = database.get(id).getColumnVector();
+      Vector x = database.get(iditer).getColumnVector();
       double[] probabilities = new double[k];
       for(int i = 0; i < k; i++) {
         Vector difference = x.minus(means.get(i));
@@ -354,7 +350,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
           clusterProbabilities[i] = probabilities[i] / priorProbability * clusterWeights[i];
         }
       }
-      probClusterIGivenX.put(id, clusterProbabilities);
+      probClusterIGivenX.put(iditer, clusterProbabilities);
     }
 
     return emSum;

@@ -211,35 +211,33 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     for(DistanceResultPair<D> seed : seeds) {
-      DBID nextID = seed.getDBID();
-      if(!processedIDs.contains(nextID)) {
-        currentCluster.add(nextID);
-        processedIDs.add(nextID);
+      if(!processedIDs.contains(seed)) {
+        currentCluster.add(seed);
+        processedIDs.add(seed);
       }
-      else if(noise.contains(nextID)) {
-        currentCluster.add(nextID);
-        noise.remove(nextID);
+      else if(noise.contains(seed)) {
+        currentCluster.add(seed);
+        noise.remove(seed);
       }
     }
     seeds.remove(0);
 
     while(seeds.size() > 0) {
-      DBID o = seeds.remove(0).getDBID();
+      DistanceResultPair<D> o = seeds.remove(0);
       List<DistanceResultPair<D>> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
 
       if(neighborhood.size() >= minpts) {
         for(DistanceResultPair<D> neighbor : neighborhood) {
-          DBID p = neighbor.getDBID();
-          boolean inNoise = noise.contains(p);
-          boolean unclassified = !processedIDs.contains(p);
+          boolean inNoise = noise.contains(neighbor);
+          boolean unclassified = !processedIDs.contains(neighbor);
           if(inNoise || unclassified) {
             if(unclassified) {
               seeds.add(neighbor);
             }
-            currentCluster.add(p);
-            processedIDs.add(p);
+            currentCluster.add(neighbor);
+            processedIDs.add(neighbor);
             if(inNoise) {
-              noise.remove(p);
+              noise.remove(neighbor);
             }
           }
         }

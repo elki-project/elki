@@ -180,7 +180,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
         weights[i] = 0.0;
       }
       else {
-        double d = distQ.distance(latest, it.getDBID()).doubleValue();
+        double d = distQ.distance(latest, it).doubleValue();
         weights[i] = d * d;
       }
       weightsum += weights[i];
@@ -202,7 +202,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     DBIDIter it = ids.iter();
     for(int i = 0; i < weights.length; i++, it.advance()) {
       if(weights[i] > 0.0) {
-        double d = distQ.distance(latest, it.getDBID()).doubleValue();
+        double d = distQ.distance(latest, it).doubleValue();
         weights[i] = Math.min(weights[i], d * d);
         weightsum += weights[i];
       }

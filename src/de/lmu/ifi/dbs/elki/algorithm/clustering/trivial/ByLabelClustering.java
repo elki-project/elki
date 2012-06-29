@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -175,10 +175,9 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final Object val = data.get(id);
+      final Object val = data.get(iditer);
       String label = (val != null) ? val.toString() : null;
-      assign(labelMap, label, id);
+      assign(labelMap, label, iditer);
     }
     return labelMap;
   }
@@ -194,10 +193,9 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     HashMap<String, ModifiableDBIDs> labelMap = new HashMap<String, ModifiableDBIDs>();
 
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      String[] labels = data.get(id).toString().split(" ");
+      String[] labels = data.get(iditer).toString().split(" ");
       for(String label : labels) {
-        assign(labelMap, label, id);
+        assign(labelMap, label, iditer);
       }
     }
     return labelMap;
@@ -210,7 +208,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @param label the label of the object to be assigned
    * @param id the id of the object to be assigned
    */
-  private void assign(HashMap<String, ModifiableDBIDs> labelMap, String label, DBID id) {
+  private void assign(HashMap<String, ModifiableDBIDs> labelMap, String label, DBIDRef id) {
     if(labelMap.containsKey(label)) {
       labelMap.get(label).add(id);
     }

@@ -186,9 +186,8 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
 
     if(relation.size() >= minpts) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        if(!processedIDs.contains(id)) {
-          expandCluster(distFunc, rangeQuery, id, objprog, clusprog);
+        if(!processedIDs.contains(iditer)) {
+          expandCluster(distFunc, rangeQuery, iditer.getDBID(), objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }
@@ -201,8 +200,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     }
     else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        noise.add(id);
+        noise.add(iditer);
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), getLogger());
           clusprog.setProcessed(resultList.size(), getLogger());
@@ -294,28 +292,26 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
     for(DistanceResultPair<DoubleDistance> seed : seeds) {
-      DBID nextID = seed.getDBID();
-
-      Integer nextID_corrDim = distFunc.getIndex().getLocalProjection(nextID).getCorrelationDimension();
+      int nextID_corrDim = distFunc.getIndex().getLocalProjection(seed).getCorrelationDimension();
       // nextID is not reachable from start object
       if(nextID_corrDim > lambda) {
         continue;
       }
 
-      if(!processedIDs.contains(nextID)) {
-        currentCluster.add(nextID);
-        processedIDs.add(nextID);
+      if(!processedIDs.contains(seed)) {
+        currentCluster.add(seed);
+        processedIDs.add(seed);
       }
-      else if(noise.contains(nextID)) {
-        currentCluster.add(nextID);
-        noise.remove(nextID);
+      else if(noise.contains(seed)) {
+        currentCluster.add(seed);
+        noise.remove(seed);
       }
     }
     seeds.remove(0);
 
     while(seeds.size() > 0) {
-      DBID q = seeds.remove(0).getDBID();
-      Integer corrDim_q = distFunc.getIndex().getLocalProjection(q).getCorrelationDimension();
+      DistanceResultPair<DoubleDistance> q = seeds.remove(0);
+      int corrDim_q = distFunc.getIndex().getLocalProjection(q).getCorrelationDimension();
       // q forms no lambda-dim hyperplane
       if(corrDim_q > lambda) {
         continue;
@@ -324,22 +320,22 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
       List<DistanceResultPair<DoubleDistance>> reachables = rangeQuery.getRangeForDBID(q, epsilon);
       if(reachables.size() > minpts) {
         for(DistanceResultPair<DoubleDistance> r : reachables) {
-          Integer corrDim_r = distFunc.getIndex().getLocalProjection(r.getDBID()).getCorrelationDimension();
+          int corrDim_r = distFunc.getIndex().getLocalProjection(r).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {
             continue;
           }
 
-          boolean inNoise = noise.contains(r.getDBID());
-          boolean unclassified = !processedIDs.contains(r.getDBID());
+          boolean inNoise = noise.contains(r);
+          boolean unclassified = !processedIDs.contains(r);
           if(inNoise || unclassified) {
             if(unclassified) {
               seeds.add(r);
             }
-            currentCluster.add(r.getDBID());
-            processedIDs.add(r.getDBID());
+            currentCluster.add(r);
+            processedIDs.add(r);
             if(inNoise) {
-              noise.remove(r.getDBID());
+              noise.remove(r);
             }
             if(objprog != null && clusprog != null) {
               objprog.setProcessed(processedIDs.size(), getLogger());

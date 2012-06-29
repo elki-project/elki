@@ -115,7 +115,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
     List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(ids.size());
     if(k < preprocessor.getK()) {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
-        KNNResult<D> dr = preprocessor.get(iter.getDBID());
+        KNNResult<D> dr = preprocessor.get(iter);
         int subk = k;
         D kdist = dr.get(subk - 1).getDistance();
         while(subk < dr.size()) {
@@ -138,7 +138,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
     }
     else {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
-        result.add(preprocessor.get(iter.getDBID()));
+        result.add(preprocessor.get(iter));
       }
     }
     return result;
