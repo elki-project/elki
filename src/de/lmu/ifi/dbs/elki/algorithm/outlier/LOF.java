@@ -335,7 +335,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = iter.getDBID();
-      double lrdp = lrds.get(id);
+      double lrdp = lrds.get(iter);
       final double lof;
       if(lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(id, k);

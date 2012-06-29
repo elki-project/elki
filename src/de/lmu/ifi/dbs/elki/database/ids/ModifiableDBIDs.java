@@ -54,14 +54,14 @@ public interface ModifiableDBIDs extends DBIDs {
    * 
    * @param id ID to add
    */
-  boolean add(DBID id);
+  boolean add(DBIDRef id);
 
   /**
    * Remove a single DBID from the collection.
    * 
    * @param id ID to remove
    */
-  boolean remove(DBID id);
+  boolean remove(DBIDRef id);
 
   /**
    * Clear this collection.

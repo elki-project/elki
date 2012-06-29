@@ -55,7 +55,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
     DBIDIter iter = relation.iterDBIDs();
     List<V> means = new ArrayList<V>(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
-      means.add(relation.get(iter.getDBID()));
+      means.add(relation.get(iter));
     }
     return means;
   }
@@ -65,7 +65,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
     DBIDIter iter = distanceFunction.getRelation().iterDBIDs();
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
-      means.add(iter.getDBID());
+      means.add(iter);
     }
     return means;
   }

@@ -29,6 +29,7 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -81,7 +82,7 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   public boolean addDBIDs(DBIDs ids) {
     super.ensureCapacity(size() + ids.size());
     boolean changed = false;
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       changed |= add(id);
     }
     return changed;
@@ -90,15 +91,20 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean changed = false;
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       changed |= super.remove(id);
     }
     return changed;
   }
 
   @Override
-  public boolean remove(DBID id) {
-    return super.remove(id);
+  public boolean add(DBIDRef id) {
+    return add(id.getDBID());
+  }
+
+  @Override
+  public boolean remove(DBIDRef id) {
+    return super.remove(id.getDBID());
   }
 
   @Override

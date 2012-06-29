@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  */
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -73,7 +73,7 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
    */
   public GenericHashSetModifiableDBIDs(DBIDs c) {
     super(c.size());
-    for(DBID id : c) {
+    for(DBIDIter id = c.iter(); id.valid(); id.advance()) {
       add(id);
     }
   }
@@ -81,7 +81,7 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   @Override
   public boolean addDBIDs(DBIDs ids) {
     boolean changed = false;
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       changed |= add(id);
     }
     return changed;
@@ -90,23 +90,27 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean changed = false;
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       changed |= super.remove(id);
     }
     return changed;
   }
 
   @Override
-  public boolean remove(DBID id) {
-    return super.remove(id);
+  public boolean add(DBIDRef id) {
+    return super.add(id.getDBID());
+  }
+
+  @Override
+  public boolean remove(DBIDRef id) {
+    return super.remove(id.getDBID());
   }
 
   @Override
   public boolean retainAll(DBIDs ids) {
     boolean modified = false;
-    Iterator<DBID> it = iterator();
-    while(it.hasNext()) {
-      if(!ids.contains(it.next())) {
+    for(DBIDMIter it = iter(); it.valid(); it.advance()) {
+      if(!ids.contains(it)) {
         it.remove();
         modified = true;
       }

@@ -144,23 +144,21 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       // Optimized codepath for double-based distances. Avoids Java
       // boxing/unboxing.
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        if(!processedIDs.contains(id)) {
+        if(!processedIDs.contains(iditer)) {
           // We need to do some ugly casts to be able to run the optimized version, unfortunately.
           @SuppressWarnings("unchecked")
           final ClusterOrderResult<DoubleDistance> doubleClusterOrder = ClusterOrderResult.class.cast(clusterOrder);
           @SuppressWarnings("unchecked")
           final RangeQuery<O, DoubleDistance> doubleRangeQuery = RangeQuery.class.cast(rangeQuery);
           final DoubleDistance depsilon = DoubleDistance.class.cast(epsilon);
-          expandClusterOrderDouble(doubleClusterOrder, database, doubleRangeQuery, id, depsilon, progress);
+          expandClusterOrderDouble(doubleClusterOrder, database, doubleRangeQuery, iditer.getDBID(), depsilon, progress);
         }
       }
     }
     else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        if(!processedIDs.contains(id)) {
-          expandClusterOrder(clusterOrder, database, rangeQuery, id, epsilon, progress);
+        if(!processedIDs.contains(iditer)) {
+          expandClusterOrder(clusterOrder, database, rangeQuery, iditer.getDBID(), epsilon, progress);
         }
       }
     }

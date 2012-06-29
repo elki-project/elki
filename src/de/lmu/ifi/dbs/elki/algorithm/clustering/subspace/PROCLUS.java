@@ -194,6 +194,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
     IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
 
+    // TODO: Use DataStore and Trove for performance
     Map<DBID, PROCLUSCluster> clusters = null;
     int loops = 0;
     while(loops < 10) {
@@ -485,7 +486,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       PROCLUSCluster c_i = clusters.get(i);
       double[] x_i = new double[dim];
       for(DBIDIter iter = c_i.objectIDs.iter(); iter.valid(); iter.advance()) {
-        V o = database.get(iter.getDBID());
+        V o = database.get(iter);
         for(int d = 0; d < dim; d++) {
           x_i[d] += Math.abs(c_i.centroid.doubleValue(d + 1) - o.doubleValue(d + 1));
         }
@@ -714,7 +715,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   private double avgDistance(V centroid, DBIDs objectIDs, Relation<V> database, int dimension) {
     double avg = 0;
     for(DBIDIter iter = objectIDs.iter(); iter.valid(); iter.advance()) {
-      V o = database.get(iter.getDBID());
+      V o = database.get(iter);
       avg += Math.abs(centroid.doubleValue(dimension) - o.doubleValue(dimension));
     }
     return avg / objectIDs.size();
