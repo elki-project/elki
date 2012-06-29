@@ -74,6 +74,7 @@ public class AutomaticEvaluation implements Evaluator {
       logger.debug("Number of new outlier results: " + outliers.size());
     }
     if(outliers.size() > 0) {
+      ResultUtil.ensureClusteringResult(ResultUtil.findDatabase(baseResult), baseResult);
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(baseResult, Clustering.class);
       if(clusterings.size() == 0) {
         logger.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
