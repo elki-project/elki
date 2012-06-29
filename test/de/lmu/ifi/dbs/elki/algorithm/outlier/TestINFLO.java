@@ -55,7 +55,7 @@ public class TestINFLO extends AbstractSimpleAlgorithmTest implements JUnit4Test
     // run INFLO on database
     OutlierResult result = inflo.run(db);
 
-    testSingleScore(result, 945, 2.5711647857619484);
-    testAUC(db, "Noise", result, 0.935222);
+    testSingleScore(result, 945, 1.215459716);
+    testAUC(db, "Noise", result, 0.9389259259259);
   }
 }
