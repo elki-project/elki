@@ -188,7 +188,7 @@ public final class DBIDUtil {
     ModifiableDBIDs inter = newHashSet(first.size());
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
       if(second.contains(it)) {
-        inter.add(it.getDBID());
+        inter.add(it);
       }
     }
     return inter;
@@ -215,12 +215,11 @@ public final class DBIDUtil {
     // Initialize with second
     secondonly.addDBIDs(second);
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
       // Try to remove
-      if(secondonly.remove(id)) {
-        intersection.add(id);
+      if(secondonly.remove(it)) {
+        intersection.add(it);
       } else {
-        firstonly.add(id);
+        firstonly.add(it);
       }
     }
   }
