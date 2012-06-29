@@ -114,8 +114,8 @@ public class SVGScoreBar {
     bar.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "" + height * 0.01);
     barchart.appendChild(bar);
 
-    double fpos = (fill / size) * (width - (0.04 * height));
-    if(fpos > 0 && fpos <= 1) { // Also ensure this is not NaN.
+    if(fill >= 0 && fill <= size + 1) {
+      double fpos = (fill / size) * (width - (0.04 * height));
       Element chart = svgp.svgRect(x + 0.02 * height, y + 0.02 * height, fpos, height - 0.04 * height);
       chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
       chart.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
@@ -125,7 +125,8 @@ public class SVGScoreBar {
 
     // Draw the values:
     if(format != null) {
-      Element lbl = svgp.svgText(x + 0.05 * width, y + 0.75 * height, FormatUtil.format(fill, format));
+      String num = Double.isNaN(fill) ? "NaN" : FormatUtil.format(fill, format);
+      Element lbl = svgp.svgText(x + 0.05 * width, y + 0.75 * height, num);
       lbl.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + 0.75 * height + "; font-weight: bold");
       barchart.appendChild(lbl);
     }
