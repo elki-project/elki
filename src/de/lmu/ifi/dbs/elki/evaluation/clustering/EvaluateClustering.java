@@ -162,10 +162,16 @@ public class EvaluateClustering implements Evaluator {
 
   private boolean isReferenceResult(Clustering<?> t) {
     // FIXME: don't hard-code strings
-    if(t.getShortName().startsWith("bylabel-")) {
+    if("bylabel-clustering".equals(t.getShortName())) {
       return true;
     }
-    if(t.getShortName().startsWith("bymodel-")) {
+    if("bymodel-clustering".equals(t.getShortName())) {
+      return true;
+    }
+    if("allinone-clustering".equals(t.getShortName())) {
+      return true;
+    }
+    if("allinnoise-clustering".equals(t.getShortName())) {
       return true;
     }
     return false;

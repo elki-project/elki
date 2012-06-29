@@ -168,6 +168,9 @@ public class Entropy {
    * @return Joint Normalized Mutual information
    */
   public double entropyNMIJoint() {
+    if (entropyJoint() == 0) {
+      return 0;
+    }
     return (entropyMutualInformation() / entropyJoint());
   }
 
