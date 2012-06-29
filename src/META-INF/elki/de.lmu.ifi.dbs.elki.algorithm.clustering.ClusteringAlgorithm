@@ -22,3 +22,4 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByModelClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise
+de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
