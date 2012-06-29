@@ -313,12 +313,7 @@ public class ClusterContingencyTable {
      */
     public static double fMeasure(double precision, double recall, double beta) {
       final double beta2 = beta * beta;
-      final double div = beta2 * precision + recall;
-      if (div > 0) {
-        return (1 + beta2) * precision * recall / div;
-      } else {
-        return 0;
-      }
+      return (1 + beta2) * precision * recall / (beta2 * precision + recall);
     }
 
     /**
@@ -329,13 +324,7 @@ public class ClusterContingencyTable {
      * @return F-Measure
      */
     public static double f1Measure(double precision, double recall) {
-      final double div = precision + recall;
-      if(div > 0) {
-        return 2 * precision * recall / div;
-      }
-      else {
-        return 0;
-      }
+      return 2 * precision * recall / (precision + recall);
     }
   }
 }

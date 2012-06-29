@@ -201,7 +201,7 @@ public class PairCounting {
     final double nom = pairconfuse[0] * pairconfuse[3] - pairconfuse[1] * pairconfuse[2];
     final long d1 = (pairconfuse[0] + pairconfuse[1]) * (pairconfuse[1] + pairconfuse[3]);
     final long d2 = (pairconfuse[0] + pairconfuse[2]) * (pairconfuse[2] + pairconfuse[3]);
-    return (d1 + d2 > 0) ? 2 * nom / (d1 + d2) : 0;
+    return 2 * nom / (d1 + d2);
   }
 
   /**
