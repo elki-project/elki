@@ -161,7 +161,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
       // Throw away the actual distance values ...
       ModifiableDBIDs neighbors = DBIDUtil.newHashSet(res.size());
       for(DistanceResultPair<D> dr : res) {
-        neighbors.add(dr.getDBID());
+        neighbors.add(dr);
       }
       return neighbors;
     }
@@ -220,7 +220,7 @@ public class EpsilonNeighborhood<O, D extends Distance<D>> implements NeighborPr
     @Override
     public void addDBIDs(ModifiableDBIDs ids, DistanceDBIDResult<D> neighbors) {
       for(DistanceResultPair<D> neighbor : neighbors) {
-        ids.add(neighbor.getDBID());
+        ids.add(neighbor);
       }
     }
   }
