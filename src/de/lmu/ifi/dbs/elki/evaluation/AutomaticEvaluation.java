@@ -24,12 +24,12 @@ package de.lmu.ifi.dbs.elki.evaluation;
  */
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
 import de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionAtKCurve;
@@ -64,9 +64,6 @@ public class AutomaticEvaluation implements Evaluator {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Database db = ResultUtil.findDatabase(baseResult);
-    // Note: this *may* reinvoke this method!
-    ResultUtil.ensureClusteringResult(db, baseResult);
     autoEvaluateClusterings(baseResult, newResult);
     autoEvaluateOutliers(baseResult, newResult);
   }
@@ -125,8 +122,23 @@ public class AutomaticEvaluation implements Evaluator {
     if(logger.isDebugging()) {
       logger.warning("Number of new clustering results: " + clusterings.size());
     }
+    for (Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
+      Clustering<?> test = c.next();
+      if ("allinone-clustering".equals(test.getShortName())) {
+        c.remove();
+      }
+      else if ("allinnoise-clustering".equals(test.getShortName())) {
+        c.remove();
+      }
+      else if ("bylabel-clustering".equals(test.getShortName())) {
+        c.remove();
+      }
+      else if ("bymodel-clustering".equals(test.getShortName())) {
+        c.remove();
+      }
+    }
     if (clusterings.size() > 0) {
-      new EvaluateClustering(new ByLabelHierarchicalClustering(), false, true).processNewResult(baseResult, newResult);
+      new EvaluateClustering(new ByLabelOrAllInOneClustering(), false, true).processNewResult(baseResult, newResult);
     }
   }
 
