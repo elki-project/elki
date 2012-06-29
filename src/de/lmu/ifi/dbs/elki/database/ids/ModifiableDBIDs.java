@@ -67,7 +67,7 @@ public interface ModifiableDBIDs extends DBIDs {
    * Clear this collection.
    */
   void clear();
-  
+
   /**
    * Get a <em>modifiable</em> DBID iterator (a more efficient API).
    * 
@@ -78,6 +78,7 @@ public interface ModifiableDBIDs extends DBIDs {
    * for(DBIDMIter iter = ids.iter(); iter.valid(); iter.advance()) {
    *   DBID id = iter.getDBID();
    *   iter.remove();
+   * }
    * }
    * </pre>
    * 

@@ -45,6 +45,7 @@ public interface DBIDs extends Iterable<DBID> {
    * for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
    *   DBID id = iter.getDBID();
    * }
+   * }
    * </pre>
    * 
    * @return iterator

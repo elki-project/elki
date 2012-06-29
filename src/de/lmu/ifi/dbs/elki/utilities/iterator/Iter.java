@@ -48,6 +48,7 @@ package de.lmu.ifi.dbs.elki.utilities.iterator;
  * for (Iter iter = ids.iter(); iter.valid(); iter.advance()) {
  *   iter.doSomething();
  * }
+ * }
  * </pre>
  * 
  * @author Erich Schubert

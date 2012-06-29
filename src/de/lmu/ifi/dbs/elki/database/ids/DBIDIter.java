@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
  *   iter.getDBID();
  * }
+ * }
  * </pre>
  * 
  * We list some fundamental differences.
@@ -57,8 +58,8 @@ public interface DBIDIter extends DBIDRef, Iter {
   /**
    * Get the referenced {@link DBID}.
    * 
-   * Efficiency note: this may require materialization of a DBID object -
-   * if possible, use DBIDRef based APIs instead.
+   * Efficiency note: this may require materialization of a DBID object - if
+   * possible, use DBIDRef based APIs instead.
    * 
    * @return referenced DBID
    */

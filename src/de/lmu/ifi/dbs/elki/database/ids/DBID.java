@@ -93,7 +93,7 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
   /**
    * Compare two DBIDs for ordering.
    * 
-   * Consider using {@link #compareDBIDs}, which is more explicit.
+   * Consider using {@link #compareDBID}, which is more explicit.
    * 
    * @param other Other DBID object
    * @return Comparison result
