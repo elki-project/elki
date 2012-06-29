@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
@@ -38,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 
 /**
@@ -133,6 +135,11 @@ public class AlgorithmStep implements WorkflowStep {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
+     * Enable logging of performance data
+     */
+    protected boolean time = false;
+
+    /**
      * Holds the algorithm to run.
      */
     protected List<Algorithm> algorithms;
@@ -140,6 +147,11 @@ public class AlgorithmStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      // Time parameter
+      final Flag timeF = new Flag(OptionID.TIME_FLAG);
+      if(config.grab(timeF)) {
+        time = timeF.getValue();
+      }
       // parameter algorithm
       final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
       if(config.grab(ALGORITHM_PARAM)) {
@@ -149,6 +161,7 @@ public class AlgorithmStep implements WorkflowStep {
 
     @Override
     protected AlgorithmStep makeInstance() {
+      LoggingConfiguration.setTime(time);
       return new AlgorithmStep(algorithms);
     }
   }
