@@ -175,13 +175,15 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * @param k the value of k
    * @param distanceFunction the distance function
    * 
-   * Uses the same distance function for neighborhood computation and reachability distance (standard as in the original publication),
-   * same as {@link #LOF(int, DistanceFunction, DistanceFunction) LOF(int, distanceFunction, distanceFunction)}.
+   *        Uses the same distance function for neighborhood computation and
+   *        reachability distance (standard as in the original publication),
+   *        same as {@link #LOF(int, DistanceFunction, DistanceFunction)
+   *        LOF(int, distanceFunction, distanceFunction)}.
    */
   public LOF(int k, DistanceFunction<? super O, D> distanceFunction) {
     this(k, distanceFunction, distanceFunction);
   }
-  
+
   /**
    * Performs the Generalized LOF_SCORE algorithm on the given database by
    * calling {@link #doRunInTime}.
@@ -239,7 +241,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * Performs the Generalized LOF_SCORE algorithm on the given database and
    * returns a {@link LOF.LOFResult} encapsulating information that may be
    * needed by an OnlineLOF algorithm.
-   *
+   * 
    * @param ids Object ids
    * @param kNNRefer the kNN query w.r.t. reference neighborhood distance
    *        function
@@ -295,7 +297,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
     Mean mean = new Mean();
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       mean.reset();
       KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
       for(DistanceResultPair<D> neighbor : neighbors) {
@@ -305,7 +307,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         }
       }
       // Avoid division by 0
-      double lrd = (mean.getCount() > 0) ? mean.getMean() : 0.0;
+      final double lrd = (mean.getCount() > 0) ? 1 / mean.getMean() : 0.0;
       lrds.putDouble(iter, lrd);
       if(lrdsProgress != null) {
         lrdsProgress.incrementProcessed(logger);
@@ -333,7 +335,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
 
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
     Mean mean = new Mean();
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double lrdp = lrds.get(iter);
       final double lof;
       if(lrdp > 0) {
