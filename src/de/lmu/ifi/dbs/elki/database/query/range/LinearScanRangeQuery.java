@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import java.util.Collections;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
@@ -60,10 +59,9 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      DBID candidateID = iter.getDBID();
-      D currentDistance = distanceQuery.distance(id, candidateID);
+      D currentDistance = distanceQuery.distance(id, iter);
       if(currentDistance.compareTo(range) <= 0) {
-        result.add(new GenericDistanceResultPair<D>(currentDistance, candidateID));
+        result.add(new GenericDistanceResultPair<D>(currentDistance, iter.getDBID()));
       }
     }
     Collections.sort(result);
@@ -74,10 +72,9 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      DBID currentID = iter.getDBID();
-      D currentDistance = distanceQuery.distance(currentID, obj);
+      D currentDistance = distanceQuery.distance(obj, iter);
       if(currentDistance.compareTo(range) <= 0) {
-        result.add(new GenericDistanceResultPair<D>(currentDistance, currentID));
+        result.add(new GenericDistanceResultPair<D>(currentDistance, iter.getDBID()));
       }
     }
     Collections.sort(result);
