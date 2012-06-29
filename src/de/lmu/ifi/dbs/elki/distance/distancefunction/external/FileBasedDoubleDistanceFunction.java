@@ -29,8 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -107,7 +107,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public DoubleDistance distance(DBID id1, DBID id2) {
+  public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }

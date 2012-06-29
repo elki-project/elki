@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -132,7 +132,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
+  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
     return getRangeForObject(relation.get(id), range);
   }
 }

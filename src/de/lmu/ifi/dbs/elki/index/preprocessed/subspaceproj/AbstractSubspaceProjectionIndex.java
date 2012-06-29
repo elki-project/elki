@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
@@ -115,20 +115,19 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(id, epsilon);
+      DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(iditer, epsilon);
 
       final P pres;
       if(neighbors.size() >= minpts) {
-        pres = computeProjection(id, neighbors, relation);
+        pres = computeProjection(iditer, neighbors, relation);
       }
       else {
         DistanceResultPair<D> firstQR = neighbors.iterator().next();
         neighbors = new GenericDistanceDBIDList<D>();
         neighbors.add(firstQR);
-        pres = computeProjection(id, neighbors, relation);
+        pres = computeProjection(iditer, neighbors, relation);
       }
-      storage.put(id, pres);
+      storage.put(iditer, pres);
 
       if(progress != null) {
         progress.incrementProcessed(getLogger());
@@ -147,7 +146,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
   }
 
   @Override
-  public P getLocalProjection(DBID objid) {
+  public P getLocalProjection(DBIDRef objid) {
     if(storage == null) {
       preprocess();
     }
@@ -168,7 +167,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * 
    * @return local subspace projection
    */
-  protected abstract P computeProjection(DBID id, DistanceDBIDResult<D> neighbors, Relation<NV> relation);
+  protected abstract P computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<NV> relation);
 
   /**
    * Factory class

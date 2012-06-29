@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.AbstractRKNNQuery;
@@ -65,7 +65,7 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k) {
+  public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k) {
     return index.reverseKNNQuery(id, k);
   }
 

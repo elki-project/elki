@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -53,5 +53,5 @@ public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends Abstra
   }
 
   @Override
-  abstract public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k);
+  abstract public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k);
 }

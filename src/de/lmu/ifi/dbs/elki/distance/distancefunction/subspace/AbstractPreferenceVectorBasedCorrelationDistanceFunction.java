@@ -27,6 +27,7 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
@@ -125,7 +126,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     }
 
     @Override
-    public PreferenceVectorBasedCorrelationDistance distance(DBID id1, DBID id2) {
+    public PreferenceVectorBasedCorrelationDistance distance(DBIDRef id1, DBIDRef id2) {
       BitSet preferenceVector1 = index.getPreferenceVector(id1);
       BitSet preferenceVector2 = index.getPreferenceVector(id2);
       V v1 = relation.get(id1);

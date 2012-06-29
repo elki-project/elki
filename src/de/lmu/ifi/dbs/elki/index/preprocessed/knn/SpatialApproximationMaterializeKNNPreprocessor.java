@@ -30,7 +30,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -113,14 +114,14 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
         getLogger().debugFinest("NumEntires = " + size);
       }
       // Collect the ids in this node.
-      DBID[] ids = new DBID[size];
+      ArrayModifiableDBIDs ids = DBIDUtil.newArray(size);
       for(int i = 0; i < size; i++) {
-        ids[i] = ((LeafEntry) node.getEntry(i)).getDBID();
+        ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
-      for(DBID id : ids) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
-        for(DBID id2 : ids) {
+        for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
           D d = cache.remove(key);
           if(d != null) {

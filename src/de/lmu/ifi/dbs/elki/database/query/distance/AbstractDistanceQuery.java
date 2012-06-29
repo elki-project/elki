@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -55,7 +55,7 @@ public abstract class AbstractDistanceQuery<O, D extends Distance<D>> extends Ab
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D distance(DBID id1, DBID id2);
+  public abstract D distance(DBIDRef id1, DBIDRef id2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -65,7 +65,7 @@ public abstract class AbstractDistanceQuery<O, D extends Distance<D>> extends Ab
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D distance(O o1, DBID id2);
+  public abstract D distance(O o1, DBIDRef id2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.
@@ -75,7 +75,7 @@ public abstract class AbstractDistanceQuery<O, D extends Distance<D>> extends Ab
    * @return the distance between the two objects specified by their object ids
    */
   @Override
-  public abstract D distance(DBID id1, O o2);
+  public abstract D distance(DBIDRef id1, O o2);
 
   /**
    * Returns the distance between the two objects specified by their object ids.

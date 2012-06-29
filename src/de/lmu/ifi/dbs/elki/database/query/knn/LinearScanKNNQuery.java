@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -77,7 +78,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   }
 
   @Override
-  public KNNResult<D> getKNNForDBID(DBID id, int k) {
+  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
     KNNHeap<D> heap = new KNNHeap<D>(k);
     if(PrimitiveDistanceQuery.class.isInstance(distanceQuery)) {
       O obj = relation.get(id);

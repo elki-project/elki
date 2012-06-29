@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -123,7 +123,7 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
     }
 
     @Override
-    public DoubleDistance distance(DBID id1, DBID id2) {
+    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
       DBIDs neighbors1 = index.getNearestNeighborSet(id1);
       DBIDs neighbors2 = index.getNearestNeighborSet(id2);
       return new DoubleDistance(1.0 - jaccardCoefficient(neighbors1, neighbors2));

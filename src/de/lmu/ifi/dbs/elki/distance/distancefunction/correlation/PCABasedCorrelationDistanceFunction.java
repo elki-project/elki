@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractIndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
@@ -134,7 +134,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
     }
 
     @Override
-    public PCACorrelationDistance distance(DBID id1, DBID id2) {
+    public PCACorrelationDistance distance(DBIDRef id1, DBIDRef id2) {
       PCAFilteredResult pca1 = index.getLocalProjection(id1);
       PCAFilteredResult pca2 = index.getLocalProjection(id2);
       V dv1 = relation.get(id1);

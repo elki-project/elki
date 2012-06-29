@@ -27,6 +27,7 @@ import java.util.Collections;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -56,7 +57,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
+  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       DBID candidateID = iter.getDBID();

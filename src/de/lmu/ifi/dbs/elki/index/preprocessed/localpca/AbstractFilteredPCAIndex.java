@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -124,7 +125,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
   }
 
   @Override
-  public PCAFilteredResult getLocalProjection(DBID objid) {
+  public PCAFilteredResult getLocalProjection(DBIDRef objid) {
     if(storage == null) {
       preprocess();
     }

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -89,7 +90,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * in a second step.
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be equal or less than " + "parameter k of the MkMax-Tree!");
     }
@@ -193,7 +194,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param node_entry the entry representing the node
    * @param result the list for the query result
    */
-  private void doReverseKNNQuery(DBID q, MkMaxTreeNode<O, D> node, MkMaxEntry<D> node_entry, List<DistanceResultPair<D>> result) {
+  private void doReverseKNNQuery(DBIDRef q, MkMaxTreeNode<O, D> node, MkMaxEntry<D> node_entry, List<DistanceResultPair<D>> result) {
     // data node
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {

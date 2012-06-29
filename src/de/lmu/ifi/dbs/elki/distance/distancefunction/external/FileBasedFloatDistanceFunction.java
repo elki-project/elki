@@ -29,8 +29,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -44,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Provides a DistanceFunction that is based on float distances given by a
@@ -105,7 +105,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
    * @return the distance between the two objects specified by their objects ids
    */
   @Override
-  public FloatDistance distance(DBID id1, DBID id2) {
+  public FloatDistance distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       return getDistanceFactory().undefinedDistance();
     }
@@ -117,7 +117,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
       return distance(id2, id1);
     }
 
-    return cache.get(new Pair<DBID, DBID>(id1, id2));
+    return cache.get(DBIDUtil.newPair(id1, id2));
   }
 
   private void loadCache(DistanceParser<FloatDistance> parser, File matrixfile) throws IOException {

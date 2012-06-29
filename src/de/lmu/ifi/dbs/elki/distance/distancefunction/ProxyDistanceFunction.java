@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -65,7 +65,7 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
   }
 
   @Override
-  public D distance(DBID o1, DBID o2) {
+  public D distance(DBIDRef o1, DBIDRef o2) {
     return inner.distance(o1, o2);
   }
 

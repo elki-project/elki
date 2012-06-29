@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -130,9 +130,9 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * @param id ID number
    * @return success code
    */
-  public boolean add(D distance, DBID id) {
+  public boolean add(D distance, DBIDRef id) {
     if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
-      return super.add(new GenericDistanceResultPair<D>(distance, id));
+      return super.add(new GenericDistanceResultPair<D>(distance, id.getDBID()));
     }
     return true; /* "success" */
   }

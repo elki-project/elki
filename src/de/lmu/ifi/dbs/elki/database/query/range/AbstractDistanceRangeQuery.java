@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -55,7 +55,7 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
   }
 
   @Override
-  abstract public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range);
+  abstract public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range);
 
   @Override
   abstract public DistanceDBIDResult<D> getRangeForObject(O obj, D range);

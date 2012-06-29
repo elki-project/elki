@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -148,7 +148,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     public abstract double transform(double similarity);
 
     @Override
-    public DoubleDistance distance(DBID id1, DBID id2) {
+    public DoubleDistance distance(DBIDRef id1, DBIDRef id2) {
       final NumberDistance<?, ?> sim = similarityQuery.similarity(id1, id2);
       return new DoubleDistance(transform(sim.doubleValue()));
     }

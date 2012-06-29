@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -111,27 +110,25 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
         KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
         for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          DBID id2 = iter2.getDBID();
-          DBIDPair key = DBIDUtil.newPair(id, id2);
+          DBIDPair key = DBIDUtil.newPair(iter, iter2);
           D d = cache.remove(key);
           if(d != null) {
             // consume the previous result.
-            kNN.add(d, id2);
+            kNN.add(d, iter2);
           }
           else {
             // compute new and store the previous result.
-            d = distanceQuery.distance(id, id2);
-            kNN.add(d, id2);
+            d = distanceQuery.distance(iter, iter2);
+            kNN.add(d, iter2);
             // put it into the cache, but with the keys reversed
-            key = DBIDUtil.newPair(id2, id);
+            key = DBIDUtil.newPair(iter2, iter);
             cache.put(key, d);
           }
         }
         ksize.put(kNN.size());
-        storage.put(id, kNN.toKNNList());
+        storage.put(iter, kNN.toKNNList());
       }
       if(logger.isDebugging()) {
         if(cache.size() > 0) {

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.query.distance;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -56,7 +57,7 @@ public class DBIDDistanceQuery<D extends Distance<D>> extends AbstractDatabaseDi
   }
 
   @Override
-  public D distance(DBID id1, DBID id2) {
+  public D distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null) {
       throw new UnsupportedOperationException("This distance function can only be used for objects stored in the database.");
     }

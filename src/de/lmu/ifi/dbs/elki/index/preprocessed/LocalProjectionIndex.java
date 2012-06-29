@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -44,10 +44,10 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
   /**
    * Get the precomputed local projection for a particular object ID.
    * 
-   * @param objid Object ID
+   * @param id Object ID
    * @return local projection
    */
-  public P getLocalProjection(DBID objid);
+  public P getLocalProjection(DBIDRef id);
 
   /**
    * Factory

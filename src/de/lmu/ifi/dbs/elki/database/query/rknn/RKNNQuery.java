@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -49,7 +49,7 @@ public interface RKNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public List<DistanceResultPair<D>> getRKNNForDBID(DBID id, int k);
+  public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k);
 
   /**
    * Get the reverse k nearest neighbors for a particular object.

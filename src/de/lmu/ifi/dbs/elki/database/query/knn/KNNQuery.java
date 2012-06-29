@@ -28,6 +28,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -51,7 +52,7 @@ public interface KNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k Number of neighbors requested
    * @return neighbors
    */
-  public KNNResult<D> getKNNForDBID(DBID id, int k);
+  public KNNResult<D> getKNNForDBID(DBIDRef id, int k);
 
   /**
    * Bulk query method

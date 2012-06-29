@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -172,7 +173,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return a List of the query results
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.k_max) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MCop-Tree!");
     }
@@ -287,7 +288,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param candidates holds possible candidates for the result (they need a
    *        refinement)
    */
-  private void doReverseKNNQuery(int k, DBID q, List<DistanceResultPair<D>> result, ModifiableDBIDs candidates) {
+  private void doReverseKNNQuery(int k, DBIDRef q, List<DistanceResultPair<D>> result, ModifiableDBIDs candidates) {
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root

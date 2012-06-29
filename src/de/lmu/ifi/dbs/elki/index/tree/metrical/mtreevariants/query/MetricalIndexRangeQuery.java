@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
@@ -189,7 +190,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBID id, D range) {
+  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
     return getRangeForObject(relation.get(id), range);
   }
 }

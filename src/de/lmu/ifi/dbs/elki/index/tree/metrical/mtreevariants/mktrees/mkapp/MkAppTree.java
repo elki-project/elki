@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -177,7 +178,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return a List of the query results
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBID id, int k) {
+  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
     List<DistanceResultPair<D>> result = doReverseKNNQuery(k, id);
     Collections.sort(result);
     return result;
@@ -244,7 +245,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param q the id of the query object
    * @return the result of the reverse knn query
    */
-  private List<DistanceResultPair<D>> doReverseKNNQuery(int k, DBID q) {
+  private List<DistanceResultPair<D>> doReverseKNNQuery(int k, DBIDRef q) {
     List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 

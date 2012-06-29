@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -143,14 +144,12 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
 
     // check if all distance values are specified
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id1 = iter.getDBID();
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        DBID id2 = iter2.getDBID();
-        if(id2.getIntegerID() < id1.getIntegerID()) {
+        if(iter2.getIntegerID() < iter.getIntegerID()) {
           continue;
         }
-        if(!containsKey(id1, id2, distanceCache)) {
-          throw new IllegalArgumentException("Distance value for " + id1 + " - " + id2 + " is missing!");
+        if(!containsKey(iter, iter2, distanceCache)) {
+          throw new IllegalArgumentException("Distance value for " + iter.getDBID() + " - " + iter2.getDBID() + " is missing!");
         }
       }
     }
@@ -200,7 +199,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    * @return <tt>true</tt> if this cache contains a distance value for the
    *         specified ids, false otherwise
    */
-  public boolean containsKey(DBID id1, DBID id2, Map<DBIDPair, D> cache) {
+  public boolean containsKey(DBIDRef id1, DBIDRef id2, Map<DBIDPair, D> cache) {
     if(id1.getIntegerID() > id2.getIntegerID()) {
       return containsKey(id2, id1, cache);
     }

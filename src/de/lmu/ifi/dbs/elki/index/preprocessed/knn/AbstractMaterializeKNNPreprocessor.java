@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -120,17 +120,17 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
   /**
    * Get the k nearest neighbors.
    * 
-   * @param objid Object ID
+   * @param id Object ID
    * @return Neighbors
    */
-  public KNNResult<D> get(DBID objid) {
+  public KNNResult<D> get(DBIDRef id) {
     if(storage == null) {
       if(getLogger().isDebugging()) {
         getLogger().debug("Running kNN preprocessor: " + this.getClass());
       }
       preprocess();
     }
-    return storage.get(objid);
+    return storage.get(id);
   }
 
   /**
