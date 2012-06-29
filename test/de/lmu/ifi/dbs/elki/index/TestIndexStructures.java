@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -223,8 +222,7 @@ public class TestIndexStructures implements JUnit4Test {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
-        DBID id = res.getDBID();
-        DoubleVector c = rep.get(id);
+        DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
 
@@ -245,8 +243,7 @@ public class TestIndexStructures implements JUnit4Test {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
-        DBID id = res.getDBID();
-        DoubleVector c = rep.get(id);
+        DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
 

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -347,8 +346,7 @@ public class CovarianceMatrix {
   public static CovarianceMatrix make(Relation<? extends NumberVector<?, ?>> relation) {
     CovarianceMatrix c = new CovarianceMatrix(DatabaseUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      c.put(relation.get(id));
+      c.put(relation.get(iditer));
     }
     return c;
   }

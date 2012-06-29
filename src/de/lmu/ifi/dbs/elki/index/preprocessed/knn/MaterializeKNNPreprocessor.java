@@ -129,9 +129,8 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     }
     else {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
-        KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
-        storage.put(id, knn);
+        KNNResult<D> knn = knnQuery.getKNNForDBID(iter, k);
+        storage.put(iter, knn);
         if(progress != null) {
           progress.incrementProcessed(getLogger());
         }
@@ -217,26 +216,24 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     DBIDs oldids = DBIDUtil.difference(relation.getDBIDs(), ids);
     for (DBIDIter iter = oldids.iter(); iter.valid(); iter.advance()) {
-      DBID id1 = iter.getDBID();
-      KNNResult<D> kNNs = storage.get(id1);
+      KNNResult<D> kNNs = storage.get(iter);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
       // look for new kNNs
       KNNHeap<D> heap = null;
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        DBID id2 = iter2.getDBID();
-        D dist = distanceQuery.distance(id1, id2);
+        D dist = distanceQuery.distance(iter, iter2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
             heap = new KNNHeap<D>(k);
             heap.addAll(kNNs);
           }
-          heap.add(dist, id2);
+          heap.add(dist, iter2);
         }
       }
       if(heap != null) {
         kNNs = heap.toKNNList();
-        storage.put(id1, kNNs);
-        rkNN_ids.add(id1);
+        storage.put(iter, kNNs);
+        rkNN_ids.add(iter);
       }
     }
     return rkNN_ids;
@@ -253,11 +250,10 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     SetDBIDs idsSet = DBIDUtil.ensureSet(ids);
     ArrayModifiableDBIDs rkNN_ids = DBIDUtil.newArray();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id1  = iditer.getDBID();
-      KNNResult<D> kNNs = storage.get(id1);
+      KNNResult<D> kNNs = storage.get(iditer);
       for(DistanceResultPair<D> kNN : kNNs) {
-        if(idsSet.contains(kNN.getDBID())) {
-          rkNN_ids.add(id1);
+        if(idsSet.contains(kNN)) {
+          rkNN_ids.add(iditer);
           break;
         }
       }
@@ -287,7 +283,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
       stepprog.beginStep(1, "New deletions ocurred, remove their materialized kNNs.", getLogger());
     }
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      storage.delete(iter.getDBID());
+      storage.delete(iter);
     }
 
     // update the affected kNNs
@@ -355,11 +351,11 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet();
     for(Collection<DistanceResultPair<D>> drps : extraxt) {
       for(DistanceResultPair<D> drp : drps) {
-        ids.add(drp.getDBID());
+        ids.add(drp);
       }
     }
     for (DBIDIter iter = remove.iter(); iter.valid(); iter.advance()) {
-      ids.remove(iter.getDBID());
+      ids.remove(iter);
     }
     // Convert back to array
     return DBIDUtil.newArray(ids);
