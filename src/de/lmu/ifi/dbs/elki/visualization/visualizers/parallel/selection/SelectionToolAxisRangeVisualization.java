@@ -31,7 +31,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -167,8 +166,8 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
     for(int i = minaxis; i < maxaxis; i++) {
       double v1 = proj.fastProjectRenderToDataSpace(z1, i);
       double v2 = proj.fastProjectRenderToDataSpace(z2, i);
-      if (logger.isDebugging()) {
-        logger.debug("Axis "+i+" dimension "+proj.getDimForVisibleAxis(i)+" "+v1+" to "+v2);
+      if(logger.isDebugging()) {
+        logger.debug("Axis " + i + " dimension " + proj.getDimForVisibleAxis(i) + " " + v1 + " to " + v2);
       }
       ranges[proj.getDimForVisibleAxis(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
     }
@@ -236,22 +235,17 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
       updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
 
       selection.clear();
-      boolean idIn = true;
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        NumberVector<?, ?> dbTupel = relation.get(id);
-        idIn = true;
+
+      candidates: for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        NumberVector<?, ?> dbTupel = relation.get(iditer);
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {
             if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
-              idIn = false;
-              break;
+              continue candidates;
             }
           }
         }
-        if(idIn == true) {
-          selection.add(id);
-        }
+        selection.add(iditer);
       }
       context.setSelection(new RangeSelection(selection, ranges));
     }

@@ -29,7 +29,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -188,12 +187,11 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
         inc[0] = frac;
         inc[snum + 1] = frac;
         for(DBIDIter iter = cspol.iterateClass(snum + off); iter.valid(); iter.advance()) {
-          DBID id = iter.getDBID();
-          if(!sample.getSample().contains(id)) {
+          if(!sample.getSample().contains(iter)) {
             continue; // TODO: can we test more efficiently than this?
           }
           try {
-            double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
+            double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) / Projection.SCALE;
             histogram.aggregate(pos, inc);
           }
           catch(ObjectNotFoundException e) {
@@ -207,8 +205,7 @@ public class ColoredHistogramVisualizer<NV extends NumberVector<NV, ?>> extends 
       double[] inc = new double[cols];
       inc[0] = frac;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double pos = proj.fastProjectDataToRenderSpace(relation.get(id)) / Projection.SCALE;
+        double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) / Projection.SCALE;
         histogram.aggregate(pos, inc);
       }
     }

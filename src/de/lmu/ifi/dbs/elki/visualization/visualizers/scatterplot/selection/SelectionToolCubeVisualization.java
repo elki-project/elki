@@ -32,7 +32,6 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -192,6 +191,11 @@ public class SelectionToolCubeVisualization extends AbstractScatterplotVisualiza
    * @param p2 Second Point of the selected rectangle
    */
   private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
+    if(p1 == null || p2 == null) {
+      logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
+      return;
+    }
+
     DBIDSelection selContext = context.getSelection();
     ModifiableDBIDs selection;
     if(selContext != null) {
@@ -202,43 +206,32 @@ public class SelectionToolCubeVisualization extends AbstractScatterplotVisualiza
     }
     DoubleDoublePair[] ranges;
 
-    if(p1 == null || p2 == null) {
-      logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
+    double x1 = Math.min(p1.getX(), p2.getX());
+    double x2 = Math.max(p1.getX(), p2.getX());
+    double y1 = Math.max(p1.getY(), p2.getY());
+    double y2 = Math.min(p1.getY(), p2.getY());
+
+    if(selContext instanceof RangeSelection) {
+      ranges = ((RangeSelection) selContext).getRanges();
     }
     else {
-      double x1 = Math.min(p1.getX(), p2.getX());
-      double x2 = Math.max(p1.getX(), p2.getX());
-      double y1 = Math.max(p1.getY(), p2.getY());
-      double y2 = Math.min(p1.getY(), p2.getY());
+      ranges = new DoubleDoublePair[dim];
+    }
+    updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
 
-      if(selContext instanceof RangeSelection) {
-        ranges = ((RangeSelection) selContext).getRanges();
-      }
-      else {
-        ranges = new DoubleDoublePair[dim];
-      }
-      updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
-
-      selection.clear();
-      boolean idIn = true;
-      for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        NumberVector<?, ?> dbTupel = rel.get(id);
-        idIn = true;
-        for(int i = 0; i < dim; i++) {
-          if(ranges != null && ranges[i] != null) {
-            if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
-              idIn = false;
-              break;
-            }
+    selection.clear();
+    candidates: for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      NumberVector<?, ?> dbTupel = rel.get(iditer);
+      for(int i = 0; i < dim; i++) {
+        if(ranges != null && ranges[i] != null) {
+          if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
+            continue candidates;
           }
         }
-        if(idIn == true) {
-          selection.add(id);
-        }
       }
-      context.setSelection(new RangeSelection(selection, ranges));
+      selection.add(iditer);
     }
+    context.setSelection(new RangeSelection(selection, ranges));
   }
 
   /**

@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -108,12 +107,11 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
       for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
         String key = DATALINE + "_" + c;
         for(DBIDIter iter = csp.iterateClass(c); iter.valid(); iter.advance()) {
-          DBID id = iter.getDBID();
-          if(!sample.getSample().contains(id)) {
+          if(!sample.getSample().contains(iter)) {
             continue; // TODO: can we test more efficiently than this?
           }
           SVGPath path = new SVGPath();
-          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
+          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
           for(int i = 0; i < yPos.length; i++) {
             path.drawTo(getVisibleAxisX(i), yPos[i]);
           }
@@ -125,16 +123,15 @@ public class LineVisualization extends AbstractParallelVisualization<NumberVecto
     }
     else {
       for(; ids.valid(); ids.advance()) {
-        DBID id = ids.getDBID();
         SVGPath path = new SVGPath();
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
+        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(ids));
         for(int i = 0; i < yPos.length; i++) {
           path.drawTo(getVisibleAxisX(i), yPos[i]);
         }
         Element line = path.makeElement(svgp);
         SVGUtil.addCSSClass(line, DATALINE);
         // assign color
-        line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(id)));
+        line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
         layer.appendChild(line);
       }
     }

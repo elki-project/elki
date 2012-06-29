@@ -30,7 +30,6 @@ import java.util.Comparator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -126,8 +125,7 @@ public class DensityEstimationOverlay extends AbstractScatterplotVisualization {
     {
       int i = 0;
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        data[i] = proj.fastProjectDataToRenderSpace(rel.get(id));
+        data[i] = proj.fastProjectDataToRenderSpace(rel.get(iditer));
         i++;
       }
     }

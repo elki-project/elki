@@ -31,7 +31,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -195,22 +194,21 @@ public class SelectionToolDotVisualization extends AbstractScatterplotVisualizat
       selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
     }
     for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double[] vec = proj.fastProjectDataToRenderSpace(rel.get(id));
+      double[] vec = proj.fastProjectDataToRenderSpace(rel.get(iditer));
       if(vec[0] >= Math.min(p1.getX(), p2.getX()) && vec[0] <= Math.max(p1.getX(), p2.getX()) && vec[1] >= Math.min(p1.getY(), p2.getY()) && vec[1] <= Math.max(p1.getY(), p2.getY())) {
         if(mode == Mode.INVERT) {
-          if(!selection.contains(id)) {
-            selection.add(id);
+          if(!selection.contains(iditer)) {
+            selection.add(iditer);
           }
           else {
-            selection.remove(id);
+            selection.remove(iditer);
           }
         }
         else {
           // In REPLACE and ADD, add objects.
           // The difference was done before by not re-using the selection.
           // Since we are using a set, we can just add in any case.
-          selection.add(id);
+          selection.add(iditer);
         }
       }
     }
