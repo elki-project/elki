@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -362,7 +362,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * @param index Point ID
    * @return Probabilities of given point
    */
-  public double[] getProbClusterIGivenX(DBID index) {
+  public double[] getProbClusterIGivenX(DBIDRef index) {
     return probClusterIGivenX.get(index);
   }
 

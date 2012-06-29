@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -183,10 +182,9 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
           // Always true if every algorithm returns a complete result (one score
           // for every DBID).
           if(iter.valid()) {
-            DBID tmpID = iter.getDBID();
-            double score = pair.second.get(tmpID);
-            if(Double.isNaN(scores.doubleValue(tmpID))) {
-              scores.putDouble(tmpID, score);
+            double score = pair.second.get(iter);
+            if(Double.isNaN(scores.doubleValue(iter))) {
+              scores.putDouble(iter, score);
               minmax.put(score);
             }
             iter.advance();
@@ -207,15 +205,14 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     else {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
         double sum = 0.0;
         for(OutlierResult r : results) {
-          final Double s = r.getScores().get(id);
+          final Double s = r.getScores().get(iter);
           if (s != null && !Double.isNaN(s)) {
             sum += s;
           }
         }
-        scores.putDouble(id, sum);
+        scores.putDouble(iter, sum);
         minmax.put(sum);
         if(cprog != null) {
           cprog.incrementProcessed(logger);

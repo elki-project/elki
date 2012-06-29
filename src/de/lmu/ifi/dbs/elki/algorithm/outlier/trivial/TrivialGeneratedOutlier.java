@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -131,8 +130,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     
     HashSet<GeneratorSingleCluster> generators = new HashSet<GeneratorSingleCluster>();
     for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      Model model = models.get(id);
+      Model model = models.get(iditer);
       if(model instanceof GeneratorSingleCluster) {
         generators.add((GeneratorSingleCluster) model);
       }
@@ -142,10 +140,9 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     }
 
     for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       double score = 0.0;
       // Convert to a math vector
-      Vector v = vecs.get(id).getColumnVector();
+      Vector v = vecs.get(iditer).getColumnVector();
       for(GeneratorSingleCluster gen : generators) {
         Vector tv = v;
         // Transform backwards
@@ -173,7 +170,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       score = expect / (expect + score);
       // adjust to 0 to 1 range:
       score = (score - minscore) / (1 - minscore);
-      scores.putDouble(id, score);
+      scores.putDouble(iditer, score);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0., 1.);

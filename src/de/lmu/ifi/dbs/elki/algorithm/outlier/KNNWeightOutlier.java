@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -121,15 +120,14 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     // distance are flagged as outliers
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       // compute sum of the distances to the k nearest neighbors
 
-      final KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
+      final KNNResult<D> knn = knnQuery.getKNNForDBID(iditer, k);
       double skn = 0;
       for(DistanceResultPair<D> r : knn) {
         skn += r.getDistance().doubleValue();
       }
-      knnw_score.putDouble(id, skn);
+      knnw_score.putDouble(iditer, skn);
       minmax.put(skn);
 
       if(progressKNNWeight != null) {

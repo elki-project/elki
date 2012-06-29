@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -192,8 +191,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final O obj = relation.get(id);
+      final O obj = relation.get(iditer);
 
       double maxmdefnorm = 0;
       // For each level
@@ -238,7 +236,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
         maxmdefnorm = Math.max(maxmdefnorm, mdefnorm);
       }
       // Store results
-      mdef_norm.putDouble(id, maxmdefnorm);
+      mdef_norm.putDouble(iditer, maxmdefnorm);
       minmax.put(maxmdefnorm);
       if(progressLOCI != null) {
         progressLOCI.incrementProcessed(logger);

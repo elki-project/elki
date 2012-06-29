@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -52,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -294,20 +294,19 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
+    Mean mean = new Mean();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      double sum = 0;
-      KNNResult<D> neighbors = knnReach.getKNNForDBID(id, k);
-      int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
+      mean.reset();
+      KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
       for(DistanceResultPair<D> neighbor : neighbors) {
-        if(objectIsInKNN || !neighbor.getDBID().sameDBID(id)) {
-          KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor.getDBID(), k);
-          sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
+        if(objectIsInKNN || !neighbor.sameDBID(iter)) {
+          KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
+          mean.put(Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()));
         }
       }
       // Avoid division by 0
-      double lrd = (sum > 0) ? nsize / sum : 0.0;
-      lrds.putDouble(id, lrd);
+      double lrd = (mean.getCount() > 0) ? mean.getMean() : 0.0;
+      lrds.putDouble(iter, lrd);
       if(lrdsProgress != null) {
         lrdsProgress.incrementProcessed(logger);
       }
@@ -333,27 +332,25 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
+    Mean mean = new Mean();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
       double lrdp = lrds.get(iter);
       final double lof;
       if(lrdp > 0) {
-        final KNNResult<D> neighbors = knnRefer.getKNNForDBID(id, k);
-        int nsize = neighbors.size() - (objectIsInKNN ? 0 : 1);
-        // skip the point itself
-        // neighbors.remove(0);
-        double sum = 0;
+        final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
+        mean.reset();
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || !neighbor.getDBID().sameDBID(id)) {
-            sum += lrds.get(neighbor.getDBID());
+          // skip the point itself
+          if(objectIsInKNN || !neighbor.sameDBID(iter)) {
+            mean.put(lrds.get(neighbor));
           }
         }
-        lof = (sum / nsize) / lrdp;
+        lof = mean.getMean() / lrdp;
       }
       else {
         lof = 1.0;
       }
-      lofs.putDouble(id, lof);
+      lofs.putDouble(iter, lof);
       // update minimum and maximum
       lofminmax.put(lof);
 

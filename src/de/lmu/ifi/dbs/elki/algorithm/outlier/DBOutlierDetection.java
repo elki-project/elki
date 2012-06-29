@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -117,19 +116,18 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     // is more than d -> object is outlier
     if(knnQuery != null) {
       for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
         counter++;
-        final KNNResult<D> knns = knnQuery.getKNNForDBID(id, m);
+        final KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, m);
         if(logger.isDebugging()) {
           logger.debugFine("distance to mth nearest neighbour" + knns.toString());
         }
         if(knns.get(Math.min(m, knns.size()) - 1).getDistance().compareTo(neighborhoodSize) <= 0) {
           // flag as outlier
-          scores.putDouble(id, 1.0);
+          scores.putDouble(iditer, 1.0);
         }
         else {
           // flag as no outlier
-          scores.putDouble(id, 0.0);
+          scores.putDouble(iditer, 0.0);
         }
       }
       if(progressOFlags != null) {
@@ -139,26 +137,15 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     else {
       // range query for each object. stop if m objects are found
       for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
         counter++;
         int count = 0;
         for (DBIDIter iterator = distFunc.getRelation().iterDBIDs(); iterator.valid() && count < m; iterator.advance()) {
-          DBID currentID = iterator.getDBID();
-          D currentDistance = distFunc.distance(id, currentID);
-
+          D currentDistance = distFunc.distance(iditer, iterator);
           if(currentDistance.compareTo(neighborhoodSize) <= 0) {
             count++;
           }
         }
-
-        if(count < m) {
-          // flag as outlier
-          scores.putDouble(id, 1.0);
-        }
-        else {
-          // flag as no outlier
-          scores.putDouble(id, 0.0);
-        }
+        scores.putDouble(iditer, (count < m) ? 1.0 : 0);
       }
 
       if(progressOFlags != null) {

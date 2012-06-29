@@ -117,14 +117,13 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      Vector x = relation.get(id).getColumnVector().minusEquals(mean);
+      Vector x = relation.get(iditer).getColumnVector().minusEquals(mean);
       // Gaussian PDF
       final double mDist = x.transposeTimesTimes(covarianceTransposed, x);
       final double prob = fakt * Math.exp(-mDist / 2.0);
 
       mm.put(prob);
-      oscores.putDouble(id, prob);
+      oscores.putDouble(iditer, prob);
     }
 
     final OutlierScoreMeta meta;
