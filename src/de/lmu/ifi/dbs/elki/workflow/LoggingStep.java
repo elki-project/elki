@@ -92,8 +92,14 @@ public class LoggingStep implements WorkflowStep {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Verbose mode
+     */
     protected boolean verbose = false;
-
+    
+    /**
+     * Enable logging levels manually
+     */
     protected String[][] levels = null;
 
     @Override

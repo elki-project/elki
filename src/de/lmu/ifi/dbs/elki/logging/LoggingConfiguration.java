@@ -160,6 +160,27 @@ public final class LoggingConfiguration {
   }
 
   /**
+   * Enable runtime performance logging.
+   * 
+   * @param time Flag
+   */
+  public static void setTime(boolean time) {
+    Logger logger1 = Logger.getLogger("de.lmu.ifi.dbs.elki.workflow.AlgorithmStep");
+    if(time) {
+      // decrease to INFO if it was higher
+      if(logger1.getLevel() == null || logger1.getLevel().intValue() > Level.INFO.intValue()) {
+        logger1.setLevel(Level.INFO);
+      }
+    }
+    else {
+      // increase to warning level if it was INFO.
+      if(logger1.getLevel() != null || logger1.getLevel() == Level.INFO) {
+        logger1.setLevel(Level.WARNING);
+      }
+    }
+  }
+
+  /**
    * Add a handler to the root logger.
    * 
    * @param handler Handler

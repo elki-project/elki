@@ -105,6 +105,14 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID VERBOSE_FLAG = new OptionID("verbose", "Enable verbose messages.");
 
   /**
+   * Flag to allow verbose messages while running the application.
+   * <p>
+   * Key: {@code -time}
+   * </p>
+   */
+  public static final OptionID TIME_FLAG = new OptionID("time", "Enable logging of runtime data. Do not combine with more verbose logging, since verbose logging can significantly impact performance.");
+
+  /**
    * The description of the OptionID.
    */
   private String description;
