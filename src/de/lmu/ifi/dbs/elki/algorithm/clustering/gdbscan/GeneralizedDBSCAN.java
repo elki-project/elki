@@ -67,8 +67,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * @author Arthur Zimek
+ *
+ * @apiviz.landmark
  * 
  * @apiviz.has Instance
+ * @apiviz.composedOf CorePredicate
+ * @apiviz.composedOf NeighborPredicate
  */
 @Reference(authors = "Jörg Sander, Martin Ester, Hans-Peter Kriegel, Xiaowei Xu", title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", booktitle = "Data Mining and Knowledge Discovery", url = "http://dx.doi.org/10.1023/A:1009745219419")
 public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
@@ -123,6 +127,9 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    * Instance for a particular data set.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.composedOf CorePredicate.Instance
+   * @apiviz.composedOf NeighborPredicate.Instance
    */
   public class Instance<T> {
     /**

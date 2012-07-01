@@ -31,7 +31,12 @@
  * @apiviz.exclude de.lmu.ifi.dbs.elki.application.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.distancefunction.geo.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.*Instance
  */
 /*
 This file is part of ELKI:

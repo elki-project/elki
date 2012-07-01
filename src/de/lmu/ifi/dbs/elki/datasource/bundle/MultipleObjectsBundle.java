@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * with multiple representations outside of any index structure.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.landmark
  */
 public class MultipleObjectsBundle implements ObjectBundle {
   /**

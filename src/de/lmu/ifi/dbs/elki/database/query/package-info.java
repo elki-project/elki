@@ -73,6 +73,9 @@
  *   knnQuery.getKNNForDBID(id, 10);
  * }
  * }</pre></blockquote>
+ * 
+ * @apiviz.exclude java.util.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
  */
 /*
 This file is part of ELKI:

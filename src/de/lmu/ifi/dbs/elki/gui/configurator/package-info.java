@@ -1,8 +1,8 @@
 /**
  * <p>Configurator components</p>
  * 
- * @apiviz.exclude javax.swing.event.*
- * @apiviz.exclude javax.awt.event.*
+ * @apiviz.exclude javax.swing.*
+ * @apiviz.exclude java.awt.event
  */
 /*
 This file is part of ELKI:

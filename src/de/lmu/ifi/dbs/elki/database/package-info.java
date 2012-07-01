@@ -1,5 +1,9 @@
 /**
  * <p>ELKI database layer - loading, storing, indexing and accessing data</p>
+ *
+ * @apiviz.exclude elki.utilities
+ * @apiviz.exclude elki.result
+ * @apiviz.exclude elki.workflow
  */
 /*
 This file is part of ELKI:

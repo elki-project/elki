@@ -300,6 +300,8 @@ public final class VectorUtil {
    * Compare number vectors by a single dimension
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class SortDBIDsBySingleDimension implements Comparator<DBID> {
     /**
@@ -350,6 +352,8 @@ public final class VectorUtil {
    * Compare number vectors by a single dimension
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class SortVectorsBySingleDimension implements Comparator<NumberVector<?, ?>> {
     /**

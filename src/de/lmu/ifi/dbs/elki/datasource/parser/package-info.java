@@ -34,6 +34,9 @@
  * <p>As an example file following these requirements consider e.g.:
  * <a href="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/datasets/example/exampledata.txt">exampledata.txt</a>
  * </p>
+ *
+ * @apiviz.exclude java.io.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
  */
 /*
 This file is part of ELKI:

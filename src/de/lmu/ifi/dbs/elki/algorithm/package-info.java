@@ -5,6 +5,9 @@
  *  the {@link de.lmu.ifi.dbs.elki.algorithm.Algorithm}-Interface.
  *  Basic functions are already provided within {@link de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm},
  *  see there for basic instructions of how to implement an algorithm suitable to the framework.
+ *
+ * @apiviz.exclude workflow.AlgorithmStep
+ * @apiviz.exclude database.query.knn.KNNQuery
  */
 /*
 This file is part of ELKI:

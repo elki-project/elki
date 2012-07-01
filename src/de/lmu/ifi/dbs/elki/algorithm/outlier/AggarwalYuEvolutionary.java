@@ -619,6 +619,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * Individuum for the evolutionary search.
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.pairs.FCPair
    */
   private static class Individuum extends FCPair<Double, int[]> {
     /**

@@ -1,6 +1,7 @@
 /**
  * <p>Prepared queries for distances.</p>
  * 
+ * @apiviz.exlude *Instance
  */
 /*
 This file is part of ELKI:

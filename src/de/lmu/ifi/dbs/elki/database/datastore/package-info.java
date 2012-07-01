@@ -18,6 +18,7 @@
  * }</pre>
  * 
  * @apiviz.exclude datastore.memory
+ * @apiviz.exclude index.preprocessed
  */
 /*
 This file is part of ELKI:

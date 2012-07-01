@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses OPTICSTypeAlgorithm oneway
+ * @apiviz.composedOf OPTICSTypeAlgorithm oneway
  * @apiviz.uses ClusterOrderResult oneway
  * @apiviz.has SteepAreaResult
  * 

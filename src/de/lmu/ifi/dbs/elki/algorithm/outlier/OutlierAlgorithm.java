@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * Generic super interface for outlier detection algorithms.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.landmark
  * 
  * @apiviz.has OutlierResult
  */

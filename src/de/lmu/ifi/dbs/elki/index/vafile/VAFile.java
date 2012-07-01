@@ -445,7 +445,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype «factory»
+   * @apiviz.stereotype factory
    * @apiviz.has VAFile
    * 
    * @param <V> Vector type
