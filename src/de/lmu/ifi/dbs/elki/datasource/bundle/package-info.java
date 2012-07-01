@@ -1,5 +1,7 @@
 /**
  * <p>Object bundles - exchange container for multi-represented objects.</p>
+ *
+ * @apiviz.exclude java.util.*
  */
 /*
 This file is part of ELKI:

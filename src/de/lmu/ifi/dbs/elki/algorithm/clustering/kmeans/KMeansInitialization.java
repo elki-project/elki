@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * Interface for initializing K-Means
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.landmark
  * 
  * @param <V> Object type
  */

@@ -78,11 +78,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Elke Achtert
  * 
- * @apiviz.uses COPAC
- * @apiviz.uses DBSCAN
- * @apiviz.uses ERiCDistanceFunction
- * @apiviz.uses FirstNEigenPairFilter
- * @apiviz.uses PCAFilteredRunner
+ * @apiviz.composedOf COPAC
+ * @apiviz.composedOf DBSCAN
+ * @apiviz.composedOf ERiCDistanceFunction
+ * @apiviz.composedOf FirstNEigenPairFilter
+ * @apiviz.composedOf PCAFilteredRunner
  * @apiviz.has CorrelationModel
  * 
  * @param <V> the type of NumberVector handled by this Algorithm

@@ -8,6 +8,10 @@
  * partition the database complete or is in any other sense a relaxed clustering result.
  * 
  * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.Algorithm
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.*
  * 
  * @see de.lmu.ifi.dbs.elki.algorithm
  */

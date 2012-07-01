@@ -65,9 +65,15 @@
  * allows masking an ArrayDBIDs with a BitSet.</p>
  * 
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.Generic*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.data.cluster.Cluster
- * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.datastructures.heap.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs.EmptyDBIDItererator
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.data.Cluster
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.query.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.distance.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.index.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.result.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.persistent.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
  * @apiviz.exclude java.*

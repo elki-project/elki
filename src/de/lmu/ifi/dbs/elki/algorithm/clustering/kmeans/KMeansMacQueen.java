@@ -63,8 +63,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has MeanModel
- * 
  * @param <V> vector type to use
  * @param <D> distance function value type
  */

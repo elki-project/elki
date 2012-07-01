@@ -4,6 +4,11 @@
  * @see de.lmu.ifi.dbs.elki.algorithm
  * 
  * @apiviz.exclude database.query
+ * @apiviz.exclude java.lang.Comparable
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.Algorithm
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm
+ * @apiviz.exclude AggarwalYuEvoluationary.Individuum
  */
 /*
 This file is part of ELKI:

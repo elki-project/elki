@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * @apiviz.has RKNNQuery oneway - - provides
  * @apiviz.has Relation oneway - - contains
  * @apiviz.has Index oneway - - manages
- * @apiviz.uses DataStoreListener oneway - - invokes
+ * @apiviz.has DataStoreListener oneway - - invokes
  */
 public interface Database extends HierarchicalResult, InspectionUtilFrequentlyScanned {
   /**

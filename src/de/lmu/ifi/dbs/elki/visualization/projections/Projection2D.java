@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
+ *
+ * @apiviz.has CanvasSize
  */
 public interface Projection2D extends Projection {
   /**

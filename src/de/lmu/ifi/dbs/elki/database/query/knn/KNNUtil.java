@@ -40,6 +40,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @author Erich Schubert
  * 
  * @apiviz.uses KNNResult
+ * @apiviz.composedOf DBIDView
+ * @apiviz.composedOf DBIDItr
+ * @apiviz.composedOf DBIDIterator
+ * @apiviz.composedOf DistanceView
+ * @apiviz.composedOf DistanceItr
+ * @apiviz.composedOf KNNSubList
  */
 public final class KNNUtil {
   /**

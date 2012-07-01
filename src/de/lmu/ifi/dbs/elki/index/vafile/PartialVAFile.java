@@ -751,7 +751,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype «factory»
+   * @apiviz.stereotype factory
    * @apiviz.has PartialVAFile
    * 
    * @param <V> Vector type

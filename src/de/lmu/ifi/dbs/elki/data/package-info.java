@@ -4,6 +4,12 @@
  * @apiviz.exclude de.lmu.ifi.dbs.elki.algorithm.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.result.textwriter.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.visualization.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.parser.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter.*
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.math.linearalgebra.*
+ * @apiviz.exclude java.io.*
+ * @apiviz.exclude java.util.*
+ * @apiviz.exclude java.lang.*
  */
 /*
 This file is part of ELKI:

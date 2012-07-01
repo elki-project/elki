@@ -55,6 +55,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * SVG files.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf VisualizerParameterizer
  */
 // TODO: make more parameterizable, wrt. what to skip
 public class ExportVisualizations implements ResultHandler {

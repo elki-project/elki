@@ -53,6 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
  * @param <M> Model object type
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.landmark
  * 
  * @apiviz.composedOf DBIDs
  * @apiviz.composedOf Model

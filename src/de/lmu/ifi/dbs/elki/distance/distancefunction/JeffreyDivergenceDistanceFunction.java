@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors="J. Puzicha,J.M. Buhmann, Y. Rubner, C. Tomasi", title="Empirical evaluation of dissimilarity measures for color and texture", booktitle="Proc. 7th IEEE International Conference on Computer Vision", url="http://dx.doi.org/10.1109/ICCV.1999.790412")
+@Reference(authors="J. Puzicha, J.M. Buhmann, Y. Rubner, C. Tomasi", title="Empirical evaluation of dissimilarity measures for color and texture", booktitle="Proc. 7th IEEE International Conference on Computer Vision", url="http://dx.doi.org/10.1109/ICCV.1999.790412")
 public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * Static instance. Use this!

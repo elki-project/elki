@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.has MeanModel
  * @apiviz.composedOf KMeansInitialization
  * 
  * @param <V> Vector type

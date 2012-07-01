@@ -77,6 +77,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf ALOCIQuadTree
  * 
  * @param <O> Object type
  * @param <D> Distance type

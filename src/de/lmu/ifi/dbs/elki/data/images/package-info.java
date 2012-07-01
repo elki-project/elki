@@ -1,7 +1,7 @@
 /**
  * <p>Package for processing image data (e.g. compute color histograms)</p>
  * 
- * 
+ * @apiviz.exclude java.io.*
  */
 /*
 This file is part of ELKI:

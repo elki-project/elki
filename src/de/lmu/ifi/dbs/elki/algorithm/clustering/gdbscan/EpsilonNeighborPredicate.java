@@ -62,6 +62,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.has NeighborListInstance
+ * @apiviz.has DBIDInstance
  * 
  * @param <D> Distance type
  */

@@ -64,9 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 /**
  * Fast Outlier Detection Using the "Local Correlation Integral".
  * 
- * Exact implementation only, not aLOCI.
- * 
- * TODO: add aLOCI
+ * Exact implementation only, not aLOCI. See {@link ALOCI}
  * 
  * Outlier detection using multiple epsilon neighborhoods.
  * 

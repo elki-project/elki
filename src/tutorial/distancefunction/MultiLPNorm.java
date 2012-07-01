@@ -95,6 +95,8 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
    * Parameterization class example
    * 
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

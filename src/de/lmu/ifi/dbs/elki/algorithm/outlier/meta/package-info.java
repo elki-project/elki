@@ -1,5 +1,8 @@
 /**
  * <p>Meta outlier detection algorithms: external scores, score rescaling.</p>
+ *
+ * @apiviz.exclude java.io.File
+ * @apiviz.exclude algorithm.AbstractAlgorithm
  */
 /*
 This file is part of ELKI:
