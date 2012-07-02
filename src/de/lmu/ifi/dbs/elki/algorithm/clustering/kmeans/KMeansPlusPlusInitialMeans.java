@@ -176,7 +176,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     double weightsum = 0.0;
     DBIDIter it = ids.iter();
     for(int i = 0; i < weights.length; i++, it.advance()) {
-      if(latest.sameDBID(it)) {
+      if(DBIDUtil.equal(latest, it)) {
         weights[i] = 0.0;
       }
       else {

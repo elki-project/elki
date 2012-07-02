@@ -103,8 +103,8 @@ public class MaskedDBIDs implements DBIDs {
   @Override
   public boolean contains(DBIDRef o) {
     // TODO: optimize.
-    for(DBID id : this) {
-      if(id.sameDBID(o)) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(DBIDFactory.FACTORY.equal(iter, o)) {
         return true;
       }
     }

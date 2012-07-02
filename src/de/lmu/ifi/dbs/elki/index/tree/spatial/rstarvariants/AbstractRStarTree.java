@@ -200,7 +200,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     N node = getNode(subtree.getLastPathComponent().getEntry());
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
-        if(((LeafEntry) node.getEntry(i)).getDBID().sameDBID(id)) {
+        if(DBIDUtil.equal(((LeafEntry) node.getEntry(i)).getDBID(), id)) {
           return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
         }
       }

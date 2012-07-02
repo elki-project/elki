@@ -58,6 +58,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -448,11 +450,11 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
         for (int i = knn.size() - 1; i >= 0; i--) {
           DistanceResultPair<D> pair = knn.get(i);
-          Element line = plotSeries(pair.getDBID(), MAXRESOLUTION);
+          Element line = plotSeries(pair, MAXRESOLUTION);
           double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);
           String colstr = "#" + Integer.toHexString(color.getRGB()).substring(2);
-          String width = (pair.getDBID().sameDBID(idx)) ? "0.5%" : "0.2%";
+          String width = (DBIDUtil.equal(pair, idx)) ? "0.5%" : "0.2%";
           SVGUtil.setStyle(line, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache
@@ -484,7 +486,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
      * @param resolution Maximum number of steps to plot
      * @return SVG element
      */
-    private Element plotSeries(DBID idx, int resolution) {
+    private Element plotSeries(DBIDRef idx, int resolution) {
       O series = data.get(idx);
 
       double step = 1.0;

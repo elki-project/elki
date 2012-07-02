@@ -140,12 +140,11 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Find the top-k for each ensemble member
     {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
         // Skip "by label", obviously
-        if(firstid.sameDBID(id)) {
+        if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
-        final NumberVector<?, ?> vec = relation.get(id);
+        final NumberVector<?, ?> vec = relation.get(iditer);
         TiedTopBoundedHeap<DoubleIntPair> heap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
         for(int i = 0; i < dim; i++) {
           heap.add(new DoubleIntPair(vec.doubleValue(i + 1), i));

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -243,7 +244,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         // use first kref neighbors as reference set
         int ks = 0;
         for(DistanceResultPair<D> neighbor : neighbors) {
-          if(objectIsInKNN || !neighbor.sameDBID(iditer)) {
+          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
             double d = neighbor.getDistance().doubleValue();
             mean.put(d * d);
             ks++;
@@ -275,7 +276,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         // use first kref neighbors as comparison set.
         int ks = 0;
         for(DistanceResultPair<D> neighbor1 : neighbors) {
-          if(objectIsInKNN || !neighbor1.sameDBID(iditer)) {
+          if(objectIsInKNN || !DBIDUtil.equal(neighbor1, iditer)) {
             mv.put(pdists.doubleValue(neighbor1));
             ks++;
             if(ks >= kcomp) {
