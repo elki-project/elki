@@ -27,6 +27,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
@@ -94,7 +95,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
-    Object[] d = data.get(id.getIntegerID());
+    Object[] d = data.get(DBIDFactory.FACTORY.asInteger(id));
     if(d == null) {
       return null;
     }
@@ -119,10 +120,10 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
-    Object[] d = data.get(id.getIntegerID());
+    Object[] d = data.get(DBIDFactory.FACTORY.asInteger(id));
     if(d == null) {
       d = new Object[rlen];
-      data.put(id.getIntegerID(), d);
+      data.put(DBIDFactory.FACTORY.asInteger(id), d);
     }
     T ret = (T) d[index];
     d[index] = value;
@@ -186,6 +187,6 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   @Override
   public boolean remove(DBIDRef id) {
-    return data.remove(id.getIntegerID()) != null;
+    return data.remove(DBIDFactory.FACTORY.asInteger(id)) != null;
   }
 }

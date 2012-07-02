@@ -30,6 +30,7 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -82,7 +83,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      success |= store.add(iter.getIntegerID());
+      success |= store.add(DBIDFactory.FACTORY.asInteger(iter));
     }
     return success;
   }
@@ -91,24 +92,24 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBID id : ids) {
-      success |= store.remove(id.getIntegerID());
+      success |= store.remove(DBIDFactory.FACTORY.asInteger(id));
     }
     return success;
   }
 
   @Override
   public boolean add(DBIDRef e) {
-    return store.add(e.getIntegerID());
+    return store.add(DBIDFactory.FACTORY.asInteger(e));
   }
 
   @Override
   public boolean remove(DBIDRef o) {
-    return store.remove(o.getIntegerID());
+    return store.remove(DBIDFactory.FACTORY.asInteger(o));
   }
 
   @Override
   public DBID set(int index, DBID element) {
-    int prev = store.set(index, element.getIntegerID());
+    int prev = store.set(index, DBIDFactory.FACTORY.asInteger(element));
     return new IntegerDBID(prev);
   }
 
@@ -129,7 +130,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
 
   @Override
   public void sort(Comparator<? super DBID> comparator) {
-    // FIXME: optimize, avoid the extra copy.
+    // FIXME: optimize, avoid the extra copy?
     // Clone data
     DBID[] data = new DBID[store.size()];
     for(int i = 0; i < store.size(); i++) {
@@ -139,7 +140,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
     Arrays.sort(data, comparator);
     // Copy back
     for(int i = 0; i < store.size(); i++) {
-      store.set(i, data[i].getIntegerID());
+      store.set(i, DBIDFactory.FACTORY.asInteger(data[i]));
     }
   }
 

@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -185,7 +186,7 @@ public class MaskedDBIDs implements DBIDs {
 
     @Override
     public int getIntegerID() {
-      return data.get(pos).getIntegerID();
+      return DBIDFactory.FACTORY.asInteger(data.get(pos));
     }
 
     @Override
@@ -195,14 +196,12 @@ public class MaskedDBIDs implements DBIDs {
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return getIntegerID() == other.getIntegerID();
+      return DBIDFactory.FACTORY.equal(this, other);
     }
 
     @Override
     public int compareDBID(DBIDRef o) {
-      final int thisVal = getIntegerID();
-      final int anotherVal = o.getIntegerID();
-      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+      return DBIDFactory.FACTORY.compare(this, o);
     }
   }
 
@@ -276,7 +275,7 @@ public class MaskedDBIDs implements DBIDs {
 
     @Override
     public int getIntegerID() {
-      return data.get(pos).getIntegerID();
+      return DBIDFactory.FACTORY.asInteger(data.get(pos));
     }
 
     @Override
@@ -286,14 +285,12 @@ public class MaskedDBIDs implements DBIDs {
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return getIntegerID() == other.getIntegerID();
+      return DBIDFactory.FACTORY.equal(this, other);
     }
 
     @Override
     public int compareDBID(DBIDRef o) {
-      final int thisVal = getIntegerID();
-      final int anotherVal = o.getIntegerID();
-      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+      return DBIDFactory.FACTORY.compare(this, o);
     }
   }
 }

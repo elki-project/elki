@@ -74,7 +74,7 @@ public abstract class AbstractLeafEntry implements LeafEntry {
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeInt(id.getIntegerID());
+    out.writeInt(DBIDUtil.asInteger(id));
   }
 
   /**

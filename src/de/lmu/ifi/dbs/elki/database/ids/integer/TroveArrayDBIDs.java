@@ -29,6 +29,7 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -76,12 +77,12 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
 
   @Override
   public boolean contains(DBIDRef o) {
-    return getStore().contains(o.getIntegerID());
+    return getStore().contains(DBIDFactory.FACTORY.asInteger(o));
   }
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return getStore().binarySearch(key.getIntegerID());
+    return getStore().binarySearch(DBIDFactory.FACTORY.asInteger(key));
   }
 
   /**
@@ -140,7 +141,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return store.get(pos) == other.getIntegerID();
+      return store.get(pos) == DBIDFactory.FACTORY.asInteger(other);
     }
 
     @Override
@@ -154,7 +155,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     @Override
     public int compareDBID(DBIDRef o) {
       final int thisVal = store.get(pos);
-      final int anotherVal = o.getIntegerID();
+      final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
       return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }

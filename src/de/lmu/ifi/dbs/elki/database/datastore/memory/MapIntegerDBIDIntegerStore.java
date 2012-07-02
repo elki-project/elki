@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
@@ -62,12 +63,12 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   @Override
   @Deprecated
   public Integer get(DBIDRef id) {
-    return map.get(id.getIntegerID());
+    return map.get(DBIDFactory.FACTORY.asInteger(id));
   }
 
   @Override
   public int intValue(DBIDRef id) {
-    return map.get(id.getIntegerID());
+    return map.get(DBIDFactory.FACTORY.asInteger(id));
   }
 
   @Override
@@ -83,7 +84,7 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   @Override
   @Deprecated
   public Integer put(DBIDRef id, Integer value) {
-    return map.put(id.getIntegerID(), value);
+    return map.put(DBIDFactory.FACTORY.asInteger(id), value);
   }
 
   @Override
@@ -94,16 +95,16 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
 
   @Override
   public void delete(DBIDRef id) {
-    map.remove(id.getIntegerID());
+    map.remove(DBIDFactory.FACTORY.asInteger(id));
   }
 
   @Override
   public int putInt(DBIDRef id, int value) {
-    return map.put(id.getIntegerID(), value);
+    return map.put(DBIDFactory.FACTORY.asInteger(id), value);
   }
 
   @Override
   public int put(DBIDRef id, int value) {
-    return map.put(id.getIntegerID(), value);
+    return map.put(DBIDFactory.FACTORY.asInteger(id), value);
   }
 }

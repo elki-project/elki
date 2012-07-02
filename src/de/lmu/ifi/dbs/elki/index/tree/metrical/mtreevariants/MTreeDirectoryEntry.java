@@ -152,7 +152,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeInt(routingObjectID.getIntegerID());
+    out.writeInt(DBIDUtil.asInteger(routingObjectID));
     out.writeObject(parentDistance);
     out.writeObject(coveringRadius);
   }

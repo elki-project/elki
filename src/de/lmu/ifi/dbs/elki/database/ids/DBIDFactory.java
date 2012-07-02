@@ -50,12 +50,24 @@ public interface DBIDFactory {
   public static DBIDFactory FACTORY = new TrivialDBIDFactory();
   
   /**
-   * Import an integer ID
+   * Import and integer as DBID.
+   * 
+   * Note: this may not be possible for some factories!
    * 
    * @param id Integer ID to import
    * @return DBID
    */
   public DBID importInteger(int id);
+
+  /**
+   * Export a DBID as int.
+   * 
+   * Note: this may not be possible for some factories!
+   * 
+   * @param id DBID to export
+   * @return integer value
+   */
+  public int asInteger(DBIDRef id);
 
   /**
    * Generate a single DBID
@@ -162,4 +174,30 @@ public interface DBIDFactory {
    * @return type restriction for DBIDs
    */
   public Class<? extends DBID> getTypeRestriction();
+
+  /**
+   * Compare two DBIDs, for sorting
+   * 
+   * @param a First
+   * @param b Second
+   * @return Comparison result
+   */
+  public int compare(DBIDRef a, DBIDRef b);
+
+  /**
+   * Compare two DBIDs, for equality testing
+   * 
+   * @param a First
+   * @param b Second
+   * @return Comparison result
+   */
+  public boolean equal(DBIDRef a, DBIDRef b);
+
+  /**
+   * Print a DBID as string
+   * 
+   * @param id DBID reference
+   * @return Formatted ID
+   */
+  public String toString(DBIDRef id);
 }

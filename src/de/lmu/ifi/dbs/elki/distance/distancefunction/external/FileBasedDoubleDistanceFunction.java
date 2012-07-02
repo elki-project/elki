@@ -115,7 +115,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
       return getDistanceFactory().undefinedDistance();
     }
     // the smaller id is the first key
-    if(id1.getIntegerID() > id2.getIntegerID()) {
+    if(DBIDUtil.compare(id1, id2) > 0) {
       return distance(id2, id1);
     }
 
