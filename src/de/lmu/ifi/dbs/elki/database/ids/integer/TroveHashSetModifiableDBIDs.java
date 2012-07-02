@@ -6,6 +6,7 @@ import gnu.trove.impl.hash.THashPrimitiveIterator;
 import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.set.hash.TIntHashSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -86,7 +87,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      success |= store.add(iter.getIntegerID());
+      success |= store.add(DBIDFactory.FACTORY.asInteger(iter));
     }
     return success;
   }
@@ -95,19 +96,19 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBID id : ids) {
-      success |= store.remove(id.getIntegerID());
+      success |= store.remove(DBIDFactory.FACTORY.asInteger(id));
     }
     return success;
   }
 
   @Override
   public boolean add(DBIDRef e) {
-    return store.add(e.getIntegerID());
+    return store.add(DBIDFactory.FACTORY.asInteger(e));
   }
 
   @Override
   public boolean remove(DBIDRef o) {
-    return store.remove(o.getIntegerID());
+    return store.remove(DBIDFactory.FACTORY.asInteger(o));
   }
 
   @Override
@@ -145,7 +146,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
 
   @Override
   public boolean contains(DBIDRef o) {
-    return store.contains(o.getIntegerID());
+    return store.contains(DBIDFactory.FACTORY.asInteger(o));
   }
 
   /**
@@ -194,13 +195,13 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return getIntegerID() == other.getIntegerID();
+      return hash._set[_index] == DBIDFactory.FACTORY.asInteger(other);
     }
 
     @Override
     public int compareDBID(DBIDRef o) {
       final int thisVal = hash._set[_index];
-      final int anotherVal = o.getIntegerID();
+      final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
       return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }

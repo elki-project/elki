@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.FloatDistance;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
@@ -101,17 +102,19 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDDistanceFun
     if(id2 == null) {
       return getDistanceFactory().undefinedDistance();
     }
-    if(id1.getIntegerID() < 0 || id2.getIntegerID() < 0) {
+    final int intid1 = DBIDUtil.asInteger(id1);
+    final int intid2 = DBIDUtil.asInteger(id2);
+    if(intid1 < 0 || intid2 < 0) {
       throw new AbortException("Negative DBIDs not supported in OnDiskCache");
     }
     // the smaller id is the first key
-    if(id1.getIntegerID() > id2.getIntegerID()) {
+    if(intid1 > intid2) {
       return distance(id2, id1);
     }
 
     float distance;
     try {
-      distance = cache.getRecordBuffer(id1.getIntegerID(), id2.getIntegerID()).getFloat();
+      distance = cache.getRecordBuffer(intid1, intid2).getFloat();
     }
     catch(IOException e) {
       throw new RuntimeException("Read error when loading distance " + id1 + "," + id2 + " from cache file.", e);

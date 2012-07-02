@@ -80,11 +80,11 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
 
   @Override
   public synchronized void deallocateSingleDBID(DBID id) {
-    if (id.getIntegerID() >= 0) {
+    if (asInteger(id) >= 0) {
       logger.warning("Single DBID returned is from a range allocation!");
       return;
     }
-    int pos = - id.getIntegerID() - 1;
+    final int pos = - asInteger(id) - 1;
     dynamicUsed.clear(pos);
     dynamicStart = Math.min(dynamicStart, pos);
   }

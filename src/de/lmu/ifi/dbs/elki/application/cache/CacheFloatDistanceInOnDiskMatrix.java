@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -127,8 +128,8 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
     int matrixsize = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBID id  = iditer.getDBID();
-      matrixsize = Math.max(matrixsize, id.getIntegerID() + 1);
-      if(id.getIntegerID() < 0) {
+      matrixsize = Math.max(matrixsize, DBIDFactory.FACTORY.asInteger(id) + 1);
+      if(DBIDFactory.FACTORY.asInteger(id) < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
       }
     }
@@ -141,11 +142,9 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id1  = iditer.getDBID();
-      for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
-        DBID id2  = iditer2.getDBID();
-        if(id2.getIntegerID() >= id1.getIntegerID()) {
+    for(DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
+      for(DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
+        if(DBIDFactory.FACTORY.asInteger(id2) >= DBIDFactory.FACTORY.asInteger(id1)) {
           float d = distanceQuery.distance(id1, id2).floatValue();
           if(debugExtraCheckSymmetry) {
             float d2 = distanceQuery.distance(id2, id1).floatValue();
@@ -154,7 +153,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
             }
           }
           try {
-            matrix.getRecordBuffer(id1.getIntegerID(), id2.getIntegerID()).putFloat(d);
+            matrix.getRecordBuffer(DBIDFactory.FACTORY.asInteger(id1), DBIDFactory.FACTORY.asInteger(id2)).putFloat(d);
           }
           catch(IOException e) {
             throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);

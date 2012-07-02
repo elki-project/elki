@@ -51,9 +51,11 @@ public final class DBIDUtil {
   public static final EmptyDBIDs EMPTYDBIDS = new EmptyDBIDs();
 
   /**
-   * Import an Integer DBID.
+   * Import and integer as DBID.
    * 
-   * @param id Integer ID
+   * Note: this may not be possible for some factories!
+   * 
+   * @param id Integer ID to import
    * @return DBID
    */
   public static DBID importInteger(int id) {
@@ -61,11 +63,55 @@ public final class DBIDUtil {
   }
 
   /**
+   * Export a DBID as int.
+   * 
+   * Note: this may not be possible for some factories!
+   * 
+   * @param id DBID to export
+   * @return integer value
+   */
+  public static int asInteger(DBIDRef id) {
+    return DBIDFactory.FACTORY.asInteger(id);
+  }
+
+  /**
+   * Compare two DBIDs.
+   * 
+   * @param id1 First ID
+   * @param id2 Second ID
+   * @return Comparison result
+   */
+  public static int compare(DBIDRef id1, DBIDRef id2) {
+    return DBIDFactory.FACTORY.compare(id1, id2);
+  }
+
+  /**
+   * Test two DBIDs for equality.
+   * 
+   * @param id1 First ID
+   * @param id2 Second ID
+   * @return Comparison result
+   */
+  public static boolean equal(DBIDRef id1, DBIDRef id2) {
+    return DBIDFactory.FACTORY.equal(id1, id2);
+  }
+
+  /**
+   * Format a DBID as string.
+   * 
+   * @param id DBID
+   * @return String representation
+   */
+  public static String toString(DBIDIter id) {
+    return DBIDFactory.FACTORY.toString(id);
+  }
+
+  /**
    * Get a serializer for DBIDs
    * 
    * @return DBID serializer
    */
-  public ByteBufferSerializer<DBID> getDBIDSerializer() {
+  public static ByteBufferSerializer<DBID> getDBIDSerializer() {
     return DBIDFactory.FACTORY.getDBIDSerializer();
   }
 
@@ -74,7 +120,7 @@ public final class DBIDUtil {
    * 
    * @return DBID serializer
    */
-  public ByteBufferSerializer<DBID> getDBIDSerializerStatic() {
+  public static ByteBufferSerializer<DBID> getDBIDSerializerStatic() {
     return DBIDFactory.FACTORY.getDBIDSerializerStatic();
   }
 
@@ -209,16 +255,17 @@ public final class DBIDUtil {
       symmetricIntersection(second, first, secondonly, intersection, firstonly);
       return;
     }
-    assert(firstonly.size() == 0) : "OUTPUT set should be empty!";
-    assert(intersection.size() == 0) : "OUTPUT set should be empty!";
-    assert(secondonly.size() == 0) : "OUTPUT set should be empty!";
+    assert (firstonly.size() == 0) : "OUTPUT set should be empty!";
+    assert (intersection.size() == 0) : "OUTPUT set should be empty!";
+    assert (secondonly.size() == 0) : "OUTPUT set should be empty!";
     // Initialize with second
     secondonly.addDBIDs(second);
     for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
       // Try to remove
       if(secondonly.remove(it)) {
         intersection.add(it);
-      } else {
+      }
+      else {
         firstonly.add(it);
       }
     }
@@ -261,9 +308,10 @@ public final class DBIDUtil {
     if(existing instanceof StaticDBIDs) {
       return (StaticDBIDs) existing;
     }
-    if (existing instanceof ArrayDBIDs) {
-      return new UnmodifiableArrayDBIDs((ArrayDBIDs)existing);
-    } else {
+    if(existing instanceof ArrayDBIDs) {
+      return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
+    }
+    else {
       return new UnmodifiableDBIDs(existing);
     }
   }
@@ -353,7 +401,7 @@ public final class DBIDUtil {
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
     if(k <= 0 || k > source.size()) {
-      throw new IllegalArgumentException("Illegal value for size of random sample: " + k+ " > "+source.size()+" or < 0");
+      throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
     final Random random;
     if(seed != null) {

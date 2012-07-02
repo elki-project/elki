@@ -103,6 +103,33 @@ public class SimpleDBIDFactory implements DBIDFactory {
   }
 
   @Override
+  public int asInteger(DBIDRef id) {
+    if (id instanceof IntegerDBID) {
+      return ((IntegerDBID)id).id;
+    }
+    final DBID inner = id.getDBID();
+    assert(inner != id) : "Unresolvable DBIDRef found.";
+    return asInteger(inner);
+  }
+
+  @Override
+  public int compare(DBIDRef a, DBIDRef b) {
+    final int inta = asInteger(a);
+    final int intb = asInteger(b);
+    return (inta < intb ? -1 : (inta == intb ? 0 : 1));
+  }
+
+  @Override
+  public boolean equal(DBIDRef a, DBIDRef b) {
+    return asInteger(a) == asInteger(b);
+  }
+
+  @Override
+  public String toString(DBIDRef id) {
+    return Integer.toString(asInteger(id));
+  }
+
+  @Override
   public ArrayModifiableDBIDs newArray() {
     return new TroveArrayModifiableDBIDs();
   }
@@ -134,7 +161,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
 
   @Override
   public DBIDPair makePair(DBIDRef first, DBIDRef second) {
-    return new IntegerDBIDPair(first.getIntegerID(), second.getIntegerID());
+    return new IntegerDBIDPair(asInteger(first), asInteger(second));
   }
 
   @Override

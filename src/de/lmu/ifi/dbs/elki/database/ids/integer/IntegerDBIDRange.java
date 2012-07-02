@@ -142,19 +142,19 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return start + pos == other.getIntegerID();
+      return start + pos == DBIDFactory.FACTORY.asInteger(other);
     }
     
     @Override
     public int compareDBID(DBIDRef o) {
-      int anotherVal = o.getIntegerID();
+      int anotherVal = DBIDFactory.FACTORY.asInteger(o);
       return (start + pos < anotherVal ? -1 : (start + pos == anotherVal ? 0 : 1));
     }
   }
 
   @Override
   public boolean contains(DBIDRef o) {
-    int oid = o.getIntegerID();
+    int oid = DBIDFactory.FACTORY.asInteger(o);
     if(oid < start) {
       return false;
     }
@@ -197,12 +197,12 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
    */
   @Override
   public int getOffset(DBIDRef dbid) {
-    return dbid.getIntegerID() - start;
+    return DBIDFactory.FACTORY.asInteger(dbid) - start;
   }
 
   @Override
   public int binarySearch(DBIDRef key) {
-    int keyid = key.getIntegerID();
+    int keyid = DBIDFactory.FACTORY.asInteger(key);
     if(keyid < start) {
       return -1;
     }

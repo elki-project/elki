@@ -29,6 +29,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -239,7 +240,7 @@ public final class KNNUtil {
 
     @Override
     public int getIntegerID() {
-      return cur.getDBID().getIntegerID();
+      return DBIDFactory.FACTORY.asInteger(cur);
     }
 
     @Override
@@ -249,14 +250,12 @@ public final class KNNUtil {
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return getIntegerID() == other.getIntegerID();
+      return DBIDFactory.FACTORY.equal(cur, other);
     }
 
     @Override
     public int compareDBID(DBIDRef o) {
-      final int thisVal = getIntegerID();
-      final int anotherVal = o.getIntegerID();
-      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+      return DBIDFactory.FACTORY.compare(cur, o);
     }
   }
 

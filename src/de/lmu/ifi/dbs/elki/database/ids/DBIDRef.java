@@ -45,8 +45,11 @@ public interface DBIDRef {
   /**
    * Return the integer value of the object ID, if possible.
    * 
+   * @deprecated Scheduled for removal.
+   * 
    * @return integer id
    */
+  @Deprecated
   public int getIntegerID();
 
   /**

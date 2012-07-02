@@ -145,11 +145,11 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     // check if all distance values are specified
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        if(iter2.getIntegerID() < iter.getIntegerID()) {
+        if(DBIDUtil.compare(iter2, iter) < 0) {
           continue;
         }
         if(!containsKey(iter, iter2, distanceCache)) {
-          throw new IllegalArgumentException("Distance value for " + iter.getDBID() + " - " + iter2.getDBID() + " is missing!");
+          throw new IllegalArgumentException("Distance value for " + DBIDUtil.toString(iter) + " - " + DBIDUtil.toString(iter2) + " is missing!");
         }
       }
     }
@@ -177,7 +177,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    */
   private void put(DBID id1, DBID id2, D distance, Map<DBIDPair, D> cache) {
     // the smaller id is the first key
-    if(id1.getIntegerID() > id2.getIntegerID()) {
+    if(DBIDUtil.compare(id1, id2) > 0) {
       put(id2, id1, distance, cache);
       return;
     }
@@ -200,7 +200,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    *         specified ids, false otherwise
    */
   public boolean containsKey(DBIDRef id1, DBIDRef id2, Map<DBIDPair, D> cache) {
-    if(id1.getIntegerID() > id2.getIntegerID()) {
+    if(DBIDUtil.compare(id1, id2) > 0) {
       return containsKey(id2, id1, cache);
     }
 

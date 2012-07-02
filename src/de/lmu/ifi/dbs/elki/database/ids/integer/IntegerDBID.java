@@ -27,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -116,21 +117,19 @@ final class IntegerDBID implements DBID {
   
     @Override
   public boolean sameDBID(DBIDRef other) {
-    return this.id == other.getIntegerID();
+    return this.id == DBIDFactory.FACTORY.asInteger(other);
   }
 
   @Override
   public int compareTo(DBIDRef o) {
-    int thisVal = this.id;
-    int anotherVal = o.getIntegerID();
-    return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
+    return (this.id < anotherVal ? -1 : (this.id == anotherVal ? 0 : 1));
   }
 
   @Override
   public int compareDBID(DBIDRef o) {
-    int thisVal = this.id;
-    int anotherVal = o.getIntegerID();
-    return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
+    return (this.id < anotherVal ? -1 : (this.id == anotherVal ? 0 : 1));
   }
 
   @Override
@@ -153,7 +152,7 @@ final class IntegerDBID implements DBID {
 
   @Override
   public boolean contains(DBIDRef o) {
-    return o.getIntegerID() == id;
+    return DBIDFactory.FACTORY.asInteger(o) == id;
   }
 
   @Override
@@ -163,7 +162,7 @@ final class IntegerDBID implements DBID {
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return (id == key.getIntegerID()) ? 0 : -1;
+    return (id == DBIDFactory.FACTORY.asInteger(key)) ? 0 : -1;
   }
 
   /**
@@ -217,7 +216,7 @@ final class IntegerDBID implements DBID {
 
     @Override
     public int getIntegerID() {
-      return id;
+      return IntegerDBID.this.id;
     }
 
     @Override
@@ -240,13 +239,12 @@ final class IntegerDBID implements DBID {
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return id == other.getIntegerID();
+      return IntegerDBID.this.sameDBID(other);
     }
 
     @Override
     public int compareDBID(DBIDRef o) {
-      int anotherVal = o.getIntegerID();
-      return (id < anotherVal ? -1 : (id == anotherVal ? 0 : 1));
+      return IntegerDBID.this.compareDBID(o);
     }
   }
 

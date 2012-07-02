@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
@@ -71,15 +72,15 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
 
   @Override
   public T get(DBIDRef id) {
-    return data.get(id.getIntegerID());
+    return data.get(DBIDFactory.FACTORY.asInteger(id));
   }
 
   @Override
   public T put(DBIDRef id, T value) {
     if(value == null) {
-      return data.remove(id.getIntegerID());
+      return data.remove(DBIDFactory.FACTORY.asInteger(id));
     }
-    return data.put(id.getIntegerID(), value);
+    return data.put(DBIDFactory.FACTORY.asInteger(id), value);
   }
 
   @Override
@@ -89,7 +90,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
 
   @Override
   public void delete(DBIDRef id) {
-    data.remove(id.getIntegerID());
+    data.remove(DBIDFactory.FACTORY.asInteger(id));
   }
 
   @Override

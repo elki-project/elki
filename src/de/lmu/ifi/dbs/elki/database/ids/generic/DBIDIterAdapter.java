@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
@@ -73,7 +74,7 @@ public class DBIDIterAdapter implements DBIDMIter {
 
   @Override
   public int getIntegerID() {
-    return cur.getIntegerID();
+    return DBIDFactory.FACTORY.asInteger(cur);
   }
 
   @Override
@@ -88,13 +89,11 @@ public class DBIDIterAdapter implements DBIDMIter {
 
   @Override
   public boolean sameDBID(DBIDRef other) {
-    return cur.getIntegerID() == other.getIntegerID();
+    return DBIDFactory.FACTORY.equal(cur, other);
   }
 
   @Override
   public int compareDBID(DBIDRef o) {
-    final int thisVal = cur.getIntegerID();
-    final int anotherVal = o.getIntegerID();
-    return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    return DBIDFactory.FACTORY.compare(cur, o);
   }
 }

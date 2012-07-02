@@ -127,7 +127,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
 
     @Override
     public boolean sameDBID(DBIDRef other) {
-      return ids[pos] == other.getIntegerID();
+      return ids[pos] == DBIDFactory.FACTORY.asInteger(other);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
 
     @Override
     public int compareDBID(DBIDRef o) {
-      int anotherVal = o.getIntegerID();
+      int anotherVal = DBIDFactory.FACTORY.asInteger(o);
       return (ids[pos] < anotherVal ? -1 : (ids[pos] == anotherVal ? 0 : 1));
     }
   }
@@ -152,7 +152,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
 
   @Override
   public boolean contains(DBIDRef o) {
-    final int oid = o.getIntegerID();
+    final int oid = DBIDFactory.FACTORY.asInteger(o);
     for(int i = 0; i < ids.length; i++) {
       if(ids[i] == oid) {
         return true;
@@ -185,6 +185,6 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return Arrays.binarySearch(ids, key.getIntegerID());
+    return Arrays.binarySearch(ids, DBIDFactory.FACTORY.asInteger(key));
   }
 }
