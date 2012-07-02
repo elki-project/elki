@@ -76,20 +76,4 @@ public interface DBIDRef {
   @Override
   @Deprecated
   public boolean equals(Object obj);
-  
-  /**
-   * Compare the <em>current</em> value of two referenced DBIDs.
-   * 
-   * @param other Other DBID reference (or DBID)
-   * @return {@code true} when the references <em>currently</em> refer to the same.
-   */
-  public boolean sameDBID(DBIDRef other);
-  
-  /**
-   * Compare two objects by the value of the referenced DBID.
-   * 
-   * @param other Other DBID or object
-   * @return -1, 0 or +1
-   */
-  public int compareDBID(DBIDRef other);
 }

@@ -156,7 +156,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr extends THashPrimitiveIterator implements DBIDMIter {
+  protected static class DBIDItr extends THashPrimitiveIterator implements DBIDMIter, IntegerDBIDRef {
     /**
      * The has we access
      */
@@ -191,18 +191,6 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
     @Override
     public DBID getDBID() {
       return new IntegerDBID(hash._set[_index]);
-    }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return hash._set[_index] == DBIDFactory.FACTORY.asInteger(other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      final int thisVal = hash._set[_index];
-      final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
-      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }
 }

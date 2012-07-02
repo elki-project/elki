@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -72,7 +73,7 @@ public class SharedNearestNeighborSimilarityFunction<O> extends AbstractIndexBas
     DBIDIter iter1 = neighbors1.iter();
     DBIDIter iter2 = neighbors2.iter();
     while(iter1.valid() && iter2.valid()) {
-      final int comp = iter1.compareDBID(iter2);
+      final int comp = DBIDUtil.compare(iter1, iter2);
       if(comp == 0) {
         intersection++;
         iter1.advance();

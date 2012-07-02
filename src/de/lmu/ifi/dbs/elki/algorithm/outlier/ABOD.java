@@ -383,7 +383,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
         if(DBIDUtil.equal(cKey, aKey)) {
           continue;
         }
-        if(bKey.compareDBID(cKey) > 0) {
+        if(DBIDUtil.compare(bKey, cKey) > 0) {
           double nenner = dists.doubleValue(bKey) * dists.doubleValue(cKey);
           if(nenner != 0) {
             double tmp = calcNumerator(kernelMatrix, aKey, bKey, cKey) / nenner;

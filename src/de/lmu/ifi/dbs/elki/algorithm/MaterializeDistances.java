@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -81,7 +82,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
         // skip inverted pairs
-        if(iditer2.compareDBID(iditer) > 0) {
+        if(DBIDUtil.compare(iditer2, iditer) > 0) {
           continue;
         }
         double d = distFunc.distance(iditer, iditer2).doubleValue();

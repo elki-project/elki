@@ -117,15 +117,5 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
       }
       return super.equals(other);
     }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return false;
-    }
-
-    @Override
-    public int compareDBID(DBIDRef other) {
-      throw new UnsupportedOperationException("Invalid iterator position. Cannot compare.");
-    }
   }
 }

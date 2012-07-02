@@ -102,7 +102,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDIter {
+  protected class DBIDItr implements DBIDIter, IntegerDBIDRef {
     int pos = 0;
 
     @Override
@@ -126,22 +126,11 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
     }
 
     @Override
-    public boolean sameDBID(DBIDRef other) {
-      return ids[pos] == DBIDFactory.FACTORY.asInteger(other);
-    }
-
-    @Override
     public boolean equals(Object other) {
       if (other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      int anotherVal = DBIDFactory.FACTORY.asInteger(o);
-      return (ids[pos] < anotherVal ? -1 : (ids[pos] == anotherVal ? 0 : 1));
     }
   }
 

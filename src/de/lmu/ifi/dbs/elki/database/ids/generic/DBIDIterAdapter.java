@@ -28,7 +28,6 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * Iterator for classic collections.
@@ -85,15 +84,5 @@ public class DBIDIterAdapter implements DBIDMIter {
   @Override
   public void remove() {
     iter.remove();
-  }
-
-  @Override
-  public boolean sameDBID(DBIDRef other) {
-    return DBIDFactory.FACTORY.equal(cur, other);
-  }
-
-  @Override
-  public int compareDBID(DBIDRef o) {
-    return DBIDFactory.FACTORY.compare(cur, o);
   }
 }
