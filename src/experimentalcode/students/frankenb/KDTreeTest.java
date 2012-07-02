@@ -46,13 +46,13 @@ public class KDTreeTest {
     assertEquals(3, list.size());
     for(DistanceResultPair<DoubleDistance> distanceEntry : list) {
       if(counter == 0) {
-        assertEquals(1, distanceEntry.getDBID().getIntegerID());
+        assertEquals(1, DBIDUtil.asInteger(distanceEntry));
       }
       else if(counter == 1) {
-        assertEquals(5, distanceEntry.getDBID().getIntegerID());
+        assertEquals(5, DBIDUtil.asInteger(distanceEntry));
       }
       else if(counter == 2) {
-        assertEquals(0, distanceEntry.getDBID().getIntegerID());
+        assertEquals(0, DBIDUtil.asInteger(distanceEntry));
       }
       counter++;
     }

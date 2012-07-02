@@ -10,6 +10,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
@@ -46,7 +48,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   
   private int requested = 0;
   private long calculations = 0;
-  private Set<Integer> alreadyRequestedIDs = new HashSet<Integer>();
+  private HashSetModifiableDBIDs alreadyRequestedIDs = DBIDUtil.newHashSet();
   
   @Override
   public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
@@ -54,9 +56,9 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
     
     KNNResult<DoubleDistance> projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);
     
-    if (!alreadyRequestedIDs.contains(id.getIntegerID())) {
+    if (!alreadyRequestedIDs.contains(id)) {
       //calculations += tree.getLastMeasure().getCalculations();
-      alreadyRequestedIDs.add(id.getIntegerID());
+      alreadyRequestedIDs.add(id);
       if (alreadyRequestedIDs.size() == dataBase.size()) {
         logger.verbose(String.format("Calculations used: %,d", calculations));
       }
