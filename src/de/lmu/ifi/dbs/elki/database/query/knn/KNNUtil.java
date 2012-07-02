@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -303,7 +304,7 @@ public final class KNNUtil {
     @Override
     public boolean contains(DBIDRef o) {
       for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-        if(iter.sameDBID(o)) {
+        if(DBIDUtil.equal(iter, o)) {
           return true;
         }
       }

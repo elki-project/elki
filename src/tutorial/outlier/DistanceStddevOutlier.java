@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -83,7 +84,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
       MeanVariance mv = new MeanVariance();
       for(DistanceResultPair<D> neighbor : neighbors) {
         // Skip the object itself. The 0 is not very informative.
-        if(id.sameDBID(neighbor.getDBID())) {
+        if(DBIDUtil.equal(id, neighbor)) {
           continue;
         }
         mv.put(neighbor.getDistance().doubleValue());

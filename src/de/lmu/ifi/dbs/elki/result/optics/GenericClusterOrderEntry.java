@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.result.optics;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -81,7 +82,7 @@ public class GenericClusterOrderEntry<D extends Distance<D>> implements Comparab
 
     final ClusterOrderEntry<?> that = (ClusterOrderEntry<?>) o;
     // Compare by ID only, for UpdatableHeap!
-    return objectID.sameDBID(that.getID());
+    return DBIDUtil.equal(objectID, that.getID());
   }
 
   /**

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -104,7 +105,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
         // calculate and store Median of neighborhood
         int c = 0;
         for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-          if(id.sameDBID(iter)) {
+          if(DBIDUtil.equal(id, iter)) {
             continue;
           }
           fi[c] = relation.get(iter).doubleValue(1);

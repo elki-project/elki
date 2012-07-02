@@ -195,7 +195,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     // similarityFunction.getPreprocessor().getParameters();
     Heap<DoubleObjPair<DBID>> nearestNeighbors = new TiedTopBoundedHeap<DoubleObjPair<DBID>>(knn);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      if(!iter.sameDBID(queryObject)) {
+      if(!DBIDUtil.equal(iter, queryObject)) {
         double sim = simQ.similarity(queryObject, iter).doubleValue();
         if(sim > 0) {
           nearestNeighbors.add(new DoubleObjPair<DBID>(sim, iter.getDBID()));

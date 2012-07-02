@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -139,10 +140,10 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       // skip the point itself
       dxp.reset(); Dxp.reset();
       for(DistanceResultPair<D> neighbor1 : neighbors) {
-        if(!neighbor1.sameDBID(iditer)) {
+        if(!DBIDUtil.equal(neighbor1, iditer)) {
           dxp.put(neighbor1.getDistance().doubleValue());
           for(DistanceResultPair<D> neighbor2 : neighbors) {
-            if(!neighbor1.sameDBID(neighbor2) && !neighbor2.sameDBID(iditer)) {
+            if(!DBIDUtil.equal(neighbor1, neighbor2) && !DBIDUtil.equal(neighbor2, iditer)) {
               Dxp.put(distFunc.distance(neighbor1, neighbor2).doubleValue());
             }
           }

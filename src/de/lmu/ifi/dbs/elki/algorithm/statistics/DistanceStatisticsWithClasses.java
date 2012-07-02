@@ -181,17 +181,15 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
     final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
     for(Cluster<?> c1 : split) {
-      for(DBIDIter iter = c1.getIDs().iter(); iter.valid(); iter.advance()) {
-        DBID id1 = iter.getDBID();
+      for(DBIDIter id1 = c1.getIDs().iter(); id1.valid(); id1.advance()) {
         // in-cluster distances
         DoubleMinMax iminmax = new DoubleMinMax();
         for(DBIDIter iter2 = c1.getIDs().iter(); iter2.valid(); iter2.advance()) {
-          DBID id2 = iter2.getDBID();
           // skip the point itself.
-          if(id1.sameDBID(id2)) {
+          if(DBIDUtil.equal(id1, iter2)) {
             continue;
           }
-          double d = distFunc.distance(id1, id2).doubleValue();
+          double d = distFunc.distance(id1, iter2).doubleValue();
 
           histogram.aggregate(d, incFirst);
 
@@ -212,12 +210,11 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
             continue;
           }
           for(DBIDIter iter2 = c2.getIDs().iter(); iter2.valid(); iter2.advance()) {
-            DBID id2 = iter2.getDBID();
             // skip the point itself (shouldn't happen though)
-            if(id1.sameDBID(id2)) {
+            if(DBIDUtil.equal(id1, iter2)) {
               continue;
             }
-            double d = distFunc.distance(id1, id2).doubleValue();
+            double d = distFunc.distance(id1, iter2).doubleValue();
 
             histogram.aggregate(d, incSecond);
 

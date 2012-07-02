@@ -198,7 +198,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         while(i < kNNs.size() && j < newKNNs.size()) {
           DistanceResultPair<D> drp1 = kNNs.get(i);
           DistanceResultPair<D> drp2 = newKNNs.get(j);
-          if(!drp1.sameDBID(drp2)) {
+          if(!DBIDUtil.equal(drp1, drp2)) {
             added.add(drp2);
             j++;
           }

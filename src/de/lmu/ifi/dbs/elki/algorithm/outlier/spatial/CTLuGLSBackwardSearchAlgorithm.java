@@ -205,10 +205,10 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
         for(DistanceResultPair<D> dpair : neighbors) {
-          if(id.sameDBID(dpair.getDBID())) {
+          if(DBIDUtil.equal(id, dpair)) {
             continue;
           }
-          neighborhood.add(dpair.getDBID());
+          neighborhood.add(dpair);
         }
         // Weight object itself positively.
         F.set(i, i, 1.0);

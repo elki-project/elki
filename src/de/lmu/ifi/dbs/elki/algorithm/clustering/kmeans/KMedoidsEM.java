@@ -145,7 +145,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
         DBID best = null;
         Mean bestm = mdists[i];
         for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
-          if(med.sameDBID(iter)) {
+          if(DBIDUtil.equal(med, iter)) {
             continue;
           }
           Mean mdist = new Mean();
@@ -157,7 +157,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
             bestm = mdist;
           }
         }
-        if(best != null && !med.sameDBID(best)) {
+        if(best != null && !DBIDUtil.equal(med, best)) {
           changed = true;
           medoids.set(i, best);
           mdists[i] = bestm;

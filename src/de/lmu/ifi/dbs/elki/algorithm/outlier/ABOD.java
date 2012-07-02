@@ -202,7 +202,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
         // PriorityQueue best = new PriorityQueue(false, k);
         while(iter2.hasNext()) {
           DistanceResultPair<DoubleDistance> key2 = iter2.next();
-          if(key2.sameDBID(key1) || key1.sameDBID(objKey) || key2.sameDBID(objKey)) {
+          if(DBIDUtil.equal(key2, key1) || DBIDUtil.equal(key1, objKey) || DBIDUtil.equal(key2, objKey)) {
             continue;
           }
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
@@ -298,11 +298,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // v++;
       s.reset();
       for(DBIDIter bKey = relation.iterDBIDs(); bKey.valid(); bKey.advance()) {
-        if(bKey.sameDBID(aKey)) {
+        if(DBIDUtil.equal(bKey, aKey)) {
           continue;
         }
         for(DBIDIter cKey = relation.iterDBIDs(); cKey.valid(); cKey.advance()) {
-          if(cKey.sameDBID(aKey)) {
+          if(DBIDUtil.equal(cKey, aKey)) {
             continue;
           }
           // double nenner = dists[y]*dists[z];
@@ -376,11 +376,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     double sqrSum = 0.0;
     double partCounter = 0;
     for(DBIDIter bKey = neighbors.iter(); bKey.valid(); bKey.advance()) {
-      if(bKey.sameDBID(aKey)) {
+      if(DBIDUtil.equal(bKey, aKey)) {
         continue;
       }
       for(DBIDIter cKey = neighbors.iter(); cKey.valid(); cKey.advance()) {
-        if(cKey.sameDBID(aKey)) {
+        if(DBIDUtil.equal(cKey, aKey)) {
           continue;
         }
         if(bKey.compareDBID(cKey) > 0) {
@@ -489,11 +489,11 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       for (DBIDIter key1 = data.iterDBIDs(); key1.valid(); key1.advance()) {
       // Collect Explanation Vectors
         s2.reset();
-        if(objKey.sameDBID(key1)) {
+        if(DBIDUtil.equal(objKey, key1)) {
           continue;
         }
         for (DBIDIter key2 = data.iterDBIDs(); key2.valid(); key2.advance()) {
-          if(key2.sameDBID(key1) || objKey.sameDBID(key2)) {
+          if(DBIDUtil.equal(key2, key1) || DBIDUtil.equal(objKey, key2)) {
             continue;
           }
           double nenner = calcDenominator(kernelMatrix, objKey, key1, key2);
@@ -513,12 +513,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       expList.add(explain.remove().getSecond());
       while(!explain.isEmpty()) {
         DBID nextKey = explain.remove().getSecond();
-        if(nextKey.sameDBID(objKey)) {
+        if(DBIDUtil.equal(nextKey, objKey)) {
           continue;
         }
         double max = Double.MIN_VALUE;
         for(DBIDIter exp = expList.iter(); exp.valid(); exp.advance()) {
-          if(exp.sameDBID(objKey) || nextKey.sameDBID(exp)) {
+          if(DBIDUtil.equal(exp, objKey) || DBIDUtil.equal(nextKey, exp)) {
             continue;
           }
           double nenner = Math.sqrt(calcCos(kernelMatrix, objKey, nextKey)) * Math.sqrt(calcCos(kernelMatrix, objKey, exp));

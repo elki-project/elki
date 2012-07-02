@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -301,7 +302,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       mean.reset();
       KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
       for(DistanceResultPair<D> neighbor : neighbors) {
-        if(objectIsInKNN || !neighbor.sameDBID(iter)) {
+        if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
           KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
           mean.put(Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()));
         }
@@ -343,7 +344,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         mean.reset();
         for(DistanceResultPair<D> neighbor : neighbors) {
           // skip the point itself
-          if(objectIsInKNN || !neighbor.sameDBID(iter)) {
+          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             mean.put(lrds.get(neighbor));
           }
         }
