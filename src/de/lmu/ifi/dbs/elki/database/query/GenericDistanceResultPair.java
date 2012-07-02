@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.query;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -81,16 +80,6 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
   @Override
   public int getIntegerID() {
     return DBIDFactory.FACTORY.asInteger(second);
-  }
-
-  @Override
-  public boolean sameDBID(DBIDRef other) {
-    return DBIDUtil.equal(second, other);
-  }
-
-  @Override
-  public int compareDBID(DBIDRef other) {
-    return DBIDUtil.compare(second, other);
   }
 
   /**

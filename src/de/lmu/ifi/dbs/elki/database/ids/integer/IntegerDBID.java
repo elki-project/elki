@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
  * @apiviz.composedOf DynamicSerializer
  * @apiviz.composedOf StaticSerializer
  */
-final class IntegerDBID implements DBID {
+final class IntegerDBID implements DBID, IntegerDBIDRef {
   /**
    * The actual object ID.
    */
@@ -115,19 +115,8 @@ final class IntegerDBID implements DBID {
     return this.id == other.id;
   }
   
-    @Override
-  public boolean sameDBID(DBIDRef other) {
-    return this.id == DBIDFactory.FACTORY.asInteger(other);
-  }
-
   @Override
   public int compareTo(DBIDRef o) {
-    final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
-    return (this.id < anotherVal ? -1 : (this.id == anotherVal ? 0 : 1));
-  }
-
-  @Override
-  public int compareDBID(DBIDRef o) {
     final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
     return (this.id < anotherVal ? -1 : (this.id == anotherVal ? 0 : 1));
   }
@@ -203,7 +192,7 @@ final class IntegerDBID implements DBID {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDIter {
+  protected class DBIDItr implements DBIDIter, IntegerDBIDRef {
     /**
      * Whether we've already returned our object.
      */
@@ -235,16 +224,6 @@ final class IntegerDBID implements DBID {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
-    }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return IntegerDBID.this.sameDBID(other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      return IntegerDBID.this.compareDBID(o);
     }
   }
 

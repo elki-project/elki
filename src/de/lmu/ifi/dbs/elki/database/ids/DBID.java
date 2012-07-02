@@ -39,24 +39,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
   /**
-   * Compare the <em>current</em> value of two referenced DBIDs.
-   * 
-   * @param other Other DBID reference (or DBID)
-   * @return {@code true} when the references <em>currently</em> refer to the same.
-   */
-  @Override
-  public boolean sameDBID(DBIDRef other);
-  
-  /**
-   * Compare two objects by the value of the referenced DBID.
-   * 
-   * @param other Other DBID or object
-   * @return -1, 0 or +1
-   */
-  @Override
-  public int compareDBID(DBIDRef other);
-
-  /**
    * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
    * stable hash code. However, it is generally preferred to use optimized
    * storage classes instead of Java collections!

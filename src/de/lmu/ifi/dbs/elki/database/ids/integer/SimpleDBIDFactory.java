@@ -104,8 +104,8 @@ public class SimpleDBIDFactory implements DBIDFactory {
 
   @Override
   public int asInteger(DBIDRef id) {
-    if (id instanceof IntegerDBID) {
-      return ((IntegerDBID)id).id;
+    if (id instanceof IntegerDBIDRef) {
+      return ((IntegerDBIDRef)id).getIntegerID();
     }
     final DBID inner = id.getDBID();
     assert(inner != id) : "Unresolvable DBIDRef found.";

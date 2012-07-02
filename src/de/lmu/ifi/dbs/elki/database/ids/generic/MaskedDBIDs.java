@@ -193,16 +193,6 @@ public class MaskedDBIDs implements DBIDs {
     public DBID getDBID() {
       return data.get(pos);
     }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return DBIDFactory.FACTORY.equal(this, other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      return DBIDFactory.FACTORY.compare(this, o);
-    }
   }
 
   /**
@@ -281,16 +271,6 @@ public class MaskedDBIDs implements DBIDs {
     @Override
     public DBID getDBID() {
       return data.get(pos);
-    }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return DBIDFactory.FACTORY.equal(this, other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      return DBIDFactory.FACTORY.compare(this, o);
     }
   }
 }

@@ -92,7 +92,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements DBIDMIter {
+  protected static class DBIDItr implements DBIDMIter, IntegerDBIDRef {
     /**
      * Current position
      */
@@ -140,23 +140,11 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     }
     
     @Override
-    public boolean sameDBID(DBIDRef other) {
-      return store.get(pos) == DBIDFactory.FACTORY.asInteger(other);
-    }
-
-    @Override
     public boolean equals(Object other) {
       if (other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      final int thisVal = store.get(pos);
-      final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
-      return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
     }
   }
 }

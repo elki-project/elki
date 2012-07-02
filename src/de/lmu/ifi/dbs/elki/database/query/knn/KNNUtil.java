@@ -248,16 +248,6 @@ public final class KNNUtil {
     public DBID getDBID() {
       return cur.getDBID();
     }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return DBIDFactory.FACTORY.equal(cur, other);
-    }
-
-    @Override
-    public int compareDBID(DBIDRef o) {
-      return DBIDFactory.FACTORY.compare(cur, o);
-    }
   }
 
   /**

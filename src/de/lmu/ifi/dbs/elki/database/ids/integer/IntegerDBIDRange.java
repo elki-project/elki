@@ -139,17 +139,6 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
     public boolean equals(Object other) {
       throw new UnsupportedOperationException();
     }
-
-    @Override
-    public boolean sameDBID(DBIDRef other) {
-      return start + pos == DBIDFactory.FACTORY.asInteger(other);
-    }
-    
-    @Override
-    public int compareDBID(DBIDRef o) {
-      int anotherVal = DBIDFactory.FACTORY.asInteger(o);
-      return (start + pos < anotherVal ? -1 : (start + pos == anotherVal ? 0 : 1));
-    }
   }
 
   @Override
