@@ -102,7 +102,7 @@ public final class DBIDUtil {
    * @param id DBID
    * @return String representation
    */
-  public static String toString(DBIDIter id) {
+  public static String toString(DBIDRef id) {
     return DBIDFactory.FACTORY.toString(id);
   }
 
