@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -147,7 +147,7 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
     DoubleMinMax minmax = new DoubleMinMax();
     {
       FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", ids.size(), logger) : null;
-      for(DBID id : ids) {
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         ArrayList<Double> scores = new ArrayList<Double>(num);
         for(OutlierResult r : results) {
           Double score = r.getScores().get(id);
