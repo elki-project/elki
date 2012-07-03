@@ -113,6 +113,7 @@ public class SimpleClassLabel extends ClassLabel {
   public static class Factory extends ClassLabel.Factory<SimpleClassLabel> {
     @Override
     public SimpleClassLabel makeFromString(String lbl) {
+      lbl = lbl.intern();
       SimpleClassLabel l = existing.get(lbl);
       if(l == null) {
         l = new SimpleClassLabel(lbl);
