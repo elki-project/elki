@@ -6,7 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -82,7 +82,7 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
         
         angles = new int[40];
         
-        for (DBID id : ids){
+        for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
           double dif = proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(j), j - 1) - proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(i), i - 1);
           int div =(int) (dif / 5.);
           

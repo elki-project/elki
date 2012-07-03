@@ -6,7 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -75,11 +75,11 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
         double[] knns = new double[ids.size()];
         double sum = 0.;
         int knn = 0;
-        for (DBID id1 : ids){
+        for(DBIDIter id1 = ids.iter(); id1.valid(); id1.advance()) {
           double idsum = 0.;
           double x, y;
           
-          for (DBID id2 : ids){
+          for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
             if (DBIDUtil.equal(id1, id2)) { break; }
             x = relation.get(id1).doubleValue(i) - relation.get(id2).doubleValue(i);
             y = relation.get(id1).doubleValue(j) - relation.get(id2).doubleValue(j);

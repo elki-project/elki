@@ -16,7 +16,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -333,7 +333,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
       double[] sampleValues = new double[conditionalSample.size()];
       {
         int l = 0;
-        for(DBID id : conditionalSample) {
+        for(DBIDIter id = conditionalSample.iter(); id.valid(); id.advance()) {
           sampleValues[l] = relation.get(id).doubleValue(chosen + 1);
           l++;
         }
@@ -342,7 +342,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
       double[] fullValues = new double[relation.size()];
       {
         int l = 0;
-        for(DBID id : subspaceIndex.get(chosen)) {
+        for(DBIDIter id = subspaceIndex.get(chosen).iter(); id.valid(); id.advance()) {
           fullValues[l] = relation.get(id).doubleValue(chosen + 1);
           l++;
         }

@@ -6,7 +6,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -86,7 +86,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
       for (int j = i + 1; j <= dim; j++){
   //      if (!proj.isAxisVisible(j - 1)) { continue; }
         
-        for (DBID id : ids){
+        for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
           double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
           line(0, (int)(5. * yPos[i-1]), 499, (int)(5. * yPos[j-1]), pic);
         }

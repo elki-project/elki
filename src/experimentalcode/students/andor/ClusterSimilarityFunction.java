@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
@@ -25,7 +25,7 @@ public class ClusterSimilarityFunction<C extends Cluster<?>> extends AbstractPri
     data1.sort();
     data2.sort();
     int intersection = 0;
-    for(DBID id: data1){
+    for(DBIDIter id = data1.iter(); id.valid(); id.advance()){
       if(data2.binarySearch(id)>=0){
         intersection++;
       }
