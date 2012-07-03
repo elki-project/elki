@@ -38,7 +38,7 @@ public interface DBIDRef {
    * 
    * Efficiency note: this may require materialization of a DBID object and recursion.
    * 
-   * Use {@link DBIDUtil#getDBID}!
+   * Use {@link DBIDUtil#deref}!
    * 
    * @return referenced DBID
    */
@@ -60,7 +60,7 @@ public interface DBIDRef {
    * WARNING: Hash codes of this interface <b>might not be stable</b> (e.g. for
    * iterators).
    * 
-   * Use {@link DBIDUtil#getDBID} to get an object with a stable hash code!
+   * Use {@link DBIDUtil#deref} to get an object with a stable hash code!
    * 
    * @return current hash code (<b>may change!</b>)
    * 

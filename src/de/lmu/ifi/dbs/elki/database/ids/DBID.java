@@ -52,7 +52,7 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
    * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
    * stable equals for other DBIDs.
    * 
-   * Yet, {@link #sameDBID} is more type safe and explicit.
+   * Yet, {@link DBIDUtil#equal} is more type safe and explicit.
    * 
    * @return true when the object is the same DBID.
    */
@@ -75,7 +75,7 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
   /**
    * Compare two DBIDs for ordering.
    * 
-   * Consider using {@link #compareDBID}, which is more explicit.
+   * Consider using {@link DBIDUtil#compare}, which is more explicit.
    * 
    * @param other Other DBID object
    * @return Comparison result

@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -31,8 +32,9 @@ public interface DBIDMIter extends DBIDIter {
   /**
    * Remove the object the iterator currently points to.
    * 
-   * Subsequent calls to {@link #getDBID} may return a different element.
-   * Call {@link #advance()} to advance the iterator to the next element for further processing.
+   * Subsequent calls to {@link #deref} or {@link DBIDUtil#deref} may return a
+   * different element. Call {@link #advance()} to advance the iterator to the
+   * next element for further processing.
    */
   void remove();
 }
