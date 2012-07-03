@@ -89,7 +89,7 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
     int[] occurences = new int[getLabels().size()];
     Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
     for(DBIDIter iter = crep.iterDBIDs(); iter.valid(); iter.advance()) {
-      ClassLabel label = crep.get(iter.getDBID());
+      ClassLabel label = crep.get(iter);
       int index = Collections.binarySearch(getLabels(), label);
       if(index > -1) {
         occurences[index]++;
@@ -140,8 +140,8 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
   }
 
   @Override
-  public Result run(@SuppressWarnings("unused") Database database) throws IllegalStateException {
-    // TODO Implement sensible default behavior.
+  public Result run(Database database) throws IllegalStateException {
+    // FIXME Implement sensible default behavior.
     return null;
   }
 

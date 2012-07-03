@@ -128,7 +128,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
       KNNResult<D> query = knnq.getKNNForObject(instance, k);
       Relation<ClassLabel> crep = database.getRelation(TypeUtil.CLASSLABEL);
       for(DistanceResultPair<D> neighbor : query) {
-        int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor.getDBID()))));
+        int index = Collections.binarySearch(getLabels(), (AssociationID.CLASS.getType().cast(crep.get(neighbor))));
         if(index >= 0) {
           occurences[index]++;
         }
