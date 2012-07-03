@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -329,7 +329,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    *        reference distance
    * @return the LOFs of the objects and the maximum LOF
    */
-  protected Pair<WritableDoubleDataStore, DoubleMinMax> computeLOFs(DBIDs ids, DataStore<Double> lrds, KNNQuery<O, D> knnRefer) {
+  protected Pair<WritableDoubleDataStore, DoubleMinMax> computeLOFs(DBIDs ids, DoubleDataStore lrds, KNNQuery<O, D> knnRefer) {
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
@@ -337,7 +337,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
     Mean mean = new Mean();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double lrdp = lrds.get(iter);
+      double lrdp = lrds.doubleValue(iter);
       final double lof;
       if(lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
@@ -345,7 +345,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         for(DistanceResultPair<D> neighbor : neighbors) {
           // skip the point itself
           if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            mean.put(lrds.get(neighbor));
+            mean.put(lrds.doubleValue(neighbor));
           }
         }
         lof = mean.getMean() / lrdp;
