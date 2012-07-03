@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -83,7 +83,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     // Run the actual score process
-    DataStore<Double> dbodscore = computeOutlierScores(database, relation, d);
+    DoubleDataStore dbodscore = computeOutlierScores(database, relation, d);
 
     // Build result representation.
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Density-Based Outlier Detection", "db-outlier", TypeUtil.DOUBLE, dbodscore, relation.getDBIDs());
@@ -99,7 +99,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * @param d distance
    * @return computed scores
    */
-  protected abstract DataStore<Double> computeOutlierScores(Database database, Relation<O> relation, D d);
+  protected abstract DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, D d);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {

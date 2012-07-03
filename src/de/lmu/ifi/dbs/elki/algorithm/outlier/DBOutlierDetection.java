@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -98,7 +98,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
   }
 
   @Override
-  protected DataStore<Double> computeOutlierScores(Database database, Relation<O> relation, D neighborhoodSize) {
+  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, D neighborhoodSize) {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
 
