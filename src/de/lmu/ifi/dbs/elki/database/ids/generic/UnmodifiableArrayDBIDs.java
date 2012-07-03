@@ -23,21 +23,19 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
 
 /**
  * Unmodifiable wrapper for DBIDs.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
+ * @apiviz.uses ArrayDBIDs
  */
 public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   /**
@@ -65,15 +63,13 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     return inner.isEmpty();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public Iterator<DBID> iterator() {
-    return new UnmodifiableIterator<DBID>(inner.iterator());
-  }
-  
   @Override
   public DBIDIter iter() {
-    return inner.iter();
+    DBIDIter it = inner.iter();
+    if(it instanceof DBIDMIter) {
+      return new UnmodifiableDBIDIter(it);
+    }
+    return it;
   }
 
   @Override

@@ -23,14 +23,11 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
-import de.lmu.ifi.dbs.elki.utilities.iterator.UnmodifiableIterator;
 
 /**
  * Unmodifiable wrapper for DBIDs.
@@ -65,15 +62,13 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
     return inner.isEmpty();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public Iterator<DBID> iterator() {
-    return new UnmodifiableIterator<DBID>(inner.iterator());
-  }
-  
   @Override
   public DBIDIter iter() {
-    return inner.iter();
+    DBIDIter it = inner.iter();
+    if(it instanceof DBIDMIter) {
+      return new UnmodifiableDBIDIter(it);
+    }
+    return it;
   }
 
   @Override
@@ -81,9 +76,6 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
     return inner.size();
   }
 
-  /**
-   * Returns a string representation of the inner DBID collection.
-   */
   @Override
   public String toString() {
     return inner.toString();

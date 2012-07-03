@@ -24,9 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import gnu.trove.list.TIntList;
-
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -49,11 +46,6 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
    * @return the store
    */
   abstract protected TIntList getStore();
-
-  @Override
-  public Iterator<DBID> iterator() {
-    return new TroveIteratorAdapter(getStore().iterator());
-  }
 
   @Override
   public DBIDMIter iter() {

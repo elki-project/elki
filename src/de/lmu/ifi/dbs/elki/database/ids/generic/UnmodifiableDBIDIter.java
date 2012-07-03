@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.integer;
+package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 /*
  This file is part of ELKI:
@@ -23,44 +23,47 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.iterator.TIntIterator;
-
-import java.util.Iterator;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
- * Adapter for using GNU Trove iterators.
+ * Make an existing DBIDMIter unmodifiable.
  * 
  * @author Erich Schubert
  */
-class TroveIteratorAdapter implements Iterator<DBID> {
+class UnmodifiableDBIDIter implements DBIDIter {
   /**
-   * The actual iterator.
+   * Wrapped iterator
    */
-  private TIntIterator iterator;
+  private DBIDIter it;
 
   /**
    * Constructor.
    * 
-   * @param iterator Trove iterator
+   * @param it inner iterator
    */
-  protected TroveIteratorAdapter(TIntIterator iterator) {
-    this.iterator = iterator;
+  public UnmodifiableDBIDIter(DBIDIter it) {
+    super();
+    this.it = it;
   }
 
   @Override
-  public boolean hasNext() {
-    return iterator.hasNext();
+  public int getIntegerID() {
+    return it.getIntegerID();
   }
 
   @Override
-  public DBID next() {
-    return new IntegerDBID(iterator.next());
+  public boolean valid() {
+    return it.valid();
   }
 
   @Override
-  public void remove() {
-    iterator.remove();
+  public void advance() {
+    it.advance();
+  }
+
+  @Override
+  public DBIDRef deref() {
+    return it;
   }
 }

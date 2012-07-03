@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
- * Trivial DBID management, that never reuses IDs and just gives them out in sequence.
- * Statically allocated DBID ranges are given positive values,
+ * Trivial DBID management, that never reuses IDs and just gives them out in
+ * sequence. Statically allocated DBID ranges are given positive values,
  * Dynamically allocated DBIDs are given negative values.
  * 
  * @author Erich Schubert
@@ -58,7 +58,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
    * Keep track of the smallest dynamic DBID offset not used
    */
   AtomicInteger next = new AtomicInteger(1);
-  
+
   /**
    * Constructor
    */
@@ -69,7 +69,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public DBID generateSingleDBID() {
     final int id = next.getAndIncrement();
-    if (id == Integer.MAX_VALUE) {
+    if(id == Integer.MAX_VALUE) {
       throw new AbortException("DBID allocation error - too many objects allocated!");
     }
     DBID ret = new IntegerDBID(id);
@@ -84,7 +84,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public DBIDRange generateStaticDBIDRange(int size) {
     final int start = next.getAndAdd(size);
-    if (start > next.get()) {
+    if(start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
     DBIDRange alloc = new IntegerDBIDRange(start, size);
@@ -103,21 +103,23 @@ public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public int asInteger(DBIDRef id) {
-    if (id instanceof IntegerDBIDRef) {
-      return ((IntegerDBIDRef)id).getIntegerID();
+    if(id instanceof IntegerDBIDRef) {
+      return ((IntegerDBIDRef) id).getIntegerID();
     }
-    assert(!(id instanceof DBID)) : "Non-Integer DBID found.";
+    assert (!(id instanceof DBID)) : "Non-Integer DBID found.";
     final DBIDRef inner = id.deref();
-    assert(inner != id) : "Unresolvable DBIDRef found.";
+    assert (inner != id) : "Unresolvable DBIDRef found.";
     return asInteger(inner);
   }
 
   @Override
   public DBID deref(DBIDRef id) {
-    if (id instanceof DBID) {
-      return (DBID)id;
+    if(id instanceof DBID) {
+      return (DBID) id;
     }
-    return deref(id);
+    DBIDRef inner = id.deref();
+    assert (inner != id) : "Unresolvable DBID: " + id;
+    return deref(inner);
   }
 
   @Override

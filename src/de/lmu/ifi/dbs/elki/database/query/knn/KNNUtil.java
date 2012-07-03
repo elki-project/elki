@@ -169,41 +169,6 @@ public final class KNNUtil {
    * 
    * @author Erich Schubert
    */
-  protected static class DBIDIterator implements Iterator<DBID> {
-    /**
-     * The real iterator.
-     */
-    Iterator<? extends DistanceResultPair<?>> itr;
-
-    /**
-     * Constructor.
-     */
-    protected DBIDIterator(Iterator<? extends DistanceResultPair<?>> itr) {
-      super();
-      this.itr = itr;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return itr.hasNext();
-    }
-
-    @Override
-    public DBID next() {
-      return DBIDUtil.deref(itr.next());
-    }
-
-    @Override
-    public void remove() {
-      itr.remove();
-    }
-  }
-
-  /**
-   * Proxy iterator for accessing DBIDs.
-   * 
-   * @author Erich Schubert
-   */
   protected static class DBIDItr implements DBIDIter {
     /**
      * Current result
@@ -274,11 +239,6 @@ public final class KNNUtil {
     @Override
     public DBID get(int i) {
       return DBIDUtil.deref(parent.get(i));
-    }
-
-    @Override
-    public Iterator<DBID> iterator() {
-      return new DBIDIterator(parent.iterator());
     }
 
     @Override

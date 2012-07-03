@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 
 /**
  * Interface for a collection of database references (IDs).
@@ -34,7 +33,7 @@ import java.util.Iterator;
  * @apiviz.composedOf DBID
  * @apiviz.has DBIDIter
  */
-public interface DBIDs extends Iterable<DBID> {
+public interface DBIDs {
   /**
    * Get a DBID iterator (a more efficient API).
    * 
@@ -73,13 +72,4 @@ public interface DBIDs extends Iterable<DBID> {
    * @return true when empty.
    */
   public boolean isEmpty();
-
-  /**
-   * Classic iterator.
-   * 
-   * @deprecated Use {@link DBIDIter} API instead.
-   */
-  @Override
-  @Deprecated
-  public Iterator<DBID> iterator();
 }

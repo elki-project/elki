@@ -23,11 +23,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.iterator.EmptyIterator;
 
 /**
  * Empty DBID collection.
@@ -52,11 +50,6 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   @Override
   public boolean contains(DBIDRef o) {
     return false;
-  }
-
-  @Override
-  public Iterator<DBID> iterator() {
-    return EmptyIterator.STATIC();
   }
 
   @Override

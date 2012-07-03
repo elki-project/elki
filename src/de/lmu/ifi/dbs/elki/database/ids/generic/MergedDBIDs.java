@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -53,11 +50,6 @@ public class MergedDBIDs implements DBIDs {
   public MergedDBIDs(DBIDs... childs) {
     super();
     this.childs = childs;
-  }
-
-  @Override
-  public Iterator<DBID> iterator() {
-    throw new AbortException("Merged iterators not completely implemented yet!");
   }
 
   @Override
