@@ -195,6 +195,7 @@ public class HierarchicalClassLabel extends ClassLabel {
   public static class Factory extends ClassLabel.Factory<HierarchicalClassLabel> {
     @Override
     public HierarchicalClassLabel makeFromString(String lbl) {
+      lbl = lbl.intern();
       HierarchicalClassLabel l = existing.get(lbl);
       if(l == null) {
         l = new HierarchicalClassLabel(lbl);
