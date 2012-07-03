@@ -27,6 +27,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
@@ -83,14 +85,14 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
     // Make an example leaf
     if(canBulkLoad()) {
       List<SpatialEntry> leafs = new ArrayList<SpatialEntry>(ids.size());
-      for(DBID id : ids) {
-        leafs.add(createNewLeafEntry(id));
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+        leafs.add(createNewLeafEntry(DBIDUtil.deref(id)));
       }
       bulkLoad(leafs);
     }
     else {
-      for(DBID id : ids) {
-        insert(id);
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+        insert(DBIDUtil.deref(id));
       }
     }
 
@@ -117,8 +119,8 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
 
   @Override
   public void deleteAll(DBIDs ids) {
-    for(DBID id : ids) {
-      delete(id);
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      delete(DBIDUtil.deref(id));
     }
   }
 
