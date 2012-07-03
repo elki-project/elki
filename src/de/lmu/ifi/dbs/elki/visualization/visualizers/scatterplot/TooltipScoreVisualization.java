@@ -31,7 +31,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -98,7 +98,7 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
   }
 
   @Override
-  protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
+  protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
     return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(result.get(id).doubleValue()));
   }
 

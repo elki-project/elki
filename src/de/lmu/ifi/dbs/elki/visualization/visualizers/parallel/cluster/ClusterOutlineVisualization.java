@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -115,8 +115,8 @@ public class ClusterOutlineVisualization extends AbstractParallelVisualization<N
 
       // Process points
       // TODO: do this just once, cache the result somewhere appropriately?
-      for(DBID objId : clus.getIDs()) {
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(objId));
+      for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
+        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
         for(int i = 0; i < dim; i++) {
           mms[i].put(yPos[i]);
           if(i > 0) {
