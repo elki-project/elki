@@ -93,7 +93,7 @@ public class DoubleDistanceResultPair implements DistanceResultPair<DoubleDistan
   }
 
   /**
-   * @deprecated Use {@link #getDBID} for clearness.
+   * @deprecated Use {@link DBIDUtil#deref} for clearness.
    */
   @Deprecated
   @Override
