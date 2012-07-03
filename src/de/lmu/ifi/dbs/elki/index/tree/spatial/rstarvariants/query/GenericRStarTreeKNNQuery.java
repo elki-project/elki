@@ -256,14 +256,14 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     // While this works, it seems to be slow at least for large sets!
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      knnLists.put(iter.getDBID(), new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
+      knnLists.put(DBIDUtil.deref(iter), new KNNHeap<D>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
     batchNN(tree.getRoot(), knnLists);
 
     List<KNNResult<D>> result = new ArrayList<KNNResult<D>>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      result.add(knnLists.get(iter.getDBID()).toKNNList());
+      result.add(knnLists.get(DBIDUtil.deref(iter)).toKNNList());
     }
     return result;
   }

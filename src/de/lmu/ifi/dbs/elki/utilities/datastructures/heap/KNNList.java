@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Queue;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNUtil;
@@ -123,7 +124,7 @@ public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultP
     Iterator<DistanceResultPair<D>> iter = this.iterator();
     while(iter.hasNext()) {
       DistanceResultPair<D> pair = iter.next();
-      buf.append(pair.getDistance()).append(":").append(pair.getDBID());
+      buf.append(pair.getDistance()).append(":").append(DBIDUtil.toString(pair));
       if(iter.hasNext()) {
         buf.append(",");
       }

@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.query;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -64,5 +65,15 @@ public class GenericDistanceDBIDList<D extends Distance<D>> extends ArrayList<Di
    */
   public GenericDistanceDBIDList(int initialCapacity) {
     super(initialCapacity);
+  }
+  
+  /**
+   * Add an element.
+   * 
+   * @param dist Distance
+   * @param id ID
+   */
+  public void add(D dist, DBIDRef id) {
+    add(new GenericDistanceResultPair<D>(dist, id));
   }
 }

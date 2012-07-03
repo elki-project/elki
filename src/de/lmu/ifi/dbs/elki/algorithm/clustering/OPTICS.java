@@ -151,14 +151,14 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
           @SuppressWarnings("unchecked")
           final RangeQuery<O, DoubleDistance> doubleRangeQuery = RangeQuery.class.cast(rangeQuery);
           final DoubleDistance depsilon = DoubleDistance.class.cast(epsilon);
-          expandClusterOrderDouble(doubleClusterOrder, database, doubleRangeQuery, iditer.getDBID(), depsilon, progress);
+          expandClusterOrderDouble(doubleClusterOrder, database, doubleRangeQuery, DBIDUtil.deref(iditer), depsilon, progress);
         }
       }
     }
     else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         if(!processedIDs.contains(iditer)) {
-          expandClusterOrder(clusterOrder, database, rangeQuery, iditer.getDBID(), epsilon, progress);
+          expandClusterOrder(clusterOrder, database, rangeQuery, DBIDUtil.deref(iditer), epsilon, progress);
         }
       }
     }
@@ -199,7 +199,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
             continue;
           }
           D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
-          heap.add(new GenericClusterOrderEntry<D>(neighbor.getDBID(), current.getID(), reachability));
+          heap.add(new GenericClusterOrderEntry<D>(DBIDUtil.deref(neighbor), current.getID(), reachability));
         }
       }
       if(progress != null) {
@@ -239,7 +239,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
               continue;
             }
             double reachability = Math.max(((DoubleDistanceResultPair) neighbor).getDoubleDistance(), coreDistance);
-            heap.add(new DoubleDistanceClusterOrderEntry(neighbor.getDBID(), current.getID(), reachability));
+            heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }
         else {
@@ -252,7 +252,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
               continue;
             }
             double reachability = Math.max(neighbor.getDistance().doubleValue(), coreDistance);
-            heap.add(new DoubleDistanceClusterOrderEntry(neighbor.getDBID(), current.getID(), reachability));
+            heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }
       }

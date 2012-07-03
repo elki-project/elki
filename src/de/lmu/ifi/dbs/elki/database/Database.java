@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -177,7 +177,7 @@ public interface Database extends HierarchicalResult, InspectionUtilFrequentlySc
    * @param id the id of the Object to be obtained from the Database
    * @return Bundle containing the objects' data
    */
-  SingleObjectBundle getBundle(DBID id);
+  SingleObjectBundle getBundle(DBIDRef id);
 
   /**
    * Returns the DatabaseObject represented by the specified id.

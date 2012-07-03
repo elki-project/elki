@@ -36,11 +36,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -70,7 +70,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Subspace Outlier Degree. Outlier detection method for axis-parallel subspaces.
@@ -193,20 +192,19 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    */
   private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBIDRef queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
-    Heap<DoubleObjPair<DBID>> nearestNeighbors = new TiedTopBoundedHeap<DoubleObjPair<DBID>>(knn);
+    Heap<DoubleDBIDPair> nearestNeighbors = new TiedTopBoundedHeap<DoubleDBIDPair>(knn);
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if(!DBIDUtil.equal(iter, queryObject)) {
         double sim = simQ.similarity(queryObject, iter).doubleValue();
         if(sim > 0) {
-          nearestNeighbors.add(new DoubleObjPair<DBID>(sim, iter.getDBID()));
+          nearestNeighbors.add(DBIDUtil.newPair(sim, iter));
         }
       }
     }
     // Collect DBIDs
     ArrayModifiableDBIDs dbids = DBIDUtil.newArray(nearestNeighbors.size());
     while(nearestNeighbors.size() > 0) {
-      final DoubleObjPair<DBID> next = nearestNeighbors.poll();
-      dbids.add(next.second);
+      dbids.add(nearestNeighbors.poll());
     }
     return dbids;
   }

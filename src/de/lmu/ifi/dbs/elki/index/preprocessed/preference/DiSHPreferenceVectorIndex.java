@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -164,10 +163,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         StringBuffer msg = new StringBuffer();
-        final DBID id = it.getDBID();
 
         if(logger.isDebugging()) {
-          msg.append("\nid = ").append(id);
+          msg.append("\nid = ").append(DBIDUtil.toString(it));
           // msg.append(" ").append(database.get(id));
           //msg.append(" ").append(database.getObjectLabelQuery().get(id));
         }
@@ -175,10 +173,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         // determine neighbors in each dimension
         ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
         for(int d = 0; d < dim; d++) {
-          DistanceDBIDResult<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(id, epsilon[d]);
+          DistanceDBIDResult<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
           allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
           for(DistanceResultPair<DoubleDistance> qr : qrList) {
-            allNeighbors[d].add(qr.getDBID());
+            allNeighbors[d].add(qr);
           }
         }
 
@@ -191,7 +189,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         }
 
         BitSet preferenceVector = determinePreferenceVector(relation, allNeighbors, msg);
-        storage.put(id, preferenceVector);
+        storage.put(it, preferenceVector);
 
         if(logger.isDebugging()) {
           logger.debugFine(msg.toString());
@@ -262,11 +260,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     UpdatableDatabase apriori_db = new HashmapDatabase();
     SimpleTypeInformation<?> bitmeta = VectorFieldTypeInformation.get(BitVector.class, dimensionality);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
       Bit[] bits = new Bit[dimensionality];
       boolean allFalse = true;
       for(int d = 0; d < dimensionality; d++) {
-        if(neighborIDs[d].contains(id)) {
+        if(neighborIDs[d].contains(it)) {
           bits[d] = new Bit(true);
           allFalse = false;
         }

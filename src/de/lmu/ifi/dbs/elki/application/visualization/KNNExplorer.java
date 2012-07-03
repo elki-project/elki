@@ -379,8 +379,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       double min = Double.MAX_VALUE;
       double max = Double.MIN_VALUE;
       for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID objID  = iditer.getDBID();
-        O vec = data.get(objID);
+        O vec = data.get(iditer);
         DoubleMinMax mm = VectorUtil.getRangeDouble(vec);
         min = Math.min(min, mm.getMin());
         max = Math.max(max, mm.getMax());
@@ -413,8 +412,8 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       DefaultListModel m = new DefaultListModel();
       for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID dbid  = iditer.getDBID();
-        m.addElement(dbid);
+        DBID dbid  = DBIDUtil.deref(iditer);
+        m.addElement(iditer);
       }
       seriesList.setModel(m);
 
@@ -458,9 +457,9 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
           SVGUtil.setStyle(line, "stroke: " + colstr + "; stroke-width: " + width + "; fill: none");
           newe.appendChild(line);
           // put into cache
-          Double known = distancecache.get(pair.getDBID());
+          Double known = distancecache.get(DBIDUtil.deref(pair));
           if(known == null || dist < known) {
-            distancecache.put(pair.getDBID(), dist);
+            distancecache.put(DBIDUtil.deref(pair), dist);
           }
         }
       }

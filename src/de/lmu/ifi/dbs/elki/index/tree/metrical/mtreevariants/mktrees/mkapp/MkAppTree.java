@@ -299,7 +299,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNList<D>> knnLists) {
     double[] means = new double[k_max];
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       KNNList<D> knns = knnLists.get(id);
       List<D> knnDists = knns.asDistanceList();
       for(int k = 0; k < k_max; k++) {

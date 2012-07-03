@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -118,8 +117,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
 
     FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), logger) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       int num = 0;
       double[] values = new double[neighbors.size()];
       // calculate trimmedMean
@@ -141,10 +139,10 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
         tm = mean.getMean();
       }
       else {
-        tm = relation.get(id).doubleValue(1);
+        tm = relation.get(iditer).doubleValue(1);
       }
       // Error: deviation from trimmed mean
-      errors.putDouble(id, relation.get(id).doubleValue(1) - tm);
+      errors.putDouble(iditer, relation.get(iditer).doubleValue(1) - tm);
 
       if(progress != null) {
         progress.incrementProcessed(logger);
@@ -164,8 +162,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       {
         int i = 0;
         for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          DBID id  = iditer.getDBID();
-          ei[i] = errors.doubleValue(id);
+          ei[i] = errors.doubleValue(iditer);
           i++;
         }
       }
@@ -184,9 +181,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double score = Math.abs(errors.doubleValue(id)) * 0.6745 / median_dev_from_median;
-      scores.putDouble(id, score);
+      double score = Math.abs(errors.doubleValue(iditer)) * 0.6745 / median_dev_from_median;
+      scores.putDouble(iditer, score);
       minmax.put(score);
     }
     //

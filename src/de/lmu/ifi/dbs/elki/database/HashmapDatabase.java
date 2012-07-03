@@ -254,8 +254,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     }
     // remove from db
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      doDelete(id);
+      doDelete(DBIDUtil.deref(iter));
     }
     // Remove from indexes
     for(Index index : indexes) {

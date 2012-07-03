@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -182,7 +181,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
           // Compute mean and standard deviation for densities of neighbors.
           MeanVariance meanv = new MeanVariance();
           for(DoubleDistanceResultPair pair : neigh) {
-            List<DoubleDistanceResultPair> n2 = subsetNeighborhoodQuery(neighc, pair.getDBID(), df, adjustedEps, kernel);
+            List<DoubleDistanceResultPair> n2 = subsetNeighborhoodQuery(neighc, pair, df, adjustedEps, kernel);
             meanv.put(kernel.subspaceDensity(subspace, n2));
           }
           deviation = (meanv.getMean() - density) / (2. * meanv.getSampleStddev());
@@ -218,7 +217,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
       else {
         double dist = p.getDistance().doubleValue();
         if(dist <= adjustedEps) {
-          n.add(new DoubleDistanceResultPair(dist, p.getDBID()));
+          n.add(new DoubleDistanceResultPair(dist, p));
         }
       }
     }
@@ -235,13 +234,13 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
    * @param kernel Kernel
    * @return Neighbors of neighbor object
    */
-  private List<DoubleDistanceResultPair> subsetNeighborhoodQuery(List<DistanceResultPair<DoubleDistance>> neighc, DBID dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
+  private List<DoubleDistanceResultPair> subsetNeighborhoodQuery(List<DistanceResultPair<DoubleDistance>> neighc, DBIDRef dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
     List<DoubleDistanceResultPair> n = new ArrayList<DoubleDistanceResultPair>(neighc.size());
     V query = kernel.relation.get(dbid);
     for(DistanceResultPair<DoubleDistance> p : neighc) {
       double dist = df.doubleDistance(query, kernel.relation.get(p));
       if(dist <= adjustedEps) {
-        n.add(new DoubleDistanceResultPair(dist, p.getDBID()));
+        n.add(new DoubleDistanceResultPair(dist, p));
       }
     }
     return n;
@@ -265,7 +264,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
       {
         int count = 0;
         for(DoubleDistanceResultPair object : neigh) {
-          V vector = relation.get(object.getDBID());
+          V vector = relation.get(object);
           data[count] = vector.doubleValue(dim + 1);
           count++;
         }

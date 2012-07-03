@@ -38,7 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * <pre>
  * {@code 
  * for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
- *   iter.getDBID();
+ *   Object o = relation.get(iter); // Many interfaces allow direct use
+ *   DBID id = DBIDUtil.getDBID(iter); // Materialize only if you need to!
  * }
  * }
  * </pre>
@@ -62,9 +63,11 @@ public interface DBIDIter extends DBIDRef, Iter {
    * 
    * Efficiency note: this may require materialization of a DBID object - if
    * possible, use DBIDRef based APIs instead.
+   *
+   * USe {@link DBIDUtil#getDBID} instead!
    * 
    * @return referenced DBID
    */
   @Override
-  public DBID getDBID();
+  DBIDRef deref();
 }

@@ -162,7 +162,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     // DBIDs object. So convert.
     List<DBID> objects = new ArrayList<DBID>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      objects.add(iter.getDBID());
+      objects.add(DBIDUtil.deref(iter));
     }
     return new DistanceParsingResult<D>(MultipleObjectsBundle.makeSimple(TypeUtil.DBID, objects), distanceCache);
   }

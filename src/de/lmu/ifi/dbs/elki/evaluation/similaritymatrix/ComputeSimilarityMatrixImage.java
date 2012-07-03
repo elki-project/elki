@@ -126,13 +126,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   private SimilarityMatrix computeSimilarityMatrixImage(Relation<O> relation, DBIDIter iter) {
     ArrayModifiableDBIDs order = DBIDUtil.newArray(relation.size());
     for(; iter.valid(); iter.advance()) {
-      Object o = iter.getDBID();
-      if(!(o instanceof DBID)) {
-        throw new IllegalStateException("Iterable result contained non-DBID - result didn't satisfy requirements");
-      }
-      else {
-        order.add((DBID) o);
-      }
+      order.add(iter);
     }
     if(order.size() != relation.size()) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");

@@ -25,8 +25,8 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import java.util.ArrayList;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -148,9 +148,9 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
       MeanVariance mv = new MeanVariance();
       DoubleMinMax mm = (max == null) ? new DoubleMinMax() : null;
       boolean skippedzeros = false;
-      for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double val = or.getScores().get(id);
+      Relation<Double> scores = or.getScores();
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+        double val = scores.get(id);
         if(nozeros && val == 0.0) {
           skippedzeros = true;
           continue;
@@ -175,9 +175,9 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
       if(min == null || max == null) {
         boolean skippedzeros = false;
         DoubleMinMax mm = new DoubleMinMax();
-        for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-          DBID id  = iditer.getDBID();
-          double val = or.getScores().get(id);
+        Relation<Double> scores = or.getScores();
+        for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+          double val = scores.get(id);
           if(nozeros && val == 0.0) {
             skippedzeros = true;
             continue;

@@ -79,7 +79,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public DBID getDBID() {
+  public DBID deref() {
     return this;
   }
 
@@ -209,7 +209,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     }
 
     @Override
-    public DBID getDBID() {
+    public DBID deref() {
       return IntegerDBID.this;
     }
 

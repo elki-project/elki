@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -152,20 +151,18 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
       DBIDs ids = computeSubspaceForGene(ind.getGene(), ranges);
       double sparsityC = sparsity(ids.size(), dbsize, k);
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
-        double prev = outlierScore.doubleValue(id);
+        double prev = outlierScore.doubleValue(iter);
         if(Double.isNaN(prev) || sparsityC < prev) {
-          outlierScore.putDouble(id, sparsityC);
+          outlierScore.putDouble(iter, sparsityC);
         }
       }
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double val = outlierScore.doubleValue(id);
+      double val = outlierScore.doubleValue(iditer);
       if(Double.isNaN(val)) {
-        outlierScore.putDouble(id, 0.0);
+        outlierScore.putDouble(iditer, 0.0);
         val = 0.0;
       }
       minmax.put(val);

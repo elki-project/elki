@@ -70,7 +70,7 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
    */
   @Deprecated
   @Override
-  public DBID getDBID();
+  public DBID deref();
 
   /**
    * Compare two DBIDs for ordering.

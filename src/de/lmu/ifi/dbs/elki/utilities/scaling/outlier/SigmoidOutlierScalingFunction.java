@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -62,9 +61,9 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double val = or.getScores().get(id);
+    Relation<Double> scores = or.getScores();
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      double val = scores.get(id);
       mv.put(val);
     }
     double a = 1.0;

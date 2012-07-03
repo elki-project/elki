@@ -97,6 +97,16 @@ public final class DBIDUtil {
   }
 
   /**
+   * Dereference a DBID reference.
+   * 
+   * @param ref DBID reference
+   * @return DBID
+   */
+  public static DBID deref(DBIDRef ref) {
+    return DBIDFactory.FACTORY.deref(ref.deref());
+  }
+
+  /**
    * Format a DBID as string.
    * 
    * @param id DBID
@@ -376,7 +386,18 @@ public final class DBIDUtil {
    * @return DBID pair
    */
   public static DBIDPair newPair(DBIDRef id1, DBIDRef id2) {
-    return DBIDFactory.FACTORY.makePair(id1, id2);
+    return DBIDFactory.FACTORY.newPair(id1, id2);
+  }
+  
+  /**
+   * Make a DoubleDBIDPair.
+   * 
+   * @param val double value
+   * @param id ID
+   * @return new pair
+   */
+  public static DoubleDBIDPair newPair(double val, DBIDRef id) {
+    return DBIDFactory.FACTORY.newPair(val, id);
   }
 
   /**

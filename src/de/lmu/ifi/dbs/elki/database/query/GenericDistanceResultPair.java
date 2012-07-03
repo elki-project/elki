@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.database.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -43,8 +43,8 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
    * @param first Distance
    * @param second Object ID
    */
-  public GenericDistanceResultPair(D first, DBID second) {
-    super(first, second);
+  public GenericDistanceResultPair(D first, DBIDRef second) {
+    super(first, DBIDUtil.deref(second));
   }
 
   /**
@@ -73,13 +73,13 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
    * @return second element in pair
    */
   @Override
-  public final DBID getDBID() {
+  public final DBID deref() {
     return second;
   }
   
   @Override
   public int getIntegerID() {
-    return DBIDFactory.FACTORY.asInteger(second);
+    return DBIDUtil.asInteger(second);
   }
 
   /**
@@ -103,7 +103,7 @@ public class GenericDistanceResultPair<D extends Distance<D>> extends Pair<D, DB
     if(ret != 0) {
       return ret;
     }
-    return second.compareTo(o.getDBID());
+    return DBIDUtil.compare(second, o);
   }
 
   @Override

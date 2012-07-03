@@ -34,8 +34,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -52,7 +54,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
@@ -116,7 +117,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final Database database = inputstep.getDatabase();
     final Relation<NumberVector<?, ?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
-    final DBID firstid = labels.iterDBIDs().getDBID();
+    final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
     if(!firstlabel.matches("bylabel")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
@@ -177,11 +178,10 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final double[] naiveensemble = new double[dim];
     {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        if(firstid.equals(id)) {
+        if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
-        final NumberVector<?, ?> vec = relation.get(id);
+        final NumberVector<?, ?> vec = relation.get(iditer);
         for(int d = 0; d < dim; d++) {
           naiveensemble[d] += vec.doubleValue(d + 1);
         }
@@ -203,27 +203,26 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     {
       // Compute individual scores
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        if(firstid.equals(id)) {
+        if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
         // fout.append(labels.get(id));
-        final NumberVector<?, ?> vec = relation.get(id);
+        final NumberVector<?, ?> vec = relation.get(iditer);
         double auc = computeROCAUC(vec, positive, dim);
         double estimated = wdist.doubleDistance(vec, estimated_truth_vec);
         double cost = tdist.doubleDistance(vec, refvec);
-        logger.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(id));
+        logger.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
         if(auc > bestauc) {
           bestauc = auc;
-          bestaucstr = labels.get(id);
+          bestaucstr = labels.get(iditer);
         }
         if(cost < bestcost) {
           bestcost = cost;
-          bestcoststr = labels.get(id);
+          bestcoststr = labels.get(iditer);
         }
         if(estimated < bestest) {
           bestest = estimated;
-          bestid = id;
+          bestid = DBIDUtil.deref(iditer);
         }
       }
     }
@@ -253,15 +252,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       double s2 = 1. / (ensemble.size() + 1.);
 
       final int heapsize = enscands.size();
-      TopBoundedHeap<DoubleObjPair<DBID>> heap = new TopBoundedHeap<DoubleObjPair<DBID>>(heapsize, Collections.reverseOrder());
+      TopBoundedHeap<DoubleDBIDPair> heap = new TopBoundedHeap<DoubleDBIDPair>(heapsize, Collections.reverseOrder());
       for (DBIDIter iter = enscands.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
-        final NumberVector<?, ?> vec = relation.get(id);
+        final NumberVector<?, ?> vec = relation.get(iter);
         double diversity = wdist.doubleDistance(vec, greedyvec);
-        heap.add(new DoubleObjPair<DBID>(diversity, id));
+        heap.add(DBIDUtil.newPair(diversity, iter));
       }
       while(heap.size() > 0) {
-        DBID bestadd = heap.poll().second;
+        DBIDRef bestadd = heap.poll();
         enscands.remove(bestadd);
         // Update ensemble:
         final NumberVector<?, ?> vec = relation.get(bestadd);
@@ -346,10 +344,9 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         {
           DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), (long)i);
           for (DBIDIter iter = random.iter(); iter.valid(); iter.advance()) {
-            DBID id = iter.getDBID();
-            assert (!firstid.equals(id));
+            assert (!DBIDUtil.equal(firstid, iter));
             // logger.verbose("Using: "+labels.get(id));
-            final NumberVector<?, ?> vec = relation.get(id);
+            final NumberVector<?, ?> vec = relation.get(iter);
             for(int d = 0; d < dim; d++) {
               randomensemble[d] += vec.doubleValue(d + 1);
             }

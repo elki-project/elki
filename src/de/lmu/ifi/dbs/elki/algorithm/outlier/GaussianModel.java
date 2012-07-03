@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -130,8 +129,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
     if(invert) {
       double max = mm.getMax() != 0 ? mm.getMax() : 1.;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        oscores.putDouble(id, (max - oscores.doubleValue(id)) / max);
+        oscores.putDouble(iditer, (max - oscores.doubleValue(iditer)) / max);
       }
       meta = new BasicOutlierScoreMeta(0.0, 1.0);
     }

@@ -115,7 +115,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     // start variance analysis
     double[] sum = new double[dim];
     for(DistanceResultPair<D> neighbor : neighbors) {
-      V o = database.get(neighbor.getDBID());
+      V o = database.get(neighbor);
       for(int d = 0; d < dim; d++) {
         sum[d] += Math.pow(obj.doubleValue(d + 1) - o.doubleValue(d + 1), 2.0);
       }

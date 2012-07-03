@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.generic;
+package de.lmu.ifi.dbs.elki.database.ids;
 
 /*
  This file is part of ELKI:
@@ -23,66 +23,42 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
- * Iterator for classic collections.
+ * Pair of a double value and a DBID
  * 
  * @author Erich Schubert
  */
-public class DBIDIterAdapter implements DBIDMIter {
+public interface DoubleDBIDPair extends PairInterface<Double, DBID>, DBIDRef, Comparable<DoubleDBIDPair> {
   /**
-   * Current DBID
-   */
-  DBID cur = null;
-
-  /**
-   * The real iterator
-   */
-  Iterator<DBID> iter;
-
-  /**
-   * Constructor.
+   * Get the double value of the pair.
    * 
-   * @param iter Iterator
+   * @return Double
    */
-  public DBIDIterAdapter(Iterator<DBID> iter) {
-    super();
-    this.iter = iter;
-    advance();
-  }
+  public double doubleValue();
 
+  /**
+   * Get the first object - note: this may cause autoboxing, use pair.first for
+   * native pairs!
+   * 
+   * @deprecated Avoid autoboxing. Use {@link #doubleValue}!
+   * 
+   * @return First object
+   */
   @Override
-  public boolean valid() {
-    return cur != null;
-  }
+  @Deprecated
+  public Double getFirst();
 
+  /**
+   * Get the second object - note: this may cause autoboxing, use pair.second
+   * for native pairs!
+   * 
+   * @deprecated Avoid autoboxing! Use {@link DBIDRef} interface!
+   * 
+   * @return Second object
+   */
   @Override
-  public void advance() {
-    if(iter.hasNext()) {
-      cur = iter.next();
-    }
-    else {
-      cur = null;
-    }
-  }
-
-  @Override
-  public int getIntegerID() {
-    return DBIDFactory.FACTORY.asInteger(cur);
-  }
-
-  @Override
-  public DBID deref() {
-    return cur;
-  }
-
-  @Override
-  public void remove() {
-    iter.remove();
-  }
+  @Deprecated
+  public DBID getSecond();
 }

@@ -70,7 +70,7 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   @Override
   public DBID get(DBIDRef id) {
     assert (ids.contains(id));
-    return id.getDBID();
+    return DBIDUtil.deref(id);
   }
 
   @Override
@@ -81,8 +81,8 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   @Override
   public void delete(DBIDRef id) {
     if(database instanceof UpdatableDatabase) {
-      // TODO: skip getDBID()
-      ((UpdatableDatabase) database).delete(id.getDBID());
+      // TODO: skip deref!
+      ((UpdatableDatabase) database).delete(DBIDUtil.deref(id));
     }
     else {
       throw new UnsupportedOperationException("Deletions are not supported.");

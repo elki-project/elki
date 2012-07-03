@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -229,15 +229,14 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
       }
     }
     for (DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      Double score = scores.get(id);
-      PolygonsObject poly = polys.get(id);
-      String label = labels.get(id);
+      Double score = scores.get(iter);
+      PolygonsObject poly = polys.get(iter);
+      String label = labels.get(iter);
       if(score == null) {
-        logger.warning("No score for object " + id);
+        logger.warning("No score for object " + DBIDUtil.toString(iter));
       }
       if(poly == null) {
-        logger.warning("No polygon for object " + id + " - skipping.");
+        logger.warning("No polygon for object " + DBIDUtil.toString(iter) + " - skipping.");
         continue;
       }
       out.writeStartElement("Placemark");
@@ -245,7 +244,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         out.writeStartElement("name");
         out.writeCharacters(score + " " + label);
         out.writeEndElement(); // name
-        StringBuffer buf = makeDescription(otherrel, id);
+        StringBuffer buf = makeDescription(otherrel, iter);
         out.writeStartElement("description");
         out.writeCData("<div>" + buf.toString() + "</div>");
         out.writeEndElement(); // description
@@ -310,7 +309,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
    * @param id Object ID
    * @return Buffer
    */
-  private StringBuffer makeDescription(Collection<Relation<?>> relations, DBID id) {
+  private StringBuffer makeDescription(Collection<Relation<?>> relations, DBIDRef id) {
     StringBuffer buf = new StringBuffer();
     for(Relation<?> rel : relations) {
       Object o = rel.get(id);

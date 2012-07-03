@@ -28,6 +28,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
@@ -42,7 +43,6 @@ public class MapStore<T> implements WritableDataStore<T> {
   /**
    * Storage Map
    */
-  // TODO: use trove maps?
   private Map<DBID, T> data;
 
   /**
@@ -65,15 +65,15 @@ public class MapStore<T> implements WritableDataStore<T> {
 
   @Override
   public T get(DBIDRef id) {
-    return data.get(id.getDBID());
+    return data.get(DBIDFactory.FACTORY.deref(id));
   }
 
   @Override
   public T put(DBIDRef id, T value) {
     if(value == null) {
-      return data.remove(id.getDBID());
+      return data.remove(DBIDFactory.FACTORY.deref(id));
     }
-    return data.put(id.getDBID(), value);
+    return data.put(DBIDFactory.FACTORY.deref(id), value);
   }
 
   @Override

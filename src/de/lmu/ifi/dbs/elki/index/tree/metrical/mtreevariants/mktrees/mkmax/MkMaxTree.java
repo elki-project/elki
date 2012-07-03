@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -111,17 +112,17 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     ModifiableDBIDs candidateIDs = DBIDUtil.newArray();
     for(DistanceResultPair<D> candidate : candidates) {
       KNNHeap<D> knns = new KNNHeap<D>(k, getDistanceQuery().infiniteDistance());
-      knnLists.put(candidate.getDBID(), knns);
-      candidateIDs.add(candidate.getDBID());
+      knnLists.put(DBIDUtil.deref(candidate), knns);
+      candidateIDs.add(candidate);
     }
     batchNN(getRoot(), candidateIDs, knnLists);
 
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
-      DBID cid = iter.getDBID();
+      DBID cid = DBIDUtil.deref(iter);
       for(DistanceResultPair<D> qr : knnLists.get(cid)) {
-        if(id.equals(qr.getDBID())) {
-          result.add(new GenericDistanceResultPair<D>(qr.getDistance(), cid));
+        if(DBIDUtil.equal(id, qr)) {
+          result.add(qr.getDistance(), cid);
           break;
         }
       }

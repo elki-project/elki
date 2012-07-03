@@ -74,7 +74,7 @@ public class RandomStableDistanceFunction extends AbstractDBIDDistanceFunction<D
     if(c > 0) {
       return distance(o2, o1);
     }
-    return new DoubleDistance(pseudoRandom(seed, Util.mixHashCodes(o1.getDBID().hashCode(), o2.getDBID().hashCode(), (int) seed)));
+    return new DoubleDistance(pseudoRandom(seed, Util.mixHashCodes(DBIDUtil.deref(o1).hashCode(), DBIDUtil.deref(o2).hashCode(), (int) seed)));
   }
 
   /**

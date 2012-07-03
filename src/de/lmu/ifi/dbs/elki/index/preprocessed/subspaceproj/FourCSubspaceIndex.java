@@ -96,7 +96,7 @@ public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance
   protected PCAFilteredResult computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<V> database) {
     ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
     for(DistanceResultPair<D> neighbor : neighbors) {
-      ids.add(neighbor.getDBID());
+      ids.add(neighbor);
     }
     PCAFilteredResult pcares = pca.processIds(ids, database);
 

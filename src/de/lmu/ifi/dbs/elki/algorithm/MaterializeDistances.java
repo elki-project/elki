@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
  * @param <O> Object type
  * @param <D> Distance type
  */
+// TODO: use DBIDPair -> D map?
 @Title("MaterializeDistances")
 @Description("Materialize all distances in the data set to use as cached/precalculated data.")
 public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, CollectionResult<CTriple<DBID, DBID, Double>>> {
@@ -86,7 +87,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
           continue;
         }
         double d = distFunc.distance(iditer, iditer2).doubleValue();
-        r.add(new CTriple<DBID, DBID, Double>(iditer.getDBID(), iditer2.getDBID(), d));
+        r.add(new CTriple<DBID, DBID, Double>(DBIDUtil.deref(iditer), DBIDUtil.deref(iditer2), d));
       }
     }
     return new CollectionResult<CTriple<DBID, DBID, Double>>("Distance Matrix", "distance-matrix", r);

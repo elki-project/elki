@@ -146,7 +146,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
 
       // Remaining objects are inliers
       for (DBIDIter iter = idview.iter(); iter.valid(); iter.advance()) {
-        scores.putDouble(iter.getDBID(), 0.0);
+        scores.putDouble(iter, 0.0);
       }
     }
 
@@ -215,7 +215,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
         final int nweight = -1 / neighborhood.size();
         // We need to find the index positions of the neighbors, unfortunately.
         for (DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
-          int pos = ids.binarySearch(iter.getDBID());
+          int pos = ids.binarySearch(iter);
           assert (pos >= 0);
           F.set(pos, i, nweight);
         }

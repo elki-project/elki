@@ -99,7 +99,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
     }
     DBIDIter order = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter();
     for(int i = 0; i < k && order.valid(); i++, order.advance()) {
-      cutoff = or.getScores().get(order.getDBID());
+      cutoff = or.getScores().get(order);
     }
     max = or.getOutlierMeta().getActualMaximum();
     ground = or.getOutlierMeta().getTheoreticalBaseline();

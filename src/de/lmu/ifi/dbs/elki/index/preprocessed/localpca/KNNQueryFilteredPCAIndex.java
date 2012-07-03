@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -86,7 +86,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> 
   }
 
   @Override
-  protected KNNResult<DoubleDistance> objectsForPCA(DBID id) {
+  protected KNNResult<DoubleDistance> objectsForPCA(DBIDRef id) {
     return knnQuery.getKNNForDBID(id, k);
   }
 

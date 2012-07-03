@@ -31,7 +31,6 @@ import java.util.TreeMap;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -181,15 +180,14 @@ public class Segments extends BasicResult implements Iterable<Segment> {
       HashSetModifiableDBIDs ndelta2 = DBIDUtil.newHashSet();
       HashSetModifiableDBIDs nsecond = DBIDUtil.newHashSet(second.size());
       for(DBIDIter iter2 = clust.getIDs().iter(); iter2.valid(); iter2.advance()) {
-        DBID id = iter2.getDBID();
-        if(ndelta1.remove(id)) {
-          nfirstp.add(id);
+        if(ndelta1.remove(iter2)) {
+          nfirstp.add(iter2);
         }
         else {
-          ndelta2.add(id);
+          ndelta2.add(iter2);
         }
-        if(second.contains(id)) {
-          nsecond.add(id);
+        if(second.contains(iter2)) {
+          nsecond.add(iter2);
         }
       }
       if(nsecond.size() <= 0) {

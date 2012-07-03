@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
@@ -94,8 +93,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     {
       int i = 0;
       for(DBIDIter iditer = rep.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        fulldata[i] = rep.get(id).doubleValue(1);
+        fulldata[i] = rep.get(iditer).doubleValue(1);
         i++;
       }
     }

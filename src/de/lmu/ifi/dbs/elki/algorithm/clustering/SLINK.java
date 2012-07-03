@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -146,7 +147,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
     // apply the algorithm
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
+      DBID id  = DBIDUtil.deref(iditer); // TODO: can we use the reference?
       step1(id);
       step2(id, processedIDs, distQuery, m);
       step3(id, processedIDs, m);
@@ -201,11 +202,10 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param processedIDs the already processed ids
    * @param distFunc Distance function to use
    */
-  private void step2(DBID newID, DBIDs processedIDs, DistanceQuery<O, D> distFunc, WritableDataStore<D> m) {
+  private void step2(DBIDRef newID, DBIDs processedIDs, DistanceQuery<O, D> distFunc, WritableDataStore<D> m) {
     for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
       // M(i) = dist(i, n+1)
-      m.put(id, distFunc.distance(id, newID));
+      m.put(it, distFunc.distance(it, newID));
     }
   }
 
@@ -216,13 +216,12 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    *        representation
    * @param processedIDs the already processed ids
    */
-  private void step3(DBID newID, DBIDs processedIDs, WritableDataStore<D> m) {
+  private void step3(DBIDRef newID, DBIDs processedIDs, WritableDataStore<D> m) {
     // for i = 1..n
     for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-      D l_i = lambda.get(id);
-      D m_i = m.get(id);
-      DBID p_i = pi.get(id);
+      D l_i = lambda.get(it);
+      D m_i = m.get(it);
+      DBID p_i = pi.get(it);
       D mp_i = m.get(p_i);
 
       // if L(i) >= M(i)
@@ -231,10 +230,10 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
         m.put(p_i, DistanceUtil.min(mp_i, l_i));
 
         // L(i) = M(i)
-        lambda.put(id, m_i);
+        lambda.put(it, m_i);
 
         // P(i) = n+1;
-        pi.put(id, newID);
+        pi.put(it, DBIDUtil.deref(newID));
       }
       else {
         // M(P(i)) = min { M(P(i)), M(i) }
@@ -249,27 +248,26 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param newID the id of the current object
    * @param processedIDs the already processed ids
    */
-  private void step4(DBID newID, DBIDs processedIDs) {
+  private void step4(DBIDRef newID, DBIDs processedIDs) {
     // for i = 1..n
     for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-      D l_i = lambda.get(id);
-      D lp_i = lambda.get(pi.get(id));
+      D l_i = lambda.get(it);
+      D lp_i = lambda.get(pi.get(it));
 
       // if L(i) >= L(P(i))
       if(l_i.compareTo(lp_i) >= 0) {
         // P(i) = n+1
-        pi.put(id, newID);
+        pi.put(it, DBIDUtil.deref(newID));
       }
     }
   }
 
-  private DBID lastObjectInCluster(DBID id, D stopdist, final DataStore<DBID> pi, final DataStore<D> lambda) {
+  private DBIDRef lastObjectInCluster(DBIDRef id, D stopdist, final DataStore<DBID> pi, final DataStore<D> lambda) {
     if(stopdist == null) {
       return id;
     }
 
-    DBID currentID = id;
+    DBIDRef currentID = id;
     while(lambda.get(currentID).compareTo(stopdist) < 1) {
       currentID = pi.get(currentID);
     }
@@ -309,16 +307,15 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     Map<DBID, ModifiableDBIDs> cluster_ids = new HashMap<DBID, ModifiableDBIDs>();
     Map<DBID, D> cluster_distances = new HashMap<DBID, D>();
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-      DBID lastObjectInCluster = lastObjectInCluster(id, stopdist, pi, lambda);
+      DBID lastObjectInCluster = DBIDUtil.deref(lastObjectInCluster(it, stopdist, pi, lambda));
       ModifiableDBIDs cluster = cluster_ids.get(lastObjectInCluster);
       if(cluster == null) {
         cluster = DBIDUtil.newArray();
         cluster_ids.put(lastObjectInCluster, cluster);
       }
-      cluster.add(id);
+      cluster.add(it);
 
-      D lambda_id = lambda.get(id);
+      D lambda_id = lambda.get(it);
       if(stopdist != null && lambda_id.compareTo(stopdist) <= 0 && (cluster_distances.get(lastObjectInCluster) == null || lambda_id.compareTo(cluster_distances.get(lastObjectInCluster)) > 0)) {
         cluster_distances.put(lastObjectInCluster, lambda_id);
       }
@@ -483,8 +480,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       D l = lambda.get(it);
       // logger.debugFine("DBID " + cur.toString() + " dist: " + l.toString());
       if(stopdist != null && stopdist.compareTo(l) > 0) {
-        DBID cur = it.getDBID();
-        ModifiableDBIDs curset = cids.remove(cur);
+        ModifiableDBIDs curset = cids.remove(it);
         ModifiableDBIDs destset = cids.get(dest);
         if(destset == null) {
           if(curset != null) {
@@ -492,7 +488,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
           }
           else {
             destset = DBIDUtil.newHashSet();
-            destset.add(cur);
+            destset.add(it);
           }
           destset.add(dest);
           cids.put(dest, destset);
@@ -502,7 +498,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             destset.addDBIDs(curset);
           }
           else {
-            destset.add(cur);
+            destset.add(it);
           }
         }
         curdist = l;

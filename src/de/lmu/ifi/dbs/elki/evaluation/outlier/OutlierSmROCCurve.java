@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
@@ -108,8 +107,7 @@ public class OutlierSmROCCurve implements Evaluator {
     // Compute mean, for inversion
     double mean = 0.0;
     for(DBIDIter iditer = scores.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      mean += scores.get(id) / size;
+      mean += scores.get(iditer) / size;
     }
 
     SmROCResult curve = new SmROCResult(positiveids.size() + 2);
@@ -122,12 +120,11 @@ public class OutlierSmROCCurve implements Evaluator {
     double x = 0, y = 0;
     for (DBIDIter nei = or.getOrdering().iter(or.getOrdering().getDBIDs()).iter(); nei.valid(); nei.advance()) {
       // Analyze next point
-      final DBID curid = nei.getDBID();
-      final double curscore = scores.get(curid);
+      final double curscore = scores.get(nei);
       // defer calculation for ties
       if(!Double.isNaN(prevscore) && (Double.compare(prevscore, curscore) == 0)) {
         // positive or negative match?
-        if(positiveids.contains(curid)) {
+        if(positiveids.contains(nei)) {
           poscnt += 1;
         }
         else {
@@ -147,7 +144,7 @@ public class OutlierSmROCCurve implements Evaluator {
         }
         curve.addAndSimplify(x, y);
         // positive or negative match?
-        if(positiveids.contains(curid)) {
+        if(positiveids.contains(nei)) {
           poscnt = 1;
           negcnt = 0;
         }

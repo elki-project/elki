@@ -185,7 +185,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
           }
           if (cost < best) {
             best = cost;
-            bestid = iter.getDBID();
+            bestid = DBIDUtil.deref(iter);
             bestcluster = i;
           }
         }

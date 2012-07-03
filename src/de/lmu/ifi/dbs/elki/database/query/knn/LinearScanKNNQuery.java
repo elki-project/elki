@@ -67,11 +67,10 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   private void linearScanBatchKNN(ArrayDBIDs ids, List<KNNHeap<D>> heaps) {
     // The distance is computed on database IDs
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      DBID candidateID = iter.getDBID();
       int index = 0;
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
         KNNHeap<D> heap = heaps.get(index);
-        heap.add(distanceQuery.distance(iter2, candidateID), candidateID);
+        heap.add(distanceQuery.distance(iter2, iter), iter);
         index++;
       }
     }

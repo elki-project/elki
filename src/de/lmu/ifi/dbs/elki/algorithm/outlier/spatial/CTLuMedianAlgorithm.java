@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -97,15 +96,14 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
 
     MeanVariance mv = new MeanVariance();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       final double median;
       {
         double[] fi = new double[neighbors.size()];
         // calculate and store Median of neighborhood
         int c = 0;
         for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(id, iter)) {
+          if(DBIDUtil.equal(iditer, iter)) {
             continue;
           }
           fi[c] = relation.get(iter).doubleValue(1);
@@ -116,11 +114,11 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
           median = QuickSelect.median(fi, 0, c);
         }
         else {
-          median = relation.get(id).doubleValue(1);
+          median = relation.get(iditer).doubleValue(1);
         }
       }
-      double h = relation.get(id).doubleValue(1) - median;
-      scores.putDouble(id, h);
+      double h = relation.get(iditer).doubleValue(1) - median;
+      scores.putDouble(iditer, h);
       mv.put(h);
     }
 
@@ -129,10 +127,9 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     final double stddev = mv.getNaiveStddev();
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double score = Math.abs((scores.doubleValue(id) - mean) / stddev);
+      double score = Math.abs((scores.doubleValue(iditer) - mean) / stddev);
       minmax.put(score);
-      scores.putDouble(id, score);
+      scores.putDouble(iditer, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("MO", "Median-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());

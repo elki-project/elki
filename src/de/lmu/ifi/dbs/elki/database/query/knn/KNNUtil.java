@@ -190,7 +190,7 @@ public final class KNNUtil {
 
     @Override
     public DBID next() {
-      return itr.next().getDBID();
+      return DBIDUtil.deref(itr.next());
     }
 
     @Override
@@ -245,8 +245,8 @@ public final class KNNUtil {
     }
 
     @Override
-    public DBID getDBID() {
-      return cur.getDBID();
+    public DBIDRef deref() {
+      return cur;
     }
   }
 
@@ -273,7 +273,7 @@ public final class KNNUtil {
 
     @Override
     public DBID get(int i) {
-      return parent.get(i).getDBID();
+      return DBIDUtil.deref(parent.get(i));
     }
 
     @Override

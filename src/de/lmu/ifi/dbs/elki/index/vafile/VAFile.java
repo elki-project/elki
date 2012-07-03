@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
@@ -138,7 +139,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
   protected void initialize(Relation<V> relation, DBIDs ids) {
     setPartitions(relation);
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }
   }
@@ -162,8 +163,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       double[] tempdata = new double[size];
       int j = 0;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        tempdata[j] = relation.get(id).doubleValue(d + 1);
+        tempdata[j] = relation.get(iditer).doubleValue(d + 1);
         j += 1;
       }
       Arrays.sort(tempdata);

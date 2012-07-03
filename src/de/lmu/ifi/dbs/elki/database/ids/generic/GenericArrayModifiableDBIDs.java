@@ -29,6 +29,7 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -99,12 +100,12 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
 
   @Override
   public boolean add(DBIDRef id) {
-    return add(id.getDBID());
+    return add(DBIDFactory.FACTORY.deref(id));
   }
 
   @Override
   public boolean remove(DBIDRef id) {
-    return super.remove(id.getDBID());
+    return super.remove(DBIDFactory.FACTORY.deref(id));
   }
 
   @Override
@@ -124,7 +125,7 @@ public class GenericArrayModifiableDBIDs extends ArrayList<DBID> implements Arra
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return Collections.binarySearch(this, key.getDBID());
+    return Collections.binarySearch(this, DBIDFactory.FACTORY.deref(key));
   }
 
   @Override

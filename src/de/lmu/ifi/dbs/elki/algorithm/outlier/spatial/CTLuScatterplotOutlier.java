@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -104,17 +104,15 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // regression using the covariance matrix
     CovarianceMatrix covm = new CovarianceMatrix(2);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final double local = relation.get(id).doubleValue(1);
+      final double local = relation.get(iditer).doubleValue(1);
       // Compute mean of neighbors
       Mean mean = new Mean();
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        DBID n = iter.getDBID();
-        if(id.equals(n)) {
+        if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        mean.put(relation.get(n).doubleValue(1));
+        mean.put(relation.get(iter).doubleValue(1));
       }
       final double m;
       if(mean.getCount() > 0) {
@@ -125,7 +123,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
         m = local;
       }
       // Store the mean for the score calculation
-      means.putDouble(id, m);
+      means.putDouble(iditer, m);
       covm.put(new double[] { local, m });
     }
     // Finalize covariance matrix, compute linear regression
@@ -143,11 +141,10 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     MeanVariance mv = new MeanVariance();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       // Compute the error from the linear regression
-      double y_i = relation.get(id).doubleValue(1);
-      double e = means.doubleValue(id) - (slope * y_i + inter);
-      scores.putDouble(id, e);
+      double y_i = relation.get(iditer).doubleValue(1);
+      double e = means.doubleValue(iditer) - (slope * y_i + inter);
+      scores.putDouble(iditer, e);
       mv.put(e);
     }
 
@@ -157,10 +154,9 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       final double mean = mv.getMean();
       final double variance = mv.getNaiveStddev();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double score = Math.abs((scores.doubleValue(id) - mean) / variance);
+        double score = Math.abs((scores.doubleValue(iditer) - mean) / variance);
         minmax.put(score);
-        scores.putDouble(id, score);
+        scores.putDouble(iditer, score);
       }
     }
     // build representation

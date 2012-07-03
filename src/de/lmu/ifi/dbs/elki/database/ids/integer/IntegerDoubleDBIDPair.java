@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.generic;
+package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 /*
  This file is part of ELKI:
@@ -23,66 +23,65 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 
 /**
- * Iterator for classic collections.
+ * Pair containing a double value and an integer DBID.
  * 
  * @author Erich Schubert
  */
-public class DBIDIterAdapter implements DBIDMIter {
+class IntegerDoubleDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   /**
-   * Current DBID
+   * The double value
    */
-  DBID cur = null;
+  double value;
 
   /**
-   * The real iterator
+   * The DB id
    */
-  Iterator<DBID> iter;
-
+  int id;
+  
   /**
    * Constructor.
-   * 
-   * @param iter Iterator
+   *
+   * @param value Double value
+   * @param id DBID
    */
-  public DBIDIterAdapter(Iterator<DBID> iter) {
+  protected IntegerDoubleDBIDPair(double value, int id) {
     super();
-    this.iter = iter;
-    advance();
+    this.value = value;
+    this.id = id;
   }
 
   @Override
-  public boolean valid() {
-    return cur != null;
-  }
-
-  @Override
-  public void advance() {
-    if(iter.hasNext()) {
-      cur = iter.next();
-    }
-    else {
-      cur = null;
-    }
+  public DBIDRef deref() {
+    return new IntegerDBID(id);
   }
 
   @Override
   public int getIntegerID() {
-    return DBIDFactory.FACTORY.asInteger(cur);
+    return id;
   }
 
   @Override
-  public DBID deref() {
-    return cur;
+  public int compareTo(DoubleDBIDPair o) {
+    return Double.compare(value, o.doubleValue());
   }
 
   @Override
-  public void remove() {
-    iter.remove();
+  public double doubleValue() {
+    return value;
+  }
+
+  @Override
+  public Double getFirst() {
+    return value;
+  }
+
+  @Override
+  public DBID getSecond() {
+    return new IntegerDBID(id);
   }
 }

@@ -189,7 +189,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
     }
 
     @Override
-    public DBID getDBID() {
+    public DBID deref() {
       return new IntegerDBID(hash._set[_index]);
     }
   }

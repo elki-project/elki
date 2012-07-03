@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -64,7 +65,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -144,14 +144,14 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
     // sort neighbors
     for(Cluster<?> clus : split) {
-      ArrayList<FCPair<Double, DBID>> cmem = new ArrayList<FCPair<Double, DBID>>(clus.size());
+      ArrayList<DoubleObjPair<DBID>> cmem = new ArrayList<DoubleObjPair<DBID>>(clus.size());
       Vector av = averages.get(clus).getColumnVector();
       Matrix covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        DBID i1 = iter.getDBID();
-        Double d = MathUtil.mahalanobisDistance(covm, av.minus(relation.get(i1).getColumnVector()));
-        cmem.add(new FCPair<Double, DBID>(d, i1));
+        DBID i1 = DBIDUtil.deref(iter);
+        double d = MathUtil.mahalanobisDistance(covm, relation.get(i1).getColumnVector().minusEquals(av));
+        cmem.add(new DoubleObjPair<DBID>(d, i1));
       }
       Collections.sort(cmem);
 

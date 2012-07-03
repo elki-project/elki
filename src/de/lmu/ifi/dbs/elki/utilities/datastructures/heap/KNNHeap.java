@@ -132,7 +132,7 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    */
   public boolean add(D distance, DBIDRef id) {
     if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
-      return super.add(new GenericDistanceResultPair<D>(distance, id.getDBID()));
+      return super.add(new GenericDistanceResultPair<D>(distance, id));
     }
     return true; /* "success" */
   }

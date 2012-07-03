@@ -144,7 +144,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     if(size >= minpts) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         if(!processedIDs.contains(iditer)) {
-          expandCluster(relation, rangeQuery, iditer.getDBID(), objprog, clusprog);
+          expandCluster(relation, rangeQuery, DBIDUtil.deref(iditer), objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);

@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -139,7 +140,7 @@ public class JSONWebServer implements HttpHandler {
    * @param re Buffer to serialize to
    * @param id Object ID
    */
-  protected void bundleToJSON(JSONBuffer re, DBID id) {
+  protected void bundleToJSON(JSONBuffer re, DBIDRef id) {
     SingleObjectBundle bundle = db.getBundle(id);
     if(bundle != null) {
       for(int j = 0; j < bundle.metaLength(); j++) {
@@ -322,10 +323,9 @@ public class JSONWebServer implements HttpHandler {
             iter.advance();
           }
           for(int i = 0; i < pagesize && iter.valid(); i++, iter.advance()) {
-            DBID id = iter.getDBID();
             re.startHash();
-            bundleToJSON(re, id);
-            final Double val = scores.get(id);
+            bundleToJSON(re, iter);
+            final Double val = scores.get(iter);
             if(val != null) {
               re.appendKeyValue("score", val);
             }

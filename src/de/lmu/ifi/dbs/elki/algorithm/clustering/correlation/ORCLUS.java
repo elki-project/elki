@@ -37,13 +37,12 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -216,7 +215,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     V factory = DatabaseUtil.assumeVectorField(database).getFactory();
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
     for(DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
-      seeds.add(new ORCLUSCluster(database.get(iter), iter.getDBID(), factory));
+      seeds.add(new ORCLUSCluster(database.get(iter), iter, factory));
     }
     return seeds;
   }
@@ -286,11 +285,10 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   private Matrix findBasis(Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, ORCLUSCluster cluster, int dim) {
     // covariance matrix of cluster
     // Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
-    List<DistanceResultPair<DoubleDistance>> results = new ArrayList<DistanceResultPair<DoubleDistance>>(cluster.objectIDs.size());
+    GenericDistanceDBIDList<DoubleDistance> results = new GenericDistanceDBIDList<DoubleDistance>(cluster.objectIDs.size());
     for(DBIDIter it = cluster.objectIDs.iter(); it.valid(); it.advance()) {
       DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(it));
-      DistanceResultPair<DoubleDistance> qr = new GenericDistanceResultPair<DoubleDistance>(distance, it.getDBID());
-      results.add(qr);
+      results.add(distance, it);
     }
     Collections.sort(results);
     PCAResult pcares = pca.processQueryResult(results, database);
@@ -513,7 +511,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
      * @param o the object belonging to this cluster.
      * @param factory Factory object / prototype
      */
-    ORCLUSCluster(V o, DBID id, V factory) {
+    ORCLUSCluster(V o, DBIDRef id, V factory) {
       this.objectIDs.add(id);
 
       // initially the basis ist the original axis-system

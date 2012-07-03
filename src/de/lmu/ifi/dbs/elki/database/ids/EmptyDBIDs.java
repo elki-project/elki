@@ -106,7 +106,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     }
 
     @Override
-    public DBID getDBID() {
+    public DBIDRef deref() {
       throw new NoSuchElementException();
     }
 

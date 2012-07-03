@@ -30,15 +30,16 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
@@ -125,7 +126,7 @@ public class ROC {
    *        'same positions'.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>> XYCurve materializeROC(int size, SetDBIDs ids, Iterator<? extends PairInterface<C, DBID>> nei) {
+  public static <C extends Comparable<? super C>> XYCurve materializeROC(int size, SetDBIDs ids, Iterator<? extends PairInterface<C, ? extends DBIDRef>> nei) {
     final int postot = ids.size(), negtot = size - postot;
     int poscnt = 0, negcnt = 0;
     XYCurve curve = new XYCurve("True Negative Rate", "True Positive Rate", postot + 2);
@@ -139,7 +140,7 @@ public class ROC {
       final double trueneg = negcnt / (double) negtot;
       final double truepos = poscnt / (double) postot;
       // Analyze next point
-      PairInterface<C, DBID> cur = nei.next();
+      PairInterface<C, ? extends DBIDRef> cur = nei.next();
       // positive or negative match?
       if(ids.contains(cur.getSecond())) {
         poscnt += 1;
@@ -216,7 +217,7 @@ public class ROC {
    * @author Erich Schubert
    * @param <D> Distance type
    */
-  public static class DistanceResultAdapter<D extends Distance<D>> implements Iterator<Pair<D, DBID>> {
+  public static class DistanceResultAdapter<D extends Distance<D>> implements Iterator<Pair<D, DBIDRef>> {
     /**
      * Original Iterator
      */
@@ -238,9 +239,9 @@ public class ROC {
     }
 
     @Override
-    public Pair<D, DBID> next() {
+    public Pair<D, DBIDRef> next() {
       DistanceResultPair<D> d = this.iter.next();
-      return new Pair<D, DBID>(d.getDistance(), d.getDBID());
+      return new Pair<D, DBIDRef>(d.getDistance(), d);
     }
 
     @Override
@@ -259,7 +260,7 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class OutlierScoreAdapter implements Iterator<DoubleObjPair<DBID>> {
+  public static class OutlierScoreAdapter implements Iterator<DoubleDBIDPair> {
     /**
      * Original Iterator
      */
@@ -287,10 +288,10 @@ public class ROC {
     }
 
     @Override
-    public DoubleObjPair<DBID> next() {
-      DBID id = this.iter.getDBID();
+    public DoubleDBIDPair next() {
+      DBID id = DBIDUtil.deref(this.iter);
       iter.advance();
-      return new DoubleObjPair<DBID>(scores.get(id), id);
+      return DBIDUtil.newPair(scores.get(id), id);
     }
 
     @Override

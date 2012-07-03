@@ -58,7 +58,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<? e
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext() && have < k; have++) {
-      ids.add(it.next().getDBID());
+      ids.add(it.next());
     }
     return processIds(ids, database);
   }

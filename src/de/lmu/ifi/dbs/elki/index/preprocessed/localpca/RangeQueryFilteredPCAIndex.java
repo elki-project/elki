@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -84,7 +84,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>
   }
 
   @Override
-  protected DistanceDBIDResult<DoubleDistance> objectsForPCA(DBID id) {
+  protected DistanceDBIDResult<DoubleDistance> objectsForPCA(DBIDRef id) {
     return rangeQuery.getRangeForDBID(id, epsilon);
   }
 

@@ -30,8 +30,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -108,17 +109,15 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
     for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      DBID id = it.getDBID();
-
       if(logger.isDebugging()) {
-        msg.append("\n\nid = ").append(id);
+        msg.append("\n\nid = ").append(DBIDUtil.toString(it));
         ///msg.append(" ").append(database.getObjectLabelQuery().get(id));
         msg.append("\n knns: ");
       }
 
-      KNNResult<DoubleDistance> knns = knnQuery.getKNNForDBID(id, k);
-      BitSet preferenceVector = determinePreferenceVector(relation, id, knns.asDBIDs(), msg);
-      storage.put(id, preferenceVector);
+      KNNResult<DoubleDistance> knns = knnQuery.getKNNForDBID(it, k);
+      BitSet preferenceVector = determinePreferenceVector(relation, it, knns.asDBIDs(), msg);
+      storage.put(it, preferenceVector);
 
       if(progress != null) {
         progress.incrementProcessed(logger);
@@ -150,7 +149,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Relation<V> relation, DBID id, DBIDs neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuffer msg) {
     // variances
     double[] variances = DatabaseUtil.variances(relation, relation.get(id), neighborIDs);
 

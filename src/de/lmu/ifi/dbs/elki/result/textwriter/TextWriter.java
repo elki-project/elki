@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
@@ -280,7 +281,7 @@ public class TextWriter {
     }
   }
 
-  private void printObject(TextWriterStream out, Database db, final DBID objID, List<Relation<?>> ra) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, Database db, final DBIDRef objID, List<Relation<?>> ra) throws UnableToComplyException, IOException {
     SingleObjectBundle bundle = db.getBundle(objID);
     // Write database element itself.
     for(int i = 0; i < bundle.metaLength(); i++) {
@@ -379,7 +380,7 @@ public class TextWriter {
     // print ids.
     DBIDs ids = clus.getIDs();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      printObject(out, db, iter.getDBID(), ra);
+      printObject(out, db, iter, ra);
     }
     out.commentPrintSeparator();
     out.flush();
@@ -419,7 +420,7 @@ public class TextWriter {
     printSettings(out, sr);
 
     for (DBIDIter i = or.iter(or.getDBIDs()).iter(); i.valid(); i.advance()) {
-      printObject(out, db, i.getDBID(), ra);
+      printObject(out, db, i, ra);
     }
     out.commentPrintSeparator();
     out.flush();

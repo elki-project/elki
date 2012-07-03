@@ -66,12 +66,11 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
     final int size = objs.size();
     // Linear scan style KNN.
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      DBID candidateID = iter.getDBID();
-      O candidate = relation.get(candidateID);
+      O candidate = relation.get(iter);
       for(int index = 0; index < size; index++) {
         O object = objs.get(index);
         KNNHeap<D> heap = heaps.get(index);
-        heap.add(distanceQuery.distance(object, candidate), candidateID);
+        heap.add(distanceQuery.distance(object, candidate), iter);
       }
     }
   }

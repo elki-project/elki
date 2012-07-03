@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -124,14 +123,13 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     FiniteProgress objloop = logger.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), logger) : null;
     // sort neighbors
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      KNNResult<D> knn = knnQuery.getKNNForDBID(id, k);
-      Object label = lrelation.get(id);
+      KNNResult<D> knn = knnQuery.getKNNForDBID(iter, k);
+      Object label = lrelation.get(iter);
 
       int positive = 0;
       Iterator<DistanceResultPair<D>> ri = knn.iterator();
       for(int i = 0; i < k && ri.hasNext(); i++) {
-        DBID nid = ri.next().getDBID();
+        DistanceResultPair<D> nid = ri.next();
         Object olabel = lrelation.get(nid);
         if(label == null) {
           if(olabel == null) {

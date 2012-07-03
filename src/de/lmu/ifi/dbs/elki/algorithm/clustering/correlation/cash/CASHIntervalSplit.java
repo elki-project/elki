@@ -116,7 +116,7 @@ public class CASHIntervalSplit {
     }
 
     for(DBIDIter iter = superSetIDs.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       Double f_min = minima.get(id);
       Double f_max = maxima.get(id);
 

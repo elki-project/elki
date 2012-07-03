@@ -264,9 +264,10 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     }
 
     // compute distances between each point in S and m_i
+    // FIXME: don't use maps, so we can work with DBIDRef
     Map<DBID, DistanceResultPair<DoubleDistance>> distances = new HashMap<DBID, DistanceResultPair<DoubleDistance>>();
     for(DBIDIter iter = s.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       DoubleDistance dist = distFunc.distance(id, m_i);
       distances.put(id, new GenericDistanceResultPair<DoubleDistance>(dist, id));
     }
@@ -276,14 +277,14 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       List<DistanceResultPair<DoubleDistance>> d = new ArrayList<DistanceResultPair<DoubleDistance>>(distances.values());
       Collections.sort(d);
 
-      m_i = d.get(d.size() - 1).getDBID();
+      m_i = DBIDUtil.deref(d.get(d.size() - 1));
       medoids.add(m_i);
       s.remove(m_i);
       distances.remove(m_i);
 
       // compute distances of each point to closest medoid
       for(DBIDIter iter = s.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
+        DBID id = DBIDUtil.deref(iter);
         DoubleDistance dist_new = distFunc.distance(id, m_i);
         DoubleDistance dist_old = distances.get(id).getDistance();
 
@@ -332,7 +333,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
     ModifiableDBIDs m_current = DBIDUtil.newHashSet();
     for(DBIDIter iter = m_best.iter(); iter.valid(); iter.advance()) {
-      DBID m_i = iter.getDBID();
+      DBID m_i = DBIDUtil.deref(iter);
       if(m_bad.contains(m_i)) {
         int currentSize = m_current.size();
         while(m_current.size() == currentSize) {
@@ -363,13 +364,13 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Map<DBID, List<DistanceResultPair<DoubleDistance>>> result = new HashMap<DBID, List<DistanceResultPair<DoubleDistance>>>();
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
-      DBID m = iter.getDBID();
+      DBID m = DBIDUtil.deref(iter);
       // determine minimum distance between current medoid m and any other
       // medoid m_i
       DoubleDistance minDist = null;
       for(DBIDIter iter2 = medoids.iter(); iter2.valid(); iter2.advance()) {
-        DBID m_i = iter2.getDBID();
-        if(m_i == m) {
+        DBID m_i = DBIDUtil.deref(iter2);
+        if(DBIDUtil.equal(m_i, m)) {
           continue;
         }
         DoubleDistance currentDist = distFunc.distance(m, m_i);
@@ -406,12 +407,12 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Map<DBID, double[]> averageDistances = new HashMap<DBID, double[]>();
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
-      DBID m_i = iter.getDBID();
+      DBID m_i = DBIDUtil.deref(iter);
       V medoid_i = database.get(m_i);
       List<DistanceResultPair<DoubleDistance>> l_i = localities.get(m_i);
       double[] x_i = new double[dim];
       for(DistanceResultPair<DoubleDistance> qr : l_i) {
-        V o = database.get(qr.getDBID());
+        V o = database.get(qr);
         for(int d = 0; d < dim; d++) {
           x_i[d] += Math.abs(medoid_i.doubleValue(d + 1) - o.doubleValue(d + 1));
         }
@@ -425,7 +426,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Map<DBID, Set<Integer>> dimensionMap = new HashMap<DBID, Set<Integer>>();
     List<CTriple<Double, DBID, Integer>> z_ijs = new ArrayList<CTriple<Double, DBID, Integer>>();
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
-      DBID m_i = iter.getDBID();
+      DBID m_i = DBIDUtil.deref(iter);
       Set<Integer> dims_i = new HashSet<Integer>();
       dimensionMap.put(m_i, dims_i);
 
@@ -569,7 +570,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     }
 
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-      DBID p_id = it.getDBID();
+      DBID p_id = DBIDUtil.deref(it);
       V p = database.get(p_id);
       DistanceResultPair<DoubleDistance> minDist = null;
       for(DBID m_i : dimensions.keySet()) {
@@ -581,7 +582,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       }
       // add p to cluster with mindist
       assert minDist != null;
-      ModifiableDBIDs ids = clusterIDs.get(minDist.getDBID());
+      ModifiableDBIDs ids = clusterIDs.get(DBIDUtil.deref(minDist));
       ids.add(p_id);
     }
 
@@ -619,7 +620,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     }
 
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-      DBID p_id = it.getDBID();
+      DBID p_id = DBIDUtil.deref(it);
       V p = database.get(p_id);
       Pair<DoubleDistance, Integer> minDist = null;
       for(int i = 0; i < dimensions.size(); i++) {

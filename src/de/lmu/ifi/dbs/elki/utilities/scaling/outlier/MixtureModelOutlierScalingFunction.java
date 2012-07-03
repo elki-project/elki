@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -121,9 +121,9 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   public void prepare(OutlierResult or) {
     // Initial parameters - are these defaults sounds?
     MeanVariance mv = new MeanVariance();
-    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double val = or.getScores().get(id);
+    Relation<Double> scores = or.getScores();
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      double val = scores.get(id);
       if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mv.put(val);
       }
