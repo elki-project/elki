@@ -151,9 +151,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
     }
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final NumberVector<?, ?> v = relation.get(id);
-      SpatialRef ref = new SpatialRef(id, v);
+      final NumberVector<?, ?> v = relation.get(iditer);
+      SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
       for(List<SpatialRef> curve : curves) {
         curve.add(ref);
       }
@@ -282,7 +281,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
       KNNHeap<D> heap = new KNNHeap<D>(k);
       final O vec = relation.get(id);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-        heap.add(distq.distance(vec, iter), iter.getDBID());
+        heap.add(distq.distance(vec, iter), iter);
         distc++;
       }
       mean.put(distc / (double) k);

@@ -119,7 +119,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     }
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
+      DBID id  = DBIDUtil.deref(iditer);
       final O v = relation.get(id);
       SpatialRef ref = new SpatialRef(id, v);
       for(List<SpatialRef> curve : curves) {
@@ -161,19 +161,18 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     KNNHeap<D> heap = new KNNHeap<D>(k);
     HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       final D n = distanceQuery.getDistanceFactory().nullDistance();
-      heap.add(n, id);
+      heap.add(n, iditer);
 
       // Get candidates.
       cands.clear();
-      int[] ps = positions.get(id);
+      int[] ps = positions.get(iditer);
       int distcomp = 0;
       for(int i = 0; i < numcurves; i++) {
         distcomp += scanCurve(curves.get(i), wsize, ps[i], cands, heap);
       }
 
-      storage.put(id, heap.toKNNList());
+      storage.put(iditer, heap.toKNNList());
       mean.put(distcomp);
     }
 

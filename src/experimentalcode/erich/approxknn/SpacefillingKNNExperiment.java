@@ -79,7 +79,7 @@ public class SpacefillingKNNExperiment {
     {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?, ?> v = rel.get(id);
-        SpatialRef ref = new SpatialRef(id.getDBID(), v);
+        SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
         zs.add(ref);
         ps.add(ref);
         hs.add(ref);

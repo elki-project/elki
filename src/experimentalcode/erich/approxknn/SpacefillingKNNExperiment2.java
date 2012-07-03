@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -92,7 +93,7 @@ public class SpacefillingKNNExperiment2 {
     {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?, ?> v = rel.get(id);
-        SpatialRef ref = new SpatialRef(id.getDBID(), v);
+        SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
         zs.add(ref);
         ps.add(ref);
         hs.add(ref);
@@ -223,8 +224,7 @@ public class SpacefillingKNNExperiment2 {
       rec.add(new Pair<ModifiableDBIDs, KNNHeap<DoubleDistance>>(cand, heap));
     }
 
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final NumberVector<?, ?> vec = rel.get(id);
       final KNNResult<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
       final DBIDs trueIds = DBIDUtil.ensureSet(trueNN.asDBIDs());
@@ -342,7 +342,7 @@ public class SpacefillingKNNExperiment2 {
     }
   }
 
-  protected void initCandidates(ModifiableDBIDs candz, KNNHeap<DoubleDistance> heapz, DBID id) {
+  protected void initCandidates(ModifiableDBIDs candz, KNNHeap<DoubleDistance> heapz, DBIDRef id) {
     candz.clear();
     candz.add(id);
     heapz.clear();
