@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -193,7 +192,7 @@ public class TestKNNJoin implements JUnit4Test {
       DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
-      for(DBID id : relation.getDBIDs()) {
+      for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
         KNNList<DoubleDistance> knnlist = result.get(id);
         meansize.put(knnlist.size());
       }
@@ -206,7 +205,7 @@ public class TestKNNJoin implements JUnit4Test {
       DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
-      for(DBID id : relation.getDBIDs()) {
+      for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
         KNNList<DoubleDistance> knnlist = result.get(id);
         meansize.put(knnlist.size());
       }

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  */
 
 import java.util.BitSet;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -71,16 +70,6 @@ public class MaskedDBIDs implements DBIDs {
   }
 
   @Override
-  public Iterator<DBID> iterator() {
-    if(inverse) {
-      return new InvItr();
-    }
-    else {
-      return new Itr();
-    }
-  }
-
-  @Override
   public DBIDIter iter() {
     if(inverse) {
       return new InvDBIDItr();
@@ -123,44 +112,6 @@ public class MaskedDBIDs implements DBIDs {
    * 
    * @apiviz.exclude
    */
-  protected class Itr implements Iterator<DBID> {
-    /**
-     * Next position.
-     */
-    private int pos;
-
-    /**
-     * Constructor
-     */
-    protected Itr() {
-      this.pos = bits.nextSetBit(0);
-    }
-
-    @Override
-    public boolean hasNext() {
-      return (pos >= 0) && (pos < data.size());
-    }
-
-    @Override
-    public DBID next() {
-      DBID cur = data.get(pos);
-      pos = bits.nextSetBit(pos + 1);
-      return cur;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
-  }
-
-  /**
-   * Iterator over set bits
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
   protected class DBIDItr implements DBIDIter {
     /**
      * Next position.
@@ -193,44 +144,6 @@ public class MaskedDBIDs implements DBIDs {
     @Override
     public DBID deref() {
       return data.get(pos);
-    }
-  }
-
-  /**
-   * Iterator over unset elements.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  protected class InvItr implements Iterator<DBID> {
-    /**
-     * Next unset position.
-     */
-    private int pos;
-
-    /**
-     * Constructor
-     */
-    protected InvItr() {
-      this.pos = bits.nextClearBit(0);
-    }
-
-    @Override
-    public boolean hasNext() {
-      return (pos >= 0) && (pos < data.size());
-    }
-
-    @Override
-    public DBID next() {
-      DBID cur = data.get(pos);
-      pos = bits.nextClearBit(pos + 1);
-      return cur;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
     }
   }
 

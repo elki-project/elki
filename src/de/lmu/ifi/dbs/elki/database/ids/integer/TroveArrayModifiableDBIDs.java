@@ -91,7 +91,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       success |= store.remove(DBIDFactory.FACTORY.asInteger(id));
     }
     return success;

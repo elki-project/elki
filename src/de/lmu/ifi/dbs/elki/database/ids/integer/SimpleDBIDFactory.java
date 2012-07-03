@@ -119,7 +119,9 @@ public class SimpleDBIDFactory implements DBIDFactory {
     if (id instanceof DBID) {
       return (DBID)id;
     }
-    return deref(id);
+    DBIDRef inner = id.deref();
+    assert (inner != id) : "Unresolvable DBID: " + id;
+    return deref(inner);
   }
 
   @Override

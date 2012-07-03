@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -135,11 +134,6 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public Iterator<DBID> iterator() {
-    return new Itr();
-  }
-
-  @Override
   public boolean contains(DBIDRef o) {
     return DBIDFactory.FACTORY.asInteger(o) == id;
   }
@@ -152,37 +146,6 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   @Override
   public int binarySearch(DBIDRef key) {
     return (id == DBIDFactory.FACTORY.asInteger(key)) ? 0 : -1;
-  }
-
-  /**
-   * Pseudo iterator for DBIDs interface.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  protected class Itr implements Iterator<DBID> {
-    /**
-     * Whether we've already returned our object.
-     */
-    boolean first = true;
-
-    @Override
-    public boolean hasNext() {
-      return first == true;
-    }
-
-    @Override
-    public DBID next() {
-      assert (first);
-      first = false;
-      return IntegerDBID.this;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
   }
 
   /**
