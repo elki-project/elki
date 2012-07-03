@@ -31,7 +31,8 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -98,7 +99,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
     double dotsize = context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
 
-    for(DBID id : sample.getSample()) {
+    for(DBIDIter id = sample.getSample().iter(); id.valid(); id.advance()) {
       double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));
       Element tooltip = makeTooltip(id, v[0], v[1], dotsize);
       SVGUtil.addCSSClass(tooltip, TOOLTIP_HIDDEN);
@@ -118,7 +119,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
     }
   }
 
-  abstract protected Element makeTooltip(DBID id, double x, double y, double dotsize);
+  abstract protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize);
 
   /**
    * Handle the hover events.

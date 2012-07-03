@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -148,7 +148,7 @@ public class ClusterMeanVisualization extends AbstractScatterplotVisualization {
 
       if(stars) {
         SVGPath star = new SVGPath();
-        for(DBID id : clus.getIDs()) {
+        for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
           double[] obj = proj.fastProjectDataToRenderSpace(rel.get(id));
           star.moveTo(mean);
           star.drawTo(obj);

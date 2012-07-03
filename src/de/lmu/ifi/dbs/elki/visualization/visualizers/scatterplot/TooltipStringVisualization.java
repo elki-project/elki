@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -98,7 +99,7 @@ public class TooltipStringVisualization extends AbstractTooltipVisualization {
   }
 
   @Override
-  protected Element makeTooltip(DBID id, double x, double y, double dotsize) {
+  protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
     final Object data = result.get(id);
     String label;
     if(data == null) {
