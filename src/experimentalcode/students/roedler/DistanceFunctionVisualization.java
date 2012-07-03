@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
@@ -97,12 +97,12 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
       int counter;
       Element dist = null;
 
-      for(DBID i : selection) {
+      for(DBIDIter i = selection.iter(); i.valid(); i.advance()) {
         counter = 1;
 
         drawDistancefunction: for(DistanceResultPair<DoubleDistance> j : result.get(i)) {
           try {
-            double[] v = proj.fastProjectDataToRenderSpace(rel.get(j.getDBID()));
+            double[] v = proj.fastProjectDataToRenderSpace(rel.get(j));
             Element dot = svgp.svgCircle(v[0], v[1], size);
             SVGUtil.addCSSClass(dot, KNNMARKER);
             layer.appendChild(dot);
@@ -126,7 +126,7 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
                 break;
               }
               case 4: {
-                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rel.get(i), rel.get(j.getDBID()));
+                dist = DistanceFunctionDrawUtils.drawCosine(svgp, proj, rel.get(i), rel.get(j));
                 break;
               }
               default: {
