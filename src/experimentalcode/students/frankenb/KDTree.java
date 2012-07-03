@@ -5,7 +5,7 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -71,7 +71,7 @@ public class KDTree<V extends NumberVector<?, ?>> {
 
   private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, KNNHeap<DoubleDistance> distanceList, Set<KDTreeNode> alreadyVisited) {
     double maxdist = distanceList.getKNNDistance().doubleValue();
-    for(DBID id : currentNode.ids) {
+    for(DBIDIter id = currentNode.ids.iter(); id.valid(); id.advance()) {
       double distanceToId = distanceFunction.doubleDistance(queryVector, relation.get(id));
       if (distanceToId < maxdist) {
         distanceList.add(new DoubleDistanceResultPair(distanceToId, id));
@@ -130,7 +130,7 @@ public class KDTree<V extends NumberVector<?, ?>> {
     ArrayModifiableDBIDs dataSetLower = DBIDUtil.newArray((int) (ids.size() * 0.51));
     ArrayModifiableDBIDs dataSetExact = DBIDUtil.newArray((int) (ids.size() * 0.05));
     ArrayModifiableDBIDs dataSetHigher = DBIDUtil.newArray((int) (ids.size() * 0.51));
-    for(DBID id : ids) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       double val = relation.get(id).doubleValue(dimension);
       if(val < position) {
         dataSetLower.add(id);

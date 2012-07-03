@@ -1,21 +1,18 @@
 package experimentalcode.students.frankenb;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -23,7 +20,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * No description given.
@@ -66,8 +62,8 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
     
     KNNHeap<DoubleDistance> newDistanceList = new KNNHeap<DoubleDistance>(k);
     for (DistanceResultPair<DoubleDistance> distance : projectedDistanceList) {
-      NumberVector<?, ?> otherVector = dataBase.get(distance.getDBID());
-      newDistanceList.add(new DoubleDistanceResultPair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance.getDBID()));
+      NumberVector<?, ?> otherVector = dataBase.get(distance);
+      newDistanceList.add(new DoubleDistanceResultPair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance));
     }
     
     if (++requested % 100000 == 0) {
@@ -80,8 +76,8 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   @Override
   public List<KNNResult<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     List<KNNResult<DoubleDistance>> results = new ArrayList<KNNResult<DoubleDistance>>();
-    for (DBID dbid : ids) {
-      results.add(getKNNForDBID(dbid, k));
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      results.add(getKNNForDBID(id, k));
     }
     return results;
   }

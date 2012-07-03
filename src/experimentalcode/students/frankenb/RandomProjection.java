@@ -5,7 +5,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -87,9 +86,8 @@ public class RandomProjection<V extends NumberVector<V, ?>> {
 
     V factory = DatabaseUtil.assumeVectorField(dataSet).getFactory();
     for(DBIDIter iditer = dataSet.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      V result = factory.newNumberVector(projectionMatrix.times(dataSet.get(id).getColumnVector()).getArrayRef());
-      projectedDataSet.set(id, result);
+      V result = factory.newNumberVector(projectionMatrix.times(dataSet.get(iditer).getColumnVector()).getArrayRef());
+      projectedDataSet.set(iditer, result);
     }
 
     if(logger.isDebugging()) {
