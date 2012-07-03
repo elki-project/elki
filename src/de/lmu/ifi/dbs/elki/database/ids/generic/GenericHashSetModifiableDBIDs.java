@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 import java.util.HashSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -98,12 +99,12 @@ public class GenericHashSetModifiableDBIDs extends HashSet<DBID> implements Hash
 
   @Override
   public boolean add(DBIDRef id) {
-    return super.add(id.getDBID());
+    return super.add(DBIDFactory.FACTORY.deref(id));
   }
 
   @Override
   public boolean remove(DBIDRef id) {
-    return super.remove(id.getDBID());
+    return super.remove(DBIDFactory.FACTORY.deref(id));
   }
 
   @Override

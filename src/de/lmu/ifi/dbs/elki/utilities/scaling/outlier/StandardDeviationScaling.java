@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -116,9 +117,9 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     if(fixedmean == null) {
       MeanVariance mv = new MeanVariance();
-      for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double val = or.getScores().get(id);
+      Relation<Double> scores = or.getScores();
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+        double val = scores.get(id);
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
@@ -131,17 +132,15 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
     }
     else {
       mean = fixedmean;
-      double sqsum = 0;
-      int cnt = 0;
-      for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        double val = or.getScores().get(id);
+      Mean sqsum = new Mean();
+      Relation<Double> scores = or.getScores();
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+        double val = scores.get(id);
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
-          sqsum += (val - mean) * (val - mean);
-          cnt += 1;
+          sqsum.put((val - mean) * (val - mean));
         }
       }
-      factor = lambda * Math.sqrt(sqsum / cnt) * MathUtil.SQRT2;
+      factor = lambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
       if (factor == 0.0) {
         factor = Double.MIN_NORMAL;
       }

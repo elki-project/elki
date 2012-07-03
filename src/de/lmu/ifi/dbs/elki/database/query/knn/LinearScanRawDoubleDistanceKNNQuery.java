@@ -71,7 +71,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
       if(doubleDistance <= max) {
-        heap.add(new DoubleDistanceResultPair(doubleDistance, iter.getDBID()));
+        heap.add(new DoubleDistanceResultPair(doubleDistance, iter));
         // Update cutoff
         if(heap.size() >= heap.getK()) {
           max = ((DoubleDistanceResultPair) heap.peek()).getDoubleDistance();
@@ -98,7 +98,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
         final KNNHeap<DoubleDistance> heap = heaps.get(index);
         double doubleDistance = rawdist.doubleDistance(objs.get(index), candidate);
         if(doubleDistance <= max[index]) {
-          heap.add(new DoubleDistanceResultPair(doubleDistance, iter.getDBID()));
+          heap.add(new DoubleDistanceResultPair(doubleDistance, iter));
           if(heap.size() >= heap.getK()) {
             max[index] = ((DoubleDistanceResultPair) heap.peek()).getDoubleDistance();
           }

@@ -26,10 +26,10 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.weighted;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Neighbor predicate with weight support.
@@ -43,7 +43,7 @@ public interface WeightedNeighborSetPredicate {
    * @param reference Reference object
    * @return Weighted Neighborhood
    */
-  public Collection<DoubleObjPair<DBID>> getWeightedNeighbors(DBID reference);
+  public Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference);
 
   /**
    * Factory interface to produce instances.

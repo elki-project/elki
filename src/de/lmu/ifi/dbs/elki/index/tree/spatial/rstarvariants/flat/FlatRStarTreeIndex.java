@@ -29,6 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
@@ -111,13 +112,13 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
     if(canBulkLoad()) {
       List<SpatialEntry> leafs = new ArrayList<SpatialEntry>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        leafs.add(createNewLeafEntry(iter.getDBID()));
+        leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }
       bulkLoad(leafs);
     }
     else {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        insert(iter.getDBID());
+        insert(DBIDUtil.deref(iter));
       }
     }
 
@@ -145,7 +146,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
   @Override
   public void deleteAll(DBIDs ids) {
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      delete(iter.getDBID());
+      delete(DBIDUtil.deref(iter));
     }
   }
 

@@ -151,18 +151,17 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
         Relation<LabelList> olq = database.getDatabase().getRelation(TypeUtil.LABELLIST);
         Relation<ExternalID> eidq = database.getDatabase().getRelation(TypeUtil.EXTERNALID);
         for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          DBID id  = iditer.getDBID();
           if(eidq != null) {
-            ExternalID eid = eidq.get(id);
+            ExternalID eid = eidq.get(iditer);
             if(eid != null) {
-              lblmap.put(eid.toString(), id);
+              lblmap.put(eid.toString(), DBIDUtil.deref(iditer));
             }
           }
           if(olq != null) {
-            LabelList label = olq.get(id);
+            LabelList label = olq.get(iditer);
             if(label != null) {
               for(String lbl : label) {
-                lblmap.put(lbl, id);
+                lblmap.put(lbl, DBIDUtil.deref(iditer));
               }
             }
           }

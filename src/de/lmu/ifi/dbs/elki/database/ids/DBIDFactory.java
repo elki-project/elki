@@ -68,6 +68,14 @@ public interface DBIDFactory {
    * @return integer value
    */
   public int asInteger(DBIDRef id);
+  
+  /**
+   * Dereference a DBID reference.
+   * 
+   * @param id Reference
+   * @return Actual DBID
+   */
+  public DBID deref(DBIDRef id);
 
   /**
    * Generate a single DBID
@@ -106,8 +114,17 @@ public interface DBIDFactory {
    * 
    * @return new pair.
    */
-  public DBIDPair makePair(DBIDRef id1, DBIDRef id2);
+  public DBIDPair newPair(DBIDRef id1, DBIDRef id2);
   
+  /**
+   * Make a double-DBID pair.
+   * 
+   * @param val Double value
+   * @param id DBID
+   * @return New pair
+   */
+  public DoubleDBIDPair newPair(double val, DBIDRef id);
+
   /**
    * Make a new (modifiable) array of DBIDs.
    * 

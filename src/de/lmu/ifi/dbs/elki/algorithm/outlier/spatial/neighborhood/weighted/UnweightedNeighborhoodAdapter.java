@@ -28,15 +28,16 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Adapter to use unweighted neighborhoods in an algorithm that requires
@@ -61,12 +62,11 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
   }
 
   @Override
-  public Collection<DoubleObjPair<DBID>> getWeightedNeighbors(DBID reference) {
+  public Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference) {
     DBIDs neighbors = inner.getNeighborDBIDs(reference);
-    ArrayList<DoubleObjPair<DBID>> adapted = new ArrayList<DoubleObjPair<DBID>>(neighbors.size());
+    ArrayList<DoubleDBIDPair> adapted = new ArrayList<DoubleDBIDPair>(neighbors.size());
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      adapted.add(new DoubleObjPair<DBID>(1.0, id));
+      adapted.add(DBIDUtil.newPair(1.0, iter));
     }
     return adapted;
   }

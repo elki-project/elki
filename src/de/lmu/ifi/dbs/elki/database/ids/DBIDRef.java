@@ -36,14 +36,18 @@ public interface DBIDRef {
   /**
    * Get the referenced {@link DBID}.
    * 
-   * Efficiency note: this may require materialization of a DBID object.
+   * Efficiency note: this may require materialization of a DBID object and recursion.
+   * 
+   * Use {@link DBIDUtil#getDBID}!
    * 
    * @return referenced DBID
    */
-  public DBID getDBID();
+  DBIDRef deref();
 
   /**
    * Return the integer value of the object ID, if possible.
+   * 
+   * Use {@link DBIDUtil#asInteger}!
    * 
    * @deprecated Scheduled for removal.
    * 
@@ -55,6 +59,8 @@ public interface DBIDRef {
   /**
    * WARNING: Hash codes of this interface <b>might not be stable</b> (e.g. for
    * iterators).
+   * 
+   * Use {@link DBIDUtil#getDBID} to get an object with a stable hash code!
    * 
    * @return current hash code (<b>may change!</b>)
    * 
@@ -69,6 +75,8 @@ public interface DBIDRef {
    * WARNING: calling equality on a reference may be an indicator of incorrect
    * usage, as it is not clear whether the programmer meant the references to be
    * the same or the DBIDs.
+   * 
+   * Use {@link DBIDUtil#equal} or {@link DBIDUtil#compare}!
    * 
    * @param obj Object to compare with
    * @return True when they are the same object

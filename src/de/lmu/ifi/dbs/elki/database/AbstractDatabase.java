@@ -32,7 +32,7 @@ import java.util.ListIterator;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -120,7 +120,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
-  public SingleObjectBundle getBundle(DBID id) {
+  public SingleObjectBundle getBundle(DBIDRef id) {
     assert (id != null);
     // TODO: ensure that the ID actually exists in the database?
     try {

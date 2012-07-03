@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -72,8 +71,7 @@ public class DAFile {
     double[] tempdata = new double[size];
     int j = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      tempdata[j] = relation.get(id).doubleValue(dimension + 1);
+      tempdata[j] = relation.get(iditer).doubleValue(dimension + 1);
       j += 1;
     }
     Arrays.sort(tempdata);

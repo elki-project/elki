@@ -113,7 +113,7 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
         }
         if(mean.getMean() < best) {
           best = mean.getMean();
-          bestid = iter.getDBID();
+          bestid = DBIDUtil.deref(iter);
           if(bestd != null) {
             bestd.destroy();
           }
@@ -133,23 +133,21 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
       DBID bestid = null;
       WritableDoubleDataStore bestd = null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
-        if(medids.contains(id)) {
+        if(medids.contains(iter)) {
           continue;
         }
         WritableDoubleDataStore newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         mean.reset();
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          DBID other = iter2.getDBID();
-          double dn = distQ.distance(id, other).doubleValue();
-          double v = Math.min(dn, mindist.doubleValue(other));
+          double dn = distQ.distance(iter, iter2).doubleValue();
+          double v = Math.min(dn, mindist.doubleValue(iter2));
           mean.put(v);
-          newd.put(other, v);
+          newd.put(iter2, v);
         }
         assert (mean.getCount() == ids.size());
         if(mean.getMean() < best) {
           best = mean.getMean();
-          bestid = id;
+          bestid = DBIDUtil.deref(iter);
           if(bestd != null) {
             bestd.destroy();
           }

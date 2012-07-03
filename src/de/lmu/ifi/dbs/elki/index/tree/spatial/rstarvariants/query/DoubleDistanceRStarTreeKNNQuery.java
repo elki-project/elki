@@ -288,7 +288,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     // While this works, it seems to be slow at least for large sets!
     final Map<DBID, KNNHeap<DoubleDistance>> knnLists = new HashMap<DBID, KNNHeap<DoubleDistance>>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       knnLists.put(id, new KNNHeap<DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
     }
 
@@ -296,7 +296,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
     List<KNNResult<DoubleDistance>> result = new ArrayList<KNNResult<DoubleDistance>>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       result.add(knnLists.get(id).toKNNList());
     }
     return result;

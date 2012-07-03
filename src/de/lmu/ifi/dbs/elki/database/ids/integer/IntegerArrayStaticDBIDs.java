@@ -121,7 +121,7 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
     }
 
     @Override
-    public DBID getDBID() {
+    public DBID deref() {
       return new IntegerDBID(ids[pos]);
     }
 

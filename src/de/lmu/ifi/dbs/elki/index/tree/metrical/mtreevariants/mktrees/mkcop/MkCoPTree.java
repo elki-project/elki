@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -178,14 +179,14 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MCop-Tree!");
     }
 
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     ModifiableDBIDs candidates = DBIDUtil.newArray();
     doReverseKNNQuery(k, id, result, candidates);
 
     // refinement of candidates
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-      knnLists.put(iter.getDBID(), new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
+      knnLists.put(DBIDUtil.deref(iter), new KNNHeap<D>(k, getDistanceQuery().infiniteDistance()));
     }
     batchNN(getRoot(), candidates, knnLists);
 
@@ -196,10 +197,10 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     rkNNStatistics.addTrueHits(result.size());
 
     for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-      DBID cid = iter.getDBID();
+      DBID cid = DBIDUtil.deref(iter);
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
-        if(qr.getDBID().equals(id)) {
-          result.add(new GenericDistanceResultPair<D>(qr.getDistance(), cid));
+        if(DBIDUtil.equal(qr, id)) {
+          result.add(qr.getDistance(), cid);
           break;
         }
       }

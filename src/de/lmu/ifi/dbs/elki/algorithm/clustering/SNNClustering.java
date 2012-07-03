@@ -157,7 +157,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
     if(relation.size() >= minpts) {
       for(DBIDIter id = snnInstance.getRelation().iterDBIDs(); id.valid(); id.advance()) {
         if(!processedIDs.contains(id)) {
-          expandCluster(snnInstance, id.getDBID(), objprog, clusprog);
+          expandCluster(snnInstance, DBIDUtil.deref(id), objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }
@@ -255,17 +255,16 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
       if(neighborhood.size() >= minpts) {
         for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
-          DBID p = iter.getDBID();
-          boolean inNoise = noise.contains(p);
-          boolean unclassified = !processedIDs.contains(p);
+          boolean inNoise = noise.contains(iter);
+          boolean unclassified = !processedIDs.contains(iter);
           if(inNoise || unclassified) {
             if(unclassified) {
-              seeds.add(p);
+              seeds.add(iter);
             }
-            currentCluster.add(p);
-            processedIDs.add(p);
+            currentCluster.add(iter);
+            processedIDs.add(iter);
             if(inNoise) {
-              noise.remove(p);
+              noise.remove(iter);
             }
           }
         }

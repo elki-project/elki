@@ -129,7 +129,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     }
 
     @Override
-    public DBID getDBID() {
+    public DBID deref() {
       return new IntegerDBID(store.get(pos));
     }
 

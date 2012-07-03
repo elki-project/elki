@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
@@ -149,12 +150,12 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     // knn of rnn
     ModifiableDBIDs ids = DBIDUtil.newArray();
     for(DistanceResultPair<D> rnn : rnns) {
-      ids.add(rnn.getDBID());
+      ids.add(rnn);
     }
 
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       knnLists.put(id, new KNNHeap<D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance()));
     }
     knnQuery.getKNNForBulkHeaps(knnLists);
@@ -206,17 +207,17 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     for(int i = 0; i < candidates.size(); i++) {
       DistanceResultPair<D> candidate = (DistanceResultPair<D>) candidates.get(i);
       KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-      knnLists.put(candidate.getDBID(), (KNNHeap<D>) knns);
-      candidateIDs.add(candidate.getDBID());
+      knnLists.put(DBIDUtil.deref(candidate), (KNNHeap<D>) knns);
+      candidateIDs.add(candidate);
     }
     knnQuery.getKNNForBulkHeaps(knnLists);
 
-    List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+    GenericDistanceDBIDList<T> result = new GenericDistanceDBIDList<T>();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       for(DistanceResultPair<D> qr : knnLists.get(id)) {
-        if(oid.equals(qr.getDBID())) {
-          result.add(new GenericDistanceResultPair<T>((T) qr.getDistance(), id));
+        if(DBIDUtil.equal(oid, qr)) {
+          result.add((T) qr.getDistance(), id);
           break;
         }
       }
@@ -236,7 +237,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     // get candidates
     Map<DBID, List<DistanceResultPair<D>>> candidateMap = new HashMap<DBID, List<DistanceResultPair<D>>>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
+      DBID id = DBIDUtil.deref(iter);
       candidateMap.put(id, new ArrayList<DistanceResultPair<D>>());
     }
     doBulkReverseKNN(getRoot(), ids, candidateMap);
@@ -255,9 +256,9 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     for(List<DistanceResultPair<D>> candidates : candidateMap.values()) {
       for(DistanceResultPair<D> candidate : candidates) {
-        if(!knnLists.containsKey(candidate.getDBID())) {
+        if(!knnLists.containsKey(DBIDUtil.deref(candidate))) {
           KNNHeap<T> knns = new KNNHeap<T>(k, distanceFunction.getDistanceFactory().infiniteDistance());
-          knnLists.put(candidate.getDBID(), (KNNHeap<D>) knns);
+          knnLists.put(DBIDUtil.deref(candidate), (KNNHeap<D>) knns);
         }
       }
     }
@@ -267,11 +268,11 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     List<List<DistanceResultPair<T>>> resultList = new ArrayList<List<DistanceResultPair<T>>>();
     for(DBID id : candidateMap.keySet()) {
       List<DistanceResultPair<D>> candidates = candidateMap.get(id);
-      List<DistanceResultPair<T>> result = new ArrayList<DistanceResultPair<T>>();
+      GenericDistanceDBIDList<T> result = new GenericDistanceDBIDList<T>();
       for(DistanceResultPair<D> candidate : candidates) {
-        for(DistanceResultPair<D> qr : knnLists.get(candidate.getDBID())) {
-          if(qr.getDBID().equals(id)) {
-            result.add(new GenericDistanceResultPair<T>((T) qr.getDistance(), id));
+        for(DistanceResultPair<D> qr : knnLists.get(DBIDUtil.deref(candidate))) {
+          if(DBIDUtil.equal(qr, id)) {
+            result.add((T) qr.getDistance(), id);
             break;
           }
         }
@@ -467,7 +468,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       for(int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry<D> entry = (RdKNNLeafEntry<D>) node.getEntry(i);
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID id = iter.getDBID();
+          DBID id = DBIDUtil.deref(iter);
           D distance = distanceQuery.distance(entry.getDBID(), id);
           if(distance.compareTo(entry.getKnnDistance()) <= 0) {
             result.get(id).add(new GenericDistanceResultPair<D>(distance, entry.getDBID()));
@@ -481,7 +482,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
         RdKNNDirectoryEntry<D> entry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
         ModifiableDBIDs candidates = DBIDUtil.newArray();
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID id = iter.getDBID();
+          DBID id = DBIDUtil.deref(iter);
           D minDist = distanceQuery.minDist(entry, id);
           if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
             candidates.add(id);
@@ -609,13 +610,13 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     if(canBulkLoad()) {
       List<RdKNNEntry<D>> leafs = new ArrayList<RdKNNEntry<D>>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        leafs.add(createNewLeafEntry(iter.getDBID()));
+        leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }
       bulkLoad(leafs);
     }
     else {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        insert(iter.getDBID());
+        insert(DBIDUtil.deref(iter));
       }
     }
 
@@ -643,7 +644,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
   @Override
   public void deleteAll(DBIDs ids) {
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      delete(iter.getDBID());
+      delete(DBIDUtil.deref(iter));
     }
   }
 

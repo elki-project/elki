@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
@@ -122,23 +121,22 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<ArrayList<DBIDs>>();
 
     // Temporary projection storage of the database
-    final ArrayList<ArrayList<DoubleObjPair<DBID>>> dbAxis = new ArrayList<ArrayList<DoubleObjPair<DBID>>>(dim);
+    final ArrayList<ArrayList<DoubleDBIDPair>> dbAxis = new ArrayList<ArrayList<DoubleDBIDPair>>(dim);
     for(int i = 0; i < dim; i++) {
-      ArrayList<DoubleObjPair<DBID>> axis = new ArrayList<DoubleObjPair<DBID>>(size);
+      ArrayList<DoubleDBIDPair> axis = new ArrayList<DoubleDBIDPair>(size);
       dbAxis.add(i, axis);
     }
     // Project
     for(DBIDIter iter = allids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      final V obj = database.get(id);
+      final V obj = database.get(iter);
       for(int d = 1; d <= dim; d++) {
-        dbAxis.get(d - 1).add(new DoubleObjPair<DBID>(obj.doubleValue(d), id));
+        dbAxis.get(d - 1).add(DBIDUtil.newPair(obj.doubleValue(d), iter));
       }
     }
     // Split into cells
     final double part = size * 1.0 / phi;
     for(int d = 1; d <= dim; d++) {
-      ArrayList<DoubleObjPair<DBID>> axis = dbAxis.get(d - 1);
+      ArrayList<DoubleDBIDPair> axis = dbAxis.get(d - 1);
       Collections.sort(axis);
       ArrayList<DBIDs> dimranges = new ArrayList<DBIDs>(phi + 1);
       dimranges.add(allids);
@@ -150,7 +148,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
         }
         ArrayModifiableDBIDs currange = DBIDUtil.newArray(phi + 1);
         for(int i = start; i < end; i++) {
-          currange.add(axis.get(i).second);
+          currange.add(axis.get(i));
         }
         start = end;
         dimranges.add(currange);

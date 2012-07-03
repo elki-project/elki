@@ -214,12 +214,12 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         // add new RkNN
         for(DistanceResultPair<D> drp : added) {
           Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(drp);
-          rknns.add(new GenericDistanceResultPair<D>(drp.getDistance(), iter.getDBID()));
+          rknns.add(new GenericDistanceResultPair<D>(drp.getDistance(), iter));
         }
         // remove old RkNN
         for(DistanceResultPair<D> drp : removed) {
           Set<DistanceResultPair<D>> rknns = materialized_RkNN.get(drp);
-          rknns.remove(new GenericDistanceResultPair<D>(drp.getDistance(), iter.getDBID()));
+          rknns.remove(new GenericDistanceResultPair<D>(drp.getDistance(), iter));
         }
 
         rkNN_ids.add(iter);

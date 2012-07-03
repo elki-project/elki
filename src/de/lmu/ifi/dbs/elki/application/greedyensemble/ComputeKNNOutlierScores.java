@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
@@ -187,9 +187,8 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       try {
         MessageDigest md = MessageDigest.getInstance("MD5");
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID id = iter.getDBID();
           md.update(" ".getBytes());
-          md.update(id.toString().getBytes());
+          md.update(DBIDUtil.toString(iter).getBytes());
         }
         fout.append("# DBID-series MD5:");
         fout.append(Base64.encodeBase64(md.digest()));

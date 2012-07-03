@@ -291,12 +291,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     if(!iter.valid()) {
       throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
     }
-    DBID firstid = iter.getDBID();
+    DBID firstid = DBIDUtil.deref(iter);
     iter.advance();
     minhotset.add(new DoubleObjPair<DBID>(Double.MAX_VALUE, firstid));
     maxhotset.add(new DoubleObjPair<DBID>(Double.MIN_VALUE, firstid));
     while(iter.valid()) {
-      DBID id1 = iter.getDBID();
+      DBID id1 = DBIDUtil.deref(iter);
       iter.advance();
       // generate candidates for min distance.
       ArrayList<DoubleObjPair<DBID>> np = new ArrayList<DoubleObjPair<DBID>>(k * 2 + randomsize * 2);
@@ -311,7 +311,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         np.add(new DoubleObjPair<DBID>(d, id2));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        DBID id2 = iter2.getDBID();
+        DBID id2 = DBIDUtil.deref(iter2);
         double d = distFunc.distance(id1, id2).doubleValue();
         np.add(new DoubleObjPair<DBID>(d, id1));
         np.add(new DoubleObjPair<DBID>(d, id2));
@@ -332,7 +332,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         np2.add(new DoubleObjPair<DBID>(d, id2));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        DBID id2 = iter2.getDBID();
+        DBID id2 = DBIDUtil.deref(iter2);
         double d = distFunc.distance(id1, id2).doubleValue();
         np.add(new DoubleObjPair<DBID>(d, id1));
         np.add(new DoubleObjPair<DBID>(d, id2));
@@ -355,14 +355,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id1  = iditer.getDBID();
       for(DBIDIter iditer2 = database.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
-        DBID id2  = iditer2.getDBID();
         // skip the point itself.
-        if(id1.compareTo(id2) == 0) {
+        if(DBIDUtil.equal(iditer, iditer2)) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).doubleValue();
+        double d = distFunc.distance(iditer, iditer2).doubleValue();
         minmax.put(d);
       }
     }

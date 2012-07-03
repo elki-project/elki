@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
@@ -107,9 +108,18 @@ public class SimpleDBIDFactory implements DBIDFactory {
     if (id instanceof IntegerDBIDRef) {
       return ((IntegerDBIDRef)id).getIntegerID();
     }
-    final DBID inner = id.getDBID();
+    assert(!(id instanceof DBID)) : "Non-integer DBID found.";
+    final DBIDRef inner = id.deref();
     assert(inner != id) : "Unresolvable DBIDRef found.";
     return asInteger(inner);
+  }
+  
+  @Override
+  public DBID deref(DBIDRef id) {
+    if (id instanceof DBID) {
+      return (DBID)id;
+    }
+    return deref(id);
   }
 
   @Override
@@ -160,8 +170,13 @@ public class SimpleDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public DBIDPair makePair(DBIDRef first, DBIDRef second) {
+  public DBIDPair newPair(DBIDRef first, DBIDRef second) {
     return new IntegerDBIDPair(asInteger(first), asInteger(second));
+  }
+
+  @Override
+  public DoubleDBIDPair newPair(double val, DBIDRef id) {
+    return new IntegerDoubleDBIDPair(val, asInteger(id));
   }
 
   @Override

@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -78,9 +77,8 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     V center = DatabaseUtil.centroid(database, ids);
     List<DoubleDistanceResultPair> dres = new ArrayList<DoubleDistanceResultPair>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(id));
-      dres.add(new DoubleDistanceResultPair(dist, id));
+      final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(iter));
+      dres.add(new DoubleDistanceResultPair(dist, iter));
     }
     Collections.sort(dres);
     return processQueryResult(dres, database);

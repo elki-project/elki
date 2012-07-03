@@ -24,7 +24,8 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  */
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -50,7 +51,7 @@ public abstract class AbstractPrecomputedNeighborhood implements NeighborSetPred
   }
 
   @Override
-  public DBIDs getNeighborDBIDs(DBID reference) {
+  public DBIDs getNeighborDBIDs(DBIDRef reference) {
     DBIDs neighbors = store.get(reference);
     if(neighbors != null) {
       return neighbors;
@@ -60,7 +61,7 @@ public abstract class AbstractPrecomputedNeighborhood implements NeighborSetPred
       if(getLogger().isDebugging()) {
         getLogger().warning("No neighbors for object " + reference);
       }
-      return reference;
+      return DBIDUtil.deref(reference);
     }
   }
 

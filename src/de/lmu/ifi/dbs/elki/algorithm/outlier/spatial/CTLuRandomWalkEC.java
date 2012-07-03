@@ -166,7 +166,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
       // Convert kNN Heap into DBID array
       ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
       while(!heap.isEmpty()) {
-        nids.add(heap.poll().getDBID());
+        nids.add(heap.poll());
       }
       neighbors.put(id, nids);
     }
@@ -205,16 +205,14 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     // compute the relevance scores between specified Object and its neighbors
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
+    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       double gmean = 1.0;
       int cnt = 0;
       for(DBIDIter iter = neighbors.get(id).iter(); iter.valid(); iter.advance()) {
-        DBID n = iter.getDBID();
-        if(id.equals(n)) {
+        if(DBIDUtil.equal(id, iter)) {
           continue;
         }
-        double sim = MathUtil.angle(similarityVectors.get(id), similarityVectors.get(n));
+        double sim = MathUtil.angle(similarityVectors.get(id), similarityVectors.get(iter));
         gmean *= sim;
         cnt++;
       }

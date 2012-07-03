@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -104,35 +104,32 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
     MeanVariance zmv = new MeanVariance();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       // Compute Mean of neighborhood
       Mean localmean = new Mean();
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        DBID n = iter.getDBID();
-        if(id.equals(n)) {
+        if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        localmean.put(relation.get(n).doubleValue(1));
+        localmean.put(relation.get(iter).doubleValue(1));
       }
       final double localdiff;
       if(localmean.getCount() > 0) {
-        localdiff = relation.get(id).doubleValue(1) - localmean.getMean();
+        localdiff = relation.get(iditer).doubleValue(1) - localmean.getMean();
       }
       else {
         localdiff = 0.0;
       }
-      scores.putDouble(id, localdiff);
+      scores.putDouble(iditer, localdiff);
       zmv.put(localdiff);
     }
 
     // Normalize scores using mean and variance
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double score = Math.abs(scores.doubleValue(id) - zmv.getMean()) / zmv.getSampleStddev();
+      double score = Math.abs(scores.doubleValue(iditer) - zmv.getMean()) / zmv.getSampleStddev();
       minmax.put(score);
-      scores.putDouble(id, score);
+      scores.putDouble(iditer, score);
     }
 
     // Wrap result

@@ -29,7 +29,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -98,8 +97,7 @@ public class OutlierThresholdClustering implements Evaluator {
       idlists.add(DBIDUtil.newHashSet());
     }
     for(DBIDIter iter = scores.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      double score = scores.get(id);
+      double score = scores.get(iter);
       if(scaling != null) {
         score = scaling.getScaled(score);
       }
@@ -109,7 +107,7 @@ public class OutlierThresholdClustering implements Evaluator {
           break;
         }
       }
-      idlists.get(i).add(id);
+      idlists.get(i).add(iter);
     }
     Clustering<Model> c = new Clustering<Model>("Outlier threshold clustering", "threshold-clustering");
     for(int i = 0; i <= threshold.length; i++) {

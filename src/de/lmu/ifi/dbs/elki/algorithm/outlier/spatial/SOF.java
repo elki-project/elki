@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -110,33 +109,31 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
 
     // Compute densities
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       double avg = 0;
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        avg += distFunc.distance(id, iter.getDBID()).doubleValue();
+        avg += distFunc.distance(iditer, iter).doubleValue();
       }
       double lrd = 1 / (avg / neighbors.size());
       if (Double.isNaN(lrd)) {
         lrd = 0;
       }
-      lrds.putDouble(id, lrd);
+      lrds.putDouble(iditer, lrd);
     }
 
     // Compute density quotients
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      DBIDs neighbors = npred.getNeighborDBIDs(id);
+      DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       double avg = 0;
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        avg += lrds.doubleValue(iter.getDBID());
+        avg += lrds.doubleValue(iter);
       }
-      final double lrd = (avg / neighbors.size()) / lrds.doubleValue(id);
+      final double lrd = (avg / neighbors.size()) / lrds.doubleValue(iditer);
       if (!Double.isNaN(lrd)) {
-        lofs.putDouble(id, lrd);
+        lofs.putDouble(iditer, lrd);
         lofminmax.put(lrd);
       } else {
-        lofs.putDouble(id, 0.0);
+        lofs.putDouble(iditer, 0.0);
       }
     }
 

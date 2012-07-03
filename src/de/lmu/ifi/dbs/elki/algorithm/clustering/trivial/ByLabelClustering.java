@@ -226,7 +226,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
       }
     }
     else {
-      labelMap.put(label, id.getDBID());
+      labelMap.put(label, DBIDUtil.deref(id));
     }
   }
 

@@ -140,7 +140,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     int pos = 0;
     DBIDIter i = order.iter();
     for(int k = 1; k <= lastk; k++, i.advance()) {
-      if(positiveids.contains(i.getDBID())) {
+      if(positiveids.contains(i)) {
         pos++;
       }
       curve.addAndSimplify(k, pos / (double) k);

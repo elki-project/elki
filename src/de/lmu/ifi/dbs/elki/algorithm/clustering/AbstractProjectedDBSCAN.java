@@ -187,7 +187,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     if(relation.size() >= minpts) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         if(!processedIDs.contains(iditer)) {
-          expandCluster(distFunc, rangeQuery, iditer.getDBID(), objprog, clusprog);
+          expandCluster(distFunc, rangeQuery, DBIDUtil.deref(iditer), objprog, clusprog);
           if(processedIDs.size() == relation.size() && noise.size() == 0) {
             break;
           }

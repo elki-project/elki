@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -100,29 +100,27 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
     WritableDoubleDataStore modifiedDistance = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     // calculate D-Tilde
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       double sum = 0;
       double maxDist = 0;
       int cnt = 0;
 
-      final DBIDs neighbors = npred.getNeighborDBIDs(id);
+      final DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        DBID neighbor = iter.getDBID();
-        if(id.equals(neighbor)) {
+        if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        double dist = distFunc.distance(id, neighbor).doubleValue();
+        double dist = distFunc.distance(iditer, iter).doubleValue();
         sum += dist;
         cnt++;
         maxDist = Math.max(maxDist, dist);
       }
       if(cnt > 1) {
-        modifiedDistance.putDouble(id, ((sum - maxDist) / (cnt - 1)));
+        modifiedDistance.putDouble(iditer, ((sum - maxDist) / (cnt - 1)));
       }
       else {
         // Use regular distance when the d-tilde trick is undefined.
         // Note: this can be 0 when there were no neighbors.
-        modifiedDistance.putDouble(id, maxDist);
+        modifiedDistance.putDouble(iditer, maxDist);
       }
     }
 
@@ -131,29 +129,26 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
     WritableDoubleDataStore sloms = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       double sum = 0;
       int cnt = 0;
 
-      final DBIDs neighbors = npred.getNeighborDBIDs(id);
+      final DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        DBID neighbor = iter.getDBID();
-        if(neighbor.equals(id)) {
+        if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        sum += modifiedDistance.doubleValue(neighbor);
+        sum += modifiedDistance.doubleValue(iter);
         cnt++;
       }
       double slom;
       if(cnt > 0) {
         // With and without the object itself:
-        double avgPlus = (sum + modifiedDistance.doubleValue(id)) / (cnt + 1);
+        double avgPlus = (sum + modifiedDistance.doubleValue(iditer)) / (cnt + 1);
         double avg = sum / cnt;
 
         double beta = 0;
         for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-          DBID neighbor = iter.getDBID();
-          final double dist = modifiedDistance.doubleValue(neighbor);
+          final double dist = modifiedDistance.doubleValue(iter);
           if(dist > avgPlus) {
             beta += 1;
           }
@@ -162,8 +157,8 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
           }
         }
         // Include object itself
-        if(!neighbors.contains(id)) {
-          final double dist = modifiedDistance.doubleValue(id);
+        if(!neighbors.contains(iditer)) {
+          final double dist = modifiedDistance.doubleValue(iditer);
           if(dist > avgPlus) {
             beta += 1;
           }
@@ -182,13 +177,13 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
         }
         beta = beta / (1 + avg);
 
-        slom = beta * modifiedDistance.doubleValue(id);
+        slom = beta * modifiedDistance.doubleValue(iditer);
       }
       else {
         // No neighbors to compare to - no score.
         slom = 0.0;
       }
-      sloms.putDouble(id, slom);
+      sloms.putDouble(iditer, slom);
       slomminmax.put(slom);
     }
 

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -205,7 +206,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     if(!it.valid()) {
       return null;
     }
-    return it.getDBID();
+    return DBIDUtil.deref(it);
   }
 
   /**

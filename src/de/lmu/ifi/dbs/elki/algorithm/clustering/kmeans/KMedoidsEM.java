@@ -153,7 +153,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
             mdist.put(distQ.distance(iter, iter2).doubleValue());
           }
           if(mdist.getMean() < bestm.getMean()) {
-            best = iter.getDBID();
+            best = DBIDUtil.deref(iter);
             bestm = mdist;
           }
         }

@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood;
  */
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -42,7 +42,7 @@ public interface NeighborSetPredicate extends Result {
    * @param reference Reference object
    * @return Neighborhood
    */
-  public DBIDs getNeighborDBIDs(DBID reference);
+  public DBIDs getNeighborDBIDs(DBIDRef reference);
 
   /**
    * Factory interface to produce instances.

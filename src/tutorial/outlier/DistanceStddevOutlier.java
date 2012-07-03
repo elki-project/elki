@@ -9,7 +9,6 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
@@ -78,19 +77,18 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
 
     // Iterate over all objects
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      DBID id = iter.getDBID();
-      KNNResult<D> neighbors = knnq.getKNNForDBID(id, k);
+      KNNResult<D> neighbors = knnq.getKNNForDBID(iter, k);
       // Aggregate distances
       MeanVariance mv = new MeanVariance();
       for(DistanceResultPair<D> neighbor : neighbors) {
         // Skip the object itself. The 0 is not very informative.
-        if(DBIDUtil.equal(id, neighbor)) {
+        if(DBIDUtil.equal(iter, neighbor)) {
           continue;
         }
         mv.put(neighbor.getDistance().doubleValue());
       }
       // Store score
-      scores.putDouble(id, mv.getSampleStddev());
+      scores.putDouble(iter, mv.getSampleStddev());
     }
 
     // Wrap the result in the standard containers

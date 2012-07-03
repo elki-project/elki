@@ -30,7 +30,6 @@ import java.util.HashSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -86,8 +85,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
 
       ArrayList<V> selection = new ArrayList<V>(db.size());
       for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID id  = iditer.getDBID();
-        selection.add(db.get(id));
+        selection.add(db.get(iditer));
       }
       return selection;
     }

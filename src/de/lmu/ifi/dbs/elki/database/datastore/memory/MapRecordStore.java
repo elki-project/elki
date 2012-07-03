@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
@@ -87,7 +88,7 @@ public class MapRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
-    Object[] d = data.get(id.getDBID());
+    Object[] d = data.get(DBIDFactory.FACTORY.deref(id));
     if(d == null) {
       return null;
     }
@@ -112,10 +113,10 @@ public class MapRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
-    Object[] d = data.get(id.getDBID());
+    Object[] d = data.get(DBIDFactory.FACTORY.deref(id));
     if(d == null) {
       d = new Object[rlen];
-      data.put(id.getDBID(), d);
+      data.put(DBIDFactory.FACTORY.deref(id), d);
     }
     T ret = (T) d[index];
     d[index] = value;

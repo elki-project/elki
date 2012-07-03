@@ -30,6 +30,7 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -380,7 +381,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       for(int i = 0; i < node.getNumEntries(); i++) {
         E p = node.getEntry(i);
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID q = iter.getDBID();
+          DBID q = DBIDUtil.deref(iter);
           KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
@@ -396,7 +397,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       for(DistanceEntry<D, E> distEntry : entries) {
         D minDist = distEntry.getDistance();
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID q = iter.getDBID();
+          DBID q = DBIDUtil.deref(iter);
           KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
@@ -450,7 +451,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
       D minMinDist = getDistanceFactory().infiniteDistance();
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        D distance = distanceQuery.distance(entry.getRoutingObjectID(), iter.getDBID());
+        D distance = distanceQuery.distance(entry.getRoutingObjectID(), DBIDUtil.deref(iter));
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
         minMinDist = DistanceUtil.max(minMinDist, minDist);
       }

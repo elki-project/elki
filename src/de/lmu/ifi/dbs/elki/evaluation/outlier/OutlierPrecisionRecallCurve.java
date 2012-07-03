@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -130,9 +129,8 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       final double curreca = ((double) poscnt) / postot;
 
       // Analyze next point
-      DBID cur = iter.getDBID();
       // positive or negative match?
-      if(ids.contains(cur)) {
+      if(ids.contains(iter)) {
         poscnt += 1;
       }
       total += 1;
@@ -142,7 +140,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       }
       // defer calculation for ties
       if(scores != null) {
-        double curscore = scores.get(cur);
+        double curscore = scores.get(iter);
         if(Double.compare(prevscore, curscore) == 0) {
           continue;
         }

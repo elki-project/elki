@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -100,8 +100,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
     // Compute the global mean and variance
     MeanVariance globalmv = new MeanVariance();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      globalmv.put(relation.get(id).doubleValue(1));
+      globalmv.put(relation.get(iditer).doubleValue(1));
     }
 
     DoubleMinMax minmax = new DoubleMinMax();
@@ -110,17 +109,15 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
     // calculate normalized attribute values
     // calculate neighborhood average of normalized attribute values.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
       // Compute global z score
-      final double globalZ = (relation.get(id).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev();
+      final double globalZ = (relation.get(iditer).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev();
       // Compute local average z score
       Mean localm = new Mean();
-      for(DBIDIter iter = npred.getNeighborDBIDs(id).iter(); iter.valid(); iter.advance()) {
-        DBID n = iter.getDBID();
-        if(id.equals(n)) {
+      for(DBIDIter iter = npred.getNeighborDBIDs(iditer).iter(); iter.valid(); iter.advance()) {
+        if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        localm.put((relation.get(n).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev());
+        localm.put((relation.get(iter).doubleValue(1) - globalmv.getMean()) / globalmv.getNaiveStddev());
       }
       // if neighors.size == 0
       final double localZ;
@@ -136,7 +133,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
       // Note: in the original moran scatterplot, any object with a score < 0 would be an outlier.
       final double score = Math.max(-globalZ * localZ, 0);
       minmax.put(score);
-      scores.putDouble(id, score);
+      scores.putDouble(iditer, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("MoranOutlier", "Moran Scatterplot Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());

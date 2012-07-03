@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -39,8 +38,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -215,12 +215,11 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
    * @return array containing the distance to one reference point for each
    *         database object and the object id
    */
-  protected List<DistanceResultPair<D>> computeDistanceVector(V refPoint, Relation<V> database, DistanceQuery<V, D> distFunc) {
+  protected DistanceDBIDResult<D> computeDistanceVector(V refPoint, Relation<V> database, DistanceQuery<V, D> distFunc) {
     // TODO: optimize for double distances?
-    List<DistanceResultPair<D>> referenceDists = new ArrayList<DistanceResultPair<D>>(database.size());
+    GenericDistanceDBIDList<D> referenceDists = new GenericDistanceDBIDList<D>(database.size());
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final D distance = distFunc.distance(iditer, refPoint);
-      referenceDists.add(new GenericDistanceResultPair<D>(distance, iditer.getDBID()));
+      referenceDists.add(distFunc.distance(iditer, refPoint), iditer);
     }
     Collections.sort(referenceDists);
     return referenceDists;

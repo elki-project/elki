@@ -94,7 +94,7 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
     }
     List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
-      result.add(preprocessor.getRKNN(iter.getDBID()));
+      result.add(preprocessor.getRKNN(iter));
     }
     return result;
   }

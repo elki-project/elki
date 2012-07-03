@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
@@ -68,9 +68,9 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     meta = or.getOutlierMeta();
     // Determine Minimum and Maximum.
     DoubleMinMax mm = new DoubleMinMax();
-    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double score = or.getScores().get(id);
+    Relation<Double> scores = or.getScores();
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      double score = scores.get(id);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mm.put(score);
       }
@@ -79,9 +79,8 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     mlogmax = -Math.log(mm.getMin() / max);
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
-    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      double score = or.getScores().get(id);
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      double score = scores.get(id);
       score = preScale(score);
       if(!Double.isNaN(score) && !Double.isInfinite(score)) {
         mv.put(score);

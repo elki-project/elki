@@ -29,10 +29,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -41,7 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Neighborhood obtained by computing the k-fold closure of an existing
@@ -87,29 +87,27 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
   }
 
   @Override
-  public Collection<DoubleObjPair<DBID>> getWeightedNeighbors(DBID reference) {
+  public Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference) {
     ModifiableDBIDs seen = DBIDUtil.newHashSet();
-    List<DoubleObjPair<DBID>> result = new ArrayList<DoubleObjPair<DBID>>();
+    List<DoubleDBIDPair> result = new ArrayList<DoubleDBIDPair>();
 
     // Add starting object
-    result.add(new DoubleObjPair<DBID>(computeWeight(0), reference));
+    result.add(DBIDUtil.newPair(computeWeight(0), reference));
     seen.add(reference);
     // Extend.
-    DBIDs cur = reference;
+    DBIDs cur = DBIDUtil.deref(reference);
     for(int i = 1; i <= steps; i++) {
       final double weight = computeWeight(i);
       // Collect newly discovered IDs
       ModifiableDBIDs add = DBIDUtil.newHashSet();
       for(DBIDIter iter = cur.iter(); iter.valid(); iter.advance()) {
-        DBID id = iter.getDBID();
-        for(DBIDIter iter2 = inner.getNeighborDBIDs(id).iter(); iter2.valid(); iter2.advance()) {
-          DBID nid = iter2.getDBID();
+        for(DBIDIter iter2 = inner.getNeighborDBIDs(iter).iter(); iter2.valid(); iter2.advance()) {
           // Seen before?
-          if(seen.contains(nid)) {
+          if(seen.contains(iter2)) {
             continue;
           }
-          add.add(nid);
-          result.add(new DoubleObjPair<DBID>(weight, nid));
+          add.add(iter2);
+          result.add(DBIDUtil.newPair(weight, iter2));
         }
       }
       if(add.size() == 0) {

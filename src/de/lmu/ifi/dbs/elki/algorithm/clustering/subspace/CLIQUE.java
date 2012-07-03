@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.data.Subspace;
 import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -387,30 +386,29 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    */
   private List<CLIQUESubspace<V>> findOneDimensionalDenseSubspaceCandidates(Relation<V> database) {
     Collection<CLIQUEUnit<V>> units = initOneDimensionalUnits(database);
-    Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
-    Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
-
     // identify dense units
     double total = database.size();
-    for(DBIDIter it = database.iterDBIDs(); it.valid();) {
+    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
       V featureVector = database.get(it);
-      final DBID id = it.getDBID();
-      it.advance();
       for(CLIQUEUnit<V> unit : units) {
-        unit.addFeatureVector(id, featureVector);
-        // unit is a dense unit
-        // FIXME: why it.valid()?
-        if(!it.valid() && unit.selectivity(total) >= tau) {
-          denseUnits.add(unit);
-          // add the dense unit to its subspace
-          int dim = unit.getIntervals().iterator().next().getDimension();
-          CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
-          if(subspace_d == null) {
-            subspace_d = new CLIQUESubspace<V>(dim);
-            denseSubspaces.put(dim, subspace_d);
-          }
-          subspace_d.addDenseUnit(unit);
+        unit.addFeatureVector(it, featureVector);
+      }
+    }
+
+    Collection<CLIQUEUnit<V>> denseUnits = new ArrayList<CLIQUEUnit<V>>();
+    Map<Integer, CLIQUESubspace<V>> denseSubspaces = new HashMap<Integer, CLIQUESubspace<V>>();
+    for(CLIQUEUnit<V> unit : units) {
+      // unit is a dense unit
+      if(unit.selectivity(total) >= tau) {
+        denseUnits.add(unit);
+        // add the dense unit to its subspace
+        int dim = unit.getIntervals().iterator().next().getDimension();
+        CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
+        if(subspace_d == null) {
+          subspace_d = new CLIQUESubspace<V>(dim);
+          denseSubspaces.put(dim, subspace_d);
         }
+        subspace_d.addDenseUnit(unit);
       }
     }
 

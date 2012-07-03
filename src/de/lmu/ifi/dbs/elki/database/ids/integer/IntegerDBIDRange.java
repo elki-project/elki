@@ -112,7 +112,7 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDIter {
+  protected class DBIDItr implements DBIDIter, IntegerDBIDRef {
     int pos = 0;
 
     @Override
@@ -131,7 +131,7 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
     }
 
     @Override
-    public DBID getDBID() {
+    public DBID deref() {
       return new IntegerDBID(start + pos);
     }
 

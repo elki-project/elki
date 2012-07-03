@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -110,9 +109,8 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
     CovarianceMatrix covmaker = new CovarianceMatrix(dim);
     WritableDataStore<Vector> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      final O obj = attributes.get(id);
-      final DBIDs neighbors = npred.getNeighborDBIDs(id);
+      final O obj = attributes.get(iditer);
+      final DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       // Compute the median vector
       final Vector median;
       {
@@ -135,8 +133,8 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
       }
 
       // Delta vector "h"
-      Vector delta = obj.getColumnVector().minus(median);
-      deltas.put(id, delta);
+      Vector delta = obj.getColumnVector().minusEquals(median);
+      deltas.put(iditer, delta);
       covmaker.put(delta);
     }
     // Finalize covariance matrix:
@@ -146,11 +144,10 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      Vector temp = deltas.get(id).minus(mean);
+      Vector temp = deltas.get(iditer).minus(mean);
       final double score = temp.transposeTimesTimes(cmati, temp);
       minmax.put(score);
-      scores.putDouble(id, score);
+      scores.putDouble(iditer, score);
     }
 
     Relation<Double> scoreResult = new MaterializedRelation<Double>("Median multiple attributes outlier", "median-outlier", TypeUtil.DOUBLE, scores, attributes.getDBIDs());

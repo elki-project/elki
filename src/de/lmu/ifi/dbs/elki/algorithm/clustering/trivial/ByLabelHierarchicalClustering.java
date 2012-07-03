@@ -178,7 +178,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
       }
     }
     else {
-      labelMap.put(label, id.getDBID());
+      labelMap.put(label, DBIDUtil.deref(id));
     }
   }
 

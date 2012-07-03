@@ -25,8 +25,8 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -52,17 +52,17 @@ public class RankingPseudoOutlierScaling implements OutlierScalingFunction {
   @Override
   public void prepare(OutlierResult or) {
     // collect all outlier scores
-    scores = new double[or.getScores().size()];
+    Relation<Double> oscores = or.getScores();
+    scores = new double[oscores.size()];
     int pos = 0;
     if(or.getOutlierMeta() instanceof InvertedOutlierScoreMeta) {
       inverted = true;
     }
-    for(DBIDIter iditer = or.getScores().iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = iditer.getDBID();
-      scores[pos] = or.getScores().get(id);
+    for(DBIDIter iditer = oscores.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      scores[pos] = oscores.get(iditer);
       pos++;
     }
-    if(pos != or.getScores().size()) {
+    if(pos != oscores.size()) {
       throw new AbortException("Database size is incorrect!");
     }
     // sort them

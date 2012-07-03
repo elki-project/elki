@@ -166,7 +166,7 @@ public class ClusterContingencyTable {
           final Cluster<?> c2 = it2.next();
           int count = 0;
           for(DBIDIter iter = c2.getIDs().iter(); iter.valid(); iter.advance()) {
-            if(ids.contains(iter.getDBID())) {
+            if(ids.contains(iter)) {
               count++;
             }
           }
