@@ -41,7 +41,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.StringLengthConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 
 /**
  * Parser to load polygon data (2D and 3D only) from a simple format. One record
@@ -197,7 +200,14 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   public static class Parameterizer extends AbstractParser.Parameterizer {
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
+      PatternParameter colParam = new PatternParameter(COLUMN_SEPARATOR_ID, "\\s+");
+      if(config.grab(colParam)) {
+        colSep = colParam.getValue();
+      }
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), ""+QUOTE_CHAR);
+      if(config.grab(quoteParam)) {
+        quoteChar = quoteParam.getValue().charAt(0);
+      }
     }
 
     @Override
