@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelati
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -292,7 +293,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       // look for the proper cluster
       Pair<BitSet, ArrayModifiableDBIDs> cluster = null;
       for(Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
-        V c_centroid = DatabaseUtil.centroid(database, c.second, c.first);
+        V c_centroid = ProjectedCentroid.make(c.first, database, c.second).toVector(database);
         PreferenceVectorBasedCorrelationDistance dist = distFunc.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
         if(dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
           double d = distFunc.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
@@ -472,7 +473,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @return the parent of the specified cluster
    */
   private Pair<BitSet, ArrayModifiableDBIDs> findParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Pair<BitSet, ArrayModifiableDBIDs> child, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
-    V child_centroid = DatabaseUtil.centroid(database, child.second, child.first);
+    V child_centroid = ProjectedCentroid.make(child.first, database, child.second).toVector(database);
 
     Pair<BitSet, ArrayModifiableDBIDs> result = null;
     int resultCardinality = -1;
@@ -493,7 +494,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       if(pv.equals(parentPV)) {
         List<Pair<BitSet, ArrayModifiableDBIDs>> parentList = clustersMap.get(parentPV);
         for(Pair<BitSet, ArrayModifiableDBIDs> parent : parentList) {
-          V parent_centroid = DatabaseUtil.centroid(database, parent.second, parentPV);
+          V parent_centroid = ProjectedCentroid.make(parentPV, database, parent.second).toVector(database);
           double d = distFunc.weightedDistance(child_centroid, parent_centroid, parentPV);
           if(d <= 2 * epsilon) {
             result = parent;
@@ -522,7 +523,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     for(int i = 0; i < clusters.size() - 1; i++) {
       Cluster<SubspaceModel<V>> c_i = clusters.get(i);
       int subspaceDim_i = dimensionality - c_i.getModel().getSubspace().dimensionality();
-      V ci_centroid = DatabaseUtil.centroid(database, c_i.getIDs(), c_i.getModel().getDimensions());
+      V ci_centroid = ProjectedCentroid.make(c_i.getModel().getDimensions(), database, c_i.getIDs()).toVector(database);
 
       for(int j = i + 1; j < clusters.size(); j++) {
         Cluster<SubspaceModel<V>> c_j = clusters.get(j);
@@ -548,7 +549,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
             }
           }
           else {
-            V cj_centroid = DatabaseUtil.centroid(database, c_j.getIDs(), c_j.getModel().getDimensions());
+            V cj_centroid = ProjectedCentroid.make(c_j.getModel().getDimensions(), database, c_j.getIDs()).toVector(database);
             PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspace().getDimensions(), c_j.getModel().getSubspace().getDimensions());
             double d = distFunc.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
             if(logger.isDebugging()) {
@@ -599,12 +600,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    *         the children clusters, false otherwise
    */
   private boolean isParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
-    V parent_centroid = DatabaseUtil.centroid(database, parent.getIDs(), parent.getModel().getDimensions());
+    V parent_centroid = ProjectedCentroid.make(parent.getModel().getDimensions(), database, parent.getIDs()).toVector(database);
     int dimensionality = DatabaseUtil.dimensionality(database);
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();
 
     for(Cluster<SubspaceModel<V>> child : children) {
-      V child_centroid = DatabaseUtil.centroid(database, child.getIDs(), child.getModel().getDimensions());
+      V child_centroid = ProjectedCentroid.make(child.getModel().getDimensions(), database, child.getIDs()).toVector(database);
       PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(parent_centroid, child_centroid, parent.getModel().getSubspace().getDimensions(), child.getModel().getSubspace().getDimensions());
       if(distance.getCorrelationValue() == subspaceDim_parent) {
         return true;

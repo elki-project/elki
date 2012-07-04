@@ -23,18 +23,17 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -75,17 +74,17 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
     // be L2-spherical to be unbiased.
     V center = DatabaseUtil.centroid(database, ids);
-    List<DoubleDistanceResultPair> dres = new ArrayList<DoubleDistanceResultPair>(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    DoubleDistanceDBIDList dres = new DoubleDistanceDBIDList(ids.size());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(iter));
-      dres.add(new DoubleDistanceResultPair(dist, iter));
+      dres.add(DBIDFactory.FACTORY.newDistancePair(dist, iter));
     }
-    Collections.sort(dres);
+    dres.sort();
     return processQueryResult(dres, database);
   }
 
   @Override
-  public <D extends NumberDistance<?, ?>> PCAFilteredResult processQueryResult(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<D, ?>> PCAFilteredResult processQueryResult(DistanceDBIDResult<D> results, Relation<? extends V> database) {
     assertSortedByDistance(results);
     final int dim = DatabaseUtil.dimensionality(database);
 
@@ -204,15 +203,24 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
    * 
    * @param results
    */
-  private <D extends NumberDistance<?, ?>> void assertSortedByDistance(Collection<? extends DistanceResultPair<D>> results) {
+  private <D extends NumberDistance<D, ?>> void assertSortedByDistance(DistanceDBIDResult<D> results) {
     // TODO: sort results instead?
     double dist = -1.0;
-    for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext();) {
-      double qr = it.next().getDistance().doubleValue();
+    boolean sorted = true;
+    for(DistanceDBIDResultIter<D> it = results.iter(); it.valid(); it.advance()) {
+      double qr = it.getDistance().doubleValue();
       if(qr < dist) {
-        System.err.println("WARNING: results not sorted by distance!");
+        sorted = false;
       }
       dist = qr;
+    }
+    if(!sorted) {
+      try {
+        results.sort();
+      }
+      catch(UnsupportedOperationException e) {
+        System.err.println("WARNING: results not sorted by distance!");
+      }
     }
   }
 

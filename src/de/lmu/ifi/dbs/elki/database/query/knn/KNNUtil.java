@@ -29,11 +29,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -57,7 +57,7 @@ public final class KNNUtil {
    * 
    * @param <D> Distance
    */
-  protected static class KNNSubList<D extends Distance<D>> extends AbstractList<DistanceResultPair<D>> implements KNNResult<D> {
+  protected static class KNNSubList<D extends Distance<D>> implements KNNResult<D> {
     /**
      * Parameter k
      */
@@ -85,7 +85,7 @@ public final class KNNUtil {
       // Compute list size
       // TODO: optimize for double distances.
       {
-        DistanceResultPair<D> dist = inner.get(k);
+        DistanceDBIDPair<D> dist = inner.get(k);
         int i = k;
         while(i + 1 < inner.size()) {
           if(dist.compareByDistance(inner.get(i + 1)) < 0) {
@@ -103,7 +103,7 @@ public final class KNNUtil {
     }
 
     @Override
-    public DistanceResultPair<D> get(int index) {
+    public DistanceDBIDPair<D> get(int index) {
       assert (index < size) : "Access beyond design size of list.";
       return inner.get(index);
     }
@@ -124,8 +124,23 @@ public final class KNNUtil {
     }
 
     @Override
-    public Iterator<DistanceResultPair<D>> iterator() {
+    public DistanceDBIDResultIter<D> iter() {
       return new Itr();
+    }
+
+    @Override
+    public boolean contains(DBIDRef o) {
+      for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+        if(DBIDUtil.equal(iter, o)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return size == 0;
     }
 
     @Override
@@ -140,78 +155,48 @@ public final class KNNUtil {
      * 
      * @apiviz.exclude
      */
-    private class Itr implements Iterator<DistanceResultPair<D>> {
+    private class Itr implements DistanceDBIDResultIter<D> {
       /**
        * Current position
        */
-      private int pos = -1;
+      private int pos = 0;
 
       @Override
-      public boolean hasNext() {
-        return pos + 1 < size;
+      public boolean valid() {
+        return pos < size;
       }
 
       @Override
-      public DistanceResultPair<D> next() {
-        pos++;
+      public DBIDRef deref() {
         return inner.get(pos);
       }
 
       @Override
-      public void remove() {
-        throw new UnsupportedOperationException("kNN results are unmodifiable.");
+      public void advance() {
+        pos++;
       }
-    }
-  }
 
-  /**
-   * Proxy iterator for accessing DBIDs.
-   * 
-   * @author Erich Schubert
-   */
-  protected static class DBIDItr implements DBIDIter {
-    /**
-     * Current result
-     */
-    DistanceResultPair<?> cur;
-
-    /**
-     * The real iterator.
-     */
-    Iterator<? extends DistanceResultPair<?>> itr;
-
-    /**
-     * Constructor.
-     */
-    protected DBIDItr(Iterator<? extends DistanceResultPair<?>> itr) {
-      super();
-      this.itr = itr;
-      advance();
-    }
-
-    @Override
-    public boolean valid() {
-      return cur != null;
-    }
-
-    @Override
-    public void advance() {
-      if(itr.hasNext()) {
-        cur = itr.next();
+      @Override
+      @Deprecated
+      public int getIntegerID() {
+        return inner.get(pos).getIntegerID();
       }
-      else {
-        cur = null;
+
+      @Override
+      public D getDistance() {
+        return inner.get(pos).getDistance();
+      }
+
+      @Override
+      public DistanceDBIDPair<D> getDistancePair() {
+        return inner.get(pos);
       }
     }
 
     @Override
-    public int getIntegerID() {
-      return DBIDFactory.FACTORY.asInteger(cur);
-    }
-
-    @Override
-    public DBIDRef deref() {
-      return cur;
+    @Deprecated
+    public void sort() {
+      inner.sort();
     }
   }
 
@@ -243,7 +228,7 @@ public final class KNNUtil {
 
     @Override
     public DBIDIter iter() {
-      return new DBIDItr(parent.iterator());
+      return parent.iter();
     }
 
     @Override
@@ -286,29 +271,31 @@ public final class KNNUtil {
     /**
      * The real iterator.
      */
-    Iterator<? extends DistanceResultPair<D>> itr;
+    DistanceDBIDResultIter<D> itr;
 
     /**
      * Constructor.
      */
-    protected DistanceItr(Iterator<? extends DistanceResultPair<D>> itr) {
+    protected DistanceItr(DistanceDBIDResultIter<D> distanceDBIDResultIter) {
       super();
-      this.itr = itr;
+      this.itr = distanceDBIDResultIter;
     }
 
     @Override
     public boolean hasNext() {
-      return itr.hasNext();
+      return itr.valid();
     }
 
     @Override
     public D next() {
-      return itr.next().getDistance();
+      D dist = itr.getDistance();
+      itr.advance();
+      return dist;
     }
 
     @Override
     public void remove() {
-      itr.remove();
+      throw new UnsupportedOperationException();
     }
   }
 
@@ -340,7 +327,7 @@ public final class KNNUtil {
 
     @Override
     public Iterator<D> iterator() {
-      return new DistanceItr<D>(parent.iterator());
+      return new DistanceItr<D>(parent.iter());
     }
 
     @Override

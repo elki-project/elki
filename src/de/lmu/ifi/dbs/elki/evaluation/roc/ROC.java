@@ -33,9 +33,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
@@ -221,26 +223,27 @@ public class ROC {
     /**
      * Original Iterator
      */
-    private Iterator<? extends DistanceResultPair<D>> iter;
+    private DistanceDBIDResultIter<D> iter;
 
     /**
      * Constructor
      * 
      * @param iter Iterator for distance results
      */
-    public DistanceResultAdapter(Iterator<? extends DistanceResultPair<D>> iter) {
+    public DistanceResultAdapter(DistanceDBIDResultIter<D> iter) {
       super();
       this.iter = iter;
     }
 
     @Override
     public boolean hasNext() {
-      return this.iter.hasNext();
+      return this.iter.valid();
     }
 
     @Override
     public Pair<D, DBIDRef> next() {
-      DistanceResultPair<D> d = this.iter.next();
+      DistanceDBIDPair<D> d = this.iter.getDistancePair();
+      this.iter.advance();
       return new Pair<D, DBIDRef>(d.getDistance(), d);
     }
 
@@ -309,7 +312,7 @@ public class ROC {
    * @param nei Query result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, Iterable<? extends DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, DistanceDBIDResult<D> nei) {
     // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }
@@ -323,9 +326,9 @@ public class ROC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, Iterable<? extends DistanceResultPair<D>> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, DistanceDBIDResult<D> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iterator()));
+    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 

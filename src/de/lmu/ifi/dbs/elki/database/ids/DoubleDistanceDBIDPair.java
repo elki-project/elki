@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.rknn;
+package de.lmu.ifi.dbs.elki.database.ids;
 
 /*
  This file is part of ELKI:
@@ -23,33 +23,31 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
- * Instance for the query on a particular database.
+ * Pair containing a double distance a DBID.
+ * 
+ * There is no getter for the DBID, as this is a {@link #DBIDRef} already.
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
+public interface DoubleDistanceDBIDPair extends DistanceDBIDPair<DoubleDistance> {
   /**
-   * Hold the distance function to be used.
-   */
-  protected final DistanceQuery<O, D> distanceQuery;
-
-  /**
-   * Constructor.
+   * Get the distance.
    * 
-   * @param distanceQuery distance query
+   * @deprecated Would produce a DoubleDistance object. Use {@link #doubleDistance} instead!
+   * 
+   * @return Distance
    */
-  public AbstractRKNNQuery(DistanceQuery<O, D> distanceQuery) {
-    super(distanceQuery.getRelation());
-    this.distanceQuery = distanceQuery;
-  }
-
   @Override
-  abstract public DistanceDBIDResult<D> getRKNNForDBID(DBIDRef id, int k);
+  @Deprecated
+  public DoubleDistance getDistance();
+
+  /**
+   * Get the distance.
+   * 
+   * @return Distance
+   */
+  public double doubleDistance();
 }

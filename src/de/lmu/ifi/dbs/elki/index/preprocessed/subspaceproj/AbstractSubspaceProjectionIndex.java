@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -122,10 +122,10 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
         pres = computeProjection(iditer, neighbors, relation);
       }
       else {
-        DistanceResultPair<D> firstQR = neighbors.iterator().next();
-        neighbors = new GenericDistanceDBIDList<D>();
-        neighbors.add(firstQR);
-        pres = computeProjection(iditer, neighbors, relation);
+        DistanceDBIDPair<D> firstQR = neighbors.iter().getDistancePair();
+        GenericDistanceDBIDList<D> newne = new GenericDistanceDBIDList<D>();
+        newne.add(firstQR);
+        pres = computeProjection(iditer, newne, relation);
       }
       storage.put(iditer, pres);
 

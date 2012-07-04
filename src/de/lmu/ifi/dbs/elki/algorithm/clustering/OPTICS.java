@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -33,9 +31,12 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -189,12 +190,12 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      List<DistanceResultPair<D>> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+      DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       if(neighbors.size() >= minpts) {
-        final DistanceResultPair<D> last = neighbors.get(minpts - 1);
+        final DistanceDBIDPair<D> last = neighbors.get(minpts - 1);
         D coreDistance = last.getDistance();
 
-        for(DistanceResultPair<D> neighbor : neighbors) {
+        for(DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if(processedIDs.contains(neighbor)) {
             continue;
           }
@@ -228,17 +229,17 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      List<DistanceResultPair<DoubleDistance>> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+      DistanceDBIDResult<DoubleDistance> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       if(neighbors.size() >= minpts) {
-        final DistanceResultPair<DoubleDistance> last = neighbors.get(minpts - 1);
-        if(last instanceof DoubleDistanceResultPair) {
-          double coreDistance = ((DoubleDistanceResultPair) last).getDoubleDistance();
+        final DistanceDBIDPair<DoubleDistance> last = neighbors.get(minpts - 1);
+        if(last instanceof DoubleDistanceDBIDPair) {
+          double coreDistance = ((DoubleDistanceDBIDPair) last).doubleDistance();
 
-          for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+          for(DistanceDBIDResultIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }
-            double reachability = Math.max(((DoubleDistanceResultPair) neighbor).getDoubleDistance(), coreDistance);
+            double reachability = Math.max(((DoubleDistanceDBIDResultIter) neighbor).doubleDistance(), coreDistance);
             heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }
@@ -247,7 +248,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
           // Only if we got an optimized result before.
           double coreDistance = last.getDistance().doubleValue();
 
-          for(DistanceResultPair<DoubleDistance> neighbor : neighbors) {
+          for(DistanceDBIDResultIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }

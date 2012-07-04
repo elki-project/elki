@@ -23,10 +23,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -66,5 +64,5 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
    * @param k the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  public abstract List<DistanceResultPair<D>> reverseKNNQuery(final DBIDRef id, int k);
+  public abstract DistanceDBIDResult<D> reverseKNNQuery(final DBIDRef id, int k);
 }

@@ -28,8 +28,10 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -72,15 +74,15 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * @return a new MkMaxLeafEntry representing the specified data object
    */
   protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    KNNHeap<D> knnList = new KNNHeap<D>(getKmax() - 1);
+    KNNHeap<DistanceDBIDPair<D>, D> knnList = new KNNHeap<DistanceDBIDPair<D>, D>(getKmax() - 1);
     doKNNQuery(id, knnList);
     D knnDistance = knnList.getMaximumDistance();
     return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);
   }
 
   @Override
-  public void insert(DBID id) {
-    insert(createNewLeafEntry(id, relation.get(id), getDistanceFactory().undefinedDistance()), false);
+  public void insert(DBIDRef id) {
+    insert(createNewLeafEntry(DBIDUtil.deref(id), relation.get(id), getDistanceFactory().undefinedDistance()), false);
   }
 
   @Override
@@ -102,7 +104,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    *         implemented yet.
    */
   @Override
-  public final boolean delete(DBID id) {
+  public final boolean delete(DBIDRef id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 

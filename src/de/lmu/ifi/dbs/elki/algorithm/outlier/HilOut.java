@@ -36,10 +36,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -366,7 +367,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
           if(mlevel < level) {
             level = mlevel;
             final double delta = hf.minDistLevel(hf.pf[i].id, level);
-            if(delta >= hf.pf[i].nn.peek().getDoubleDistance()) {
+            if(delta >= hf.pf[i].nn.peek().doubleDistance()) {
               break; // stop = true
             }
           }
@@ -376,10 +377,10 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
     double br = hf.boxRadius(i, a - 1, b + 1);
     double newlb = 0.0;
     double newub = 0.0;
-    for(DoubleDistanceResultPair entry : hf.pf[i].nn) {
-      newub += entry.getDoubleDistance();
-      if(entry.getDoubleDistance() <= br) {
-        newlb += entry.getDoubleDistance();
+    for(DoubleDistanceDBIDPair entry : hf.pf[i].nn) {
+      newub += entry.doubleDistance();
+      if(entry.doubleDistance() <= br) {
+        newlb += entry.doubleDistance();
       }
     }
     if(newlb > hf.pf[i].lbound) {
@@ -482,7 +483,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
 
       int pos = 0;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new Heap<DoubleDistanceResultPair>(k, Collections.reverseOrder()));
+        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new Heap<DoubleDistanceDBIDPair>(k, Collections.reverseOrder()));
       }
       this.out = new Heap<HilFeature>(n, new Comparator<HilFeature>() {
         @Override
@@ -824,7 +825,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
     /**
      * Heap with the nearest known neighbors
      */
-    public Heap<DoubleDistanceResultPair> nn;
+    public Heap<DoubleDistanceDBIDPair> nn;
 
     /**
      * Set representation of the nearest neighbors for faster lookups
@@ -842,7 +843,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * @param id Object ID
      * @param nn Heap for neighbors
      */
-    public HilFeature(DBID id, Heap<DoubleDistanceResultPair> nn) {
+    public HilFeature(DBID id, Heap<DoubleDistanceDBIDPair> nn) {
       super();
       this.id = id;
       this.nn = nn;
@@ -864,27 +865,26 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
     protected void insert(DBID id, double dt, int k) {
       // assert (!nn_keys.contains(id));
       if(nn.size() < k) {
-        DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
+        DoubleDistanceDBIDPair entry = DBIDFactory.FACTORY.newDistancePair(dt, id);
         nn.offer(entry);
         nn_keys.add(id);
         sum_nn += dt;
       }
       else {
-        DoubleDistanceResultPair head = nn.peek();
-        if(dt < head.getDoubleDistance()) {
+        DoubleDistanceDBIDPair head = nn.peek();
+        if(dt < head.doubleDistance()) {
           head = nn.poll(); // Remove worst
-          sum_nn -= head.getDoubleDistance();
+          sum_nn -= head.doubleDistance();
           nn_keys.remove(head);
 
-          // assert (nn.peek().getDoubleDistance() <= head.getDoubleDistance());
+          // assert (nn.peek().doubleDistance() <= head.doubleDistance());
 
-          DoubleDistanceResultPair entry = new DoubleDistanceResultPair(dt, id);
+          DoubleDistanceDBIDPair entry = DBIDFactory.FACTORY.newDistancePair(dt, id);
           nn.offer(entry);
           nn_keys.add(id);
           sum_nn += dt;
         }
       }
-
     }
   }
 

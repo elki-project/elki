@@ -227,7 +227,7 @@ public class TopologicalSplitter implements SplitStrategy {
       // is best for the split axis
       bestSorting = null;
 
-      assert (size - 2 * minEntries > 0) : "Cannot split underfull nodes.";
+      assert (size - 2 * minEntries >= 0) : "Cannot split nodes (" + size + " < 2*" + minEntries + ")";
       // test the sorting with respect to the minimal values
       {
         ModifiableHyperBoundingBox mbr1 = mbr(minSorting, 0, minEntries - 1);

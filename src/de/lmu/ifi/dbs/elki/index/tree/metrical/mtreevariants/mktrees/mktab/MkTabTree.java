@@ -24,14 +24,15 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -91,15 +92,15 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
+  public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
 
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     doReverseKNNQuery(k, id, null, getRoot(), result);
 
-    Collections.sort(result);
+    result.sort();
     return result;
   }
 
@@ -140,7 +141,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   @Override
-  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
+  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists) {
     MkTabTreeNode<O, D> node = getNode(entry);
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
@@ -210,14 +211,14 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param node the root of the subtree
    * @param result the list holding the query result
    */
-  private void doReverseKNNQuery(int k, DBIDRef q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, List<DistanceResultPair<D>> result) {
+  private void doReverseKNNQuery(int k, DBIDRef q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, GenericDistanceDBIDList<D> result) {
     // data node
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         if(distance.compareTo(entry.getKnnDistance(k)) <= 0) {
-          result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+          result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getRoutingObjectID()));
         }
       }
     }

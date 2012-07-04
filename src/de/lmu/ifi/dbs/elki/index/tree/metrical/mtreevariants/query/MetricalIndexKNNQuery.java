@@ -24,11 +24,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -79,7 +80,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
    * @param q the id of the query object
    * @param knnList the query result list
    */
-  protected final void doKNNQuery(O q, KNNHeap<D> knnList) {
+  protected final void doKNNQuery(O q, KNNHeap<DistanceDBIDPair<D>, D> knnList) {
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
@@ -135,7 +136,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
           if(diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
             if(d3.compareTo(d_k) <= 0) {
-              knnList.add(d3, o_j);
+              knnList.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
               d_k = knnList.getKNNDistance();
             }
           }
@@ -150,7 +151,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    final KNNHeap<D> knnList = new KNNHeap<D>(k, distanceQuery.getDistanceFactory().infiniteDistance());
+    final KNNHeap<DistanceDBIDPair<D>, D> knnList = new KNNHeap<DistanceDBIDPair<D>, D>(k, distanceQuery.getDistanceFactory().infiniteDistance());
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }
@@ -162,12 +163,6 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
   @Override
   public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // TODO: implement
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  @Override
-  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

@@ -32,8 +32,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -108,7 +111,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
     }
     assert (!(id instanceof DBID)) : "Non-Integer DBID found.";
     final DBIDRef inner = id.deref();
-    assert (inner != id) : "Unresolvable DBIDRef found.";
+    assert (inner != id) : "Unresolvable DBIDRef found: " + id;
     return asInteger(inner);
   }
 
@@ -116,6 +119,9 @@ public class TrivialDBIDFactory implements DBIDFactory {
   public DBID deref(DBIDRef id) {
     if(id instanceof DBID) {
       return (DBID) id;
+    }
+    if (id instanceof IntegerDBIDRef) {
+      return importInteger(((IntegerDBIDRef)id).getIntegerID());
     }
     DBIDRef inner = id.deref();
     assert (inner != id) : "Unresolvable DBID: " + id;
@@ -177,6 +183,16 @@ public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public DoubleDBIDPair newPair(double val, DBIDRef id) {
     return new IntegerDoubleDBIDPair(val, asInteger(id));
+  }
+
+  @Override
+  public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id) {
+    return new DistanceIntegerDBIDPair<D>(val, asInteger(id));
+  }
+
+  @Override
+  public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id) {
+    return new DoubleDistanceIntegerDBIDPair(val, asInteger(id));
   }
 
   @Override

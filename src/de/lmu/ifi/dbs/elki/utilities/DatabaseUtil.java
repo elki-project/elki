@@ -127,24 +127,6 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the centroid w.r.t. the dimensions specified by the given BitSet as
-   * a NumberVector object of the specified objects stored in the given
-   * database. The objects belonging to the specified IDs must be instance of
-   * <code>NumberVector</code>.
-   * 
-   * @param <V> Vector type
-   * @param relation the database storing the objects
-   * @param ids the identifiable objects
-   * @param dimensions the BitSet representing the dimensions to be considered
-   * @return the centroid of the specified objects stored in the given database
-   *         w.r.t. the specified subspace
-   * @throws IllegalArgumentException if the id list is empty
-   */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation, DBIDs ids, BitSet dimensions) {
-    return ProjectedCentroid.make(dimensions, relation, ids).toVector(relation);
-  }
-
-  /**
    * Determines the covariance matrix of the objects stored in the given
    * database.
    * 

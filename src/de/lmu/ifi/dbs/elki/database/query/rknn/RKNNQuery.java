@@ -28,7 +28,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -49,7 +49,7 @@ public interface RKNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k);
+  public DistanceDBIDResult<D> getRKNNForDBID(DBIDRef id, int k);
 
   /**
    * Get the reverse k nearest neighbors for a particular object.
@@ -58,7 +58,7 @@ public interface RKNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k);
+  public DistanceDBIDResult<D> getRKNNForObject(O obj, int k);
 
   /**
    * Bulk query method for reverse k nearest neighbors for ids.
@@ -67,5 +67,5 @@ public interface RKNNQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param k number of neighbors requested
    * @return reverse k nearest neighbors
    */
-  public List<List<DistanceResultPair<D>>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k);
+  public List<? extends DistanceDBIDResult<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k);
 }

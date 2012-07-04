@@ -140,6 +140,20 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   public boolean contains(DBIDRef o) {
     return store.contains(DBIDFactory.FACTORY.asInteger(o));
   }
+  
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append("[");
+    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if (buf.length() > 1) {
+        buf.append(", ");
+      }
+      buf.append(iter.toString());
+    }
+    buf.append("]");
+    return buf.toString();
+  }
 
   /**
    * Iterator over trove hashs.
@@ -183,6 +197,11 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
     @Override
     public DBID deref() {
       return new IntegerDBID(hash._set[_index]);
+    }
+    
+    @Override
+    public String toString() {
+      return Integer.toString(getIntegerID());
     }
   }
 }

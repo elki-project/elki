@@ -290,7 +290,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
       DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(it));
       results.add(distance, it);
     }
-    Collections.sort(results);
+    results.sort();
     PCAResult pcares = pca.processQueryResult(results, database);
     SortedEigenPairs eigenPairs = pcares.getEigenPairs();
     return eigenPairs.reverseEigenVectors(dim);

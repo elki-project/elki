@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 
@@ -124,6 +125,24 @@ public interface DBIDFactory {
    * @return New pair
    */
   public DoubleDBIDPair newPair(double val, DBIDRef id);
+  
+  /**
+   * Make a new distance-DBID pair.
+   * 
+   * @param val Distance value
+   * @param id Object ID
+   * @return New pair
+   */
+  public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id);
+
+  /**
+   * Make a new distance-DBID pair.
+   * 
+   * @param val Distance value
+   * @param id Object ID
+   * @return New pair
+   */
+  public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id);
 
   /**
    * Make a new (modifiable) array of DBIDs.

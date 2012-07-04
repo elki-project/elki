@@ -29,6 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -92,8 +93,8 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
    * @param id the object id that was inserted
    */
   @Override
-  public final void insert(DBID id) {
-    insertLeaf(createNewLeafEntry(id));
+  public final void insert(DBIDRef id) {
+    insertLeaf(createNewLeafEntry(DBIDUtil.deref(id)));
   }
 
   /**
@@ -118,7 +119,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
     }
     else {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        insert(DBIDUtil.deref(iter));
+        insert(iter);
       }
     }
 
@@ -132,7 +133,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
    *         false otherwise
    */
   @Override
-  public final boolean delete(DBID id) {
+  public final boolean delete(DBIDRef id) {
     // find the leaf node containing o
     O obj = relation.get(id);
     IndexTreePath<SpatialEntry> deletionPath = findPathToObject(getRootPath(), obj, id);

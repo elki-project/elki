@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -122,8 +121,8 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
         ArrayModifiableDBIDs neighbours = DBIDUtil.newArray(neighbors.size());
-        for(DistanceResultPair<D> dpair : neighbors) {
-          neighbours.add(dpair);
+        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          neighbours.add(neighbor);
         }
         s.put(iditer, neighbours);
       }

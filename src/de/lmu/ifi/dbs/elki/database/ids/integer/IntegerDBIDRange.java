@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractList;
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -39,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * 
  * @apiviz.has IntegerDBID
  */
-class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
+class IntegerDBIDRange implements DBIDRange {
   /**
    * Start value
    */
@@ -68,41 +65,13 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
   }
 
   @Override
-  public Iterator<DBID> iterator() {
-    return new Itr();
+  public boolean isEmpty() {
+    return len == 0;
   }
 
   @Override
   public DBIDIter iter() {
     return new DBIDItr();
-  }
-
-  /**
-   * Iterator class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  protected class Itr implements Iterator<DBID> {
-    int pos = 0;
-
-    @Override
-    public boolean hasNext() {
-      return pos < len;
-    }
-
-    @Override
-    public DBID next() {
-      DBID ret = new IntegerDBID(pos + start);
-      pos++;
-      return ret;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException("CompactStaticDBIDs is read-only.");
-    }
   }
 
   /**
@@ -139,6 +108,11 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
     public boolean equals(Object other) {
       throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String toString() {
+      return Integer.toString(getIntegerID());
+    }
   }
 
   @Override
@@ -151,23 +125,6 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
       return false;
     }
     return true;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T[] toArray(T[] a) {
-    T[] r = a;
-    if(a.length < start) {
-      r = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), len);
-    }
-    for(int i = 0; i < start; i++) {
-      r[i] = (T) DBIDFactory.FACTORY.importInteger(len + i);
-    }
-    // zero-terminate array
-    if(r.length > len) {
-      r[len] = null;
-    }
-    return r;
   }
 
   @Override
@@ -200,5 +157,10 @@ class IntegerDBIDRange extends AbstractList<DBID> implements DBIDRange {
       return off;
     }
     return -(len + 1);
+  }
+
+  @Override
+  public String toString() {
+    return "[" + start + " to " + (start + len - 1) + "]";
   }
 }

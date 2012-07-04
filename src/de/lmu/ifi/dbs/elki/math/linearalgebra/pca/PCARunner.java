@@ -23,11 +23,10 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
@@ -113,7 +112,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
    * @param database the database used
    * @return PCA result
    */
-  public <D extends NumberDistance<?, ?>> PCAResult processQueryResult(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database) {
+  public <D extends NumberDistance<D, ?>> PCAResult processQueryResult(DistanceDBIDResult<D> results, Relation<? extends V> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
   }
 
