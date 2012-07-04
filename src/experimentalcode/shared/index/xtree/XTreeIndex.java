@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -56,8 +56,8 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
     this.initialize();
   }
 
-  protected SpatialEntry createNewLeafEntry(DBID id) {
-    return new SpatialPointLeafEntry(id, relation.get(id));
+  protected SpatialEntry createNewLeafEntry(DBIDRef id) {
+    return new SpatialPointLeafEntry(DBIDUtil.deref(id), relation.get(id));
   }
 
   /**
@@ -66,7 +66,7 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
    * @param id the object id that was inserted
    */
   @Override
-  public final void insert(DBID id) {
+  public final void insert(DBIDRef id) {
     insertLeaf(createNewLeafEntry(id));
   }
 
@@ -106,7 +106,7 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
    *         false otherwise
    */
   @Override
-  public final boolean delete(DBID id) {
+  public final boolean delete(DBIDRef id) {
     // find the leaf node containing o
     O obj = relation.get(id);
     IndexTreePath<SpatialEntry> deletionPath = findPathToObject(getRootPath(), obj, id);
