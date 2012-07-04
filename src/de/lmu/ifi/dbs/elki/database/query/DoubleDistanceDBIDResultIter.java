@@ -38,7 +38,7 @@ public interface DoubleDistanceDBIDResultIter extends DistanceDBIDResultIter<Dou
    * @return distance
    */
   public double doubleDistance();
-  
+
   /**
    * Get an object pair.
    * 
@@ -46,11 +46,11 @@ public interface DoubleDistanceDBIDResultIter extends DistanceDBIDResultIter<Dou
    */
   @Override
   public DoubleDistanceDBIDPair getDistancePair();
-  
+
   /**
    * Get the distance
    * 
-   * @deprecated Use {@link doubleDistance} to avoid creating unneccessary
+   * @deprecated Use {@link #doubleDistance} to avoid creating unnecessary
    *             objects.
    * 
    * @return distance
