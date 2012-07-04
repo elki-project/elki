@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -268,7 +268,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(1, "Recompute LRDs.", logger);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
-      List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      List<? extends DistanceDBIDResult<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -285,7 +285,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       if(stepprog != null) {
         stepprog.beginStep(2, "Recompute LOFS.", logger);
       }
-      List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      List<? extends DistanceDBIDResult<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -327,7 +327,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(2, "Recompute LRDs.", logger);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
-      List<List<DistanceResultPair<D>>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      List<? extends DistanceDBIDResult<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -344,7 +344,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       if(stepprog != null) {
         stepprog.beginStep(3, "Recompute LOFS.", logger);
       }
-      List<List<DistanceResultPair<D>>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      List<? extends DistanceDBIDResult<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -367,15 +367,13 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      * @return a set containing the ids of the query result and the specified
      *         ids
      */
-    private ArrayModifiableDBIDs mergeIDs(List<List<DistanceResultPair<D>>> queryResults, DBIDs... ids) {
+    private ArrayModifiableDBIDs mergeIDs(List<? extends DistanceDBIDResult<D>> queryResults, DBIDs... ids) {
       ModifiableDBIDs result = DBIDUtil.newHashSet();
       for(DBIDs dbids : ids) {
         result.addDBIDs(dbids);
       }
-      for(List<DistanceResultPair<D>> queryResult : queryResults) {
-        for(DistanceResultPair<D> qr : queryResult) {
-          result.add(qr);
-        }
+      for(DistanceDBIDResult<D> queryResult : queryResults) {
+        result.addDBIDs(queryResult);
       }
       return DBIDUtil.newArray(result);
     }

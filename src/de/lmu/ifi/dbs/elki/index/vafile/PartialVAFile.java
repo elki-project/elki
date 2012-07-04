@@ -36,13 +36,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -453,7 +453,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
 
     @Override
-    public DistanceDBIDResult<DoubleDistance> getRangeForObject(V query, DoubleDistance range) {
+    public DoubleDistanceDBIDList getRangeForObject(V query, DoubleDistance range) {
       stats.issuedQueries++;
       long t = System.nanoTime();
 
@@ -481,7 +481,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       // create candidate list (all objects) and prune candidates w.r.t.
       // mindist (i.e. remove them from the list)
       // important: this structure contains the maxDist values for refinement!
-      DistanceDBIDResult<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
+      DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
       int candidates = 0;
       for(VectorApproximation va : vectorApprox) {
         DBID id = va.getId();
@@ -504,18 +504,18 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
             // candidate cannot be dropped
             // TODO: actually: no refinement needed - need API that allows
             // reporting maxdists only.
-            result.add(new DoubleDistanceResultPair(refine(id, query).doubleValue(), id));
+            result.add(DBIDFactory.FACTORY.newDistancePair(refine(id, query).doubleValue(), id));
           }
           else { // refine candidate - true refinement
             DoubleDistance dis = refine(id, query);
             stats.refinements += 1;
             if(dis.doubleValue() <= range.doubleValue()) {
-              result.add(new DoubleDistanceResultPair(dis.doubleValue(), id));
+              result.add(DBIDFactory.FACTORY.newDistancePair(dis.doubleValue(), id));
             }
           }
         }
       }
-      Collections.sort(result);
+      result.sort();
 
       stats.scannedBytes += relation.size() * VectorApproximation.byteOnDisk(subspace.cardinality(), partitions);
 
@@ -713,7 +713,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
 
     protected KNNList<DoubleDistance> retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
-      KNNHeap<DoubleDistance> result = new KNNHeap<DoubleDistance>(k, DoubleDistance.FACTORY.infiniteDistance());
+      KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> result = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k, DoubleDistance.FACTORY.infiniteDistance());
       for(PartialVACandidate va : sortedCandidates) {
         double stopdist = result.getKNNDistance().doubleValue();
         DBID currentID = va.getId();
@@ -721,7 +721,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
           DoubleDistance dist = refine(currentID, query);
           stats.refinements += 1;
           if(dist.doubleValue() < stopdist) {
-            result.add(new DoubleDistanceResultPair(dist.doubleValue(), currentID));
+            result.add(DBIDFactory.FACTORY.newDistancePair(dist.doubleValue(), currentID));
           }
         }
       }

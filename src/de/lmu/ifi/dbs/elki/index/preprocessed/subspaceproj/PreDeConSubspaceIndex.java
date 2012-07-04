@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -114,7 +114,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
 
     // start variance analysis
     double[] sum = new double[dim];
-    for(DistanceResultPair<D> neighbor : neighbors) {
+    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       V o = database.get(neighbor);
       for(int d = 0; d < dim; d++) {
         sum[d] += Math.pow(obj.doubleValue(d + 1) - o.doubleValue(d + 1), 2.0);

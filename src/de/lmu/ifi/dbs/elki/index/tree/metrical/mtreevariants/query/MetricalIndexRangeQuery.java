@@ -23,15 +23,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -75,7 +71,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
    * @param r_q the query range
    * @param result the list holding the query results
    */
-  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, DBID q, D r_q, List<DistanceResultPair<D>> result) {
+  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, DBID q, D r_q, GenericDistanceDBIDList<D> result) {
     if(!node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<D> entry = node.getEntry(i);
@@ -114,8 +110,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         if(diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
           if(d3.compareTo(r_q) <= 0) {
-            DistanceResultPair<D> queryResult = new GenericDistanceResultPair<D>(d3, o_j);
-            result.add(queryResult);
+            result.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
           }
         }
       }
@@ -133,7 +128,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
    * @param r_q the query range
    * @param result the list holding the query results
    */
-  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, O q, D r_q, List<DistanceResultPair<D>> result) {
+  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, O q, D r_q, GenericDistanceDBIDList<D> result) {
     if(!node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<D> entry = node.getEntry(i);
@@ -170,8 +165,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         if(diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
           if(d3.compareTo(r_q) <= 0) {
-            DistanceResultPair<D> queryResult = new GenericDistanceResultPair<D>(d3, o_j);
-            result.add(queryResult);
+            result.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
           }
         }
       }
@@ -185,7 +179,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
     doRangeQuery(null, index.getRoot(), obj, range, result);
 
     // sort the result according to the distances
-    Collections.sort(result);
+    result.sort();
     return result;
   }
 

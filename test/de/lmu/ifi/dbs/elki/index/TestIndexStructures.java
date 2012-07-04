@@ -26,8 +26,6 @@ package de.lmu.ifi.dbs.elki.index;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-import java.util.List;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -35,7 +33,8 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -143,7 +142,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
     testFileBasedDatabaseConnection(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
   }
-  
+
   /**
    * Test {@link PartialVAFile} using a file based database connection.
    * 
@@ -156,7 +155,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(PartialVAFile.Factory.PARTITIONS_ID, 4);
     testFileBasedDatabaseConnection(spatparams, PartialVAFile.PartialVAFileKNNQuery.class, PartialVAFile.PartialVAFileRangeQuery.class);
   }
-  
+
   /**
    * Test {@link RStarTree} using a file based database connection. With "fast"
    * mode enabled on an extreme level (since this should only reduce
@@ -218,15 +217,13 @@ public class TestIndexStructures implements JUnit4Test {
 
       // verify that the neighbors match.
       int i = 0;
-      for(DistanceResultPair<DoubleDistance> res : ids) {
+      for(DistanceDBIDResultIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
-
-        i++;
       }
     }
     {
@@ -234,20 +231,18 @@ public class TestIndexStructures implements JUnit4Test {
       DoubleVector dv = new DoubleVector(querypoint);
       RangeQuery<DoubleVector, DoubleDistance> rangeq = db.getRangeQuery(dist, eps);
       assertTrue("Returned range query is not of expected class.", expectRangeQuery.isAssignableFrom(rangeq.getClass()));
-      List<DistanceResultPair<DoubleDistance>> ids = rangeq.getRangeForObject(dv, eps);
+      DistanceDBIDResult<DoubleDistance> ids = rangeq.getRangeForObject(dv, eps);
       assertEquals("Result size does not match expectation!", shouldd.length, ids.size());
 
       // verify that the neighbors match.
       int i = 0;
-      for(DistanceResultPair<DoubleDistance> res : ids) {
+      for(DistanceDBIDResultIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
         DoubleVector c = rep.get(res);
         DoubleVector c2 = new DoubleVector(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2).doubleValue(), 0.00001);
-
-        i++;
       }
     }
   }

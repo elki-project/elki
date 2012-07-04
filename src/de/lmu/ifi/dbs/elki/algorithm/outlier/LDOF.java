@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -139,10 +139,11 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
       // skip the point itself
       dxp.reset(); Dxp.reset();
-      for(DistanceResultPair<D> neighbor1 : neighbors) {
+      // TODO: optimize for double distances
+      for (DistanceDBIDResultIter<D> neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
         if(!DBIDUtil.equal(neighbor1, iditer)) {
           dxp.put(neighbor1.getDistance().doubleValue());
-          for(DistanceResultPair<D> neighbor2 : neighbors) {
+          for (DistanceDBIDResultIter<D> neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
             if(!DBIDUtil.equal(neighbor1, neighbor2) && !DBIDUtil.equal(neighbor2, iditer)) {
               Dxp.put(distFunc.distance(neighbor1, neighbor2).doubleValue());
             }

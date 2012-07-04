@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
@@ -63,7 +61,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
         result.add(currentDistance, iter);
       }
     }
-    Collections.sort(result);
+    result.sort();
     return result;
   }
 
@@ -76,7 +74,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
         result.add(currentDistance, iter);
       }
     }
-    Collections.sort(result);
+    result.sort();
     return result;
   }
 }

@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.database.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -36,6 +36,33 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  *
  * @param <D> Distance type
  */
-public interface DistanceDBIDResult<D extends Distance<D>> extends List<DistanceResultPair<D>> {
-  // Empty. TODO: add "sorted" property?
+public interface DistanceDBIDResult<D extends Distance<D>> extends DBIDs {
+  /**
+   * Size of list.
+   * 
+   * @return Size
+   */
+  @Override
+  public int size();
+  
+  /**
+   * Access a single pair.
+   * 
+   * @param off Offset
+   * @return Pair
+   */
+  public DistanceDBIDPair<D> get(int off);
+  
+  /**
+   * Get an iterator
+   * 
+   * @return New iterator
+   */
+  @Override
+  public DistanceDBIDResultIter<D> iter(); 
+  
+  /**
+   * Sort the result in ascending order
+   */
+  public void sort();
 }

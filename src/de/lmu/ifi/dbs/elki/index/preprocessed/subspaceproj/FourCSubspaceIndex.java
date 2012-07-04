@@ -26,11 +26,11 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -95,7 +95,7 @@ public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance
   @Override
   protected PCAFilteredResult computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<V> database) {
     ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
-    for(DistanceResultPair<D> neighbor : neighbors) {
+    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       ids.add(neighbor);
     }
     PCAFilteredResult pcares = pca.processIds(ids, database);

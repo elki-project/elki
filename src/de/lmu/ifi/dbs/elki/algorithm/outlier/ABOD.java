@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -44,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -194,14 +192,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
       // System.out.println("Processing: " +objKey);
       KNNResult<DoubleDistance> neighbors = knnQuery.getKNNForDBID(objKey, k);
-      Iterator<DistanceResultPair<DoubleDistance>> iter = neighbors.iterator();
-      while(iter.hasNext()) {
-        DistanceResultPair<DoubleDistance> key1 = iter.next();
-        // Iterator iter2 = data.keyIterator();
-        Iterator<DistanceResultPair<DoubleDistance>> iter2 = neighbors.iterator();
-        // PriorityQueue best = new PriorityQueue(false, k);
-        while(iter2.hasNext()) {
-          DistanceResultPair<DoubleDistance> key2 = iter2.next();
+      for (DBIDIter key1 = neighbors.iter(); key1.valid(); key1.advance()) {
+        for (DBIDIter key2 = neighbors.iter(); key2.valid(); key2.advance()) {
           if(DBIDUtil.equal(key2, key1) || DBIDUtil.equal(key1, objKey) || DBIDUtil.equal(key2, objKey)) {
             continue;
           }

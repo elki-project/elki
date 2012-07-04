@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -448,7 +448,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
         }
 
         for (int i = knn.size() - 1; i >= 0; i--) {
-          DistanceResultPair<D> pair = knn.get(i);
+          DistanceDBIDPair<D> pair = knn.get(i);
           Element line = plotSeries(pair, MAXRESOLUTION);
           double dist = pair.getDistance().doubleValue() / maxdist;
           Color color = getColor(dist);

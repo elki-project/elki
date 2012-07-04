@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query;
+package de.lmu.ifi.dbs.elki.database.ids;
 
 /*
  This file is part of ELKI:
@@ -23,46 +23,30 @@ package de.lmu.ifi.dbs.elki.database.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 
 /**
- * Class that consists of a pair (distance, object ID) commonly returned for kNN
- * and range queries.
+ * Pair containing a distance an an object ID
+ * 
+ * Note: there is no getter for the object, as this is a {@link DBIDRef}.
  * 
  * @author Erich Schubert
- * 
- * @param <D> Distance type
+ *
+ * @param <D> Distance
  */
-public interface DistanceResultPair<D extends Distance<?>> extends PairInterface<D, DBID>, Comparable<DistanceResultPair<D>>, DBIDRef {
+public interface DistanceDBIDPair<D extends Distance<D>> extends DBIDRef {
   /**
-   * Getter for first
+   * Get the distance.
    * 
-   * @return first element in pair
+   * @return Distance
    */
   public D getDistance();
-
+  
   /**
-   * Setter for first
+   * Compare to another result, by distance, smaller first.
    * 
-   * @param first new value for first element
+   * @param other Other result
+   * @return Comparison result
    */
-  public void setDistance(D first);
-
-  /**
-   * Setter for second
-   * 
-   * @param second new value for second element
-   */
-  public void setID(DBID second);
-
-  /**
-   * Compare value, but by distance only.
-   * 
-   * @param o Other object
-   * @return comparison result, as by Double.compare(this, other)
-   */
-  public int compareByDistance(DistanceResultPair<D> o);
+  public int compareByDistance(DistanceDBIDPair<D> other);
 }

@@ -188,6 +188,11 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
       }
       return super.equals(other);
     }
+    
+    @Override
+    public String toString() {
+      return Integer.toString(getIntegerID());
+    }
   }
 
   @Override

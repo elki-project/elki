@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -136,9 +136,10 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       List<Double> core = new ArrayList<Double>();
       double lrd = 0;
-      for(DistanceResultPair<D> neighPair : nMinPts.get(iditer)) {
-        double coreDist = coreDistance.doubleValue(neighPair);
-        double dist = distQuery.distance(iditer, neighPair).doubleValue();
+      // TODO: optimize for double distances
+      for (DistanceDBIDResultIter<D> neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
+        double coreDist = coreDistance.doubleValue(neighbor);
+        double dist = distQuery.distance(iditer, neighbor).doubleValue();
         double rd = Math.max(coreDist, dist);
         lrd = rd + lrd;
         core.add(rd);
@@ -153,9 +154,9 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     WritableDoubleDataStore ofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double of = 0;
-      for(DistanceResultPair<D> pair : nMinPts.get(iditer)) {
+      for (DBIDIter neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
         double lrd = lrds.doubleValue(iditer);
-        double lrdN = lrds.doubleValue(pair);
+        double lrdN = lrds.doubleValue(neighbor);
         of = of + lrdN / lrd;
       }
       of = of / minPtsNeighborhoodSize.intValue(iditer);

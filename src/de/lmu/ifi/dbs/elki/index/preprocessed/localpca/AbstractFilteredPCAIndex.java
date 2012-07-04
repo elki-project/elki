@@ -23,15 +23,13 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -101,7 +99,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
 
     // TODO: use a bulk operation?
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      Collection<DistanceResultPair<DoubleDistance>> objects = objectsForPCA(iditer);
+      DistanceDBIDResult<DoubleDistance> objects = objectsForPCA(iditer);
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, relation);
 
@@ -138,7 +136,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
    */
-  protected abstract Collection<DistanceResultPair<DoubleDistance>> objectsForPCA(DBIDRef id);
+  protected abstract DistanceDBIDResult<DoubleDistance> objectsForPCA(DBIDRef id);
 
   /**
    * Factory class

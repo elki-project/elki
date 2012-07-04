@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -63,7 +62,6 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -146,75 +144,68 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       logger.debugFine(msg.toString());
     }
 
-    try {
-      long start = System.currentTimeMillis();
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
+    long start = System.currentTimeMillis();
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
 
-      // only one epsilon value specified
-      int dim = DatabaseUtil.dimensionality(relation);
-      if(epsilon.length == 1 && dim != 1) {
-        DoubleDistance eps = epsilon[0];
-        epsilon = new DoubleDistance[dim];
-        Arrays.fill(epsilon, eps);
+    // only one epsilon value specified
+    int dim = DatabaseUtil.dimensionality(relation);
+    if(epsilon.length == 1 && dim != 1) {
+      DoubleDistance eps = epsilon[0];
+      epsilon = new DoubleDistance[dim];
+      Arrays.fill(epsilon, eps);
+    }
+
+    // epsilons as string
+    RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(relation, dim);
+
+    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+      StringBuffer msg = new StringBuffer();
+
+      if(logger.isDebugging()) {
+        msg.append("\nid = ").append(DBIDUtil.toString(it));
+        // msg.append(" ").append(database.get(id));
+        // msg.append(" ").append(database.getObjectLabelQuery().get(id));
       }
 
-      // epsilons as string
-      RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(relation, dim);
+      // determine neighbors in each dimension
+      ModifiableDBIDs[] allNeighbors = new ModifiableDBIDs[dim];
+      for(int d = 0; d < dim; d++) {
+        DistanceDBIDResult<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
+        allNeighbors[d] = DBIDUtil.newHashSet(qrList);
+      }
 
-      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-        StringBuffer msg = new StringBuffer();
-
-        if(logger.isDebugging()) {
-          msg.append("\nid = ").append(DBIDUtil.toString(it));
-          // msg.append(" ").append(database.get(id));
-          //msg.append(" ").append(database.getObjectLabelQuery().get(id));
-        }
-
-        // determine neighbors in each dimension
-        ModifiableDBIDs[] allNeighbors = ClassGenericsUtil.newArrayOfNull(dim, ModifiableDBIDs.class);
+      if(logger.isDebugging()) {
         for(int d = 0; d < dim; d++) {
-          DistanceDBIDResult<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
-          allNeighbors[d] = DBIDUtil.newHashSet(qrList.size());
-          for(DistanceResultPair<DoubleDistance> qr : qrList) {
-            allNeighbors[d].add(qr);
-          }
-        }
-
-        if(logger.isDebugging()) {
-          for(int d = 0; d < dim; d++) {
-            msg.append("\n neighbors [").append(d).append("]");
-            msg.append(" (").append(allNeighbors[d].size()).append(") = ");
-            msg.append(allNeighbors[d]);
-          }
-        }
-
-        BitSet preferenceVector = determinePreferenceVector(relation, allNeighbors, msg);
-        storage.put(it, preferenceVector);
-
-        if(logger.isDebugging()) {
-          logger.debugFine(msg.toString());
-        }
-
-        if(progress != null) {
-          progress.incrementProcessed(logger);
+          msg.append("\n neighbors [").append(d).append("]");
+          msg.append(" (").append(allNeighbors[d].size()).append(") = ");
+          msg.append(allNeighbors[d]);
         }
       }
+
+      try {
+        storage.put(it, determinePreferenceVector(relation, allNeighbors, msg));
+      }
+      catch(UnableToComplyException e) {
+        throw new IllegalStateException(e);
+      }
+
+      if(logger.isDebugging()) {
+        logger.debugFine(msg.toString());
+      }
+
       if(progress != null) {
-        progress.ensureCompleted(logger);
+        progress.incrementProcessed(logger);
       }
+    }
+    if(progress != null) {
+      progress.ensureCompleted(logger);
+    }
 
-      long end = System.currentTimeMillis();
-      // TODO: re-add timing code!
-      if(logger.isVerbose()) {
-        long elapsedTime = end - start;
-        logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
-      }
-    }
-    catch(ParameterException e) {
-      throw new IllegalStateException(e);
-    }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException(e);
+    long end = System.currentTimeMillis();
+    // TODO: re-add timing code!
+    if(logger.isVerbose()) {
+      long elapsedTime = end - start;
+      logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
   }
 
@@ -225,11 +216,10 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
-   * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
    * 
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    */
-  private BitSet determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws UnableToComplyException {
     if(strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(relation, neighborIDs, msg);
     }
@@ -248,12 +238,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @param neighborIDs the list of ids of the neighbors in each dimension
    * @param msg a string buffer for debug messages
    * @return the preference vector
-   * @throws de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException
    * 
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws ParameterException, UnableToComplyException {
+  private BitSet determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws UnableToComplyException {
     int dimensionality = neighborIDs.length;
 
     // database for apriori
@@ -413,9 +402,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * @param dimensionality the dimensionality of the objects
    * @return the dimension selecting distancefunctions to determine the
    *         preference vectors
-   * @throws ParameterException
    */
-  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Relation<V> relation, int dimensionality) throws ParameterException {
+  private RangeQuery<V, DoubleDistance>[] initRangeQueries(Relation<V> relation, int dimensionality) {
     Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {

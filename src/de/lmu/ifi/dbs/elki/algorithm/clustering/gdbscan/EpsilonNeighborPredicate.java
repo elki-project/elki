@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -32,18 +30,15 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -62,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.has NeighborListInstance
  * @apiviz.has DBIDInstance
  * 
@@ -94,18 +89,10 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
-    if(TypeUtil.DBIDS.isAssignableFromType(type)) {
-      DistanceQuery<O, D> dq = QueryUtil.getDistanceQuery(database, distFunc);
-      RangeQuery<O, D> rq = database.getRangeQuery(dq);
-      return (Instance<T>) new DBIDInstance<D>(epsilon, rq, dq.getRelation().getDBIDs());
-    }
-    if(TypeUtil.NEIGHBORLIST.isAssignableFromType(type)) {
-      DistanceQuery<O, D> dq = QueryUtil.getDistanceQuery(database, distFunc);
-      RangeQuery<O, D> rq = database.getRangeQuery(dq);
-      return (Instance<T>) new NeighborListInstance<D>(epsilon, rq, dq.getRelation().getDBIDs());
-    }
-    throw new AbortException("Incompatible predicate types");
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+    DistanceQuery<O, D> dq = QueryUtil.getDistanceQuery(database, distFunc);
+    RangeQuery<O, D> rq = database.getRangeQuery(dq);
+    return (NeighborPredicate.Instance<T>) new Instance<D>(epsilon, rq, dq.getRelation().getDBIDs());
   }
 
   @Override
@@ -123,7 +110,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
    * 
    * @author Erich Schubert
    */
-  public static class DBIDInstance<D extends Distance<D>> implements NeighborPredicate.Instance<DBIDs> {
+  public static class Instance<D extends Distance<D>> implements NeighborPredicate.Instance<DistanceDBIDResult<D>> {
     /**
      * Range to query with
      */
@@ -146,64 +133,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
      * @param rq Range query to use
      * @param ids DBIDs to process
      */
-    public DBIDInstance(D epsilon, RangeQuery<?, D> rq, DBIDs ids) {
-      super();
-      this.epsilon = epsilon;
-      this.rq = rq;
-      this.ids = ids;
-    }
-
-    @Override
-    public DBIDs getIDs() {
-      return ids;
-    }
-
-    @Override
-    public DBIDs getNeighbors(DBIDRef reference) {
-      List<DistanceResultPair<D>> res = rq.getRangeForDBID(reference, epsilon);
-      // Throw away the actual distance values ...
-      ModifiableDBIDs neighbors = DBIDUtil.newHashSet(res.size());
-      for(DistanceResultPair<D> dr : res) {
-        neighbors.add(dr);
-      }
-      return neighbors;
-    }
-
-    @Override
-    public void addDBIDs(ModifiableDBIDs ids, DBIDs neighbors) {
-      ids.addDBIDs(neighbors);
-    }
-  }
-
-  /**
-   * Instance for a particular data set.
-   * 
-   * @author Erich Schubert
-   */
-  public static class NeighborListInstance<D extends Distance<D>> implements NeighborPredicate.Instance<DistanceDBIDResult<D>> {
-    /**
-     * Range to query with
-     */
-    D epsilon;
-
-    /**
-     * Range query to use on the database.
-     */
-    RangeQuery<?, D> rq;
-
-    /**
-     * DBIDs to process
-     */
-    DBIDs ids;
-
-    /**
-     * Constructor.
-     * 
-     * @param epsilon Epsilon
-     * @param rq Range query to use
-     * @param ids DBIDs to process
-     */
-    public NeighborListInstance(D epsilon, RangeQuery<?, D> rq, DBIDs ids) {
+    public Instance(D epsilon, RangeQuery<?, D> rq, DBIDs ids) {
       super();
       this.epsilon = epsilon;
       this.rq = rq;
@@ -222,9 +152,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
 
     @Override
     public void addDBIDs(ModifiableDBIDs ids, DistanceDBIDResult<D> neighbors) {
-      for(DistanceResultPair<D> neighbor : neighbors) {
-        ids.add(neighbor);
-      }
+      ids.addDBIDs(neighbors);
     }
   }
 

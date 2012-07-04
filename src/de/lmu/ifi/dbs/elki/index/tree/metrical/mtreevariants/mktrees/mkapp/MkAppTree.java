@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +31,15 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -138,14 +139,14 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       initialize(entries.get(0));
     }
 
-    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>(entries.size());
+    Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnHeaps = new HashMap<DBID, KNNHeap<DistanceDBIDPair<D>, D>>(entries.size());
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert
     for(MkAppEntry<D> entry : entries) {
       DBID id = entry.getRoutingObjectID();
       // create knnList for the object
-      knnHeaps.put(id, new KNNHeap<D>(k_max + 1, getDistanceQuery().infiniteDistance()));
+      knnHeaps.put(id, new KNNHeap<DistanceDBIDPair<D>, D>(k_max + 1, getDistanceQuery().infiniteDistance()));
 
       ids.add(id);
       // insert the object
@@ -157,7 +158,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // finish KNN lists (sort them completely)
     Map<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
-    for(Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
+    for(Entry<DBID, KNNHeap<DistanceDBIDPair<D>, D>> ent : knnHeaps.entrySet()) {
       knnLists.put(ent.getKey(), ent.getValue().toKNNList());
     }
 
@@ -178,9 +179,9 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return a List of the query results
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
-    List<DistanceResultPair<D>> result = doReverseKNNQuery(k, id);
-    Collections.sort(result);
+  public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
+    DistanceDBIDResult<D> result = doReverseKNNQuery(k, id);
+    result.sort();
     return result;
   }
 
@@ -245,8 +246,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param q the id of the query object
    * @return the result of the reverse knn query
    */
-  private List<DistanceResultPair<D>> doReverseKNNQuery(int k, DBIDRef q) {
-    List<DistanceResultPair<D>> result = new ArrayList<DistanceResultPair<D>>();
+  private DistanceDBIDResult<D> doReverseKNNQuery(int k, DBIDRef q) {
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
@@ -288,7 +289,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(distance.compareTo(approximatedKnnDist) <= 0) {
-            result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+            result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getRoutingObjectID()));
           }
         }
       }

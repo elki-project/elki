@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -94,7 +95,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
   }
 
   @Override
-  public void insert(DBID id) {
+  public void insert(DBIDRef id) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -117,7 +118,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    *         implemented yet.
    */
   @Override
-  public final boolean delete(DBID id) {
+  public final boolean delete(DBIDRef id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 

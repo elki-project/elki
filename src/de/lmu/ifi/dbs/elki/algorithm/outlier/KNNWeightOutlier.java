@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -124,8 +124,9 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
 
       final KNNResult<D> knn = knnQuery.getKNNForDBID(iditer, k);
       double skn = 0;
-      for(DistanceResultPair<D> r : knn) {
-        skn += r.getDistance().doubleValue();
+      // TODO: optimize for double distances
+      for (DistanceDBIDResultIter<D> neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
+        skn += neighbor.getDistance().doubleValue();
       }
       knnw_score.putDouble(iditer, skn);
       minmax.put(skn);

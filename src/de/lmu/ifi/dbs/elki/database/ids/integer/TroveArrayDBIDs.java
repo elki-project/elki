@@ -27,6 +27,7 @@ import gnu.trove.list.TIntList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -77,6 +78,20 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     return getStore().binarySearch(DBIDFactory.FACTORY.asInteger(key));
   }
 
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    buf.append("[");
+    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if (buf.length() > 1) {
+        buf.append(", ");
+      }
+      buf.append(((IntegerDBIDRef)iter).getIntegerID());
+    }
+    buf.append("]");
+    return buf.toString();
+  }
+  
   /**
    * Iterate over a Trove IntList, ELKI/C-style
    * 
@@ -137,6 +152,11 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
+    }
+    
+    @Override
+    public String toString() {
+      return Integer.toString(getIntegerID());
     }
   }
 }

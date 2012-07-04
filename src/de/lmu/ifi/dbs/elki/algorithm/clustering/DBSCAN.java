@@ -34,11 +34,13 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -144,7 +146,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     if(size >= minpts) {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         if(!processedIDs.contains(iditer)) {
-          expandCluster(relation, rangeQuery, DBIDUtil.deref(iditer), objprog, clusprog);
+          expandCluster(relation, rangeQuery, iditer, objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
           objprog.setProcessed(processedIDs.size(), logger);
@@ -194,11 +196,11 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
    */
-  protected void expandCluster(Relation<O> relation, RangeQuery<O, D> rangeQuery, DBID startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    List<DistanceResultPair<D>> seeds = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+  protected void expandCluster(Relation<O> relation, RangeQuery<O, D> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+    DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
-    if(seeds.size() < minpts) {
+    if(neighbors.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if(objprog != null && clusprog != null) {
@@ -209,25 +211,28 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
 
     // try to expand the cluster
+    HashSetModifiableDBIDs seeds = DBIDUtil.newHashSet();
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    for(DistanceResultPair<D> seed : seeds) {
+    for (DBIDIter seed = neighbors.iter(); seed.valid(); seed.advance()) {
       if(!processedIDs.contains(seed)) {
         currentCluster.add(seed);
         processedIDs.add(seed);
+        seeds.add(seed);
       }
       else if(noise.contains(seed)) {
         currentCluster.add(seed);
         noise.remove(seed);
       }
     }
-    seeds.remove(0);
+    seeds.remove(startObjectID);
 
     while(seeds.size() > 0) {
-      DistanceResultPair<D> o = seeds.remove(0);
-      List<DistanceResultPair<D>> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
+      DBIDMIter o = seeds.iter();
+      DistanceDBIDResult<D> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
+      o.remove();
 
       if(neighborhood.size() >= minpts) {
-        for(DistanceResultPair<D> neighbor : neighborhood) {
+        for(DBIDIter neighbor = neighborhood.iter(); neighbor.valid(); neighbor.advance()) {
           boolean inNoise = noise.contains(neighbor);
           boolean unclassified = !processedIDs.contains(neighbor);
           if(inNoise || unclassified) {

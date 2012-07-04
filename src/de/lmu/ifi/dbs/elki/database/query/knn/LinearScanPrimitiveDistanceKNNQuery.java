@@ -25,13 +25,12 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
@@ -62,15 +61,15 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
    * @param objs Objects list
    * @param heaps Heaps array
    */
-  protected void linearScanBatchKNN(List<O> objs, List<KNNHeap<D>> heaps) {
+  protected void linearScanBatchKNN(List<O> objs, List<KNNHeap<DistanceDBIDPair<D>, D>> heaps) {
     final int size = objs.size();
     // Linear scan style KNN.
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       O candidate = relation.get(iter);
       for(int index = 0; index < size; index++) {
         O object = objs.get(index);
-        KNNHeap<D> heap = heaps.get(index);
-        heap.add(distanceQuery.distance(object, candidate), iter);
+        KNNHeap<DistanceDBIDPair<D>, D> heap = heaps.get(index);
+        heap.add(DBIDFactory.FACTORY.newDistancePair(distanceQuery.distance(object, candidate), iter));
       }
     }
   }
@@ -83,29 +82,18 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
   @Override
   public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     final int size = ids.size();
-    final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(size);
+    final List<KNNHeap<DistanceDBIDPair<D>, D>> heaps = new ArrayList<KNNHeap<DistanceDBIDPair<D>, D>>(size);
     List<O> objs = new ArrayList<O>(size);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      heaps.add(new KNNHeap<D>(k));
+      heaps.add(new KNNHeap<DistanceDBIDPair<D>, D>(k));
       objs.add(relation.get(iter));
     }
     linearScanBatchKNN(objs, heaps);
 
     List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(heaps.size());
-    for(KNNHeap<D> heap : heaps) {
+    for(KNNHeap<DistanceDBIDPair<D>, D> heap : heaps) {
       result.add(heap.toKNNList());
     }
     return result;
-  }
-
-  @Override
-  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
-    List<O> objs = new ArrayList<O>(heaps.size());
-    List<KNNHeap<D>> kheaps = new ArrayList<KNNHeap<D>>(heaps.size());
-    for(Entry<DBID, KNNHeap<D>> ent : heaps.entrySet()) {
-      objs.add(relation.get(ent.getKey()));
-      kheaps.add(ent.getValue());
-    }
-    linearScanBatchKNN(objs, kheaps);
   }
 }

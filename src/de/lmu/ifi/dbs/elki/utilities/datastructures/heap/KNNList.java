@@ -23,14 +23,18 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractList;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Queue;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -42,7 +46,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultPair<D>> implements KNNResult<D> {
+public class KNNList<D extends Distance<D>> implements KNNResult<D> {
   /**
    * The value of k this was materialized for.
    */
@@ -59,11 +63,11 @@ public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultP
    * 
    * @param heap Calling heap
    */
-  protected KNNList(KNNHeap<D> heap) {
+  protected KNNList(KNNHeap<?, D> heap) {
     super();
     this.data = new Object[heap.size()];
     this.k = heap.getK();
-    assert(heap.size() >= this.k) : "Heap doesn't contain enough objects!";
+    assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
     while(!heap.isEmpty()) {
@@ -85,7 +89,7 @@ public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultP
     super();
     this.data = new Object[heap.size()];
     this.k = k;
-    assert(heap.size() >= this.k) : "Heap doesn't contain enough objects!";
+    assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
     while(!heap.isEmpty()) {
@@ -121,11 +125,10 @@ public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultP
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append("kNNList[");
-    Iterator<DistanceResultPair<D>> iter = this.iterator();
-    while(iter.hasNext()) {
-      DistanceResultPair<D> pair = iter.next();
-      buf.append(pair.getDistance()).append(":").append(DBIDUtil.toString(pair));
-      if(iter.hasNext()) {
+    for(DistanceDBIDResultIter<D> iter = this.iter(); iter.valid();) {
+      buf.append(iter.getDistance()).append(":").append(DBIDUtil.toString(iter));
+      iter.advance();
+      if(iter.valid()) {
         buf.append(",");
       }
     }
@@ -135,18 +138,33 @@ public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultP
 
   @SuppressWarnings("unchecked")
   @Override
-  public DistanceResultPair<D> get(int index) {
-    return (DistanceResultPair<D>) data[index];
+  public DistanceDBIDPair<D> get(int index) {
+    return (DistanceDBIDPair<D>) data[index];
   }
 
   @Override
-  public Iterator<DistanceResultPair<D>> iterator() {
+  public DistanceDBIDResultIter<D> iter() {
     return new Itr();
   }
 
   @Override
   public int size() {
     return data.length;
+  }
+
+  @Override
+  public boolean contains(DBIDRef o) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(DBIDUtil.equal(iter, o)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size() == 0;
   }
 
   /**
@@ -156,27 +174,54 @@ public class KNNList<D extends Distance<D>> extends AbstractList<DistanceResultP
    * 
    * @apiviz.exclude
    */
-  private class Itr implements Iterator<DistanceResultPair<D>> {
+  private class Itr implements DistanceDBIDResultIter<D> {
     /**
      * Cursor position
      */
-    private int pos = -1;
+    private int pos = 0;
 
     @Override
-    public boolean hasNext() {
-      return pos + 1 < data.length;
+    public DBIDRef deref() {
+      return get(pos);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public DistanceResultPair<D> next() {
+    public boolean valid() {
+      return pos < data.length;
+    }
+
+    @Override
+    public void advance() {
       pos++;
-      return (DistanceResultPair<D>) data[pos];
     }
 
     @Override
-    public void remove() {
-      throw new UnsupportedOperationException("kNN results are unmodifiable.");
+    @Deprecated
+    public int getIntegerID() {
+      return get(pos).getIntegerID();
     }
+
+    @Override
+    public D getDistance() {
+      return get(pos).getDistance();
+    }
+
+    @Override
+    public DistanceDBIDPair<D> getDistancePair() {
+      return get(pos);
+    }
+  }
+
+  @Override
+  public void sort() {
+    Collections.sort(Arrays.asList(data), new Comparator<Object>() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public int compare(Object o1, Object o2) {
+        DistanceDBIDPair<D> p1 = (DistanceDBIDPair<D>) o1;
+        DistanceDBIDPair<D> p2 = (DistanceDBIDPair<D>) o2;
+        return p1.compareByDistance(p2);
+      }
+    });
   }
 }

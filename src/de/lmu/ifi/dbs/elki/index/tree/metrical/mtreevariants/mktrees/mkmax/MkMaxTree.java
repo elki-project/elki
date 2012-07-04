@@ -23,20 +23,19 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -91,27 +90,27 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * in a second step.
    */
   @Override
-  public List<DistanceResultPair<D>> reverseKNNQuery(DBIDRef id, int k) {
+  public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be equal or less than " + "parameter k of the MkMax-Tree!");
     }
 
     // get the candidates
-    List<DistanceResultPair<D>> candidates = new ArrayList<DistanceResultPair<D>>();
+    GenericDistanceDBIDList<D> candidates = new GenericDistanceDBIDList<D>();
     doReverseKNNQuery(id, getRoot(), null, candidates);
 
     if(k == this.getKmax()) {
-      Collections.sort(candidates);
+      candidates.sort();
       rkNNStatistics.addTrueHits(candidates.size());
       rkNNStatistics.addResults(candidates.size());
       return candidates;
     }
 
     // refinement of candidates
-    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
-    ModifiableDBIDs candidateIDs = DBIDUtil.newArray();
-    for(DistanceResultPair<D> candidate : candidates) {
-      KNNHeap<D> knns = new KNNHeap<D>(k, getDistanceQuery().infiniteDistance());
+    Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists = new HashMap<DBID, KNNHeap<DistanceDBIDPair<D>, D>>();
+    ModifiableDBIDs candidateIDs = DBIDUtil.newArray(candidates.size());
+    for (DBIDIter candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
+      KNNHeap<DistanceDBIDPair<D>, D> knns = new KNNHeap<DistanceDBIDPair<D>, D>(k, getDistanceQuery().infiniteDistance());
       knnLists.put(DBIDUtil.deref(candidate), knns);
       candidateIDs.add(candidate);
     }
@@ -120,7 +119,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
       DBID cid = DBIDUtil.deref(iter);
-      for(DistanceResultPair<D> qr : knnLists.get(cid)) {
+      for(DistanceDBIDPair<D> qr : knnLists.get(cid)) {
         if(DBIDUtil.equal(id, qr)) {
           result.add(qr.getDistance(), cid);
           break;
@@ -130,7 +129,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     rkNNStatistics.addResults(result.size());
     rkNNStatistics.addCandidates(candidates.size());
-    Collections.sort(result);
+    result.sort();
     return result;
   }
 
@@ -156,7 +155,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected void preInsert(MkMaxEntry<D> entry) {
-    KNNHeap<D> knns_o = new KNNHeap<D>(getKmax(), getDistanceQuery().infiniteDistance());
+    KNNHeap<DistanceDBIDPair<D>, D> knns_o = new KNNHeap<DistanceDBIDPair<D>, D>(getKmax(), getDistanceQuery().infiniteDistance());
     preInsert(entry, getRootEntry(), knns_o);
   }
 
@@ -164,7 +163,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * Adjusts the knn distance in the subtree of the specified root entry.
    */
   @Override
-  protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
+  protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists) {
     MkMaxTreeNode<O, D> node = getNode(entry);
     D knnDist_node = getDistanceQuery().nullDistance();
     if(node.isLeaf()) {
@@ -195,14 +194,14 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param node_entry the entry representing the node
    * @param result the list for the query result
    */
-  private void doReverseKNNQuery(DBIDRef q, MkMaxTreeNode<O, D> node, MkMaxEntry<D> node_entry, List<DistanceResultPair<D>> result) {
+  private void doReverseKNNQuery(DBIDRef q, MkMaxTreeNode<O, D> node, MkMaxEntry<D> node_entry, GenericDistanceDBIDList<D> result) {
     // data node
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> entry = node.getEntry(i);
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         if(distance.compareTo(entry.getKnnDistance()) <= 0) {
-          result.add(new GenericDistanceResultPair<D>(distance, entry.getRoutingObjectID()));
+          result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getRoutingObjectID()));
         }
       }
     }
@@ -231,7 +230,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param nodeEntry the entry representing the root of thge current subtree
    * @param knns_q the knns of q
    */
-  private void preInsert(MkMaxEntry<D> q, MkMaxEntry<D> nodeEntry, KNNHeap<D> knns_q) {
+  private void preInsert(MkMaxEntry<D> q, MkMaxEntry<D> nodeEntry, KNNHeap<DistanceDBIDPair<D>, D> knns_q) {
     if(logger.isDebugging()) {
       logger.debugFine("preInsert " + q + " - " + nodeEntry + "\n");
     }
@@ -249,7 +248,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
         if(dist_pq.compareTo(knnDist_q) <= 0) {
-          DistanceResultPair<D> knn = new GenericDistanceResultPair<D>(dist_pq, p.getRoutingObjectID());
+          DistanceDBIDPair<D> knn = DBIDFactory.FACTORY.newDistancePair(dist_pq, p.getRoutingObjectID());
           knns_q.add(knn);
           if(knns_q.size() >= getKmax()) {
             knnDist_q = knns_q.getMaximumDistance();
@@ -260,8 +259,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
-          KNNHeap<D> knns_p = new KNNHeap<D>(getKmax(), getDistanceQuery().infiniteDistance());
-          knns_p.add(new GenericDistanceResultPair<D>(dist_pq, q.getRoutingObjectID()));
+          KNNHeap<DistanceDBIDPair<D>, D> knns_p = new KNNHeap<DistanceDBIDPair<D>, D>(getKmax(), getDistanceQuery().infiniteDistance());
+          knns_p.add(DBIDFactory.FACTORY.newDistancePair(dist_pq, q.getRoutingObjectID()));
           doKNNQuery(p.getRoutingObjectID(), knns_p);
 
           if(knns_p.size() < getKmax()) {

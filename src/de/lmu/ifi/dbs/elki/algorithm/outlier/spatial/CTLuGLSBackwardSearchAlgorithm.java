@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -138,14 +137,14 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
           break;
         }
         scores.putDouble(candidate.first, candidate.second);
-        if (!Double.isNaN(candidate.second)) {
+        if(!Double.isNaN(candidate.second)) {
           mm.put(candidate.second);
         }
         idview.remove(candidate.first);
       }
 
       // Remaining objects are inliers
-      for (DBIDIter iter = idview.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = idview.iter(); iter.valid(); iter.advance()) {
         scores.putDouble(iter, 0.0);
       }
     }
@@ -204,17 +203,17 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
       {
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
-        for(DistanceResultPair<D> dpair : neighbors) {
-          if(DBIDUtil.equal(id, dpair)) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if(DBIDUtil.equal(id, neighbor)) {
             continue;
           }
-          neighborhood.add(dpair);
+          neighborhood.add(neighbor);
         }
         // Weight object itself positively.
         F.set(i, i, 1.0);
         final int nweight = -1 / neighborhood.size();
         // We need to find the index positions of the neighbors, unfortunately.
-        for (DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
           int pos = ids.binarySearch(iter);
           assert (pos >= 0);
           F.set(pos, i, nweight);

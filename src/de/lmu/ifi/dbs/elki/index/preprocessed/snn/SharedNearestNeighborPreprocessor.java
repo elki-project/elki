@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -117,9 +116,9 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
       KNNResult<D> kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
-      for(DistanceResultPair<D> pair : kNN) {
+      for (DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
         // if(!id.equals(nid)) {
-        neighbors.add(pair);
+        neighbors.add(iter);
         // }
         // Size limitation to exactly numberOfNeighbors
         if(neighbors.size() >= numberOfNeighbors) {

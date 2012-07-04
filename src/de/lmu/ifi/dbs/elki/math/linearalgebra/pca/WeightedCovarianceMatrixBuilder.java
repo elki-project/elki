@@ -23,14 +23,13 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -158,7 +157,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
    * @return Covariance Matrix
    */
   @Override
-  public <D extends NumberDistance<?, ?>> Matrix processQueryResults(Collection<? extends DistanceResultPair<D>> results, Relation<? extends V> database, int k) {
+  public <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database, int k) {
     final int dim = DatabaseUtil.dimensionality(database);
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
 
@@ -172,11 +171,11 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
     double stddev = 0.0;
     {
       int i = 0;
-      for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
-        DistanceResultPair<D> res = it.next();
+      for (DistanceDBIDResultIter<D> it = results.iter(); it.valid() && i < k; it.advance(), k++) {
+        DistanceDBIDPair<D> res = it.getDistancePair();
         final double dist;
-        if(res instanceof DoubleDistanceResultPair) {
-          dist = ((DoubleDistanceResultPair) res).getDoubleDistance();
+        if(res instanceof DoubleDistanceDBIDPair) {
+          dist = ((DoubleDistanceDBIDPair) res).doubleDistance();
         }
         else {
           dist = res.getDistance().doubleValue();
@@ -194,11 +193,11 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<? extends V,
 
     // calculate weighted PCA
     int i = 0;
-    for(Iterator<? extends DistanceResultPair<D>> it = results.iterator(); it.hasNext() && i < k; i++) {
-      DistanceResultPair<? extends NumberDistance<?, ?>> res = it.next();
+    for (DistanceDBIDResultIter<D> it = results.iter(); it.valid() && i < k; it.advance(), k++) {
+      DistanceDBIDPair<D> res = it.getDistancePair();
       final double dist;
-      if(res instanceof DoubleDistanceResultPair) {
-        dist = ((DoubleDistanceResultPair) res).getDoubleDistance();
+      if(res instanceof DoubleDistanceDBIDPair) {
+        dist = ((DoubleDistanceDBIDPair) res).doubleDistance();
       }
       else {
         dist = res.getDistance().doubleValue();

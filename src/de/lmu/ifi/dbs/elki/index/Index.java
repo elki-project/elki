@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -48,7 +48,7 @@ public interface Index extends Result {
    * 
    * @param id the object to be inserted
    */
-  public void insert(DBID id);
+  public void insert(DBIDRef id);
 
   /**
    * Inserts the specified objects into this index. If a bulk load mode is
@@ -64,7 +64,7 @@ public interface Index extends Result {
    * @param id Object to remove
    * @return true if this index did contain the object, false otherwise
    */
-  public boolean delete(DBID id);
+  public boolean delete(DBIDRef id);
 
   /**
    * Deletes the specified objects from this index.

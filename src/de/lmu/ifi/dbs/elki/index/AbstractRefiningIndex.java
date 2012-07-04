@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index;
  */
 
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -37,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * Abstract base class for Filter-refinement indexes.
@@ -180,11 +178,6 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
 
     @Override
     public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
-    public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
       throw new UnsupportedOperationException("Not yet implemented.");
     }
 

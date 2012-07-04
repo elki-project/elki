@@ -34,9 +34,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -136,7 +138,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
-    KNNHeap<D> heap = new KNNHeap<D>(k);
+    KNNHeap<DistanceDBIDPair<D>, D> heap = new KNNHeap<DistanceDBIDPair<D>, D>(k);
     for(int i = 0; i < ids.size(); i++) {
       final DBID id = ids.get(i);
       final double val = relation.get(id).doubleValue(1);
@@ -148,7 +150,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
         final DBID n = ids.get(j);
         final double e;
         final D distance = distFunc.distance(id, n);
-        heap.add(distance, n);
+        heap.add(DBIDFactory.FACTORY.newDistancePair(distance, n));
         double dist = distance.doubleValue();
         if(dist == 0) {
           logger.warning("Zero distances are not supported - skipping: " + id + " " + n);

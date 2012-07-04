@@ -29,9 +29,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -115,18 +117,18 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        KNNHeap<D> kNN = new KNNHeap<D>(k, distanceQuery.infiniteDistance());
+        KNNHeap<DistanceDBIDPair<D>, D> kNN = new KNNHeap<DistanceDBIDPair<D>, D>(k, distanceQuery.infiniteDistance());
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
           D d = cache.remove(key);
           if(d != null) {
             // consume the previous result.
-            kNN.add(d, id2);
+            kNN.add(DBIDFactory.FACTORY.newDistancePair(d, id2));
           }
           else {
             // compute new and store the previous result.
             d = distanceQuery.distance(id, id2);
-            kNN.add(d, id2);
+            kNN.add(DBIDFactory.FACTORY.newDistancePair(d, id2));
             // put it into the cache, but with the keys reversed
             key = DBIDUtil.newPair(id2, id);
             cache.put(key, d);

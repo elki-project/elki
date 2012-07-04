@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -247,7 +249,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param q the id of the query object
    * @param knnList the query result list
    */
-  protected final void doKNNQuery(DBID q, KNNHeap<D> knnList) {
+  protected final void doKNNQuery(DBID q, KNNHeap<DistanceDBIDPair<D>, D> knnList) {
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
@@ -308,7 +310,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
           if(diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
             if(d3.compareTo(d_k) <= 0) {
-              knnList.add(d3, o_j);
+              knnList.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
               d_k = knnList.getKNNDistance();
             }
           }
@@ -376,18 +378,18 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @deprecated Change to use by-object NN lookups instead.
    */
   @Deprecated
-  protected final void batchNN(N node, DBIDs ids, Map<DBID, KNNHeap<D>> knnLists) {
+  protected final void batchNN(N node, DBIDs ids, Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         E p = node.getEntry(i);
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           DBID q = DBIDUtil.deref(iter);
-          KNNHeap<D> knns_q = knnLists.get(q);
+          KNNHeap<DistanceDBIDPair<D>, D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           D dist_pq = distanceQuery.distance(p.getRoutingObjectID(), q);
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(dist_pq, p.getRoutingObjectID());
+            knns_q.add(DBIDFactory.FACTORY.newDistancePair(dist_pq, p.getRoutingObjectID()));
           }
         }
       }
@@ -398,7 +400,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         D minDist = distEntry.getDistance();
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           DBID q = DBIDUtil.deref(iter);
-          KNNHeap<D> knns_q = knnLists.get(q);
+          KNNHeap<DistanceDBIDPair<D>, D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {

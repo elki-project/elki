@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.AbstractList;
 import java.util.Arrays;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -41,7 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @apiviz.has IntegerDBID
  */
-public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements ArrayStaticDBIDs {
+public class IntegerArrayStaticDBIDs implements ArrayStaticDBIDs {
   /**
    * The actual storage.
    */
@@ -58,41 +56,8 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
   }
 
   @Override
-  public Iterator<DBID> iterator() {
-    return new Itr();
-  }
-
-  @Override
   public DBIDIter iter() {
     return new DBIDItr();
-  }
-
-  /**
-   * Iterator class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  protected class Itr implements Iterator<DBID> {
-    int off = 0;
-
-    @Override
-    public boolean hasNext() {
-      return off < ids.length;
-    }
-
-    @Override
-    public DBID next() {
-      DBID ret = new IntegerDBID(ids[off]);
-      off++;
-      return ret;
-    }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
   }
 
   /**
@@ -132,11 +97,21 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
       }
       return super.equals(other);
     }
+    
+    @Override
+    public String toString() {
+      return Integer.toString(getIntegerID());
+    }
   }
 
   @Override
   public int size() {
     return ids.length;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return ids.length == 0;
   }
 
   @Override
@@ -148,23 +123,6 @@ public class IntegerArrayStaticDBIDs extends AbstractList<DBID> implements Array
       }
     }
     return false;
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> T[] toArray(T[] a) {
-    T[] r = a;
-    if(a.length < ids.length) {
-      r = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), ids.length);
-    }
-    for(int i = 0; i < ids.length; i++) {
-      r[i] = (T) DBIDFactory.FACTORY.importInteger(ids[i]);
-    }
-    // zero-terminate array
-    if(r.length > ids.length) {
-      r[ids.length] = null;
-    }
-    return r;
   }
 
   @Override

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
@@ -75,7 +75,7 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k) {
+  public DistanceDBIDResult<D> getRKNNForDBID(DBIDRef id, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
@@ -83,16 +83,16 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
   }
   
   @Override
-  public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
+  public DistanceDBIDResult<D> getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
   
   @Override
-  public List<List<DistanceResultPair<D>>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<? extends DistanceDBIDResult<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<List<DistanceResultPair<D>>> result = new ArrayList<List<DistanceResultPair<D>>>(ids.size());
+    List<DistanceDBIDResult<D>> result = new ArrayList<DistanceDBIDResult<D>>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
       result.add(preprocessor.getRKNN(iter));
     }

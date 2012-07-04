@@ -133,6 +133,21 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    */
   public class Instance<T> {
     /**
+     * Unprocessed IDs
+     */
+    private static final int UNPROCESSED = -2;
+
+    /**
+     * Noise IDs
+     */
+    private static final int NOISE = -1;
+
+    /**
+     * Noise IDs
+     */
+    private static final int FIRST_CLUSTER = 0;
+
+    /**
      * The neighborhood predicate
      */
     final NeighborPredicate.Instance<T> npred;
@@ -155,7 +170,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     }
 
     /**
-     * Run the actual DBSCAN algorithm.
+     * Run the actual GDBSCAN algorithm.
      * 
      * @return Clustering result
      */
@@ -165,20 +180,19 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", ids.size(), logger) : null;
       final IndefiniteProgress clusprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters", logger) : null;
       // (Temporary) store the cluster ID assigned.
-      final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -2);
+      final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, UNPROCESSED);
       // Note: these are not exact!
       final TIntArrayList clustersizes = new TIntArrayList();
 
       // Implementation Note: using Integer objects should result in
       // reduced memory use in the HashMap!
-      final int noiseid = -1;
-      int clusterid = 0;
+      int clusterid = FIRST_CLUSTER;
       int clustersize = 0;
       int noisesize = 0;
       // Iterate over all objects in the database.
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         // Skip already processed ids.
-        if(clusterids.intValue(id) > -2) {
+        if(clusterids.intValue(id) != UNPROCESSED) {
           continue;
         }
         // Evaluate Neighborhood predicate
@@ -197,7 +211,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         }
         else {
           // otherwise, it's a noise point
-          clusterids.putInt(id, noiseid);
+          clusterids.putInt(id, NOISE);
           noisesize += 1;
         }
         // We've completed this element
@@ -247,7 +261,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * @param neighbors Neighbors acquired by initial getNeighbors call.
      * @param progress Progress logging
      * 
-     * @return cluster size;
+     * @return cluster size
      */
     protected int setbasedExpandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, final FiniteProgress progress) {
       int clustersize = 0;

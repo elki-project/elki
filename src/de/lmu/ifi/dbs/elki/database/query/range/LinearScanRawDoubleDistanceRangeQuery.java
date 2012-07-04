@@ -23,13 +23,10 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
@@ -63,14 +60,14 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
       double epsilon = range.doubleValue();
 
       O qo = relation.get(id);
-      GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
+      DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         double doubleDistance = rawdist.doubleDistance(qo, relation.get(iter));
         if(doubleDistance <= epsilon) {
-          result.add(new DoubleDistanceResultPair(doubleDistance, iter));
+          result.add(doubleDistance, iter);
         }
       }
-      Collections.sort(result);
+      result.sort();
       return result;
     }
     else {
@@ -85,14 +82,14 @@ public class LinearScanRawDoubleDistanceRangeQuery<O> extends LinearScanRangeQue
       PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
       double epsilon = range.doubleValue();
 
-      GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
+      DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
         if(doubleDistance <= epsilon) {
-          result.add(new DoubleDistanceResultPair(doubleDistance, iter));
+          result.add(doubleDistance, iter);
         }
       }
-      Collections.sort(result);
+      result.sort();
       return result;
     }
     else {

@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
@@ -65,7 +65,7 @@ public abstract class AbstractIndex<O> implements Index {
   }
 
   @Override
-  public void insert(DBID id) {
+  public void insert(DBIDRef id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 
@@ -75,7 +75,7 @@ public abstract class AbstractIndex<O> implements Index {
   }
 
   @Override
-  public boolean delete(DBID id) {
+  public boolean delete(DBIDRef id) {
     throw new UnsupportedOperationException("This index does not allow dynamic updates.");
   }
 

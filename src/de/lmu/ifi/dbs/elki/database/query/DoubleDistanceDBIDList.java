@@ -24,33 +24,33 @@ package de.lmu.ifi.dbs.elki.database.query;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Default class to keep a list of distance-object pairs.
  * 
  * @author Erich Schubert
- * 
- * @param <D> Distance type
  */
-public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceDBIDResult<D> {
+public class DoubleDistanceDBIDList implements DistanceDBIDResult<DoubleDistance> {
   /**
    * Actual storage
    */
-  final ArrayList<DistanceDBIDPair<D>> storage;
-
+  final ArrayList<DoubleDistanceDBIDPair> storage;
+  
   /**
    * Constructor.
    */
-  public GenericDistanceDBIDList() {
+  public DoubleDistanceDBIDList() {
     super();
-    storage = new ArrayList<DistanceDBIDPair<D>>();
+    storage = new ArrayList<DoubleDistanceDBIDPair>();
   }
 
   /**
@@ -58,9 +58,22 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
    * 
    * @param initialCapacity Capacity
    */
-  public GenericDistanceDBIDList(int initialCapacity) {
+  public DoubleDistanceDBIDList(int initialCapacity) {
     super();
-    storage = new ArrayList<DistanceDBIDPair<D>>(initialCapacity);
+    storage = new ArrayList<DoubleDistanceDBIDPair>(initialCapacity);
+  }
+  
+  /**
+   * Add an element.
+   * 
+   * @deprecated Pass a double value instead.
+   * 
+   * @param dist Distance
+   * @param id ID
+   */
+  @Deprecated
+  public void add(DoubleDistance dist, DBIDRef id) {
+    storage.add(DBIDFactory.FACTORY.newDistancePair(dist.doubleValue(), id));
   }
 
   /**
@@ -69,16 +82,16 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
    * @param dist Distance
    * @param id ID
    */
-  public void add(D dist, DBIDRef id) {
+  public void add(double dist, DBIDRef id) {
     storage.add(DBIDFactory.FACTORY.newDistancePair(dist, id));
   }
 
   /**
-   * Add a prepared pair.
+   * Add an element.
    * 
    * @param pair Pair to add
    */
-  public void add(DistanceDBIDPair<D> pair) {
+  public void add(DoubleDistanceDBIDPair pair) {
     storage.add(pair);
   }
 
@@ -88,12 +101,12 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
   }
 
   @Override
-  public DistanceDBIDPair<D> get(int off) {
+  public DoubleDistanceDBIDPair get(int off) {
     return storage.get(off);
   }
 
   @Override
-  public DistanceDBIDResultIter<D> iter() {
+  public DoubleDistanceDBIDResultIter iter() {
     return new Iter();
   }
 
@@ -116,7 +129,7 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
   public String toString() {
     return DistanceDBIDResultUtil.toString(this);
   }
-
+  
   /**
    * Iterator class.
    * 
@@ -124,7 +137,7 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
    * 
    * @apiviz.exclude
    */
-  protected class Iter implements DistanceDBIDResultIter<D> {
+  protected class Iter implements DoubleDistanceDBIDResultIter {
     /**
      * Iterator position
      */
@@ -152,12 +165,18 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
     }
 
     @Override
-    public D getDistance() {
+    @Deprecated
+    public DoubleDistance getDistance() {
       return get(pos).getDistance();
     }
 
     @Override
-    public DistanceDBIDPair<D> getDistancePair() {
+    public double doubleDistance() {
+      return get(pos).doubleDistance();
+    }
+
+    @Override
+    public DoubleDistanceDBIDPair getDistancePair() {
       return get(pos);
     }
     
@@ -169,6 +188,17 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
 
   @Override
   public void sort() {
-    DistanceDBIDResultUtil.sortByDistance(storage);
+    Collections.sort(storage, COMP);
   }
+
+  /**
+   * Comparator used for sorting.
+   */
+  private static final Comparator<? super DoubleDistanceDBIDPair> COMP = new Comparator<DoubleDistanceDBIDPair>() {
+    @Override
+    public int compare(DoubleDistanceDBIDPair o1, DoubleDistanceDBIDPair o2) {
+      final int d = o1.compareByDistance(o2);
+      return (d == 0) ? DBIDUtil.compare(o1, o2) : d;
+    }
+  };
 }

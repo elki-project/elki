@@ -32,13 +32,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -318,7 +318,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     }
 
     @Override
-    public DistanceDBIDResult<DoubleDistance> getRangeForObject(V query, DoubleDistance range) {
+    public DoubleDistanceDBIDList getRangeForObject(V query, DoubleDistance range) {
       final double eps = range.doubleValue();
       // generate query approximation and lookup table
       VectorApproximation queryApprox = calculateApproximation(null, query);
@@ -329,7 +329,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       // Count a VA file scan
       scans += 1;
 
-      GenericDistanceDBIDList<DoubleDistance> result = new GenericDistanceDBIDList<DoubleDistance>();
+      DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
       // Approximation step
       for(int i = 0; i < vectorApprox.size(); i++) {
         VectorApproximation va = vectorApprox.get(i);
@@ -345,10 +345,10 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
         // refine the next element
         final double dist = refine(va.id, query).doubleValue();
         if(dist <= eps) {
-          result.add(new DoubleDistanceResultPair(dist, va.id));
+          result.add(DBIDFactory.FACTORY.newDistancePair(dist, va.id));
         }
       }
-      Collections.sort(result);
+      result.sort();
       return result;
     }
   }
@@ -414,7 +414,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       Collections.sort(candidates);
 
       // refinement step
-      KNNHeap<DoubleDistance> result = new KNNHeap<DoubleDistance>(k);
+      KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> result = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances
@@ -429,7 +429,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
 
         // refine the next element
         final double dist = refine(va.second, query).doubleValue();
-        result.add(new DoubleDistanceResultPair(dist, va.second));
+        result.add(DBIDFactory.FACTORY.newDistancePair(dist, va.second));
       }
       if(log.isDebuggingFinest()) {
         log.finest("query = (" + query + ")");

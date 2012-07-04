@@ -27,7 +27,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.AbstractRKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -60,17 +60,17 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRKNNForObject(O obj, int k) {
+  public DistanceDBIDResult<D> getRKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 
   @Override
-  public List<DistanceResultPair<D>> getRKNNForDBID(DBIDRef id, int k) {
+  public DistanceDBIDResult<D> getRKNNForDBID(DBIDRef id, int k) {
     return index.reverseKNNQuery(id, k);
   }
 
   @Override
-  public List<List<DistanceResultPair<D>>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<? extends DistanceDBIDResult<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }

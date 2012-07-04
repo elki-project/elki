@@ -23,16 +23,12 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -73,14 +69,8 @@ public class MinPtsCorePredicate implements CorePredicate {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
-    if(TypeUtil.DBIDS.isAssignableFromType(type)) {
-      return (Instance<T>) new DBIDsInstance(minpts);
-    }
-    if(TypeUtil.NEIGHBORLIST.isAssignableFromType(type)) {
-      return (Instance<T>) new NeighborListInstance(minpts);
-    }
-    throw new AbortException("Incompatible predicate types");
+  public <T> CorePredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+    return (CorePredicate.Instance<T>) new Instance(minpts);
   }
 
   @Override
@@ -99,7 +89,7 @@ public class MinPtsCorePredicate implements CorePredicate {
    * 
    * @author Erich Schubert
    */
-  public static class DBIDsInstance implements CorePredicate.Instance<DBIDs> {
+  public static class Instance implements CorePredicate.Instance<DBIDs> {
     /**
      * The minpts parameter.
      */
@@ -110,40 +100,13 @@ public class MinPtsCorePredicate implements CorePredicate {
      * 
      * @param minpts MinPts parameter
      */
-    public DBIDsInstance(int minpts) {
+    public Instance(int minpts) {
       super();
       this.minpts = minpts;
     }
 
     @Override
     public boolean isCorePoint(DBIDRef point, DBIDs neighbors) {
-      return neighbors.size() >= minpts;
-    }
-  }
-
-  /**
-   * Instance for a particular data set.
-   * 
-   * @author Erich Schubert
-   */
-  public static class NeighborListInstance implements CorePredicate.Instance<List<? extends DistanceResultPair<?>>> {
-    /**
-     * The minpts parameter.
-     */
-    int minpts;
-
-    /**
-     * Constructor for this predicate.
-     * 
-     * @param minpts MinPts parameter
-     */
-    public NeighborListInstance(int minpts) {
-      super();
-      this.minpts = minpts;
-    }
-
-    @Override
-    public boolean isCorePoint(DBIDRef point, List<? extends DistanceResultPair<?>> neighbors) {
       return neighbors.size() >= minpts;
     }
   }

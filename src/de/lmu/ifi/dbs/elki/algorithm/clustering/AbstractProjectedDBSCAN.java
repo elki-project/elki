@@ -38,9 +38,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -277,9 +279,9 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     }
 
     // compute weighted epsilon neighborhood
-    List<DistanceResultPair<DoubleDistance>> seeds = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+    DistanceDBIDResult<DoubleDistance> neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
     // neighbors < minPts -> noise
-    if(seeds.size() < minpts) {
+    if(neighbors.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if(objprog != null && clusprog != null) {
@@ -291,7 +293,8 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
 
     // try to expand the cluster
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    for(DistanceResultPair<DoubleDistance> seed : seeds) {
+    ModifiableDBIDs seeds = DBIDUtil.newHashSet();
+    for (DistanceDBIDResultIter<DoubleDistance> seed = neighbors.iter(); seed.valid(); seed.advance()) {
       int nextID_corrDim = distFunc.getIndex().getLocalProjection(seed).getCorrelationDimension();
       // nextID is not reachable from start object
       if(nextID_corrDim > lambda) {
@@ -301,25 +304,27 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
       if(!processedIDs.contains(seed)) {
         currentCluster.add(seed);
         processedIDs.add(seed);
+        seeds.add(seed);
       }
       else if(noise.contains(seed)) {
         currentCluster.add(seed);
         noise.remove(seed);
       }
     }
-    seeds.remove(0);
 
     while(seeds.size() > 0) {
-      DistanceResultPair<DoubleDistance> q = seeds.remove(0);
-      int corrDim_q = distFunc.getIndex().getLocalProjection(q).getCorrelationDimension();
+      DBIDMIter iter = seeds.iter();
+      int corrDim_q = distFunc.getIndex().getLocalProjection(iter).getCorrelationDimension();
       // q forms no lambda-dim hyperplane
       if(corrDim_q > lambda) {
         continue;
       }
 
-      List<DistanceResultPair<DoubleDistance>> reachables = rangeQuery.getRangeForDBID(q, epsilon);
+      DistanceDBIDResult<DoubleDistance> reachables = rangeQuery.getRangeForDBID(iter, epsilon);
+      iter.remove();
+      
       if(reachables.size() > minpts) {
-        for(DistanceResultPair<DoubleDistance> r : reachables) {
+        for (DistanceDBIDResultIter<DoubleDistance> r = reachables.iter(); r.valid(); r.advance()) {
           int corrDim_r = distFunc.getIndex().getLocalProjection(r).getCorrelationDimension();
           // r is not reachable from q
           if(corrDim_r > lambda) {

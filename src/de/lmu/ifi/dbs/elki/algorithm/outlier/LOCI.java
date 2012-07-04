@@ -36,8 +36,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -154,7 +155,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
       {
         for(int i = 0; i < neighbors.size(); i++) {
-          DistanceResultPair<D> r = neighbors.get(i);
+          DistanceDBIDPair<D> r = neighbors.get(i);
           if(i + 1 < neighbors.size() && r.getDistance().compareTo(neighbors.get(i + 1).getDistance()) == 0) {
             continue;
           }
@@ -202,9 +203,9 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       if(maxneig >= nmin) {
         D range = distFunc.getDistanceFactory().fromDouble(maxdist);
         // Compute the largest neighborhood we will need.
-        List<DistanceResultPair<D>> maxneighbors = rangeQuery.getRangeForDBID(iditer, range);
+        DistanceDBIDResult<D> maxneighbors = rangeQuery.getRangeForDBID(iditer, range);
         // Ensure the set is sorted. Should be a no-op with most indexes.
-        Collections.sort(maxneighbors);
+        maxneighbors.sort();
         // For any critical distance, compute the normalized MDEF score.
         for(DoubleIntPair c : cdist) {
           // Only start when minimum size is fulfilled
@@ -217,12 +218,13 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           final int n_alphar = elementsAtRadius(cdist, alpha_r);
           // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
           MeanVariance mv_n_r_alpha = new MeanVariance();
-          for(DistanceResultPair<D> ne : maxneighbors) {
+          // TODO: optimize for double distances
+          for (DistanceDBIDResultIter<D> neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
             // Stop at radius r
-            if(ne.getDistance().doubleValue() > r) {
+            if(neighbor.getDistance().doubleValue() > r) {
               break;
             }
-            int rn_alphar = elementsAtRadius(interestingDistances.get(ne), alpha_r);
+            int rn_alphar = elementsAtRadius(interestingDistances.get(neighbor), alpha_r);
             mv_n_r_alpha.put(rn_alphar);
           }
           // We only use the average and standard deviation

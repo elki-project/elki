@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -83,8 +84,8 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
   }
 
   @Override
-  public void insert(DBID id) {
-    insert(createNewLeafEntry(id, relation.get(id), getDistanceFactory().undefinedDistance()), false);
+  public void insert(DBIDRef id) {
+    insert(createNewLeafEntry(DBIDUtil.deref(id), relation.get(id), getDistanceFactory().undefinedDistance()), false);
   }
 
   @Override
@@ -106,7 +107,7 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
    *         implemented yet.
    */
   @Override
-  public final boolean delete(DBID id) {
+  public final boolean delete(DBIDRef id) {
     throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 

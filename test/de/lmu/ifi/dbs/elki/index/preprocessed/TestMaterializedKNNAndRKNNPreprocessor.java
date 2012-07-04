@@ -41,7 +41,8 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -161,9 +162,15 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     for(int i = 0; i < rep.size(); i++) {
       KNNResult<DoubleDistance> lin_knn = lin_knn_ids.get(i);
       KNNResult<DoubleDistance> pre_knn = preproc_knn_ids.get(i);
-      if(!lin_knn.equals(pre_knn)) {
-        System.out.println("LIN kNN " + lin_knn);
-        System.out.println("PRE kNN " + pre_knn);
+      DistanceDBIDResultIter<DoubleDistance> lin = lin_knn.iter(), pre = pre_knn.iter();
+      for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
+        if(!DBIDUtil.equal(lin, pre) && lin.getDistance().compareTo(pre.getDistance()) != 0) {
+          System.out.print("LIN kNN #" + i + " " + lin.getDistancePair());
+          System.out.print(" <=> ");
+          System.out.print("PRE kNN #" + i + " " + pre.getDistancePair());
+          System.out.println();
+          break;
+        }
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {
@@ -176,15 +183,21 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
   private void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query, RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    List<List<DistanceResultPair<DoubleDistance>>> lin_rknn_ids = lin_rknn_query.getRKNNForBulkDBIDs(sample, k);
-    List<List<DistanceResultPair<DoubleDistance>>> preproc_rknn_ids = preproc_rknn_query.getRKNNForBulkDBIDs(sample, k);
+    List<? extends DistanceDBIDResult<DoubleDistance>> lin_rknn_ids = lin_rknn_query.getRKNNForBulkDBIDs(sample, k);
+    List<? extends DistanceDBIDResult<DoubleDistance>> preproc_rknn_ids = preproc_rknn_query.getRKNNForBulkDBIDs(sample, k);
     for(int i = 0; i < rep.size(); i++) {
-      List<DistanceResultPair<DoubleDistance>> lin_rknn = lin_rknn_ids.get(i);
-      List<DistanceResultPair<DoubleDistance>> pre_rknn = preproc_rknn_ids.get(i);
-      if(!lin_rknn.equals(pre_rknn)) {
-        System.out.println("LIN RkNN " + lin_rknn);
-        System.out.println("PRE RkNN " + pre_rknn);
-        System.out.println();
+      DistanceDBIDResult<DoubleDistance> lin_rknn = lin_rknn_ids.get(i);
+      DistanceDBIDResult<DoubleDistance> pre_rknn = preproc_rknn_ids.get(i);
+
+      DistanceDBIDResultIter<DoubleDistance> lin = lin_rknn.iter(), pre = pre_rknn.iter();
+      for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
+        if(!DBIDUtil.equal(lin, pre) || lin.getDistance().compareTo(pre.getDistance()) != 0) {
+          System.out.print("LIN RkNN #" + i + " " + lin);
+          System.out.print(" <=> ");
+          System.out.print("PRE RkNN #" + i + " " + pre);
+          System.out.println();
+          break;
+        }
       }
       assertEquals("rkNN sizes do not agree for k=" + k, lin_rknn.size(), pre_rknn.size());
       for(int j = 0; j < lin_rknn.size(); j++) {

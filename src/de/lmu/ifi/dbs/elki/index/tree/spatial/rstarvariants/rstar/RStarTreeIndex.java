@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -82,8 +82,8 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
    * @param id Object id
    * @return Spatial leaf entry
    */
-  protected SpatialPointLeafEntry createNewLeafEntry(DBID id) {
-    return new SpatialPointLeafEntry(id, relation.get(id));
+  protected SpatialPointLeafEntry createNewLeafEntry(DBIDRef id) {
+    return new SpatialPointLeafEntry(DBIDUtil.deref(id), relation.get(id));
   }
 
   /**
@@ -92,7 +92,7 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
    * @param id the object id that was inserted
    */
   @Override
-  public void insert(DBID id) {
+  public void insert(DBIDRef id) {
     insertLeaf(createNewLeafEntry(id));
   }
 
@@ -112,7 +112,7 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
     if(canBulkLoad()) {
       List<SpatialEntry> leafs = new ArrayList<SpatialEntry>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
+        leafs.add(createNewLeafEntry(iter));
       }
       bulkLoad(leafs);
     }
@@ -132,7 +132,7 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
    *         false otherwise
    */
   @Override
-  public boolean delete(DBID id) {
+  public boolean delete(DBIDRef id) {
     // find the leaf node containing o
     O obj = relation.get(id);
     IndexTreePath<SpatialEntry> deletionPath = findPathToObject(getRootPath(), obj, id);
@@ -146,7 +146,7 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
   @Override
   public void deleteAll(DBIDs ids) {
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      delete(DBIDUtil.deref(iter));
+      delete(iter);
     }
   }
 

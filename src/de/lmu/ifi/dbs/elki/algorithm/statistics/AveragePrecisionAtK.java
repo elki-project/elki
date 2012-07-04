@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -36,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -126,11 +124,9 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       KNNResult<D> knn = knnQuery.getKNNForDBID(iter, k);
       Object label = lrelation.get(iter);
 
-      int positive = 0;
-      Iterator<DistanceResultPair<D>> ri = knn.iterator();
-      for(int i = 0; i < k && ri.hasNext(); i++) {
-        DistanceResultPair<D> nid = ri.next();
-        Object olabel = lrelation.get(nid);
+      int positive = 0, i = 0;
+      for (DBIDIter ri = knn.iter(); i < k && ri.valid(); ri.advance(), i++) {
+        Object olabel = lrelation.get(ri);
         if(label == null) {
           if(olabel == null) {
             positive += 1;

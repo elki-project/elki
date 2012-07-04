@@ -44,12 +44,14 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -265,17 +267,17 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
     // compute distances between each point in S and m_i
     // FIXME: don't use maps, so we can work with DBIDRef
-    Map<DBID, DistanceResultPair<DoubleDistance>> distances = new HashMap<DBID, DistanceResultPair<DoubleDistance>>();
+    Map<DBID, DistanceDBIDPair<DoubleDistance>> distances = new HashMap<DBID, DistanceDBIDPair<DoubleDistance>>();
     for(DBIDIter iter = s.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       DoubleDistance dist = distFunc.distance(id, m_i);
-      distances.put(id, new GenericDistanceResultPair<DoubleDistance>(dist, id));
+      distances.put(id, DBIDFactory.FACTORY.newDistancePair(dist, id));
     }
 
     for(int i = 1; i < m; i++) {
       // choose medoid m_i to be far from prevois medoids
-      List<DistanceResultPair<DoubleDistance>> d = new ArrayList<DistanceResultPair<DoubleDistance>>(distances.values());
-      Collections.sort(d);
+      List<DistanceDBIDPair<DoubleDistance>> d = new ArrayList<DistanceDBIDPair<DoubleDistance>>(distances.values());
+      DistanceDBIDResultUtil.sortByDistance(d);
 
       m_i = DBIDUtil.deref(d.get(d.size() - 1));
       medoids.add(m_i);
@@ -289,7 +291,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
         DoubleDistance dist_old = distances.get(id).getDistance();
 
         DoubleDistance dist = dist_new.compareTo(dist_old) < 0 ? dist_new : dist_old;
-        distances.put(id, new GenericDistanceResultPair<DoubleDistance>(dist, id));
+        distances.put(id, DBIDFactory.FACTORY.newDistancePair(dist, id));
       }
 
       if(logger.isDebugging()) {
@@ -360,8 +362,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * @param distFunc the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private Map<DBID, List<DistanceResultPair<DoubleDistance>>> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
-    Map<DBID, List<DistanceResultPair<DoubleDistance>>> result = new HashMap<DBID, List<DistanceResultPair<DoubleDistance>>>();
+  private Map<DBID, DistanceDBIDResult<DoubleDistance>> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
+    Map<DBID, DistanceDBIDResult<DoubleDistance>> result = new HashMap<DBID, DistanceDBIDResult<DoubleDistance>>();
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       DBID m = DBIDUtil.deref(iter);
@@ -381,7 +383,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
       // determine points in sphere centered at m with radius minDist
       assert minDist != null;
-      List<DistanceResultPair<DoubleDistance>> qr = rangeQuery.getRangeForDBID(m, minDist);
+      DistanceDBIDResult<DoubleDistance> qr = rangeQuery.getRangeForDBID(m, minDist);
       result.put(m, qr);
     }
 
@@ -400,7 +402,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    */
   private Map<DBID, Set<Integer>> findDimensions(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
     // get localities
-    Map<DBID, List<DistanceResultPair<DoubleDistance>>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
+    Map<DBID, DistanceDBIDResult<DoubleDistance>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
     int dim = DatabaseUtil.dimensionality(database);
@@ -409,9 +411,9 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       DBID m_i = DBIDUtil.deref(iter);
       V medoid_i = database.get(m_i);
-      List<DistanceResultPair<DoubleDistance>> l_i = localities.get(m_i);
+      DistanceDBIDResult<DoubleDistance> l_i = localities.get(m_i);
       double[] x_i = new double[dim];
-      for(DistanceResultPair<DoubleDistance> qr : l_i) {
+      for(DBIDIter qr = l_i.iter(); qr.valid(); qr.advance()) {
         V o = database.get(qr);
         for(int d = 0; d < dim; d++) {
           x_i[d] += Math.abs(medoid_i.doubleValue(d + 1) - o.doubleValue(d + 1));
@@ -572,11 +574,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
       DBID p_id = DBIDUtil.deref(it);
       V p = database.get(p_id);
-      DistanceResultPair<DoubleDistance> minDist = null;
+      DistanceDBIDPair<DoubleDistance> minDist = null;
       for(DBID m_i : dimensions.keySet()) {
         V m = database.get(m_i);
-        DistanceResultPair<DoubleDistance> currentDist = new GenericDistanceResultPair<DoubleDistance>(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
-        if(minDist == null || currentDist.compareTo(minDist) < 0) {
+        DistanceDBIDPair<DoubleDistance> currentDist = DBIDFactory.FACTORY.newDistancePair(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
+        if(minDist == null || currentDist.compareByDistance(minDist) < 0) {
           minDist = currentDist;
         }
       }

@@ -27,9 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -39,9 +37,10 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.has KNNList oneway - - serializes to
  * 
+ * @param <P> pair type
  * @param <D> distance type
  */
-public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceResultPair<D>> {
+public class KNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> extends TiedTopBoundedHeap<P> {
   /**
    * Serial version
    */
@@ -75,8 +74,8 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
   }
 
   @Override
-  public ArrayList<DistanceResultPair<D>> toSortedArrayList() {
-    ArrayList<DistanceResultPair<D>> list = super.toSortedArrayList();
+  public ArrayList<P> toSortedArrayList() {
+    ArrayList<P> list = super.toSortedArrayList();
     Collections.reverse(list);
     return list;
   }
@@ -130,12 +129,12 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * @param id ID number
    * @return success code
    */
-  public boolean add(D distance, DBIDRef id) {
-    if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
-      return super.add(new GenericDistanceResultPair<D>(distance, id));
-    }
-    return true; /* "success" */
-  }
+  //public boolean add(D distance, DBIDRef id) {
+  //  if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
+  //    return super.add(new GenericDistanceResultPair<D>(distance, id));
+  //  }
+  //  return true; /* "success" */
+  //}
 
   /**
    * Comparator to use.
@@ -144,9 +143,9 @@ public class KNNHeap<D extends Distance<D>> extends TiedTopBoundedHeap<DistanceR
    * 
    * @apiviz.exclude
    */
-  public static class Comp<D extends Distance<D>> implements Comparator<DistanceResultPair<D>> {
+  public static class Comp<D extends Distance<D>> implements Comparator<DistanceDBIDPair<D>> {
     @Override
-    public int compare(DistanceResultPair<D> o1, DistanceResultPair<D> o2) {
+    public int compare(DistanceDBIDPair<D> o1, DistanceDBIDPair<D> o2) {
       return -o1.compareByDistance(o2);
     }
   }

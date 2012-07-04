@@ -39,11 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 public interface CorePredicate {
   /**
-   * Constant for the generic type {@code List<? extends DistanceResultPair<?>>}
-   */
-  public static final String NEIGHBOR_LIST = "neighborhood-list";
-  
-  /**
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
