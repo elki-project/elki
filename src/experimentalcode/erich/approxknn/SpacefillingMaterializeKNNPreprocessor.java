@@ -35,8 +35,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -158,11 +160,11 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
 
     // Convert to final storage
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
-    KNNHeap<D> heap = new KNNHeap<D>(k);
+    KNNHeap<DistanceDBIDPair<D>, D> heap = new KNNHeap<DistanceDBIDPair<D>, D>(k);
     HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final D n = distanceQuery.getDistanceFactory().nullDistance();
-      heap.add(n, iditer);
+      heap.add(DBIDFactory.FACTORY.newDistancePair(n, iditer));
 
       // Get candidates.
       cands.clear();
@@ -191,7 +193,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
    * @param tempstorage Temporary storage
    * @return number of distance computations
    */
-  private int scanCurve(List<SpatialRef> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<D> heap) {
+  private int scanCurve(List<SpatialRef> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<DistanceDBIDPair<D>, D> heap) {
     int distcomp = 0;
     final int win2size = wsize * 2 + 1;
     final int start, end;
@@ -215,7 +217,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
       }
       SpatialRef ref2 = curve.get(pos);
       if(cands.add(ref2.id)) {
-        heap.add(distanceQuery.distance(q, ref2.vec), ref2.id);
+        heap.add(DBIDFactory.FACTORY.newDistancePair(distanceQuery.distance(q, ref2.vec), ref2.id));
         distcomp++;
       }
     }

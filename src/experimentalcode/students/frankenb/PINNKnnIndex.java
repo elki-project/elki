@@ -1,7 +1,7 @@
 package experimentalcode.students.frankenb;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -39,13 +39,13 @@ public class PINNKnnIndex<V extends NumberVector<?, ?>> implements KNNIndex<V> {
   }
 
   @Override
-  public void insert(DBID id) {
+  public void insert(DBIDRef id) {
     // TODO Auto-generated method stub
     
   }
 
   @Override
-  public boolean delete(DBID id) {
+  public boolean delete(DBIDRef id) {
     // TODO Auto-generated method stub
     return false;
   }

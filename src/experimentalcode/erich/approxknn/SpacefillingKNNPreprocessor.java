@@ -25,7 +25,6 @@ package experimentalcode.erich.approxknn;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -38,10 +37,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -278,10 +279,10 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
       }
       // Refine:
       int distc = 0;
-      KNNHeap<D> heap = new KNNHeap<D>(k);
+      KNNHeap<DistanceDBIDPair<D>, D> heap = new KNNHeap<DistanceDBIDPair<D>, D>(k);
       final O vec = relation.get(id);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
-        heap.add(distq.distance(vec, iter), iter);
+        heap.add(DBIDFactory.FACTORY.newDistancePair(distq.distance(vec, iter), iter));
         distc++;
       }
       mean.put(distc / (double) k);
@@ -290,11 +291,6 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
 
     @Override
     public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      throw new AbortException("Not yet implemented");
-    }
-
-    @Override
-    public void getKNNForBulkHeaps(Map<DBID, KNNHeap<D>> heaps) {
       throw new AbortException("Not yet implemented");
     }
 

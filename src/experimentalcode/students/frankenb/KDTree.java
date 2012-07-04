@@ -5,11 +5,12 @@ import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -62,19 +63,19 @@ public class KDTree<V extends NumberVector<?, ?>> {
     V vector = this.relation.get(id);
     KDTreeNode node = searchNodeFor(vector, this.root);
 
-    KNNHeap<DoubleDistance> distanceList = new KNNHeap<DoubleDistance>(k);
+    KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> distanceList = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
     Set<KDTreeNode> alreadyVisited = new HashSet<KDTreeNode>();
 
     findNeighbors(k, distanceFunction, vector, node, distanceList, alreadyVisited);
     return distanceList.toKNNList();
   }
 
-  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, KNNHeap<DoubleDistance> distanceList, Set<KDTreeNode> alreadyVisited) {
+  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> distanceList, Set<KDTreeNode> alreadyVisited) {
     double maxdist = distanceList.getKNNDistance().doubleValue();
     for(DBIDIter id = currentNode.ids.iter(); id.valid(); id.advance()) {
       double distanceToId = distanceFunction.doubleDistance(queryVector, relation.get(id));
       if (distanceToId < maxdist) {
-        distanceList.add(new DoubleDistanceResultPair(distanceToId, id));
+        distanceList.add(DBIDFactory.FACTORY.newDistancePair(distanceToId, id));
         maxdist = distanceList.getKNNDistance().doubleValue();
       }
     }

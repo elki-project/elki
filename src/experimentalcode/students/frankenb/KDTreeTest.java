@@ -10,7 +10,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.data.IntegerVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -44,15 +44,15 @@ public class KDTreeTest {
 
     int counter = 0;
     assertEquals(3, list.size());
-    for(DistanceResultPair<DoubleDistance> distanceEntry : list) {
+    for (DistanceDBIDResultIter<DoubleDistance> iter = list.iter(); iter.valid(); iter.advance()) {
       if(counter == 0) {
-        assertEquals(1, DBIDUtil.asInteger(distanceEntry));
+        assertEquals(1, DBIDUtil.asInteger(iter));
       }
       else if(counter == 1) {
-        assertEquals(5, DBIDUtil.asInteger(distanceEntry));
+        assertEquals(5, DBIDUtil.asInteger(iter));
       }
       else if(counter == 2) {
-        assertEquals(0, DBIDUtil.asInteger(distanceEntry));
+        assertEquals(0, DBIDUtil.asInteger(iter));
       }
       counter++;
     }

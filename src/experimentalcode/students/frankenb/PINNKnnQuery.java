@@ -2,17 +2,16 @@ package experimentalcode.students.frankenb;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -60,10 +59,10 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
       }
     }
     
-    KNNHeap<DoubleDistance> newDistanceList = new KNNHeap<DoubleDistance>(k);
-    for (DistanceResultPair<DoubleDistance> distance : projectedDistanceList) {
+    KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> newDistanceList = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
+    for (DistanceDBIDResultIter<DoubleDistance> distance = projectedDistanceList.iter(); distance.valid(); distance.advance()) {
       NumberVector<?, ?> otherVector = dataBase.get(distance);
-      newDistanceList.add(new DoubleDistanceResultPair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance));
+      newDistanceList.add(DBIDFactory.FACTORY.newDistancePair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance));
     }
     
     if (++requested % 100000 == 0) {
@@ -86,11 +85,5 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   public KNNResult<DoubleDistance> getKNNForObject(NumberVector<?, ?> obj, int k) {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  @Override
-  public void getKNNForBulkHeaps(Map<DBID, KNNHeap<DoubleDistance>> heaps) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
   }
 }

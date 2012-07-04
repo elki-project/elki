@@ -37,12 +37,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceResultPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
@@ -217,11 +218,11 @@ public class SpacefillingKNNExperiment2 {
       merr.add(MeanVariance.newArray(numcurves));
     }
 
-    ArrayList<Pair<ModifiableDBIDs, KNNHeap<DoubleDistance>>> rec = new ArrayList<Pair<ModifiableDBIDs, KNNHeap<DoubleDistance>>>();
+    ArrayList<Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>> rec = new ArrayList<Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>>();
     for(int i = 0; i < numcurves; i++) {
       ModifiableDBIDs cand = DBIDUtil.newHashSet(maxoff * 2);
-      KNNHeap<DoubleDistance> heap = new KNNHeap<DoubleDistance>(k);
-      rec.add(new Pair<ModifiableDBIDs, KNNHeap<DoubleDistance>>(cand, heap));
+      KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> heap = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
+      rec.add(new Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>(cand, heap));
     }
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
@@ -244,12 +245,12 @@ public class SpacefillingKNNExperiment2 {
           DBID cid = rand.get(i * 2);
           if(rec.get(0).first.add(cid)) {
             final double d = distanceFunction.doubleDistance(vec, rel.get(cid));
-            rec.get(0).second.add(new DoubleDistanceResultPair(d, cid));
+            rec.get(0).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
           }
           cid = rand.get(i * 2 + 1);
           if(rec.get(0).first.add(cid)) {
             final double d = distanceFunction.doubleDistance(vec, rel.get(cid));
-            rec.get(0).second.add(new DoubleDistanceResultPair(d, cid));
+            rec.get(0).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
           }
           // Candidate set size: distance computations
           mdic.get(i)[0].put(rec.get(0).first.size());
@@ -342,14 +343,14 @@ public class SpacefillingKNNExperiment2 {
     }
   }
 
-  protected void initCandidates(ModifiableDBIDs candz, KNNHeap<DoubleDistance> heapz, DBIDRef id) {
+  protected void initCandidates(ModifiableDBIDs candz, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> heapz, DBIDRef id) {
     candz.clear();
     candz.add(id);
     heapz.clear();
-    heapz.add(new DoubleDistanceResultPair(0, id));
+    heapz.add(DBIDFactory.FACTORY.newDistancePair(0, id));
   }
 
-  protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?, ?> vec, Relation<NumberVector<?, ?>> rel, List<Pair<ModifiableDBIDs, KNNHeap<DoubleDistance>>> pairs, int... runs) {
+  protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?, ?> vec, Relation<NumberVector<?, ?>> rel, List<Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>> pairs, int... runs) {
     if(pos - off >= 0) {
       final DBID cid = zs.get(pos - off).id;
       double d = Double.NaN;
@@ -358,7 +359,7 @@ public class SpacefillingKNNExperiment2 {
           if(Double.isNaN(d)) {
             d = distanceFunction.doubleDistance(vec, rel.get(cid));
           }
-          pairs.get(runs[i]).second.add(new DoubleDistanceResultPair(d, cid));
+          pairs.get(runs[i]).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
         }
       }
     }
@@ -370,7 +371,7 @@ public class SpacefillingKNNExperiment2 {
           if(Double.isNaN(d)) {
             d = distanceFunction.doubleDistance(vec, rel.get(cid));
           }
-          pairs.get(runs[i]).second.add(new DoubleDistanceResultPair(d, cid));
+          pairs.get(runs[i]).second.add(DBIDFactory.FACTORY.newDistancePair(d, cid));
         }
       }
     }
