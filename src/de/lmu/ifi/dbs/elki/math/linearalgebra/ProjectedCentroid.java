@@ -57,7 +57,7 @@ public class ProjectedCentroid extends Centroid {
   public ProjectedCentroid(BitSet dims, int dim) {
     super(dim);
     this.dims = dims;
-    assert (dims.size() <= dim);
+    assert (dims.length() <= dim) : (dims.length() + " > " + dim + " ?!?");
   }
 
   /**
@@ -150,8 +150,8 @@ public class ProjectedCentroid extends Centroid {
    */
   public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
     ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
-    assert (dims.size() <= DatabaseUtil.dimensionality(relation));
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    assert (dims.length() <= DatabaseUtil.dimensionality(relation));
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }
     return c;
