@@ -28,7 +28,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -43,8 +42,8 @@ public final class DistanceDBIDResultUtil {
    * @return comparator
    */
   @SuppressWarnings("unchecked")
-  public static <D extends Distance<D>> Comparator<DistanceDBIDPair<D>> distanceComparator() {
-    return (Comparator<DistanceDBIDPair<D>>) BY_DISTANCE_THEN_DBID;
+  public static <D extends DistanceDBIDPair<?>> Comparator<D> distanceComparator() {
+    return (Comparator<D>) BY_DISTANCE_THEN_DBID;
   }
 
   /**
@@ -53,17 +52,18 @@ public final class DistanceDBIDResultUtil {
    * @param list List to sort
    */
   @SuppressWarnings("unchecked")
-  public static <D extends Distance<D>> void sortByDistance(List<? extends DistanceDBIDPair<D>> list) {
-    Collections.sort(list, (Comparator<DistanceDBIDPair<D>>) BY_DISTANCE_THEN_DBID);
+  public static <D extends DistanceDBIDPair<?>> void sortByDistance(List<? extends D> list) {
+    Collections.sort(list, (Comparator<D>) BY_DISTANCE_THEN_DBID);
   }
 
   /**
    * Static comparator.
    */
-  private static final Comparator<?> BY_DISTANCE_THEN_DBID = new Comparator<DistanceDBIDPair<DoubleDistance>>() {
+  private static final Comparator<DistanceDBIDPair<?>> BY_DISTANCE_THEN_DBID = new Comparator<DistanceDBIDPair<?>>() {
+    @SuppressWarnings("unchecked")
     @Override
-    public int compare(DistanceDBIDPair<DoubleDistance> o1, DistanceDBIDPair<DoubleDistance> o2) {
-      final int d = o1.compareByDistance(o2);
+    public int compare(DistanceDBIDPair<?> o1, DistanceDBIDPair<?> o2) {
+      final int d = ((DistanceDBIDPair<DoubleDistance>)o1).compareByDistance((DistanceDBIDPair<DoubleDistance>)o2);
       return (d == 0) ? DBIDUtil.compare(o1, o2) : d;
     }
   };

@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceResultPair;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -100,7 +100,7 @@ public class DistanceFunctionVisualization<D extends NumberDistance<D, ?>> exten
       for(DBIDIter i = selection.iter(); i.valid(); i.advance()) {
         counter = 1;
 
-        drawDistancefunction: for(DistanceResultPair<DoubleDistance> j : result.get(i)) {
+        drawDistancefunction: for(DistanceDBIDResultIter<DoubleDistance> j = result.get(i).iter(); j.valid(); j.advance()) {
           try {
             double[] v = proj.fastProjectDataToRenderSpace(rel.get(j));
             Element dot = svgp.svgCircle(v[0], v[1], size);
