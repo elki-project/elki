@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 /**
  * Pair containing a double distance a DBID.
  * 
- * There is no getter for the DBID, as this is a {@link #DBIDRef} already.
+ * There is no getter for the DBID, as this is a {@link DBIDRef} already.
  * 
  * @author Erich Schubert
  */
