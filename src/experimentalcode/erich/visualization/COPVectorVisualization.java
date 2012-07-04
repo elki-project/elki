@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -92,7 +92,7 @@ public class COPVectorVisualization extends AbstractScatterplotVisualization imp
   @Override
   public void redraw() {
     setupCSS(svgp);
-    for(DBID objId : sample.getSample()) {
+    for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
       Vector evec = result.get(objId);
       if(evec == null) {
         continue;

@@ -65,7 +65,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import experimentalcode.niedermayer.rknnjoin.DoubleDistanceResultPair;
 
 /**
  * Adaptive outlierness for subspace outlier ranking (OUTRES).
@@ -213,7 +212,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
     // We don't have a guarantee for this list to be sorted
     for (DistanceDBIDResultIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
       DistanceDBIDPair<DoubleDistance> p = neighbor.getDistancePair();
-      if(p instanceof DoubleDistanceResultPair) {
+      if(p instanceof DoubleDistanceDBIDPair) {
         if(((DoubleDistanceDBIDPair) p).doubleDistance() <= adjustedEps) {
           n.add((DoubleDistanceDBIDPair) p);
         }
