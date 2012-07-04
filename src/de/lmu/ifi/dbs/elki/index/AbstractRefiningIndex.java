@@ -146,7 +146,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
      * @param q Query object
      * @return Distance
      */
-    protected D refine(DBID id, O q) {
+    protected D refine(DBIDRef id, O q) {
       AbstractRefiningIndex.this.refinements++;
       return distanceQuery.distance(q, id);
     }
