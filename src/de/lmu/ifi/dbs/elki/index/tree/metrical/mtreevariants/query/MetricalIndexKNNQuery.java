@@ -27,11 +27,10 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -41,7 +40,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
@@ -80,7 +78,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
    * @param q the id of the query object
    * @param knnList the query result list
    */
-  protected final void doKNNQuery(O q, KNNHeap<DistanceDBIDPair<D>, D> knnList) {
+  protected final void doKNNQuery(O q, GenericKNNHeap<D> knnList) {
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
@@ -91,7 +89,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     while(!pq.isEmpty()) {
       GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
 
-      if(pqNode.mindist.compareTo(d_k) > 0) {
+      if(d_k != null && pqNode.mindist.compareTo(d_k) > 0) {
         return;
       }
 
@@ -109,12 +107,10 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
-          D sum = d_k.plus(r_or);
-
-          if(diff.compareTo(sum) <= 0) {
+          if(d_k == null || diff.compareTo(d_k.plus(r_or)) <= 0) {
             D d3 = distanceQuery.distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), distanceQuery.nullDistance());
-            if(d_min.compareTo(d_k) <= 0) {
+            if(d_k == null || d_min.compareTo(d_k) <= 0) {
               pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, ((DirectoryEntry)entry).getPageID(), o_r));
             }
           }
@@ -133,10 +129,10 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
-          if(diff.compareTo(d_k) <= 0) {
+          if(d_k == null || diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
-            if(d3.compareTo(d_k) <= 0) {
-              knnList.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
+            if(d_k == null || d3.compareTo(d_k) <= 0) {
+              knnList.add(d3, o_j);
               d_k = knnList.getKNNDistance();
             }
           }
@@ -151,7 +147,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    final KNNHeap<DistanceDBIDPair<D>, D> knnList = new KNNHeap<DistanceDBIDPair<D>, D>(k, distanceQuery.getDistanceFactory().infiniteDistance());
+    final GenericKNNHeap<D> knnList = new GenericKNNHeap<D>(k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }

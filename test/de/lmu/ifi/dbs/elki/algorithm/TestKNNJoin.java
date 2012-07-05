@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFacto
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -189,11 +188,11 @@ public class TestKNNJoin implements JUnit4Test {
     // Euclidean
     {
       KNNJoin<DoubleVector, DoubleDistance, ?, ?> knnjoin = new KNNJoin<DoubleVector, DoubleDistance, RStarTreeNode, SpatialEntry>(EuclideanDistanceFunction.STATIC, 2);
-      DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
+      DataStore<KNNResult<DoubleDistance>> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
-        KNNList<DoubleDistance> knnlist = result.get(id);
+        KNNResult<DoubleDistance> knnlist = result.get(id);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Euclidean mean 2NN", mean2nnEuclid, meansize.getMean(), 0.00001);
@@ -202,11 +201,11 @@ public class TestKNNJoin implements JUnit4Test {
     // Manhattan
     {
       KNNJoin<DoubleVector, DoubleDistance, ?, ?> knnjoin = new KNNJoin<DoubleVector, DoubleDistance, RStarTreeNode, SpatialEntry>(ManhattanDistanceFunction.STATIC, 2);
-      DataStore<KNNList<DoubleDistance>> result = knnjoin.run(db);
+      DataStore<KNNResult<DoubleDistance>> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
-        KNNList<DoubleDistance> knnlist = result.get(id);
+        KNNResult<DoubleDistance> knnlist = result.get(id);
         meansize.put(knnlist.size());
       }
       org.junit.Assert.assertEquals("Manhattan mean 2NN", mean2nnManhattan, meansize.getMean(), 0.00001);

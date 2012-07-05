@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndex
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
@@ -74,9 +73,9 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * @return a new MkMaxLeafEntry representing the specified data object
    */
   protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    KNNHeap<DistanceDBIDPair<D>, D> knnList = new KNNHeap<DistanceDBIDPair<D>, D>(getKmax() - 1);
+    GenericKNNHeap<D> knnList = new GenericKNNHeap<D>(getKmax() - 1);
     doKNNQuery(id, knnList);
-    D knnDistance = knnList.getMaximumDistance();
+    D knnDistance = knnList.getKNNDistance();
     return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);
   }
 

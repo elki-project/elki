@@ -36,14 +36,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -63,8 +62,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -504,13 +501,13 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
             // candidate cannot be dropped
             // TODO: actually: no refinement needed - need API that allows
             // reporting maxdists only.
-            result.add(DBIDFactory.FACTORY.newDistancePair(refine(id, query).doubleValue(), id));
+            result.add(refine(id, query).doubleValue(), id);
           }
           else { // refine candidate - true refinement
             DoubleDistance dis = refine(id, query);
             stats.refinements += 1;
             if(dis.doubleValue() <= range.doubleValue()) {
-              result.add(DBIDFactory.FACTORY.newDistancePair(dis.doubleValue(), id));
+              result.add(dis.doubleValue(), id);
             }
           }
         }
@@ -634,7 +631,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<PartialVACandidate>(candidates2);
       // sort candidates by lower bound (minDist)
       Collections.sort(sortedCandidates);
-      KNNList<DoubleDistance> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
+      KNNResult<DoubleDistance> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
       stats.queryTime += System.nanoTime() - t;
       return result;
@@ -712,16 +709,16 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       return result;
     }
 
-    protected KNNList<DoubleDistance> retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
-      KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> result = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k, DoubleDistance.FACTORY.infiniteDistance());
+    protected KNNResult<DoubleDistance> retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
+      DoubleDistanceKNNHeap result = new DoubleDistanceKNNHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
-        double stopdist = result.getKNNDistance().doubleValue();
+        double stopdist = result.doubleKNNDistance();
         DBID currentID = va.getId();
         if(result.size() < k || va.minDistP < stopdist) {
           DoubleDistance dist = refine(currentID, query);
           stats.refinements += 1;
           if(dist.doubleValue() < stopdist) {
-            result.add(DBIDFactory.FACTORY.newDistancePair(dist.doubleValue(), currentID));
+            result.add(dist.doubleValue(), currentID);
           }
         }
       }

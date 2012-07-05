@@ -23,14 +23,12 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * Optimized linear scan query for {@link PrimitiveDoubleDistanceFunction}s.
@@ -64,12 +62,12 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
     @SuppressWarnings("unchecked")
     final PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
     // Optimization for double distances.
-    final KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> heap = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
+    final DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
     double max = Double.POSITIVE_INFINITY;
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
       if(doubleDistance <= max) {
-        heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
+        heap.add(doubleDistance, iter);
         // Update cutoff
         if(heap.size() >= heap.getK()) {
           max = ((DoubleDistanceDBIDPair) heap.peek()).doubleDistance();

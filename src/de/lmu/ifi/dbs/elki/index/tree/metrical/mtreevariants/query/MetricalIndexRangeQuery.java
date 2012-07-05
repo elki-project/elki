@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
@@ -110,7 +109,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         if(diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
           if(d3.compareTo(r_q) <= 0) {
-            result.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
+            result.add(d3, o_j);
           }
         }
       }
@@ -165,7 +164,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
         if(diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
           if(d3.compareTo(r_q) <= 0) {
-            result.add(DBIDFactory.FACTORY.newDistancePair(d3, o_j));
+            result.add(d3, o_j);
           }
         }
       }

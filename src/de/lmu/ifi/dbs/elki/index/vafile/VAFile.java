@@ -32,14 +32,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -56,7 +55,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -345,7 +343,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
         // refine the next element
         final double dist = refine(va.id, query).doubleValue();
         if(dist <= eps) {
-          result.add(DBIDFactory.FACTORY.newDistancePair(dist, va.id));
+          result.add(dist, va.id);
         }
       }
       result.sort();
@@ -414,14 +412,14 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       Collections.sort(candidates);
 
       // refinement step
-      KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> result = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
+      DoubleDistanceKNNHeap result = new DoubleDistanceKNNHeap(k);
 
       // log.fine("candidates size " + candidates.size());
       // retrieve accurate distances
       for(DoubleObjPair<DBID> va : candidates) {
         // Stop when we are sure to have all elements
         if(result.size() >= k) {
-          double kDist = result.getKNNDistance().doubleValue();
+          double kDist = result.doubleKNNDistance();
           if(va.first > kDist) {
             break;
           }
@@ -429,7 +427,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
 
         // refine the next element
         final double dist = refine(va.second, query).doubleValue();
-        result.add(DBIDFactory.FACTORY.newDistancePair(dist, va.second));
+        result.add(dist, va.second);
       }
       if(log.isDebuggingFinest()) {
         log.finest("query = (" + query + ")");

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
+package de.lmu.ifi.dbs.elki.database.query.knn;
 
 /*
  This file is part of ELKI:
@@ -29,6 +29,8 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 
 /**
  * Heap used for KNN management.
@@ -40,37 +42,24 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @param <P> pair type
  * @param <D> distance type
  */
-public class KNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> extends TiedTopBoundedHeap<P> {
+public abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> extends TiedTopBoundedHeap<P> implements KNNHeap<D> {
   /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-
+  
   /**
-   * Maximum distance, usually infiniteDistance
+   * Static comparator.
    */
-  private final D maxdist;
+  private static final Comparator<? super DistanceDBIDPair<?>> COMPARATOR = new Comp();
 
   /**
    * Constructor.
    * 
    * @param k k Parameter
-   * @param maxdist k-distance to return for less than k neighbors - usually
-   *        infiniteDistance
    */
-  public KNNHeap(int k, D maxdist) {
-    super(k, new Comp<D>());
-    this.maxdist = maxdist;
-  }
-
-  /**
-   * Simplified constructor. Will return {@code null} as kNN distance with less
-   * than k entries.
-   * 
-   * @param k k Parameter
-   */
-  public KNNHeap(int k) {
-    this(k, null);
+  public AbstractKNNHeap(int k) {
+    super(k, COMPARATOR);
   }
 
   @Override
@@ -81,12 +70,13 @@ public class KNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> exten
   }
 
   /**
-   * Serialize to a {@link KNNList}. This empties the heap!
+   * Serialize to a {@link GenericKNNList}. This empties the heap!
    * 
    * @return KNNList with the heaps contents.
    */
-  public KNNList<D> toKNNList() {
-    return new KNNList<D>(this);
+  @Override
+  public GenericKNNList<D> toKNNList() {
+    return new GenericKNNList<D>(this);
   }
 
   /**
@@ -94,6 +84,7 @@ public class KNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> exten
    * 
    * @return K
    */
+  @Override
   public int getK() {
     return super.getMaxSize();
   }
@@ -103,38 +94,13 @@ public class KNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> exten
    * 
    * @return Maximum distance
    */
+  @Override
   public D getKNNDistance() {
     if(size() < getK()) {
-      return maxdist;
+      return null;
     }
     return peek().getDistance();
   }
-
-  /**
-   * Get maximum distance in heap
-   */
-  public D getMaximumDistance() {
-    if(isEmpty()) {
-      return maxdist;
-    }
-    return peek().getDistance();
-  }
-
-  /**
-   * Add a distance-id pair to the heap unless the distance is too large.
-   * 
-   * Compared to the super.add() method, this often saves the pair construction.
-   * 
-   * @param distance Distance value
-   * @param id ID number
-   * @return success code
-   */
-  //public boolean add(D distance, DBIDRef id) {
-  //  if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
-  //    return super.add(new GenericDistanceResultPair<D>(distance, id));
-  //  }
-  //  return true; /* "success" */
-  //}
 
   /**
    * Comparator to use.
@@ -143,10 +109,11 @@ public class KNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Comp<D extends Distance<D>> implements Comparator<DistanceDBIDPair<D>> {
+  protected static class Comp implements Comparator<DistanceDBIDPair<?>> {
+    @SuppressWarnings("unchecked")
     @Override
-    public int compare(DistanceDBIDPair<D> o1, DistanceDBIDPair<D> o2) {
-      return -o1.compareByDistance(o2);
+    public int compare(DistanceDBIDPair<?> o1, DistanceDBIDPair<?> o2) {
+      return -((DistanceDBIDPair<DoubleDistance>)o1).compareByDistance((DistanceDBIDPair<DoubleDistance>)o2);
     }
   }
 }

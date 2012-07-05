@@ -2,13 +2,13 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 
 /*
  This file is part of ELKI:
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
  * @param <V> vector type
  * @param <D> distance type
  */
-public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<V, D, KNNList<D>> {
+public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<V, D, KNNResult<D>> {
   /**
    * Logging class.
    */
@@ -92,7 +92,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D e
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O extends NumberVector<O, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNList<D>> {
+  public static class Factory<O extends NumberVector<O, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
     /**
      * Constructor.
      * 

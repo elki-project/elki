@@ -31,16 +31,17 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -50,8 +51,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 
 /**
@@ -139,14 +138,15 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       initialize(entries.get(0));
     }
 
-    Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnHeaps = new HashMap<DBID, KNNHeap<DistanceDBIDPair<D>, D>>(entries.size());
+    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>(entries.size());
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert
     for(MkAppEntry<D> entry : entries) {
       DBID id = entry.getRoutingObjectID();
       // create knnList for the object
-      knnHeaps.put(id, new KNNHeap<DistanceDBIDPair<D>, D>(k_max + 1, getDistanceQuery().infiniteDistance()));
+      knnHeaps.put(id, new GenericKNNHeap<D>(k_max + 1));
+      // TODO: optimize for double.
 
       ids.add(id);
       // insert the object
@@ -157,8 +157,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     batchNN(getRoot(), ids, knnHeaps);
 
     // finish KNN lists (sort them completely)
-    Map<DBID, KNNList<D>> knnLists = new HashMap<DBID, KNNList<D>>();
-    for(Entry<DBID, KNNHeap<DistanceDBIDPair<D>, D>> ent : knnHeaps.entrySet()) {
+    Map<DBID, KNNResult<D>> knnLists = new HashMap<DBID, KNNResult<D>>();
+    for(Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
       knnLists.put(ent.getKey(), ent.getValue().toKNNList());
     }
 
@@ -289,7 +289,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
 
           if(distance.compareTo(approximatedKnnDist) <= 0) {
-            result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getRoutingObjectID()));
+            result.add(distance, entry.getRoutingObjectID());
           }
         }
       }
@@ -297,11 +297,11 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     return result;
   }
 
-  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNList<D>> knnLists) {
+  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNResult<D>> knnLists) {
     double[] means = new double[k_max];
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      KNNList<D> knns = knnLists.get(id);
+      KNNResult<D> knns = knnLists.get(id);
       List<D> knnDists = knns.asDistanceList();
       for(int k = 0; k < k_max; k++) {
         D knnDist = knnDists.get(k);
@@ -324,7 +324,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNResult<D>> knnLists) {
     MkAppTreeNode<O, D> node = getNode(entry);
 
     if(node.isLeaf()) {
