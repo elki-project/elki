@@ -26,10 +26,8 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Queue;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -107,16 +105,6 @@ class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
   @Override
   public D getKNNDistance() {
     return get(getK() - 1).getDistance();
-  }
-
-  @Override
-  public ArrayDBIDs asDBIDs() {
-    return KNNUtil.asDBIDs(this);
-  }
-
-  @Override
-  public List<D> asDistanceList() {
-    return KNNUtil.asDistanceList(this);
   }
 
   @Override

@@ -130,7 +130,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       double sqrt2 = Math.sqrt(2.0);
       for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
-        ModifiableDBIDs nids = DBIDUtil.newArray(neighbors.asDBIDs());
+        ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
 
         // TODO: do we want to use the query point as centroid?

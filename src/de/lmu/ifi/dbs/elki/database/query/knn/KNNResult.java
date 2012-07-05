@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -41,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  *   // You can get the distance via: iter.getDistance();
  *   // Or use iter just like any other DBIDRef
  * }
+ * }
  * </pre>
  * 
  * If you are only interested in the IDs of the objects, the following is also
@@ -50,6 +48,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * {@code
  * for (DBIDIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
  *   // Use iter just like any other DBIDRef
+ * }
  * }
  * </pre>
  * 
@@ -87,18 +86,4 @@ public interface KNNResult<D extends Distance<D>> extends DistanceDBIDResult<D> 
    * @return Maximum distance
    */
   public D getKNNDistance();
-
-  /**
-   * View as ArrayDBIDs
-   * 
-   * @return Static DBIDs
-   */
-  public ArrayDBIDs asDBIDs();
-
-  /**
-   * View as list of distances
-   * 
-   * @return List of distances view
-   */
-  public List<D> asDistanceList();
 }

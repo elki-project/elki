@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
@@ -270,7 +271,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           if(approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
+          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
 
           if(minDist.compareTo(approximatedKnnDist) <= 0) {
             pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID()));
@@ -286,7 +287,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           if(approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().parseString(Double.toString(approxValue));
+          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
 
           if(distance.compareTo(approximatedKnnDist) <= 0) {
             result.add(distance, entry.getRoutingObjectID());
@@ -302,17 +303,16 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       KNNResult<D> knns = knnLists.get(id);
-      List<D> knnDists = knns.asDistanceList();
-      for(int k = 0; k < k_max; k++) {
-        D knnDist = knnDists.get(k);
-        means[k] += knnDist.doubleValue();
+      int k = 0;
+      for (DistanceDBIDResultIter<D> it = knns.iter(); k < k_max && it.valid(); it.advance(), k++) {
+        means[k] += it.getDistance().doubleValue();
       }
     }
 
     List<D> result = new ArrayList<D>();
     for(int k = 0; k < k_max; k++) {
       means[k] /= ids.size();
-      result.add(getDistanceQuery().getDistanceFactory().parseString(Double.toString(means[k])));
+      result.add(getDistanceQuery().getDistanceFactory().fromDouble(means[k]));
     }
 
     return result;

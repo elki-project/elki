@@ -27,8 +27,6 @@ import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -114,16 +112,6 @@ public final class KNNUtil {
     }
 
     @Override
-    public ArrayDBIDs asDBIDs() {
-      return KNNUtil.asDBIDs(this);
-    }
-
-    @Override
-    public List<D> asDistanceList() {
-      return KNNUtil.asDistanceList(this);
-    }
-
-    @Override
     public DistanceDBIDResultIter<D> iter() {
       return new Itr();
     }
@@ -201,68 +189,6 @@ public final class KNNUtil {
   }
 
   /**
-   * A view on the DBIDs of the result
-   * 
-   * @author Erich Schubert
-   */
-  protected static class DBIDView implements ArrayDBIDs {
-    /**
-     * The true list.
-     */
-    final KNNResult<?> parent;
-
-    /**
-     * Constructor.
-     * 
-     * @param parent Owner
-     */
-    public DBIDView(KNNResult<?> parent) {
-      super();
-      this.parent = parent;
-    }
-
-    @Override
-    public DBID get(int i) {
-      return DBIDUtil.deref(parent.get(i));
-    }
-
-    @Override
-    public DBIDIter iter() {
-      return parent.iter();
-    }
-
-    @Override
-    public int size() {
-      return parent.size();
-    }
-
-    @Override
-    public boolean contains(DBIDRef o) {
-      for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-        if(DBIDUtil.equal(iter, o)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    @Override
-    public boolean isEmpty() {
-      return parent.size() == 0;
-    }
-
-    /**
-     * A binary search does not make sense here, as the (read-only) result is sorted by
-     * distance, not DBID. Thus unsupported.
-     */
-    @Override
-    @Deprecated
-    public int binarySearch(DBIDRef key) {
-      throw new UnsupportedOperationException("Since the result is usually not sorted, a binary Search does not make sense!");
-    }
-  }
-
-  /**
    * Proxy iterator for accessing DBIDs.
    * 
    * @author Erich Schubert
@@ -334,16 +260,6 @@ public final class KNNUtil {
     public int size() {
       return parent.size();
     }
-  }
-
-  /**
-   * View as ArrayDBIDs
-   * 
-   * @param list Result to proxy
-   * @return Static DBIDs
-   */
-  public static ArrayDBIDs asDBIDs(KNNResult<?> list) {
-    return new DBIDView(list);
   }
 
   /**

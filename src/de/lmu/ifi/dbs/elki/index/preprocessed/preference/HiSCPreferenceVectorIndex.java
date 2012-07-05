@@ -116,7 +116,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
 
       KNNResult<DoubleDistance> knns = knnQuery.getKNNForDBID(it, k);
-      BitSet preferenceVector = determinePreferenceVector(relation, it, knns.asDBIDs(), msg);
+      BitSet preferenceVector = determinePreferenceVector(relation, it, knns, msg);
       storage.put(it, preferenceVector);
 
       if(progress != null) {

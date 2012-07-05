@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -144,7 +145,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistances(knnLists.get(getPageID(leafEntry)).toKNNList().asDistanceList());
+        leafEntry.setKnnDistances(KNNUtil.asDistanceList(knnLists.get(getPageID(leafEntry)).toKNNList()));
         knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
       }
     }
