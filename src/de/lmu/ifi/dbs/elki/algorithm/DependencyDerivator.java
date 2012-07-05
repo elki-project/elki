@@ -162,7 +162,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       else {
         DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
         KNNResult<D> queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
-        ids = DBIDUtil.newHashSet(queryResults.asDBIDs());
+        ids = DBIDUtil.newHashSet(queryResults);
       }
     }
     else {

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  *   // You can get the distance via: iter.getDistance();
  *   // Or use iter just like any other DBIDRef
  * }
+ * }
  * </pre>
  * 
  * If you are only interested in the IDs of the objects, the following is also
@@ -47,6 +48,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * {@code
  * for (DBIDIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
  *   // Use iter just like any other DBIDRef
+ * }
  * }
  * </pre>
  * 

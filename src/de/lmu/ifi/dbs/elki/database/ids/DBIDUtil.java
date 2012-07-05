@@ -117,6 +117,26 @@ public final class DBIDUtil {
   }
 
   /**
+   * Format a DBID as string.
+   * 
+   * @param ids DBIDs
+   * @return String representation
+   */
+  public static String toString(DBIDs ids) {
+    if(ids instanceof DBID) {
+      return DBIDFactory.FACTORY.toString((DBID) ids);
+    }
+    StringBuffer buf = new StringBuffer();
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      if(buf.length() > 0) {
+        buf.append(", ");
+      }
+      buf.append(DBIDFactory.FACTORY.toString(iter));
+    }
+    return buf.toString();
+  }
+
+  /**
    * Get a serializer for DBIDs
    * 
    * @return DBID serializer
@@ -388,7 +408,7 @@ public final class DBIDUtil {
   public static DBIDPair newPair(DBIDRef id1, DBIDRef id2) {
     return DBIDFactory.FACTORY.newPair(id1, id2);
   }
-  
+
   /**
    * Make a DoubleDBIDPair.
    * 
