@@ -33,15 +33,14 @@ import java.util.Map.Entry;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -52,7 +51,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -103,7 +101,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param object the query object
    * @param knnList the knn list containing the result
    */
-  protected void doKNNQuery(O object, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> knnList) {
+  protected void doKNNQuery(O object, DoubleDistanceKNNHeap knnList) {
     final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>(Math.min(knnList.getK() * 2, 20));
 
     // push root
@@ -121,7 +119,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
   }
 
-  private double expandNode(O object, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> knnList, final Heap<DoubleDistanceSearchCandidate> pq, double maxDist, final Integer nodeID) {
+  private double expandNode(O object, DoubleDistanceKNNHeap knnList, final Heap<DoubleDistanceSearchCandidate> pq, double maxDist, final Integer nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {
@@ -130,8 +128,8 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
         double distance = distanceFunction.doubleMinDist(entry, object);
         tree.distanceCalcs++;
         if(distance <= maxDist) {
-          knnList.add(DBIDFactory.FACTORY.newDistancePair(distance, ((LeafEntry) entry).getDBID()));
-          maxDist = knnList.getKNNDistance().doubleValue();
+          knnList.add(distance, ((LeafEntry) entry).getDBID());
+          maxDist = knnList.doubleKNNDistance();
         }
       }
     }
@@ -161,21 +159,21 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param node the node for which the query should be performed
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>> knnLists) {
+  protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, DoubleDistanceKNNHeap> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
-        for(Entry<DBID, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>> ent : knnLists.entrySet()) {
+        for(Entry<DBID, DoubleDistanceKNNHeap> ent : knnLists.entrySet()) {
           final DBID q = ent.getKey();
-          final KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> knns_q = ent.getValue();
-          double knn_q_maxDist = knns_q.getKNNDistance().doubleValue();
+          final DoubleDistanceKNNHeap knns_q = ent.getValue();
+          double knn_q_maxDist = knns_q.doubleKNNDistance();
 
           DBID pid = ((LeafEntry) p).getDBID();
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
           double dist_pq = distanceFunction.doubleDistance(relation.get(pid), relation.get(q));
           tree.distanceCalcs++;
           if(dist_pq <= knn_q_maxDist) {
-            knns_q.add(DBIDFactory.FACTORY.newDistancePair(dist_pq, pid));
+            knns_q.add(dist_pq, pid);
           }
         }
       }
@@ -188,9 +186,9 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       List<DoubleDistanceEntry> entries = getSortedEntries(node, ids);
       for(DoubleDistanceEntry distEntry : entries) {
         double minDist = distEntry.distance;
-        for(Entry<DBID, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>> ent : knnLists.entrySet()) {
-          final KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> knns_q = ent.getValue();
-          double knn_q_maxDist = knns_q.getKNNDistance().doubleValue();
+        for(Entry<DBID, DoubleDistanceKNNHeap> ent : knnLists.entrySet()) {
+          final DoubleDistanceKNNHeap knns_q = ent.getValue();
+          double knn_q_maxDist = knns_q.doubleKNNDistance();
 
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
@@ -270,7 +268,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    final KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> knnList = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance());
+    final DoubleDistanceKNNHeap knnList = new DoubleDistanceKNNHeap(k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }
@@ -287,10 +285,10 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
 
     // While this works, it seems to be slow at least for large sets!
-    final Map<DBID, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>> knnLists = new HashMap<DBID, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>(ids.size());
+    final Map<DBID, DoubleDistanceKNNHeap> knnLists = new HashMap<DBID, DoubleDistanceKNNHeap>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      knnLists.put(id, new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k, distanceFunction.getDistanceFactory().infiniteDistance()));
+      knnLists.put(id, new DoubleDistanceKNNHeap(k));
     }
 
     batchNN(tree.getRoot(), knnLists);

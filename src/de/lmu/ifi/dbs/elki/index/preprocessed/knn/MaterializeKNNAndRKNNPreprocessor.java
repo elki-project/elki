@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.rknn.PreprocessorRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -58,8 +59,6 @@ import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -180,23 +179,23 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
       KNNResult<D> oldkNNs = storage.get(id);
       D knnDist = oldkNNs.getKNNDistance();
       // look for new kNNs
-      KNNHeap<DistanceDBIDPair<D>, D> heap = null;
+      GenericKNNHeap<D> heap = null;
       for(DBIDIter newid = ids.iter(); newid.valid(); newid.advance()) {
         D dist = distanceQuery.distance(id, newid);
         if(dist.compareTo(knnDist) <= 0) {
           // New id changes the kNNs of oldid.
           if(heap == null) {
-            heap = new KNNHeap<DistanceDBIDPair<D>, D>(k);
+            heap = new GenericKNNHeap<D>(k);
             for(DistanceDBIDResultIter<D> oldnn = oldkNNs.iter(); oldnn.valid(); oldnn.advance()) {
               heap.add(oldnn.getDistancePair());
             }
           }
-          heap.add(DBIDFactory.FACTORY.newDistancePair(dist, newid));
+          heap.add(dist, newid);
         }
       }
       // kNNs for oldid have changed:
       if(heap != null) {
-        KNNList<D> newkNNs = heap.toKNNList();
+        KNNResult<D> newkNNs = heap.toKNNList();
         newkNNs.sort();
         storage.put(id, newkNNs);
 

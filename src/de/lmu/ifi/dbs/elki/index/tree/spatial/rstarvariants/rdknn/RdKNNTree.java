@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -46,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -67,7 +67,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -139,7 +138,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   @Override
   protected void preInsert(RdKNNEntry<D> entry) {
-    KNNHeap<DistanceDBIDPair<D>, D> knns_o = new KNNHeap<DistanceDBIDPair<D>, D>(k_max, distanceQuery.getDistanceFactory().infiniteDistance());
+    GenericKNNHeap<D> knns_o = new GenericKNNHeap<D>(k_max);
     preInsert(entry, getRootEntry(), knns_o);
   }
 
@@ -366,7 +365,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    * @param nodeEntry the entry representing the root of the current subtree
    * @param knns_q the knns of q
    */
-  private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, KNNHeap<DistanceDBIDPair<D>, D> knns_q) {
+  private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, GenericKNNHeap<D> knns_q) {
     D knnDist_q = knns_q.getKNNDistance();
     RdKNNNode<D> node = getNode(nodeEntry);
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
@@ -380,9 +379,9 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
         if(dist_pq.compareTo(knnDist_q) <= 0) {
-          knns_q.add(DBIDFactory.FACTORY.newDistancePair(dist_pq, p.getDBID()));
+          knns_q.add(dist_pq, p.getDBID());
           if(knns_q.size() >= k_max) {
-            knnDist_q = knns_q.getMaximumDistance();
+            knnDist_q = knns_q.getKNNDistance();
             q.setKnnDistance(knnDist_q);
           }
 
@@ -435,7 +434,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
         RdKNNLeafEntry<D> entry = (RdKNNLeafEntry<D>) node.getEntry(i);
         D distance = distanceQuery.distance(entry.getDBID(), oid);
         if(distance.compareTo(entry.getKnnDistance()) <= 0) {
-          result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getDBID()));
+          result.add(distance, entry.getDBID());
         }
       }
     }
@@ -466,7 +465,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
           DBID id = DBIDUtil.deref(iter);
           D distance = distanceQuery.distance(entry.getDBID(), id);
           if(distance.compareTo(entry.getKnnDistance()) <= 0) {
-            result.get(id).add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getDBID()));
+            result.get(id).add(distance, entry.getDBID());
           }
         }
       }

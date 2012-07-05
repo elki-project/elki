@@ -119,8 +119,8 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
       // distance to the kth nearest neighbor
       final KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, k);
       double dkn = knns.getKNNDistance().doubleValue();
-      knno_score.putDouble(iditer, dkn);
 
+      knno_score.putDouble(iditer, dkn);
       minmax.put(dkn);
 
       if(progressKNNDistance != null) {

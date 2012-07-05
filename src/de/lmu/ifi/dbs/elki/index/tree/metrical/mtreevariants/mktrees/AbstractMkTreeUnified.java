@@ -29,16 +29,16 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * Abstract class for all M-Tree variants supporting processing of reverse
@@ -90,7 +90,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
       initialize(entries.get(0));
     }
 
-    Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists = new HashMap<DBID, KNNHeap<DistanceDBIDPair<D>, D>>();
+    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert sequentially
@@ -99,7 +99,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
       final DBID id = entry.getRoutingObjectID();
 
       ids.add(id);
-      knnLists.put(id, new KNNHeap<DistanceDBIDPair<D>, D>(k_max, getDistanceFactory().infiniteDistance()));
+      knnLists.put(id, new GenericKNNHeap<D>(k_max));
 
       // insert the object
       super.insert(entry, false);
@@ -122,7 +122,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists);
+  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNHeap<D>> knnLists);
 
   /**
    * Get the value of k_max.

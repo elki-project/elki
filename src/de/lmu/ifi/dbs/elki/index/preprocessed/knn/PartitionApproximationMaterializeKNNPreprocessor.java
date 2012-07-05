@@ -29,12 +29,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -42,7 +41,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -112,18 +110,18 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        KNNHeap<DistanceDBIDPair<D>, D> kNN = new KNNHeap<DistanceDBIDPair<D>, D>(k, distanceQuery.infiniteDistance());
+        GenericKNNHeap<D> kNN = new GenericKNNHeap<D>(k);
         for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           DBIDPair key = DBIDUtil.newPair(iter, iter2);
           D d = cache.remove(key);
           if(d != null) {
             // consume the previous result.
-            kNN.add(DBIDFactory.FACTORY.newDistancePair(d, iter2));
+            kNN.add(d, iter2);
           }
           else {
             // compute new and store the previous result.
             d = distanceQuery.distance(iter, iter2);
-            kNN.add(DBIDFactory.FACTORY.newDistancePair(d, iter2));
+            kNN.add(d, iter2);
             // put it into the cache, but with the keys reversed
             key = DBIDUtil.newPair(iter2, iter);
             cache.put(key, d);

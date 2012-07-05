@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
@@ -109,7 +108,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
         if(distance.compareTo(epsilon) <= 0) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);
-            result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getDBID()));
+            result.add(distance, entry.getDBID());
           }
           else {
             DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);

@@ -30,15 +30,14 @@ import javax.swing.event.EventListenerList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -48,7 +47,6 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -221,17 +219,17 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
       KNNResult<D> kNNs = storage.get(iter);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
       // look for new kNNs
-      KNNHeap<DistanceDBIDPair<D>, D> heap = null;
+      GenericKNNHeap<D> heap = null;
       for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
         D dist = distanceQuery.distance(iter, iter2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
-            heap = new KNNHeap<DistanceDBIDPair<D>, D>(k);
+            heap = new GenericKNNHeap<D>(k);
             for(DistanceDBIDResultIter<D> it = kNNs.iter(); it.valid(); it.advance()) {
               heap.add(it.getDistancePair());
             }
           }
-          heap.add(DBIDFactory.FACTORY.newDistancePair(dist, iter2));
+          heap.add(dist, iter2);
         }
       }
       if(heap != null) {

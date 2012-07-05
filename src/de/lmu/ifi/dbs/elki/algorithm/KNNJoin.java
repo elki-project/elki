@@ -36,17 +36,17 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
@@ -57,8 +57,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNList;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -86,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
-public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNList<D>>> {
+public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNResult<D>>> {
   /**
    * The logger for this class.
    */
@@ -122,7 +120,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @return result
    */
   @SuppressWarnings("unchecked")
-  public WritableDataStore<KNNList<D>> run(Database database, Relation<V> relation) {
+  public WritableDataStore<KNNResult<D>> run(Database database, Relation<V> relation) {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
@@ -135,20 +133,17 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     SpatialPrimitiveDistanceFunction<V, D> distFunction = (SpatialPrimitiveDistanceFunction<V, D>) getDistanceFunction();
     DBIDs ids = relation.getDBIDs();
 
-    // Optimize for double?
-    final boolean doubleOptimize = (getDistanceFunction() instanceof SpatialPrimitiveDoubleDistanceFunction);
-
     // data pages
     List<E> ps_candidates = new ArrayList<E>(index.getLeaves());
     // knn heaps
-    List<List<KNNHeap<DistanceDBIDPair<D>, D>>> heaps = new ArrayList<List<KNNHeap<DistanceDBIDPair<D>, D>>>(ps_candidates.size());
+    List<List<KNNHeap<D>>> heaps = new ArrayList<List<KNNHeap<D>>>(ps_candidates.size());
     Heap<Task> pq = new Heap<Task>(ps_candidates.size() * ps_candidates.size() / 10);
 
     // Initialize with the page self-pairing
     for(int i = 0; i < ps_candidates.size(); i++) {
       E pr_entry = ps_candidates.get(i);
       N pr = index.getNode(pr_entry);
-      heaps.add(initHeaps(distFunction, doubleOptimize, pr));
+      heaps.add(initHeaps(distFunction, pr));
     }
 
     // Build priority queue
@@ -159,19 +154,19 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     FiniteProgress mprogress = logger.isVerbose() ? new FiniteProgress("Comparing leaf MBRs", sqsize, logger) : null;
     for(int i = 0; i < ps_candidates.size(); i++) {
       E pr_entry = ps_candidates.get(i);
-      List<KNNHeap<DistanceDBIDPair<D>, D>> pr_heaps = heaps.get(i);
+      List<KNNHeap<D>> pr_heaps = heaps.get(i);
       D pr_knn_distance = computeStopDistance(pr_heaps);
 
       for(int j = i + 1; j < ps_candidates.size(); j++) {
         E ps_entry = ps_candidates.get(j);
-        List<KNNHeap<DistanceDBIDPair<D>, D>> ps_heaps = heaps.get(j);
+        List<KNNHeap<D>> ps_heaps = heaps.get(j);
         D ps_knn_distance = computeStopDistance(ps_heaps);
         D minDist = distFunction.minDist(pr_entry, ps_entry);
         // Resolve immediately:
         if(minDist.isNullDistance()) {
           N pr = index.getNode(ps_candidates.get(i));
           N ps = index.getNode(ps_candidates.get(j));
-          processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, ps_heaps, pr, ps);
+          processDataPagesOptimize(distFunction, pr_heaps, ps_heaps, pr, ps);
         }
         else if(minDist.compareTo(pr_knn_distance) <= 0 || minDist.compareTo(ps_knn_distance) <= 0) {
           pq.add(new Task(minDist, i, j));
@@ -190,8 +185,8 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     IndefiniteProgress fprogress = logger.isVerbose() ? new IndefiniteProgress("Full comparisons", logger) : null;
     while(!pq.isEmpty()) {
       Task task = pq.poll();
-      List<KNNHeap<DistanceDBIDPair<D>, D>> pr_heaps = heaps.get(task.i);
-      List<KNNHeap<DistanceDBIDPair<D>, D>> ps_heaps = heaps.get(task.j);
+      List<KNNHeap<D>> pr_heaps = heaps.get(task.i);
+      List<KNNHeap<D>> ps_heaps = heaps.get(task.j);
       D pr_knn_distance = computeStopDistance(pr_heaps);
       D ps_knn_distance = computeStopDistance(ps_heaps);
       boolean dor = task.mindist.compareTo(pr_knn_distance) <= 0;
@@ -200,14 +195,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         N pr = index.getNode(ps_candidates.get(task.i));
         N ps = index.getNode(ps_candidates.get(task.j));
         if(dor && dos) {
-          processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, ps_heaps, pr, ps);
+          processDataPagesOptimize(distFunction, pr_heaps, ps_heaps, pr, ps);
         }
         else {
           if(dor) {
-            processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, null, pr, ps);
+            processDataPagesOptimize(distFunction, pr_heaps, null, pr, ps);
           }
           else /* dos */{
-            processDataPagesOptimize(distFunction, doubleOptimize, ps_heaps, null, ps, pr);
+            processDataPagesOptimize(distFunction, ps_heaps, null, ps, pr);
           }
         }
         if(fprogress != null) {
@@ -225,7 +220,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       fprogress.setCompleted(logger);
     }
 
-    WritableDataStore<KNNList<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
+    WritableDataStore<KNNResult<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNResult.class);
     // FiniteProgress progress = logger.isVerbose() ? new
     // FiniteProgress(this.getClass().getName(), relation.size(), logger) :
     // null;
@@ -233,7 +228,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     // int processed = 0;
     for(int i = 0; i < ps_candidates.size(); i++) {
       N pr = index.getNode(ps_candidates.get(i));
-      List<KNNHeap<DistanceDBIDPair<D>, D>> pr_heaps = heaps.get(i);
+      List<KNNHeap<D>> pr_heaps = heaps.get(i);
 
       // Finalize lists
       for(int j = 0; j < pr.getNumEntries(); j++) {
@@ -259,16 +254,24 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     return knnLists;
   }
 
-  private List<KNNHeap<DistanceDBIDPair<D>, D>> initHeaps(SpatialPrimitiveDistanceFunction<V, D> distFunction, final boolean doubleOptimize, N pr) {
-    List<KNNHeap<DistanceDBIDPair<D>, D>> pr_heaps;
-    // Create for each data object a knn heap
-    pr_heaps = new ArrayList<KNNHeap<DistanceDBIDPair<D>, D>>(pr.getNumEntries());
-    for(int j = 0; j < pr.getNumEntries(); j++) {
-      pr_heaps.add(new KNNHeap<DistanceDBIDPair<D>, D>(k, distFunction.getDistanceFactory().infiniteDistance()));
+  @SuppressWarnings("unchecked")
+  private List<KNNHeap<D>> initHeaps(SpatialPrimitiveDistanceFunction<V, D> distFunction, N pr) {
+    List<KNNHeap<D>> pr_heaps = new ArrayList<KNNHeap<D>>(pr.getNumEntries());
+    if(DistanceUtil.isDoubleDistanceFunction(distFunction)) {
+      // Create for each data object a knn heap
+      for(int j = 0; j < pr.getNumEntries(); j++) {
+        pr_heaps.add((KNNHeap<D>) new DoubleDistanceKNNHeap(k));
+      }
+    }
+    else {
+      // Create for each data object a knn heap
+      for(int j = 0; j < pr.getNumEntries(); j++) {
+        pr_heaps.add(new GenericKNNHeap<D>(k));
+      }
     }
     // Self-join first, as this is expected to improve most and cannot be
     // pruned.
-    processDataPagesOptimize(distFunction, doubleOptimize, pr_heaps, null, pr, pr);
+    processDataPagesOptimize(distFunction, pr_heaps, null, pr, pr);
     return pr_heaps;
   }
 
@@ -277,18 +280,17 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * neighbors of pr in ps.
    * 
    * @param distFunction the distance to use
-   * @param doubleOptimize Flag whether to optimize for doubles.
    * @param pr the first data page
    * @param ps the second data page
    * @param pr_heaps the knn lists for each data object in pr
    * @param ps_heaps the knn lists for each data object in ps (if ps != pr)
    */
   @SuppressWarnings("unchecked")
-  private void processDataPagesOptimize(SpatialPrimitiveDistanceFunction<V, D> distFunction, final boolean doubleOptimize, List<KNNHeap<DistanceDBIDPair<D>, D>> pr_heaps, List<KNNHeap<DistanceDBIDPair<D>, D>> ps_heaps, N pr, N ps) {
-    if(doubleOptimize) {
+  private void processDataPagesOptimize(SpatialPrimitiveDistanceFunction<V, D> distFunction, List<? extends KNNHeap<D>> pr_heaps, List<? extends KNNHeap<D>> ps_heaps, N pr, N ps) {
+    if(DistanceUtil.isDoubleDistanceFunction(distFunction)) {
       List<?> khp = (List<?>) pr_heaps;
       List<?> khs = (List<?>) ps_heaps;
-      processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>) khp, (List<KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>) khs);
+      processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<DoubleDistanceKNNHeap>) khp, (List<DoubleDistanceKNNHeap>) khs);
     }
     else {
       for(int j = 0; j < ps.getNumEntries(); j++) {
@@ -297,9 +299,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         for(int i = 0; i < pr.getNumEntries(); i++) {
           final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
           D distance = distFunction.minDist(s_e, r_e);
-          pr_heaps.get(i).add(DBIDFactory.FACTORY.newDistancePair(distance, s_id));
+          pr_heaps.get(i).add(distance, s_id);
           if(pr != ps && ps_heaps != null) {
-            ps_heaps.get(j).add(DBIDFactory.FACTORY.newDistancePair(distance, r_e.getDBID()));
+            ps_heaps.get(j).add(distance, r_e.getDBID());
           }
         }
       }
@@ -316,7 +318,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param pr_heaps the knn lists for each data object
    * @param ps_heaps the knn lists for each data object in ps
    */
-  private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>> pr_heaps, List<KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>> ps_heaps) {
+  private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<DoubleDistanceKNNHeap> pr_heaps, List<DoubleDistanceKNNHeap> ps_heaps) {
     // Compare pairwise
     for(int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
@@ -324,9 +326,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       for(int i = 0; i < pr.getNumEntries(); i++) {
         final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
         double distance = df.doubleMinDist(s_e, r_e);
-        pr_heaps.get(i).add(DBIDFactory.FACTORY.newDistancePair(distance, s_id));
+        pr_heaps.get(i).add(distance, s_id);
         if(pr != ps && ps_heaps != null) {
-          ps_heaps.get(j).add(DBIDFactory.FACTORY.newDistancePair(distance, r_e.getDBID()));
+          ps_heaps.get(j).add(distance, r_e.getDBID());
         }
       }
     }
@@ -338,10 +340,10 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @param heaps
    * @return the k-nearest neighbor distance of pr in ps
    */
-  private D computeStopDistance(List<KNNHeap<DistanceDBIDPair<D>, D>> heaps) {
+  private D computeStopDistance(List<KNNHeap<D>> heaps) {
     // Update pruning distance
     D pr_knn_distance = null;
-    for(KNNHeap<DistanceDBIDPair<D>, D> knnList : heaps) {
+    for(KNNHeap<D> knnList : heaps) {
       // set kNN distance of r
       if(pr_knn_distance == null) {
         pr_knn_distance = knnList.getKNNDistance();
@@ -349,6 +351,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       else {
         pr_knn_distance = DistanceUtil.max(knnList.getKNNDistance(), pr_knn_distance);
       }
+    }
+    if (pr_knn_distance == null) {
+      return getDistanceFunction().getDistanceFactory().infiniteDistance();
     }
     return pr_knn_distance;
   }

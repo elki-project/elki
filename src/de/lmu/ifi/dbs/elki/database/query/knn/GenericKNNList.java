@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
+package de.lmu.ifi.dbs.elki.database.query.knn;
 
 /*
  This file is part of ELKI:
@@ -35,8 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -46,7 +44,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-public class KNNList<D extends Distance<D>> implements KNNResult<D> {
+class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
   /**
    * The value of k this was materialized for.
    */
@@ -63,14 +61,14 @@ public class KNNList<D extends Distance<D>> implements KNNResult<D> {
    * 
    * @param heap Calling heap
    */
-  protected KNNList(KNNHeap<?, D> heap) {
+  protected GenericKNNList(KNNHeap<D> heap) {
     super();
     this.data = new Object[heap.size()];
     this.k = heap.getK();
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
-    while(!heap.isEmpty()) {
+    while(heap.size() > 0) {
       i--;
       assert (i >= 0);
       data[i] = heap.poll();
@@ -85,7 +83,7 @@ public class KNNList<D extends Distance<D>> implements KNNResult<D> {
    * @param heap Calling heap
    * @param k K value
    */
-  public KNNList(Queue<D> heap, int k) {
+  public GenericKNNList(Queue<D> heap, int k) {
     super();
     this.data = new Object[heap.size()];
     this.k = k;

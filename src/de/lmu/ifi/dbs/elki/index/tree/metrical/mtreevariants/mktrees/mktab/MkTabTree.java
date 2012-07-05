@@ -28,19 +28,17 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * MkTabTree is a metrical index structure based on the concepts of the M-Tree
@@ -137,11 +135,10 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     if(leafCapacity < 10) {
       logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
-
   }
-
+  
   @Override
-  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<DistanceDBIDPair<D>, D>> knnLists) {
+  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
     MkTabTreeNode<O, D> node = getNode(entry);
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
@@ -218,7 +215,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         MkTabEntry<D> entry = node.getEntry(i);
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         if(distance.compareTo(entry.getKnnDistance(k)) <= 0) {
-          result.add(DBIDFactory.FACTORY.newDistancePair(distance, entry.getRoutingObjectID()));
+          result.add(distance, entry.getRoutingObjectID());
         }
       }
     }

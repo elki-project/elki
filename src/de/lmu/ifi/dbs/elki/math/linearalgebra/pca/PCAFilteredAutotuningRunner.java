@@ -77,7 +77,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     DoubleDistanceDBIDList dres = new DoubleDistanceDBIDList(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(iter));
-      dres.add(DBIDFactory.FACTORY.newDistancePair(dist, iter));
+      dres.add(dist, iter);
     }
     dres.sort();
     return processQueryResult(dres, database);

@@ -28,19 +28,17 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
@@ -99,13 +97,13 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
     int i = 0;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNHeap<DistanceDBIDPair<D>, D> kNN = new KNNHeap<DistanceDBIDPair<D>, D>(k, distanceQuery.infiniteDistance());
+      GenericKNNHeap<D> kNN = new GenericKNNHeap<D>(k);
 
       long rseed = i * 0x7FFFFFFFFFFFFFE7L + iseed;
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rseed);
       for (DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
         D dist = distanceQuery.distance(iter, iter2);
-        kNN.add(DBIDFactory.FACTORY.newDistancePair(dist, iter2));
+        kNN.add(dist, iter2);
       }
 
       storage.put(iter, kNN.toKNNList());
