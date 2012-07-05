@@ -31,7 +31,27 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Interface for kNN results - List<> like.
+ * Interface for kNN results.
+ * 
+ * To iterate over the results, use the following code:
+ * 
+ * <pre>
+ * {@code
+ * for (DistanceDBIDResultIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
+ *   // You can get the distance via: iter.getDistance();
+ *   // Or use iter just like any other DBIDRef
+ * }
+ * </pre>
+ * 
+ * If you are only interested in the IDs of the objects, the following is also
+ * sufficient:
+ * 
+ * <pre>
+ * {@code
+ * for (DBIDIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
+ *   // Use iter just like any other DBIDRef
+ * }
+ * </pre>
  * 
  * @author Erich Schubert
  * 
