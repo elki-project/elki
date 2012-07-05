@@ -35,11 +35,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
@@ -160,11 +159,11 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
 
     // Convert to final storage
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
-    KNNHeap<DistanceDBIDPair<D>, D> heap = new KNNHeap<DistanceDBIDPair<D>, D>(k);
+    KNNHeap<D> heap = new GenericKNNHeap<D>(k);
     HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final D n = distanceQuery.getDistanceFactory().nullDistance();
-      heap.add(DBIDFactory.FACTORY.newDistancePair(n, iditer));
+      heap.add(n, iditer);
 
       // Get candidates.
       cands.clear();
@@ -193,7 +192,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
    * @param tempstorage Temporary storage
    * @return number of distance computations
    */
-  private int scanCurve(List<SpatialRef> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<DistanceDBIDPair<D>, D> heap) {
+  private int scanCurve(List<SpatialRef> curve, final int wsize, int p, HashSetModifiableDBIDs cands, KNNHeap<D> heap) {
     int distcomp = 0;
     final int win2size = wsize * 2 + 1;
     final int start, end;
@@ -217,7 +216,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
       }
       SpatialRef ref2 = curve.get(pos);
       if(cands.add(ref2.id)) {
-        heap.add(DBIDFactory.FACTORY.newDistancePair(distanceQuery.distance(q, ref2.vec), ref2.id));
+        heap.add(distanceQuery.distance(q, ref2.vec), ref2.id);
         distcomp++;
       }
     }

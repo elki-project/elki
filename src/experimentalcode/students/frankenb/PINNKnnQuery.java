@@ -9,16 +9,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 
 /**
  * No description given.
@@ -59,7 +58,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
       }
     }
     
-    KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> newDistanceList = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
+    DoubleDistanceKNNHeap newDistanceList = new DoubleDistanceKNNHeap(k);
     for (DistanceDBIDResultIter<DoubleDistance> distance = projectedDistanceList.iter(); distance.valid(); distance.advance()) {
       NumberVector<?, ?> otherVector = dataBase.get(distance);
       newDistanceList.add(DBIDFactory.FACTORY.newDistancePair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance));

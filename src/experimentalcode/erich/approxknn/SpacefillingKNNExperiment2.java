@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -61,7 +61,6 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.KNNHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -218,11 +217,11 @@ public class SpacefillingKNNExperiment2 {
       merr.add(MeanVariance.newArray(numcurves));
     }
 
-    ArrayList<Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>> rec = new ArrayList<Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>>();
+    ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> rec = new ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>>();
     for(int i = 0; i < numcurves; i++) {
       ModifiableDBIDs cand = DBIDUtil.newHashSet(maxoff * 2);
-      KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> heap = new KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>(k);
-      rec.add(new Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>(cand, heap));
+      DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
+      rec.add(new Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>(cand, heap));
     }
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
@@ -258,7 +257,7 @@ public class SpacefillingKNNExperiment2 {
           final int isize = DBIDUtil.intersection(trueIds, rec.get(0).first).size();
           mrec.get(i)[0].put(isize);
           // Error = quotient of distances
-          double err = rec.get(0).second.getMaximumDistance().doubleValue() / trueNN.getKNNDistance().doubleValue();
+          double err = rec.get(0).second.doubleKNNDistance() / trueNN.getKNNDistance().doubleValue();
           merr.get(i)[0].put(err);
         }
       }
@@ -290,7 +289,7 @@ public class SpacefillingKNNExperiment2 {
           final int isize = DBIDUtil.intersection(trueIds, rec.get(i).first).size();
           mrec.get(off)[i].put(isize);
           // Error = quotient of distances
-          double err = rec.get(i).second.getMaximumDistance().doubleValue() / trueNN.getKNNDistance().doubleValue();
+          double err = rec.get(i).second.doubleKNNDistance() / trueNN.getKNNDistance().doubleValue();
           merr.get(off)[i].put(err);
         }
       }
@@ -343,14 +342,14 @@ public class SpacefillingKNNExperiment2 {
     }
   }
 
-  protected void initCandidates(ModifiableDBIDs candz, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance> heapz, DBIDRef id) {
+  protected void initCandidates(ModifiableDBIDs candz, DoubleDistanceKNNHeap heapz, DBIDRef id) {
     candz.clear();
     candz.add(id);
     heapz.clear();
     heapz.add(DBIDFactory.FACTORY.newDistancePair(0, id));
   }
 
-  protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?, ?> vec, Relation<NumberVector<?, ?>> rel, List<Pair<ModifiableDBIDs, KNNHeap<DoubleDistanceDBIDPair, DoubleDistance>>> pairs, int... runs) {
+  protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?, ?> vec, Relation<NumberVector<?, ?>> rel, List<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> pairs, int... runs) {
     if(pos - off >= 0) {
       final DBID cid = zs.get(pos - off).id;
       double d = Double.NaN;
