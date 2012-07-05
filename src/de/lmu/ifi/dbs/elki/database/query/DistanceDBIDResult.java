@@ -30,10 +30,31 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 /**
  * Collection of objects and their distances.
  * 
+ * To iterate over the results, use the following code:
+ * 
+ * <pre>
+ * {@code
+ * for (DistanceDBIDResultIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
+ *   // You can get the distance via: iter.getDistance();
+ *   // Or use iter just like any other DBIDRef
+ * }
+ * </pre>
+ * 
+ * If you are only interested in the IDs of the objects, the following is also
+ * sufficient:
+ * 
+ * <pre>
+ * {@code
+ * for (DBIDIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
+ *   // Use iter just like any other DBIDRef
+ * }
+ * </pre>
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.composedOf DistanceResultPair
- *
+ * @apiviz.has DistanceResultPairIter
+ * 
  * @param <D> Distance type
  */
 public interface DistanceDBIDResult<D extends Distance<D>> extends DBIDs {
@@ -44,7 +65,7 @@ public interface DistanceDBIDResult<D extends Distance<D>> extends DBIDs {
    */
   @Override
   public int size();
-  
+
   /**
    * Access a single pair.
    * 
@@ -52,15 +73,15 @@ public interface DistanceDBIDResult<D extends Distance<D>> extends DBIDs {
    * @return Pair
    */
   public DistanceDBIDPair<D> get(int off);
-  
+
   /**
    * Get an iterator
    * 
    * @return New iterator
    */
   @Override
-  public DistanceDBIDResultIter<D> iter(); 
-  
+  public DistanceDBIDResultIter<D> iter();
+
   /**
    * Sort the result in ascending order
    */
