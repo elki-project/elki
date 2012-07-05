@@ -227,7 +227,7 @@ public class SpacefillingKNNExperiment2 {
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final NumberVector<?, ?> vec = rel.get(id);
       final KNNResult<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
-      final DBIDs trueIds = DBIDUtil.ensureSet(trueNN.asDBIDs());
+      final DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       final int[] posi = positions.get(id);
 
       // Reinit:

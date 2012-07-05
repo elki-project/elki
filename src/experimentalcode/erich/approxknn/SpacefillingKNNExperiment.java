@@ -130,7 +130,7 @@ public class SpacefillingKNNExperiment {
     }
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final KNNResult<DoubleDistance> trueNN = knnq.getKNNForDBID(id, k);
-      DBIDs trueIds = DBIDUtil.ensureSet(trueNN.asDBIDs());
+      DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       int[] posi = positions.get(id);
       // Approximate NN in Z curve only
       {
