@@ -23,7 +23,10 @@ package de.lmu.ifi.dbs.elki.distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Class with distance related utility functions.
@@ -88,5 +91,34 @@ public final class DistanceUtil {
     else {
       return d1;
     }
+  }
+
+  /**
+   * Test whether a distance function is double-valued.
+   * 
+   * @param df Distance function
+   * @return True when the distance function returns double values
+   */
+  public static boolean isDoubleDistanceFunction(DistanceFunction<?, ?> df) {
+    Object factory = df.getDistanceFactory();
+    if (factory == DoubleDistance.FACTORY) {
+      return true;
+    }
+    return (factory instanceof DoubleDistance);
+  }
+
+
+  /**
+   * Test whether a distance query is double-valued.
+   * 
+   * @param df Distance function
+   * @return True when the distance function returns double values
+   */
+  public static boolean isDoubleDistanceFunction(DistanceQuery<?, ?> df) {
+    Object factory = df.getDistanceFactory();
+    if (factory == DoubleDistance.FACTORY) {
+      return true;
+    }
+    return (factory instanceof DoubleDistance);
   }
 }
