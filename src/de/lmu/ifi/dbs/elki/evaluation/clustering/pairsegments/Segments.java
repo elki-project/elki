@@ -68,12 +68,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
  * </p>
  * 
+ * <p>
+ * Details on the experimental setup can be found at: <a
+ * href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation"
+ * >wiki/Examples/ClusterEvaluation</a>
+ * </p>
+ * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
  * 
  * @apiviz.composedOf Segment
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://elki.dbs.ifi.lmu.de/wiki/PairSegments")
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Class logger
