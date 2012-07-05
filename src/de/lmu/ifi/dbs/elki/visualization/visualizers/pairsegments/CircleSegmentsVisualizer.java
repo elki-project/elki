@@ -73,6 +73,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
  * </p>
  * 
+ * <p>
+ * Details on the experimental setup can be found at: <a
+ * href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation"
+ * >wiki/Examples/ClusterEvaluation</a>
+ * </p>
+ * 
  * @author Sascha Goldhofer
  * @author Erich Schubert
  * 
@@ -81,7 +87,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * @apiviz.uses Segments
  * @apiviz.has SegmentsStylingPolicy
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://elki.dbs.ifi.lmu.de/wiki/PairSegments")
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class CircleSegmentsVisualizer extends AbstractVisualization implements ResultListener {
   /**
    * Class logger
@@ -709,9 +715,10 @@ public class CircleSegmentsVisualizer extends AbstractVisualization implements R
       for(Segments segmentResult : segments) {
         SegmentsStylingPolicy policy;
         List<SegmentsStylingPolicy> styles = ResultUtil.filterResults(segmentResult, SegmentsStylingPolicy.class);
-        if (!styles.isEmpty()) {
+        if(!styles.isEmpty()) {
           policy = styles.get(0);
-        } else {
+        }
+        else {
           policy = new SegmentsStylingPolicy(segmentResult);
           baseResult.getHierarchy().add(segmentResult, policy);
         }
