@@ -36,6 +36,5 @@ interface IntegerDBIDRef extends DBIDRef {
    * 
    * @return integer id
    */
-  @Override
   int getIntegerID();
 }

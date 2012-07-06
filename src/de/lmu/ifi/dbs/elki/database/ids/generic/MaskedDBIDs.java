@@ -136,12 +136,6 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public int getIntegerID() {
-      // TODO: can we get an integer directly?
-      return DBIDFactory.FACTORY.asInteger(data.get(pos));
-    }
-
-    @Override
     public DBID deref() {
       return data.get(pos);
     }
@@ -175,12 +169,6 @@ public class MaskedDBIDs implements DBIDs {
     @Override
     public void advance() {
       pos = bits.nextClearBit(pos + 1);
-    }
-
-    @Override
-    public int getIntegerID() {
-      // TODO: can we get the integer directly?
-      return DBIDFactory.FACTORY.asInteger(data.get(pos));
     }
 
     @Override

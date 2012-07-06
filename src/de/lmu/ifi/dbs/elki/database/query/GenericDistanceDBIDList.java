@@ -135,12 +135,6 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements DistanceD
       return get(pos);
     }
 
-    @Deprecated
-    @Override
-    public int getIntegerID() {
-      return get(pos).getIntegerID();
-    }
-
     @Override
     public boolean valid() {
       return pos < size();
