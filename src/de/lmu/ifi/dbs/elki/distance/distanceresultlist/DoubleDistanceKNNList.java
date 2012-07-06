@@ -33,6 +33,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * Finalized KNN List.
  * 
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf DoubleDistanceDBIDPair
+ * @apiviz.has DoubleDistanceDBIDResultIter
  */
 public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
   /**
