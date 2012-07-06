@@ -164,7 +164,7 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
     }
 
     /**
-     * @deprecated use {@link #doubleDistance!}
+     * @deprecated use {@link #doubleDistance}!
      */
     @Override
     @Deprecated
