@@ -165,12 +165,6 @@ public final class KNNUtil {
       }
 
       @Override
-      @Deprecated
-      public int getIntegerID() {
-        return inner.get(pos).getIntegerID();
-      }
-
-      @Override
       public D getDistance() {
         return inner.get(pos).getDistance();
       }

@@ -43,19 +43,7 @@ public interface DBIDRef {
    * @return referenced DBID
    */
   DBIDRef deref();
-
-  /**
-   * Return the integer value of the object ID, if possible.
-   * 
-   * Use {@link DBIDUtil#asInteger}!
-   * 
-   * @deprecated Scheduled for removal.
-   * 
-   * @return integer id
-   */
-  @Deprecated
-  public int getIntegerID();
-
+  
   /**
    * WARNING: Hash codes of this interface <b>might not be stable</b> (e.g. for
    * iterators).

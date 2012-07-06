@@ -48,11 +48,6 @@ class UnmodifiableDBIDIter implements DBIDIter {
   }
 
   @Override
-  public int getIntegerID() {
-    return it.getIntegerID();
-  }
-
-  @Override
   public boolean valid() {
     return it.valid();
   }

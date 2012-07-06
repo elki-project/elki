@@ -182,12 +182,6 @@ class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
     }
 
     @Override
-    @Deprecated
-    public int getIntegerID() {
-      return get(pos).getIntegerID();
-    }
-
-    @Override
     public D getDistance() {
       return get(pos).getDistance();
     }

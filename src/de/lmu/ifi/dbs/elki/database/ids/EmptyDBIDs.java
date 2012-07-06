@@ -68,7 +68,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDMIter iter() {
     return EMPTY_ITERATOR;
   }
 
@@ -82,7 +82,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
    * 
    * @author Erich Schubert
    */
-  protected static class EmptyDBIDIterator implements DBIDIter {
+  protected static class EmptyDBIDIterator implements DBIDMIter {
     @Override
     public boolean valid() {
       return false;
@@ -91,11 +91,6 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     @Override
     public void advance() {
       assert (false) : "Misplaced call to advance()";
-    }
-
-    @Override
-    public int getIntegerID() {
-      throw new NoSuchElementException();
     }
 
     @Override
@@ -109,6 +104,11 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
+    }
+
+    @Override
+    public void remove() {
+      throw new NoSuchElementException();
     }
   }
 }
