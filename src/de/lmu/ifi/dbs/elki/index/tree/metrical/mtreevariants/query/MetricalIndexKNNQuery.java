@@ -30,9 +30,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -78,7 +79,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
    * @param q the id of the query object
    * @param knnList the query result list
    */
-  protected final void doKNNQuery(O q, GenericKNNHeap<D> knnList) {
+  protected final void doKNNQuery(O q, KNNHeap<D> knnList) {
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
@@ -147,7 +148,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    final GenericKNNHeap<D> knnList = new GenericKNNHeap<D>(k);
+    KNNHeap<D> knnList = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }

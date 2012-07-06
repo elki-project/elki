@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -58,15 +61,14 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
    * @param objs Objects list
    * @param heaps Heaps array
    */
-  protected void linearScanBatchKNN(List<O> objs, List<GenericKNNHeap<D>> heaps) {
+  protected void linearScanBatchKNN(List<O> objs, List<KNNHeap<D>> heaps) {
     final int size = objs.size();
     // Linear scan style KNN.
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       O candidate = relation.get(iter);
       for(int index = 0; index < size; index++) {
         O object = objs.get(index);
-        GenericKNNHeap<D> heap = heaps.get(index);
-        heap.add(distanceQuery.distance(object, candidate), iter);
+        heaps.get(index).add(distanceQuery.distance(object, candidate), iter);
       }
     }
   }
@@ -79,16 +81,16 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
   @Override
   public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     final int size = ids.size();
-    final List<GenericKNNHeap<D>> heaps = new ArrayList<GenericKNNHeap<D>>(size);
+    final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(size);
     List<O> objs = new ArrayList<O>(size);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      heaps.add(new GenericKNNHeap<D>(k));
+      heaps.add(KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k));
       objs.add(relation.get(iter));
     }
     linearScanBatchKNN(objs, heaps);
 
     List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(heaps.size());
-    for(GenericKNNHeap<D> heap : heaps) {
+    for(KNNHeap<D> heap : heaps) {
       result.add(heap.toKNNList());
     }
     return result;

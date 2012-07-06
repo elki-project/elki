@@ -35,13 +35,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
@@ -141,7 +141,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     for(MkCoPEntry<D> entry : entries) {
       DBID id = entry.getRoutingObjectID();
       // create knnList for the object
-      knnHeaps.put(id, new GenericKNNHeap<D>(k_max + 1));
+      knnHeaps.put(id, KNNUtil.newHeap(distanceFunction, k_max + 1));
 
       ids.add(id);
       // insert the object
@@ -186,7 +186,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     // refinement of candidates
     Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
-      knnLists.put(DBIDUtil.deref(iter), new GenericKNNHeap<D>(k));
+      knnLists.put(DBIDUtil.deref(iter), KNNUtil.newHeap(distanceFunction, k));
     }
     batchNN(getRoot(), candidates, knnLists);
 

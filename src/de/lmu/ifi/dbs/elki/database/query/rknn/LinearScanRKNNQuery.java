@@ -31,13 +31,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**

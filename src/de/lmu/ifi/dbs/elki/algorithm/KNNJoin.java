@@ -37,15 +37,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -254,20 +254,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     return knnLists;
   }
 
-  @SuppressWarnings("unchecked")
   private List<KNNHeap<D>> initHeaps(SpatialPrimitiveDistanceFunction<V, D> distFunction, N pr) {
     List<KNNHeap<D>> pr_heaps = new ArrayList<KNNHeap<D>>(pr.getNumEntries());
-    if(DistanceUtil.isDoubleDistanceFunction(distFunction)) {
-      // Create for each data object a knn heap
-      for(int j = 0; j < pr.getNumEntries(); j++) {
-        pr_heaps.add((KNNHeap<D>) new DoubleDistanceKNNHeap(k));
-      }
-    }
-    else {
-      // Create for each data object a knn heap
-      for(int j = 0; j < pr.getNumEntries(); j++) {
-        pr_heaps.add(new GenericKNNHeap<D>(k));
-      }
+    // Create for each data object a knn heap
+    for(int j = 0; j < pr.getNumEntries(); j++) {
+      pr_heaps.add(KNNUtil.newHeap(distFunction, k));
     }
     // Self-join first, as this is expected to improve most and cannot be
     // pruned.
@@ -352,7 +343,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
         pr_knn_distance = DistanceUtil.max(knnList.getKNNDistance(), pr_knn_distance);
       }
     }
-    if (pr_knn_distance == null) {
+    if(pr_knn_distance == null) {
       return getDistanceFunction().getDistanceFactory().infiniteDistance();
     }
     return pr_knn_distance;

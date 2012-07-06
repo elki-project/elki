@@ -31,13 +31,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -124,9 +126,15 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
 
       final KNNResult<D> knn = knnQuery.getKNNForDBID(iditer, k);
       double skn = 0;
-      // TODO: optimize for double distances
-      for (DistanceDBIDResultIter<D> neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
-        skn += neighbor.getDistance().doubleValue();
+      if(knn instanceof DoubleDistanceKNNList) {
+        for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) knn).iter(); neighbor.valid(); neighbor.advance()) {
+          skn += neighbor.doubleDistance();
+        }
+      }
+      else {
+        for(DistanceDBIDResultIter<D> neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
+          skn += neighbor.getDistance().doubleValue();
+        }
       }
       knnw_score.putDouble(iditer, skn);
       minmax.put(skn);

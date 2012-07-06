@@ -40,9 +40,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -263,7 +263,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
+  public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -274,12 +274,12 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
+  public DoubleDistanceKNNList getKNNForDBID(DBIDRef id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public List<KNNResult<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<DoubleDistanceKNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -293,7 +293,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
     batchNN(tree.getRoot(), knnLists);
 
-    List<KNNResult<DoubleDistance>> result = new ArrayList<KNNResult<DoubleDistance>>();
+    List<DoubleDistanceKNNList> result = new ArrayList<DoubleDistanceKNNList>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       result.add(knnLists.get(id).toKNNList());

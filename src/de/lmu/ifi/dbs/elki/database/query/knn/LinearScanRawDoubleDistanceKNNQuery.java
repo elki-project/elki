@@ -25,9 +25,10 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -53,26 +54,20 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
+  public DoubleDistanceKNNList getKNNForDBID(DBIDRef id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
+  public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
     @SuppressWarnings("unchecked")
     final PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
     // Optimization for double distances.
     final DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
-    double max = Double.POSITIVE_INFINITY;
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
-      if(doubleDistance <= max) {
-        heap.add(doubleDistance, iter);
-        // Update cutoff
-        if(heap.size() >= heap.getK()) {
-          max = ((DoubleDistanceDBIDPair) heap.peek()).doubleDistance();
-        }
-      }
+      // With the newer optimizations it is reasonably efficient to do these checks in the heap.
+      heap.add(doubleDistance, iter);
     }
     return heap.toKNNList();
   }

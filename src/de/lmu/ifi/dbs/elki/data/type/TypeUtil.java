@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;

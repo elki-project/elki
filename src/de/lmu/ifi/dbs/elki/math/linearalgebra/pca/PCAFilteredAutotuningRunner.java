@@ -28,14 +28,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.ModifiableDistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
@@ -216,7 +216,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
     }
     if(!sorted) {
       try {
-        results.sort();
+        ModifiableDistanceDBIDResult.class.cast(results).sort();
+      }
+      catch(ClassCastException e) {
+        System.err.println("WARNING: results not sorted by distance!");
       }
       catch(UnsupportedOperationException e) {
         System.err.println("WARNING: results not sorted by distance!");

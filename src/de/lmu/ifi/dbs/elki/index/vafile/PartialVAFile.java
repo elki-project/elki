@@ -40,16 +40,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
@@ -558,7 +558,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
 
     @Override
-    public KNNResult<DoubleDistance> getKNNForObject(V query, int k) {
+    public DoubleDistanceKNNList getKNNForObject(V query, int k) {
       stats.issuedQueries++;
       long t = System.nanoTime();
 
@@ -631,7 +631,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<PartialVACandidate>(candidates2);
       // sort candidates by lower bound (minDist)
       Collections.sort(sortedCandidates);
-      KNNResult<DoubleDistance> result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
+      DoubleDistanceKNNList result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
       stats.queryTime += System.nanoTime() - t;
       return result;
@@ -709,7 +709,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       return result;
     }
 
-    protected KNNResult<DoubleDistance> retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
+    protected DoubleDistanceKNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
       DoubleDistanceKNNHeap result = new DoubleDistanceKNNHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
         double stopdist = result.doubleKNNDistance();

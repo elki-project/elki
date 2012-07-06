@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -99,7 +99,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
       final DBID id = entry.getRoutingObjectID();
 
       ids.add(id);
-      knnLists.put(id, new GenericKNNHeap<D>(k_max));
+      knnLists.put(id, KNNUtil.newHeap(distanceFunction, k_max));
 
       // insert the object
       super.insert(entry, false);

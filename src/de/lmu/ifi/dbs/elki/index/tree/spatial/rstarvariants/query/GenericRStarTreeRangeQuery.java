@@ -25,11 +25,11 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;

@@ -39,10 +39,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -136,7 +137,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
-    GenericKNNHeap<D> heap = new GenericKNNHeap<D>(k);
+    KNNHeap<D> heap = KNNUtil.newHeap(distFunc.getDistanceFactory(), k);
     for(int i = 0; i < ids.size(); i++) {
       final DBID id = ids.get(i);
       final double val = relation.get(id).doubleValue(1);
@@ -165,7 +166,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
       }
       // Convert kNN Heap into DBID array
       ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
-      while(!heap.isEmpty()) {
+      while(heap.size() > 0) {
         nids.add(heap.poll());
       }
       neighbors.put(id, nids);

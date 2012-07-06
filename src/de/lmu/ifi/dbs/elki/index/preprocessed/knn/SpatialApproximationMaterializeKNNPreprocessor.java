@@ -35,10 +35,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -120,7 +121,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        GenericKNNHeap<D> kNN = new GenericKNNHeap<D>(k);
+        KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
           D d = cache.remove(key);

@@ -41,11 +41,8 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
@@ -53,6 +50,9 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
@@ -157,8 +157,8 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
   private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector, DoubleDistance> lin_knn_query, KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query, int k) {
     ArrayDBIDs sample = DBIDUtil.ensureArray(rep.getDBIDs());
-    List<KNNResult<DoubleDistance>> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
-    List<KNNResult<DoubleDistance>> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
+    List<? extends KNNResult<DoubleDistance>> lin_knn_ids = lin_knn_query.getKNNForBulkDBIDs(sample, k);
+    List<? extends KNNResult<DoubleDistance>> preproc_knn_ids = preproc_knn_query.getKNNForBulkDBIDs(sample, k);
     for(int i = 0; i < rep.size(); i++) {
       KNNResult<DoubleDistance> lin_knn = lin_knn_ids.get(i);
       KNNResult<DoubleDistance> pre_knn = preproc_knn_ids.get(i);

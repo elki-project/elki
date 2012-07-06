@@ -37,15 +37,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -301,11 +303,21 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       mean.reset();
       KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
-      // TODO: optimize for double distances
-      for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-        if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-          KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
-          mean.put(Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()));
+      if(neighbors instanceof DoubleDistanceKNNList) {
+        // Fast version for double distances
+        for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+            DoubleDistanceKNNList neighborsNeighbors = (DoubleDistanceKNNList) knnReach.getKNNForDBID(neighbor, k);
+            mean.put(Math.max(neighbor.doubleDistance(), neighborsNeighbors.doubleKNNDistance()));
+          }
+        }
+      }
+      else {
+        for(DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+            KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
+            mean.put(Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()));
+          }
         }
       }
       // Avoid division by 0
@@ -343,7 +355,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       if(lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
         mean.reset();
-        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
           if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             mean.put(lrds.doubleValue(neighbor));

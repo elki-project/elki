@@ -40,19 +40,20 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -138,7 +139,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    */
   @Override
   protected void preInsert(RdKNNEntry<D> entry) {
-    GenericKNNHeap<D> knns_o = new GenericKNNHeap<D>(k_max);
+    KNNHeap<D> knns_o = KNNUtil.newHeap(distanceFunction, k_max);
     preInsert(entry, getRootEntry(), knns_o);
   }
 
@@ -154,7 +155,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     // knn of rnn
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rnns);
     ids.sort();
-    List<KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, k_max);
+    List<? extends KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, k_max);
 
     // adjust knn distances
     adjustKNNDistance(getRootEntry(), ids, knnLists);
@@ -175,7 +176,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       ids.add(id);
     }
     ids.sort();
-    List<KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, k_max);
+    List<? extends KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, k_max);
     adjustKNNDistance(getRootEntry(), ids, knnLists);
 
     // test
@@ -204,7 +205,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       candidateIDs.add(candidate);
     }
     candidateIDs.sort();
-    List<KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
+    List<? extends KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
 
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     int i = 0;
@@ -254,7 +255,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       }
     }
     candidateIDs.sort();
-    List<KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
+    List<? extends KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
 
     // and add candidate c to the result if o is a knn of c
     List<GenericDistanceDBIDList<D>> resultList = new ArrayList<GenericDistanceDBIDList<D>>();
@@ -365,7 +366,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    * @param nodeEntry the entry representing the root of the current subtree
    * @param knns_q the knns of q
    */
-  private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, GenericKNNHeap<D> knns_q) {
+  private void preInsert(RdKNNEntry<D> q, RdKNNEntry<D> nodeEntry, KNNHeap<D> knns_q) {
     D knnDist_q = knns_q.getKNNDistance();
     RdKNNNode<D> node = getNode(nodeEntry);
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
@@ -496,7 +497,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
    * @param ids <em>Sorted</em> list of IDs
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustKNNDistance(RdKNNEntry<D> entry, ArrayDBIDs ids, List<KNNResult<D>> knnLists) {
+  private void adjustKNNDistance(RdKNNEntry<D> entry, ArrayDBIDs ids, List<? extends KNNResult<D>> knnLists) {
     RdKNNNode<D> node = getNode(entry);
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
     if(node.isLeaf()) {

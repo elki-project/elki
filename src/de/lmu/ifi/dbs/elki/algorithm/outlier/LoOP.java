@@ -35,14 +35,16 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -244,13 +246,27 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         // use first kref neighbors as reference set
         int ks = 0;
         // TODO: optimize for double distances
-        for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
-            double d = neighbor.getDistance().doubleValue();
-            mean.put(d * d);
-            ks++;
-            if(ks >= kreach) {
-              break;
+        if(neighbors instanceof DoubleDistanceKNNList) {
+          for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList)neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+            if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
+              final double d = neighbor.doubleDistance();
+              mean.put(d * d);
+              ks++;
+              if(ks >= kreach) {
+                break;
+              }
+            }
+          }
+        }
+        else {
+          for(DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+            if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
+              double d = neighbor.getDistance().doubleValue();
+              mean.put(d * d);
+              ks++;
+              if(ks >= kreach) {
+                break;
+              }
             }
           }
         }
@@ -276,7 +292,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         mv.reset();
         // use first kref neighbors as comparison set.
         int ks = 0;
-        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if(objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
             mv.put(pdists.doubleValue(neighbor));
             ks++;

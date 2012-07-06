@@ -36,14 +36,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.database.query.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
@@ -146,7 +146,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     for(MkAppEntry<D> entry : entries) {
       DBID id = entry.getRoutingObjectID();
       // create knnList for the object
-      knnHeaps.put(id, new GenericKNNHeap<D>(k_max + 1));
+      knnHeaps.put(id, KNNUtil.newHeap(distanceFunction, k_max + 1));
       // TODO: optimize for double.
 
       ids.add(id);
@@ -181,8 +181,53 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
-    DistanceDBIDResult<D> result = doReverseKNNQuery(k, id);
-    result.sort();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
+
+    // push root
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null));
+
+    // search in tree
+    while(!pq.isEmpty()) {
+      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
+
+      MkAppTreeNode<O, D> node = getNode(pqNode.nodeID);
+
+      // directory node
+      if(!node.isLeaf()) {
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          MkAppEntry<D> entry = node.getEntry(i);
+          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), id);
+          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
+
+          double approxValue = log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
+          if(approxValue < 0) {
+            approxValue = 0;
+          }
+          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
+
+          if(minDist.compareTo(approximatedKnnDist) <= 0) {
+            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID()));
+          }
+        }
+      }
+      // data node
+      else {
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          MkAppLeafEntry<D> entry = (MkAppLeafEntry<D>) node.getEntry(i);
+          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), id);
+          double approxValue = log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
+          if(approxValue < 0) {
+            approxValue = 0;
+          }
+          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
+
+          if(distance.compareTo(approximatedKnnDist) <= 0) {
+            result.add(distance, entry.getRoutingObjectID());
+          }
+        }
+      }
+    }
     return result;
   }
 
@@ -240,71 +285,13 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
   }
 
-  /**
-   * Performs a reverse knn query.
-   * 
-   * @param k the parameter k of the rknn query
-   * @param q the id of the query object
-   * @return the result of the reverse knn query
-   */
-  private DistanceDBIDResult<D> doReverseKNNQuery(int k, DBIDRef q) {
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
-
-    // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null));
-
-    // search in tree
-    while(!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
-
-      MkAppTreeNode<O, D> node = getNode(pqNode.nodeID);
-
-      // directory node
-      if(!node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          MkAppEntry<D> entry = node.getEntry(i);
-          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
-
-          double approxValue = log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
-          if(approxValue < 0) {
-            approxValue = 0;
-          }
-          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
-
-          if(minDist.compareTo(approximatedKnnDist) <= 0) {
-            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID()));
-          }
-        }
-      }
-      // data node
-      else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
-          MkAppLeafEntry<D> entry = (MkAppLeafEntry<D>) node.getEntry(i);
-          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-          double approxValue = log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
-          if(approxValue < 0) {
-            approxValue = 0;
-          }
-          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
-
-          if(distance.compareTo(approximatedKnnDist) <= 0) {
-            result.add(distance, entry.getRoutingObjectID());
-          }
-        }
-      }
-    }
-    return result;
-  }
-
   private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNResult<D>> knnLists) {
     double[] means = new double[k_max];
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       KNNResult<D> knns = knnLists.get(id);
       int k = 0;
-      for (DistanceDBIDResultIter<D> it = knns.iter(); k < k_max && it.valid(); it.advance(), k++) {
+      for(DistanceDBIDResultIter<D> it = knns.iter(); k < k_max && it.valid(); it.advance(), k++) {
         means[k] += it.getDistance().doubleValue();
       }
     }
