@@ -65,7 +65,6 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * 
    * @param distance Distance value
    * @param id ID number
-   * @return success code
    */
   public void add(double distance, DBIDRef id) {
     if(size() < maxsize || peek().doubleDistance() >= distance) {
