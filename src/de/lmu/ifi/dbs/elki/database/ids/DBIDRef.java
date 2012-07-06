@@ -31,6 +31,10 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * are a good example how the DBIDRef may change.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.has DBID oneway - - «references»
  */
 public interface DBIDRef {
   /**

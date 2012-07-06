@@ -26,6 +26,7 @@
  * @apiviz.exclude elki.database.ids.DBIDIter
  * @apiviz.exclude elki.database.ids.DBIDs
  * @apiviz.exclude KNNUtil.DistanceItr
+ * @apiviz.exclude DoubleDistance
  */
 /*
  This file is part of ELKI:

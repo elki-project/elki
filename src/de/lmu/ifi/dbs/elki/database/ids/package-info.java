@@ -64,9 +64,11 @@
  * <p>{@link de.lmu.ifi.dbs.elki.database.ids.generic.MaskedDBIDs MaskedDBIDs}
  * allows masking an ArrayDBIDs with a BitSet.</p>
  * 
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.integer.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.generic.*
- * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs.EmptyDBIDItererator
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.ids.EmptyDBIDs.EmptyDBIDIterator
+ * @apiviz.exclude de.lmu.ifi.dbs.elki.database.*Database
  * @apiviz.exclude de.lmu.ifi.dbs.elki.data.Cluster
  * @apiviz.exclude de.lmu.ifi.dbs.elki.utilities.*
  * @apiviz.exclude de.lmu.ifi.dbs.elki.datasource.filter.*
