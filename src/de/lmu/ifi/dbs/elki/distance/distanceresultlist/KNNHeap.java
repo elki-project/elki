@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.landmark
  * 
- * @apiviz.uses KNNResult - - «serializes to»
+ * @apiviz.uses GenericKNNList - - «serializes to»
+ * @apiviz.uses DoubleDistanceKNNList - - «serializes to»
  * @apiviz.composedOf DistanceDBIDPair
  * 
  * @param <D> Distance function

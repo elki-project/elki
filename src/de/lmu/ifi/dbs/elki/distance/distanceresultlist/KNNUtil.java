@@ -45,8 +45,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @apiviz.landmark
  * 
- * @apiviz.uses KNNResult
- * @apiviz.has KNNHeap - - creates
+ * @apiviz.has KNNResult oneway - - «processes»
+ * @apiviz.has KNNHeap oneway - - «creates»
  * @apiviz.has DistanceView
  * @apiviz.has KNNSubList
  */

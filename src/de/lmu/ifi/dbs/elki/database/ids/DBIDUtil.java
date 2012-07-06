@@ -35,7 +35,11 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBIDFactory
+ * 
+ * @apiviz.has DBID
+ * @apiviz.has DBIDs
+ * @apiviz.uses DBIDRef
+ * @apiviz.composedOf DBIDFactory
  */
 public final class DBIDUtil {
   /**
