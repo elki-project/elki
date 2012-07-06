@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * Utility classes for distance DBID results.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses DistanceDBIDPair oneway - -
  */
 public final class DistanceDBIDResultUtil {
   /**

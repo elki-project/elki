@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,10 +23,19 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+
 /**
  * Interface for kNN heaps.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.uses KNNResult - - «serializes to»
+ * @apiviz.composedOf DistanceDBIDPair
  * 
  * @param <D> Distance function
  */

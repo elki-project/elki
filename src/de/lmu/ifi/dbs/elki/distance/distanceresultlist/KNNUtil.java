@@ -43,13 +43,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * 
  * @apiviz.uses KNNResult
- * @apiviz.composedOf DBIDView
- * @apiviz.composedOf DBIDItr
- * @apiviz.composedOf DBIDIterator
- * @apiviz.composedOf DistanceView
- * @apiviz.composedOf DistanceItr
- * @apiviz.composedOf KNNSubList
+ * @apiviz.has KNNHeap - - creates
+ * @apiviz.has DistanceView
+ * @apiviz.has KNNSubList
  */
 public final class KNNUtil {
   /**
@@ -298,6 +297,8 @@ public final class KNNUtil {
    * A view on the Distances of the result
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.composedOf DistanceItr
    */
   protected static class DistanceView<D extends Distance<D>> extends AbstractList<D> implements List<D> {
     /**

@@ -37,6 +37,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * Default class to keep a list of distance-object pairs.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf DoubleDistanceDBIDPair
+ * @apiviz.has DoubleDistanceDBIDResultIter
  */
 public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<DoubleDistance> {
   /**

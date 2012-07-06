@@ -37,8 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has KNNList oneway - - serializes to
- * 
  * @param <P> pair type
  * @param <D> distance type
  */

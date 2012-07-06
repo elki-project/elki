@@ -34,6 +34,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDRef}.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.has DistanceDBIDPair - - iterator for
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID - - iterator for
  */
 public interface DistanceDBIDResultIter<D extends Distance<D>> extends DBIDIter {
   /**
