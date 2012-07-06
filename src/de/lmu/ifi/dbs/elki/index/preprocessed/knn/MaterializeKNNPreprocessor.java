@@ -36,12 +36,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -113,7 +113,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing k nearest neighbors (k=" + k + ")", ids.size(), getLogger()) : null;
 
     // Try bulk
-    List<KNNResult<D>> kNNList = null;
+    List<? extends KNNResult<D>> kNNList = null;
     if(usebulk) {
       kNNList = knnQuery.getKNNForBulkDBIDs(ids, k);
       if(kNNList != null) {
@@ -181,7 +181,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     if(stepprog != null) {
       stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", getLogger());
     }
-    List<KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
+    List<? extends KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
     for(int i = 0; i < aids.size(); i++) {
       DBID id = aids.get(i);
       storage.put(id, kNNList.get(i));
@@ -219,15 +219,12 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
       KNNResult<D> kNNs = storage.get(iter);
       D knnDist = kNNs.get(kNNs.size() - 1).getDistance();
       // look for new kNNs
-      GenericKNNHeap<D> heap = null;
+      KNNHeap<D> heap = null;
       for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
         D dist = distanceQuery.distance(iter, iter2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
-            heap = new GenericKNNHeap<D>(k);
-            for(DistanceDBIDResultIter<D> it = kNNs.iter(); it.valid(); it.advance()) {
-              heap.add(it.getDistancePair());
-            }
+            heap = KNNUtil.newHeap(kNNs);
           }
           heap.add(dist, iter2);
         }
@@ -262,7 +259,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     }
 
     // update the kNNs of the RkNNs
-    List<KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
+    List<? extends KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
     for(int i = 0; i < rkNN_ids.size(); i++) {
       DBID id = rkNN_ids.get(i);
       storage.put(id, kNNList.get(i));

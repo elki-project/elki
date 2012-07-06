@@ -40,10 +40,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -102,7 +103,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param object the query object
    * @param knnList the knn list containing the result
    */
-  protected void doKNNQuery(O object, GenericKNNHeap<D> knnList) {
+  protected void doKNNQuery(O object, KNNHeap<D> knnList) {
     final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>(Math.min(knnList.getK() * 2, 20));
 
     // push root
@@ -120,7 +121,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     }
   }
 
-  private D expandNode(O object, GenericKNNHeap<D> knnList, final Heap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final Integer nodeID) {
+  private D expandNode(O object, KNNHeap<D> knnList, final Heap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final Integer nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {
@@ -160,13 +161,13 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param node the node for which the query should be performed
    * @param knnLists a map containing the knn lists for each query objects
    */
-  protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, GenericKNNHeap<D>> knnLists) {
+  protected void batchNN(AbstractRStarTreeNode<?, ?> node, Map<DBID, KNNHeap<D>> knnLists) {
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry p = node.getEntry(i);
-        for(Entry<DBID, GenericKNNHeap<D>> ent : knnLists.entrySet()) {
+        for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
           final DBID q = ent.getKey();
-          final GenericKNNHeap<D> knns_q = ent.getValue();
+          final KNNHeap<D> knns_q = ent.getValue();
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           DBID pid = ((LeafEntry) p).getDBID();
@@ -186,8 +187,8 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       List<DistanceEntry<D, SpatialEntry>> entries = getSortedEntries(node, ids);
       for(DistanceEntry<D, SpatialEntry> distEntry : entries) {
         D minDist = distEntry.getDistance();
-        for(Entry<DBID, GenericKNNHeap<D>> ent : knnLists.entrySet()) {
-          final GenericKNNHeap<D> knns_q = ent.getValue();
+        for(Entry<DBID, KNNHeap<D>> ent : knnLists.entrySet()) {
+          final KNNHeap<D> knns_q = ent.getValue();
           D knn_q_maxDist = knns_q.getKNNDistance();
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
@@ -232,7 +233,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
 
-    final GenericKNNHeap<D> knnList = new GenericKNNHeap<D>(k);
+    final KNNHeap<D> knnList = KNNUtil.newHeap(distanceFunction, k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }
@@ -248,9 +249,9 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
     // While this works, it seems to be slow at least for large sets!
-    final Map<DBID, GenericKNNHeap<D>> knnLists = new HashMap<DBID, GenericKNNHeap<D>>(ids.size());
+    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      knnLists.put(DBIDUtil.deref(iter), new GenericKNNHeap<D>(k));
+      knnLists.put(DBIDUtil.deref(iter), KNNUtil.newHeap(distanceFunction, k));
     }
 
     batchNN(tree.getRoot(), knnLists);

@@ -40,10 +40,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.query.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -143,7 +143,12 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(size);
-    if(size >= minpts) {
+    if(size < minpts) {
+      // The can't be any clusters
+      noise.addDBIDs(relation.getDBIDs());
+      objprog.setProcessed(noise.size(), logger);
+    }
+    else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         if(!processedIDs.contains(iditer)) {
           expandCluster(relation, rangeQuery, iditer, objprog, clusprog);
@@ -154,15 +159,6 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         }
         if(processedIDs.size() == size) {
           break;
-        }
-      }
-    }
-    else {
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        noise.add(iditer);
-        if(objprog != null && clusprog != null) {
-          objprog.setProcessed(noise.size(), logger);
-          clusprog.setProcessed(resultList.size(), logger);
         }
       }
     }
@@ -213,7 +209,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     // try to expand the cluster
     HashSetModifiableDBIDs seeds = DBIDUtil.newHashSet();
     ModifiableDBIDs currentCluster = DBIDUtil.newArray();
-    for (DBIDIter seed = neighbors.iter(); seed.valid(); seed.advance()) {
+    for(DBIDIter seed = neighbors.iter(); seed.valid(); seed.advance()) {
       if(!processedIDs.contains(seed)) {
         currentCluster.add(seed);
         processedIDs.add(seed);

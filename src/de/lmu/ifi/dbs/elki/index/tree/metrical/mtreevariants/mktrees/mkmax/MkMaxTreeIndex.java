@@ -33,12 +33,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
@@ -73,7 +74,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * @return a new MkMaxLeafEntry representing the specified data object
    */
   protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    GenericKNNHeap<D> knnList = new GenericKNNHeap<D>(getKmax() - 1);
+    KNNHeap<D> knnList = KNNUtil.newHeap(distanceFunction, getKmax() - 1);
     doKNNQuery(id, knnList);
     D knnDistance = knnList.getKNNDistance();
     return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);

@@ -32,10 +32,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.GenericKNNHeap;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNResult;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -97,7 +98,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
     int i = 0;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      GenericKNNHeap<D> kNN = new GenericKNNHeap<D>(k);
+      KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
 
       long rseed = i * 0x7FFFFFFFFFFFFFE7L + iseed;
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rseed);

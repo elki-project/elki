@@ -35,9 +35,24 @@ import java.util.regex.Pattern;
  */
 public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   /**
+   * Zero distance constant
+   */
+  public static final DoubleDistance ZERO_DISTANCE = new DoubleDistance(0.0);
+
+  /**
+   * Infinite distance constant
+   */
+  public static final DoubleDistance INFINITE_DISTANCE = new DoubleDistance(Double.POSITIVE_INFINITY);
+
+  /**
+   * Undefined distance constant
+   */
+  public static final DoubleDistance UNDEFINED_DISTANCE = new DoubleDistance(Double.NaN);
+  
+  /**
    * The static factory instance
    */
-  public final static DoubleDistance FACTORY = new DoubleDistance();
+  public final static DoubleDistance FACTORY = UNDEFINED_DISTANCE;
 
   /**
    * The actual value.
@@ -175,7 +190,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    */
   @Override
   public DoubleDistance infiniteDistance() {
-    return new DoubleDistance(Double.POSITIVE_INFINITY);
+    return INFINITE_DISTANCE;
   }
 
   /**
@@ -183,7 +198,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    */
   @Override
   public DoubleDistance nullDistance() {
-    return new DoubleDistance(0.0);
+    return ZERO_DISTANCE;
   }
 
   /**
@@ -191,7 +206,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    */
   @Override
   public DoubleDistance undefinedDistance() {
-    return new DoubleDistance(Double.NaN);
+    return UNDEFINED_DISTANCE;
   }
 
   /**

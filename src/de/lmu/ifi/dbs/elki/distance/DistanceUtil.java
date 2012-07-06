@@ -101,12 +101,8 @@ public final class DistanceUtil {
    */
   public static boolean isDoubleDistanceFunction(DistanceFunction<?, ?> df) {
     Object factory = df.getDistanceFactory();
-    if (factory == DoubleDistance.FACTORY) {
-      return true;
-    }
-    return (factory instanceof DoubleDistance);
+    return (factory == DoubleDistance.FACTORY) || (factory instanceof DoubleDistance);
   }
-
 
   /**
    * Test whether a distance query is double-valued.
@@ -116,9 +112,6 @@ public final class DistanceUtil {
    */
   public static boolean isDoubleDistanceFunction(DistanceQuery<?, ?> df) {
     Object factory = df.getDistanceFactory();
-    if (factory == DoubleDistance.FACTORY) {
-      return true;
-    }
-    return (factory instanceof DoubleDistance);
+    return (factory == DoubleDistance.FACTORY) || (factory instanceof DoubleDistance);
   }
 }
