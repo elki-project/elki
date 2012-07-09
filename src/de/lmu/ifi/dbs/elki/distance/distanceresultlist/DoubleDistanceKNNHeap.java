@@ -38,6 +38,11 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * Serial version
    */
   private static final long serialVersionUID = 1L;
+  
+  /**
+   * Cached distance to k nearest neighbor (to avoid going through {@link #peek})
+   */
+  protected double knndistance = Double.POSITIVE_INFINITY;
 
   /**
    * Constructor.
@@ -67,8 +72,11 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * @param id ID number
    */
   public void add(double distance, DBIDRef id) {
-    if(size() < maxsize || peek().doubleDistance() >= distance) {
+    if(size() < maxsize || knndistance >= distance) {
       super.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
+      if (size() >= maxsize) {
+        knndistance = peek().doubleDistance();        
+      }
     }
   }
 
@@ -88,18 +96,12 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * @return Maximum distance
    */
   public double doubleKNNDistance() {
-    if(size() < getK()) {
-      return Double.POSITIVE_INFINITY;
-    }
-    return peek().doubleDistance();
+    return knndistance;
   }
 
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
-    if(size() < getK()) {
-      return DoubleDistance.INFINITE_DISTANCE;
-    }
-    return peek().getDistance();
+    return new DoubleDistance(knndistance);
   }
 }
