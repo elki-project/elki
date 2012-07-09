@@ -5,6 +5,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /*
  This file is part of ELKI:
@@ -796,7 +798,7 @@ public class QuickSelect {
    * @param rank Rank position that we are interested in (integer!)
    * @return Value at the given rank
    */
-  public static DBID quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int rank) {
+  public static DBID quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int rank) {
     quickSelect(data, comparator, 0, data.size(), rank);
     return data.get(rank);
   }
@@ -810,7 +812,7 @@ public class QuickSelect {
    * @param comparator Comparator to use
    * @return Median value
    */
-  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator) {
+  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator) {
     return median(data, comparator, 0, data.size());
   }
 
@@ -827,7 +829,7 @@ public class QuickSelect {
    * @param end End of valid values (exclusive!)
    * @return Median value
    */
-  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int begin, int end) {
+  public static DBID median(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int begin, int end) {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
@@ -846,7 +848,7 @@ public class QuickSelect {
    * @param quant Quantile to compute
    * @return Value at quantile
    */
-  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, double quant) {
+  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, double quant) {
     return quantile(data, comparator, 0, data.size(), quant);
   }
 
@@ -864,7 +866,7 @@ public class QuickSelect {
    * @param quant Quantile to compute
    * @return Value at quantile
    */
-  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int begin, int end, double quant) {
+  public static DBID quantile(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int begin, int end, double quant) {
     final int length = end - begin;
     assert (length > 0) : "Quantile on empty set?";
     // Integer division is "floor" since we are non-negative.
@@ -885,7 +887,7 @@ public class QuickSelect {
    * @param end Interval end (inclusive)
    * @param rank rank position we are interested in (starting at 0)
    */
-  public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int start, int end, int rank) {
+  public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end, int rank) {
     // Optimization for small arrays
     // This also ensures a minimum size below
     if(start + SMALL > end) {
@@ -914,13 +916,18 @@ public class QuickSelect {
 
     // Begin partitioning
     int i = start + 1, j = end - 3;
+    DBIDArrayIter refi = data.iter(), refj = data.iter();
+    refi.seek(i);
+    refj.seek(j);
     // This is classic quicksort stuff
     while(true) {
-      while(comparator.compare(data.get(i), pivot) <= 0 && i <= j) {
+      while(comparator.compare(refi, pivot) <= 0 && i <= j) {
         i++;
+        refi.advance();
       }
-      while(comparator.compare(data.get(j), pivot) >= 0 && j >= i) {
+      while(comparator.compare(refj, pivot) >= 0 && j >= i) {
         j--;
+        refj.retract();
       }
       if(i >= j) {
         break;
@@ -948,9 +955,15 @@ public class QuickSelect {
    * @param start Interval start
    * @param end Interval end
    */
-  private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBID> comparator, int start, int end) {
+  private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end) {
+    DBIDArrayIter iter1 = data.iter(), iter2 = data.iter();
     for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
+      iter1.seek(i - 1);
+      iter2.seek(i);
+      for(int j = i; j > start; j--, iter1.retract(), iter2.retract()) {
+        if(comparator.compare(iter1, iter2) > 0) {
+          break;
+        }
         data.swap(j, j - 1);
       }
     }

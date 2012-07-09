@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -114,15 +114,21 @@ public class MaskedDBIDs implements DBIDs {
    */
   protected class DBIDItr implements DBIDIter {
     /**
-     * Next position.
+     * Current position.
      */
     private int pos;
+
+    /**
+     * Array iterator, for referencing
+     */
+    private DBIDArrayIter iter;
 
     /**
      * Constructor
      */
     protected DBIDItr() {
       this.pos = bits.nextSetBit(0);
+      this.iter = data.iter();
     }
 
     @Override
@@ -136,8 +142,9 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public DBID deref() {
-      return data.get(pos);
+    public DBIDRef deref() {
+      iter.seek(pos);
+      return iter;
     }
   }
 
@@ -155,10 +162,16 @@ public class MaskedDBIDs implements DBIDs {
     private int pos;
 
     /**
+     * Array iterator, for referencing
+     */
+    private DBIDArrayIter iter;
+
+    /**
      * Constructor
      */
     protected InvDBIDItr() {
       this.pos = bits.nextClearBit(0);
+      this.iter = data.iter();
     }
 
     @Override
@@ -172,8 +185,9 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public DBID deref() {
-      return data.get(pos);
+    public DBIDRef deref() {
+      iter.seek(pos);
+      return iter;
     }
   }
 }

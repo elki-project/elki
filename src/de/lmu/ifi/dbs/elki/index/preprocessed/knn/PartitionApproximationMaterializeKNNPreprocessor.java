@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -105,14 +106,19 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
       int size = (partitions * minsize + part >= aids.size()) ? minsize : minsize + 1;
       // Collect the ids in this node.
       ArrayModifiableDBIDs ids = DBIDUtil.newArray(size);
-      for(int i = 0; i < size; i++) {
-        assert (size * partitions + part < aids.size());
-        ids.add(aids.get(i * partitions + part));
+      {
+        DBIDArrayIter iter = ids.iter();
+        // Offset
+        iter.seek(part);
+        // Seek in steps of "partitions".
+        for(; iter.valid(); iter.advance(partitions)) {
+          ids.add(iter);
+        }
       }
       HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
-        for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+        for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           DBIDPair key = DBIDUtil.newPair(iter, iter2);
           D d = cache.remove(key);
           if(d != null) {

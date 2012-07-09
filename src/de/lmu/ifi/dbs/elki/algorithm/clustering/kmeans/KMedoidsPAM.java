@@ -150,16 +150,17 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
       DBID bestid = null;
       int bestcluster = -1;
       int i = 0;
-      for (DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
+      for(DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
         for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
           if(DBIDUtil.equal(miter, iter)) {
             continue;
           }
           // double disti = distQ.distance(id, med).doubleValue();
           double cost = 0;
-          for(int j = 0; j < k; j++) {
+          DBIDIter olditer = medoids.iter();
+          for(int j = 0; j < k; j++, olditer.advance()) {
             for(DBIDIter iter2 = clusters.get(j).iter(); iter2.valid(); iter2.advance()) {
-              double distcur = distQ.distance(iter2, miter).doubleValue();
+              double distcur = distQ.distance(iter2, olditer).doubleValue();
               double distnew = distQ.distance(iter2, iter).doubleValue();
               if(j == i) {
                 // Cases 1 and 2.

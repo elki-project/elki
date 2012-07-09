@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf ALOCIQuadTree
  * 
  * @param <O> Object type
@@ -394,7 +394,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
         NumberVector<?, ?> first = relation.get(iter);
         iter.advance();
         boolean degenerate = true;
-        loop: for(int pos = start + 1; pos < end; pos++, iter.advance()) {
+        loop: for(; iter.getOffset() < end; iter.advance()) {
           NumberVector<?, ?> other = relation.get(iter);
           for(int d = 1; d <= lmin.length; d++) {
             if(Math.abs(first.doubleValue(d) - other.doubleValue(d)) > 1E-15) {
@@ -437,20 +437,23 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       }
       else {
         // Partially sort data, by dimension dim < mid
-        int spos = start, epos = end;
-        while(spos < epos) {
-          if(getShiftedDim(relation.get(ids.get(spos)), dim, level) <= .5) {
-            spos++;
+        DBIDArrayIter siter = ids.iter(), eiter = ids.iter();
+        siter.seek(start);
+        eiter.seek(end);
+        while(siter.getOffset() < eiter.getOffset()) {
+          if(getShiftedDim(relation.get(siter), dim, level) <= .5) {
+            siter.advance();
             continue;
           }
-          if(getShiftedDim(relation.get(ids.get(epos - 1)), dim, level) > 0.5) {
-            epos--;
+          if(getShiftedDim(relation.get(eiter), dim, level) > 0.5) {
+            eiter.retract();
             continue;
           }
-          ids.swap(spos, epos - 1);
-          spos++;
-          epos--;
+          ids.swap(siter.getOffset(), eiter.getOffset() - 1);
+          siter.advance();
+          eiter.retract();
         }
+        final int spos = siter.getOffset();
         if(start < spos) {
           final double tmp = lmax[dim];
           lmax[dim] = lmax[dim] * .5 + lmin[dim] * .5;
