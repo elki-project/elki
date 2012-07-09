@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
  * @param <P> pair type
  * @param <D> distance type
  */
-public abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> extends TiedTopBoundedHeap<P> implements KNNHeap<D> {
+abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> extends TiedTopBoundedHeap<P> implements KNNHeap<D> {
   /**
    * Serial version
    */
@@ -60,6 +60,9 @@ public abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends D
     super(k, COMPARATOR);
   }
 
+  /**
+   * @deprecated Use {@link #toKNNList()} instead!
+   */
   @Override
   @Deprecated
   public ArrayList<P> toSortedArrayList() {
@@ -76,19 +79,6 @@ public abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends D
   @Override
   public int getK() {
     return super.getMaxSize();
-  }
-
-  /**
-   * Get the distance to the k nearest neighbor, or maxdist otherwise.
-   * 
-   * @return Maximum distance
-   */
-  @Override
-  public D getKNNDistance() {
-    if(size() < getK()) {
-      return null;
-    }
-    return peek().getDistance();
   }
 
   /**

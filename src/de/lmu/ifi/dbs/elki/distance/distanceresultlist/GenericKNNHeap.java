@@ -44,6 +44,11 @@ public class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<Dista
   private static final long serialVersionUID = 1L;
 
   /**
+   * Cached distance to k nearest neighbor (to avoid going through {@link #peek})
+   */
+  protected D knndistance = null;
+
+  /**
    * Constructor.
    * 
    * @param k Heap size
@@ -64,8 +69,16 @@ public class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<Dista
 
   @Override
   public void add(D distance, DBIDRef id) {
-    if(size() < maxsize || peek().getDistance().compareTo(distance) >= 0) {
+    if(size() < maxsize || knndistance.compareTo(distance) >= 0) {
       super.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
+      if (size() >= maxsize) {
+        knndistance = peek().getDistance();        
+      }
     }
+  }
+
+  @Override
+  public D getKNNDistance() {
+    return knndistance;
   }
 }
