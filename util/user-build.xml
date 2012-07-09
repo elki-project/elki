@@ -42,6 +42,7 @@
 			<fileset dir="${src}">
 				<include name="de/**/*" />
 				<include name="META-INF/elki/*" />
+				<include name="META-INF/services/*" />
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
