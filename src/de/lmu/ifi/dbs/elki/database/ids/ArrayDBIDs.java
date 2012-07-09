@@ -27,6 +27,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Interface for array based DBIDs.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has DBIDArrayIter
  */
 public interface ArrayDBIDs extends DBIDs {
   /**
@@ -43,7 +45,7 @@ public interface ArrayDBIDs extends DBIDs {
    * @return Iterator
    */
   @Override
-  public DBIDIter iter();
+  public DBIDArrayIter iter();
 
   /**
    * Size of the DBID "collection".

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids;
+package de.lmu.ifi.dbs.elki.utilities.iterator;
 
 /*
  This file is part of ELKI:
@@ -23,21 +23,35 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.iterator.MIter;
-
 /**
- * Modifiable DBID iterator.
+ * Array iterators can also go backwards and seek.
  * 
  * @author Erich Schubert
  */
-public interface DBIDMIter extends DBIDIter, MIter {
+public interface ArrayIter extends Iter {
   /**
-   * Remove the object the iterator currently points to.
+   * Get current iterator offset.
    * 
-   * Subsequent calls to {@link #deref} or {@link DBIDUtil#deref} may return a
-   * different element. Call {@link #advance()} to advance the iterator to the
-   * next element for further processing.
+   * @return Iterator position
    */
-  @Override
-  void remove();
+  public int getOffset();
+  
+  /**
+   * Moves the iterator forward or backward by the given offset.
+   * 
+   * @param count offset to move forward or backwards
+   */
+  public void advance(int count);
+
+  /**
+   * Moves the iterator backward to the previous entry.
+   */
+  public void retract();
+
+  /**
+   * Moves the iterator to the given position
+   * 
+   * @param off Seek offset
+   */
+  public void seek(int off);
 }

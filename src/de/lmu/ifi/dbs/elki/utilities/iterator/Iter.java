@@ -63,9 +63,6 @@ public interface Iter {
 
   /**
    * Moves the iterator forward to the next entry.
-   * 
-   * @throws java.util.NoSuchElementException if the iterator is already
-   *         exhausted
    */
   public void advance();
 }

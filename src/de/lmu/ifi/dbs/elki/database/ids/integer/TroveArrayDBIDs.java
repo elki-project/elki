@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.list.TIntList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
@@ -49,7 +49,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   abstract protected TIntList getStore();
 
   @Override
-  public DBIDMIter iter() {
+  public DBIDArrayMIter iter() {
     return new DBIDItr(getStore());
   }
 
@@ -62,7 +62,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   public int size() {
     return getStore().size();
   }
-  
+
   @Override
   public boolean isEmpty() {
     return getStore().isEmpty();
@@ -82,16 +82,16 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append("[");
-    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if (buf.length() > 1) {
+    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if(buf.length() > 1) {
         buf.append(", ");
       }
-      buf.append(((IntegerDBIDRef)iter).getIntegerID());
+      buf.append(((IntegerDBIDRef) iter).getIntegerID());
     }
     buf.append("]");
     return buf.toString();
   }
-  
+
   /**
    * Iterate over a Trove IntList, ELKI/C-style
    * 
@@ -99,7 +99,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements DBIDMIter, IntegerDBIDRef {
+  protected static class DBIDItr implements DBIDArrayMIter, IntegerDBIDRef {
     /**
      * Current position
      */
@@ -131,6 +131,26 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
     }
 
     @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      pos--;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
     public int getIntegerID() {
       return store.get(pos);
     }
@@ -145,15 +165,15 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
       store.removeAt(pos);
       pos--;
     }
-    
+
     @Override
     public boolean equals(Object other) {
-      if (other instanceof DBID) {
+      if(other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
     }
-    
+
     @Override
     public String toString() {
       return Integer.toString(getIntegerID());

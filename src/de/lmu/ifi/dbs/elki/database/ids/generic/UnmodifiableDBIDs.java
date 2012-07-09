@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses de.lmu.ifi.dbs.elki.database.ids.DBIDs
+ * @apiviz.uses DBIDs
+ * @apiviz.has UnmodifiableDBIDIter
  */
 public class UnmodifiableDBIDs implements StaticDBIDs {
   /**
@@ -79,5 +80,42 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
   @Override
   public String toString() {
     return inner.toString();
+  }
+
+  /**
+   * Make an existing DBIDMIter unmodifiable.
+   * 
+   * @author Erich Schubert
+   */
+  class UnmodifiableDBIDIter implements DBIDIter {
+    /**
+     * Wrapped iterator
+     */
+    private DBIDIter it;
+
+    /**
+     * Constructor.
+     * 
+     * @param it inner iterator
+     */
+    public UnmodifiableDBIDIter(DBIDIter it) {
+      super();
+      this.it = it;
+    }
+
+    @Override
+    public boolean valid() {
+      return it.valid();
+    }
+
+    @Override
+    public void advance() {
+      it.advance();
+    }
+
+    @Override
+    public DBIDRef deref() {
+      return it;
+    }
   }
 }

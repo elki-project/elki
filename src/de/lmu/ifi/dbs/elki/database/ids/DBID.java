@@ -37,7 +37,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @apiviz.landmark
  */
-public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs {
+public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs {
   /**
    * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
    * stable hash code. However, it is generally preferred to use optimized

@@ -31,6 +31,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * <em>deliberately</em>.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has DBIDMIter
  */
 public interface ModifiableDBIDs extends DBIDs {
   /**
