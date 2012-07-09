@@ -23,8 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @author Erich Schubert
  */
-public class RandomParameter extends AbstractParameter<Random, Random> {
+public class RandomParameter extends AbstractParameter<RandomFactory, RandomFactory> {
   /**
    * Seed value, if used
    */
@@ -70,7 +69,7 @@ public class RandomParameter extends AbstractParameter<Random, Random> {
    * @param defaultValue Default value. If {@code null}, a new random object
    *        will be created.
    */
-  public RandomParameter(OptionID optionID, Random defaultValue) {
+  public RandomParameter(OptionID optionID, RandomFactory defaultValue) {
     super(optionID, defaultValue);
   }
 
@@ -95,51 +94,51 @@ public class RandomParameter extends AbstractParameter<Random, Random> {
   @Override
   public void setValue(Object obj) throws ParameterException {
     // This is a bit hackish. Set both seed and random (via super.setValue())
-    if(obj instanceof Random) {
+    if(obj instanceof RandomFactory) {
       seed = null;
     }
     else if(obj instanceof Long) {
       seed = (Long) obj;
-      obj = new Random(seed);
+      obj = RandomFactory.get(seed);
     }
     else if(obj instanceof Integer) {
       seed = (long) (Integer) obj;
-      obj = new Random(seed);
+      obj = RandomFactory.get(seed);
     }
     else {
       try {
         seed = Long.parseLong(obj.toString());
-        obj = new Random(seed);
+        obj = RandomFactory.get(seed);
       }
       catch(NullPointerException e) {
-        throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator, read: " + obj + "!\n");
+        throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
       }
       catch(NumberFormatException e) {
-        throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator, read: " + obj + "!\n");
+        throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
       }
     }
     super.setValue(obj);
   }
 
   @Override
-  protected Random parseValue(Object obj) throws ParameterException {
-    if(obj instanceof Random) {
-      return (Random) obj;
+  protected RandomFactory parseValue(Object obj) throws ParameterException {
+    if(obj instanceof RandomFactory) {
+      return (RandomFactory) obj;
     }
     if(obj instanceof Long) {
-      return new Random((Long) obj);
+      return RandomFactory.get((Long) obj);
     }
     if(obj instanceof Integer) {
-      return new Random((long) (Integer) obj);
+      return RandomFactory.get((long) (Integer) obj);
     }
     try {
-      return new Random(Long.parseLong(obj.toString()));
+      return RandomFactory.get(Long.parseLong(obj.toString()));
     }
     catch(NullPointerException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
     }
     catch(NumberFormatException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
     }
   }
 
@@ -147,7 +146,7 @@ public class RandomParameter extends AbstractParameter<Random, Random> {
   public Object getGivenValue() {
     Object r = super.getGivenValue();
     if (r == null && seed != null) {
-      super.givenValue = new Random(seed);
+      super.givenValue = RandomFactory.get(seed);
       r = super.givenValue;
     }
     return r;
