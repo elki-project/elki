@@ -49,9 +49,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -61,9 +58,6 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * 
  * @apiviz.landmark
- * @apiviz.uses Centroid
- * @apiviz.uses ProjectedCentroid
- * @apiviz.uses CovarianceMatrix
  */
 public final class DatabaseUtil {
   /**
@@ -97,96 +91,6 @@ public final class DatabaseUtil {
   }
 
   /**
-   * Returns the centroid as a NumberVector object of the specified database.
-   * The objects must be instance of <code>NumberVector</code>.
-   * 
-   * @param <V> Vector type
-   * @param relation the Relation storing the objects
-   * @return the centroid of the specified objects stored in the given database
-   * @throws IllegalArgumentException if the database is empty
-   */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation) {
-    return Centroid.make(relation).toVector(relation);
-  }
-
-  /**
-   * Returns the centroid as a NumberVector object of the specified objects
-   * stored in the given database. The objects belonging to the specified ids
-   * must be instance of <code>NumberVector</code>.
-   * 
-   * @param <V> Vector type
-   * @param relation the relation
-   * @param ids the ids of the objects
-   * @return the centroid of the specified objects stored in the given database
-   * @throws IllegalArgumentException if the id list is empty
-   */
-  public static <V extends NumberVector<? extends V, ?>> V centroid(Relation<? extends V> relation, DBIDs ids) {
-    return Centroid.make(relation, ids).toVector(relation);
-  }
-
-  /**
-   * Determines the covariance matrix of the objects stored in the given
-   * database.
-   * 
-   * @param <V> Vector type
-   * @param database the database storing the objects
-   * @param ids the ids of the objects
-   * @return the covariance matrix of the specified objects
-   */
-  public static <V extends NumberVector<? extends V, ?>> Matrix covarianceMatrix(Relation<? extends V> database, DBIDs ids) {
-    return CovarianceMatrix.make(database, ids).destroyToNaiveMatrix();
-  }
-
-  /**
-   * Determines the d x d covariance matrix of the given n x d data matrix.
-   * 
-   * @param data the database storing the objects
-   * @return the covariance matrix of the given data matrix.
-   */
-  public static Matrix covarianceMatrix(Matrix data) {
-    return CovarianceMatrix.make(data).destroyToNaiveMatrix();
-  }
-
-  /**
-   * Determines the variances in each dimension of all objects stored in the
-   * given database.
-   * 
-   * @param database the database storing the objects
-   * @return the variances in each dimension of all objects stored in the given
-   *         database
-   */
-  public static <V extends NumberVector<? extends V, ?>> double[] variances(Relation<V> database) {
-    NumberVector<?, ?> centroid = centroid(database);
-    double[] variances = new double[centroid.getDimensionality()];
-
-    for(int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.doubleValue(d);
-
-      for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
-        NumberVector<?, ?> o = database.get(it);
-        double diff = o.doubleValue(d) - mu;
-        variances[d - 1] += diff * diff;
-      }
-
-      variances[d - 1] /= database.size();
-    }
-    return variances;
-  }
-
-  /**
-   * Determines the variances in each dimension of the specified objects stored
-   * in the given database. Returns
-   * <code>variances(database, centroid(database, ids), ids)</code>
-   * 
-   * @param database the database storing the objects
-   * @param ids the ids of the objects
-   * @return the variances in each dimension of the specified objects
-   */
-  public static <V extends NumberVector<? extends V, ?>> double[] variances(Relation<V> database, DBIDs ids) {
-    return variances(database, centroid(database, ids), ids);
-  }
-
-  /**
    * Determines the variances in each dimension of the specified objects stored
    * in the given database.
    * 
@@ -196,18 +100,15 @@ public final class DatabaseUtil {
    * @return the variances in each dimension of the specified objects
    */
   public static double[] variances(Relation<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs ids) {
+    final int size = ids.size();
     double[] variances = new double[centroid.getDimensionality()];
 
-    for(int d = 1; d <= centroid.getDimensionality(); d++) {
-      double mu = centroid.doubleValue(d);
-
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        NumberVector<?, ?> o = database.get(iter);
-        double diff = o.doubleValue(d) - mu;
-        variances[d - 1] += diff * diff;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      NumberVector<?, ?> o = database.get(iter);
+      for(int d = 1; d <= centroid.getDimensionality(); d++) {
+        final double diff = o.doubleValue(d) - centroid.doubleValue(d);
+        variances[d - 1] += diff * diff / size;
       }
-
-      variances[d - 1] /= ids.size();
     }
     return variances;
   }
@@ -281,7 +182,7 @@ public final class DatabaseUtil {
   public static <V extends NumberVector<?, ?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
     final double[] vals = new double[ids.size()];
     int i = 0;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       vals[i] = relation.get(iter).doubleValue(dimension);
       i++;
     }

@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -267,7 +268,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     // recompute the seed in each clusters
     for(ORCLUSCluster cluster : clusters) {
       if(cluster.objectIDs.size() > 0) {
-        cluster.centroid = DatabaseUtil.centroid(database, cluster.objectIDs);
+        cluster.centroid = Centroid.make(database, cluster.objectIDs).toVector(database);
       }
     }
   }
@@ -435,7 +436,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
     c.objectIDs = DBIDUtil.newArray(c.objectIDs);
 
     if(c.objectIDs.size() > 0) {
-      c.centroid = DatabaseUtil.centroid(relation, c.objectIDs);
+      c.centroid = Centroid.make(relation, c.objectIDs).toVector(relation);
       c.basis = findBasis(relation, distFunc, c, dim);
     }
     else {

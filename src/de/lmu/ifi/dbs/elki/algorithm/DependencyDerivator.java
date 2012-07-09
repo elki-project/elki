@@ -39,13 +39,13 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -153,7 +153,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     if(logger.isVerbose()) {
       logger.verbose("retrieving database objects...");
     }
-    V centroidDV = DatabaseUtil.centroid(relation);
+    Centroid centroid = Centroid.make(relation);
+    V centroidDV = centroid.toVector(relation);
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {
@@ -169,7 +170,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       ids = relation.getDBIDs();
     }
 
-    return generateModel(relation, ids, centroidDV);
+    return generateModel(relation, ids, centroid);
   }
 
   /**
@@ -181,8 +182,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @return a matrix of equations describing the dependencies
    */
   public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids) {
-    V centroidDV = DatabaseUtil.centroid(db, ids);
-    return generateModel(db, ids, centroidDV);
+    return generateModel(db, ids, Centroid.make(db, ids));
   }
 
   /**
@@ -193,7 +193,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @param centroidDV the centroid
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, V centroidDV) {
+  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, Vector centroid) {
     CorrelationAnalysisSolution<V> sol;
     if(logger.isDebuggingFine()) {
       logger.debugFine("PCA...");
@@ -206,7 +206,6 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     // Matrix strongEigenvectors =
     // pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
     Matrix strongEigenvectors = pcares.getStrongEigenvectors();
-    Vector centroid = centroidDV.getColumnVector();
 
     // TODO: what if we don't have any weak eigenvectors?
     if(weakEigenvectors.getColumnDimensionality() == 0) {

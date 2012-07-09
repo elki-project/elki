@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelati
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
@@ -378,7 +379,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       for(int i = 0; i < parallelClusters.size(); i++) {
         Pair<BitSet, ArrayModifiableDBIDs> c = parallelClusters.get(i);
         Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
-        cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.first), DatabaseUtil.centroid(database, c.second)));
+        cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.first), Centroid.make(database, c.second).toVector(database)));
         cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
         // cluster.setName("Cluster_" + num++);
         String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");

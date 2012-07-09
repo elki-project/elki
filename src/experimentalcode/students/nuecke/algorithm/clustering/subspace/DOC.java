@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -514,7 +515,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(C.size());
     ids.addDBIDs(C);
     Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(ids);
-    cluster.setModel(new SubspaceModel<V>(new Subspace<V>(D), DatabaseUtil.centroid(relation, ids)));
+    cluster.setModel(new SubspaceModel<V>(new Subspace<V>(D), Centroid.make(relation, ids).toVector(relation)));
     return cluster;
   }
 

@@ -53,11 +53,11 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -128,11 +128,12 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
-    HashMap<Cluster<?>, V> averages = new HashMap<Cluster<?>, V>(split.size());
+    HashMap<Cluster<?>, Vector> averages = new HashMap<Cluster<?>, Vector>(split.size());
     HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(split.size());
     for(Cluster<?> clus : split) {
-      averages.put(clus, DatabaseUtil.centroid(relation, clus.getIDs()));
-      covmats.put(clus, DatabaseUtil.covarianceMatrix(relation, clus.getIDs()));
+      CovarianceMatrix covmat = CovarianceMatrix.make(relation, clus.getIDs());
+      averages.put(clus, covmat.getMeanVector());
+      covmats.put(clus, covmat.destroyToNaiveMatrix());
     }
 
     AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
@@ -145,7 +146,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     // sort neighbors
     for(Cluster<?> clus : split) {
       ArrayList<DoubleObjPair<DBID>> cmem = new ArrayList<DoubleObjPair<DBID>>(clus.size());
-      Vector av = averages.get(clus).getColumnVector();
+      Vector av = averages.get(clus);
       Matrix covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {

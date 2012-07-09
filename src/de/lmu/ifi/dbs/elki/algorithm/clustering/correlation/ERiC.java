@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.IntegerDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -233,7 +234,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
 
         PCAFilteredResult pcares = pca.processIds(group, database);
 
-        V centroid = DatabaseUtil.centroid(database, group);
+        V centroid = Centroid.make(database, group).toVector(database);
         Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[" + correlationDimension + "_" + correlationClusters.size() + "]", group, new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
         correlationClusters.add(correlationCluster);
       }
@@ -268,7 +269,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       }
       PCAFilteredResult pcares = pca.processIds(noise.getIDs(), database);
 
-      V centroid = DatabaseUtil.centroid(database, noise.getIDs());
+      V centroid = Centroid.make(database, noise.getIDs()).toVector(database);
       Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getIDs(), new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
       correlationClusters.add(correlationCluster);
     }
