@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -593,7 +594,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       ModifiableDBIDs objectIDs = clusterIDs.get(m_i);
       if(!objectIDs.isEmpty()) {
         Set<Integer> clusterDimensions = dimensions.get(m_i);
-        V centroid = DatabaseUtil.centroid(database, objectIDs);
+        V centroid = Centroid.make(database, objectIDs).toVector(database);
         clusters.put(m_i, new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
       }
     }
@@ -645,7 +646,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       ModifiableDBIDs objectIDs = clusterIDs.get(i);
       if(!objectIDs.isEmpty()) {
         Set<Integer> clusterDimensions = dimensions.get(i).second;
-        V centroid = DatabaseUtil.centroid(database, objectIDs);
+        V centroid = Centroid.make(database, objectIDs).toVector(database);
         clusters.add(new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
       }
     }

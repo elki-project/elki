@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -214,7 +215,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
       for(Pair<Subspace<V>, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(modelAndCluster.second);
-        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, DatabaseUtil.centroid(relation, modelAndCluster.second)));
+        newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second).toVector(relation)));
         newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }
