@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -364,11 +365,12 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
           continue;
         }
         ArrayDBIDs sortedIndices = subspaceIndex.get(j);
-        ArrayModifiableDBIDs indexBlock = DBIDUtil.newArray();
+        ArrayModifiableDBIDs indexBlock = DBIDUtil.newArray(windowsize);
         // initialize index block
-        int start = random.nextInt(relation.size() - windowsize);
-        for(int k = start; k < start + windowsize; k++) {
-          indexBlock.add(sortedIndices.get(k)); // select index block
+        DBIDArrayIter iter = sortedIndices.iter();
+        iter.seek(random.nextInt(relation.size() - windowsize));
+        for(int k = 0; k < windowsize; k++, iter.advance()) {
+          indexBlock.add(iter); // select index block
         }
 
         conditionalSample = DBIDUtil.intersection(conditionalSample, indexBlock);

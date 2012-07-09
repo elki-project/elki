@@ -176,47 +176,50 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
     Matrix X = new Matrix(ids.size(), 6);
     Matrix F = new Matrix(ids.size(), ids.size());
     Matrix Y = new Matrix(ids.size(), dimy);
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
 
-      // Fill the data matrix
-      {
-        V vec = relationx.get(id);
-        double la = vec.doubleValue(1);
-        double lo = vec.doubleValue(2);
-        X.set(i, 0, 1.0);
-        X.set(i, 1, la);
-        X.set(i, 2, lo);
-        X.set(i, 3, la * lo);
-        X.set(i, 4, la * la);
-        X.set(i, 5, lo * lo);
-      }
-
-      {
-        for(int d = 0; d < dimy; d++) {
-          double idy = relationy.get(id).doubleValue(d + 1);
-          Y.set(i, d, idy);
+    {
+      int i = 0;
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
+        // Fill the data matrix
+        {
+          V vec = relationx.get(id);
+          double la = vec.doubleValue(1);
+          double lo = vec.doubleValue(2);
+          X.set(i, 0, 1.0);
+          X.set(i, 1, la);
+          X.set(i, 2, lo);
+          X.set(i, 3, la * lo);
+          X.set(i, 4, la * la);
+          X.set(i, 5, lo * lo);
         }
-      }
 
-      // Fill the neighborhood matrix F:
-      {
-        KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
-        ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
-        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(DBIDUtil.equal(id, neighbor)) {
-            continue;
+        {
+          for(int d = 0; d < dimy; d++) {
+            double idy = relationy.get(id).doubleValue(d + 1);
+            Y.set(i, d, idy);
           }
-          neighborhood.add(neighbor);
         }
-        // Weight object itself positively.
-        F.set(i, i, 1.0);
-        final int nweight = -1 / neighborhood.size();
-        // We need to find the index positions of the neighbors, unfortunately.
-        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
-          int pos = ids.binarySearch(iter);
-          assert (pos >= 0);
-          F.set(pos, i, nweight);
+
+        // Fill the neighborhood matrix F:
+        {
+          KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+          ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
+          for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+            if(DBIDUtil.equal(id, neighbor)) {
+              continue;
+            }
+            neighborhood.add(neighbor);
+          }
+          // Weight object itself positively.
+          F.set(i, i, 1.0);
+          final int nweight = -1 / neighborhood.size();
+          // We need to find the index positions of the neighbors,
+          // unfortunately.
+          for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+            int pos = ids.binarySearch(iter);
+            assert (pos >= 0);
+            F.set(pos, i, nweight);
+          }
         }
       }
     }
@@ -235,13 +238,13 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
 
     DBID worstid = null;
     double worstscore = Double.NEGATIVE_INFINITY;
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
+    int i = 0;
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
       double err = E.getRow(i).euclideanLength();
       // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;
-        worstid = id;
+        worstid = DBIDUtil.deref(id);
       }
     }
 

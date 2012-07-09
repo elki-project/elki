@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -146,9 +147,9 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
       // insert into db - note: DBIDs should have been prepared before this!
       Relation<?>[] targets = alignColumns(objpackages);
 
-      for(int j = 0; j < objpackages.dataLength(); j++) {
+      DBIDIter newid = ids.iter();
+      for(int j = 0; j < objpackages.dataLength(); j++, newid.advance()) {
         // insert object
-        final DBID newid = ids.get(j);
         for(int i = 0; i < targets.length; i++) {
           // DBIDs were handled above.
           if(i == idrepnr) {
