@@ -136,13 +136,11 @@ public class LongParameter extends NumberParameter<Long> {
     super(optionID);
   }
   
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     return Long.toString(getValue());
   }
 
-  /** {@inheritDoc} */
   @Override
   protected Long parseValue(Object obj) throws ParameterException {
     if(obj instanceof Long) {
@@ -155,10 +153,10 @@ public class LongParameter extends NumberParameter<Long> {
       return Long.parseLong(obj.toString());
     }
     catch(NullPointerException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");
     }
     catch(NumberFormatException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
+      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");
     }
   }
 

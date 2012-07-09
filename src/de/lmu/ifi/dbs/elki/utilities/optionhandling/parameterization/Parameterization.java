@@ -58,7 +58,7 @@ public interface Parameterization {
    * @param opt Option to add
    * @return if the value is available (= readable)
    */
-  public boolean grab(Parameter<?,?> opt);
+  public boolean grab(Parameter<?, ?> opt);
 
   /**
    * Assign a value for an option, but not using default values and throwing
@@ -68,7 +68,7 @@ public interface Parameterization {
    * @return Success code
    * @throws ParameterException on assignment errors.
    */
-  public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException;
+  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException;
 
   /**
    * Get the configuration errors thrown in {@link #grab}

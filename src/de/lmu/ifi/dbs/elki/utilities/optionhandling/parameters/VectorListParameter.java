@@ -137,7 +137,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     super(optionID);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     StringBuffer buf = new StringBuffer();
@@ -160,7 +159,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     return buf.toString();
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected List<List<Double>> parseValue(Object obj) throws ParameterException {

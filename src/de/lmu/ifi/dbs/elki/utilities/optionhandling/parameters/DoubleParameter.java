@@ -137,13 +137,11 @@ public class DoubleParameter extends NumberParameter<Double> {
     super(optionID);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     return Double.toString(getValue());
   }
 
-  /** {@inheritDoc} */
   @Override
   protected Double parseValue(Object obj) throws WrongParameterValueException {
     if(obj instanceof Double) {

@@ -35,7 +35,7 @@ import java.util.List;
  * @author Erich Schubert
  * @param <T> the type of a possible value (i.e., the type of the option)
  */
-public abstract class NumberParameter<T extends Number> extends Parameter<Number, T> {
+public abstract class NumberParameter<T extends Number> extends AbstractParameter<Number, T> {
   /**
    * Constructs a number parameter with the given optionID, constraint, and
    * optional flag.

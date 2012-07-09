@@ -60,7 +60,7 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    */
   @Override
   public void test() throws ParameterException {
-    for(Parameter<?,?> p : parameters) {
+    for(Parameter<?, ?> p : parameters) {
       if(p.isDefined()) {
         return;
       }

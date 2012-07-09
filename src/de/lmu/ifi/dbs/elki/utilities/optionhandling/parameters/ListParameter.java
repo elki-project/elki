@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * @author Erich Schubert
  * @param <T> List type
  */
-public abstract class ListParameter<T> extends Parameter<List<T>, List<T>> {
+public abstract class ListParameter<T> extends AbstractParameter<List<T>, List<T>> {
   /**
    * A pattern defining a &quot,&quot.
    */

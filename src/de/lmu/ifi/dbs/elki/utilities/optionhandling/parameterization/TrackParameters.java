@@ -158,7 +158,6 @@ public class TrackParameters implements Parameterization {
     return ret;
   }
 
-  /** {@inheritDoc} */
   @Override
   public boolean checkConstraint(GlobalParameterConstraint constraint) {
     return inner.checkConstraint(constraint);

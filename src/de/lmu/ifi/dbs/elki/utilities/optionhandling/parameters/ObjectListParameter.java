@@ -68,13 +68,11 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
     super(optionID, restrictionClass);
   }
   
-  /** {@inheritDoc} */
   @Override
   public String getSyntax() {
     return "<object_1|class_1,...,object_n|class_n>";
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected List<Class<? extends C>> parseValue(Object obj) throws ParameterException {
@@ -116,7 +114,6 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
     return super.parseValue(obj);
   }
 
-  /** {@inheritDoc} */
   @Override
   public List<C> instantiateClasses(Parameterization config) {
     if (instances == null) {

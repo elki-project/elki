@@ -33,9 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Global parameter constraint specifying that either all elements of a list of
- * parameters (
- * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter})
- * must be set, or none of them.
+ * parameters ({@link Parameter}) must be set, or none of them.
  * 
  * @author Steffi Wanka
  */

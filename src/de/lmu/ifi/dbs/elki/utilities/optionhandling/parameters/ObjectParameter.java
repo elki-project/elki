@@ -99,7 +99,6 @@ public class ObjectParameter<C> extends ClassParameter<C> {
     super(optionID, restrictionClass);
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected Class<? extends C> parseValue(Object obj) throws ParameterException {
@@ -113,7 +112,6 @@ public class ObjectParameter<C> extends ClassParameter<C> {
     return super.parseValue(obj);
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   public void setValue(Object obj) throws ParameterException {
@@ -154,7 +152,6 @@ public class ObjectParameter<C> extends ClassParameter<C> {
     return instance = super.instantiateClass(config);
   }
 
-  /** {@inheritDoc} */
   @Override
   public Object getGivenValue() {
     if(instance != null) {
