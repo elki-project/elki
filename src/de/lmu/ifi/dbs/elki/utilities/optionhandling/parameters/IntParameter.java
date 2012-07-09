@@ -136,13 +136,11 @@ public class IntParameter extends NumberParameter<Integer> {
     super(optionID);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     return Integer.toString(getValue());
   }
 
-  /** {@inheritDoc} */
   @Override
   protected Integer parseValue(Object obj) throws ParameterException {
     if(obj instanceof Integer) {

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Erich Schubert
  */
 // TODO: turn FileType into a Constraint?
-public class FileParameter extends Parameter<File, File> {
+public class FileParameter extends AbstractParameter<File, File> {
   /**
    * Available file types: {@link #INPUT_FILE} denotes an input file,
    * {@link #OUTPUT_FILE} denotes an output file.
@@ -86,7 +86,6 @@ public class FileParameter extends Parameter<File, File> {
     setOptional(optional);
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     try {
@@ -97,7 +96,6 @@ public class FileParameter extends Parameter<File, File> {
     }
   }
 
-  /** {@inheritDoc} */
   @Override
   protected File parseValue(Object obj) throws ParameterException {
     if(obj == null) {
@@ -112,7 +110,6 @@ public class FileParameter extends Parameter<File, File> {
     throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": Unsupported value given!");
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean validate(File obj) throws ParameterException {
     if(!super.validate(obj)) {

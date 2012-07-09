@@ -73,7 +73,7 @@ public class ChainedParameterization extends AbstractParameterization {
   }
   
   @Override
-  public boolean setValueForOption(Parameter<?,?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
     for(Parameterization p : chain) {
       if(p.setValueForOption(opt)) {
         return true;
@@ -102,7 +102,6 @@ public class ChainedParameterization extends AbstractParameterization {
     this.errorTarget = config;
   }
 
-  /** {@inheritDoc} */
   @Override
   public void reportError(ParameterException e) {
     if (this.errorTarget == this) {

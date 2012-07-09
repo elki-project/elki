@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class PatternParameter extends Parameter<Pattern, Pattern> {
+public class PatternParameter extends AbstractParameter<Pattern, Pattern> {
   /**
    * Constructs a pattern parameter with the given optionID, constraints and
    * default value.

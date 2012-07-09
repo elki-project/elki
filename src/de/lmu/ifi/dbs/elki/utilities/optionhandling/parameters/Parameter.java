@@ -1,5 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,229 +28,28 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Vector;
-
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
-
-/**
- * Abstract class for specifying a parameter.
- * 
- * A parameter is defined as an option having a specific value.
- * 
- * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
- * documentation!
- * 
- * @author Steffi Wanka
- * @author Erich Schubert
- * 
- * @apiviz.composedOf OptionID
- * @apiviz.uses ParameterConstraint
- * 
- * @param <T> the type of a possible value (i.e., the type of the option)
- * @param <S> the supertype for constraints
- */
-public abstract class Parameter<S, T extends S> {
-  /**
-   * The default value of the parameter (may be null).
-   */
-  protected T defaultValue = null;
-
-  /**
-   * Specifies if the default value of this parameter was taken as parameter
-   * value.
-   */
-  private boolean defaultValueTaken = false;
-
-  /**
-   * Specifies if this parameter is an optional parameter.
-   */
-  protected boolean optionalParameter = false;
-
-  /**
-   * Holds parameter constraints for this parameter.
-   */
-  protected final List<ParameterConstraint<S>> constraints;
-
-  /**
-   * The option name.
-   */
-  protected final OptionID optionid;
-
-  /**
-   * The short description of the option. An extended description is provided by
-   * the method {@link #getFullDescription()}
-   */
-  protected String shortDescription;
-
-  /**
-   * The value last passed to this option.
-   */
-  protected T givenValue = null;
-
-  /**
-   * The value of this option.
-   */
-  private T value;
-
-  /**
-   * Constructs a parameter with the given optionID, constraints, and default
-   * value.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraints the constraints of this parameter, may be empty if there
-   *        are no constraints
-   * @param defaultValue the default value of this parameter (may be null)
-   */
-  public Parameter(OptionID optionID, List<ParameterConstraint<S>> constraints, T defaultValue) {
-    this.optionid = optionID;
-    this.shortDescription = optionID.getDescription();
-    this.optionalParameter = true;
-    this.defaultValue = defaultValue;
-    this.constraints = (constraints != null) ? constraints : new Vector<ParameterConstraint<S>>();
-  }
-
-  /**
-   * Constructs a parameter with the given optionID, constraints, and optional
-   * flag.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraints the constraints of this parameter, may be empty if there
-   *        are no constraints
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public Parameter(OptionID optionID, List<ParameterConstraint<S>> constraints, boolean optional) {
-    this.optionid = optionID;
-    this.shortDescription = optionID.getDescription();
-    this.optionalParameter = optional;
-    this.defaultValue = null;
-    this.constraints = (constraints != null) ? constraints : new Vector<ParameterConstraint<S>>();
-  }
-
-  /**
-   * Constructs a parameter with the given optionID, and constraints.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraints the constraints of this parameter, may be empty if there
-   *        are no constraints
-   */
-  public Parameter(OptionID optionID, List<ParameterConstraint<S>> constraints) {
-    this(optionID, constraints, false);
-  }
-
-  /**
-   * Constructs a parameter with the given optionID, constraint, and default
-   * value.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter
-   * @param defaultValue the default value of this parameter (may be null)
-   */
-  public Parameter(OptionID optionID, ParameterConstraint<S> constraint, T defaultValue) {
-    this(optionID, makeConstraintsVector(constraint), defaultValue);
-  }
-
-  /**
-   * Constructs a parameter with the given optionID, constraint, and optional
-   * flag.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public Parameter(OptionID optionID, ParameterConstraint<S> constraint, boolean optional) {
-    this(optionID, makeConstraintsVector(constraint), optional);
-  }
-
-  /**
-   * Constructs a parameter with the given optionID, and constraint.
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter
-   */
-  public Parameter(OptionID optionID, ParameterConstraint<S> constraint) {
-    this(optionID, constraint, false);
-  }
-
-  /**
-   * Constructs a parameter with the given optionID and default value.
-   * 
-   * @param optionID the unique id of the option
-   * @param defaultValue default value.
-   */
-  public Parameter(OptionID optionID, T defaultValue) {
-    this(optionID, (Vector<ParameterConstraint<S>>) null, defaultValue);
-  }
-
-  /**
-   * Constructs a parameter with the given optionID and optional flag.
-   * 
-   * @param optionID the unique id of the option
-   * @param optional optional flag
-   */
-  public Parameter(OptionID optionID, boolean optional) {
-    this(optionID, (Vector<ParameterConstraint<S>>) null, optional);
-  }
-
-  /**
-   * Constructs a parameter with the given optionID.
-   * 
-   * @param optionID the unique id of the option
-   */
-  public Parameter(OptionID optionID) {
-    this(optionID, (Vector<ParameterConstraint<S>>) null, false);
-  }
-
-  /**
-   * Wrap a single constraint into a vector of constraints.
-   * 
-   * @param <S> Type
-   * @param constraint Constraint, may be {@code null}
-   * @return Vector containing the constraint (if not null)
-   */
-  private static <S> List<ParameterConstraint<S>> makeConstraintsVector(ParameterConstraint<S> constraint) {
-    Vector<ParameterConstraint<S>> constraints = new Vector<ParameterConstraint<S>>((constraint == null) ? 0 : 1);
-    if(constraint != null) {
-      constraints.add(constraint);
-    }
-    return constraints;
-  }
+public interface Parameter<S, T extends S> {
 
   /**
    * Sets the default value of this parameter.
    * 
    * @param defaultValue default value of this parameter
    */
-  public void setDefaultValue(T defaultValue) {
-    this.defaultValue = defaultValue;
-    this.optionalParameter = true;
-  }
+  public abstract void setDefaultValue(T defaultValue);
 
   /**
    * Checks if this parameter has a default value.
    * 
    * @return true, if this parameter has a default value, false otherwise
    */
-  public boolean hasDefaultValue() {
-    return !(defaultValue == null);
-  }
+  public abstract boolean hasDefaultValue();
 
   /**
    * Sets the default value of this parameter as the actual value of this
    * parameter.
    */
   // TODO: can we do this more elegantly?
-  public void useDefaultValue() {
-    setValueInternal(defaultValue);
-    defaultValueTaken = true;
-  }
+  public abstract void useDefaultValue();
 
   /**
    * Handle default values for a parameter.
@@ -255,38 +59,21 @@ public abstract class Parameter<S, T extends S> {
    *         required parameter!
    * @throws UnspecifiedParameterException If the parameter requires a value
    */
-  public boolean tryDefaultValue() throws UnspecifiedParameterException {
-    // Assume default value instead.
-    if(hasDefaultValue()) {
-      useDefaultValue();
-      return true;
-    }
-    else if(isOptional()) {
-      // Optional is fine, but not successful
-      return false;
-    }
-    else {
-      throw new UnspecifiedParameterException(this);
-    }
-  }
+  public abstract boolean tryDefaultValue() throws UnspecifiedParameterException;
 
   /**
    * Specifies if this parameter is an optional parameter.
    * 
    * @param opt true if this parameter is optional, false otherwise
    */
-  public void setOptional(boolean opt) {
-    this.optionalParameter = opt;
-  }
+  public abstract void setOptional(boolean opt);
 
   /**
    * Checks if this parameter is an optional parameter.
    * 
    * @return true if this parameter is optional, false otherwise
    */
-  public boolean isOptional() {
-    return this.optionalParameter;
-  }
+  public abstract boolean isOptional();
 
   /**
    * Checks if the default value of this parameter was taken as the actual
@@ -295,18 +82,14 @@ public abstract class Parameter<S, T extends S> {
    * @return true, if the default value was taken as actual parameter value,
    *         false otherwise
    */
-  public boolean tookDefaultValue() {
-    return defaultValueTaken;
-  }
+  public abstract boolean tookDefaultValue();
 
   /**
    * Returns true if the value of the option is defined, false otherwise.
    * 
    * @return true if the value of the option is defined, false otherwise.
    */
-  public boolean isDefined() {
-    return (this.value != null);
-  }
+  public abstract boolean isDefined();
 
   /**
    * Returns the default value of the parameter.
@@ -317,27 +100,21 @@ public abstract class Parameter<S, T extends S> {
    *         has no default value.
    */
   // TODO: change this to return a string value?
-  public T getDefaultValue() {
-    return defaultValue;
-  }
+  public abstract T getDefaultValue();
 
   /**
    * Whether this class has a list of default values.
    * 
    * @return whether the class has a description of valid values.
    */
-  public boolean hasValuesDescription() {
-    return false;
-  }
+  public abstract boolean hasValuesDescription();
 
   /**
    * Return a string explaining valid values.
    * 
    * @return String explaining valid values (e.g. a class list)
    */
-  public String getValuesDescription() {
-    return "";
-  }
+  public abstract String getValuesDescription();
 
   /**
    * Returns the extended description of the option which includes the option's
@@ -345,99 +122,35 @@ public abstract class Parameter<S, T extends S> {
    * 
    * @return the option's description.
    */
-  public String getFullDescription() {
-    StringBuffer description = new StringBuffer();
-    // description.append(getParameterType()).append(" ");
-    description.append(shortDescription);
-    description.append(FormatUtil.NEWLINE);
-    if(hasValuesDescription()) {
-      final String valuesDescription = getValuesDescription();
-      description.append(valuesDescription);
-      if(!valuesDescription.endsWith(FormatUtil.NEWLINE)) {
-        description.append(FormatUtil.NEWLINE);
-      }
-    }
-    if(hasDefaultValue()) {
-      description.append("Default: ");
-      description.append(getDefaultValueAsString());
-      description.append(FormatUtil.NEWLINE);
-    }
-    if(!constraints.isEmpty()) {
-      if(constraints.size() == 1) {
-        description.append("Constraint: ");
-      }
-      else if(constraints.size() > 1) {
-        description.append("Constraints: ");
-      }
-      for(int i = 0; i < constraints.size(); i++) {
-        ParameterConstraint<S> constraint = constraints.get(i);
-        if(i > 0) {
-          description.append(", ");
-        }
-        description.append(constraint.getDescription(getName()));
-        if(i == constraints.size() - 1) {
-          description.append(".");
-        }
-      }
-      description.append(FormatUtil.NEWLINE);
-    }
-    return description.toString();
-  }
-
-  /**
-   * Validate a value after parsing (e.g. do constrain checks!)
-   * 
-   * @param obj Object to validate
-   * @return true iff the object is valid for this parameter.
-   * @throws ParameterException when the object is not valid.
-   */
-  protected boolean validate(T obj) throws ParameterException {
-    try {
-      for(ParameterConstraint<S> cons : this.constraints) {
-        cons.test(obj);
-      }
-    }
-    catch(ParameterException e) {
-      throw new WrongParameterValueException("Specified parameter value for parameter \"" + getName() + "\" breaches parameter constraint.\n" + e.getMessage());
-    }
-    return true;
-  }
+  public abstract String getFullDescription();
 
   /**
    * Return the OptionID of this option.
    * 
    * @return Option ID
    */
-  public OptionID getOptionID() {
-    return optionid;
-  }
+  public abstract OptionID getOptionID();
 
   /**
    * Returns the name of the option.
    * 
    * @return the option's name.
    */
-  public String getName() {
-    return optionid.getName();
-  }
+  public abstract String getName();
 
   /**
    * Returns the short description of the option.
    * 
    * @return the option's short description.
    */
-  public String getShortDescription() {
-    return shortDescription;
-  }
+  public abstract String getShortDescription();
 
   /**
    * Sets the short description of the option.
    * 
    * @param description the short description to be set
    */
-  public void setShortDescription(String description) {
-    this.shortDescription = description;
-  }
+  public abstract void setShortDescription(String description);
 
   /**
    * Sets the value of the option.
@@ -446,24 +159,7 @@ public abstract class Parameter<S, T extends S> {
    * @throws ParameterException if the given value is not a valid value for this
    *         option.
    */
-  public void setValue(Object obj) throws ParameterException {
-    T val = parseValue(obj);
-    if(validate(val)) {
-      setValueInternal(val);
-    }
-    else {
-      throw new InvalidParameterException("Value for option \"" + getName() + "\" did not validate: " + obj.toString());
-    }
-  }
-
-  /**
-   * Internal setter for the value.
-   * 
-   * @param val Value
-   */
-  protected final void setValueInternal(T val) {
-    this.value = this.givenValue = val;
-  }
+  public abstract void setValue(Object obj) throws ParameterException;
 
   /**
    * Returns the value of the option.
@@ -473,21 +169,14 @@ public abstract class Parameter<S, T extends S> {
    * 
    * @return the option's value.
    */
-  public final T getValue() {
-    if(this.value == null) {
-      LoggingUtil.warning("Programming error: Parameter#getValue() called for unset parameter \"" + this.optionid.getName() + "\"", new Throwable());
-    }
-    return this.value;
-  }
+  public abstract T getValue();
 
   /**
    * Get the last given value. May return {@code null}
    * 
    * @return Given value
    */
-  public Object getGivenValue() {
-    return this.givenValue;
-  }
+  public abstract Object getGivenValue();
 
   /**
    * Checks if the given argument is valid for this option.
@@ -497,10 +186,7 @@ public abstract class Parameter<S, T extends S> {
    * @throws ParameterException if the given value is not a valid value for this
    *         option.
    */
-  public final boolean isValid(Object obj) throws ParameterException {
-    T val = parseValue(obj);
-    return validate(val);
-  }
+  public abstract boolean isValid(Object obj) throws ParameterException;
 
   /**
    * Returns a string representation of the parameter's type (e.g. an
@@ -510,15 +196,6 @@ public abstract class Parameter<S, T extends S> {
    * @return a string representation of the parameter's type
    */
   public abstract String getSyntax();
-
-  /**
-   * Parse a given value into the destination type.
-   * 
-   * @param obj Object to parse (may be a string representation!)
-   * @return Parsed object
-   * @throws ParameterException when the object cannot be parsed.
-   */
-  protected abstract T parseValue(Object obj) throws ParameterException;
 
   /**
    * Get the value as string. May return {@code null}
@@ -532,16 +209,13 @@ public abstract class Parameter<S, T extends S> {
    * 
    * @return default value
    */
-  public String getDefaultValueAsString() {
-    return getDefaultValue().toString();
-  }
+  public abstract String getDefaultValueAsString();
 
   /**
    * Add an additional constraint.
    * 
    * @param constraint Constraint to add.
    */
-  public void addConstraint(ParameterConstraint<S> constraint) {
-    constraints.add(constraint);
-  }
+  public abstract void addConstraint(ParameterConstraint<S> constraint);
+
 }

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class Flag extends Parameter<Boolean, Boolean> {
+public class Flag extends AbstractParameter<Boolean, Boolean> {
   /**
    * Constant indicating that the flag is set.
    */
@@ -89,7 +89,6 @@ public class Flag extends Parameter<Boolean, Boolean> {
     return "<|" + SET + "|" + NOT_SET + ">";
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     return getValue() ? SET : NOT_SET;

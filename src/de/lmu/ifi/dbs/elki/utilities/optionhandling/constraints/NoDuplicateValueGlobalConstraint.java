@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -44,7 +45,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
   /**
    * List of number parameters to be checked.
    */
-  private List<? extends Parameter<?, ?>> parameters;
+  private List<? extends AbstractParameter<?, ?>> parameters;
 
   /**
    * Constructs a Not-Equal-Value global parameter constraint. That is, the
@@ -53,7 +54,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
    * 
    * @param parameters list of number parameters to be tested
    */
-  public NoDuplicateValueGlobalConstraint(List<? extends Parameter<?, ?>> parameters) {
+  public NoDuplicateValueGlobalConstraint(List<? extends AbstractParameter<?, ?>> parameters) {
     this.parameters = parameters;
   }
 
@@ -64,7 +65,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
    * 
    * @param parameters list of number parameters to be tested
    */
-  public NoDuplicateValueGlobalConstraint(Parameter<?, ?>... parameters) {
+  public NoDuplicateValueGlobalConstraint(AbstractParameter<?, ?>... parameters) {
     this.parameters = Arrays.asList(parameters);
   }
 

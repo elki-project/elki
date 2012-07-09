@@ -75,7 +75,6 @@ public class FileListParameter extends ListParameter<File> {
 
   // TODO: Add remaining constructors.
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     StringBuffer buf = new StringBuffer();
@@ -90,7 +89,6 @@ public class FileListParameter extends ListParameter<File> {
     return buf.toString();
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected List<File> parseValue(Object obj) throws ParameterException {
@@ -119,7 +117,6 @@ public class FileListParameter extends ListParameter<File> {
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of file values!");
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean validate(List<File> obj) throws ParameterException {
     if(!super.validate(obj)) {

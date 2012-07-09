@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class StringParameter extends Parameter<String, String> {
+public class StringParameter extends AbstractParameter<String, String> {
   /**
    * Constructs a string parameter with the given optionID, constraints and
    * default value.
@@ -137,13 +137,11 @@ public class StringParameter extends Parameter<String, String> {
     super(optionID);
   }
   
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     return getValue();
   }
 
-  /** {@inheritDoc} */
   @Override
   protected String parseValue(Object obj) throws ParameterException {
     if(obj == null) {

@@ -85,7 +85,6 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     this.restrictionClass = (Class<C>) restrictionClass;
   }
 
-  /** {@inheritDoc} */
   @Override
   public String getValueAsString() {
     StringBuffer buf = new StringBuffer();
@@ -103,7 +102,6 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     return buf.toString();
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected List<Class<? extends C>> parseValue(Object obj) throws ParameterException {
@@ -169,7 +167,6 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Class values!");
   }
 
-  /** {@inheritDoc} */
   @Override
   protected boolean validate(List<Class<? extends C>> obj) throws ParameterException {
     for(Class<? extends C> cls : obj) {
@@ -282,7 +279,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /**
    * This class sometimes provides a list of value descriptions.
    * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter#hasValuesDescription()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
    */
   @Override
   public boolean hasValuesDescription() {
@@ -292,7 +289,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /**
    * Return a description of known valid classes.
    * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter#getValuesDescription()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#getValuesDescription()
    */
   @Override
   public String getValuesDescription() {

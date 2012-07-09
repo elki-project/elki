@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 // TODO: add additional constructors with parameter constraints.
 // TODO: turn restrictionClass into a constraint?
-public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
+public class ClassParameter<C> extends AbstractParameter<Class<?>, Class<? extends C>> {
   /**
    * Class loader.
    */
@@ -122,7 +122,6 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
     this(optionID, restrictionClass, false);
   }
 
-  /** {@inheritDoc} */
   @SuppressWarnings("unchecked")
   @Override
   protected Class<? extends C> parseValue(Object obj) throws ParameterException {
@@ -196,7 +195,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
   /**
    * This class sometimes provides a list of value descriptions.
    * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter#hasValuesDescription()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
    */
   @Override
   public boolean hasValuesDescription() {
@@ -206,7 +205,7 @@ public class ClassParameter<C> extends Parameter<Class<?>, Class<? extends C>> {
   /**
    * Return a description of known valid classes.
    * 
-   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter#getValuesDescription()
+   * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#getValuesDescription()
    */
   @Override
   public String getValuesDescription() {

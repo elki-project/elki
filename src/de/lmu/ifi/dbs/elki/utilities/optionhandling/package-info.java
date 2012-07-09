@@ -19,7 +19,7 @@
  * </li>
  * 
  * <li><b>Parameter Object</b>: To obtain a value, you <em>must</em> use a
- * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter Parameter}
+ * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter Parameter}
  * object. <br />
  * Parameter objects handle <em>parsing</em> of values into the desired type, and various
  * subclasses for common types are provided. It is not desirable to subclass these types

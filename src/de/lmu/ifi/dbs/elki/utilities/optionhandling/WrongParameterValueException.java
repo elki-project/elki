@@ -40,7 +40,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param parameter the parameter that has a wrong value
    * @param read the value of the parameter read by the option handler
    */
-  public WrongParameterValueException(Parameter<?,?> parameter, String read) {
+  public WrongParameterValueException(Parameter<?, ?> parameter, String read) {
     this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription());
   }
 

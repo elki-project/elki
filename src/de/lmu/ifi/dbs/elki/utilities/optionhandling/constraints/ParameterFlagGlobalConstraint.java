@@ -28,11 +28,12 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Global parameter constraint describing the dependency of a parameter (
- * {@link Parameter}) on a given flag ({@link Flag}). Depending on the status of
+ * {@link AbstractParameter}) on a given flag ({@link Flag}). Depending on the status of
  * the flag the parameter is tested for keeping its constraints or not.
  * 
  * @author Steffi Wanka
@@ -47,7 +48,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
   /**
    * Parameter possibly to be checked.
    */
-  private Parameter<S,C> param;
+  private Parameter<S, C> param;
 
   /**
    * Flag the checking of the parameter constraints is dependent on.

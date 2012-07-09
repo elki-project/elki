@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @param <E> Enum type
  */
-public class EnumParameter<E extends Enum<E>> extends Parameter<Enum<E>, E> {
+public class EnumParameter<E extends Enum<E>> extends AbstractParameter<Enum<E>, E> {
 
   /**
    * Reference to the actual enum type, for T.valueOf().

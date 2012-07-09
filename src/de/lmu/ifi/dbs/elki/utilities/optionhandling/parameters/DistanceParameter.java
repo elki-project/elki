@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @param <D> Distance type 
  */
-public class DistanceParameter<D extends Distance<D>> extends Parameter<D, D> {
+public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<D, D> {
   /**
    * Distance type
    */
