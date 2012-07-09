@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -142,19 +142,22 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // Note: we assume that we have an efficient distance cache available,
     // since we are using 2*O(n*n) distance computations.
     DoubleMinMax minmax = new DoubleMinMax();
-    for(int x = 0; x < size; x++) {
-      DBID id1 = order.get(x);
-      for(int y = x; y < size; y++) {
-        DBID id2 = order.get(y);
-        final double dist = dq.distance(id1, id2).doubleValue();
-        if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
-          if(!skipzero || dist != 0.0) {
-            minmax.put(dist);
+    {
+      DBIDArrayIter id1 = order.iter();
+      DBIDArrayIter id2 = order.iter();
+      for(; id1.valid(); id1.advance()) {
+        id2.seek(id1.getOffset());
+        for(; id2.valid(); id2.advance()) {
+          final double dist = dq.distance(id1, id2).doubleValue();
+          if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
+            if(!skipzero || dist != 0.0) {
+              minmax.put(dist);
+            }
           }
         }
-      }
-      if(prog != null) {
-        prog.incrementProcessed(logger);
+        if(prog != null) {
+          prog.incrementProcessed(logger);
+        }
       }
     }
 
@@ -164,25 +167,28 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     }
     LinearScaling scale = new LinearScaling(zoom, -minmax.getMin() * zoom);
     BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
-    for(int x = 0; x < size; x++) {
-      DBID id1 = order.get(x);
-      for(int y = x; y < size; y++) {
-        DBID id2 = order.get(y);
-        double ddist = dq.distance(id1, id2).doubleValue();
-        if(ddist > 0.0) {
-          ddist = scale.getScaled(ddist);
+    {
+      DBIDArrayIter id1 = order.iter();
+      DBIDArrayIter id2 = order.iter();
+      for(int x = 0; x < size && id1.valid(); x++, id1.advance()) {
+        id2.seek(id1.getOffset());
+        for(int y = x; y < size && id2.valid(); y++, id2.advance()) {
+          double ddist = dq.distance(id1, id2).doubleValue();
+          if(ddist > 0.0) {
+            ddist = scale.getScaled(ddist);
+          }
+          // Apply extra scaling
+          if(scaling != null) {
+            ddist = scaling.getScaled(ddist);
+          }
+          int dist = 0xFF & (int) (255 * ddist);
+          int col = 0xff000000 | (dist << 16) | (dist << 8) | dist;
+          img.setRGB(x, y, col);
+          img.setRGB(y, x, col);
         }
-        // Apply extra scaling
-        if(scaling != null) {
-          ddist = scaling.getScaled(ddist);
+        if(prog != null) {
+          prog.incrementProcessed(logger);
         }
-        int dist = 0xFF & (int) (255 * ddist);
-        int col = 0xff000000 | (dist << 16) | (dist << 8) | dist;
-        img.setRGB(x, y, col);
-        img.setRGB(y, x, col);
-      }
-      if(prog != null) {
-        prog.incrementProcessed(logger);
       }
     }
     if(prog != null) {

@@ -29,7 +29,6 @@ import javax.swing.event.EventListenerList;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -181,10 +180,12 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     if(stepprog != null) {
       stepprog.beginStep(1, "New insertions ocurred, materialize their new kNNs.", getLogger());
     }
+    // Bulk-query kNNs
     List<? extends KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(aids, k);
-    for(int i = 0; i < aids.size(); i++) {
-      DBID id = aids.get(i);
-      storage.put(id, kNNList.get(i));
+    // Store in storage
+    DBIDIter iter = aids.iter();
+    for(int i = 0; i < aids.size(); i++, iter.advance()) {
+      storage.put(iter, kNNList.get(i));
     }
 
     // update the affected kNNs
@@ -260,9 +261,9 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
 
     // update the kNNs of the RkNNs
     List<? extends KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(rkNN_ids, k);
-    for(int i = 0; i < rkNN_ids.size(); i++) {
-      DBID id = rkNN_ids.get(i);
-      storage.put(id, kNNList.get(i));
+    DBIDIter iter = rkNN_ids.iter();
+    for(int i = 0; i < rkNN_ids.size(); i++, iter.advance()) {
+      storage.put(iter, kNNList.get(i));
     }
 
     return rkNN_ids;

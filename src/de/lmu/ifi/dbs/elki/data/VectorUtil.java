@@ -29,7 +29,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -303,7 +303,7 @@ public final class VectorUtil {
    *
    * @apiviz.exclude
    */
-  public static class SortDBIDsBySingleDimension implements Comparator<DBID> {
+  public static class SortDBIDsBySingleDimension implements Comparator<DBIDRef> {
     /**
      * Dimension to sort with
      */
@@ -343,7 +343,7 @@ public final class VectorUtil {
     }
 
     @Override
-    public int compare(DBID id1, DBID id2) {
+    public int compare(DBIDRef id1, DBIDRef id2) {
       return Double.compare(data.get(id1).doubleValue(d), data.get(id2).doubleValue(d));
     }
   }
