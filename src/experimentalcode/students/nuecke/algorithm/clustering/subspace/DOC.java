@@ -1,8 +1,6 @@
 package experimentalcode.students.nuecke.algorithm.clustering.subspace;
 
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
@@ -19,6 +17,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -268,11 +267,8 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
       V pV = relation.get(p);
 
       for(int j = 0; j < m; ++j) {
-        // Choose a set of random points. Shuffle the list and use
-        // the
-        // first r elements.
-        Collections.shuffle(S);
-        // FIXME: use DBIDUtil.randomSample(S, r, seed);
+        // Choose a set of random points.
+        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), (int) r), random.nextLong());
 
         // Initialize cluster info.
         ArrayModifiableDBIDs nC = DBIDUtil.newArray();
@@ -283,7 +279,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
         double[] min = new double[d];
         double[] max = new double[d];
         for(int k = 0; k < d; ++k) {
-          if(dimensionIsRelevant(k, relation, S.subList(0, Math.min(S.size(), (int) r)))) {
+          if(dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
             min[k] = pV.doubleValue(k + 1) - w;
             max[k] = pV.doubleValue(k + 1) + w;
@@ -299,9 +295,9 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
 
         // Get all points in the box.
         // TODO nicer way to do this?
-        for(DBID s : S) {
-          if(isPointInBounds(relation.get(s), bounds)) {
-            nC.add(s);
+        for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
+          if(isPointInBounds(relation.get(iter.deref()), bounds)) {
+            nC.add(iter.deref());
           }
         }
 
@@ -382,17 +378,15 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
       V pV = relation.get(p);
 
       for(int j = 0; j < m; ++j) {
-        // Choose a set of random points. Shuffle the list and use
-        // the first r elements.
-        Collections.shuffle(S);
-        // FIXME: use DBIDUtil.randomSample(S, r, seed);
+        // Choose a set of random points.
+        DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), (int) r), random.nextLong());
 
         // Initialize cluster info.
         BitSet nD = new BitSet(d);
 
         // Test each dimension and build bounding box while we're at it.
         for(int k = 0; k < d; ++k) {
-          if(dimensionIsRelevant(k, relation, S.subList(0, Math.min(S.size(), (int) r)))) {
+          if(dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
           }
         }
@@ -442,9 +436,9 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
 
     // Get all points in the box.
     // TODO nicer way to do this?
-    for(DBID s : S) {
-      if(isPointInBounds(relation.get(s), bounds)) {
-        C.add(s);
+    for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
+      if(isPointInBounds(relation.get(iter.deref()), bounds)) {
+        C.add(iter.deref());
       }
     }
 
@@ -471,11 +465,11 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
    * @param points the points to test.
    * @return <code>true</code> if the dimension is relevant.
    */
-  private boolean dimensionIsRelevant(int dimension, Relation<V> relation, List<DBID> points) {
+  private boolean dimensionIsRelevant(int dimension, Relation<V> relation, DBIDs points) {
     double min = Double.POSITIVE_INFINITY;
     double max = Double.NEGATIVE_INFINITY;
-    for(DBID x : points) {
-      V xV = relation.get(x);
+    for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
+      V xV = relation.get(iter.deref());
       min = Math.min(min, xV.doubleValue(dimension + 1));
       max = Math.max(max, xV.doubleValue(dimension + 1));
       if(max - min > w) {
