@@ -297,10 +297,11 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
           labelcolumns.set(i);
         }
       }
+      // Else: labels.
       if(labels == null) {
         labels = new LabelList(1);
       }
-      labels.add(ent);
+      labels.add(new String(ent)); // Make a new string, to not keep the whole file in memory.
     }
     // Maybe a label row?
     if(lineNumber == 1 && attributes.size() == 0) {
