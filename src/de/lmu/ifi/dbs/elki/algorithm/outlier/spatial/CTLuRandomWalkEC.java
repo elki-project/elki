@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -33,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -83,7 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
-@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url="http://dx.doi.org/10.1145/1869790.1869841")
+@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url = "http://dx.doi.org/10.1145/1869790.1869841")
 public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger
@@ -138,38 +138,40 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
     KNNHeap<D> heap = KNNUtil.newHeap(distFunc.getDistanceFactory(), k);
-    for(int i = 0; i < ids.size(); i++) {
-      final DBID id = ids.get(i);
-      final double val = relation.get(id).doubleValue(1);
-      assert (heap.size() == 0);
-      for(int j = 0; j < ids.size(); j++) {
-        if(i == j) {
-          continue;
+    {
+      int i = 0;
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
+        final double val = relation.get(id).doubleValue(1);
+        assert (heap.size() == 0);
+        int j = 0;
+        for(DBIDIter n = ids.iter(); n.valid(); n.advance(), j++) {
+          if(i == j) {
+            continue;
+          }
+          final double e;
+          final D distance = distFunc.distance(id, n);
+          heap.add(distance, n);
+          double dist = distance.doubleValue();
+          if(dist == 0) {
+            logger.warning("Zero distances are not supported - skipping: " + DBIDUtil.toString(id) + " " + DBIDUtil.toString(n));
+            e = 0;
+          }
+          else {
+            double diff = Math.abs(val - relation.get(n).doubleValue(1));
+            double exp = Math.exp(Math.pow(diff, alpha));
+            // Implementation note: not inverting exp worked a lot better.
+            // Therefore we diverge from the article here.
+            e = exp / dist;
+          }
+          E.set(j, i, e);
         }
-        final DBID n = ids.get(j);
-        final double e;
-        final D distance = distFunc.distance(id, n);
-        heap.add(distance, n);
-        double dist = distance.doubleValue();
-        if(dist == 0) {
-          logger.warning("Zero distances are not supported - skipping: " + id + " " + n);
-          e = 0;
+        // Convert kNN Heap into DBID array
+        ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
+        while(heap.size() > 0) {
+          nids.add(heap.poll());
         }
-        else {
-          double diff = Math.abs(val - relation.get(n).doubleValue(1));
-          double exp = Math.exp(Math.pow(diff, alpha));
-          // Implementation note: not inverting exp worked a lot better.
-          // Therefore we diverge from the article here.
-          e = exp / dist;
-        }
-        E.set(j, i, e);
+        neighbors.put(id, nids);
       }
-      // Convert kNN Heap into DBID array
-      ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
-      while(heap.size() > 0) {
-        nids.add(heap.poll());
-      }
-      neighbors.put(id, nids);
     }
     // normalize the adjacent Matrix
     // Sum based normalization - don't use E.normalizeColumns()
@@ -196,17 +198,19 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     E = E.inverse().timesEquals(1 - c);
 
     // Split the matrix into columns
-    for(int i = 0; i < ids.size(); i++) {
-      DBID id = ids.get(i);
-      // Note: matrix times ith unit vector = ith column
-      Vector sim = E.getCol(i);
-      similarityVectors.put(id, sim);
+    {
+      int i = 0;
+      for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
+        // Note: matrix times ith unit vector = ith column
+        Vector sim = E.getCol(i);
+        similarityVectors.put(id, sim);
+      }
     }
     E = null;
     // compute the relevance scores between specified Object and its neighbors
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(spatial.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       double gmean = 1.0;
       int cnt = 0;
       for(DBIDIter iter = neighbors.get(id).iter(); iter.valid(); iter.advance()) {

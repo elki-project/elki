@@ -459,9 +459,11 @@ public final class DBIDUtil {
     // Two methods: constructive vs. destructive
     if(k < source.size() / 2) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
+      DBIDArrayIter iter = aids.iter();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
       while(sample.size() < k) {
-        sample.add(aids.get(random.nextInt(aids.size())));
+        iter.seek(random.nextInt(aids.size()));
+        sample.add(iter);
       }
       return sample;
     }

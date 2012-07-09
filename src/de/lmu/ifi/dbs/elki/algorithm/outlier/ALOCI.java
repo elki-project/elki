@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -388,10 +389,13 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       // logger.warning(FormatUtil.format(lmin)+" "+FormatUtil.format(lmax)+" "+start+"->"+end+" "+(end-start));
       // Hack: Check degenerate cases that won't split
       if(dim == 0) {
-        NumberVector<?, ?> first = relation.get(ids.get(start));
+        DBIDArrayIter iter = ids.iter();
+        iter.seek(start);
+        NumberVector<?, ?> first = relation.get(iter);
+        iter.advance();
         boolean degenerate = true;
-        loop: for(int pos = start + 1; pos < end; pos++) {
-          NumberVector<?, ?> other = relation.get(ids.get(pos));
+        loop: for(int pos = start + 1; pos < end; pos++, iter.advance()) {
+          NumberVector<?, ?> other = relation.get(iter);
           for(int d = 1; d <= lmin.length; d++) {
             if(Math.abs(first.doubleValue(d) - other.doubleValue(d)) > 1E-15) {
               degenerate = false;

@@ -140,12 +140,12 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     while(changed) {
       changed = false;
       // Try to swap the medoid with a better cluster member:
-      for(int i = 0; i < k; i++) {
-        DBID med = medoids.get(i);
+      int i = 0;
+      for (DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
         DBID best = null;
         Mean bestm = mdists[i];
         for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(med, iter)) {
+          if(DBIDUtil.equal(miter, iter)) {
             continue;
           }
           Mean mdist = new Mean();
@@ -157,7 +157,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
             bestm = mdist;
           }
         }
-        if(best != null && !DBIDUtil.equal(med, best)) {
+        if(best != null && !DBIDUtil.equal(miter, best)) {
           changed = true;
           medoids.set(i, best);
           mdists[i] = bestm;
@@ -195,11 +195,14 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
-      for(int i = 0; i < k; i++) {
-        dists[i] = distQ.distance(iditer, means.get(i)).doubleValue();
-        if(dists[i] < mindist) {
-          minIndex = i;
-          mindist = dists[i];
+      {
+        int i = 0;
+        for(DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
+          dists[i] = distQ.distance(iditer, miter).doubleValue();
+          if(dists[i] < mindist) {
+            minIndex = i;
+            mindist = dists[i];
+          }
         }
       }
       if(clusters.get(minIndex).add(iditer)) {
@@ -207,7 +210,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
         mdist[minIndex].put(mindist);
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
-        for(int i = 0; i < k; i++) {
+        for (int i = 0; i < k; i++) {
           if(i != minIndex) {
             if(clusters.get(i).remove(iditer)) {
               mdist[minIndex].put(dists[i], -1);

@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -154,20 +153,19 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
     // logger.debugFine(logLike + " loglike beginning" +
     // loglikelihoodNormal(normalObjs, database));
     DoubleMinMax minmax = new DoubleMinMax();
-    for(int i = 0; i < objids.size(); i++) {
+    
+    DBIDIter iter = objids.iter();
+    for(int i = 0; i < objids.size(); i++, iter.advance()) {
       // logger.debugFine("i     " + i);
       // Change mask to make the current object anomalous
       bits.set(i);
       // Compute new likelihoods
       double currentLogLike = normalObjs.size() * logml + loglikelihoodNormal(normalObjs, relation) + anomalousObjs.size() * logl + loglikelihoodAnomalous(anomalousObjs);
 
-      // Get the actual object id
-      DBID curid = objids.get(i);
-
       // if the loglike increases more than a threshold, object stays in
       // anomalous set and is flagged as outlier
       final double loglikeGain = currentLogLike - logLike;
-      oscores.putDouble(curid, loglikeGain);
+      oscores.putDouble(iter, loglikeGain);
       minmax.put(loglikeGain);
 
       if(loglikeGain > c) {

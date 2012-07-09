@@ -34,6 +34,8 @@ public interface ArrayDBIDs extends DBIDs {
   /**
    * Get the i'th entry (starting at 0)
    * 
+   * If possible, use an {@link DBIDArrayIter} via {@link #iter()} instead!
+   * 
    * @param i Index
    * @return DBID of i'th entry.
    */

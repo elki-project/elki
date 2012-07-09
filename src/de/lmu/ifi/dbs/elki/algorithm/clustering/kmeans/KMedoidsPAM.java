@@ -149,17 +149,17 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
       double best = 0;
       DBID bestid = null;
       int bestcluster = -1;
-      for(int i = 0; i < k; i++) {
-        DBID med = medoids.get(i);
+      int i = 0;
+      for (DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
         for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(med, iter)) {
+          if(DBIDUtil.equal(miter, iter)) {
             continue;
           }
           // double disti = distQ.distance(id, med).doubleValue();
           double cost = 0;
           for(int j = 0; j < k; j++) {
             for(DBIDIter iter2 = clusters.get(j).iter(); iter2.valid(); iter2.advance()) {
-              double distcur = distQ.distance(iter2, medoids.get(j)).doubleValue();
+              double distcur = distQ.distance(iter2, miter).doubleValue();
               double distnew = distQ.distance(iter2, iter).doubleValue();
               if(j == i) {
                 // Cases 1 and 2.
@@ -174,16 +174,17 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
               }
               else {
                 // Cases 3-4: objects from other clusters
-                if (distcur < distnew) {
+                if(distcur < distnew) {
                   // Case 3: no change
-                } else {
+                }
+                else {
                   // Case 4: would switch to new medoid
                   cost += distnew - distcur; // Always negative
                 }
               }
             }
           }
-          if (cost < best) {
+          if(cost < best) {
             best = cost;
             bestid = DBIDUtil.deref(iter);
             bestcluster = i;
@@ -231,15 +232,18 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
       double mindist2 = Double.POSITIVE_INFINITY;
-      for(int i = 0; i < k; i++) {
-        double dist = distQ.distance(iditer, means.get(i)).doubleValue();
-        if(dist < mindist) {
-          minIndex = i;
-          mindist2 = mindist;
-          mindist = dist;
-        }
-        else if(dist < mindist2) {
-          mindist2 = dist;
+      {
+        int i = 0;
+        for(DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
+          double dist = distQ.distance(iditer, miter).doubleValue();
+          if(dist < mindist) {
+            minIndex = i;
+            mindist2 = mindist;
+            mindist = dist;
+          }
+          else if(dist < mindist2) {
+            mindist2 = dist;
+          }
         }
       }
       if(clusters.get(minIndex).add(iditer)) {
