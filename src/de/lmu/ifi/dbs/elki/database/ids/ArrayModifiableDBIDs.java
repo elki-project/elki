@@ -29,6 +29,8 @@ import java.util.Comparator;
  * Array-oriented implementation of a modifiable DBID collection.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has DBIDArrayMIter
  */
 public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
   /**
@@ -59,7 +61,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @return previous value
    */
   public DBID set(int i, DBID newval);
-  
+
   /**
    * Swap DBIDs add positions a and b.
    * 
@@ -67,4 +69,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
    * @param b Second position
    */
   public void swap(int a, int b);
+
+  @Override
+  public DBIDArrayMIter iter();
 }

@@ -23,21 +23,11 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.iterator.MIter;
-
 /**
- * Modifiable DBID iterator.
+ * Modifiable array iterator.
  * 
  * @author Erich Schubert
  */
-public interface DBIDMIter extends DBIDIter, MIter {
-  /**
-   * Remove the object the iterator currently points to.
-   * 
-   * Subsequent calls to {@link #deref} or {@link DBIDUtil#deref} may return a
-   * different element. Call {@link #advance()} to advance the iterator to the
-   * next element for further processing.
-   */
-  @Override
-  void remove();
+public interface DBIDArrayMIter extends DBIDArrayIter, DBIDMIter {
+  // Nothing new, see {@link DBIDArrayIter} and {@link DBIDMIter}
 }

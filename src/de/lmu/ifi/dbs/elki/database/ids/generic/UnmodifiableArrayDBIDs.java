@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * @author Erich Schubert
  * 
  * @apiviz.uses ArrayDBIDs
+ * @apiviz.has UnmodifiableDBIDArrayIter
  */
 public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   /**
@@ -64,10 +65,10 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   }
 
   @Override
-  public DBIDIter iter() {
-    DBIDIter it = inner.iter();
+  public DBIDArrayIter iter() {
+    DBIDArrayIter it = inner.iter();
     if(it instanceof DBIDMIter) {
-      return new UnmodifiableDBIDIter(it);
+      return new UnmodifiableDBIDArrayIter(it);
     }
     return it;
   }
@@ -93,5 +94,62 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   @Override
   public int binarySearch(DBIDRef key) {
     return inner.binarySearch(key);
+  }
+
+  /**
+   * Make an existing DBIDMIter unmodifiable.
+   * 
+   * @author Erich Schubert
+   */
+  class UnmodifiableDBIDArrayIter implements DBIDArrayIter {
+    /**
+     * Wrapped iterator
+     */
+    private DBIDArrayIter it;
+
+    /**
+     * Constructor.
+     * 
+     * @param it inner iterator
+     */
+    public UnmodifiableDBIDArrayIter(DBIDArrayIter it) {
+      super();
+      this.it = it;
+    }
+
+    @Override
+    public boolean valid() {
+      return it.valid();
+    }
+
+    @Override
+    public void advance() {
+      it.advance();
+    }
+
+    @Override
+    public DBIDRef deref() {
+      return it;
+    }
+
+    @Override
+    public void advance(int count) {
+      it.advance(count);
+    }
+
+    @Override
+    public void retract() {
+      it.retract();
+    }
+
+    @Override
+    public void seek(int off) {
+      it.seek(off);
+    }
+
+    @Override
+    public int getOffset() {
+      return it.getOffset();
+    }
   }
 }

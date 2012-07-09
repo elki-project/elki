@@ -27,8 +27,8 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
@@ -56,7 +56,7 @@ public class IntegerArrayStaticDBIDs implements ArrayStaticDBIDs {
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDArrayIter iter() {
     return new DBIDItr();
   }
 
@@ -67,7 +67,10 @@ public class IntegerArrayStaticDBIDs implements ArrayStaticDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDIter, IntegerDBIDRef {
+  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
+    /**
+     * Position within array
+     */
     int pos = 0;
 
     @Override
@@ -78,6 +81,26 @@ public class IntegerArrayStaticDBIDs implements ArrayStaticDBIDs {
     @Override
     public void advance() {
       pos++;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += 0;
+    }
+
+    @Override
+    public void retract() {
+      pos--;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
     }
 
     @Override
@@ -92,12 +115,12 @@ public class IntegerArrayStaticDBIDs implements ArrayStaticDBIDs {
 
     @Override
     public boolean equals(Object other) {
-      if (other instanceof DBID) {
+      if(other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
     }
-    
+
     @Override
     public String toString() {
       return Integer.toString(getIntegerID());

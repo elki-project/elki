@@ -26,8 +26,8 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -105,7 +105,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   @Override
   public boolean equals(Object obj) {
     if(!(obj instanceof IntegerDBID)) {
-      if (obj instanceof DBIDRef) {
+      if(obj instanceof DBIDRef) {
         LoggingUtil.warning("Programming error: DBID.equals(DBIDRef) is not well-defined. use sameDBID!", new Throwable());
       }
       return false;
@@ -113,7 +113,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     IntegerDBID other = (IntegerDBID) obj;
     return this.id == other.id;
   }
-  
+
   @Override
   public int compareTo(DBIDRef o) {
     final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
@@ -121,7 +121,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDArrayIter iter() {
     return new DBIDItr();
   }
 
@@ -155,15 +155,35 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDIter, IntegerDBIDRef {
+  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
     /**
-     * Whether we've already returned our object.
+     * Iterator position: We use an integer so we can support retract().
      */
-    boolean first = true;
+    int pos = 0;
 
     @Override
     public void advance() {
-      first = false;
+      pos++;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      pos--;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
     }
 
     @Override
@@ -178,17 +198,17 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
     @Override
     public boolean valid() {
-      return first;
+      return (pos == 0);
     }
 
     @Override
     public boolean equals(Object other) {
-      if (other instanceof DBID) {
+      if(other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
     }
-    
+
     @Override
     public String toString() {
       return Integer.toString(getIntegerID());

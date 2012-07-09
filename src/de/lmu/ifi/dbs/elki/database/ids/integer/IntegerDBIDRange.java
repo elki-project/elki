@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
@@ -70,7 +70,7 @@ class IntegerDBIDRange implements DBIDRange {
   }
 
   @Override
-  public DBIDIter iter() {
+  public DBIDArrayIter iter() {
     return new DBIDItr();
   }
 
@@ -81,7 +81,7 @@ class IntegerDBIDRange implements DBIDRange {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDIter, IntegerDBIDRef {
+  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
     int pos = 0;
 
     @Override
@@ -92,6 +92,26 @@ class IntegerDBIDRange implements DBIDRange {
     @Override
     public void advance() {
       pos++;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      pos--;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
     }
 
     @Override

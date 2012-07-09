@@ -68,7 +68,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
-  public DBIDMIter iter() {
+  public DBIDArrayMIter iter() {
     return EMPTY_ITERATOR;
   }
 
@@ -82,7 +82,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
    * 
    * @author Erich Schubert
    */
-  protected static class EmptyDBIDIterator implements DBIDMIter {
+  protected static class EmptyDBIDIterator implements DBIDArrayMIter {
     @Override
     public boolean valid() {
       return false;
@@ -100,7 +100,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
 
     @Override
     public boolean equals(Object other) {
-      if (other instanceof DBID) {
+      if(other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
@@ -109,6 +109,26 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     @Override
     public void remove() {
       throw new NoSuchElementException();
+    }
+
+    @Override
+    public void advance(int count) {
+      assert (count != 0) : "Misplaced call to advance()";
+    }
+
+    @Override
+    public void retract() {
+      assert (false) : "Misplaced call to retract()";
+    }
+
+    @Override
+    public void seek(int off) {
+      // Ignore
+    }
+
+    @Override
+    public int getOffset() {
+      return 0;
     }
   }
 }
