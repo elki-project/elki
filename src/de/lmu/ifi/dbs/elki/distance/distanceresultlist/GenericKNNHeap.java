@@ -33,23 +33,28 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * For double distances, see {@link DoubleDistanceKNNHeap}
  * 
+ * <b>To instantiate, use {@link KNNUtil#newHeap} instead!</b>
+ * 
  * @author Erich Schubert
  * 
  * @param <D> Distance type
  */
-public class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBIDPair<D>, D> {
+class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBIDPair<D>, D> {
   /**
    * Serial version
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Cached distance to k nearest neighbor (to avoid going through {@link #peek})
+   * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
+   * )
    */
   protected D knndistance = null;
 
   /**
    * Constructor.
+   * 
+   * <b>To instantiate, use {@link KNNUtil#newHeap} instead!</b>
    * 
    * @param k Heap size
    */
@@ -71,8 +76,8 @@ public class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<Dista
   public void add(D distance, DBIDRef id) {
     if(size() < maxsize || knndistance.compareTo(distance) >= 0) {
       super.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
-      if (size() >= maxsize) {
-        knndistance = peek().getDistance();        
+      if(size() >= maxsize) {
+        knndistance = peek().getDistance();
       }
     }
   }

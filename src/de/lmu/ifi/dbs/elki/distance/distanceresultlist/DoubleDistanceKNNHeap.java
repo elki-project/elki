@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 /**
  * Heap for collecting double-valued KNN instances.
  * 
+ * See also: {@link KNNUtil#newHeap}!
+ * 
  * @author Erich Schubert
  */
 public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPair, DoubleDistance> {
@@ -38,14 +40,17 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * Serial version
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
-   * Cached distance to k nearest neighbor (to avoid going through {@link #peek})
+   * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
+   * too often)
    */
   protected double knndistance = Double.POSITIVE_INFINITY;
 
   /**
    * Constructor.
+   * 
+   * See also: {@link KNNUtil#newHeap}!
    * 
    * @param k Heap size
    */
@@ -62,7 +67,7 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
   public DoubleDistanceKNNList toKNNList() {
     return new DoubleDistanceKNNList(this);
   }
-  
+
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
    * 
@@ -72,10 +77,10 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * @param id ID number
    */
   public void add(double distance, DBIDRef id) {
-    if(size() < maxsize || knndistance >= distance) {
+    if(distance <= knndistance) {
       super.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
-      if (size() >= maxsize) {
-        knndistance = peek().doubleDistance();        
+      if(size() >= maxsize) {
+        knndistance = peek().doubleDistance();
       }
     }
   }
