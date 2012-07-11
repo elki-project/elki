@@ -77,14 +77,15 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     colors = new TIntArrayList(clusters.size());
 
     Iterator<? extends Cluster<?>> ci = clusters.iterator();
-    for(int i = 0;; i++) {
+    for(int i = 0; ci.hasNext(); i++) {
       Cluster<?> c = ci.next();
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
       Color col = SVGUtil.stringToColor(colorset.getColor(i));
-      if (col != null) {
+      if(col != null) {
         colors.add(col.getRGB());
-      } else {
-        LoggingUtil.warning("Unrecognized color name: "+colorset.getColor(i));
+      }
+      else {
+        LoggingUtil.warning("Unrecognized color name: " + colorset.getColor(i));
       }
       if(!ci.hasNext()) {
         break;
