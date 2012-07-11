@@ -1,6 +1,5 @@
 package experimentalcode.erich.parallel;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,26 +23,43 @@ package experimentalcode.erich.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 /**
- * Map executor.
+ * Shared variables storing a particular type.
  * 
  * @author Erich Schubert
+ * 
+ * @param <T> Payload type
  */
-public interface MapExecutor {
+public interface SharedVariable<T> {
   /**
-   * Get a channel for this executor.
+   * Instantiate for an execution thread.
    * 
-   * @param parent Channel parent
-   * @param cls Channel instance class
-   * @return Instance or {@code null}
+   * @param mapper Mapper to instantiate for
+   * @return Instance
    */
-  public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls);
+  public Instance<T> instantiate(MapExecutor mapper);
 
   /**
-   * Add a channel instance to this executor.
+   * Instance for a single execution thread.
    * 
-   * @param parent Channel parent
-   * @param inst Channel instance
+   * @author Erich Schubert
+   * 
+   * @param <T> Payload type
    */
-  public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst);
+  public interface Instance<T> {
+    /**
+     * Get the current value
+     * 
+     * @return Value
+     */
+    public T get();
+
+    /**
+     * Set a new value
+     * 
+     * @param data Setter
+     */
+    public void set(T data);
+  }
 }

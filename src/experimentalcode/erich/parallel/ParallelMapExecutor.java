@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import experimentalcode.erich.parallel.mapper.Mapper;
 
 /**
  * Class to run mappers in Parallel.
@@ -109,11 +110,11 @@ public class ParallelMapExecutor {
      * Mapper
      */
     private Mapper.Instance[] mapper;
-    
+
     /**
      * Channel map
      */
-    private HashMap<Object, Object> channels = new HashMap<Object, Object>();
+    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<SharedVariable<?>, SharedVariable.Instance<?>>();
 
     /**
      * Constructor.
@@ -131,7 +132,7 @@ public class ParallelMapExecutor {
       this.end = end;
       this.step = step;
       this.mapper = new Mapper.Instance[mapper.length];
-      for (int i = 0; i < mapper.length; i++) {
+      for(int i = 0; i < mapper.length; i++) {
         this.mapper[i] = mapper[i].instantiate(this);
       }
     }
@@ -141,7 +142,7 @@ public class ParallelMapExecutor {
       DBIDArrayIter iter = ids.iter();
       iter.seek(start);
       for(; iter.valid() && iter.getOffset() < end; iter.advance(step)) {
-        for (int i = 0; i < mapper.length; i++) {
+        for(int i = 0; i < mapper.length; i++) {
           mapper[i].map(iter);
         }
         // This is a good moment for multitasking
@@ -150,26 +151,21 @@ public class ParallelMapExecutor {
       return ids;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> InputChannel.Instance<T> instantiate(InputChannel<T> chan) {
-      @SuppressWarnings("unchecked")
-      InputChannel.Instance<T> chaninst = (InputChannel.Instance<T>) channels.get(chan);
-      if (chaninst == null) {
-        chaninst = chan.instantiate(this);
-        channels.put(chan, chaninst);
+    public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls) {
+      SharedVariable.Instance<?> inst = channels.get(parent);
+      if(inst == null) {
+        return null;
       }
-      return chaninst;
+      else {
+        return (I) cls.cast(inst);
+      }
     }
 
     @Override
-    public <T> OutputChannel.Instance<T> instantiate(OutputChannel<T> chan) {
-      @SuppressWarnings("unchecked")
-      OutputChannel.Instance<T> chaninst = (OutputChannel.Instance<T>) channels.get(chan);
-      if (chaninst == null) {
-        chaninst = chan.instantiate(this);
-        channels.put(chan, chaninst);
-      }
-      return chaninst;
+    public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst) {
+      channels.put(chan, inst);
     }
   }
 }
