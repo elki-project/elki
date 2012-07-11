@@ -1,6 +1,5 @@
 package experimentalcode.erich.parallel;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,25 +24,50 @@ package experimentalcode.erich.parallel;
  */
 
 /**
- * Map executor.
+ * Direct channel connecting two mappers.
  * 
  * @author Erich Schubert
  */
-public interface MapExecutor {
-  /**
-   * Get a channel for this executor.
-   * 
-   * @param parent Channel parent
-   * @param cls Channel instance class
-   * @return Instance or {@code null}
-   */
-  public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls);
+public class SharedDouble implements SharedVariable<Double> {
+  @Override
+  public Instance instantiate(MapExecutor mapper) {
+    Instance instance = mapper.getShared(this, Instance.class);
+    if(instance == null) {
+      instance = new Instance();
+      mapper.addShared(this, instance);
+    }
+    return instance;
+  }
 
   /**
-   * Add a channel instance to this executor.
+   * Instance for a sub-channel.
    * 
-   * @param parent Channel parent
-   * @param inst Channel instance
+   * @author Erich Schubert
    */
-  public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst);
+  public static class Instance implements SharedVariable.Instance<Double> {
+    /**
+     * Cache for last data consumed/produced
+     */
+    protected double data = Double.NaN;
+
+    @Deprecated
+    @Override
+    public Double get() {
+      return data;
+    }
+
+    @Deprecated
+    @Override
+    public void set(Double data) {
+      this.data = data;
+    }
+
+    public double doubleValue() {
+      return data;
+    }
+
+    public void set(double data) {
+      this.data = data;
+    }
+  }
 }

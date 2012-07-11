@@ -1,5 +1,4 @@
-package experimentalcode.erich.parallel;
-
+package experimentalcode.erich.parallel.mapper;
 
 /*
  This file is part of ELKI:
@@ -24,26 +23,42 @@ package experimentalcode.erich.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import experimentalcode.erich.parallel.MapExecutor;
+
 /**
- * Map executor.
+ * Class to represent a mapper factory.
  * 
  * @author Erich Schubert
  */
-public interface MapExecutor {
+public interface Mapper {
   /**
-   * Get a channel for this executor.
+   * Create an instance. May be called multiple times, for example for multiple
+   * threads.
    * 
-   * @param parent Channel parent
-   * @param cls Channel instance class
-   * @return Instance or {@code null}
+   * @param executor Map executor
+   * @return Instance
    */
-  public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls);
+  public Instance instantiate(MapExecutor exectutor);
 
   /**
-   * Add a channel instance to this executor.
+   * Mapper instance.
    * 
-   * @param parent Channel parent
-   * @param inst Channel instance
+   * @author Erich Schubert
    */
-  public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst);
+  public interface Instance {
+    /**
+     * Map a single object
+     * 
+     * @param id Object to map.
+     * 
+     * @return Mapping result
+     */
+    public void map(DBIDRef id);
+
+    /**
+     * Invoke cleanup.
+     */
+    public void cleanup();
+  }
 }
