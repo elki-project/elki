@@ -1,6 +1,7 @@
 package experimentalcode.erich.parallel;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -22,6 +23,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
 import experimentalcode.erich.parallel.mapper.KDoubleDistanceMapper;
 import experimentalcode.erich.parallel.mapper.KNNMapper;
@@ -94,16 +96,35 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
     return logger;
   }
 
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   *
+   * @param <O> Object type
+   * @param <D> Distance type
+   */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * K parameter
+     */
+    int k;
+    
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      
+      IntParameter kP = new IntParameter(KNNOutlier.K_ID);
+      if (config.grab(kP)) {
+        k = kP.getValue();
+      }
     }
 
     @Override
     protected ParallelKNNOutlier<O, D> makeInstance() {
-      return new ParallelKNNOutlier<O, D>(distanceFunction, 10);
+      return new ParallelKNNOutlier<O, D>(distanceFunction, k);
     }
-
   }
 }
