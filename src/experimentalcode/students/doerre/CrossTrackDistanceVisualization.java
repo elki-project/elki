@@ -16,6 +16,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -84,49 +85,20 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> imple
   }
 
   private void processRelation(Database db, Relation<V> rel) {
-    // TODO: distanz-funktion parameterisierbar
-    //DistanceQuery<V, DoubleDistance> dq = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
-    //KNNQuery<V, DoubleDistance> knnq = db.getKNNQuery(dq);
+
     V factory = DatabaseUtil.assumeVectorField(rel).getFactory();
 
-    //SpatialPrimitiveDoubleDistanceFunction<? super V> df = EuclideanDistanceFunction.STATIC;
-    //ModifiableHyperBoundingBox bb = new ModifiableHyperBoundingBox(new double[]{37.788800, -77.011533}, new double[]{43.788800, -71.011533});
-    //ModifiableHyperBoundingBox bb = new ModifiableHyperBoundingBox(new double[]{-77.011533, +37.788800}, new double[]{-71.011533, +43.788800});
     SpatialPrimitiveDoubleDistanceFunction<? super V> df2 = LatLngDistanceFunction.STATIC;
-    
-    //V newyork = factory.newNumberVector(new double[]{-74.011533, +40.788800});
-    //V berlin = factory.newNumberVector(new double[]{+13.24, +52.31});
     
     //latlong-schreibweise
     V newyork2 = factory.newNumberVector(new double[]{40.788800, -74.011533});
     V berlin2 = factory.newNumberVector(new double[]{52.31, 13.24});
-    //V reykjavik2 = factory.newNumberVector(new double[]{64.9, -21.56});
-    //V dublin2 = factory.newNumberVector(new double[]{53.21, -6.16});  
-    
+
     V p1 = berlin2;
     V p2 = newyork2;
-    //V p3 = reykjavik2;
-    //V p4 = dublin2;
-    
+
     double dist_bn = df2.doubleDistance(berlin2, newyork2);
     
-    // Calculate Cross-Track and Along-Track distances of Berlin-New York-Track and two Test Points
-    //double dist_ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),p3.doubleValue(1),p3.doubleValue(2));    
-    //double dist_alt = experimentalcode.students.doerre.AlongTrackDistance.AlongTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),p3.doubleValue(1),p3.doubleValue(2));  
-    //double dist_ctd2 = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),p4.doubleValue(1),p4.doubleValue(2));
-    //double dist_alt2 = experimentalcode.students.doerre.AlongTrackDistance.AlongTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),p4.doubleValue(1),p4.doubleValue(2));
-    
-    //System.out.println("Strecke: Berlin - New York. Großkreis-Distanz: " + (int) dist_bn + " km");
-    
-    //System.out.println("Cross-Track Distance (Reykjavik): " + (int) dist_ctd + " km");
-    //System.out.println("Along-Track Distance (Reykjavik): " + (int) dist_alt + " km");
-    //System.out.println("Cross-Track Distance (Dublin): " + (int) dist_ctd2 + " km");
-    //System.out.println("Along-Track Distance (Dublin): " + (int) dist_alt2 + " km");
-    
-    // Calculate coordinates of nearest points on the track 
-    //double [] coordinates = experimentalcode.students.doerre.AlongTrackDistance.AlongTrackCoordinates (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),p3.doubleValue(1),p3.doubleValue(2));
-    //double [] coordinates2 = experimentalcode.students.doerre.AlongTrackDistance.AlongTrackCoordinates (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),p4.doubleValue(1),p4.doubleValue(2));
-
     int distance_of_points = 5;
     
     int number_of_points = (int) (dist_bn / distance_of_points);
@@ -148,6 +120,8 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> imple
     // Calculate Cross-Track and Along-Track distances of all points 
     
     double [][] cross_track_distances = new double [width][height];
+    DoubleMinMax minmax = new DoubleMinMax();
+
     
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
@@ -157,19 +131,28 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> imple
         // ..und übergeben
         double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),lat,lon);    
         cross_track_distances [x][y] = ctd;
+        minmax.put(ctd);
       }
     }
     
     // Red: left off-course, green: right off-course
-    int red=0x99ff0000;
-    int green=0x9900ff00;
+    int red=0xffff0000;
+    int green=0xff00ff00;
     
     for(int x = 0; x < width; x++) {
       for(int y = 0; y < height; y++) {
-        if (cross_track_distances[x][y] < 0) {
-          img.setRGB(x, y, red);
+        if (cross_track_distances[x][y] < 0) { 
+          double reldist = cross_track_distances[x][y] / minmax.getMax();
+          int val = 255 - (0xFF & 16* (int) (15 * reldist - .95));
+          int col = val << 24;
+          int col_red = red - col;  // red
+          img.setRGB(x, y, col_red);
         } else if (cross_track_distances[x][y] > 0){
-          img.setRGB(x, y, green);
+          double reldist = cross_track_distances[x][y] / minmax.getMax();
+          int val = 255 - (0xFF & 16* (int) (.5 + 15 * reldist));
+          int col = val << 24;
+          int col_green = green + col;  // green
+          img.setRGB(x, y, col_green); 
         }
       }
     }
@@ -184,7 +167,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> imple
     for (int iter2=0; iter2<number_of_points; iter2++) {
         
         int point_y2 = (int) ((dest_points[iter2][0] + 90) / 180. * height); 
-        int point_y3 = height - point_y2; // oben/unten vertauschen notwendig!
+        int point_y3 = height - point_y2; // changing of sides necessary
         int point_x2 = (int) ((dest_points[iter2][1] + 180) / 360. * width);
         
         g2d.drawRect(point_x2, point_y3, 1, 1);
