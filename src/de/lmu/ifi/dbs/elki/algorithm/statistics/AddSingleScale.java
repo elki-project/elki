@@ -35,21 +35,37 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
- * Pseudo "algorith" that computes the global min/max for a relation across all
+ * Pseudo "algorithm" that computes the global min/max for a relation across all
  * attributes.
+ * 
+ * FIXME: this should become part of relation metadata.
  * 
  * @author Erich Schubert
  */
 @Description("Setup a scaling so that all dimensions are scaled equally in visualization.")
 public class AddSingleScale implements Algorithm {
   /**
-   * Constructor.
+   * Minimum and maximum to use
    */
-  public AddSingleScale() {
+  double[] minmax = null;
+
+  /**
+   * Constructor.
+   * 
+   * @param minmax Minimum and maximum values
+   */
+  public AddSingleScale(double[] minmax) {
     super();
+    this.minmax = minmax;
   }
 
   @SuppressWarnings("unchecked")
@@ -72,17 +88,26 @@ public class AddSingleScale implements Algorithm {
    */
   private ScalesResult run(Relation<? extends NumberVector<?, ?>> rel) {
     final int dim = DatabaseUtil.dimensionality(rel);
-    DoubleMinMax minmax = new DoubleMinMax();
-    for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      NumberVector<?, ?> vec = rel.get(iditer);
-      for(int d = 1; d <= dim; d++) {
-        minmax.put(vec.doubleValue(d));
+    LinearScale[] scales = new LinearScale[dim];
+    if(minmax == null) {
+      DoubleMinMax minmax = new DoubleMinMax();
+      for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        NumberVector<?, ?> vec = rel.get(iditer);
+        for(int d = 1; d <= dim; d++) {
+          minmax.put(vec.doubleValue(d));
+        }
+      }
+      LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
+      for(int i = 0; i < dim; i++) {
+        scales[i] = scale;
       }
     }
-    LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
-    LinearScale[] scales = new LinearScale[dim];
-    for(int i = 0; i < dim; i++) {
-      scales[i] = scale;
+    else {
+      // Use predefined.
+      LinearScale scale = new LinearScale(minmax[0], minmax[1]);
+      for(int i = 0; i < dim; i++) {
+        scales[i] = scale;
+      }
     }
     ScalesResult res = new ScalesResult(scales);
     return res;
@@ -91,5 +116,38 @@ public class AddSingleScale implements Algorithm {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+  }
+
+  /**
+   * Parameterization class
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Minimum and maximum to use
+     */
+    double[] minmax = null;
+
+    /**
+     * Minimum and maximum values
+     */
+    public static final OptionID MINMAX_ID = OptionID.getOrCreateOptionID("scales.minmax", "Forcibly set the scales to the given range.");
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleListParameter minmaxP = new DoubleListParameter(MINMAX_ID, new ListSizeConstraint<Double>(2), true);
+      if(config.grab(minmaxP)) {
+        minmax = ArrayLikeUtil.toPrimitiveDoubleArray(minmaxP.getValue());
+      }
+    }
+
+    @Override
+    protected AddSingleScale makeInstance() {
+      return new AddSingleScale(minmax);
+    }
   }
 }
