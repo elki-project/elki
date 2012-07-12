@@ -26,6 +26,7 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -105,9 +106,13 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
     @Override
     public void map(DBIDRef id) {
       KNNResult<D> knn = knns.get(id);
-      final int size = knn.size();
+      final int size = knn.size() - 1;
       double lrd = 0.0;
       for(DistanceDBIDResultIter<D> n = knn.iter(); n.valid(); n.advance()) {
+        if(DBIDUtil.equal(n, id)) {
+          // TODO: check that the size value is correct!
+          continue;
+        }
         lrd += Math.max(kdists.doubleValue(n), n.getDistance().doubleValue()) / size;
       }
       output.set(lrd);
