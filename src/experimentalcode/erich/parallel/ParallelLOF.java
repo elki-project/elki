@@ -1,7 +1,7 @@
 package experimentalcode.erich.parallel;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -71,20 +71,20 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
   public OutlierResult run(Database database, Relation<O> relation) {
     DBIDs ids = relation.getDBIDs();
     DistanceQuery<O, D> distq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O, D> knnq = database.getKNNQuery(distq, k);
+    KNNQuery<O, D> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist
     WritableDoubleDataStore kdists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     WritableDataStore<KNNResult<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNResult.class);
     {
       // Compute kNN
-      KNNMapper<O, D> knnm = new KNNMapper<O, D>(k, knnq);
+      KNNMapper<O, D> knnm = new KNNMapper<O, D>(k + 1, knnq);
       SharedObject<KNNResult<D>> knnv = new SharedObject<KNNResult<D>>();
       WriteDataStoreMapper<KNNResult<D>> storek = new WriteDataStoreMapper<KNNResult<D>>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
       // Compute k-dist
-      KDoubleDistanceMapper kdistm = new KDoubleDistanceMapper(k);
+      KDoubleDistanceMapper kdistm = new KDoubleDistanceMapper(k + 1);
       SharedDouble kdistv = new SharedDouble();
       WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(kdists);
       kdistm.connectKNNInput(knnv);
@@ -155,7 +155,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter kP = new IntParameter(KNNOutlier.K_ID);
+      IntParameter kP = new IntParameter(LOF.K_ID);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
