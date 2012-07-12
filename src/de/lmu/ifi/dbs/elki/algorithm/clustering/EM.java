@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -138,17 +139,24 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
   private KMeansInitialization<V> initializer;
 
   /**
+   * Maximum number of iterations to allow
+   */
+  private int maxiter;
+
+  /**
    * Constructor.
    * 
    * @param k k parameter
    * @param delta delta parameter
    * @param initializer Class to choose the initial means
+   * @param maxiter Maximum number of iterations
    */
-  public EM(int k, double delta, KMeansInitialization<V> initializer) {
+  public EM(int k, double delta, KMeansInitialization<V> initializer, int maxiter) {
     super();
     this.k = k;
     this.delta = delta;
     this.initializer = initializer;
+    this.maxiter = maxiter;
   }
 
   /**
@@ -205,14 +213,12 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
     if(logger.isVerbose()) {
       logger.verbose("iterating EM");
     }
+    if(logger.isVerbose()) {
+      logger.verbose("iteration " + 0 + " - expectation value: " + emNew);
+    }
 
     double em;
-    int it = 0;
-    do {
-      it++;
-      if(logger.isVerbose()) {
-        logger.verbose("iteration " + it + " - expectation value: " + emNew);
-      }
+    for(int it = 1; it <= maxiter || maxiter < 0; it++) {
       em = emNew;
 
       // recompute models
@@ -259,8 +265,14 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
       // reassign probabilities
       emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
+
+      if(logger.isVerbose()) {
+        logger.verbose("iteration " + it + " - expectation value: " + emNew);
+      }
+      if(Math.abs(em - emNew) <= delta) {
+        break;
+      }
     }
-    while(Math.abs(em - emNew) > delta);
 
     if(logger.isVerbose()) {
       logger.verbose("assigning clusters");
@@ -390,6 +402,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
 
     protected KMeansInitialization<V> initializer;
 
+    protected int maxiter = -1;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -407,11 +421,16 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }
+
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, new GreaterEqualConstraint(0), true);
+      if(config.grab(maxiterP)) {
+        maxiter = maxiterP.getValue();
+      }
     }
 
     @Override
     protected EM<V> makeInstance() {
-      return new EM<V>(k, delta, initializer);
+      return new EM<V>(k, delta, initializer, maxiter);
     }
   }
 }
