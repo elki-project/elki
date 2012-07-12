@@ -40,7 +40,7 @@ public class WriteDataStoreMapper<T> implements Mapper {
    * Store to write to
    */
   WritableDataStore<T> store;
-  
+
   /**
    * Input variable
    */
@@ -54,6 +54,15 @@ public class WriteDataStoreMapper<T> implements Mapper {
   public WriteDataStoreMapper(WritableDataStore<T> store) {
     super();
     this.store = store;
+  }
+
+  /**
+   * Connect the data source
+   * 
+   * @param input Input
+   */
+  public void connectInput(SharedObject<T> input) {
+    this.input = input;
   }
 
   @Override
@@ -74,7 +83,7 @@ public class WriteDataStoreMapper<T> implements Mapper {
 
     /**
      * Constructor.
-     *
+     * 
      * @param input Input object
      */
     public Instance(SharedObject.Instance<T> input) {
