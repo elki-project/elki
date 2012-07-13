@@ -286,7 +286,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     Iterator<String> itr = entries.iterator();
     for(int i = 0; itr.hasNext(); i++) {
       String ent = itr.next();
-      if(!labelIndices.get(i)) {
+      if(labelIndices == null || !labelIndices.get(i)) {
         try {
           double attribute = Double.parseDouble(ent);
           attributes.add(attribute);
@@ -413,8 +413,8 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     protected void getLabelIndices(Parameterization config) {
       IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
 
-      labelIndices = new BitSet();
       if(config.grab(labelIndicesP)) {
+        labelIndices = new BitSet();
         List<Integer> labelcols = labelIndicesP.getValue();
         for(Integer idx : labelcols) {
           labelIndices.set(idx);
