@@ -108,14 +108,20 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
       KNNResult<D> knn = knns.get(id);
       final int size = knn.size() - 1;
       double lrd = 0.0;
+      int dup = 0;
       for(DistanceDBIDResultIter<D> n = knn.iter(); n.valid(); n.advance()) {
+        // Do not include the query object
         if(DBIDUtil.equal(n, id)) {
-          // TODO: check that the size value is correct!
+          dup++;
           continue;
         }
         lrd += Math.max(kdists.doubleValue(n), n.getDistance().doubleValue()) / size;
       }
-      output.set(lrd);
+      // This shouldn't occur, but we can handle it:
+      if(dup != 1) {
+        lrd = lrd * (size / (knn.size() - (double) dup));
+      }
+      output.set(lrd > 0 ? 1 / lrd : 0);
     }
 
     @Override
