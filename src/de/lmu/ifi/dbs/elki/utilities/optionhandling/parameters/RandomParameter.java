@@ -51,7 +51,7 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
   /**
    * Constructor with optional flag.
    * 
-   * Note: you probably mean to use {@link #RandomParameter(OptionID, null)},
+   * Note: you probably mean to use {@code new RandomParameter(OptionID, null)},
    * which will use a random seed.
    * 
    * @param optionID Option ID
@@ -74,12 +74,10 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
   }
 
   /**
-   * Constructor with default value. The default value may be {@code null},
-   * which means a new random will be generated.
+   * Constructor with default seed value.
    * 
    * @param optionID Option ID
-   * @param defaultValue Default value. If {@code null}, a new random object
-   *        will be created.
+   * @param seed Default seed.
    */
   public RandomParameter(OptionID optionID, long seed) {
     super(optionID);
