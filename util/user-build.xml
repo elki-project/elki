@@ -1,13 +1,22 @@
 <project name="ELKI-Custom" default="jar" basedir="..">
-	<!-- SEARCH FOR "CUSTOMIZE" TO FIND IMPORTANT SETTINGS -->
-	<!-- Note: the generated jar requires the "lib" folder for dependencies, it's not standalone -->
+	<!-- SEARCH FOR "CUSTOMIZE" TO FIND IMPORTANT SETTINGS!
+	
+	Note: the generated jar requires the "lib" folder for dependencies, it's not standalone
+	
+	     To include your classes in the drop-down menus,
+	     you will need to update the META-INF/elki files.
+	     A patches to auto-update these files are welcome.
+	     de.lmu.ifi.dbs.elki.application.internal.CheckELKIServices
+	     can find the classes already, it just doesn't change the files yet!
+	-->
 	<property name="src" location="src" />
 	<property name="build" location="build" />
 	<property name="dist" location="." />
 	<property name="elki" value="de.lmu.ifi.dbs.elki" />
 	<property name="title" value="ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures" />
 	<property name="url" value="http://elki.dbs.ifi.lmu.de/" />
-	<property name="version" value="custom" /> <!-- You can customize this, too. -->
+	<property name="version" value="custom" />
+	<!-- You can customize this, too. -->
 
 	<target name="init">
 		<!-- Create the build directory structure used by compile -->
@@ -23,7 +32,7 @@
 				<pathelement path="lib/batik-all-1.7.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01-ext.jar" />
-				<pathelement path="lib/trove-3.0.2.jar" />
+				<pathelement path="lib/trove-3.0.3.jar" />
 			</classpath>
 			<include name="de/lmu/ifi/dbs/elki/**/*.java" />
 			<include name="tutorial/**/*.java" />
