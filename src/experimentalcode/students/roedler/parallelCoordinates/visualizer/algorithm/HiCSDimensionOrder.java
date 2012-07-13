@@ -53,7 +53,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
   /**
    * Maximum number of retries.
    */
-  private static final int MAX_RETRIES = 100;
+  private static final int MAX_RETRIES = 10;
   
   /**
    * Monte-Carlo iterations
@@ -223,38 +223,9 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
         ts.set(j);
         calculateContrast(relation, ts, subspaceIndex);
         dDimensionalList.add(ts);
-
       }
     }
-
-    for(int d = 3; !dDimensionalList.isEmpty(); d++) {
-
-      subspaceList.addAll(dDimensionalList);
-      // result now contains all d-dimensional sets of subspaces
-
-      ArrayList<HiCSSubspace> candidateList = new ArrayList<HiCSSubspace>(dDimensionalList);
-      dDimensionalList.clear();
-      // candidateList now contains the *m* best d-dimensional sets
-      Collections.sort(candidateList, HiCSSubspace.SORT_BY_SUBSPACE);
-
-      // TODO: optimize APRIORI style, by not even computing the bit set or?
-      for(int i = 0; i < candidateList.size() - 1; i++) {
-        for(int j = i + 1; j < candidateList.size(); j++) {
-          HiCSSubspace set1 = candidateList.get(i);
-          HiCSSubspace set2 = candidateList.get(j);
-
-          HiCSSubspace joinedSet = new HiCSSubspace();
-          joinedSet.or(set1);
-          joinedSet.or(set2);
-          if(joinedSet.cardinality() != d) {
-            continue;
-          }
-
-          calculateContrast(relation, joinedSet, subspaceIndex);
-          dDimensionalList.add(joinedSet);
-        }
-      }  
-    }
+    subspaceList.addAll(dDimensionalList);
  
     return subspaceList;
   }
