@@ -111,7 +111,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
     LabelList labels = null;
 
     for(int i = 1; i < entries.size() - 1; i++) {
-      if(!labelIndices.get(i)) {
+      if(labelIndices == null || !labelIndices.get(i)) {
         try {
           int index = Integer.valueOf(entries.get(i));
           if(index >= maxdim) {
