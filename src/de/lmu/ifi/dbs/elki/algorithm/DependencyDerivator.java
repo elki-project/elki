@@ -190,7 +190,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * 
    * @param db the database
    * @param ids the set of ids
-   * @param centroidDV the centroid
+   * @param centroid the centroid
    * @return a matrix of equations describing the dependencies
    */
   public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, Vector centroid) {
