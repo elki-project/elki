@@ -296,8 +296,8 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
         // Get all points in the box.
         // TODO nicer way to do this?
         for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-          if(isPointInBounds(relation.get(iter.deref()), bounds)) {
-            nC.add(iter.deref());
+          if(isPointInBounds(relation.get(iter), bounds)) {
+            nC.add(iter);
           }
         }
 
@@ -437,8 +437,8 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
     // Get all points in the box.
     // TODO nicer way to do this?
     for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-      if(isPointInBounds(relation.get(iter.deref()), bounds)) {
-        C.add(iter.deref());
+      if(isPointInBounds(relation.get(iter), bounds)) {
+        C.add(iter);
       }
     }
 
@@ -469,7 +469,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
     double min = Double.POSITIVE_INFINITY;
     double max = Double.NEGATIVE_INFINITY;
     for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
-      V xV = relation.get(iter.deref());
+      V xV = relation.get(iter);
       min = Math.min(min, xV.doubleValue(dimension + 1));
       max = Math.max(max, xV.doubleValue(dimension + 1));
       if(max - min > w) {
