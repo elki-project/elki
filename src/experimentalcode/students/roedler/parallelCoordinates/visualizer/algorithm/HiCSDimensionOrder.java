@@ -20,6 +20,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
@@ -58,7 +59,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
   /**
    * Monte-Carlo iterations
    */
-  private int m = 10;
+  private int m = 50;
 
   /**
    * Alpha threshold
@@ -80,6 +81,10 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
    */
   private Random random;
   
+  /**
+   * The Logger for this class
+   */
+  private static final Logging logger = Logging.getLogger(HiCSDimensionOrder.class);
   
   /**
    * Constructor.
@@ -101,7 +106,8 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
   private void arrange(int par) {
     int dim = DatabaseUtil.dimensionality(relation);
     Matrix hicsmat = new Matrix(dim, dim, 0.);
-
+    long start, end;
+    
     DBIDs ids = null;
     
     switch(par){
@@ -118,12 +124,20 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
       }
     }
     
+    start = System.nanoTime();
+    
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation, ids);
     Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex);
     
     for (HiCSSubspace hics : subspaces){
       hicsmat.set(hics.nextSetBit(0), hics.nextSetBit(hics.nextSetBit(0) + 1), hics.contrast);
       hicsmat.set(hics.nextSetBit(hics.nextSetBit(0) + 1), hics.nextSetBit(0), hics.contrast);
+    }
+    
+    end = System.nanoTime();
+    
+    if (logger.isVerbose()){
+      logger.verbose("Runtime HiCSDimensionOrder: " + (end - start)/1000000. + " ms for a dataset with " + ids.size() + " objects and " + dim + " dimensions");
     }
     
     ArrayList<Integer> arrange = new ArrayList<Integer>();

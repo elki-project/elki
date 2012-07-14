@@ -3,11 +3,13 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer.algorit
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -33,6 +35,11 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
   public static final String CLUSTERORDER = "Angle Dimension Order";
 
   private Clustering<Model> clustering;
+  
+  /**
+   * The Logger for this class
+   */
+  private static final Logging logger = Logging.getLogger(AngleDimensionOrder.class);
 
   /**
    * Constructor.
@@ -51,6 +58,9 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
 
   private void arrange(int par) {
     int dim = DatabaseUtil.dimensionality(relation);
+    
+    long start, end;
+    
     Matrix angmat = new Matrix(dim, dim, 0.);
 
     int[] angles;
@@ -69,6 +79,8 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
         ids = clustering.getAllClusters().get(par).getIDs();
       }
     }
+    
+    start = System.nanoTime();
     
     double temp;
     
@@ -111,7 +123,11 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
         angmat.set(j - 1, i - 1, 1 + entropy);
       }
     }
+    end = System.nanoTime();
     
+    if (logger.isVerbose()){
+      logger.verbose("Runtime AngleDimensionOrder: " + (end - start)/1000000. + " ms for a dataset with " + ids.size() + " objects and " + dim + " dimensions");
+    }
     
     ArrayList<Integer> arrange = new ArrayList<Integer>();
 

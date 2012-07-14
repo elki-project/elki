@@ -9,6 +9,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -36,6 +37,11 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
   private Clustering<Model> clustering;
 
   /**
+   * The Logger for this class
+   */
+  private static final Logging logger = Logging.getLogger(SURFINGDimensionOrder.class);
+  
+  /**
    * Constructor.
    * 
    * @param task VisualizationTask
@@ -53,6 +59,7 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
   private void arrange(int par) {
     int dim = DatabaseUtil.dimensionality(relation);
     Matrix surfmat = new Matrix(dim, dim, 0.);
+    long start, end;
 
     DBIDs ids = null;
     
@@ -69,6 +76,7 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
         ids = clustering.getAllClusters().get(par).getIDs();
       }
     }
+    start = System.nanoTime();
     
     for (int i = 1; i < dim; i++){
       for (int j = i + 1; j <= dim; j++){
@@ -115,7 +123,11 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
         surfmat.set(j - 1, i - 1, quality);
       }
     }
+    end = System.nanoTime();
     
+    if (logger.isVerbose()){
+      logger.verbose("Runtime SURFINGDimensionOrder: " + (end - start)/1000000. + " ms for a dataset with " + ids.size() + " objects and " + dim + " dimensions");
+    }
     
     ArrayList<Integer> arrange = new ArrayList<Integer>();
 

@@ -8,6 +8,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -39,6 +40,11 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
   private int mode = 3;
 
   /**
+   * The Logger for this class
+   */
+  private static final Logging logger = Logging.getLogger(HSMDimensionOrder.class);
+  
+  /**
    * Constructor.
    * 
    * @param task VisualizationTask
@@ -58,6 +64,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
     int dim = DatabaseUtil.dimensionality(relation);
     Matrix hsmmat = new Matrix(dim, dim, 0.);
     Matrix pic = new Matrix(500, 500);
+    long start, end;
 
     DBIDs ids = null;
     
@@ -74,6 +81,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         ids = clustering.getAllClusters().get(par).getIDs();
       }
     }
+    start = System.nanoTime();
     
     int progress = 0;
     int max = ((dim * dim) - dim) / 2;
@@ -103,9 +111,16 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         hsmmat.set(j - 1, i - 1, 1. - (bigCells / 2500.));
         
         progress++;
-        System.out.println("HSM Progress " + progress + " von " + max);
+      //  System.out.println("HSM Progress " + progress + " von " + max);
       }
     }
+    end = System.nanoTime();
+    
+    if (logger.isVerbose()){
+      logger.verbose("Runtime HSMDimensionOrder: " + (end - start)/1000000. + " ms for a dataset with " + ids.size() + " objects and " + dim + " dimensions");
+    }
+    
+    
     System.out.println(hsmmat.toString());
     
     ArrayList<Integer> arrange = new ArrayList<Integer>();
