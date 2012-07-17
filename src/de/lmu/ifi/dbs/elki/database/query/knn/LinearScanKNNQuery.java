@@ -76,15 +76,28 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   @Override
   public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
     KNNHeap<D> heap = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+    D max = distanceQuery.getDistanceFactory().infiniteDistance();
     if(PrimitiveDistanceQuery.class.isInstance(distanceQuery)) {
       O obj = relation.get(id);
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-        heap.add(distanceQuery.distance(obj, relation.get(iter)), iter);
+        final D dist = distanceQuery.distance(obj, relation.get(iter));
+        if(max.compareTo(dist) > 0) {
+          heap.add(dist, iter);
+          if(heap.size() >= k) {
+            max = heap.getKNNDistance();
+          }
+        }
       }
     }
     else {
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-        heap.add(distanceQuery.distance(id, iter), iter);
+        final D dist = distanceQuery.distance(id, iter);
+        if(max.compareTo(dist) > 0) {
+          heap.add(dist, iter);
+          if(heap.size() >= k) {
+            max = heap.getKNNDistance();
+          }
+        }
       }
     }
     return heap.toKNNList();
