@@ -64,10 +64,15 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
     final PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
     // Optimization for double distances.
     final DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
-    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+    // Checking max here has a surprisingly large effect on performance
+    // Probably due to inlining by the Hotspot VM.
+    double max = Double.POSITIVE_INFINITY;
+    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
-      // With the newer optimizations it is reasonably efficient to do these checks in the heap.
-      heap.add(doubleDistance, iter);
+      if (doubleDistance <= max) {
+        heap.add(doubleDistance, iter);
+        max = heap.doubleKNNDistance();
+      }
     }
     return heap.toKNNList();
   }
