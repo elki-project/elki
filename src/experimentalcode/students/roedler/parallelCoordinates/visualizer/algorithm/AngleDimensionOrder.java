@@ -164,6 +164,8 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
     for(int i = 0; i < dim; i++) {
       proj.moveAxis(proj.getAxisForDim(arrange.get(i)), i);
     }
+    
+    context.getHierarchy().resultChanged(proj);
   }
 
   private int[] getMax(Matrix mat) {
