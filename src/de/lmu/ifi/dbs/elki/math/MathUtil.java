@@ -95,6 +95,16 @@ public final class MathUtil {
   public static final double LOGSQRTTWOPI = Math.log(SQRTTWOPI);
 
   /**
+   * Constant for degrees to radians
+   */
+  public static final double DEG2RAD = Math.PI / 180.0;
+
+  /**
+   * Constant for radians to degrees
+   */
+  public static final double RAD2DEG = 180 / Math.PI;
+
+  /**
    * Fake constructor for static class.
    */
   private MathUtil() {
@@ -437,7 +447,7 @@ public final class MathUtil {
    * @return Radian value
    */
   public static double deg2rad(double deg) {
-    return deg * Math.PI / 180.0;
+    return deg * DEG2RAD;
   }
 
   /**
@@ -447,7 +457,7 @@ public final class MathUtil {
    * @return Degree value
    */
   public static double rad2deg(double rad) {
-    return rad * 180 / Math.PI;
+    return rad * RAD2DEG;
   }
 
   /**
@@ -477,7 +487,9 @@ public final class MathUtil {
     // return EARTH_RADIUS * Math.atan(dist);
 
     // Alternative: Havestine formula, higher precision at < 1 meters:
-    final double a = Math.sin(dlat / 2) * Math.sin(dlat / 2) + Math.sin(dlon / 2) * Math.sin(dlon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    final double slat = Math.sin(dlat / 2);
+    final double slon = Math.sin(dlon / 2);
+    final double a = slat * slat + slon * slon * Math.cos(lat1) * Math.cos(lat2);
     final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return EARTH_RADIUS * c;
   }
