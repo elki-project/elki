@@ -176,6 +176,8 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
     for(int i = 0; i < dim; i++) {
       proj.moveAxis(proj.getAxisForDim(arrange.get(i)), i);
     }
+    
+    context.getHierarchy().resultChanged(proj);
   }
 
   private int[] getMax(Matrix mat) {

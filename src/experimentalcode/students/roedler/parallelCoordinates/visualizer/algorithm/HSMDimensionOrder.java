@@ -168,6 +168,8 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
     for(int i = 0; i < dim; i++) {
       proj.moveAxis(proj.getAxisForDim(arrange.get(i)), i);
     }
+    
+    context.getHierarchy().resultChanged(proj);
   }
   
   private int sumMatrix(int[][] mat){
