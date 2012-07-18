@@ -3,7 +3,6 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer.algorit
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.Set;
@@ -24,6 +23,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
+import de.lmu.ifi.dbs.elki.math.statistics.tests.WelchTTest;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -54,7 +54,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
   /**
    * Maximum number of retries.
    */
-  private static final int MAX_RETRIES = 10;
+  private static final int MAX_RETRIES = 100;
   
   /**
    * Monte-Carlo iterations
@@ -94,6 +94,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
   public HiCSDimensionOrder(VisualizationTask task) {
     super(task);
     clustering = task.getResult();
+   // this.statTest = new WelchTTest();
     this.statTest = new KolmogorovSmirnovTest();
     this.random = new Random();
     incrementalRedraw();

@@ -65,13 +65,6 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
     Matrix hsmmat = new Matrix(dim, dim, 0.);
     int[][] pic = new int[500][500];
     
-    for (int i = 0; i < 500; i++){
-      for(int j = 0; j < 500; j++){
-        pic[i][j] = 0;
-      }
-    }
-    
-    
     long start, end;
 
     DBIDs ids = null;
@@ -102,6 +95,12 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
       for (int j = i + 1; j <= dim; j++){
   //      if (!proj.isAxisVisible(j - 1)) { continue; }
         
+        for (int m = 0; m < 500; m++){
+          for(int n = 0; n < 500; n++){
+            pic[m][n] = 0;
+          }
+        }
+        
         for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
           double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
           line(0, (int)(5. * yPos[i-1]), 499, (int)(5. * yPos[j-1]), pic);
@@ -121,6 +120,10 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         if (logger.isVerbose()){
           progress++;
           logger.verbose("HSM Progress " + progress + " von " + max);
+        }
+        else{
+          progress++;
+          System.out.println("HSM Progress " + progress + " von " + max);
         }
       }
     }
