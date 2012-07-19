@@ -2,12 +2,6 @@
 	<!-- SEARCH FOR "CUSTOMIZE" TO FIND IMPORTANT SETTINGS!
 	
 	Note: the generated jar requires the "lib" folder for dependencies, it's not standalone
-	
-	     To include your classes in the drop-down menus,
-	     you will need to update the META-INF/elki files.
-	     A patches to auto-update these files are welcome.
-	     de.lmu.ifi.dbs.elki.application.internal.CheckELKIServices
-	     can find the classes already, it just doesn't change the files yet!
 	-->
 	<property name="src" location="src" />
 	<property name="build" location="build" />
@@ -33,6 +27,7 @@
 				<pathelement path="lib/xml-commons-external-1.4.01.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01-ext.jar" />
 				<pathelement path="lib/trove-3.0.3.jar" />
+				<pathelement path="lib/junit-4.8.1.jar" />
 			</classpath>
 			<include name="de/lmu/ifi/dbs/elki/**/*.java" />
 			<include name="tutorial/**/*.java" />
@@ -57,7 +52,22 @@
 		</copy>
 	</target>
 
-	<target name="jar" depends="compile, install">
+	<target name="updateservices" depends="compile, install">
+		<java dir="${build}" classname="${elki}.application.internal.CheckELKIServices" fork="true">
+			<classpath>
+				<pathelement path="${build}" />
+				<pathelement path="lib/batik-all-1.7.jar" />
+				<pathelement path="lib/xml-commons-external-1.4.01.jar" />
+				<pathelement path="lib/xml-commons-external-1.4.01-ext.jar" />
+				<pathelement path="lib/trove-3.0.3.jar" />
+				<pathelement path="lib/junit-4.8.1.jar" />
+			</classpath>
+			<arg value="-update" />
+			<arg value="-all" />
+		</java>
+	</target>
+
+	<target name="jar" depends="compile, install, updateservices">
 		<!-- build precompiled jar -->
 		<jar jarfile="${dist}/elki-custom.jar" basedir="${build}">
 			<manifest>
@@ -66,7 +76,7 @@
 				<attribute name="Implementation-Title" value="${title}" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<attribute name="Implementation-URL" value="${url}" />
-				<attribute name="Class-Path" value="lib/batik-all-1.7.jar lib/xml-commons-external-1.4.01.jar lib/xml-commons-external-1.4.01-ext.jar lib/trove-3.0.2.jar" />
+				<attribute name="Class-Path" value="lib/batik-all-1.7.jar lib/xml-commons-external-1.4.01.jar lib/xml-commons-external-1.4.01-ext.jar lib/trove-3.0.3.jar" />
 			</manifest>
 		</jar>
 	</target>
