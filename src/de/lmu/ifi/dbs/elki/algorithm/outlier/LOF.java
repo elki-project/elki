@@ -54,7 +54,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -299,16 +298,18 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
-    Mean mean = new Mean();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      mean.reset();
-      KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
+      final KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
+      final int size = neighbors.size() - 1; // estimated
+      double sum = 0.0;
+      int count = 0;
       if(neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
         for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             DoubleDistanceKNNList neighborsNeighbors = (DoubleDistanceKNNList) knnReach.getKNNForDBID(neighbor, k);
-            mean.put(Math.max(neighbor.doubleDistance(), neighborsNeighbors.doubleKNNDistance()));
+            sum += Math.max(neighbor.doubleDistance(), neighborsNeighbors.doubleKNNDistance()) / size;
+            count++;
           }
         }
       }
@@ -316,12 +317,24 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         for(DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
-            mean.put(Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()));
+            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()) / size;
+            count++;
           }
         }
       }
       // Avoid division by 0
-      final double lrd = (mean.getCount() > 0) ? 1 / mean.getMean() : 0.0;
+      final double lrd;
+      if(sum <= 0) {
+        lrd = 0.0;
+      }
+      else if(count == size) {
+        lrd = 1 / sum;
+      }
+      else {
+        // Correct estimation
+        sum *= size / (double) count;
+        lrd = 1 / sum;
+      }
       lrds.putDouble(iter, lrd);
       if(lrdsProgress != null) {
         lrdsProgress.incrementProcessed(logger);
@@ -348,20 +361,29 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
-    Mean mean = new Mean();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double lrdp = lrds.doubleValue(iter);
+      final double lrdp = lrds.doubleValue(iter);
       final double lof;
       if(lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
-        mean.reset();
+        final int size = neighbors.size() - 1; // estimated
+        double sum = 0.0;
+        int count = 0;
         for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
           if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            mean.put(lrds.doubleValue(neighbor));
+            sum += lrds.doubleValue(neighbor) / size;
+            count++;
           }
         }
-        lof = mean.getMean() / lrdp;
+        if(count == size) {
+          lof = sum / lrdp;
+        }
+        else {
+          // Correct estimation
+          sum *= size / (double) count;
+          lof = sum / lrdp;
+        }
       }
       else {
         lof = 1.0;
