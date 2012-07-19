@@ -1,0 +1,22 @@
+<!DOCTYPE dataset PUBLIC "GeneratorByModel.dtd" "GeneratorByModel.dtd">
+<dataset random-seed="1" test-model="1">
+  <cluster name="Cluster_1" size="200">
+    <uniform min="0.0" max="0.4" />
+    <uniform min="0.3" max="0.7" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_2" size="200">
+    <uniform min="0.6" max="1.0" />
+    <uniform min="0.3" max="0.7" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Cluster_3" size="800">
+    <uniform min="0.25" max="0.75" />
+    <uniform min="0.4" max="0.6" />
+    <clip min="0 0" max="1 1"/>
+  </cluster>
+  <cluster name="Noise" size="10" density-correction="20">
+    <uniform min="0" max="1" />
+    <uniform min="0" max="1" />
+  </cluster>
+</dataset>
