@@ -25,9 +25,11 @@ package de.lmu.ifi.dbs.elki.application.internal;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -73,23 +75,36 @@ public class CheckELKIServices {
    * @param argv Command line arguments
    */
   public static void main(String[] argv) {
-    new CheckELKIServices().checkServices();
+    boolean update = false, noskip = false;
+    for(String arg : argv) {
+      if("-update".equals(arg)) {
+        update = true;
+      }
+      if("-all".equals(arg)) {
+        noskip = true;
+      }
+    }
+    new CheckELKIServices().checkServices(update, noskip);
   }
 
   /**
    * Retrieve all properties and check them.
+   * 
+   * @param update Flag to enable automatic updating
+   * @param noskip Override filters, include all (in particular,
+   *        experimentalcode)
    */
-  public void checkServices() {
+  public void checkServices(boolean update, boolean noskip) {
     URL u = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX);
     try {
       for(String prop : new File(u.toURI()).list()) {
-        if (".svn".equals(prop)) {
+        if(".svn".equals(prop)) {
           continue;
         }
-        if (logger.isVerbose()) {
-          logger.verbose("Checking property: "+prop);
+        if(logger.isVerbose()) {
+          logger.verbose("Checking property: " + prop);
         }
-        checkService(prop);
+        checkService(prop, update, noskip);
       }
     }
     catch(URISyntaxException e) {
@@ -101,8 +116,11 @@ public class CheckELKIServices {
    * Check a single service class
    * 
    * @param prop Class name.
+   * @param update Flag to enable automatic updating
+   * @param noskip Override filters, include all (in particular,
+   *        experimentalcode)
    */
-  private void checkService(String prop) {
+  private void checkService(String prop, boolean update, boolean noskip) {
     Class<?> cls;
     try {
       cls = Class.forName(prop);
@@ -121,7 +139,7 @@ public class CheckELKIServices {
           break;
         }
       }
-      if(skip) {
+      if(!noskip && skip) {
         continue;
       }
       names.add(c2.getName());
@@ -157,16 +175,43 @@ public class CheckELKIServices {
       logger.exception(e);
     }
     if(names.size() > 0) {
-      StringBuffer message = new StringBuffer();
-      message.append("Class " + prop + " lacks suggestions:" + FormatUtil.NEWLINE);
       // format for copy & paste to properties file:
       ArrayList<String> sorted = new ArrayList<String>(names);
       // TODO: sort by package, then classname
       Collections.sort(sorted);
-      for(String remaining : sorted) {
-        message.append("# " + remaining + FormatUtil.NEWLINE);
+      if(!update) {
+        StringBuffer message = new StringBuffer();
+        message.append("Class " + prop + " lacks suggestions:" + FormatUtil.NEWLINE);
+        for(String remaining : sorted) {
+          message.append("# " + remaining + FormatUtil.NEWLINE);
+        }
+        logger.warning(message.toString());
       }
-      logger.warning(message.toString());
+      else {
+        // Try to automatically update:
+        URL f = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX + cls.getName());
+        String fnam = f.getFile();
+        if(fnam == null) {
+          logger.warning("Cannot update: " + f + " seems to be in a jar file.");
+        } else {
+          try {
+            FileOutputStream out = new FileOutputStream(fnam, true);
+            PrintStream pr = new PrintStream(out);
+            pr.println("# Automatically appended entries:");
+            for(String remaining : sorted) {
+              pr.println(remaining);
+            }
+            pr.flush();
+            pr.close();
+            out.flush();
+            out.close();
+            logger.warning("Updated: " + fnam);
+          }
+          catch(IOException e) {
+            logger.exception(e);
+          }
+        }
+      }
     }
   }
 }
