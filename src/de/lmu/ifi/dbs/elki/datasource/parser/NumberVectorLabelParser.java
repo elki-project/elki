@@ -248,7 +248,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * Update the meta element.
    */
   protected void buildMeta() {
-    if(labelcolumns.cardinality() > 0) {
+    if(labelcolumns.cardinality() > 0 || (labelIndices != null && labelIndices.cardinality() > 0)) {
       meta = new BundleMeta(2);
       meta.add(getTypeInformation(dimensionality));
       meta.add(TypeUtil.LABELLIST);
