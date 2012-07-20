@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.index.tree.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
- * Candidate for expansion in a distance search (generic implementation).
+ * Candidate for expansion in a distance search (double optimized
+ * implementation).
  * 
  * @author Erich Schubert
  */
