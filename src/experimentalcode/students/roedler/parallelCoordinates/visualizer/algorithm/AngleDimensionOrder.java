@@ -3,7 +3,6 @@ package experimentalcode.students.roedler.parallelCoordinates.visualizer.algorit
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
