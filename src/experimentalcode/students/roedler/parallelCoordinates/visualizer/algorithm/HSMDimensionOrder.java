@@ -37,7 +37,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
   
   private int sum;
   
-  private int mode = 3;
+  private int mode = 2;
 
   /**
    * The Logger for this class
