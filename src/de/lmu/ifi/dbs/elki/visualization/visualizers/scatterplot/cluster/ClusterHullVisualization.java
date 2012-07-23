@@ -69,207 +69,200 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @author Robert Rödler
  * @author Erich Schubert
  * 
- * @apiviz.has Clustering oneway - - visualizes
- * @apiviz.uses GrahamScanConvexHull2D
- * @apiviz.uses AlphaShape
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class ClusterHullVisualization extends AbstractScatterplotVisualization {
+public class ClusterHullVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Cluster Hull Visualization";
 
   /**
-   * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * Settings
    */
-  public static final String CLUSTERHULL = "cluster-hull";
+  Parameterizer settings;
 
   /**
-   * The result we work on
-   */
-  Clustering<Model> clustering;
-
-  /**
-   * Alpha value
-   */
-  double alpha = Double.POSITIVE_INFINITY;
-
-  /**
-   * Constructor
+   * Constructor.
    * 
-   * @param task VisualizationTask
-   * @param alpha Alpha value
+   * @param settings Settings
    */
-  public ClusterHullVisualization(VisualizationTask task, double alpha) {
-    super(task);
-    this.clustering = task.getResult();
-    this.alpha = alpha;
-    incrementalRedraw();
+  public ClusterHullVisualization(Parameterizer settings) {
+    super();
+    this.settings = settings;
   }
 
   @Override
-  protected void redraw() {
-    // Viewport size, for "relative size" computations
-    final CanvasSize viewp = proj.estimateViewport();
-    double projarea = viewp.getDiffX() * viewp.getDiffY();
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
 
-    double opacity = 0.25;
-
-    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
-
-    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-      Cluster<?> clus = ci.next();
-      final DBIDs ids = clus.getIDs();
-
-      if(alpha >= Double.POSITIVE_INFINITY) {
-        GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
-
-        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
-          hull.add(new Vector(projP));
-        }
-        Polygon chres = hull.getHull();
-
-        // Plot the convex hull:
-        if(chres != null && chres.size() > 1) {
-          SVGPath path = new SVGPath(chres);
-          // Approximate area (using bounding box)
-          double hullarea = SpatialUtil.volume(chres);
-          final double relativeArea = (projarea - hullarea) / projarea;
-          final double relativeSize = (double) ids.size() / rel.size();
-          opacity = Math.sqrt(relativeSize * relativeArea);
-
-          Element hulls = path.makeElement(svgp);
-          addCSSClasses(svgp, cnum, opacity);
-          SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
-          layer.appendChild(hulls);
-        }
-      }
-      else {
-        ArrayList<Vector> ps = new ArrayList<Vector>(ids.size());
-        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
-          ps.add(new Vector(projP));
-        }
-        List<Polygon> polys = (new AlphaShape(ps, alpha * Projection.SCALE)).compute();
-        for(Polygon p : polys) {
-          SVGPath path = new SVGPath(p);
-          Element hulls = path.makeElement(svgp);
-          addCSSClasses(svgp, cnum, 0.5);
-          SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
-          layer.appendChild(hulls);
-        }
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    // Find clusterings we can visualize:
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    for(Clustering<?> c : clusterings) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        baseResult.getHierarchy().add(c, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
   }
 
   /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-
-    CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);
-    cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-
-    final String color;
-    if(clustering.getAllClusters().size() == 1) {
-      color = "black";
-    }
-    else {
-      color = colors.getColor(clusterID);
-    }
-    cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
-    cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
-    cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, opac);
-
-    svgp.addCSSClassOrLogError(cls);
-  }
-
-  /**
-   * Factory for visualizers to generate an SVG-Element containing the convex
-   * hull or alpha shape of a cluster.
+   * Instance.
    * 
    * @author Robert Rödler
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses ClusterHullVisualization oneway - - «create»
+   * @apiviz.has Clustering oneway - - visualizes
+   * @apiviz.uses GrahamScanConvexHull2D
+   * @apiviz.uses AlphaShape
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractScatterplotVisualization {
+    /**
+     * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
+     */
+    public static final String CLUSTERHULL = "cluster-hull";
+
+    /**
+     * The result we work on
+     */
+    Clustering<Model> clustering;
+
+    /**
+     * Constructor
+     * 
+     * @param task VisualizationTask
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.clustering = task.getResult();
+      incrementalRedraw();
+    }
+
+    @Override
+    protected void redraw() {
+      // Viewport size, for "relative size" computations
+      final CanvasSize viewp = proj.estimateViewport();
+      double projarea = viewp.getDiffX() * viewp.getDiffY();
+
+      double opacity = 0.25;
+
+      Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+
+      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
+        Cluster<?> clus = ci.next();
+        final DBIDs ids = clus.getIDs();
+
+        if(settings.alpha >= Double.POSITIVE_INFINITY) {
+          GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+
+          for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+            double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
+            hull.add(new Vector(projP));
+          }
+          Polygon chres = hull.getHull();
+
+          // Plot the convex hull:
+          if(chres != null && chres.size() > 1) {
+            SVGPath path = new SVGPath(chres);
+            // Approximate area (using bounding box)
+            double hullarea = SpatialUtil.volume(chres);
+            final double relativeArea = (projarea - hullarea) / projarea;
+            final double relativeSize = (double) ids.size() / rel.size();
+            opacity = Math.sqrt(relativeSize * relativeArea);
+
+            Element hulls = path.makeElement(svgp);
+            addCSSClasses(svgp, cnum, opacity);
+            SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
+            layer.appendChild(hulls);
+          }
+        }
+        else {
+          ArrayList<Vector> ps = new ArrayList<Vector>(ids.size());
+          for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+            double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
+            ps.add(new Vector(projP));
+          }
+          List<Polygon> polys = (new AlphaShape(ps, settings.alpha * Projection.SCALE)).compute();
+          for(Polygon p : polys) {
+            SVGPath path = new SVGPath(p);
+            Element hulls = path.makeElement(svgp);
+            addCSSClasses(svgp, cnum, 0.5);
+            SVGUtil.addCSSClass(hulls, CLUSTERHULL + cnum);
+            layer.appendChild(hulls);
+          }
+        }
+      }
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+      CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+
+      final String color;
+      if(clustering.getAllClusters().size() == 1) {
+        color = "black";
+      }
+      else {
+        color = colors.getColor(clusterID);
+      }
+      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+      cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, opac);
+
+      svgp.addCSSClassOrLogError(cls);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Alpha-Value for alpha-shapes
+     * 
+     * <p>
+     * Key: {@code -hull.alpha}
+     * </p>
+     */
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
+
     /**
      * Alpha value
      */
     double alpha = Double.POSITIVE_INFINITY;
 
-    /**
-     * Constructor.
-     * 
-     * @param alpha Alpha value
-     */
-    public Factory(double alpha) {
-      super();
-      this.alpha = alpha;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
+      if(config.grab(alphaP)) {
+        alpha = alphaP.getValue();
+      }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterHullVisualization(task, alpha);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      // Find clusterings we can visualize:
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-      for(Clustering<?> c : clusterings) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          baseResult.getHierarchy().add(c, task);
-          baseResult.getHierarchy().add(p, task);
-        }
-      }
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      /**
-       * Alpha-Value for alpha-shapes
-       * 
-       * <p>
-       * Key: {@code -hull.alpha}
-       * </p>
-       */
-      public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
-
-      /**
-       * Alpha value
-       */
-      double alpha = Double.POSITIVE_INFINITY;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
-        if(config.grab(alphaP)) {
-          alpha = alphaP.getValue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(alpha);
-      }
+    protected ClusterHullVisualization makeInstance() {
+      return new ClusterHullVisualization(this);
     }
   }
 }
