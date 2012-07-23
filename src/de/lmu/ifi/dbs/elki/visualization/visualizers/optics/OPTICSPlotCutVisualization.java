@@ -52,247 +52,249 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
- * new clustering result
+ * new clustering result.
  * 
  * @author Heidi Kolb
+ * @author Erich Schubert
  * 
- * @param <D> distance type
+ * @apiviz.stereotype factory
+ * @apiviz.uses OPTICSPlotCutVisualization oneway - - «create»
  */
-public class OPTICSPlotCutVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
+public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICS Cut";
 
-  /**
-   * CSS-Styles
-   */
-  protected static final String CSS_LINE = "opticsPlotLine";
+  public OPTICSPlotCutVisualization() {
+    super();
+  }
+
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector<?> p : ops) {
+      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+      baseResult.getHierarchy().add(p, task);
+    }
+  }
+
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance<DoubleDistance>(task);
+  }
+
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
+  }
 
   /**
-   * CSS-Styles
-   */
-  protected final static String CSS_EPSILON = "opticsPlotEpsilonValue";
-
-  /**
-   * The current epsilon value.
-   */
-  private double epsilon = 0.0;
-
-  /**
-   * Sensitive (clickable) area
-   */
-  private DragableArea eventarea = null;
-
-  /**
-   * The label element
-   */
-  private Element elemText = null;
-
-  /**
-   * The line element
-   */
-  private Element elementLine = null;
-
-  /**
-   * The drag handle element
-   */
-  private Element elementPoint = null;
-
-  /**
-   * Constructor.
+   * Instance.
    * 
-   * @param task Task
-   */
-  public OPTICSPlotCutVisualization(VisualizationTask task) {
-    super(task);
-  }
-
-  @Override
-  protected void redraw() {
-    incrementalRedraw();
-  }
-
-  @Override
-  protected void incrementalRedraw() {
-    if(layer == null) {
-      makeLayerElement();
-      addCSSClasses();
-    }
-
-    // TODO make the number of digits configurable
-    final String label = (epsilon != 0.0) ? FormatUtil.format(epsilon, 4) : "";
-    // compute absolute y-value of bar
-    final double yAct = plotheight - getYFromEpsilon(epsilon);
-
-    if(elemText == null) {
-      elemText = svgp.svgText(StyleLibrary.SCALE * 1.05, yAct, label);
-      SVGUtil.setAtt(elemText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
-      layer.appendChild(elemText);
-    }
-    else {
-      elemText.setTextContent(label);
-      SVGUtil.setAtt(elemText, SVGConstants.SVG_Y_ATTRIBUTE, yAct);
-    }
-
-    // line and handle
-    if(elementLine == null) {
-      elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE * 1.04, yAct);
-      SVGUtil.addCSSClass(elementLine, CSS_LINE);
-      layer.appendChild(elementLine);
-    }
-    else {
-      SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y1_ATTRIBUTE, yAct);
-      SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y2_ATTRIBUTE, yAct);
-    }
-    if(elementPoint == null) {
-      elementPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.04, yAct, StyleLibrary.SCALE * 0.004);
-      SVGUtil.addCSSClass(elementPoint, CSS_LINE);
-      layer.appendChild(elementPoint);
-    }
-    else {
-      SVGUtil.setAtt(elementPoint, SVG12Constants.SVG_CY_ATTRIBUTE, yAct);
-    }
-
-    if(eventarea == null) {
-      eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotheight, this);
-      layer.appendChild(eventarea.getElement());
-    }
-  }
-
-  @Override
-  public void destroy() {
-    super.destroy();
-    eventarea.destroy();
-  }
-
-  /**
-   * Get epsilon from y-value
-   * 
-   * @param y y-Value
-   * @return epsilon
-   */
-  protected double getEpsilonFromY(double y) {
-    if(y < 0) {
-      y = 0;
-    }
-    if(y > plotheight) {
-      y = plotheight;
-    }
-    return optics.getOPTICSPlot(context).getScale().getUnscaled(y / plotheight);
-  }
-
-  /**
-   * Get y-value from epsilon
-   * 
-   * @param epsilon epsilon
-   * @return y-Value
-   */
-  protected double getYFromEpsilon(double epsilon) {
-    double y = optics.getOPTICSPlot(context).getScale().getScaled(epsilon) * plotheight;
-    if(y < 0) {
-      y = 0;
-    }
-    if(y > plotheight) {
-      y = plotheight;
-    }
-    return y;
-  }
-
-  @Override
-  public boolean startDrag(SVGPoint start, Event evt) {
-    epsilon = getEpsilonFromY(plotheight - start.getY());
-    // opvis.unsetEpsilonExcept(this);
-    synchronizedRedraw();
-    return true;
-  }
-
-  @Override
-  public boolean duringDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
-    if(inside) {
-      epsilon = getEpsilonFromY(plotheight - end.getY());
-    }
-    // opvis.unsetEpsilonExcept(this);
-    synchronizedRedraw();
-    return true;
-  }
-
-  @Override
-  public boolean endDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
-    if(inside) {
-      epsilon = getEpsilonFromY(plotheight - end.getY());
-      // opvis.unsetEpsilonExcept(this);
-
-      // FIXME: replace an existing optics cut result!
-      final ClusterOrderResult<D> order = optics.getResult();
-      Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, optics.getOPTICSPlot(context).getDistanceAdapter(), epsilon);
-      order.addChildResult(cl);
-    }
-    context.getHierarchy().resultChanged(this.task);
-    // synchronizedRedraw();
-    return true;
-  }
-
-  /**
-   * Reset the epsilon value.
-   */
-  public void unsetEpsilon() {
-    epsilon = 0.0;
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   */
-  private void addCSSClasses() {
-    // Class for the epsilon-value
-    if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
-      final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
-      label.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
-      label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
-      label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL));
-      svgp.addCSSClassOrLogError(label);
-    }
-    // Class for the epsilon cut line
-    if(!svgp.getCSSClassManager().contains(CSS_LINE)) {
-      final CSSClass lcls = new CSSClass(svgp, CSS_LINE);
-      lcls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
-      lcls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.5 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      svgp.addCSSClassOrLogError(lcls);
-    }
-  }
-
-  /**
-   * Factory class
-   * 
+   * @author Heidi Kolb
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses OPTICSPlotCutVisualization oneway - - «create»
+   * @param <D> distance type
    */
-  public static class Factory extends AbstractVisFactory {
-    public Factory() {
-      super();
+  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
+    /**
+     * CSS-Styles
+     */
+    protected static final String CSS_LINE = "opticsPlotLine";
+
+    /**
+     * CSS-Styles
+     */
+    protected final static String CSS_EPSILON = "opticsPlotEpsilonValue";
+
+    /**
+     * The current epsilon value.
+     */
+    private double epsilon = 0.0;
+
+    /**
+     * Sensitive (clickable) area
+     */
+    private DragableArea eventarea = null;
+
+    /**
+     * The label element
+     */
+    private Element elemText = null;
+
+    /**
+     * The line element
+     */
+    private Element elementLine = null;
+
+    /**
+     * The drag handle element
+     */
+    private Element elementPoint = null;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : ops) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      incrementalRedraw();
+    }
+
+    @Override
+    protected void incrementalRedraw() {
+      if(layer == null) {
+        makeLayerElement();
+        addCSSClasses();
+      }
+
+      // TODO make the number of digits configurable
+      final String label = (epsilon != 0.0) ? FormatUtil.format(epsilon, 4) : "";
+      // compute absolute y-value of bar
+      final double yAct = plotheight - getYFromEpsilon(epsilon);
+
+      if(elemText == null) {
+        elemText = svgp.svgText(StyleLibrary.SCALE * 1.05, yAct, label);
+        SVGUtil.setAtt(elemText, SVGConstants.SVG_CLASS_ATTRIBUTE, CSS_EPSILON);
+        layer.appendChild(elemText);
+      }
+      else {
+        elemText.setTextContent(label);
+        SVGUtil.setAtt(elemText, SVGConstants.SVG_Y_ATTRIBUTE, yAct);
+      }
+
+      // line and handle
+      if(elementLine == null) {
+        elementLine = svgp.svgLine(0, yAct, StyleLibrary.SCALE * 1.04, yAct);
+        SVGUtil.addCSSClass(elementLine, CSS_LINE);
+        layer.appendChild(elementLine);
+      }
+      else {
+        SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y1_ATTRIBUTE, yAct);
+        SVGUtil.setAtt(elementLine, SVG12Constants.SVG_Y2_ATTRIBUTE, yAct);
+      }
+      if(elementPoint == null) {
+        elementPoint = svgp.svgCircle(StyleLibrary.SCALE * 1.04, yAct, StyleLibrary.SCALE * 0.004);
+        SVGUtil.addCSSClass(elementPoint, CSS_LINE);
+        layer.appendChild(elementPoint);
+      }
+      else {
+        SVGUtil.setAtt(elementPoint, SVG12Constants.SVG_CY_ATTRIBUTE, yAct);
+      }
+
+      if(eventarea == null) {
+        eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotheight, this);
+        layer.appendChild(eventarea.getElement());
       }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new OPTICSPlotCutVisualization<DoubleDistance>(task);
+    public void destroy() {
+      super.destroy();
+      eventarea.destroy();
+    }
+
+    /**
+     * Get epsilon from y-value
+     * 
+     * @param y y-Value
+     * @return epsilon
+     */
+    protected double getEpsilonFromY(double y) {
+      if(y < 0) {
+        y = 0;
+      }
+      if(y > plotheight) {
+        y = plotheight;
+      }
+      return optics.getOPTICSPlot(context).getScale().getUnscaled(y / plotheight);
+    }
+
+    /**
+     * Get y-value from epsilon
+     * 
+     * @param epsilon epsilon
+     * @return y-Value
+     */
+    protected double getYFromEpsilon(double epsilon) {
+      double y = optics.getOPTICSPlot(context).getScale().getScaled(epsilon) * plotheight;
+      if(y < 0) {
+        y = 0;
+      }
+      if(y > plotheight) {
+        y = plotheight;
+      }
+      return y;
     }
 
     @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+    public boolean startDrag(SVGPoint start, Event evt) {
+      epsilon = getEpsilonFromY(plotheight - start.getY());
+      // opvis.unsetEpsilonExcept(this);
+      synchronizedRedraw();
+      return true;
+    }
+
+    @Override
+    public boolean duringDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
+      if(inside) {
+        epsilon = getEpsilonFromY(plotheight - end.getY());
+      }
+      // opvis.unsetEpsilonExcept(this);
+      synchronizedRedraw();
+      return true;
+    }
+
+    @Override
+    public boolean endDrag(SVGPoint start, SVGPoint end, Event evt, boolean inside) {
+      if(inside) {
+        epsilon = getEpsilonFromY(plotheight - end.getY());
+        // opvis.unsetEpsilonExcept(this);
+
+        // FIXME: replace an existing optics cut result!
+        final ClusterOrderResult<D> order = optics.getResult();
+        Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, optics.getOPTICSPlot(context).getDistanceAdapter(), epsilon);
+        order.addChildResult(cl);
+      }
+      context.getHierarchy().resultChanged(this.task);
+      // synchronizedRedraw();
+      return true;
+    }
+
+    /**
+     * Reset the epsilon value.
+     */
+    public void unsetEpsilon() {
+      epsilon = 0.0;
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     */
+    private void addCSSClasses() {
+      // Class for the epsilon-value
+      if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
+        final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
+        label.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL));
+        svgp.addCSSClassOrLogError(label);
+      }
+      // Class for the epsilon cut line
+      if(!svgp.getCSSClassManager().contains(CSS_LINE)) {
+        final CSSClass lcls = new CSSClass(svgp, CSS_LINE);
+        lcls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+        lcls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.5 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        svgp.addCSSClassOrLogError(lcls);
+      }
     }
   }
 }

@@ -56,13 +56,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Handle the marker in an OPTICS plot.
  * 
- * @author Heidi Kolb
+ * @author Erich Schubert
  * 
- * @apiviz.uses DBIDSelection oneway - 1 visualizes
- * 
- * @param <D> distance type
+ * @apiviz.stereotype factory
+ * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
  */
-public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
+public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
@@ -72,16 +71,6 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICS Selection";
-
-  /**
-   * CSS class for markers
-   */
-  protected static final String CSS_MARKER = "opticsPlotMarker";
-
-  /**
-   * CSS class for markers
-   */
-  protected static final String CSS_RANGEMARKER = "opticsPlotRangeMarker";
 
   /**
    * Input modes
@@ -94,278 +83,290 @@ public class OPTICSPlotSelectionVisualization<D extends Distance<D>> extends Abs
   }
 
   /**
-   * Element for the events
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private Element etag;
-
-  /**
-   * Element for the marker
-   */
-  private Element mtag;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public OPTICSPlotSelectionVisualization(VisualizationTask task) {
-    super(task);
-    context.addResultListener(this);
-    incrementalRedraw();
+  public OPTICSPlotSelectionVisualization() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    makeLayerElement();
-    addCSSClasses();
-
-    mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    addMarker();
-
-    DragableArea drag = new DragableArea(svgp, 0 - plotwidth * 0.1, 0, plotwidth * 1.1, plotheight, this);
-    etag = drag.getElement();
-    // mtag first, etag must be the top Element
-    layer.appendChild(mtag);
-    layer.appendChild(etag);
-  }
-
-  /**
-   * Add marker for the selected IDs to mtag
-   */
-  public void addMarker() {
-    List<ClusterOrderEntry<D>> order = getClusterOrder();
-    // TODO: replace mtag!
-    DBIDSelection selContext = context.getSelection();
-    if(selContext != null) {
-      DBIDs selection = DBIDUtil.ensureSet(selContext.getSelectedIds());
-
-      final double width = plotwidth / order.size();
-      int begin = -1;
-      for(int j = 0; j < order.size(); j++) {
-        DBID id = order.get(j).getID();
-        if(selection.contains(id)) {
-          if(begin == -1) {
-            begin = j;
-          }
-        }
-        else {
-          if(begin != -1) {
-            Element marker = addMarkerRect(begin * width, (j - begin) * width);
-            SVGUtil.addCSSClass(marker, CSS_MARKER);
-            mtag.appendChild(marker);
-            begin = -1;
-          }
-        }
-      }
-      // tail
-      if(begin != -1) {
-        Element marker = addMarkerRect(begin * width, (order.size() - begin) * width);
-        SVGUtil.addCSSClass(marker, CSS_MARKER);
-        mtag.appendChild(marker);
-      }
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector<?> p : ops) {
+      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+      baseResult.getHierarchy().add(p, task);
     }
   }
 
-  /**
-   * Create a rectangle as marker (Marker higher than plot!)
-   * 
-   * @param x1 X-Value for the marker
-   * @param width Width of an entry
-   * @return SVG-Element svg-rectangle
-   */
-  public Element addMarkerRect(double x1, double width) {
-    return svgp.svgRect(x1, 0, width, plotheight);
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance<DoubleDistance>(task);
   }
 
   @Override
-  public boolean startDrag(SVGPoint startPoint, Event evt) {
-    List<ClusterOrderEntry<D>> order = getClusterOrder();
-    int mouseActIndex = getSelectedIndex(order, startPoint);
-    if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
+  }
+
+  /**
+   * Instance.
+   * 
+   * @author Heidi Kolb
+   * @author Erich Schubert
+   * 
+   * @apiviz.uses DBIDSelection oneway - 1 visualizes
+   * 
+   * @param <D> distance type
+   */
+  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> implements DragableArea.DragListener {
+    /**
+     * CSS class for markers
+     */
+    protected static final String CSS_MARKER = "opticsPlotMarker";
+
+    /**
+     * CSS class for markers
+     */
+    protected static final String CSS_RANGEMARKER = "opticsPlotRangeMarker";
+
+    /**
+     * Element for the events
+     */
+    private Element etag;
+
+    /**
+     * Element for the marker
+     */
+    private Element mtag;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      context.addResultListener(this);
+      incrementalRedraw();
+    }
+
+    @Override
+    protected void redraw() {
+      makeLayerElement();
+      addCSSClasses();
+
+      mtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
+      addMarker();
+
+      DragableArea drag = new DragableArea(svgp, 0 - plotwidth * 0.1, 0, plotwidth * 1.1, plotheight, this);
+      etag = drag.getElement();
+      // mtag first, etag must be the top Element
+      layer.appendChild(mtag);
+      layer.appendChild(etag);
+    }
+
+    /**
+     * Add marker for the selected IDs to mtag
+     */
+    public void addMarker() {
+      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      // TODO: replace mtag!
+      DBIDSelection selContext = context.getSelection();
+      if(selContext != null) {
+        DBIDs selection = DBIDUtil.ensureSet(selContext.getSelectedIds());
+
+        final double width = plotwidth / order.size();
+        int begin = -1;
+        for(int j = 0; j < order.size(); j++) {
+          DBID id = order.get(j).getID();
+          if(selection.contains(id)) {
+            if(begin == -1) {
+              begin = j;
+            }
+          }
+          else {
+            if(begin != -1) {
+              Element marker = addMarkerRect(begin * width, (j - begin) * width);
+              SVGUtil.addCSSClass(marker, CSS_MARKER);
+              mtag.appendChild(marker);
+              begin = -1;
+            }
+          }
+        }
+        // tail
+        if(begin != -1) {
+          Element marker = addMarkerRect(begin * width, (order.size() - begin) * width);
+          SVGUtil.addCSSClass(marker, CSS_MARKER);
+          mtag.appendChild(marker);
+        }
+      }
+    }
+
+    /**
+     * Create a rectangle as marker (Marker higher than plot!)
+     * 
+     * @param x1 X-Value for the marker
+     * @param width Width of an entry
+     * @return SVG-Element svg-rectangle
+     */
+    public Element addMarkerRect(double x1, double width) {
+      return svgp.svgRect(x1, 0, width, plotheight);
+    }
+
+    @Override
+    public boolean startDrag(SVGPoint startPoint, Event evt) {
+      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      int mouseActIndex = getSelectedIndex(order, startPoint);
+      if(mouseActIndex >= 0 && mouseActIndex < order.size()) {
+        double width = plotwidth / order.size();
+        double x1 = mouseActIndex * width;
+        Element marker = addMarkerRect(x1, width);
+        SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
+        mtag.appendChild(marker);
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      int mouseDownIndex = getSelectedIndex(order, startPoint);
+      int mouseActIndex = getSelectedIndex(order, dragPoint);
+      final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
+      final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
       double width = plotwidth / order.size();
-      double x1 = mouseActIndex * width;
-      Element marker = addMarkerRect(x1, width);
+      double x1 = begin * width;
+      double x2 = (end * width) + width;
+      mtag.removeChild(mtag.getLastChild());
+      Element marker = addMarkerRect(x1, x2 - x1);
       SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
       mtag.appendChild(marker);
       return true;
     }
-    return false;
-  }
 
-  @Override
-  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-    List<ClusterOrderEntry<D>> order = getClusterOrder();
-    int mouseDownIndex = getSelectedIndex(order, startPoint);
-    int mouseActIndex = getSelectedIndex(order, dragPoint);
-    final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
-    final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
-    double width = plotwidth / order.size();
-    double x1 = begin * width;
-    double x2 = (end * width) + width;
-    mtag.removeChild(mtag.getLastChild());
-    Element marker = addMarkerRect(x1, x2 - x1);
-    SVGUtil.setCSSClass(marker, CSS_RANGEMARKER);
-    mtag.appendChild(marker);
-    return true;
-  }
-
-  @Override
-  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-    List<ClusterOrderEntry<D>> order = getClusterOrder();
-    int mouseDownIndex = getSelectedIndex(order, startPoint);
-    int mouseActIndex = getSelectedIndex(order, dragPoint);
-    Mode mode = getInputMode(evt);
-    final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
-    final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
-    updateSelection(mode, begin, end);
-    return true;
-  }
-
-  /**
-   * Get the current input mode, on each mouse event.
-   * 
-   * @param evt Mouse event.
-   * @return Input mode
-   */
-  private Mode getInputMode(Event evt) {
-    if(evt instanceof DOMMouseEvent) {
-      DOMMouseEvent domme = (DOMMouseEvent) evt;
-      // TODO: visual indication of mode possible?
-      if(domme.getShiftKey()) {
-        return Mode.ADD;
-      }
-      else if(domme.getCtrlKey()) {
-        return Mode.INVERT;
-      }
-      else {
-        return Mode.REPLACE;
-      }
-    }
-    // Default mode is replace.
-    return Mode.REPLACE;
-  }
-
-  /**
-   * Gets the Index of the ClusterOrderEntry where the event occurred
-   * 
-   * @param order List of ClusterOrderEntries
-   * @param cPt clicked point
-   * @return Index of the object
-   */
-  private int getSelectedIndex(List<ClusterOrderEntry<D>> order, SVGPoint cPt) {
-    int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
-    return mouseActIndex;
-  }
-
-  /**
-   * Updates the selection for the given ClusterOrderEntry.
-   * 
-   * @param mode Input mode
-   * @param begin first index to select
-   * @param end last index to select
-   */
-  protected void updateSelection(Mode mode, int begin, int end) {
-    List<ClusterOrderEntry<D>> order = getClusterOrder();
-    if(begin < 0 || begin > end || end >= order.size()) {
-      logger.warning("Invalid range in updateSelection: " + begin + " .. " + end);
-      return;
+    @Override
+    public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      int mouseDownIndex = getSelectedIndex(order, startPoint);
+      int mouseActIndex = getSelectedIndex(order, dragPoint);
+      Mode mode = getInputMode(evt);
+      final int begin = Math.max(Math.min(mouseDownIndex, mouseActIndex), 0);
+      final int end = Math.min(Math.max(mouseDownIndex, mouseActIndex), order.size());
+      updateSelection(mode, begin, end);
+      return true;
     }
 
-    DBIDSelection selContext = context.getSelection();
-    HashSetModifiableDBIDs selection;
-    if(selContext == null || mode == Mode.REPLACE) {
-      selection = DBIDUtil.newHashSet();
-    }
-    else {
-      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-    }
-
-    for(int i = begin; i <= end; i++) {
-      DBID id = order.get(i).getID();
-      if(mode == Mode.INVERT) {
-        if(!selection.contains(id)) {
-          selection.add(id);
+    /**
+     * Get the current input mode, on each mouse event.
+     * 
+     * @param evt Mouse event.
+     * @return Input mode
+     */
+    private Mode getInputMode(Event evt) {
+      if(evt instanceof DOMMouseEvent) {
+        DOMMouseEvent domme = (DOMMouseEvent) evt;
+        // TODO: visual indication of mode possible?
+        if(domme.getShiftKey()) {
+          return Mode.ADD;
+        }
+        else if(domme.getCtrlKey()) {
+          return Mode.INVERT;
         }
         else {
-          selection.remove(id);
+          return Mode.REPLACE;
         }
       }
-      else {
-        // In REPLACE and ADD, add objects.
-        // The difference was done before by not re-using the selection.
-        // Since we are using a set, we can just add in any case.
-        selection.add(id);
-      }
-    }
-    context.setSelection(new DBIDSelection(selection));
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   */
-  private void addCSSClasses() {
-    // Class for the markers
-    if(!svgp.getCSSClassManager().contains(CSS_MARKER)) {
-      final CSSClass cls = new CSSClass(this, CSS_MARKER);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
-      svgp.addCSSClassOrLogError(cls);
+      // Default mode is replace.
+      return Mode.REPLACE;
     }
 
-    // Class for the range marking
-    if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
-      final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-      rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-      rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
-      svgp.addCSSClassOrLogError(rcls);
-    }
-  }
-
-  @Override
-  public void resultChanged(Result current) {
-    if(current instanceof SelectionResult) {
-      synchronizedRedraw();
-      return;
-    }
-    super.resultChanged(current);
-  }
-
-  /**
-   * Factory class for OPTICS plot selections.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
-   */
-  public static class Factory extends AbstractVisFactory {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Gets the Index of the ClusterOrderEntry where the event occurred
+     * 
+     * @param order List of ClusterOrderEntries
+     * @param cPt clicked point
+     * @return Index of the object
      */
-    public Factory() {
-      super();
+    private int getSelectedIndex(List<ClusterOrderEntry<D>> order, SVGPoint cPt) {
+      int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
+      return mouseActIndex;
     }
 
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : ops) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        baseResult.getHierarchy().add(p, task);
+    /**
+     * Updates the selection for the given ClusterOrderEntry.
+     * 
+     * @param mode Input mode
+     * @param begin first index to select
+     * @param end last index to select
+     */
+    protected void updateSelection(Mode mode, int begin, int end) {
+      List<ClusterOrderEntry<D>> order = getClusterOrder();
+      if(begin < 0 || begin > end || end >= order.size()) {
+        logger.warning("Invalid range in updateSelection: " + begin + " .. " + end);
+        return;
+      }
+
+      DBIDSelection selContext = context.getSelection();
+      HashSetModifiableDBIDs selection;
+      if(selContext == null || mode == Mode.REPLACE) {
+        selection = DBIDUtil.newHashSet();
+      }
+      else {
+        selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
+      }
+
+      for(int i = begin; i <= end; i++) {
+        DBID id = order.get(i).getID();
+        if(mode == Mode.INVERT) {
+          if(!selection.contains(id)) {
+            selection.add(id);
+          }
+          else {
+            selection.remove(id);
+          }
+        }
+        else {
+          // In REPLACE and ADD, add objects.
+          // The difference was done before by not re-using the selection.
+          // Since we are using a set, we can just add in any case.
+          selection.add(id);
+        }
+      }
+      context.setSelection(new DBIDSelection(selection));
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     */
+    private void addCSSClasses() {
+      // Class for the markers
+      if(!svgp.getCSSClassManager().contains(CSS_MARKER)) {
+        final CSSClass cls = new CSSClass(this, CSS_MARKER);
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLUE_VALUE);
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+        svgp.addCSSClassOrLogError(cls);
+      }
+
+      // Class for the range marking
+      if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
+        final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
+        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
+        svgp.addCSSClassOrLogError(rcls);
       }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new OPTICSPlotSelectionVisualization<DoubleDistance>(task);
-    }
-
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+    public void resultChanged(Result current) {
+      if(current instanceof SelectionResult) {
+        synchronizedRedraw();
+        return;
+      }
+      super.resultChanged(current);
     }
   }
 }

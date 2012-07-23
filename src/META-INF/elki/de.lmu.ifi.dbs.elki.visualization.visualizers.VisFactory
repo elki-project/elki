@@ -20,7 +20,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionCon
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionCubeVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionToolCubeVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionToolDotVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.histogram.ColoredHistogramVisualizer$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.histogram.ColoredHistogramVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.LineVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.ParallelAxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterParallelMeanVisualization
@@ -30,7 +30,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionAxisRa
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionLineVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolAxisRangeVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection.SelectionToolLineVisualization
-de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisualizer$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.ClusterEvaluationVisFactory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.XYCurveVisFactory
@@ -39,8 +39,8 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.PixmapVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisFactory
-de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSClusterVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotCutVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotSelectionVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotVisualizer$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSSteepAreaVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSClusterVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotCutVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotSelectionVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotVisualizer
+de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSSteepAreaVisualization

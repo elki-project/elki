@@ -55,11 +55,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Clustering oneway - - «visualizes»
- * 
- * @param <D> Distance type (actually unused)
+ * @apiviz.stereotype factory
+ * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
  */
-public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
+public class OPTICSClusterVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
@@ -71,30 +70,43 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
   private static final String NAME = "OPTICS Cluster Ranges";
 
   /**
-   * CSS class for markers
-   */
-  protected static final String CSS_BRACKET = "opticsBracket";
-
-  /**
    * Optics clustering we visualize
    */
   public static final String CLUSTERING = "OPTICSClustering";
 
   /**
-   * Our clustering
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  Clustering<OPTICSModel> clus;
+  public OPTICSClusterVisualization() {
+    super();
+  }
 
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public OPTICSClusterVisualization(VisualizationTask task) {
-    super(task);
-    this.clus = task.getGenerics(CLUSTERING, Clustering.class);
-    context.addResultListener(this);
-    incrementalRedraw();
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector<?> p : ops) {
+      final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
+      if(ocl != null) {
+        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        task.put(CLUSTERING, ocl);
+        baseResult.getHierarchy().add(p, task);
+      }
+    }
+    // TODO: also run when a new clustering is added, instead of just new
+    // projections?
+  }
+
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance<DoubleDistance>(task);
+  }
+
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
   }
 
   /**
@@ -115,7 +127,8 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
         if(firstcluster.getModel() instanceof OPTICSModel) {
           return (Clustering<OPTICSModel>) clus;
         }
-      } catch(Exception e) {
+      }
+      catch(Exception e) {
         // Empty clustering? Shouldn't happen.
         logger.warning("Clustering with no cluster detected.", e);
       }
@@ -123,110 +136,99 @@ public class OPTICSClusterVisualization<D extends Distance<D>> extends AbstractO
     return null;
   }
 
-  @Override
-  protected void redraw() {
-    makeLayerElement();
-    addCSSClasses();
-    
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    HashMap<Cluster<?>, String> colormap = new HashMap<Cluster<?>, String>();
-    int cnum = 0;
-    for (Cluster<?> c : clus.getAllClusters()) {
-      colormap.put(c, colors.getColor(cnum));
-      cnum++;
-    }
-    drawClusters(clus.getToplevelClusters(), 1, colormap);
-  }
-
   /**
-   * Recursively draw clusters
-   * 
-   * @param clusters Current set of clusters
-   * @param depth Recursion depth
-   * @param colormap Color mapping
-   */
-  private void drawClusters(List<Cluster<OPTICSModel>> clusters, int depth, Map<Cluster<?>,String> colormap) {
-    final double scale = StyleLibrary.SCALE;
-
-    for(Cluster<OPTICSModel> cluster : clusters) {
-      try {
-        OPTICSModel model = cluster.getModel();
-        final double x1 = plotwidth * ((model.getStartIndex() + .25) / this.optics.getResult().getClusterOrder().size());
-        final double x2 = plotwidth * ((model.getEndIndex() + .75) / this.optics.getResult().getClusterOrder().size());
-        final double y = plotheight + depth * scale * 0.01;
-        Element e = svgp.svgLine(x1, y, x2, y);
-        SVGUtil.addCSSClass(e, CSS_BRACKET);
-        String color = colormap.get(cluster);
-        if (color != null) {
-          SVGUtil.setAtt(e, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY+":"+color);
-        }
-        layer.appendChild(e);
-      }
-      catch(ClassCastException e) {
-        logger.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
-      }
-      // Descend
-      final List<Cluster<OPTICSModel>> children = cluster.getChildren();
-      if(children != null) {
-        drawClusters(children, depth + 1, colormap);
-      }
-    }
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   */
-  private void addCSSClasses() {
-    // Class for the markers
-    if(!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
-      final CSSClass cls = new CSSClass(this, CSS_BRACKET);
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      svgp.addCSSClassOrLogError(cls);
-    }
-  }
-
-  /**
-   * Factory class for OPTICS plot selections.
+   * Instance.
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
+   * @apiviz.uses Clustering oneway - - «visualizes»
+   * 
+   * @param <D> Distance type (actually unused)
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * CSS class for markers
      */
-    public Factory() {
-      super();
+    protected static final String CSS_BRACKET = "opticsBracket";
+
+    /**
+     * Our clustering
+     */
+    Clustering<OPTICSModel> clus;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.clus = task.getGenerics(CLUSTERING, Clustering.class);
+      context.addResultListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : ops) {
-        final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
-        if(ocl != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          task.put(CLUSTERING, ocl);
-          baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      makeLayerElement();
+      addCSSClasses();
+
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      HashMap<Cluster<?>, String> colormap = new HashMap<Cluster<?>, String>();
+      int cnum = 0;
+      for(Cluster<?> c : clus.getAllClusters()) {
+        colormap.put(c, colors.getColor(cnum));
+        cnum++;
+      }
+      drawClusters(clus.getToplevelClusters(), 1, colormap);
+    }
+
+    /**
+     * Recursively draw clusters
+     * 
+     * @param clusters Current set of clusters
+     * @param depth Recursion depth
+     * @param colormap Color mapping
+     */
+    private void drawClusters(List<Cluster<OPTICSModel>> clusters, int depth, Map<Cluster<?>, String> colormap) {
+      final double scale = StyleLibrary.SCALE;
+
+      for(Cluster<OPTICSModel> cluster : clusters) {
+        try {
+          OPTICSModel model = cluster.getModel();
+          final double x1 = plotwidth * ((model.getStartIndex() + .25) / this.optics.getResult().getClusterOrder().size());
+          final double x2 = plotwidth * ((model.getEndIndex() + .75) / this.optics.getResult().getClusterOrder().size());
+          final double y = plotheight + depth * scale * 0.01;
+          Element e = svgp.svgLine(x1, y, x2, y);
+          SVGUtil.addCSSClass(e, CSS_BRACKET);
+          String color = colormap.get(cluster);
+          if(color != null) {
+            SVGUtil.setAtt(e, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + color);
+          }
+          layer.appendChild(e);
+        }
+        catch(ClassCastException e) {
+          logger.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
+        }
+        // Descend
+        final List<Cluster<OPTICSModel>> children = cluster.getChildren();
+        if(children != null) {
+          drawClusters(children, depth + 1, colormap);
         }
       }
-      // TODO: also run when a new clustering is added, instead of just new projections?
     }
 
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new OPTICSClusterVisualization<DoubleDistance>(task);
-    }
-
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+    /**
+     * Adds the required CSS-Classes
+     */
+    private void addCSSClasses() {
+      // Class for the markers
+      if(!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
+        final CSSClass cls = new CSSClass(this, CSS_BRACKET);
+        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        svgp.addCSSClassOrLogError(cls);
+      }
     }
   }
 }
