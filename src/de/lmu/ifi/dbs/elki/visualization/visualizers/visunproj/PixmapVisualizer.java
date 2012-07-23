@@ -45,99 +45,99 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has PixmapResult oneway - 1 visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class PixmapVisualizer extends AbstractVisualization {
+public class PixmapVisualizer extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
   private static final String NAME = "Pixmap Visualizer";
 
   /**
-   * The actual pixmap result.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private PixmapResult result;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public PixmapVisualizer(VisualizationTask task) {
-    super(task);
-    this.result = task.getResult();
+  public PixmapVisualizer() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    // TODO: Use width, height, imgratio, number of OPTICS plots!
-    double scale = StyleLibrary.SCALE;
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
+    for(PixmapResult pr : prs) {
+      // Add plots, attach visualizer
+      final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
+      task.width = pr.getImage().getWidth() / pr.getImage().getHeight();
+      task.height = 1.0;
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      baseResult.getHierarchy().add(pr, task);
+    }
+  }
 
-    final double sizex = scale;
-    final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = 0.0; // context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
 
-    RenderedImage img = result.getImage();
-    // is ratio, target ratio
-    double iratio = img.getHeight() / img.getWidth();
-    double tratio = task.getHeight() / task.getWidth();
-    // We want to place a (iratio, 1.0) object on a (tratio, 1.0) screen.
-    // Both dimensions must fit:
-    double zoom = (iratio >= tratio) ? Math.min(tratio / iratio, 1.0) : Math.max(iratio / tratio, 1.0);
-
-    Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale * zoom * iratio);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * zoom);
-    itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, result.getAsFile().toURI().toString());
-
-    layer.appendChild(itag);
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
   }
 
   /**
-   * Factory class for pixmap visualizers.
+   * Instance.
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses PixmapVisualizer oneway - - «create»
+   * @apiviz.has PixmapResult oneway - 1 visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractVisualization {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * The actual pixmap result.
      */
-    public Factory() {
-      super();
+    private PixmapResult result;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.result = task.getResult();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
-      for(PixmapResult pr : prs) {
-        // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
-        task.width = pr.getImage().getWidth() / pr.getImage().getHeight();
-        task.height = 1.0;
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-        baseResult.getHierarchy().add(pr, task);
-      }
-    }
+    protected void redraw() {
+      // TODO: Use width, height, imgratio, number of OPTICS plots!
+      double scale = StyleLibrary.SCALE;
 
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new PixmapVisualizer(task);
-    }
+      final double sizex = scale;
+      final double sizey = scale * task.getHeight() / task.getWidth();
+      final double margin = 0.0; // context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+      SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+      RenderedImage img = result.getImage();
+      // is ratio, target ratio
+      double iratio = img.getHeight() / img.getWidth();
+      double tratio = task.getHeight() / task.getWidth();
+      // We want to place a (iratio, 1.0) object on a (tratio, 1.0) screen.
+      // Both dimensions must fit:
+      double zoom = (iratio >= tratio) ? Math.min(tratio / iratio, 1.0) : Math.max(iratio / tratio, 1.0);
+
+      Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale * zoom * iratio);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * zoom);
+      itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, result.getAsFile().toURI().toString());
+
+      layer.appendChild(itag);
     }
   }
 }

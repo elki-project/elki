@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualization oneway - - «create»
+ * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  */
-public class LabelVisFactory extends AbstractVisFactory {
+public class LabelVisualization extends AbstractVisFactory {
   /**
    * The label to render
    */
@@ -61,7 +61,7 @@ public class LabelVisFactory extends AbstractVisFactory {
   /**
    * Constructor. Solely for API purposes (Parameterizable!)
    */
-  public LabelVisFactory() {
+  public LabelVisualization() {
     super();
   }
 
@@ -70,7 +70,7 @@ public class LabelVisFactory extends AbstractVisFactory {
    * 
    * @param label Label to use
    */
-  public LabelVisFactory(String label) {
+  public LabelVisualization(String label) {
     this(label, false);
   }
 
@@ -80,7 +80,7 @@ public class LabelVisFactory extends AbstractVisFactory {
    * @param label Label to use
    * @param rotated Rotated 90 deg to the left
    */
-  public LabelVisFactory(String label, boolean rotated) {
+  public LabelVisualization(String label, boolean rotated) {
     super();
     this.label = label;
     this.rotated = rotated;
@@ -114,7 +114,7 @@ public class LabelVisFactory extends AbstractVisFactory {
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90)");
     }
-    return new StaticVisualization(task, layer);
+    return new StaticVisualizationInstance(task, layer);
   }
 
   @Override

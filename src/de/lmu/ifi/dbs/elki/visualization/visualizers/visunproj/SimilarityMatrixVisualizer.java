@@ -49,123 +49,123 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has SimilarityMatrix oneway - 1 visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class SimilarityMatrixVisualizer extends AbstractVisualization {
+public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
   private static final String NAME = "Similarity Matrix Visualizer";
 
   /**
-   * The actual pixmap result.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private SimilarityMatrix result;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public SimilarityMatrixVisualizer(VisualizationTask task) {
-    super(task);
-    this.result = task.getResult();
+  public SimilarityMatrixVisualizer() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    // TODO: Use width, height, imgratio, number of OPTICS plots!
-    double scale = StyleLibrary.SCALE;
-
-    final double sizex = scale;
-    final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-
-    RenderedImage img = result.getImage();
-    // is ratio, target ratio
-    double iratio = img.getHeight() / img.getWidth();
-    double tratio = task.getHeight() / task.getWidth();
-    // We want to place a (iratio, 1.0) object on a (tratio, 1.0) screen.
-    // Both dimensions must fit:
-    double zoom = (iratio >= tratio) ? Math.min(tratio / iratio, 1.0) : Math.max(iratio / tratio, 1.0);
-
-    Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, margin * 0.75);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, margin * 0.75);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale * zoom * iratio);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * zoom);
-    itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, result.getAsFile().toURI().toString());
-    layer.appendChild(itag);
-
-    // Add object labels
-    final int size = result.getIDs().size();
-    final double hlsize = scale * zoom * iratio / size;
-    final double vlsize = scale * zoom / size;
-    int i = 0;
-    final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getRelation().getDatabase());
-    for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {
-      String label = lrep.get(id);
-      if(label != null) {
-        // Label on horizontal axis
-        final double hlx = margin * 0.75 + hlsize * (i + .8);
-        final double hly = margin * 0.7;
-        Element lbl = svgp.svgText(hlx, hly, label);
-        SVGUtil.setAtt(lbl, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + hlx + "," + hly + ")");
-        SVGUtil.setAtt(lbl, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + hlsize * 0.8);
-        layer.appendChild(lbl);
-        // Label on vertical axis
-        Element lbl2 = svgp.svgText(margin * 0.7, margin * 0.75 + vlsize * (i + .8), label);
-        SVGUtil.setAtt(lbl2, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
-        SVGUtil.setAtt(lbl2, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + vlsize * 0.8);
-        layer.appendChild(lbl2);
-      }
-      i++;
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
+    for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
+      // Add plots, attach visualizer
+      final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
+      task.width = 1.0;
+      task.height = 1.0;
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      baseResult.getHierarchy().add(pr, task);
     }
   }
 
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
+
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
+  }
+
   /**
-   * Factory class for pixmap visualizers.
+   * Instance
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses PixmapVisualizer oneway - - «create»
+   * @apiviz.has SimilarityMatrix oneway - 1 visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractVisualization {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * The actual pixmap result.
      */
-    public Factory() {
-      super();
+    private SimilarityMatrix result;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.result = task.getResult();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
-      for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
-        // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
-        task.width = 1.0;
-        task.height = 1.0;
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-        baseResult.getHierarchy().add(pr, task);
+    protected void redraw() {
+      // TODO: Use width, height, imgratio, number of OPTICS plots!
+      double scale = StyleLibrary.SCALE;
+
+      final double sizex = scale;
+      final double sizey = scale * task.getHeight() / task.getWidth();
+      final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
+      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+      SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+
+      RenderedImage img = result.getImage();
+      // is ratio, target ratio
+      double iratio = img.getHeight() / img.getWidth();
+      double tratio = task.getHeight() / task.getWidth();
+      // We want to place a (iratio, 1.0) object on a (tratio, 1.0) screen.
+      // Both dimensions must fit:
+      double zoom = (iratio >= tratio) ? Math.min(tratio / iratio, 1.0) : Math.max(iratio / tratio, 1.0);
+
+      Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, margin * 0.75);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, margin * 0.75);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale * zoom * iratio);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * zoom);
+      itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, result.getAsFile().toURI().toString());
+      layer.appendChild(itag);
+
+      // Add object labels
+      final int size = result.getIDs().size();
+      final double hlsize = scale * zoom * iratio / size;
+      final double vlsize = scale * zoom / size;
+      int i = 0;
+      final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getRelation().getDatabase());
+      for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {
+        String label = lrep.get(id);
+        if(label != null) {
+          // Label on horizontal axis
+          final double hlx = margin * 0.75 + hlsize * (i + .8);
+          final double hly = margin * 0.7;
+          Element lbl = svgp.svgText(hlx, hly, label);
+          SVGUtil.setAtt(lbl, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + hlx + "," + hly + ")");
+          SVGUtil.setAtt(lbl, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + hlsize * 0.8);
+          layer.appendChild(lbl);
+          // Label on vertical axis
+          Element lbl2 = svgp.svgText(margin * 0.7, margin * 0.75 + vlsize * (i + .8), label);
+          SVGUtil.setAtt(lbl2, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_END_VALUE);
+          SVGUtil.setAtt(lbl2, SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: " + vlsize * 0.8);
+          layer.appendChild(lbl2);
+        }
+        i++;
       }
-    }
-
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new SimilarityMatrixVisualizer(task);
-    }
-
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
     }
   }
 }

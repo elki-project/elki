@@ -55,144 +55,145 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has Clustering oneway - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class KeyVisualization extends AbstractVisualization {
+public class KeyVisualization extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
   private static final String NAME = "Cluster Key";
 
-  /**
-   * Clustering to display
-   */
-  private Clustering<Model> clustering;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public KeyVisualization(VisualizationTask task) {
-    super(task);
-    this.clustering = task.getResult();
-    context.addResultListener(this);
-  }
-
   @Override
-  public void destroy() {
-    context.removeResultListener(this);
-    super.destroy();
-  }
-
-  @Override
-  public void resultChanged(Result current) {
-    super.resultChanged(current);
-    if(current == context.getStyleResult()) {
-      incrementalRedraw();
-    }
-  }
-
-  @Override
-  protected void redraw() {
-    SVGPlot svgp = task.getPlot();
-    final List<Cluster<Model>> allcs = clustering.getAllClusters();
-
-    StyleLibrary style = context.getStyleLibrary();
-    MarkerLibrary ml = style.markers();
-    layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
-
-    // Add a label for the clustering.
-    {
-      Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
-      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.4; fill: "+style.getTextColor(StyleLibrary.DEFAULT));
-      layer.appendChild(label);
-    }
-
-    // TODO: multi-column layout!
-    int i = 0;
-    for(Cluster<Model> c : allcs) {
-      ml.useMarker(svgp, layer, 0.3, i + 1.5, i, 0.3);
-      Element label = svgp.svgText(0.7, i + 1.7, c.getNameAutomatic());
-      label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; fill: "+style.getTextColor(StyleLibrary.DEFAULT));
-      layer.appendChild(label);
-      i++;
-    }
-
-    // Add a button to set style policy
-    {
-      StylingPolicy sp = context.getStyleResult().getStylingPolicy();
-      if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
-        // Don't show the button when active. May confuse people more than the disappearing button
-        
-        // SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
-        // button.setTitle("Active style", "darkgray");
-        // layer.appendChild(button.render(svgp));
-      }
-      else {
-        SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
-        button.setTitle("Set style", "black");
-        Element elem = button.render(svgp);
-        // Attach listener
-        EventTarget etr = (EventTarget) elem;
-        etr.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new EventListener() {
-          @Override
-          public void handleEvent(Event evt) {
-            setStylePolicy();
-          }
-        }, false);
-        layer.appendChild(elem);
+  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+    // Find clusterings we can visualize:
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
+    for(Clustering<?> c : clusterings) {
+      if(c.getAllClusters().size() > 0) {
+        final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
+        task.width = 1.0;
+        task.height = 1.0;
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+        task.put(VisualizationTask.META_NODETAIL, true);
+        baseResult.getHierarchy().add(c, task);
       }
     }
+  }
 
-    int rows = i + 2;
-    int cols = Math.max(6, (int) (rows * task.getHeight() / task.getWidth()));
-    final double margin = style.getSize(StyleLibrary.MARGIN);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
-    SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
+
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    return false;
   }
 
   /**
-   * Trigger a style change.
-   */
-  protected void setStylePolicy() {
-    context.getStyleResult().setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleLibrary()));
-    context.getHierarchy().resultChanged(context.getStyleResult());
-  }
-
-  /**
-   * Visualization factory
+   * Instance
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses KeyVisualization oneway - - «create»
+   * @apiviz.has Clustering oneway - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractVisualization {
+    /**
+     * Clustering to display
+     */
+    private Clustering<Model> clustering;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.clustering = task.getResult();
+      context.addResultListener(this);
+    }
+
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-      // Find clusterings we can visualize:
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-      for (Clustering<?> c : clusterings) {
-        if(c.getAllClusters().size() > 0) {
-          final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
-          task.width = 1.0;
-          task.height = 1.0;
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-          task.put(VisualizationTask.META_NODETAIL, true);
-          baseResult.getHierarchy().add(c, task);
-        }
+    public void destroy() {
+      context.removeResultListener(this);
+      super.destroy();
+    }
+
+    @Override
+    public void resultChanged(Result current) {
+      super.resultChanged(current);
+      if(current == context.getStyleResult()) {
+        incrementalRedraw();
       }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new KeyVisualization(task);
+    protected void redraw() {
+      SVGPlot svgp = task.getPlot();
+      final List<Cluster<Model>> allcs = clustering.getAllClusters();
+
+      StyleLibrary style = context.getStyleLibrary();
+      MarkerLibrary ml = style.markers();
+      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+
+      // Add a label for the clustering.
+      {
+        Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
+        label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.4; fill: " + style.getTextColor(StyleLibrary.DEFAULT));
+        layer.appendChild(label);
+      }
+
+      // TODO: multi-column layout!
+      int i = 0;
+      for(Cluster<Model> c : allcs) {
+        ml.useMarker(svgp, layer, 0.3, i + 1.5, i, 0.3);
+        Element label = svgp.svgText(0.7, i + 1.7, c.getNameAutomatic());
+        label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; fill: " + style.getTextColor(StyleLibrary.DEFAULT));
+        layer.appendChild(label);
+        i++;
+      }
+
+      // Add a button to set style policy
+      {
+        StylingPolicy sp = context.getStyleResult().getStylingPolicy();
+        if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
+          // Don't show the button when active. May confuse people more than the
+          // disappearing button
+
+          // SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+          // button.setTitle("Active style", "darkgray");
+          // layer.appendChild(button.render(svgp));
+        }
+        else {
+          SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+          button.setTitle("Set style", "black");
+          Element elem = button.render(svgp);
+          // Attach listener
+          EventTarget etr = (EventTarget) elem;
+          etr.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new EventListener() {
+            @Override
+            public void handleEvent(Event evt) {
+              setStylePolicy();
+            }
+          }, false);
+          layer.appendChild(elem);
+        }
+      }
+
+      int rows = i + 2;
+      int cols = Math.max(6, (int) (rows * task.getHeight() / task.getWidth()));
+      final double margin = style.getSize(StyleLibrary.MARGIN);
+      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
+      SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      return false;
+    /**
+     * Trigger a style change.
+     */
+    protected void setStylePolicy() {
+      context.getStyleResult().setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleLibrary()));
+      context.getHierarchy().resultChanged(context.getStyleResult());
     }
   }
 }
