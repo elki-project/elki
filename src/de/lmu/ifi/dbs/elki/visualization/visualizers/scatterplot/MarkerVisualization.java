@@ -54,121 +54,122 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses StyleResult
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class MarkerVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
+public class MarkerVisualization extends AbstractVisFactory {
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * A short name characterizing this Visualizer.
    */
-  public static final String DOTMARKER = "dot";
+  private static final String NAME = "Markers";
 
   /**
-   * The result we visualize
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private StyleResult style;
+  public MarkerVisualization() {
+    super();
+    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
+  }
+
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
+
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    // Find a style result to visualize:
+    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
+    for(StyleResult c : styleres) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        baseResult.getHierarchy().add(c, task);
+        baseResult.getHierarchy().add(p, task);
+      }
+    }
+  }
 
   /**
-   * Constructor.
+   * Instance.
    * 
-   * @param task Visualization task
+   * @author Erich Schubert
+   * 
+   * @apiviz.uses StyleResult
    */
-  public MarkerVisualization(VisualizationTask task) {
-    super(task);
-    this.style = task.getResult();
-    context.addDataStoreListener(this);
-    context.addResultListener(this);
-    incrementalRedraw();
-  }
+  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+    /**
+     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
+     */
+    public static final String DOTMARKER = "dot";
 
-  @Override
-  public void destroy() {
-    super.destroy();
-    context.removeDataStoreListener(this);
-    context.removeResultListener(this);
-  }
+    /**
+     * The result we visualize
+     */
+    private StyleResult style;
 
-  @Override
-  public void redraw() {
-    final MarkerLibrary ml = context.getStyleLibrary().markers();
-    final double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
-    final StylingPolicy spol = style.getStylingPolicy();
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.style = task.getResult();
+      context.addDataStoreListener(this);
+      context.addResultListener(this);
+      incrementalRedraw();
+    }
 
-    if(spol instanceof ClassStylingPolicy) {
-      ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
-      for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
-        for(DBIDIter iter = cspol.iterateClass(cnum); iter.valid(); iter.advance()) {
-          if(!sample.getSample().contains(iter)) {
-            continue; // TODO: can we test more efficiently than this?
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeDataStoreListener(this);
+      context.removeResultListener(this);
+    }
+
+    @Override
+    public void redraw() {
+      final MarkerLibrary ml = context.getStyleLibrary().markers();
+      final double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
+      final StylingPolicy spol = style.getStylingPolicy();
+
+      if(spol instanceof ClassStylingPolicy) {
+        ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
+        for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
+          for(DBIDIter iter = cspol.iterateClass(cnum); iter.valid(); iter.advance()) {
+            if(!sample.getSample().contains(iter)) {
+              continue; // TODO: can we test more efficiently than this?
+            }
+            try {
+              final NumberVector<?, ?> vec = rel.get(iter);
+              double[] v = proj.fastProjectDataToRenderSpace(vec);
+              ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
+            }
+            catch(ObjectNotFoundException e) {
+              // ignore.
+            }
           }
+        }
+      }
+      else {
+        final String FILL = SVGConstants.CSS_FILL_PROPERTY + ":";
+        // Color-based styling. Fall back to dots
+        for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
           try {
-            final NumberVector<?, ?> vec = rel.get(iter);
-            double[] v = proj.fastProjectDataToRenderSpace(vec);
-            ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
+            double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
+            Element dot = svgp.svgCircle(v[0], v[1], marker_size);
+            SVGUtil.addCSSClass(dot, DOTMARKER);
+            int col = spol.getColorForDBID(iter);
+            SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
+            layer.appendChild(dot);
           }
           catch(ObjectNotFoundException e) {
             // ignore.
           }
-        }
-      }
-    }
-    else {
-      final String FILL = SVGConstants.CSS_FILL_PROPERTY + ":";
-      // Color-based styling. Fall back to dots
-      for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
-        try {
-          double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
-          Element dot = svgp.svgCircle(v[0], v[1], marker_size);
-          SVGUtil.addCSSClass(dot, DOTMARKER);
-          int col = spol.getColorForDBID(iter);
-          SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
-          layer.appendChild(dot);
-        }
-        catch(ObjectNotFoundException e) {
-          // ignore.
-        }
-      }
-    }
-  }
-
-  /**
-   * Visualization factory
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses MarkerVisualization oneway - - «create»
-   */
-  public static class Factory extends AbstractVisFactory {
-    /**
-     * A short name characterizing this Visualizer.
-     */
-    private static final String NAME = "Markers";
-
-    /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-     */
-    public Factory() {
-      super();
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
-    }
-
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new MarkerVisualization(task);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      // Find a style result to visualize:
-      Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-      for(StyleResult c : styleres) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          baseResult.getHierarchy().add(c, task);
-          baseResult.getHierarchy().add(p, task);
         }
       }
     }

@@ -1,6 +1,6 @@
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AxisVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.MarkerVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.PolygonVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AxisVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.MarkerVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.PolygonVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterMeanVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterHullVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.EMClusterVisualization
@@ -9,10 +9,10 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterOrderVi
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeSphereVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier.BubbleVisualization
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipScoreVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipStringVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ToolBox2DVisualization$Factory
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ReferencePointsVisualization$Factory
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipScoreVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipStringVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ToolBox2DVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ReferencePointsVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density.DensityEstimationOverlay
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.MoveObjectsToolVisualization$Factory
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionDotVisualization$Factory
