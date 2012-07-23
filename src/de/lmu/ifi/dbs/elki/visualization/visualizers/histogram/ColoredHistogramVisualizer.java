@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses ColoredHistogramVisualizer oneway - - «create»
+ * @apiviz.uses Instance oneway - - «create»
  */
 public class ColoredHistogramVisualizer extends AbstractVisFactory {
   /**
