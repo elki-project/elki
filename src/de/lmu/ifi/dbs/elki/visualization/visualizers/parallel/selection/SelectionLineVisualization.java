@@ -54,112 +54,112 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Robert Rödler
  * 
- * @apiviz.has SelectionResult oneway - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class SelectionLineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class SelectionLineVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Selection Line";
-
-  /**
-   * CSS Class for the range marker
-   */
-  public static final String MARKER = "SelectionLine";
+  public static final String NAME = "Selection Line";
 
   /**
    * Constructor.
-   *
-   * @param task Visualization task
    */
-  public SelectionLineVisualization(VisualizationTask task) {
-    super(task);
-    addCSSClasses(svgp);
-    context.addDataStoreListener(this);
-    context.addResultListener(this);
-    incrementalRedraw();
-  }
-  
-  @Override
-  public void destroy() {
-    context.removeDataStoreListener(this);
-    context.removeResultListener(this);
-    super.destroy();
+  public SelectionLineVisualization() {
+    super();
+    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
-  protected void redraw() {
-    DBIDSelection selContext = context.getSelection();
-    if(selContext != null) {
-      DBIDs selection = selContext.getSelectedIds();
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
 
-      for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
-
-        SVGPath path = new SVGPath();
-        for(int i = 0; i < proj.getVisibleDimensions(); i++) {
-          path.drawTo(getVisibleAxisX(i), yPos[i]);
-        }
-        Element marker = path.makeElement(svgp);
-        SVGUtil.addCSSClass(marker, MARKER);
-        layer.appendChild(marker);
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+    for(SelectionResult selres : selectionResults) {
+      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+      for(ParallelPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        baseResult.getHierarchy().add(selres, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
   }
 
   /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    final StyleLibrary style = context.getStyleLibrary();
-    // Class for the cube
-    if(!svgp.getCSSClassManager().contains(MARKER)) {
-      CSSClass cls = new CSSClass(this, MARKER);
-      cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.);
-      cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-      svgp.addCSSClassOrLogError(cls);
-    }
-  }
-
-  /**
-   * Factory for visualizers to generate an SVG-Element containing a cube as
-   * marker representing the selected range for each dimension
+   * Instance
    * 
    * @author Robert Rödler
    * 
-   * @apiviz.stereotype factory
+   * @apiviz.has SelectionResult oneway - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+    /**
+     * CSS Class for the range marker
+     */
+    public static final String MARKER = "SelectionLine";
+
     /**
      * Constructor.
+     * 
+     * @param task Visualization task
      */
-    public Factory() {
-      super();
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
+    public Instance(VisualizationTask task) {
+      super(task);
+      addCSSClasses(svgp);
+      context.addDataStoreListener(this);
+      context.addResultListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionLineVisualization(task);
+    public void destroy() {
+      context.removeDataStoreListener(this);
+      context.removeResultListener(this);
+      super.destroy();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-        for(ParallelPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA -1);
-          baseResult.getHierarchy().add(selres, task);
-          baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      DBIDSelection selContext = context.getSelection();
+      if(selContext != null) {
+        DBIDs selection = selContext.getSelectedIds();
+
+        for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
+          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
+
+          SVGPath path = new SVGPath();
+          for(int i = 0; i < proj.getVisibleDimensions(); i++) {
+            path.drawTo(getVisibleAxisX(i), yPos[i]);
+          }
+          Element marker = path.makeElement(svgp);
+          SVGUtil.addCSSClass(marker, MARKER);
+          layer.appendChild(marker);
         }
+      }
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleLibrary();
+      // Class for the cube
+      if(!svgp.getCSSClassManager().contains(MARKER)) {
+        CSSClass cls = new CSSClass(this, MARKER);
+        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        svgp.addCSSClassOrLogError(cls);
       }
     }
   }

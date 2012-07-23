@@ -48,134 +48,132 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
- * Visualizer for generating an SVG-Element representing the selected range for
- * each dimension
+ * Visualizer for generating an SVG-Element representing the selected range.
  * 
  * @author Robert Rödler
  * 
- * @apiviz.has SelectionResult oneway - - visualizes
- * @apiviz.has RangeSelection oneway - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class SelectionAxisRangeVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> {
+public class SelectionAxisRangeVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Selection Axis Range";
-
-  /**
-   * CSS Class for the range marker
-   */
-  public static final String MARKER = "selectionAxisRange";
+  public static final String NAME = "Selection Axis Range";
 
   /**
    * Constructor.
-   * 
-   * @param task Visualization task
    */
-  public SelectionAxisRangeVisualization(VisualizationTask task) {
-    super(task);
-    addCSSClasses(svgp);
-    context.addResultListener(this);
-    incrementalRedraw();
+  public SelectionAxisRangeVisualization() {
+    super();
+    thumbmask |= ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
-  public void destroy() {
-    context.removeResultListener(this);
-    super.destroy();
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    final StyleLibrary style = context.getStyleLibrary();
-    // Class for the cube
-    if(!svgp.getCSSClassManager().contains(MARKER)) {
-      CSSClass cls = new CSSClass(this, MARKER);
-      cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
-      cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
-
-      svgp.addCSSClassOrLogError(cls);
-    }
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
   @Override
-  protected void redraw() {
-    DBIDSelection selContext = context.getSelection();
-    if(selContext == null || !(selContext instanceof RangeSelection)) {
-      return;
-    }
-    DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-    if(ranges == null) {
-      return;
-    }
-
-    // Project:
-    double[] min = new double[ranges.length];
-    double[] max = new double[ranges.length];
-    for(int d = 0; d < ranges.length; d++) {
-      if(ranges[d] != null) {
-        min[d] = ranges[d].first;
-        max[d] = ranges[d].second;
-      }
-    }
-    min = proj.fastProjectDataToRenderSpace(min);
-    max = proj.fastProjectDataToRenderSpace(max);
-
-    int dim = proj.getVisibleDimensions();
-    for(int d = 0; d < dim; d++) {
-      if(ranges[proj.getDimForVisibleAxis(d)] != null) {
-        double amin = Math.min(min[d], max[d]);
-        double amax = Math.max(min[d], max[d]);
-        Element rect = svgp.svgRect(getVisibleAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
-        SVGUtil.addCSSClass(rect, MARKER);
-        layer.appendChild(rect);
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+    for(SelectionResult selres : selectionResults) {
+      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+      for(ParallelPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        baseResult.getHierarchy().add(selres, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
   }
 
   /**
-   * Factory for visualizers to generate an SVG-Element containing a cube as
-   * marker representing the selected range for each dimension
+   * Instance
    * 
    * @author Robert Rödler
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses SelectionAxisRangeVisualization oneway - - «create»
+   * @apiviz.has SelectionResult oneway - - visualizes
+   * @apiviz.has RangeSelection oneway - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> {
+    /**
+     * CSS Class for the range marker
+     */
+    public static final String MARKER = "selectionAxisRange";
+
     /**
      * Constructor.
+     * 
+     * @param task Visualization task
      */
-    public Factory() {
-      super();
-      thumbmask |= ThumbnailVisualization.ON_SELECTION;
+    public Instance(VisualizationTask task) {
+      super(task);
+      addCSSClasses(svgp);
+      context.addResultListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionAxisRangeVisualization(task);
+    public void destroy() {
+      context.removeResultListener(this);
+      super.destroy();
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleLibrary();
+      // Class for the cube
+      if(!svgp.getCSSClassManager().contains(MARKER)) {
+        CSSClass cls = new CSSClass(this, MARKER);
+        cls.setStatement(SVGConstants.CSS_STROKE_VALUE, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+
+        svgp.addCSSClassOrLogError(cls);
+      }
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-        for(ParallelPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-          baseResult.getHierarchy().add(selres, task);
-          baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      DBIDSelection selContext = context.getSelection();
+      if(selContext == null || !(selContext instanceof RangeSelection)) {
+        return;
+      }
+      DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
+      if(ranges == null) {
+        return;
+      }
+
+      // Project:
+      double[] min = new double[ranges.length];
+      double[] max = new double[ranges.length];
+      for(int d = 0; d < ranges.length; d++) {
+        if(ranges[d] != null) {
+          min[d] = ranges[d].first;
+          max[d] = ranges[d].second;
+        }
+      }
+      min = proj.fastProjectDataToRenderSpace(min);
+      max = proj.fastProjectDataToRenderSpace(max);
+
+      int dim = proj.getVisibleDimensions();
+      for(int d = 0; d < dim; d++) {
+        if(ranges[proj.getDimForVisibleAxis(d)] != null) {
+          double amin = Math.min(min[d], max[d]);
+          double amax = Math.max(min[d], max[d]);
+          Element rect = svgp.svgRect(getVisibleAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
+          SVGUtil.addCSSClass(rect, MARKER);
+          layer.appendChild(rect);
         }
       }
     }
