@@ -56,40 +56,47 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses 
- *              de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
+ * @apiviz.stereotype factory
+ * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
  */
-public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
+public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "OPTICS Steep Areas";
 
   /**
-   * CSS class for markers
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  protected static final String CSS_STEEP_UP = "opticsSteepUp";
+  public OPTICSSteepAreaVisualization() {
+    super();
+  }
 
-  /**
-   * CSS class for markers
-   */
-  protected static final String CSS_STEEP_DOWN = "opticsSteepDown";
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector<?> p : ops) {
+      final SteepAreaResult steep = findSteepAreaResult(p.getResult());
+      if(steep != null) {
+        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
+        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        baseResult.getHierarchy().add(p, task);
+        baseResult.getHierarchy().add(steep, task);
+      }
+    }
+  }
 
-  /**
-   * Our clustering
-   */
-  OPTICSXi.SteepAreaResult areas;
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance<DoubleDistance>(task);
+  }
 
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public OPTICSSteepAreaVisualization(VisualizationTask task) {
-    super(task);
-    this.areas = findSteepAreaResult(this.optics.getResult());
-    context.addResultListener(this);
-    incrementalRedraw();
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
   }
 
   /**
@@ -107,116 +114,109 @@ public class OPTICSSteepAreaVisualization<D extends Distance<D>> extends Abstrac
     return null;
   }
 
-  @Override
-  protected void redraw() {
-    makeLayerElement();
-    addCSSClasses();
-    
-    final OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
-    final List<ClusterOrderEntry<D>> co = getClusterOrder();
-    final OPTICSDistanceAdapter<D> adapter = opticsplot.getDistanceAdapter();
-    final LinearScale scale = opticsplot.getScale();
-    
-    for(OPTICSXi.SteepArea area : areas) {
-      final int st = area.getStartIndex();
-      final int en = area.getEndIndex();
-      // Note: make sure we are using doubles!
-      final double x1 = (st + .25) / co.size();
-      final double x2 = (en + .75) / co.size();
-      final double d1 = adapter.getDoubleForEntry(co.get(st));
-      final double d2 = adapter.getDoubleForEntry(co.get(en));
-      final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - scale.getScaled(d1)) : 0.;
-      final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - scale.getScaled(d2)) : 0.;
-      Element e = svgp.svgLine(plotwidth * x1, plotheight * y1, plotwidth * x2, plotheight * y2);
-      if(area instanceof OPTICSXi.SteepDownArea) {
-        SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
-      }
-      else {
-        SVGUtil.addCSSClass(e, CSS_STEEP_UP);
-      }
-      layer.appendChild(e);
-    }
-  }
-
   /**
-   * Adds the required CSS-Classes
-   */
-  private void addCSSClasses() {
-    // Class for the markers
-    if(!svgp.getCSSClassManager().contains(CSS_STEEP_DOWN)) {
-      final CSSClass cls = new CSSClass(this, CSS_STEEP_DOWN);
-      Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
-      if(color == null) {
-        color = Color.BLACK;
-      }
-      color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256), (int) (color.getBlue() * 0.8));
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      svgp.addCSSClassOrLogError(cls);
-    }
-    if(!svgp.getCSSClassManager().contains(CSS_STEEP_UP)) {
-      final CSSClass cls = new CSSClass(this, CSS_STEEP_UP);
-      Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
-      if(color == null) {
-        color = Color.BLACK;
-      }
-      color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-      svgp.addCSSClassOrLogError(cls);
-    }
-  }
-
-  @Override
-  public void resultChanged(Result current) {
-    if(current instanceof SelectionResult) {
-      synchronizedRedraw();
-      return;
-    }
-    super.resultChanged(current);
-  }
-
-  /**
-   * Factory class for OPTICS plot selections.
+   * Instance
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses OPTICSPlotSelectionVisualization oneway - - «create»
+   * @apiviz.uses 
+   *              de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi.SteepAreaResult
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * CSS class for markers
      */
-    public Factory() {
-      super();
+    protected static final String CSS_STEEP_UP = "opticsSteepUp";
+
+    /**
+     * CSS class for markers
+     */
+    protected static final String CSS_STEEP_DOWN = "opticsSteepDown";
+
+    /**
+     * Our clustering
+     */
+    OPTICSXi.SteepAreaResult areas;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.areas = findSteepAreaResult(this.optics.getResult());
+      context.addResultListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : ops) {
-        final SteepAreaResult steep = findSteepAreaResult(p.getResult());
-        if(steep != null) {
-          final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          baseResult.getHierarchy().add(p, task);
-          baseResult.getHierarchy().add(steep, task);
+    protected void redraw() {
+      makeLayerElement();
+      addCSSClasses();
+
+      final OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
+      final List<ClusterOrderEntry<D>> co = getClusterOrder();
+      final OPTICSDistanceAdapter<D> adapter = opticsplot.getDistanceAdapter();
+      final LinearScale scale = opticsplot.getScale();
+
+      for(OPTICSXi.SteepArea area : areas) {
+        final int st = area.getStartIndex();
+        final int en = area.getEndIndex();
+        // Note: make sure we are using doubles!
+        final double x1 = (st + .25) / co.size();
+        final double x2 = (en + .75) / co.size();
+        final double d1 = adapter.getDoubleForEntry(co.get(st));
+        final double d2 = adapter.getDoubleForEntry(co.get(en));
+        final double y1 = (!Double.isInfinite(d1) && !Double.isNaN(d1)) ? (1. - scale.getScaled(d1)) : 0.;
+        final double y2 = (!Double.isInfinite(d2) && !Double.isNaN(d2)) ? (1. - scale.getScaled(d2)) : 0.;
+        Element e = svgp.svgLine(plotwidth * x1, plotheight * y1, plotwidth * x2, plotheight * y2);
+        if(area instanceof OPTICSXi.SteepDownArea) {
+          SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
         }
+        else {
+          SVGUtil.addCSSClass(e, CSS_STEEP_UP);
+        }
+        layer.appendChild(e);
+      }
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     */
+    private void addCSSClasses() {
+      // Class for the markers
+      if(!svgp.getCSSClassManager().contains(CSS_STEEP_DOWN)) {
+        final CSSClass cls = new CSSClass(this, CSS_STEEP_DOWN);
+        Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+        if(color == null) {
+          color = Color.BLACK;
+        }
+        color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256), (int) (color.getBlue() * 0.8));
+        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        svgp.addCSSClassOrLogError(cls);
+      }
+      if(!svgp.getCSSClassManager().contains(CSS_STEEP_UP)) {
+        final CSSClass cls = new CSSClass(this, CSS_STEEP_UP);
+        Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+        if(color == null) {
+          color = Color.BLACK;
+        }
+        color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
+        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        svgp.addCSSClassOrLogError(cls);
       }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new OPTICSSteepAreaVisualization<DoubleDistance>(task);
-    }
-
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+    public void resultChanged(Result current) {
+      if(current instanceof SelectionResult) {
+        synchronizedRedraw();
+        return;
+      }
+      super.resultChanged(current);
     }
   }
 }

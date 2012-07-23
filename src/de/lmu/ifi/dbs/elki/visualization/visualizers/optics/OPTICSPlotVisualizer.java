@@ -48,87 +48,87 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @param <D> Distance type
+ * @apiviz.stereotype factory
+ * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
  */
-public class OPTICSPlotVisualizer<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
+public class OPTICSPlotVisualizer extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
   private static final String NAME = "OPTICS Plot";
 
   /**
-   * Constructor.
-   * 
-   * @param task Visualization task
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public OPTICSPlotVisualizer(VisualizationTask task) {
-    super(task);
+  public OPTICSPlotVisualizer() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    makeLayerElement();
-    // addCSSClasses();
-
-    OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
-    String ploturi = opticsplot.getSVGPlotURI();
-
-    Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, plotwidth);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, plotheight);
-    itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ploturi);
-
-    layer.appendChild(itag);
-
-    try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
-    }
-    catch(CSSNamingConflict e) {
-      LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+    for(OPTICSProjector<?> p : ops) {
+      // Add plots, attach visualizer
+      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+      baseResult.getHierarchy().add(p, task);
     }
   }
 
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance<DoubleDistance>(task);
+  }
+
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
+  }
+
   /**
-   * Factory class for OPTICS plot.
+   * Instance.
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
+   * @param <D> Distance type
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance<D extends Distance<D>> extends AbstractOPTICSVisualization<D> {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
+     * 
+     * @param task Visualization task
      */
-    public Factory() {
-      super();
+    public Instance(VisualizationTask task) {
+      super(task);
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-      for(OPTICSProjector<?> p : ops) {
-        // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      makeLayerElement();
+      // addCSSClasses();
+
+      OPTICSPlot<D> opticsplot = optics.getOPTICSPlot(context);
+      String ploturi = opticsplot.getSVGPlotURI();
+
+      Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, 0);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, 0);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, plotwidth);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, plotheight);
+      itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ploturi);
+
+      layer.appendChild(itag);
+
+      try {
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
       }
-    }
-
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new OPTICSPlotVisualizer<DoubleDistance>(task);
-    }
-
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+      catch(CSSNamingConflict e) {
+        LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);
+      }
     }
   }
 }
