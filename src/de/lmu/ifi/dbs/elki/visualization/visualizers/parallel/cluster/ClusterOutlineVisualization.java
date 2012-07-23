@@ -56,203 +56,205 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * Generates a SVG-Element that visualizes the area covered by a cluster.
  * 
  * @author Robert Rödler
- * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class ClusterOutlineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+// TODO: make parameterizable: rounded.
+public class ClusterOutlineVisualization extends AbstractVisFactory {
   /**
-   * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * A short name characterizing this Visualizer.
    */
-  public static final String CLUSTERAREA = "Clusteroutline";
+  public static final String NAME = "Cluster Outline";
 
   /**
-   * The result we visualize
+   * Currently unused option to enable/disable rounding
    */
-  private Clustering<Model> clustering;
+  public static final OptionID ROUNDED_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
 
   /**
-   * Flag for using rounded shapes
+   * Currently, always enabled.
    */
-  boolean rounded = true;
+  private boolean rounded = true;
 
   /**
-   * Constructor.
-   * 
-   * @param task VisualizationTask
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public ClusterOutlineVisualization(VisualizationTask task, boolean rounded) {
-    super(task);
-    this.clustering = task.getResult();
-    this.rounded = rounded;
-    context.addDataStoreListener(this);
-    context.addResultListener(this);
-    incrementalRedraw();
+  public ClusterOutlineVisualization() {
+    super();
   }
 
   @Override
-  public void destroy() {
-    context.removeDataStoreListener(this);
-    context.removeResultListener(this);
-    super.destroy();
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task, rounded);
   }
 
   @Override
-  protected void redraw() {
-    addCSSClasses(svgp);
-    int dim = proj.getVisibleDimensions();
-
-    DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
-    DoubleMinMax[] midmm = DoubleMinMax.newArray(dim - 1);
-
-    Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
-    for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-      Cluster<?> clus = ci.next();
-      for(int i = 0; i < dim; i++) {
-        mms[i].reset();
-        if(i < dim - 1) {
-          midmm[i].reset();
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    // Find clusterings we can visualize:
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    for(Clustering<?> c : clusterings) {
+      if(c.getAllClusters().size() > 0) {
+        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+        for(ParallelPlotProjector<?> p : ps) {
+          final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          baseResult.getHierarchy().add(c, task);
+          baseResult.getHierarchy().add(p, task);
         }
-      }
-
-      // Process points
-      // TODO: do this just once, cache the result somewhere appropriately?
-      for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
-        for(int i = 0; i < dim; i++) {
-          mms[i].put(yPos[i]);
-          if(i > 0) {
-            midmm[i - 1].put((yPos[i] + yPos[i - 1]) / 2.);
-          }
-        }
-      }
-
-      SVGPath path = new SVGPath();
-      if(!rounded) {
-        // Straight lines
-        for(int i = 0; i < dim; i++) {
-          path.drawTo(getVisibleAxisX(i), mms[i].getMax());
-          if(i < dim - 1) {
-            path.drawTo(getVisibleAxisX(i + .5), midmm[i].getMax());
-          }
-        }
-        for(int i = dim - 1; i >= 0; i--) {
-          if(i < dim - 1) {
-            path.drawTo(getVisibleAxisX(i + .5), midmm[i].getMin());
-          }
-          path.drawTo(getVisibleAxisX(i), mms[i].getMin());
-        }
-        path.close();
-      }
-      else {
-        // Maxima
-        path.drawTo(getVisibleAxisX(0), mms[0].getMax());
-        for(int i = 1; i < dim; i++) {
-          path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMax(), getVisibleAxisX(i), mms[i].getMax());
-        }
-        // Minima
-        path.drawTo(getVisibleAxisX(dim - 1), mms[dim - 1].getMin());
-        for(int i = dim - 1; i > 0; i--) {
-          path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMin(), getVisibleAxisX(i - 1), mms[i - 1].getMin());
-        }
-        path.close();
-      }
-
-      Element intervals = path.makeElement(svgp);
-      SVGUtil.addCSSClass(intervals, CLUSTERAREA + cnum);
-      layer.appendChild(intervals);
-    }
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    if(!svgp.getCSSClassManager().contains(CLUSTERAREA)) {
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-      int clusterID = 0;
-
-      for(@SuppressWarnings("unused")
-      Cluster<?> cluster : clustering.getAllClusters()) {
-        CSSClass cls = new CSSClass(this, CLUSTERAREA + clusterID);
-        // cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,
-        // context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / 2.0);
-        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
-        final String color;
-        if(clustering.getAllClusters().size() == 1) {
-          color = SVGConstants.CSS_BLACK_VALUE;
-        }
-        else {
-          color = colors.getColor(clusterID);
-        }
-        // cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
-
-        svgp.addCSSClassOrLogError(cls);
-        clusterID++;
       }
     }
   }
 
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
+  }
+
   /**
-   * Factory for axis visualizations
+   * Instance
    * 
    * @author Robert Rödler
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses ClusterOutlineVisualization oneway - - «create»
+   * @author Erich Schubert
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
     /**
-     * A short name characterizing this Visualizer.
+     * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
      */
-    private static final String NAME = "Cluster Outline";
+    public static final String CLUSTERAREA = "Clusteroutline";
 
     /**
-     * Currently unused option to enable/disable rounding
+     * The result we visualize
      */
-    public static final OptionID ROUNDED_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
+    private Clustering<Model> clustering;
 
     /**
-     * Currently, always enabled.
+     * Flag for using rounded shapes
      */
-    private boolean rounded = true;
+    boolean rounded = true;
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Constructor.
+     * 
+     * @param task VisualizationTask
      */
-    public Factory() {
-      super();
+    public Instance(VisualizationTask task, boolean rounded) {
+      super(task);
+      this.clustering = task.getResult();
+      this.rounded = rounded;
+      context.addDataStoreListener(this);
+      context.addResultListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new ClusterOutlineVisualization(task, rounded);
+    public void destroy() {
+      context.removeDataStoreListener(this);
+      context.removeResultListener(this);
+      super.destroy();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      // Find clusterings we can visualize:
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-      for(Clustering<?> c : clusterings) {
-        if(c.getAllClusters().size() > 0) {
-          Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-          for(ParallelPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-            baseResult.getHierarchy().add(c, task);
-            baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      addCSSClasses(svgp);
+      int dim = proj.getVisibleDimensions();
+
+      DoubleMinMax[] mms = DoubleMinMax.newArray(dim);
+      DoubleMinMax[] midmm = DoubleMinMax.newArray(dim - 1);
+
+      Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
+      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
+        Cluster<?> clus = ci.next();
+        for(int i = 0; i < dim; i++) {
+          mms[i].reset();
+          if(i < dim - 1) {
+            midmm[i].reset();
           }
         }
+
+        // Process points
+        // TODO: do this just once, cache the result somewhere appropriately?
+        for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
+          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
+          for(int i = 0; i < dim; i++) {
+            mms[i].put(yPos[i]);
+            if(i > 0) {
+              midmm[i - 1].put((yPos[i] + yPos[i - 1]) / 2.);
+            }
+          }
+        }
+
+        SVGPath path = new SVGPath();
+        if(!rounded) {
+          // Straight lines
+          for(int i = 0; i < dim; i++) {
+            path.drawTo(getVisibleAxisX(i), mms[i].getMax());
+            if(i < dim - 1) {
+              path.drawTo(getVisibleAxisX(i + .5), midmm[i].getMax());
+            }
+          }
+          for(int i = dim - 1; i >= 0; i--) {
+            if(i < dim - 1) {
+              path.drawTo(getVisibleAxisX(i + .5), midmm[i].getMin());
+            }
+            path.drawTo(getVisibleAxisX(i), mms[i].getMin());
+          }
+          path.close();
+        }
+        else {
+          // Maxima
+          path.drawTo(getVisibleAxisX(0), mms[0].getMax());
+          for(int i = 1; i < dim; i++) {
+            path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMax(), getVisibleAxisX(i), mms[i].getMax());
+          }
+          // Minima
+          path.drawTo(getVisibleAxisX(dim - 1), mms[dim - 1].getMin());
+          for(int i = dim - 1; i > 0; i--) {
+            path.quadTo(getVisibleAxisX(i - .5), midmm[i - 1].getMin(), getVisibleAxisX(i - 1), mms[i - 1].getMin());
+          }
+          path.close();
+        }
+
+        Element intervals = path.makeElement(svgp);
+        SVGUtil.addCSSClass(intervals, CLUSTERAREA + cnum);
+        layer.appendChild(intervals);
       }
     }
 
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      if(!svgp.getCSSClassManager().contains(CLUSTERAREA)) {
+        ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+        int clusterID = 0;
+
+        for(@SuppressWarnings("unused")
+        Cluster<?> cluster : clustering.getAllClusters()) {
+          CSSClass cls = new CSSClass(this, CLUSTERAREA + clusterID);
+          // cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY,
+          // context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) / 2.0);
+          cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.5);
+          final String color;
+          if(clustering.getAllClusters().size() == 1) {
+            color = SVGConstants.CSS_BLACK_VALUE;
+          }
+          else {
+            color = colors.getColor(clusterID);
+          }
+          // cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+
+          svgp.addCSSClassOrLogError(cls);
+          clusterID++;
+        }
+      }
     }
   }
 }

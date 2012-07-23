@@ -52,144 +52,144 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Robert Rödler
  * 
- * @apiviz.uses SVGSimpleLinearAxis
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-// TODO: split into interactive / non-interactive parts?
-public class ParallelAxisVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> {
+public class ParallelAxisVisualization extends AbstractVisFactory {
   /**
-   * Axis label class
+   * A short name characterizing this Visualizer.
    */
-  public final static String AXIS_LABEL = "paxis-label";
+  private static final String NAME = "Parallel Axes";
 
   /**
-   * Clickable area for the axis.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public final static String INVERTEDAXIS = "paxis-button";
-
-  /**
-   * Constructor.
-   * 
-   * @param task VisualizationTask
-   */
-  public ParallelAxisVisualization(VisualizationTask task) {
-    super(task);
-    incrementalRedraw();
-    context.addResultListener(this);
+  public ParallelAxisVisualization() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    addCSSClasses(svgp);
-    final int dim = proj.getVisibleDimensions();
-    try {
-      for(int i = 0; i < dim; i++) {
-        final int truedim = proj.getDimForVisibleAxis(i);
-        final double axisX = getVisibleAxisX(i);
-        if(!proj.isAxisInverted(i)) {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
-        }
-        else {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
-        }
-        // Get axis label
-        final String label = DatabaseUtil.getColumnLabel(relation, truedim + 1);
-        // Add axis label
-        Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
-        SVGUtil.setCSSClass(text, AXIS_LABEL);
-        layer.appendChild(text);
-        // TODO: Split into background + clickable layer.
-        Element button = svgp.svgRect(axisX - getAxisSep() * .475, -getMarginTop(), .95 * getAxisSep(), .5 * getMarginTop());
-        SVGUtil.setCSSClass(button, INVERTEDAXIS);
-        addEventListener(button, truedim);
-        layer.appendChild(button);
-      }
-    }
-    catch(CSSNamingConflict e) {
-      throw new RuntimeException("Conflict in CSS naming for axes.", e);
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
+
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
+    for(ParallelPlotProjector<?> p : ps) {
+      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
+      baseResult.getHierarchy().add(p, task);
     }
   }
 
-  /**
-   * Add the main CSS classes.
-   * 
-   * @param svgp Plot to draw to
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    final StyleLibrary style = context.getStyleLibrary();
-    if(!svgp.getCSSClassManager().contains(AXIS_LABEL)) {
-      CSSClass cls = new CSSClass(this, AXIS_LABEL);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
-      cls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
-      cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, style.getTextSize(StyleLibrary.AXIS_LABEL));
-      cls.setStatement(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, SVGConstants.SVG_MIDDLE_VALUE);
-      svgp.addCSSClassOrLogError(cls);
-    }
-    if(!svgp.getCSSClassManager().contains(INVERTEDAXIS)) {
-      CSSClass cls = new CSSClass(this, INVERTEDAXIS);
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.1);
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_GREY_VALUE);
-      svgp.addCSSClassOrLogError(cls);
-    }
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return true;
   }
 
   /**
-   * Add an event listener to the Element
-   * 
-   * @param tag Element to add the listener
-   * @param i Tool number for the Element
-   */
-  private void addEventListener(final Element tag, final int i) {
-    EventTarget targ = (EventTarget) tag;
-    targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
-      @Override
-      public void handleEvent(Event evt) {
-        proj.toggleDimInverted(i);
-        context.getHierarchy().resultChanged(proj);
-      }
-    }, false);
-  }
-
-  /**
-   * Factory for axis visualizations
+   * Instance.
    * 
    * @author Robert Rödler
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses ParallelAxisVisualization oneway - - «create»
+   * @apiviz.uses SVGSimpleLinearAxis
    */
-  public static class Factory extends AbstractVisFactory {
+  // TODO: split into interactive / non-interactive parts?
+  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> {
     /**
-     * A short name characterizing this Visualizer.
+     * Axis label class
      */
-    private static final String NAME = "Parallel Axes";
+    public final static String AXIS_LABEL = "paxis-label";
 
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Clickable area for the axis.
      */
-    public Factory() {
-      super();
+    public final static String INVERTEDAXIS = "paxis-button";
+
+    /**
+     * Constructor.
+     * 
+     * @param task VisualizationTask
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      incrementalRedraw();
+      context.addResultListener(this);
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new ParallelAxisVisualization(task);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
-        baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      addCSSClasses(svgp);
+      final int dim = proj.getVisibleDimensions();
+      try {
+        for(int i = 0; i < dim; i++) {
+          final int truedim = proj.getDimForVisibleAxis(i);
+          final double axisX = getVisibleAxisX(i);
+          if(!proj.isAxisInverted(i)) {
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+          }
+          else {
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+          }
+          // Get axis label
+          final String label = DatabaseUtil.getColumnLabel(relation, truedim + 1);
+          // Add axis label
+          Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
+          SVGUtil.setCSSClass(text, AXIS_LABEL);
+          layer.appendChild(text);
+          // TODO: Split into background + clickable layer.
+          Element button = svgp.svgRect(axisX - getAxisSep() * .475, -getMarginTop(), .95 * getAxisSep(), .5 * getMarginTop());
+          SVGUtil.setCSSClass(button, INVERTEDAXIS);
+          addEventListener(button, truedim);
+          layer.appendChild(button);
+        }
+      }
+      catch(CSSNamingConflict e) {
+        throw new RuntimeException("Conflict in CSS naming for axes.", e);
       }
     }
 
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return true;
+    /**
+     * Add the main CSS classes.
+     * 
+     * @param svgp Plot to draw to
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleLibrary();
+      if(!svgp.getCSSClassManager().contains(AXIS_LABEL)) {
+        CSSClass cls = new CSSClass(this, AXIS_LABEL);
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
+        cls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
+        cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, style.getTextSize(StyleLibrary.AXIS_LABEL));
+        cls.setStatement(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, SVGConstants.SVG_MIDDLE_VALUE);
+        svgp.addCSSClassOrLogError(cls);
+      }
+      if(!svgp.getCSSClassManager().contains(INVERTEDAXIS)) {
+        CSSClass cls = new CSSClass(this, INVERTEDAXIS);
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.1);
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_GREY_VALUE);
+        svgp.addCSSClassOrLogError(cls);
+      }
+    }
+
+    /**
+     * Add an event listener to the Element
+     * 
+     * @param tag Element to add the listener
+     * @param i Tool number for the Element
+     */
+    private void addEventListener(final Element tag, final int i) {
+      EventTarget targ = (EventTarget) tag;
+      targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
+        @Override
+        public void handleEvent(Event evt) {
+          proj.toggleDimInverted(i);
+          context.getHierarchy().resultChanged(proj);
+        }
+      }, false);
     }
   }
 }

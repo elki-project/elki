@@ -59,10 +59,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * 
  * @author Robert Rödler
  * 
- * @apiviz.has SelectionResult oneway - - updates
- * @apiviz.has RangeSelection oneway - - updates
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class SelectionToolAxisRangeVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
+public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
@@ -74,237 +74,237 @@ public class SelectionToolAxisRangeVisualization extends AbstractParallelVisuali
   private static final String NAME = "Axis Range Selection";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private static final String CSS_RANGEMARKER = "selectionAxisRangeMarker";
-
-  /**
-   * Element for selection rectangle
-   */
-  private Element rtag;
-
-  /**
-   * Element for the rectangle to add listeners
-   */
-  private Element etag;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Task
-   */
-  public SelectionToolAxisRangeVisualization(VisualizationTask task) {
-    super(task);
-    incrementalRedraw();
+  public SelectionToolAxisRangeVisualization() {
+    super();
   }
 
   @Override
-  public void destroy() {
-    super.destroy();
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
   @Override
-  protected void redraw() {
-    addCSSClasses(svgp);
-
-    // rtag: tag for the selected rect
-    rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
-    layer.appendChild(rtag);
-
-    // etag: sensitive area
-    DragableArea drag = new DragableArea(svgp, -.1 * getMarginLeft(), -.1 * getMarginTop(), getSizeX() + getMarginLeft() * .2, getSizeY() + getMarginTop() * .2, this);
-    etag = drag.getElement();
-    layer.appendChild(etag);
-  }
-
-  /**
-   * Delete the children of the element
-   * 
-   * @param container SVG-Element
-   */
-  private void deleteChildren(Element container) {
-    while(container.hasChildNodes()) {
-      container.removeChild(container.getLastChild());
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+    for(SelectionResult selres : selectionResults) {
+      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+      for(ParallelPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+        task.put(VisualizationTask.META_TOOL, true);
+        task.put(VisualizationTask.META_NOTHUMB, true);
+        task.put(VisualizationTask.META_NOEXPORT, true);
+        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        baseResult.getHierarchy().add(selres, task);
+        baseResult.getHierarchy().add(p, task);
+      }
     }
   }
 
   /**
-   * Set the selected ranges and the mask for the actual dimensions in the
-   * context
-   * 
-   * @param x1 min x-value
-   * @param x2 max x-value
-   * @param y1 min y-value
-   * @param y2 max y-value
-   */
-  private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
-    final int dim = proj.getVisibleDimensions();
-    int minaxis = dim + 1;
-    int maxaxis = -1;
-    {
-      int i = 0;
-      while(i < dim) {
-        double axx = getVisibleAxisX(i);
-        if(x1 < axx || x2 < axx) {
-          minaxis = i;
-          break;
-        }
-        i++;
-      }
-      while(i <= dim) {
-        double axx = getVisibleAxisX(i);
-        if(x2 < axx && x1 < axx) {
-          maxaxis = i;
-          break;
-        }
-        i++;
-      }
-    }
-    double z1 = Math.max(Math.min(y1, y2), 0);
-    double z2 = Math.min(Math.max(y1, y2), getSizeY());
-    for(int i = minaxis; i < maxaxis; i++) {
-      double v1 = proj.fastProjectRenderToDataSpace(z1, i);
-      double v2 = proj.fastProjectRenderToDataSpace(z2, i);
-      if(logger.isDebugging()) {
-        logger.debug("Axis " + i + " dimension " + proj.getDimForVisibleAxis(i) + " " + v1 + " to " + v2);
-      }
-      ranges[proj.getDimForVisibleAxis(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
-    }
-  }
-
-  @Override
-  public boolean startDrag(SVGPoint startPoint, Event evt) {
-    return true;
-  }
-
-  @Override
-  public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-    deleteChildren(rtag);
-    double x = Math.min(startPoint.getX(), dragPoint.getX());
-    double y = Math.min(startPoint.getY(), dragPoint.getY());
-    double width = Math.abs(startPoint.getX() - dragPoint.getX());
-    double height = Math.abs(startPoint.getY() - dragPoint.getY());
-    rtag.appendChild(svgp.svgRect(x, y, width, height));
-    return true;
-  }
-
-  @Override
-  public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-    deleteChildren(rtag);
-    if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
-      updateSelection(proj, startPoint, dragPoint);
-    }
-    return true;
-  }
-
-  /**
-   * Update the selection in the context.
-   * 
-   * @param proj The projection
-   * @param p1 First Point of the selected rectangle
-   * @param p2 Second Point of the selected rectangle
-   */
-  private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
-    DBIDSelection selContext = context.getSelection();
-    ModifiableDBIDs selection;
-    if(selContext != null) {
-      selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-    }
-    else {
-      selection = DBIDUtil.newHashSet();
-    }
-    DoubleDoublePair[] ranges;
-
-    if(p1 == null || p2 == null) {
-      logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
-    }
-    else {
-      double x1 = Math.min(p1.getX(), p2.getX());
-      double x2 = Math.max(p1.getX(), p2.getX());
-      double y1 = Math.max(p1.getY(), p2.getY());
-      double y2 = Math.min(p1.getY(), p2.getY());
-
-      int dim = proj.getInputDimensionality();
-      if(selContext instanceof RangeSelection) {
-        ranges = ((RangeSelection) selContext).getRanges();
-      }
-      else {
-        ranges = new DoubleDoublePair[dim];
-      }
-      updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
-
-      selection.clear();
-
-      candidates: for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        NumberVector<?, ?> dbTupel = relation.get(iditer);
-        for(int i = 0; i < dim; i++) {
-          if(ranges != null && ranges[i] != null) {
-            if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
-              continue candidates;
-            }
-          }
-        }
-        selection.add(iditer);
-      }
-      context.setSelection(new RangeSelection(selection, ranges));
-    }
-  }
-
-  /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  protected void addCSSClasses(SVGPlot svgp) {
-    // Class for the range marking
-    if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
-      final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-      final StyleLibrary style = context.getStyleLibrary();
-      rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
-      rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
-      svgp.addCSSClassOrLogError(rcls);
-    }
-  }
-
-  /**
-   * Factory for tool visualizations for selecting ranges and the inclosed
-   * objects
+   * Instance
    * 
    * @author Robert Rödler
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses SelectionToolAxisRangeVisualization oneway - - «create»
+   * @apiviz.has SelectionResult oneway - - updates
+   * @apiviz.has RangeSelection oneway - - updates
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
      */
-    public Factory() {
-      super();
+    private static final String CSS_RANGEMARKER = "selectionAxisRangeMarker";
+
+    /**
+     * Element for selection rectangle
+     */
+    private Element rtag;
+
+    /**
+     * Element for the rectangle to add listeners
+     */
+    private Element etag;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionToolAxisRangeVisualization(task);
+    public void destroy() {
+      super.destroy();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-        for(ParallelPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_NOTHUMB, true);
-          task.put(VisualizationTask.META_NOEXPORT, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          baseResult.getHierarchy().add(selres, task);
-          baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      addCSSClasses(svgp);
+
+      // rtag: tag for the selected rect
+      rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
+      SVGUtil.addCSSClass(rtag, CSS_RANGEMARKER);
+      layer.appendChild(rtag);
+
+      // etag: sensitive area
+      DragableArea drag = new DragableArea(svgp, -.1 * getMarginLeft(), -.1 * getMarginTop(), getSizeX() + getMarginLeft() * .2, getSizeY() + getMarginTop() * .2, this);
+      etag = drag.getElement();
+      layer.appendChild(etag);
+    }
+
+    /**
+     * Delete the children of the element
+     * 
+     * @param container SVG-Element
+     */
+    private void deleteChildren(Element container) {
+      while(container.hasChildNodes()) {
+        container.removeChild(container.getLastChild());
+      }
+    }
+
+    /**
+     * Set the selected ranges and the mask for the actual dimensions in the
+     * context
+     * 
+     * @param x1 min x-value
+     * @param x2 max x-value
+     * @param y1 min y-value
+     * @param y2 max y-value
+     */
+    private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
+      final int dim = proj.getVisibleDimensions();
+      int minaxis = dim + 1;
+      int maxaxis = -1;
+      {
+        int i = 0;
+        while(i < dim) {
+          double axx = getVisibleAxisX(i);
+          if(x1 < axx || x2 < axx) {
+            minaxis = i;
+            break;
+          }
+          i++;
         }
+        while(i <= dim) {
+          double axx = getVisibleAxisX(i);
+          if(x2 < axx && x1 < axx) {
+            maxaxis = i;
+            break;
+          }
+          i++;
+        }
+      }
+      double z1 = Math.max(Math.min(y1, y2), 0);
+      double z2 = Math.min(Math.max(y1, y2), getSizeY());
+      for(int i = minaxis; i < maxaxis; i++) {
+        double v1 = proj.fastProjectRenderToDataSpace(z1, i);
+        double v2 = proj.fastProjectRenderToDataSpace(z2, i);
+        if(logger.isDebugging()) {
+          logger.debug("Axis " + i + " dimension " + proj.getDimForVisibleAxis(i) + " " + v1 + " to " + v2);
+        }
+        ranges[proj.getDimForVisibleAxis(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
+      }
+    }
+
+    @Override
+    public boolean startDrag(SVGPoint startPoint, Event evt) {
+      return true;
+    }
+
+    @Override
+    public boolean duringDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+      deleteChildren(rtag);
+      double x = Math.min(startPoint.getX(), dragPoint.getX());
+      double y = Math.min(startPoint.getY(), dragPoint.getY());
+      double width = Math.abs(startPoint.getX() - dragPoint.getX());
+      double height = Math.abs(startPoint.getY() - dragPoint.getY());
+      rtag.appendChild(svgp.svgRect(x, y, width, height));
+      return true;
+    }
+
+    @Override
+    public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
+      deleteChildren(rtag);
+      if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
+        updateSelection(proj, startPoint, dragPoint);
+      }
+      return true;
+    }
+
+    /**
+     * Update the selection in the context.
+     * 
+     * @param proj The projection
+     * @param p1 First Point of the selected rectangle
+     * @param p2 Second Point of the selected rectangle
+     */
+    private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
+      DBIDSelection selContext = context.getSelection();
+      ModifiableDBIDs selection;
+      if(selContext != null) {
+        selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
+      }
+      else {
+        selection = DBIDUtil.newHashSet();
+      }
+      DoubleDoublePair[] ranges;
+
+      if(p1 == null || p2 == null) {
+        logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
+      }
+      else {
+        double x1 = Math.min(p1.getX(), p2.getX());
+        double x2 = Math.max(p1.getX(), p2.getX());
+        double y1 = Math.max(p1.getY(), p2.getY());
+        double y2 = Math.min(p1.getY(), p2.getY());
+
+        int dim = proj.getInputDimensionality();
+        if(selContext instanceof RangeSelection) {
+          ranges = ((RangeSelection) selContext).getRanges();
+        }
+        else {
+          ranges = new DoubleDoublePair[dim];
+        }
+        updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
+
+        selection.clear();
+
+        candidates: for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+          NumberVector<?, ?> dbTupel = relation.get(iditer);
+          for(int i = 0; i < dim; i++) {
+            if(ranges != null && ranges[i] != null) {
+              if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
+                continue candidates;
+              }
+            }
+          }
+          selection.add(iditer);
+        }
+        context.setSelection(new RangeSelection(selection, ranges));
+      }
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    protected void addCSSClasses(SVGPlot svgp) {
+      // Class for the range marking
+      if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
+        final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
+        final StyleLibrary style = context.getStyleLibrary();
+        rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
+        rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
+        svgp.addCSSClassOrLogError(rcls);
       }
     }
   }

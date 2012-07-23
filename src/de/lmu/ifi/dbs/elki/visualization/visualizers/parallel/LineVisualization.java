@@ -53,163 +53,164 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * Generates data lines.
  * 
  * @author Robert Rödler
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class LineVisualization extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+public class LineVisualization extends AbstractVisFactory {
   /**
-   * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * A short name characterizing this Visualizer.
    */
-  public static final String DATALINE = "Dataline";
+  public static final String NAME = "Data lines";
 
   /**
-   * Sample we visualize.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private SamplingResult sample;
+  public LineVisualization() {
+    super();
+    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
+  }
+
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
+
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
+    for(ParallelPlotProjector<?> p : ps) {
+      final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+      baseResult.getHierarchy().add(p, task);
+    }
+  }
 
   /**
-   * Constructor.
+   * Instance for a particular data set.
    * 
-   * @param task VisualizationTask
+   * @author Robert Rödler
    */
-  public LineVisualization(VisualizationTask task) {
-    super(task);
-    this.sample = ResultUtil.getSamplingResult(relation);
-    context.addResultListener(this);
-    context.addDataStoreListener(this);
-    incrementalRedraw();
-  }
+  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+    /**
+     * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
+     */
+    public static final String DATALINE = "Dataline";
 
-  @Override
-  public void destroy() {
-    context.removeDataStoreListener(this);
-    context.removeResultListener(this);
-    super.destroy();
-  }
+    /**
+     * Sample we visualize.
+     */
+    private SamplingResult sample;
 
-  @Override
-  public void resultChanged(Result current) {
-    super.resultChanged(current);
-    if(current == sample || current == context.getStyleResult()) {
-      synchronizedRedraw();
+    /**
+     * Constructor.
+     * 
+     * @param task VisualizationTask
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.sample = ResultUtil.getSamplingResult(relation);
+      context.addResultListener(this);
+      context.addDataStoreListener(this);
+      incrementalRedraw();
     }
-  }
 
-  @Override
-  protected void redraw() {
-    StylingPolicy sp = context.getStyleResult().getStylingPolicy();
-    addCSSClasses(svgp, sp);
-
-    DBIDIter ids = sample.getSample().iter();
-    if(ids == null || !ids.valid()) {
-      ids = relation.iterDBIDs();
+    @Override
+    public void destroy() {
+      context.removeDataStoreListener(this);
+      context.removeResultListener(this);
+      super.destroy();
     }
-    if(sp instanceof ClassStylingPolicy) {
-      ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-      for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
-        String key = DATALINE + "_" + c;
-        for(DBIDIter iter = csp.iterateClass(c); iter.valid(); iter.advance()) {
-          if(!sample.getSample().contains(iter)) {
-            continue; // TODO: can we test more efficiently than this?
+
+    @Override
+    public void resultChanged(Result current) {
+      super.resultChanged(current);
+      if(current == sample || current == context.getStyleResult()) {
+        synchronizedRedraw();
+      }
+    }
+
+    @Override
+    protected void redraw() {
+      StylingPolicy sp = context.getStyleResult().getStylingPolicy();
+      addCSSClasses(svgp, sp);
+
+      DBIDIter ids = sample.getSample().iter();
+      if(ids == null || !ids.valid()) {
+        ids = relation.iterDBIDs();
+      }
+      if(sp instanceof ClassStylingPolicy) {
+        ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+        for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
+          String key = DATALINE + "_" + c;
+          for(DBIDIter iter = csp.iterateClass(c); iter.valid(); iter.advance()) {
+            if(!sample.getSample().contains(iter)) {
+              continue; // TODO: can we test more efficiently than this?
+            }
+            SVGPath path = new SVGPath();
+            double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
+            for(int i = 0; i < yPos.length; i++) {
+              path.drawTo(getVisibleAxisX(i), yPos[i]);
+            }
+            Element line = path.makeElement(svgp);
+            SVGUtil.addCSSClass(line, key);
+            layer.appendChild(line);
           }
+        }
+      }
+      else {
+        for(; ids.valid(); ids.advance()) {
           SVGPath path = new SVGPath();
-          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
+          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(ids));
           for(int i = 0; i < yPos.length; i++) {
             path.drawTo(getVisibleAxisX(i), yPos[i]);
           }
           Element line = path.makeElement(svgp);
-          SVGUtil.addCSSClass(line, key);
+          SVGUtil.addCSSClass(line, DATALINE);
+          // assign color
+          line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
           layer.appendChild(line);
         }
       }
     }
-    else {
-      for(; ids.valid(); ids.advance()) {
-        SVGPath path = new SVGPath();
-        double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(ids));
-        for(int i = 0; i < yPos.length; i++) {
-          path.drawTo(getVisibleAxisX(i), yPos[i]);
-        }
-        Element line = path.makeElement(svgp);
-        SVGUtil.addCSSClass(line, DATALINE);
-        // assign color
-        line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
-        layer.appendChild(line);
-      }
-    }
-  }
 
-  /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
-    final StyleLibrary style = context.getStyleLibrary();
-    final LineStyleLibrary lines = style.lines();
-    final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
-    if(sp instanceof ClassStylingPolicy) {
-      ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-      for(int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
-        String key = DATALINE + "_" + i;
-        if(!svgp.getCSSClassManager().contains(key)) {
-          CSSClass cls = new CSSClass(this, key);
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
+      final StyleLibrary style = context.getStyleLibrary();
+      final LineStyleLibrary lines = style.lines();
+      final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
+      if(sp instanceof ClassStylingPolicy) {
+        ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+        for(int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
+          String key = DATALINE + "_" + i;
+          if(!svgp.getCSSClassManager().contains(key)) {
+            CSSClass cls = new CSSClass(this, key);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+            lines.formatCSSClass(cls, i, width);
+            svgp.addCSSClassOrLogError(cls);
+          }
+        }
+      }
+      else {
+        // Class for the distance function
+        if(!svgp.getCSSClassManager().contains(DATALINE)) {
+          CSSClass cls = new CSSClass(this, DATALINE);
           cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
           cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-          lines.formatCSSClass(cls, i, width);
+          lines.formatCSSClass(cls, -1, width);
           svgp.addCSSClassOrLogError(cls);
         }
       }
-    }
-    else {
-      // Class for the distance function
-      if(!svgp.getCSSClassManager().contains(DATALINE)) {
-        CSSClass cls = new CSSClass(this, DATALINE);
-        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-        lines.formatCSSClass(cls, -1, width);
-        svgp.addCSSClassOrLogError(cls);
-      }
-    }
-    svgp.updateStyleElement();
-  }
-
-  /**
-   * Factory for axis visualizations
-   * 
-   * @author Robert Rödler
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses LineVisualization oneway - - «create»
-   */
-  public static class Factory extends AbstractVisFactory {
-    /**
-     * A short name characterizing this Visualizer.
-     */
-    private static final String NAME = "Data lines";
-
-    /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-     */
-    public Factory() {
-      super();
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
-    }
-
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new LineVisualization(task);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        baseResult.getHierarchy().add(p, task);
-      }
+      svgp.updateStyleElement();
     }
   }
 }
