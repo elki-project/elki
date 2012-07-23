@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses OPTICSPlotVisualizer oneway - - «create»
+ * @apiviz.uses Instance oneway - - «create»
  */
 public class OPTICSPlotVisualizer extends AbstractVisFactory {
   /**
