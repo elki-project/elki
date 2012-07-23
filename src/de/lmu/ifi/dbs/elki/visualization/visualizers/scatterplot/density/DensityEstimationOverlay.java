@@ -52,184 +52,184 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * <em>in the projection, not the actual data!</em>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-// TODO: make parameterizable, in particular color map, kernel bandwidth and
-// kernel function
-public class DensityEstimationOverlay extends AbstractScatterplotVisualization {
+public class DensityEstimationOverlay extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Density estimation overlay";
 
   /**
-   * Density map resolution
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  private int resolution = 500;
-
-  /**
-   * The actual image
-   */
-  private BufferedImage img = null;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Task
-   */
-  public DensityEstimationOverlay(VisualizationTask task) {
-    super(task);
-    incrementalRedraw();
+  public DensityEstimationOverlay() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    if(img == null) {
-      renderImage();
-    }
-
-    CanvasSize canvas = proj.estimateViewport();
-    String imguri = ThumbnailRegistryEntry.INTERNAL_PREFIX + ThumbnailRegistryEntry.registerImage(img);
-    Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, canvas.minx);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, canvas.miny);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, canvas.maxx - canvas.minx);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, canvas.maxy - canvas.miny);
-    SVGUtil.setAtt(itag, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_OPACITY_PROPERTY + ": .5");
-    itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, imguri);
-
-    layer.appendChild(itag);
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
-  @Reference(authors = "D. W. Scott", title = "Multivariate density estimation", booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", url = "http://dx.doi.org/10.1002/9780470316849.fmatter")
-  private double[] initializeBandwidth(double[][] data) {
-    MeanVariance mv0 = new MeanVariance();
-    MeanVariance mv1 = new MeanVariance();
-    // For Kernel bandwidth.
-    for(double[] projected : data) {
-      mv0.put(projected[0]);
-      mv1.put(projected[1]);
-    }
-    // Set bandwidths according to Scott's rule:
-    // Note: in projected space, d=2.
-    double[] bandwidth = new double[2];
-    bandwidth[0] = MathUtil.SQRT5 * mv0.getSampleStddev() * Math.pow(rel.size(), -1 / 6.);
-    bandwidth[1] = MathUtil.SQRT5 * mv1.getSampleStddev() * Math.pow(rel.size(), -1 / 6.);
-    return bandwidth;
-  }
-
-  private void renderImage() {
-    // TODO: SAMPLE? Do region queries?
-    // Project the data just once, keep a copy.
-    double[][] data = new double[rel.size()][];
-    {
-      int i = 0;
-      for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        data[i] = proj.fastProjectDataToRenderSpace(rel.get(iditer));
-        i++;
-      }
-    }
-    double[] bandwidth = initializeBandwidth(data);
-    // Compare by first component
-    Comparator<double[]> comp0 = new Comparator<double[]>() {
-      @Override
-      public int compare(double[] o1, double[] o2) {
-        return Double.compare(o1[0], o2[0]);
-      }
-    };
-    // Compare by second component
-    Comparator<double[]> comp1 = new Comparator<double[]>() {
-      @Override
-      public int compare(double[] o1, double[] o2) {
-        return Double.compare(o1[1], o2[1]);
-      }
-    };
-    // TODO: choose comparator order based on smaller bandwidth?
-    Arrays.sort(data, comp0);
-
-    CanvasSize canvas = proj.estimateViewport();
-    double min0 = canvas.minx, max0 = canvas.maxx, ste0 = (max0 - min0) / resolution;
-    double min1 = canvas.miny, max1 = canvas.maxy, ste1 = (max1 - min1) / resolution;
-
-    double kernf = 9. / (16 * bandwidth[0] * bandwidth[1]);
-    double maxdens = 0.0;
-    double[][] dens = new double[resolution][resolution];
-    {
-      // TODO: incrementally update the loff/roff values?
-      for(int x = 0; x < resolution; x++) {
-        double xlow = min0 + ste0 * x, xhig = xlow + ste0;
-        int loff = unflip(Arrays.binarySearch(data, new double[] { xlow - bandwidth[0] }, comp0));
-        int roff = unflip(Arrays.binarySearch(data, new double[] { xhig + bandwidth[0] }, comp0));
-        // Resort by second component
-        Arrays.sort(data, loff, roff, comp1);
-        for(int y = 0; y < resolution; y++) {
-          double ylow = min1 + ste1 * y, yhig = ylow + ste1;
-          int boff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, ylow - bandwidth[1] }, comp1));
-          int toff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, yhig + bandwidth[1] }, comp1));
-          for(int pos = boff; pos < toff; pos++) {
-            double[] val = data[pos];
-            double d0 = (val[0] < xlow) ? (xlow - val[0]) : (val[0] > xhig) ? (val[0] - xhig) : 0;
-            double d1 = (val[1] < ylow) ? (ylow - val[1]) : (val[1] > yhig) ? (val[1] - yhig) : 0;
-            d0 = d0 / bandwidth[0];
-            d1 = d1 / bandwidth[1];
-            dens[x][y] += kernf * (1 - d0 * d0) * (1 - d1 * d1);
-          }
-          maxdens = Math.max(maxdens, dens[x][y]);
-        }
-        // Restore original sorting, as the intervals overlap
-        Arrays.sort(data, loff, roff, comp0);
-      }
-    }
-    img = new BufferedImage(resolution, resolution, BufferedImage.TYPE_INT_ARGB);
-    {
-      for(int x = 0; x < resolution; x++) {
-        for(int y = 0; y < resolution; y++) {
-          int rgb = KMLOutputHandler.getColorForValue(dens[x][y] / maxdens).getRGB();
-          img.setRGB(x, y, rgb);
-        }
-      }
-    }
-  }
-
-  private int unflip(int binarySearch) {
-    if(binarySearch < 0) {
-      return (-binarySearch) - 1;
-    }
-    else {
-      return binarySearch;
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
+    for(ScatterPlotProjector<?> p : ps) {
+      final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
+      task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+      baseResult.getHierarchy().add(p, task);
     }
   }
 
   /**
-   * The visualization factory
+   * Instance for a particular data set.
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses DensityEstimationOverlay oneway - - «create»
    */
-  public static class Factory extends AbstractVisFactory {
+  // TODO: make parameterizable, in particular color map, kernel bandwidth and
+  // kernel function
+  public class Instance extends AbstractScatterplotVisualization {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Density map resolution
      */
-    public Factory() {
-      super();
+    private int resolution = 500;
+
+    /**
+     * The actual image
+     */
+    private BufferedImage img = null;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new DensityEstimationOverlay(task);
+    protected void redraw() {
+      if(img == null) {
+        renderImage();
+      }
+
+      CanvasSize canvas = proj.estimateViewport();
+      String imguri = ThumbnailRegistryEntry.INTERNAL_PREFIX + ThumbnailRegistryEntry.registerImage(img);
+      Element itag = svgp.svgElement(SVGConstants.SVG_IMAGE_TAG);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, canvas.minx);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, canvas.miny);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, canvas.maxx - canvas.minx);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, canvas.maxy - canvas.miny);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_OPACITY_PROPERTY + ": .5");
+      itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, imguri);
+
+      layer.appendChild(itag);
     }
 
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
-        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-        baseResult.getHierarchy().add(p, task);
+    @Reference(authors = "D. W. Scott", title = "Multivariate density estimation", booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", url = "http://dx.doi.org/10.1002/9780470316849.fmatter")
+    private double[] initializeBandwidth(double[][] data) {
+      MeanVariance mv0 = new MeanVariance();
+      MeanVariance mv1 = new MeanVariance();
+      // For Kernel bandwidth.
+      for(double[] projected : data) {
+        mv0.put(projected[0]);
+        mv1.put(projected[1]);
+      }
+      // Set bandwidths according to Scott's rule:
+      // Note: in projected space, d=2.
+      double[] bandwidth = new double[2];
+      bandwidth[0] = MathUtil.SQRT5 * mv0.getSampleStddev() * Math.pow(rel.size(), -1 / 6.);
+      bandwidth[1] = MathUtil.SQRT5 * mv1.getSampleStddev() * Math.pow(rel.size(), -1 / 6.);
+      return bandwidth;
+    }
+
+    private void renderImage() {
+      // TODO: SAMPLE? Do region queries?
+      // Project the data just once, keep a copy.
+      double[][] data = new double[rel.size()][];
+      {
+        int i = 0;
+        for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+          data[i] = proj.fastProjectDataToRenderSpace(rel.get(iditer));
+          i++;
+        }
+      }
+      double[] bandwidth = initializeBandwidth(data);
+      // Compare by first component
+      Comparator<double[]> comp0 = new Comparator<double[]>() {
+        @Override
+        public int compare(double[] o1, double[] o2) {
+          return Double.compare(o1[0], o2[0]);
+        }
+      };
+      // Compare by second component
+      Comparator<double[]> comp1 = new Comparator<double[]>() {
+        @Override
+        public int compare(double[] o1, double[] o2) {
+          return Double.compare(o1[1], o2[1]);
+        }
+      };
+      // TODO: choose comparator order based on smaller bandwidth?
+      Arrays.sort(data, comp0);
+
+      CanvasSize canvas = proj.estimateViewport();
+      double min0 = canvas.minx, max0 = canvas.maxx, ste0 = (max0 - min0) / resolution;
+      double min1 = canvas.miny, max1 = canvas.maxy, ste1 = (max1 - min1) / resolution;
+
+      double kernf = 9. / (16 * bandwidth[0] * bandwidth[1]);
+      double maxdens = 0.0;
+      double[][] dens = new double[resolution][resolution];
+      {
+        // TODO: incrementally update the loff/roff values?
+        for(int x = 0; x < resolution; x++) {
+          double xlow = min0 + ste0 * x, xhig = xlow + ste0;
+          int loff = unflip(Arrays.binarySearch(data, new double[] { xlow - bandwidth[0] }, comp0));
+          int roff = unflip(Arrays.binarySearch(data, new double[] { xhig + bandwidth[0] }, comp0));
+          // Resort by second component
+          Arrays.sort(data, loff, roff, comp1);
+          for(int y = 0; y < resolution; y++) {
+            double ylow = min1 + ste1 * y, yhig = ylow + ste1;
+            int boff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, ylow - bandwidth[1] }, comp1));
+            int toff = unflip(Arrays.binarySearch(data, loff, roff, new double[] { 0, yhig + bandwidth[1] }, comp1));
+            for(int pos = boff; pos < toff; pos++) {
+              double[] val = data[pos];
+              double d0 = (val[0] < xlow) ? (xlow - val[0]) : (val[0] > xhig) ? (val[0] - xhig) : 0;
+              double d1 = (val[1] < ylow) ? (ylow - val[1]) : (val[1] > yhig) ? (val[1] - yhig) : 0;
+              d0 = d0 / bandwidth[0];
+              d1 = d1 / bandwidth[1];
+              dens[x][y] += kernf * (1 - d0 * d0) * (1 - d1 * d1);
+            }
+            maxdens = Math.max(maxdens, dens[x][y]);
+          }
+          // Restore original sorting, as the intervals overlap
+          Arrays.sort(data, loff, roff, comp0);
+        }
+      }
+      img = new BufferedImage(resolution, resolution, BufferedImage.TYPE_INT_ARGB);
+      {
+        for(int x = 0; x < resolution; x++) {
+          for(int y = 0; y < resolution; y++) {
+            int rgb = KMLOutputHandler.getColorForValue(dens[x][y] / maxdens).getRGB();
+            img.setRGB(x, y, rgb);
+          }
+        }
+      }
+    }
+
+    private int unflip(int binarySearch) {
+      if(binarySearch < 0) {
+        return (-binarySearch) - 1;
+      }
+      else {
+        return binarySearch;
       }
     }
   }
