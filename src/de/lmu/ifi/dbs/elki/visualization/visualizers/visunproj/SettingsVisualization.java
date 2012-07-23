@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -50,11 +50,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualization oneway - - «create»
+ * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has SettingsResult oneway - - visualizes
  */
 // TODO: make this a menu item instead of a "visualization"?
-public class SettingsVisFactory extends AbstractVisFactory {
+public class SettingsVisualization extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -64,7 +64,7 @@ public class SettingsVisFactory extends AbstractVisFactory {
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public SettingsVisFactory() {
+  public SettingsVisualization() {
     super();
   }
 
@@ -132,7 +132,7 @@ public class SettingsVisFactory extends AbstractVisFactory {
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, layer);
+    return new StaticVisualizationInstance(task, layer);
   }
 
   @Override

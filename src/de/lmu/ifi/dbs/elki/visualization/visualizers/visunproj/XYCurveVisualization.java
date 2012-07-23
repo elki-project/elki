@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -57,10 +57,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualization oneway - - «create»
+ * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has XYCurve oneway - - visualizes
  */
-public class XYCurveVisFactory extends AbstractVisFactory {
+public class XYCurveVisualization extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -79,7 +79,7 @@ public class XYCurveVisFactory extends AbstractVisFactory {
   /**
    * Constructor, Parameterizable style - does nothing.
    */
-  public XYCurveVisFactory() {
+  public XYCurveVisualization() {
     super();
   }
 
@@ -161,7 +161,7 @@ public class XYCurveVisFactory extends AbstractVisFactory {
     }
 
     layer.appendChild(line);
-    return new StaticVisualization(task, layer);
+    return new StaticVisualizationInstance(task, layer);
   }
 
   /**

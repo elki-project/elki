@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGScoreBar;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -58,10 +58,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Sascha Goldhofer
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualization oneway - - «create»
+ * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult oneway - - visualizes
  */
-public class ClusterEvaluationVisFactory extends AbstractVisFactory {
+public class ClusterEvaluationVisualization extends AbstractVisFactory {
   /**
    * Name for this visualizer.
    */
@@ -80,7 +80,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
   /**
    * Constructor.
    */
-  public ClusterEvaluationVisFactory() {
+  public ClusterEvaluationVisualization() {
     super();
   }
 
@@ -185,7 +185,7 @@ public class ClusterEvaluationVisFactory extends AbstractVisFactory {
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualization(task, parent);
+    return new StaticVisualizationInstance(task, parent);
   }
 
   @Override

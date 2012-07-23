@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.projections.Simple1D;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualization;
 
 /**
  * ScatterPlotProjector is responsible for producing a set of scatterplot
@@ -94,7 +94,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
       // Add labels
       for(int d1 = 0; d1 < dmax; d1++) {
         PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
-        LabelVisFactory lbl = new LabelVisFactory(DatabaseUtil.getColumnLabel(rel, d1 + 1));
+        LabelVisualization lbl = new LabelVisualization(DatabaseUtil.getColumnLabel(rel, d1 + 1));
         final VisualizationTask task = new VisualizationTask("", null, null, lbl);
         task.height = lheight;
         task.width = 1;

@@ -32,14 +32,14 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
  * 
  * @author Erich Schubert
  */
-public class StaticVisualization extends AbstractVisualization {
+public class StaticVisualizationInstance extends AbstractVisualization {
   /**
    * Unchanging precomputed visualization.
    * 
    * @param task Task to visualize
    * @param element Element containing the resulting visualization
    */
-  public StaticVisualization(VisualizationTask task, Element element) {
+  public StaticVisualizationInstance(VisualizationTask task, Element element) {
     super(task);
     this.layer = element;
   }

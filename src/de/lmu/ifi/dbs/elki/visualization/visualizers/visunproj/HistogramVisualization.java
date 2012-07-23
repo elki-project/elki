@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -56,10 +56,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses StaticVisualization oneway - - «create»
+ * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has HistogramResult oneway - - visualizes
  */
-public class HistogramVisFactory extends AbstractVisFactory {
+public class HistogramVisualization extends AbstractVisFactory {
   /**
    * Histogram visualizer name
    */
@@ -74,7 +74,7 @@ public class HistogramVisFactory extends AbstractVisFactory {
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  public HistogramVisFactory() {
+  public HistogramVisualization() {
     super();
   }
 
@@ -161,7 +161,7 @@ public class HistogramVisFactory extends AbstractVisFactory {
       layer.appendChild(line);
     }
 
-    return new StaticVisualization(task, layer);
+    return new StaticVisualizationInstance(task, layer);
   }
 
   @Override
