@@ -60,14 +60,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has AbstractRStarTree oneway - - visualizes
- * @apiviz.uses SVGHyperCube
- * 
- * @param <N> Tree node type
- * @param <E> Tree entry type
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-// TODO: listen for tree changes instead of data changes?
-public class TreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractScatterplotVisualization implements DataStoreListener {
+public class TreeMBRVisualization extends AbstractVisFactory {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -79,109 +75,151 @@ public class TreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E exten
   public static final String NAME = "Index MBRs";
 
   /**
-   * Fill parameter.
+   * Settings
    */
-  protected boolean fill = false;
-
-  /**
-   * The tree we visualize
-   */
-  protected AbstractRStarTree<N, E> tree;
+  protected Parameterizer settings;
 
   /**
    * Constructor.
    * 
-   * @param task Visualization task
-   * @param fill Fill flag
+   * @param settings Settings
    */
-  @SuppressWarnings("unchecked")
-  public TreeMBRVisualization(VisualizationTask task, boolean fill) {
-    super(task);
-    this.tree = AbstractRStarTree.class.cast(task.getResult());
-    this.fill = fill;
-    incrementalRedraw();
-    context.addDataStoreListener(this);
+  public TreeMBRVisualization(Parameterizer settings) {
+    super();
+    this.settings = settings;
   }
 
   @Override
-  protected void redraw() {
-    int projdim = proj.getVisibleDimensions2D().cardinality();
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-
-    if(tree != null) {
-      E root = tree.getRootEntry();
-      for(int i = 0; i < tree.getHeight(); i++) {
-        CSSClass cls = new CSSClass(this, INDEX + i);
-        // Relative depth of this level. 1.0 = toplevel
-        final double relDepth = 1. - (((double) i) / tree.getHeight());
-        if(fill) {
-          cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
-          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
-        }
-        else {
-          cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-        }
-        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-        svgp.addCSSClassOrLogError(cls);
-      }
-      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
-    }
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance<RStarTreeNode, SpatialEntry>(task);
   }
 
-  /**
-   * Recursively draw the MBR rectangles.
-   * 
-   * @param svgp SVG Plot
-   * @param layer Layer
-   * @param proj Projection
-   * @param rtree Rtree to visualize
-   * @param entry Current entry
-   * @param depth Current depth
-   */
-  private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
-    SpatialComparable mbr = entry;
-
-    if(fill) {
-      Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
-      layer.appendChild(r);
-    }
-    else {
-      Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
-      SVGUtil.setCSSClass(r, INDEX + depth);
-      layer.appendChild(r);
-    }
-
-    if(!entry.isLeafEntry()) {
-      N node = rtree.getNode(entry);
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        E child = node.getEntry(i);
-        if(!child.isLeafEntry()) {
-          visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+    for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
+      if(tree instanceof Result) {
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        for(ScatterPlotProjector<?> p : ps) {
+          final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
+          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+          baseResult.getHierarchy().add((Result) tree, task);
+          baseResult.getHierarchy().add(p, task);
         }
       }
     }
   }
 
-  @Override
-  public void destroy() {
-    super.destroy();
-    context.removeDataStoreListener(this);
-  }
-
   /**
-   * Factory
+   * Instance for a particular tree
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses TreeMBRVisualization oneway - - «create»
+   * @apiviz.has AbstractRStarTree oneway - - visualizes
+   * @apiviz.uses SVGHyperCube
+   * 
+   * @param <N> Tree node type
+   * @param <E> Tree entry type
    */
-  public static class Factory extends AbstractVisFactory {
+  // TODO: listen for tree changes instead of data changes?
+  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractScatterplotVisualization implements DataStoreListener {
+    /**
+     * The tree we visualize
+     */
+    protected AbstractRStarTree<N, E> tree;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    @SuppressWarnings("unchecked")
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.tree = AbstractRStarTree.class.cast(task.getResult());
+      incrementalRedraw();
+      context.addDataStoreListener(this);
+    }
+
+    @Override
+    protected void redraw() {
+      int projdim = proj.getVisibleDimensions2D().cardinality();
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+      if(tree != null) {
+        E root = tree.getRootEntry();
+        for(int i = 0; i < tree.getHeight(); i++) {
+          CSSClass cls = new CSSClass(this, INDEX + i);
+          // Relative depth of this level. 1.0 = toplevel
+          final double relDepth = 1. - (((double) i) / tree.getHeight());
+          if(settings.fill) {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
+          }
+          else {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+          }
+          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          svgp.addCSSClassOrLogError(cls);
+        }
+        visualizeRTreeEntry(svgp, layer, proj, tree, root, 0);
+      }
+    }
+
+    /**
+     * Recursively draw the MBR rectangles.
+     * 
+     * @param svgp SVG Plot
+     * @param layer Layer
+     * @param proj Projection
+     * @param rtree Rtree to visualize
+     * @param entry Current entry
+     * @param depth Current depth
+     */
+    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
+      SpatialComparable mbr = entry;
+
+      if(settings.fill) {
+        Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
+        layer.appendChild(r);
+      }
+      else {
+        Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
+        SVGUtil.setCSSClass(r, INDEX + depth);
+        layer.appendChild(r);
+      }
+
+      if(!entry.isLeafEntry()) {
+        N node = rtree.getNode(entry);
+        for(int i = 0; i < node.getNumEntries(); i++) {
+          E child = node.getEntry(i);
+          if(!child.isLeafEntry()) {
+            visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
+          }
+        }
+      }
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeDataStoreListener(this);
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
      * 
@@ -191,65 +229,20 @@ public class TreeMBRVisualization<N extends AbstractRStarTreeNode<N, E>, E exten
      */
     public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("index.fill", "Partially transparent filling of index pages.");
 
-    /**
-     * Fill parameter.
-     */
     protected boolean fill = false;
 
-    /**
-     * Constructor.
-     * 
-     * @param fill
-     */
-    public Factory(boolean fill) {
-      super();
-      this.fill = fill;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag fillF = new Flag(FILL_ID);
+      if(config.grab(fillF)) {
+        fill = fillF.getValue();
+      }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new TreeMBRVisualization<RStarTreeNode, SpatialEntry>(task, fill);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
-      for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
-        if(tree instanceof Result) {
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
-            baseResult.getHierarchy().add((Result) tree, task);
-            baseResult.getHierarchy().add(p, task);
-          }
-        }
-      }
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      protected boolean fill = false;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        Flag fillF = new Flag(FILL_ID);
-        if(config.grab(fillF)) {
-          fill = fillF.getValue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(fill);
-      }
+    protected TreeMBRVisualization makeInstance() {
+      return new TreeMBRVisualization(this);
     }
   }
 }

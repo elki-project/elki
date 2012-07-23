@@ -66,10 +66,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
- * @apiviz.has OutlierResult oneway - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", url = "http://dx.doi.org/10.1007/978-3-642-12098-5_34")
-public class BubbleVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
+public class BubbleVisualization extends AbstractVisFactory {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -81,148 +82,53 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
   public static final String NAME = "Outlier Bubbles";
 
   /**
-   * Fill parameter.
+   * Current settings
    */
-  protected boolean fill;
-
-  /**
-   * Scaling function to use for Bubbles
-   */
-  protected ScalingFunction scaling;
-
-  /**
-   * The outlier result to visualize
-   */
-  protected OutlierResult result;
+  protected Parameterizer settings;
 
   /**
    * Constructor.
    * 
-   * @param task Visualization task
-   * @param scaling Scaling function
-   * @param fill Fill flag
+   * @param settings Settings
    */
-  public BubbleVisualization(VisualizationTask task, ScalingFunction scaling, boolean fill) {
-    super(task);
-    this.result = task.getResult();
-    this.scaling = scaling;
-    this.fill = fill;
-    context.addDataStoreListener(this);
-    context.addResultListener(this);
-    incrementalRedraw();
+  public BubbleVisualization(Parameterizer settings) {
+    super();
+    this.settings = settings;
+    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
-  public void destroy() {
-    super.destroy();
-    context.removeResultListener(this);
-    context.removeDataStoreListener(this);
+  public Visualization makeVisualization(VisualizationTask task) {
+    if(settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
+      final OutlierResult outlierResult = task.getResult();
+      ((OutlierScalingFunction) settings.scaling).prepare(outlierResult);
+    }
+    return new Instance(task);
   }
 
   @Override
-  public void redraw() {
-    StylingPolicy stylepolicy = context.getStyleResult().getStylingPolicy();
-    // bubble size
-    final double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
-    if(stylepolicy instanceof ClassStylingPolicy) {
-      ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
-      setupCSS(svgp, colors);
-      // draw data
-      for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
-        final Double radius = getScaledForId(objId);
-        if(radius > 0.01 && !Double.isInfinite(radius)) {
-          final NumberVector<?, ?> vec = rel.get(objId);
-          if(vec != null) {
-            double[] v = proj.fastProjectDataToRenderSpace(vec);
-            Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
-            SVGUtil.addCSSClass(circle, BUBBLE + colors.getStyleForDBID(objId));
-            layer.appendChild(circle);
-          }
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+    for(OutlierResult o : ors) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      boolean vis = true;
+      // Quick and dirty hack: hide if parent result is also an outlier result
+      // Since that probably is already visible and we're redundant.
+      for(Result r : o.getHierarchy().getParents(o)) {
+        if(r instanceof OutlierResult) {
+          vis = false;
+          break;
         }
       }
-    }
-    else {
-      // draw data
-      for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
-        final Double radius = getScaledForId(objId);
-        if(radius > 0.01 && !Double.isInfinite(radius)) {
-          final NumberVector<?, ?> vec = rel.get(objId);
-          if(vec != null) {
-            double[] v = proj.fastProjectDataToRenderSpace(vec);
-            Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
-            int color = stylepolicy.getColorForDBID(objId);
-            final StringBuffer style = new StringBuffer();
-            if(fill) {
-              style.append(SVGConstants.CSS_FILL_PROPERTY + ":").append(SVGUtil.colorToString(color));
-              style.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY + ":0.5");
-            }
-            else {
-              style.append(SVGConstants.CSS_STROKE_VALUE + ":").append(SVGUtil.colorToString(color));
-              style.append(SVGConstants.CSS_FILL_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
-            }
-            SVGUtil.setAtt(circle, SVGConstants.SVG_STYLE_ATTRIBUTE, style.toString());
-            layer.appendChild(circle);
-          }
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        if(!vis) {
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
         }
+        baseResult.getHierarchy().add(o, task);
+        baseResult.getHierarchy().add(p, task);
       }
-    }
-  }
-
-  @Override
-  public void resultChanged(Result current) {
-    super.resultChanged(current);
-    if(sample == current || context.getStyleResult() == current) {
-      synchronizedRedraw();
-    }
-  }
-
-  /**
-   * Registers the Bubble-CSS-Class at a SVGPlot.
-   * 
-   * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
-   * @param policy Clustering to use
-   */
-  private void setupCSS(SVGPlot svgp, ClassStylingPolicy policy) {
-    ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-
-    // creating IDs manually because cluster often return a null-ID.
-    for(int clusterID = policy.getMinStyle(); clusterID < policy.getMaxStyle(); clusterID++) {
-      CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
-      bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
-
-      String color = colors.getColor(clusterID);
-
-      if(fill) {
-        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
-        bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
-      }
-      else {
-        // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
-        bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
-        bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-      }
-
-      svgp.addCSSClassOrLogError(bubble);
-    }
-  }
-
-  /**
-   * Convenience method to apply scalings in the right order.
-   * 
-   * @param id object ID to get scaled score for
-   * @return a Double representing a outlierness-score, after it has modified by
-   *         the given scales.
-   */
-  protected double getScaledForId(DBIDRef id) {
-    double d = result.getScores().get(id).doubleValue();
-    if(Double.isNaN(d) || Double.isInfinite(d)) {
-      return 0.0;
-    }
-    if(scaling == null) {
-      return result.getOutlierMeta().normalizeScore(d);
-    }
-    else {
-      return scaling.getScaled(d);
     }
   }
 
@@ -231,10 +137,150 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses BubbleVisualization oneway - - «create»
+   * @apiviz.has OutlierResult oneway - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+    /**
+     * The outlier result to visualize
+     */
+    protected OutlierResult result;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.result = task.getResult();
+      context.addDataStoreListener(this);
+      context.addResultListener(this);
+      incrementalRedraw();
+    }
+
+    @Override
+    public void destroy() {
+      super.destroy();
+      context.removeResultListener(this);
+      context.removeDataStoreListener(this);
+    }
+
+    @Override
+    public void redraw() {
+      StylingPolicy stylepolicy = context.getStyleResult().getStylingPolicy();
+      // bubble size
+      final double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
+      if(stylepolicy instanceof ClassStylingPolicy) {
+        ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
+        setupCSS(svgp, colors);
+        // draw data
+        for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
+          final Double radius = getScaledForId(objId);
+          if(radius > 0.01 && !Double.isInfinite(radius)) {
+            final NumberVector<?, ?> vec = rel.get(objId);
+            if(vec != null) {
+              double[] v = proj.fastProjectDataToRenderSpace(vec);
+              Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
+              SVGUtil.addCSSClass(circle, BUBBLE + colors.getStyleForDBID(objId));
+              layer.appendChild(circle);
+            }
+          }
+        }
+      }
+      else {
+        // draw data
+        for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
+          final Double radius = getScaledForId(objId);
+          if(radius > 0.01 && !Double.isInfinite(radius)) {
+            final NumberVector<?, ?> vec = rel.get(objId);
+            if(vec != null) {
+              double[] v = proj.fastProjectDataToRenderSpace(vec);
+              Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
+              int color = stylepolicy.getColorForDBID(objId);
+              final StringBuffer style = new StringBuffer();
+              if(settings.fill) {
+                style.append(SVGConstants.CSS_FILL_PROPERTY + ":").append(SVGUtil.colorToString(color));
+                style.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY + ":0.5");
+              }
+              else {
+                style.append(SVGConstants.CSS_STROKE_VALUE + ":").append(SVGUtil.colorToString(color));
+                style.append(SVGConstants.CSS_FILL_PROPERTY + ":" + SVGConstants.CSS_NONE_VALUE);
+              }
+              SVGUtil.setAtt(circle, SVGConstants.SVG_STYLE_ATTRIBUTE, style.toString());
+              layer.appendChild(circle);
+            }
+          }
+        }
+      }
+    }
+
+    @Override
+    public void resultChanged(Result current) {
+      super.resultChanged(current);
+      if(sample == current || context.getStyleResult() == current) {
+        synchronizedRedraw();
+      }
+    }
+
+    /**
+     * Registers the Bubble-CSS-Class at a SVGPlot.
+     * 
+     * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
+     * @param policy Clustering to use
+     */
+    private void setupCSS(SVGPlot svgp, ClassStylingPolicy policy) {
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+
+      // creating IDs manually because cluster often return a null-ID.
+      for(int clusterID = policy.getMinStyle(); clusterID < policy.getMaxStyle(); clusterID++) {
+        CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
+        bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+
+        String color = colors.getColor(clusterID);
+
+        if(settings.fill) {
+          bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+          bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
+        }
+        else {
+          // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
+          bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
+          bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        }
+
+        svgp.addCSSClassOrLogError(bubble);
+      }
+    }
+
+    /**
+     * Convenience method to apply scalings in the right order.
+     * 
+     * @param id object ID to get scaled score for
+     * @return a Double representing a outlierness-score, after it has modified
+     *         by the given scales.
+     */
+    protected double getScaledForId(DBIDRef id) {
+      double d = result.getScores().get(id).doubleValue();
+      if(Double.isNaN(d) || Double.isInfinite(d)) {
+        return 0.0;
+      }
+      if(settings.scaling == null) {
+        return result.getOutlierMeta().normalizeScore(d);
+      }
+      else {
+        return settings.scaling.getScaled(d);
+      }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
      * 
@@ -263,90 +309,23 @@ public class BubbleVisualization extends AbstractScatterplotVisualization implem
      */
     protected ScalingFunction scaling;
 
-    /**
-     * Constructor.
-     * 
-     * @param fill
-     * @param scaling
-     */
-    public Factory(boolean fill, ScalingFunction scaling) {
-      super();
-      this.fill = fill;
-      this.scaling = scaling;
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag fillF = new Flag(FILL_ID);
+      if(config.grab(fillF)) {
+        fill = fillF.getValue();
+      }
+
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);
+      if(config.grab(scalingP)) {
+        scaling = scalingP.instantiateClass(config);
+      }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      if(this.scaling != null && this.scaling instanceof OutlierScalingFunction) {
-        final OutlierResult outlierResult = task.getResult();
-        ((OutlierScalingFunction) this.scaling).prepare(outlierResult);
-      }
-      return new BubbleVisualization(task, scaling, fill);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-      for(OutlierResult o : ors) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        boolean vis = true;
-        // Quick and dirty hack: hide if parent result is also an outlier result
-        // Since that probably is already visible and we're redundant.
-        for(Result r : o.getHierarchy().getParents(o)) {
-          if(r instanceof OutlierResult) {
-            vis = false;
-            break;
-          }
-        }
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          if(!vis) {
-            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          }
-          baseResult.getHierarchy().add(o, task);
-          baseResult.getHierarchy().add(p, task);
-        }
-      }
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      /**
-       * Fill parameter.
-       */
-      protected boolean fill = false;
-
-      /**
-       * Scaling function to use for Bubbles
-       */
-      protected ScalingFunction scaling = null;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        Flag fillF = new Flag(FILL_ID);
-        if(config.grab(fillF)) {
-          fill = fillF.getValue();
-        }
-
-        ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);
-        if(config.grab(scalingP)) {
-          scaling = scalingP.instantiateClass(config);
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(fill, scaling);
-      }
+    protected BubbleVisualization makeInstance() {
+      return new BubbleVisualization(this);
     }
   }
 }
