@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -55,126 +54,122 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.has PolygonsObject - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class PolygonVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
+public class PolygonVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Polygons";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * Constructor
    */
-  public static final String POLYS = "polys";
-
-  /**
-   * The current projection
-   */
-  final protected Projection2D proj;
-
-  /**
-   * The representation we visualize
-   */
-  final protected Relation<PolygonsObject> rep;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Task to visualize
-   */
-  public PolygonVisualization(VisualizationTask task) {
-    super(task);
-    this.proj = task.getProj();
-    this.rep = task.getResult(); // Note: relation was used for projection
-    context.addDataStoreListener(this);
-    incrementalRedraw();
+  public PolygonVisualization() {
+    super();
   }
 
   @Override
-  public void destroy() {
-    super.destroy();
-    context.removeDataStoreListener(this);
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
   @Override
-  public void redraw() {
-    CSSClass css = new CSSClass(svgp, POLYS);
-    // TODO: separate fill and line colors?
-    css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.POLYGONS));
-    css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.POLYGONS));
-    css.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    svgp.addCSSClassOrLogError(css);
-    svgp.updateStyleElement();
-
-    // draw data
-    for(DBIDIter iditer = rep.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      try {
-        PolygonsObject poly = rep.get(iditer);
-        if(poly == null) {
-          continue;
-        }
-        SVGPath path = new SVGPath();
-        for(Polygon ppoly : poly.getPolygons()) {
-          Vector first = ppoly.get(0);
-          double[] f = proj.fastProjectDataToRenderSpace(first.getArrayRef());
-          path.moveTo(f[0], f[1]);
-          for(Vector v : ppoly) {
-            if(v == first) {
-              continue;
-            }
-            double[] p = proj.fastProjectDataToRenderSpace(v.getArrayRef());
-            path.drawTo(p[0], p[1]);
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
+    for(Relation<?> rel : results) {
+      if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
+        // Assume that a 2d projector is using the same coordinates as the
+        // polygons.
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        for(ScatterPlotProjector<?> p : ps) {
+          if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
+            final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
+            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 10);
+            baseResult.getHierarchy().add(rel, task);
+            baseResult.getHierarchy().add(p, task);
           }
-          // close path.
-          path.drawTo(f[0], f[1]);
         }
-        Element e = path.makeElement(svgp);
-        SVGUtil.addCSSClass(e, POLYS);
-        layer.appendChild(e);
-      }
-      catch(ObjectNotFoundException e) {
-        // ignore.
       }
     }
   }
 
   /**
-   * The visualization factory
+   * Instance
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses PolygonVisualization oneway - - «create»
+   * @apiviz.has PolygonsObject - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
-     * Constructor
+     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
      */
-    public Factory() {
-      super();
+    public static final String POLYS = "polys";
+
+    /**
+     * The representation we visualize
+     */
+    final protected Relation<PolygonsObject> rep;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Task to visualize
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.rep = task.getResult(); // Note: relation was used for projection
+      context.addDataStoreListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new PolygonVisualization(task);
+    public void destroy() {
+      super.destroy();
+      context.removeDataStoreListener(this);
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
-      for(Relation<?> rel : results) {
-        if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
-          // Assume that a 2d projector is using the same coordinates as the polygons.
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
-              final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
-              task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 10);
-              baseResult.getHierarchy().add(rel, task);
-              baseResult.getHierarchy().add(p, task);
-            }
+    public void redraw() {
+      CSSClass css = new CSSClass(svgp, POLYS);
+      // TODO: separate fill and line colors?
+      css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.POLYGONS));
+      css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.POLYGONS));
+      css.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+      svgp.addCSSClassOrLogError(css);
+      svgp.updateStyleElement();
+
+      // draw data
+      for(DBIDIter iditer = rep.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        try {
+          PolygonsObject poly = rep.get(iditer);
+          if(poly == null) {
+            continue;
           }
+          SVGPath path = new SVGPath();
+          for(Polygon ppoly : poly.getPolygons()) {
+            Vector first = ppoly.get(0);
+            double[] f = proj.fastProjectDataToRenderSpace(first.getArrayRef());
+            path.moveTo(f[0], f[1]);
+            for(Vector v : ppoly) {
+              if(v == first) {
+                continue;
+              }
+              double[] p = proj.fastProjectDataToRenderSpace(v.getArrayRef());
+              path.drawTo(p[0], p[1]);
+            }
+            // close path.
+            path.drawTo(f[0], f[1]);
+          }
+          Element e = path.makeElement(svgp);
+          SVGUtil.addCSSClass(e, POLYS);
+          layer.appendChild(e);
+        }
+        catch(ObjectNotFoundException e) {
+          // ignore.
         }
       }
     }

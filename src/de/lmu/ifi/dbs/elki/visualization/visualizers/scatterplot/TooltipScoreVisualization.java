@@ -56,8 +56,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * as the cursor lingers on the marker.
  * 
  * @author Remigius Wojdanowski
+ * @author Erich Schubert
+ * 
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class TooltipScoreVisualization extends AbstractTooltipVisualization {
+public class TooltipScoreVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
@@ -69,86 +73,151 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
   public static final String NAME_GEN = " Tooltips";
 
   /**
-   * Number format.
+   * Settings
    */
-  NumberFormat nf;
+  protected Parameterizer settings;
 
   /**
-   * Number value to visualize
-   */
-  private Relation<? extends Number> result;
-
-  /**
-   * Font size to use.
-   */
-  private double fontsize;
-
-  /**
-   * Constructor
+   * Constructor.
    * 
-   * @param task Task
-   * @param nf Number Format
+   * @param settings Settings
    */
-  public TooltipScoreVisualization(VisualizationTask task, NumberFormat nf) {
-    super(task);
-    this.result = task.getResult();
-    this.nf = nf;
-    this.fontsize = 3 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
-    synchronizedRedraw();
+  public TooltipScoreVisualization(Parameterizer settings) {
+    super();
+    this.settings = settings;
   }
 
   @Override
-  protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
-    return svgp.svgText(x + dotsize, y + fontsize * 0.07, nf.format(result.get(id).doubleValue()));
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
-  /**
-   * Registers the Tooltip-CSS-Class at a SVGPlot.
-   * 
-   * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
-   */
   @Override
-  protected void setupCSS(SVGPlot svgp) {
-    final StyleLibrary style = context.getStyleLibrary();
-    final double fontsize = style.getTextSize(StyleLibrary.PLOT);
-    final String fontfamily = style.getFontFamily(StyleLibrary.PLOT);
-
-    CSSClass tooltiphidden = new CSSClass(svgp, TOOLTIP_HIDDEN);
-    tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
-    tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
-    tooltiphidden.setStatement(SVGConstants.CSS_DISPLAY_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    svgp.addCSSClassOrLogError(tooltiphidden);
-
-    CSSClass tooltipvisible = new CSSClass(svgp, TOOLTIP_VISIBLE);
-    tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
-    tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
-    svgp.addCSSClassOrLogError(tooltipvisible);
-
-    CSSClass tooltipsticky = new CSSClass(svgp, TOOLTIP_STICKY);
-    tooltipsticky.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
-    tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
-    svgp.addCSSClassOrLogError(tooltipsticky);
-
-    // invisible but sensitive area for the tooltip activator
-    CSSClass tooltiparea = new CSSClass(svgp, TOOLTIP_AREA);
-    tooltiparea.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-    tooltiparea.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-    tooltiparea.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
-    tooltiparea.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
-    svgp.addCSSClassOrLogError(tooltiparea);
-    
-    svgp.updateStyleElement();
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    // TODO: we can also visualize other scores!
+    Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+    for(OutlierResult o : ors) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
+        task.put(VisualizationTask.META_TOOL, true);
+        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        baseResult.getHierarchy().add(o.getScores(), task);
+        baseResult.getHierarchy().add(p, task);
+      }
+    }
+    Collection<Relation<?>> rrs = ResultUtil.filterResults(result, Relation.class);
+    for(Relation<?> r : rrs) {
+      if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
+        continue;
+      }
+      // Skip if we already considered it above
+      boolean add = true;
+      for(Result p : baseResult.getHierarchy().getChildren(r)) {
+        if(p instanceof VisualizationTask && ((VisualizationTask) p).getFactory() instanceof TooltipScoreVisualization) {
+          add = false;
+          break;
+        }
+      }
+      if(add) {
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        for(ScatterPlotProjector<?> p : ps) {
+          final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), this);
+          task.put(VisualizationTask.META_TOOL, true);
+          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          baseResult.getHierarchy().add(r, task);
+          baseResult.getHierarchy().add(p, task);
+        }
+      }
+    }
   }
 
   /**
-   * Factory for tooltip visualizers
+   * Instance
+   * 
+   * @author Remigius Wojdanowski
+   * @author Erich Schubert
+   */
+  public class Instance extends AbstractTooltipVisualization {
+    /**
+     * Number value to visualize
+     */
+    private Relation<? extends Number> result;
+
+    /**
+     * Font size to use.
+     */
+    private double fontsize;
+
+    /**
+     * Constructor
+     * 
+     * @param task Task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.result = task.getResult();
+      this.fontsize = 3 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
+      synchronizedRedraw();
+    }
+
+    @Override
+    protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
+      return svgp.svgText(x + dotsize, y + fontsize * 0.07, settings.nf.format(result.get(id).doubleValue()));
+    }
+
+    /**
+     * Registers the Tooltip-CSS-Class at a SVGPlot.
+     * 
+     * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
+     */
+    @Override
+    protected void setupCSS(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleLibrary();
+      final double fontsize = style.getTextSize(StyleLibrary.PLOT);
+      final String fontfamily = style.getFontFamily(StyleLibrary.PLOT);
+
+      CSSClass tooltiphidden = new CSSClass(svgp, TOOLTIP_HIDDEN);
+      tooltiphidden.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+      tooltiphidden.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
+      tooltiphidden.setStatement(SVGConstants.CSS_DISPLAY_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+      svgp.addCSSClassOrLogError(tooltiphidden);
+
+      CSSClass tooltipvisible = new CSSClass(svgp, TOOLTIP_VISIBLE);
+      tooltipvisible.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+      tooltipvisible.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
+      svgp.addCSSClassOrLogError(tooltipvisible);
+
+      CSSClass tooltipsticky = new CSSClass(svgp, TOOLTIP_STICKY);
+      tooltipsticky.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, fontsize);
+      tooltipsticky.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, fontfamily);
+      svgp.addCSSClassOrLogError(tooltipsticky);
+
+      // invisible but sensitive area for the tooltip activator
+      CSSClass tooltiparea = new CSSClass(svgp, TOOLTIP_AREA);
+      tooltiparea.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
+      tooltiparea.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+      tooltiparea.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
+      tooltiparea.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
+      svgp.addCSSClassOrLogError(tooltiparea);
+
+      svgp.updateStyleElement();
+    }
+  }
+
+  /**
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses TooltipScoreVisualization oneway - - «create»
+   * @apiviz.exclude
    */
-  public static class Factory extends AbstractVisFactory {
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Number formatter used for visualization
+     */
+    NumberFormat nf = null;
+
     /**
      * Parameter for the gamma-correction.
      * 
@@ -162,92 +231,22 @@ public class TooltipScoreVisualization extends AbstractTooltipVisualization {
      */
     public static final OptionID DIGITS_ID = OptionID.getOrCreateOptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
 
-    /**
-     * Number formatter used for visualization
-     */
-    NumberFormat nf = null;
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
 
-    /**
-     * Constructor.
-     * 
-     * @param digits number of digits
-     */
-    public Factory(int digits) {
-      super();
-      nf = NumberFormat.getInstance(Locale.ROOT);
-      nf.setGroupingUsed(false);
-      nf.setMaximumFractionDigits(digits);
+      if(config.grab(DIGITS_PARAM)) {
+        int digits = DIGITS_PARAM.getValue();
+        nf = NumberFormat.getInstance(Locale.ROOT);
+        nf.setGroupingUsed(false);
+        nf.setMaximumFractionDigits(digits);
+      }
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new TooltipScoreVisualization(task, nf);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      // TODO: we can also visualize other scores!
-      Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-      for(OutlierResult o : ors) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-          baseResult.getHierarchy().add(o.getScores(), task);
-          baseResult.getHierarchy().add(p, task);
-        }
-      }
-      Collection<Relation<?>> rrs = ResultUtil.filterResults(result, Relation.class);
-      for(Relation<?> r : rrs) {
-        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
-          continue;
-        }
-        // Skip if we already considered it above
-        boolean add = true;
-        for(Result p : baseResult.getHierarchy().getChildren(r)) {
-          if(p instanceof VisualizationTask && ((VisualizationTask) p).getFactory() instanceof Factory) {
-            add = false;
-            break;
-          }
-        }
-        if(add) {
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), this);
-            task.put(VisualizationTask.META_TOOL, true);
-            task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-            baseResult.getHierarchy().add(r, task);
-            baseResult.getHierarchy().add(p, task);
-          }
-        }
-      }
-    }
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      protected int digits = 4;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
-
-        if(config.grab(DIGITS_PARAM)) {
-          digits = DIGITS_PARAM.getValue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(digits);
-      }
+    protected TooltipScoreVisualization makeInstance() {
+      return new TooltipScoreVisualization(this);
     }
   }
 }

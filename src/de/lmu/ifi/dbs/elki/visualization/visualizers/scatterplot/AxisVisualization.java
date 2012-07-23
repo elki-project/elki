@@ -47,113 +47,116 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Generates a SVG-Element containing axes, including labeling.
  * 
  * @author Remigius Wojdanowski
+ * @author Erich Schubert
  * 
- * @apiviz.uses SVGSimpleLinearAxis
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class AxisVisualization extends AbstractScatterplotVisualization {
+public class AxisVisualization extends AbstractVisFactory {
   /**
-   * Constructor.
-   * 
-   * @param task VisualizationTask
+   * A short name characterizing this Visualizer.
    */
-  public AxisVisualization(VisualizationTask task) {
-    super(task);
-    incrementalRedraw();
+  private static final String NAME = "Axes";
+
+  /**
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   */
+  public AxisVisualization() {
+    super();
   }
 
   @Override
-  protected void redraw() {
-    int dim = DatabaseUtil.dimensionality(rel);
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
 
-    // origin
-    double[] orig = proj.fastProjectScaledToRenderSpace(new double[dim]);
-    // diagonal point opposite to origin
-    double[] diag = new double[dim];
-    for(int d2 = 0; d2 < dim; d2++) {
-      diag[d2] = 1;
-    }
-    diag = proj.fastProjectScaledToRenderSpace(diag);
-    // compute angle to diagonal line, used for axis labeling.
-    double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
-
-    double alfontsize = 1.1 * context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL);
-    CSSClass alcls = new CSSClass(AxisVisualization.class, "unmanaged");
-    alcls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(alfontsize));
-    alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
-    alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
-
-    // draw axes
-    for(int d = 0; d < dim; d++) {
-      double[] v = new double[dim];
-      v[d] = 1;
-      // projected endpoint of axis
-      double[] ax = proj.fastProjectScaledToRenderSpace(v);
-      boolean righthand = false;
-      double axa = Math.atan2(ax[1] - orig[1], ax[0] - orig[0]);
-      if(axa > diaga || (diaga > 0 && axa > diaga + Math.PI)) {
-        righthand = true;
-      }
-      // System.err.println(ax.get(0) + " "+ ax.get(1)+
-      // " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
-      if(ax[0] != orig[0] || ax[1] != orig[1]) {
-        try {
-          SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig[0], orig[1], ax[0], ax[1], righthand ? SVGSimpleLinearAxis.LabelStyle.RIGHTHAND : SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
-          // TODO: move axis labeling into drawAxis function.
-          double offx = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
-          double offy = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
-          Element label = svgp.svgText(ax[0] + offx, ax[1] + offy, DatabaseUtil.getColumnLabel(rel, d + 1));
-          SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
-          SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, righthand ? SVGConstants.SVG_START_VALUE : SVGConstants.SVG_END_VALUE);
-          layer.appendChild(label);
-        }
-        catch(CSSNamingConflict e) {
-          throw new RuntimeException("Conflict in CSS naming for axes.", e);
-        }
-      }
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
+    for(ScatterPlotProjector<?> p : ps) {
+      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
+      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
+      baseResult.getHierarchy().add(p, task);
     }
   }
 
+  @Override
+  public boolean allowThumbnails(VisualizationTask task) {
+    // Don't use thumbnails
+    return false;
+  }
+
   /**
-   * Factory for axis visualizations
+   * Instance
    * 
    * @author Erich Schubert
+   * @author Remigius Wojdanowski
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses AxisVisualization oneway - - «create»
+   * @apiviz.uses SVGSimpleLinearAxis
+   * 
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractScatterplotVisualization {
     /**
-     * A short name characterizing this Visualizer.
+     * Constructor.
+     * 
+     * @param task VisualizationTask
      */
-    private static final String NAME = "Axes";
-
-    /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
-     */
-    public Factory() {
-      super();
+    public Instance(VisualizationTask task) {
+      super(task);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new AxisVisualization(task);
-    }
+    protected void redraw() {
+      int dim = DatabaseUtil.dimensionality(rel);
 
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
-        baseResult.getHierarchy().add(p, task);
+      // origin
+      double[] orig = proj.fastProjectScaledToRenderSpace(new double[dim]);
+      // diagonal point opposite to origin
+      double[] diag = new double[dim];
+      for(int d2 = 0; d2 < dim; d2++) {
+        diag[d2] = 1;
       }
-    }
+      diag = proj.fastProjectScaledToRenderSpace(diag);
+      // compute angle to diagonal line, used for axis labeling.
+      double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
 
-    @Override
-    public boolean allowThumbnails(VisualizationTask task) {
-      // Don't use thumbnails
-      return false;
+      double alfontsize = 1.1 * context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL);
+      CSSClass alcls = new CSSClass(AxisVisualization.class, "unmanaged");
+      alcls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(alfontsize));
+      alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
+      alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
+
+      // draw axes
+      for(int d = 0; d < dim; d++) {
+        double[] v = new double[dim];
+        v[d] = 1;
+        // projected endpoint of axis
+        double[] ax = proj.fastProjectScaledToRenderSpace(v);
+        boolean righthand = false;
+        double axa = Math.atan2(ax[1] - orig[1], ax[0] - orig[0]);
+        if(axa > diaga || (diaga > 0 && axa > diaga + Math.PI)) {
+          righthand = true;
+        }
+        // System.err.println(ax.get(0) + " "+ ax.get(1)+
+        // " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
+        if(ax[0] != orig[0] || ax[1] != orig[1]) {
+          try {
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig[0], orig[1], ax[0], ax[1], righthand ? SVGSimpleLinearAxis.LabelStyle.RIGHTHAND : SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
+            // TODO: move axis labeling into drawAxis function.
+            double offx = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
+            double offy = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
+            Element label = svgp.svgText(ax[0] + offx, ax[1] + offy, DatabaseUtil.getColumnLabel(rel, d + 1));
+            SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
+            SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, righthand ? SVGConstants.SVG_START_VALUE : SVGConstants.SVG_END_VALUE);
+            layer.appendChild(label);
+          }
+          catch(CSSNamingConflict e) {
+            throw new RuntimeException("Conflict in CSS naming for axes.", e);
+          }
+        }
+      }
     }
   }
 }

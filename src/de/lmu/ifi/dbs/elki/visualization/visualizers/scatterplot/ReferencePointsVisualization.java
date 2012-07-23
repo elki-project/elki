@@ -46,98 +46,101 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * The actual visualization instance, for a single projection
  * 
+ * @author Remigius Wojdanowski
  * @author Erich Schubert
  * 
- * @apiviz.has ReferencePointsResult oneway - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-// TODO: add a result listener for the reference points.
-public class ReferencePointsVisualization extends AbstractScatterplotVisualization {
-  /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
-   */
-  public static final String REFPOINT = "refpoint";
-
+public class ReferencePointsVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Reference Points";
 
   /**
-   * Serves reference points.
+   * Constructor, adhering to
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
-  protected ReferencePointsResult<? extends NumberVector<?, ?>> result;
-
-  /**
-   * Constructor.
-   * 
-   * @param task Visualization task
-   */
-  public ReferencePointsVisualization(VisualizationTask task) {
-    super(task);
-    this.result = task.getResult();
-    incrementalRedraw();
+  public ReferencePointsVisualization() {
+    super();
   }
 
   @Override
-  public void redraw() {
-    setupCSS(svgp);
-    Iterator<? extends NumberVector<?, ?>> iter = result.iterator();
-
-    final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
-    while(iter.hasNext()) {
-      NumberVector<?, ?> v = iter.next();
-      double[] projected = proj.fastProjectDataToRenderSpace(v);
-      Element dot = svgp.svgCircle(projected[0], projected[1], dotsize);
-      SVGUtil.addCSSClass(dot, REFPOINT);
-      layer.appendChild(dot);
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
+    for(ReferencePointsResult<?> rp : rps) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        baseResult.getHierarchy().add(rp, task);
+        baseResult.getHierarchy().add(p, task);
+      }
     }
   }
 
-  /**
-   * Registers the Reference-Point-CSS-Class at a SVGPlot.
-   * 
-   * @param svgp the SVGPlot to register the -CSS-Class.
-   */
-  private void setupCSS(SVGPlot svgp) {
-    CSSClass refpoint = new CSSClass(svgp, REFPOINT);
-    refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.REFERENCE_POINTS));
-    svgp.addCSSClassOrLogError(refpoint);
+  @Override
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
   /**
-   * Generates a SVG-Element visualizing reference points.
+   * Instance.
    * 
    * @author Remigius Wojdanowski
+   * @author Erich Schubert
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses ReferencePointsVisualization oneway - - «create»
+   * @apiviz.has ReferencePointsResult oneway - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  // TODO: add a result listener for the reference points.
+  public class Instance extends AbstractScatterplotVisualization {
     /**
-     * Constructor, adhering to
-     * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
      */
-    public Factory() {
-      super();
+    public static final String REFPOINT = "refpoint";
+
+    /**
+     * Serves reference points.
+     */
+    protected ReferencePointsResult<? extends NumberVector<?, ?>> result;
+
+    /**
+     * Constructor.
+     * 
+     * @param task Visualization task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      this.result = task.getResult();
+      incrementalRedraw();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
-      for(ReferencePointsResult<?> rp : rps) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-          baseResult.getHierarchy().add(rp, task);
-          baseResult.getHierarchy().add(p, task);
-        }
+    public void redraw() {
+      setupCSS(svgp);
+      Iterator<? extends NumberVector<?, ?>> iter = result.iterator();
+
+      final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
+      while(iter.hasNext()) {
+        NumberVector<?, ?> v = iter.next();
+        double[] projected = proj.fastProjectDataToRenderSpace(v);
+        Element dot = svgp.svgCircle(projected[0], projected[1], dotsize);
+        SVGUtil.addCSSClass(dot, REFPOINT);
+        layer.appendChild(dot);
       }
     }
 
-    @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new ReferencePointsVisualization(task);
+    /**
+     * Registers the Reference-Point-CSS-Class at a SVGPlot.
+     * 
+     * @param svgp the SVGPlot to register the -CSS-Class.
+     */
+    private void setupCSS(SVGPlot svgp) {
+      CSSClass refpoint = new CSSClass(svgp, REFPOINT);
+      refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.REFERENCE_POINTS));
+      svgp.addCSSClassOrLogError(refpoint);
     }
   }
 }
