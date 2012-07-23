@@ -54,109 +54,109 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Heidi Kolb
  * 
- * @apiviz.has SelectionResult oneway - - visualizes
- * @apiviz.has DBIDSelection oneway - - visualizes
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class SelectionDotVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
+public class SelectionDotVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Selection";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * Constructor
    */
-  public static final String MARKER = "selectionDotMarker";
-
-  /**
-   * Constructor.
-   * 
-   * @param task Task
-   */
-  public SelectionDotVisualization(VisualizationTask task) {
-    super(task);
-    context.addResultListener(this);
-    context.addDataStoreListener(this);
-    incrementalRedraw();
+  public SelectionDotVisualization() {
+    super();
+    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
-  public void destroy() {
-    context.removeResultListener(this);
-    super.destroy();
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
   }
 
   @Override
-  protected void redraw() {
-    addCSSClasses(svgp);
-    final double size = context.getStyleLibrary().getSize(StyleLibrary.SELECTION);
-    DBIDSelection selContext = context.getSelection();
-    if(selContext != null) {
-      DBIDs selection = selContext.getSelectedIds();
-      for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
-        try {
-          double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
-          Element dot = svgp.svgCircle(v[0], v[1], size);
-          SVGUtil.addCSSClass(dot, MARKER);
-          layer.appendChild(dot);
-        }
-        catch(ObjectNotFoundException e) {
-          // ignore
-        }
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+    for(SelectionResult selres : selectionResults) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        baseResult.getHierarchy().add(selres, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
   }
 
   /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    // Class for the dot markers
-    if(!svgp.getCSSClassManager().contains(MARKER)) {
-      CSSClass cls = new CSSClass(this, MARKER);
-      final StyleLibrary style = context.getStyleLibrary();
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
-      svgp.addCSSClassOrLogError(cls);
-    }
-  }
-
-  /**
-   * Factory for visualizers to generate an SVG-Element containing dots as
-   * markers representing the selected Database's objects.
+   * Instance
    * 
    * @author Heidi Kolb
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses SelectionDotVisualization oneway - - «create»
+   * @apiviz.has SelectionResult oneway - - visualizes
+   * @apiviz.has DBIDSelection oneway - - visualizes
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
-     * Constructor
+     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
      */
-    public Factory() {
-      super();
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
+    public static final String MARKER = "selectionDotMarker";
+
+    /**
+     * Constructor.
+     * 
+     * @param task Task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      context.addResultListener(this);
+      context.addDataStoreListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionDotVisualization(task);
+    public void destroy() {
+      context.removeResultListener(this);
+      super.destroy();
     }
 
     @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-          baseResult.getHierarchy().add(selres, task);
-          baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      addCSSClasses(svgp);
+      final double size = context.getStyleLibrary().getSize(StyleLibrary.SELECTION);
+      DBIDSelection selContext = context.getSelection();
+      if(selContext != null) {
+        DBIDs selection = selContext.getSelectedIds();
+        for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
+          try {
+            double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
+            Element dot = svgp.svgCircle(v[0], v[1], size);
+            SVGUtil.addCSSClass(dot, MARKER);
+            layer.appendChild(dot);
+          }
+          catch(ObjectNotFoundException e) {
+            // ignore
+          }
         }
+      }
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      // Class for the dot markers
+      if(!svgp.getCSSClassManager().contains(MARKER)) {
+        CSSClass cls = new CSSClass(this, MARKER);
+        final StyleLibrary style = context.getStyleLibrary();
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
+        svgp.addCSSClassOrLogError(cls);
       }
     }
   }

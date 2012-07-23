@@ -58,114 +58,114 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * 
  * @author Robert Rödler
  * 
- * @apiviz.has SelectionResult oneway - - visualizes
- * @apiviz.has DBIDSelection oneway - - visualizes
- * @apiviz.uses GrahamScanConvexHull2D
+ * @apiviz.stereotype factory
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class SelectionConvexHullVisualization extends AbstractScatterplotVisualization implements DataStoreListener {
+public class SelectionConvexHullVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Convex Hull of Selection";
 
   /**
-   * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
+   * Constructor
    */
-  public static final String SELECTEDHULL = "selectionConvexHull";
-
-  /**
-   * Constructor.
-   * 
-   * @param task Task
-   */
-  public SelectionConvexHullVisualization(VisualizationTask task) {
-    super(task);
-    context.addResultListener(this);
-    context.addDataStoreListener(this);
-    incrementalRedraw();
+  public SelectionConvexHullVisualization() {
+    super();
+    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
-  protected void redraw() {
-    addCSSClasses(svgp);
-    DBIDSelection selContext = context.getSelection();
-    if(selContext != null) {
-      DBIDs selection = selContext.getSelectedIds();
-      GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
-      for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
-        try {
-          hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(iter))));
-        }
-        catch(ObjectNotFoundException e) {
-          // ignore
-        }
-      }
-      Polygon chres = hull.getHull();
-      if(chres != null && chres.size() >= 3) {
-        SVGPath path = new SVGPath(chres);
+  public Visualization makeVisualization(VisualizationTask task) {
+    return new Instance(task);
+  }
 
-        Element selHull = path.makeElement(svgp);
-        SVGUtil.addCSSClass(selHull, SELECTEDHULL);
-        // TODO: use relative selection size for opacity?
-        layer.appendChild(selHull);
+  @Override
+  public void processNewResult(HierarchicalResult baseResult, Result result) {
+    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
+    for(SelectionResult selres : selectionResults) {
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      for(ScatterPlotProjector<?> p : ps) {
+        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
+        baseResult.getHierarchy().add(selres, task);
+        baseResult.getHierarchy().add(p, task);
       }
     }
   }
 
   /**
-   * Adds the required CSS-Classes
-   * 
-   * @param svgp SVG-Plot
-   */
-  private void addCSSClasses(SVGPlot svgp) {
-    // Class for the dot markers
-    if(!svgp.getCSSClassManager().contains(SELECTEDHULL)) {
-      CSSClass cls = new CSSClass(this, SELECTEDHULL);
-      // cls = new CSSClass(this, CONVEXHULL);
-      cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
-      cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, ".25");
-      cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-      svgp.addCSSClassOrLogError(cls);
-    }
-  }
-
-  /**
-   * Factory for visualizers to generate an SVG-Element containing the convex
-   * hull of the selected points
+   * Instance
    * 
    * @author Robert Rödler
    * 
-   * @apiviz.stereotype factory
-   * @apiviz.uses SelectionConvexHullVisualization oneway - - «create»
+   * @apiviz.has SelectionResult oneway - - visualizes
+   * @apiviz.has DBIDSelection oneway - - visualizes
+   * @apiviz.uses GrahamScanConvexHull2D
    */
-  public static class Factory extends AbstractVisFactory {
+  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
-     * Constructor
+     * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
+     * etc.
      */
-    public Factory() {
-      super();
-      thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
+    public static final String SELECTEDHULL = "selectionConvexHull";
+
+    /**
+     * Constructor.
+     * 
+     * @param task Task
+     */
+    public Instance(VisualizationTask task) {
+      super(task);
+      context.addResultListener(this);
+      context.addDataStoreListener(this);
+      incrementalRedraw();
     }
 
     @Override
-    public Visualization makeVisualization(VisualizationTask task) {
-      return new SelectionConvexHullVisualization(task);
-    }
-
-    @Override
-    public void processNewResult(HierarchicalResult baseResult, Result result) {
-      Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-      for(SelectionResult selres : selectionResults) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
-          baseResult.getHierarchy().add(selres, task);
-          baseResult.getHierarchy().add(p, task);
+    protected void redraw() {
+      addCSSClasses(svgp);
+      DBIDSelection selContext = context.getSelection();
+      if(selContext != null) {
+        DBIDs selection = selContext.getSelectedIds();
+        GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
+        for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
+          try {
+            hull.add(new Vector(proj.fastProjectDataToRenderSpace(rel.get(iter))));
+          }
+          catch(ObjectNotFoundException e) {
+            // ignore
+          }
         }
+        Polygon chres = hull.getHull();
+        if(chres != null && chres.size() >= 3) {
+          SVGPath path = new SVGPath(chres);
+
+          Element selHull = path.makeElement(svgp);
+          SVGUtil.addCSSClass(selHull, SELECTEDHULL);
+          // TODO: use relative selection size for opacity?
+          layer.appendChild(selHull);
+        }
+      }
+    }
+
+    /**
+     * Adds the required CSS-Classes
+     * 
+     * @param svgp SVG-Plot
+     */
+    private void addCSSClasses(SVGPlot svgp) {
+      // Class for the dot markers
+      if(!svgp.getCSSClassManager().contains(SELECTEDHULL)) {
+        CSSClass cls = new CSSClass(this, SELECTEDHULL);
+        // cls = new CSSClass(this, CONVEXHULL);
+        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, ".25");
+        cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+        svgp.addCSSClassOrLogError(cls);
       }
     }
   }
