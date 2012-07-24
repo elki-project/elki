@@ -429,7 +429,8 @@ public class Logging {
    * @param e Exception
    */
   public void exception(Throwable e) {
-    log(Level.SEVERE, e.getMessage(), e);
+    final String msg = e.getMessage();
+    log(Level.SEVERE, msg != null ? msg : "An exception occurred.", e);
   }
 
   /**
