@@ -143,7 +143,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   protected List<String> columnnames = null;
 
   /**
-   * Bitset to indicate which columns are numeric
+   * Bitset to indicate which columns are not numeric
    */
   protected BitSet labelcolumns = null;
 
@@ -174,9 +174,9 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   /**
    * Constructor
    * 
-   * @param colSep
-   * @param quoteChar
-   * @param labelIndices
+   * @param colSep Column separator
+   * @param quoteChar Quote character
+   * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
   public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, V factory) {
@@ -192,6 +192,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     dimensionality = DIMENSIONALITY_UNKNOWN;
     columnnames = null;
     labelcolumns = new BitSet();
+    labelcolumns.or(labelIndices);
   }
 
   @Override
@@ -227,7 +228,8 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
               nextevent = Event.NEXT_OBJECT;
               return Event.META_CHANGED;
             }
-          } else if (curlbl != null && meta != null && meta.size() == 1) {
+          }
+          else if(curlbl != null && meta != null && meta.size() == 1) {
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
@@ -301,12 +303,14 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       if(labels == null) {
         labels = new LabelList(1);
       }
-      labels.add(new String(ent)); // Make a new string, to not keep the whole file in memory.
+      // Make a new string, to not keep the whole file in memory!
+      labels.add(new String(ent));
     }
     // Maybe a label row?
     if(lineNumber == 1 && attributes.size() == 0) {
       columnnames = labels;
       labelcolumns.clear();
+      labelcolumns.or(labelIndices);
       curvec = null;
       curlbl = null;
       return;
