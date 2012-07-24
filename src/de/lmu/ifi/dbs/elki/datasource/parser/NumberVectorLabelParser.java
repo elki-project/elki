@@ -192,7 +192,9 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     dimensionality = DIMENSIONALITY_UNKNOWN;
     columnnames = null;
     labelcolumns = new BitSet();
-    labelcolumns.or(labelIndices);
+    if (labelIndices != null) {
+      labelcolumns.or(labelIndices);
+    }
   }
 
   @Override
