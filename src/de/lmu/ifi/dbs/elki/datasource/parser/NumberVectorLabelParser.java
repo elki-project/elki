@@ -312,7 +312,9 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     if(lineNumber == 1 && attributes.size() == 0) {
       columnnames = labels;
       labelcolumns.clear();
-      labelcolumns.or(labelIndices);
+      if (labelIndices != null) {
+        labelcolumns.or(labelIndices);
+      }
       curvec = null;
       curlbl = null;
       return;
