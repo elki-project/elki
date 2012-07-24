@@ -82,6 +82,9 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * </p>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf VisualizerParameterizer
+ * @apiviz.composedOf SimilarityMatrixVisualizer
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
 public class VisualizePairwiseGainMatrix extends AbstractApplication {
@@ -240,7 +243,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     VisualizerContext context = vispar.newContext(database);
 
     // Attach visualizers to results
-    SimilarityMatrixVisualizer.Factory factory = new SimilarityMatrixVisualizer.Factory();
+    SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
     factory.processNewResult(database, database);
 
     List<VisualizationTask> tasks = ResultUtil.filterResults(database, VisualizationTask.class);
@@ -259,7 +262,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    * @param factory
    * @param task
    */
-  private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer.Factory factory, VisualizationTask task) {
+  private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer factory, VisualizationTask task) {
     SVGPlot plot = new SVGPlot();
     Visualization vis = factory.makeVisualization(task.clone(plot, context, null, 1.0, 1.0));
     plot.getRoot().appendChild(vis.getLayer());
