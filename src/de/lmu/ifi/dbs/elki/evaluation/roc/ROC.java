@@ -86,7 +86,7 @@ public class ROC {
   public static <C extends Comparable<? super C>, T> XYCurve materializeROC(int size, Set<? super T> ids, Iterator<? extends PairInterface<C, T>> nei) {
     final int postot = ids.size(), negtot = size - postot;
     int poscnt = 0, negcnt = 0;
-    XYCurve curve = new XYCurve("True Negative Rate", "True Positive Rate", postot + 2);
+    XYCurve curve = new XYCurve("False Positive Rate", "True Positive Rate", postot + 2);
 
     // start in bottom left
     curve.add(0.0, 0.0);
@@ -131,7 +131,7 @@ public class ROC {
   public static <C extends Comparable<? super C>> XYCurve materializeROC(int size, SetDBIDs ids, Iterator<? extends PairInterface<C, ? extends DBIDRef>> nei) {
     final int postot = ids.size(), negtot = size - postot;
     int poscnt = 0, negcnt = 0;
-    XYCurve curve = new XYCurve("True Negative Rate", "True Positive Rate", postot + 2);
+    XYCurve curve = new XYCurve("False Positive Rate", "True Positive Rate", postot + 2);
 
     // start in bottom left
     curve.add(0.0, 0.0);
