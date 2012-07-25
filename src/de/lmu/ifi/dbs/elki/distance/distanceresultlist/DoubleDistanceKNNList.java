@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -33,7 +36,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * Finalized KNN List.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf DoubleDistanceDBIDPair
  * @apiviz.has DoubleDistanceDBIDResultIter
  */
@@ -47,6 +50,25 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
    * The actual data array.
    */
   private final DoubleDistanceDBIDPair[] data;
+
+  /**
+   * Constructor. This will <em>clone</em> the given collection!
+   * 
+   * @param col Existing collection
+   * @param k K parameter
+   */
+  public DoubleDistanceKNNList(Collection<DoubleDistanceDBIDPair> col, int k) {
+    super();
+    this.data = new DoubleDistanceDBIDPair[col.size()];
+    this.k = k;
+    assert (col.size() >= this.k) : "Collection doesn't contain enough objects!";
+    // Get sorted data from heap; but in reverse.
+    Iterator<DoubleDistanceDBIDPair> it = col.iterator();
+    for(int i = 0; it.hasNext(); i++) {
+      data[i] = it.next();
+    }
+    assert (data.length == 0 || data[0] != null);
+  }
 
   /**
    * Constructor, to be called from KNNHeap only. Use {@link KNNHeap#toKNNList}

@@ -423,13 +423,17 @@ public final class SpatialUtil {
   public static <E extends SpatialComparable, A> double[] unionFlatMBR(A data, ArrayAdapter<E, ? super A> getter) {
     final int num = getter.size(data);
     assert (num > 0) : "Cannot compute MBR of empty set.";
-    final E first = getter.get(data, 0);
-    final int dim = first.getDimensionality();
-    double[] mbr = new double[2 * dim];
-    for(int d = 0; d < dim; d++) {
-      mbr[d] = first.getMin(d + 1);
-      mbr[dim + d] = first.getMax(d + 1);
-    }
+    final int dim;
+    final double[] mbr;
+    { // First entry
+      final E first = getter.get(data, 0);
+      dim = first.getDimensionality();
+      mbr = new double[2 * dim];
+      for(int d = 0; d < dim; d++) {
+        mbr[d] = first.getMin(d + 1);
+        mbr[dim + d] = first.getMax(d + 1);
+      }
+    } // Remaining entries
     for(int i = 1; i < num; i++) {
       E next = getter.get(data, i);
       for(int d = 0; d < dim; d++) {
