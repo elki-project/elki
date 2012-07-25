@@ -131,7 +131,6 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      * Constructor.
      * 
      * @param task Visualization task
-     * @param fill Fill flag
      */
     @SuppressWarnings("unchecked")
     public Instance(VisualizationTask task) {
