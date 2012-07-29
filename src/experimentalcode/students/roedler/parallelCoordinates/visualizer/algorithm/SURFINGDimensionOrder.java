@@ -24,7 +24,13 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
 
 /**
- * Arrange dimensions
+ * SURFING algorithm to arrange dimensions but with k=N
+ * 
+ * Reference: <br>
+ * Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-
+ * Peter Kriegel, and Peer Kr¨oger. Subspace Selection for Clustering
+ * High-Dimensional Data.<br> 
+ * In ICDM, pages 11–18, 2004.
  * 
  * @author Robert Rödler
  */
