@@ -23,7 +23,14 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
 
 /**
- * Arrange dimensions
+ * HSM algorithm to arrange dimensions
+ * 
+ * Reference: <br>
+ * Andrada Tatu, Georgia Albuquerque, Martin Eisemann, Peter
+ * Bak, Holger Theisel, Marcus A. Magnor, and Daniel A. Keim. Automated
+ * Analytical Methods to Support Visual Exploration of High-
+ * Dimensional Data. <br>
+ * IEEE Trans. Vis. Comput. Graph., pages 584–597, 2011.
  * 
  * @author Robert Rödler
  */
@@ -33,6 +40,9 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
    */
   public static final String CLUSTERORDER = "HSM Dimension Order";
 
+  /**
+   * the result we work on
+   */
   private Clustering<Model> clustering;
   
   private int sum;

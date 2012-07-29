@@ -38,7 +38,11 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.MenuOwner;
 import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
 
 /**
- * Arrange dimensions
+ * HiCS algorithm to arrange dimensions
+ * 
+ * Fabian Keller, Emmanuel M¨uller, and Klemens B¨ohm. HiCS:
+ * High Contrast Subspaces for Density-Based Outlier Ranking. <br>
+ * In ICDE, pages 1037–1048, 2012.
  * 
  * @author Robert Rödler
  */
