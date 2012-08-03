@@ -69,15 +69,39 @@ public class KeyVisualization extends AbstractVisFactory {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
+      final int numc = c.getAllClusters().size();
+      if(numc > 0) {
+        // FIXME: compute from labels?
+        final double maxwidth = 10.;
         final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
-        task.width = 1.0;
-        task.height = 1.0;
+        final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
+        final int rows = (int) Math.ceil(numc / (double) cols);
+        final double div = Math.max(2. + rows, cols * maxwidth);
+        task.width = cols * maxwidth / div;
+        task.height = (2. + rows) / div;
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
         task.put(VisualizationTask.META_NODETAIL, true);
         baseResult.getHierarchy().add(c, task);
       }
     }
+  }
+
+  /**
+   * Compute the preferred number of columns.
+   * 
+   * @param width Target width
+   * @param height Target height
+   * @param numc Number of clusters
+   * @param maxwidth Max width of entries
+   * @return Preferred number of columns
+   */
+  public static int getPreferredColumns(double width, double height, int numc, double maxwidth) {
+    // Maximum width (compared to height) of labels - guess.
+    // FIXME: do we really need to do this three-step computation?
+    // Number of rows we'd use in a squared layout:
+    final double rows = Math.ceil(Math.pow(numc * maxwidth, height / (width + height)));
+    // Given this number of rows (plus two for header), use this many columns:
+    return (int) Math.ceil(numc / (rows + 2));
   }
 
   @Override
@@ -131,12 +155,20 @@ public class KeyVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       SVGPlot svgp = task.getPlot();
-      final List<Cluster<Model>> allcs = clustering.getAllClusters();
-
       StyleLibrary style = context.getStyleLibrary();
       MarkerLibrary ml = style.markers();
-      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
+      // Maximum width (compared to height) of labels - guess.
+      // FIXME: compute from labels?
+      final double maxwidth = 10.;
+
+      final List<Cluster<Model>> allcs = clustering.getAllClusters();
+      final int numc = allcs.size();
+      final int cols = getPreferredColumns(task.getWidth(), task.getHeight(), numc, maxwidth);
+      final int rows = 2 + (int) Math.ceil(numc / (double) cols);
+      // We use a coordinate system based on rows, so columns are at c*maxwidth
+
+      layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
       // Add a label for the clustering.
       {
         Element label = svgp.svgText(0.1, 0.7, clustering.getLongName());
@@ -144,11 +176,12 @@ public class KeyVisualization extends AbstractVisFactory {
         layer.appendChild(label);
       }
 
-      // TODO: multi-column layout!
       int i = 0;
       for(Cluster<Model> c : allcs) {
-        ml.useMarker(svgp, layer, 0.3, i + 1.5, i, 0.3);
-        Element label = svgp.svgText(0.7, i + 1.7, c.getNameAutomatic());
+        final int col = i / rows;
+        final int row = i % rows;
+        ml.useMarker(svgp, layer, 0.3 + maxwidth * col, row + 1.5, i, 0.3);
+        Element label = svgp.svgText(0.7 + maxwidth * col, row + 1.7, c.getNameAutomatic());
         label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; fill: " + style.getTextColor(StyleLibrary.DEFAULT));
         layer.appendChild(label);
         i++;
@@ -159,14 +192,14 @@ public class KeyVisualization extends AbstractVisFactory {
         StylingPolicy sp = context.getStyleResult().getStylingPolicy();
         if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
           // Don't show the button when active. May confuse people more than the
-          // disappearing button
+          // disappearing button?
 
-          // SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+          // SVGButton button = new SVGButton(.1, rows + 1.1, 3.8, .7, .2);
           // button.setTitle("Active style", "darkgray");
           // layer.appendChild(button.render(svgp));
         }
         else {
-          SVGButton button = new SVGButton(.1, i + 1.1, 3.8, .7, .2);
+          SVGButton button = new SVGButton(.1, rows + 1.1, 3.8, .7, .2);
           button.setTitle("Set style", "black");
           Element elem = button.render(svgp);
           // Attach listener
@@ -181,10 +214,11 @@ public class KeyVisualization extends AbstractVisFactory {
         }
       }
 
-      int rows = i + 2;
-      int cols = Math.max(6, (int) (rows * task.getHeight() / task.getWidth()));
+      // int rows = i + 2;
+      // int cols = Math.max(6, (int) (rows * task.getHeight() /
+      // task.getWidth()));
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
+      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols * maxwidth, rows, margin / StyleLibrary.SCALE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
