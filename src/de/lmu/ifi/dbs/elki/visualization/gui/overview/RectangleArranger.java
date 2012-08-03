@@ -415,7 +415,10 @@ public class RectangleArranger<T> {
     return true;
   }
 
-  public void logSizes() {
+  /**
+   * Debug logging
+   */
+  protected void logSizes() {
     StringBuffer buf = new StringBuffer();
     final int cols = widths.size();
     final int rows = heights.size();
@@ -452,6 +455,28 @@ public class RectangleArranger<T> {
       buf.append("+\n");
     }
     logger.debug(buf);
+  }
+
+  /**
+   * Compute the relative fill. Useful for triggering a relayout if the relative
+   * fill is not satisfactory.
+   * 
+   * @return relative fill
+   */
+  public double relativeFill() {
+    double acc = 0.0;
+    final int cols = widths.size();
+    final int rows = heights.size();
+    {
+      for(int y = 0; y < rows; y++) {
+        for(int x = 0; x < cols; x++) {
+          if(usage.get(y).get(x) != null) {
+            acc += widths.get(x) * heights.get(y);
+          }
+        }
+      }
+    }
+    return acc / (twidth * theight);
   }
 
   /**
