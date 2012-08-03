@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,15 +69,15 @@ public class RectangleArranger<T> {
   /**
    * Column widths
    */
-  private ArrayList<Double> widths = new ArrayList<Double>();
+  private TDoubleArrayList widths = new TDoubleArrayList();
 
   /**
    * Column heights
    */
-  private ArrayList<Double> heights = new ArrayList<Double>();
+  private TDoubleArrayList heights = new TDoubleArrayList();
 
   /**
-   * Bit sets to store usage. ArrayList = y, BitSet = x
+   * Map indicating which cells are used.
    */
   private ArrayList<ArrayList<Object>> usage = new ArrayList<ArrayList<Object>>();
 
@@ -120,7 +122,9 @@ public class RectangleArranger<T> {
    * @param data Data object to add (key)
    */
   public void put(double w, double h, T data) {
-    logger.finest("Add: " + w + "x" + h);
+    if(logger.isDebuggingFinest()) {
+      logger.finest("Add: " + w + "x" + h);
+    }
     final int cols = widths.size();
     final int rows = heights.size();
 
@@ -233,7 +237,9 @@ public class RectangleArranger<T> {
         double hinc = Math.max(0.0, h - avh);
         double inc = computeIncreaseArea(winc, hinc);
 
-        logger.debugFinest("Candidate: " + sx + "," + sy + " - " + ex + "," + ey + ": " + avw + "x" + avh + " " + inc);
+        if(logger.isDebuggingFinest()) {
+          logger.debugFinest("Candidate: " + sx + "," + sy + " - " + ex + "," + ey + ": " + avw + "x" + avh + " " + inc);
+        }
         if(inc < bestinc) {
           bestinc = inc;
           bestsx = sx;
@@ -251,7 +257,9 @@ public class RectangleArranger<T> {
       }
       assert assertConsistent();
     }
-    logger.debugFinest("Best: " + bestsx + "," + bestsy + " - " + bestex + "," + bestey + " inc: " + bestwi + "x" + besthi + " " + bestinc);
+    if(logger.isDebuggingFinest()) {
+      logger.debugFinest("Best: " + bestsx + "," + bestsy + " - " + bestex + "," + bestey + " inc: " + bestwi + "x" + besthi + " " + bestinc);
+    }
     // Need to increase the total area
     if(bestinc > 0) {
       assert (bestex == cols - 1 || bestey == rows - 1);
@@ -302,25 +310,29 @@ public class RectangleArranger<T> {
   }
 
   protected void splitRow(int bestey, double besthi) {
-    assert(bestey < heights.size());
-    if (heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
+    assert (bestey < heights.size());
+    if(heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
       return;
     }
-    logger.debugFine("Split row " + bestey);
-    heights.add(bestey + 1, besthi);
+    if(logger.isDebuggingFine()) {
+      logger.debugFine("Split row " + bestey);
+    }
+    heights.insert(bestey + 1, besthi);
     heights.set(bestey, heights.get(bestey) - besthi);
     // Update used map
     usage.add(bestey + 1, new ArrayList<Object>(usage.get(bestey)));
   }
 
   protected void splitCol(int bestex, double bestwi) {
-    assert(bestex < widths.size());
-    if (widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
+    assert (bestex < widths.size());
+    if(widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
       return;
     }
     final int rows = heights.size();
-    logger.debugFine("Split column " + bestex);
-    widths.add(bestex + 1, bestwi);
+    if(logger.isDebuggingFine()) {
+      logger.debugFine("Split column " + bestex);
+    }
+    widths.insert(bestex + 1, bestwi);
     widths.set(bestex, widths.get(bestex) - bestwi);
     // Update used map
     for(int y = 0; y < rows; y++) {
@@ -332,9 +344,11 @@ public class RectangleArranger<T> {
   private void resize(double inc) {
     final int cols = widths.size();
     final int rows = heights.size();
-    logger.debugFine("Resize by " + inc + "x" + (inc / ratio));
-    if(logger.isDebuggingFinest()) {
-      logSizes();
+    if(logger.isDebuggingFine()) {
+      logger.debugFine("Resize by " + inc + "x" + (inc / ratio));
+      if(logger.isDebuggingFinest()) {
+        logSizes();
+      }
     }
     // TODO: if the last row or column is empty, we can do this simpler
     widths.add(inc);
@@ -379,7 +393,7 @@ public class RectangleArranger<T> {
     {
       double wsum = 0.0;
       for(int x = 0; x < cols; x++) {
-        assert (widths.get(x) > 0) : "Non-positive width: "+widths.get(x);
+        assert (widths.get(x) > 0) : "Non-positive width: " + widths.get(x);
         wsum += widths.get(x);
       }
       assert (Math.abs(wsum - twidth) < 1E-10);
@@ -387,7 +401,7 @@ public class RectangleArranger<T> {
     {
       double hsum = 0.0;
       for(int y = 0; y < rows; y++) {
-        assert (heights.get(y) > 0) : "Non-positive height: "+heights.get(y);
+        assert (heights.get(y) > 0) : "Non-positive height: " + heights.get(y);
         hsum += heights.get(y);
       }
       assert (Math.abs(hsum - theight) < 1E-10);
