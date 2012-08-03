@@ -186,9 +186,13 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
 
   /**
    * Recompute the layout of visualizations.
+   * 
+   * @param width Initial width
+   * @param height Initial height
+   * @return Arrangement
    */
-  private void arrangeVisualizations() {
-    RectangleArranger<PlotItem> plotmap = new RectangleArranger<PlotItem>(ratio);
+  private RectangleArranger<PlotItem> arrangeVisualizations(double width, double height) {
+    RectangleArranger<PlotItem> plotmap = new RectangleArranger<PlotItem>(width, height);
 
     ArrayList<Projector> projectors = ResultUtil.filterResults(context.getResult(), Projector.class);
     // Rectangle layout
@@ -221,7 +225,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         plotmap.put(it.w, it.h, it);
       }
     }
-    this.plotmap = plotmap;
+    return plotmap;
   }
 
   /**
@@ -229,7 +233,13 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    */
   private void reinitialize() {
     setupHoverer();
-    arrangeVisualizations();
+    plotmap = arrangeVisualizations(ratio, 1.0);
+    double s = plotmap.relativeFill();
+    if(s < 0.9) {
+      // Retry, sometimes this yields better results
+      plotmap = arrangeVisualizations(plotmap.getWidth() * s, plotmap.getHeight() * s);
+    }
+
     recalcViewbox();
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
     // TODO: cancel pending thumbnail requests!
@@ -322,7 +332,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         LoggingUtil.warning("Visualization returned empty layer: " + vis);
       }
       else {
-        if (VisualizerUtil.isNoExport(task)) {
+        if(VisualizerUtil.isNoExport(task)) {
           vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
         }
         parent.appendChild(vis.getLayer());
