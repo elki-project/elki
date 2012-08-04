@@ -139,6 +139,8 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
           // Add axis label
           Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
           SVGUtil.setCSSClass(text, AXIS_LABEL);
+          SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_LENGTH_ATTRIBUTE, getAxisSep() * 0.95);
+          SVGUtil.setAtt(text, SVGConstants.SVG_LENGTH_ADJUST_ATTRIBUTE, SVGConstants.SVG_SPACING_AND_GLYPHS_VALUE);
           layer.appendChild(text);
           // TODO: Split into background + clickable layer.
           Element button = svgp.svgRect(axisX - getAxisSep() * .475, -getMarginTop(), .95 * getAxisSep(), .5 * getMarginTop());
