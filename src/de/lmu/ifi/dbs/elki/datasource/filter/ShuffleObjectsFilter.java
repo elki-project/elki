@@ -47,17 +47,17 @@ public class ShuffleObjectsFilter implements ObjectFilter {
 
   /**
    * Optional parameter to specify a seed for randomly shuffling the rows of the
-   * database. If unused, no shuffling will be performed. Shuffling takes time
+   * database. If not set, a random seed will be used. Shuffling takes time
    * linearly dependent from the size of the database.
    * <p>
    * Key: {@code -shuffle.seed}
    * </p>
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, no shuffling will be performed.");
+  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
 
   /**
-   * Seed for randomly shuffling the rows of the database. If null, no shuffling
-   * will be performed. Shuffling takes time linearly dependent from the size of
+   * Seed for randomly shuffling the rows of the database. If not set, a random
+   * seed will be used. Shuffling takes time linearly dependent from the size of
    * the database.
    */
   final Long seed;
