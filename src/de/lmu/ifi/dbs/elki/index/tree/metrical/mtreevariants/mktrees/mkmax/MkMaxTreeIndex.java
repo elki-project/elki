@@ -38,8 +38,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
@@ -52,8 +51,24 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQue
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
+/**
+ * MkMax tree
+ * 
+ * @author Elke Achtert
+ *
+ * @param <O> Object type
+ * @param <D> Distance type
+ */
 public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+  /**
+   * Relation indexed.
+   */
   private Relation<O> relation;
+  
+  /**
+   * kNN query used internally
+   */
+  private KNNQuery<O, D> knnq;
 
   /**
    * Constructor.
@@ -67,6 +82,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
     super(pagefile, distanceQuery, distanceFunction, k_max);
     this.relation = relation;
+    this.knnq = getKNNQuery(distanceQuery); 
     this.initialize();
   }
 
@@ -74,9 +90,8 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * @return a new MkMaxLeafEntry representing the specified data object
    */
   protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    KNNHeap<D> knnList = KNNUtil.newHeap(distanceFunction, getKmax() - 1);
-    doKNNQuery(id, knnList);
-    D knnDistance = knnList.getKNNDistance();
+    KNNResult<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
+    D knnDistance = knns.getKNNDistance();
     return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);
   }
 

@@ -107,7 +107,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * 
    * @return the distance factory used
    */
-  protected final D getDistanceFactory() {
+  public final D getDistanceFactory() {
     return distanceFunction.getDistanceFactory();
   }
 
@@ -245,7 +245,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * 
    * @param q the id of the query object
    * @param knnList the query result list
+   * 
+   * @deprecated kNN queries have been split out to separate query classes - use
+   *             these instead!
    */
+  @Deprecated
   protected final void doKNNQuery(DBID q, KNNHeap<D> knnList) {
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<GenericMTreeDistanceSearchCandidate<D>>();
 
@@ -253,11 +257,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceFactory().nullDistance(), getRootID(), null));
     D d_k = knnList.getKNNDistance();
 
-    if (d_k == null) {
+    if(d_k == null) {
       // Empty tree?
       return;
     }
-    
+
     // search in tree
     while(!pq.isEmpty()) {
       GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
@@ -380,7 +384,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         E p = node.getEntry(i);
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           DBID q = DBIDUtil.deref(iter);
           KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
@@ -396,7 +400,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids);
       for(DistanceEntry<D, E> distEntry : entries) {
         D minDist = distEntry.getDistance();
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           DBID q = DBIDUtil.deref(iter);
           KNNHeap<D> knns_q = knnLists.get(q);
           D knn_q_maxDist = knns_q.getKNNDistance();
@@ -452,7 +456,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       D radius = entry.getCoveringRadius();
 
       D minMinDist = getDistanceFactory().infiniteDistance();
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         D distance = distanceQuery.distance(entry.getRoutingObjectID(), iter);
         D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
         minMinDist = DistanceUtil.max(minMinDist, minDist);
@@ -476,20 +480,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       return getDistanceFactory().undefinedDistance();
     }
     return distanceQuery.distance(id1, id2);
-  }
-
-  /**
-   * Returns the distance between the given object and the id.
-   * 
-   * @param id1 the first id
-   * @param o2 the second object
-   * @return the distance between the two specified objects
-   */
-  protected final D distance(DBID id1, O o2) {
-    if(id1 == null) {
-      return getDistanceFactory().undefinedDistance();
-    }
-    return distanceQuery.distance(id1, o2);
   }
 
   /**
@@ -534,32 +524,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     return new SplitResult(split, newNode);
   }
-
-  /**
-   * Sorts the entries of the specified node according to their minimum distance
-   * to the specified objects.
-   * 
-   * @param node the node
-   * @param ids the ids of the objects
-   * @return a list of the sorted entries
-   */
-  // FIXME: Duplicate from above?
-  /*
-   * private List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
-   * List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
-   * 
-   * for(int i = 0; i < node.getNumEntries(); i++) { E entry = node.getEntry(i);
-   * 
-   * D minMinDist = distanceFunction.infiniteDistance(); for(DBID q : ids) { D
-   * distance = distance(entry.getRoutingObjectID(), q); D minDist =
-   * entry.getCoveringRadius().compareTo(distance) > 0 ?
-   * distanceFunction.nullDistance() :
-   * distance.minus(entry.getCoveringRadius()); if(minDist.compareTo(minMinDist)
-   * < 0) { minMinDist = minDist; } } result.add(new DistanceEntry<D, E>(entry,
-   * minMinDist, i)); }
-   * 
-   * Collections.sort(result); return result; }
-   */
 
   /**
    * Adjusts the tree after insertion of some nodes.
