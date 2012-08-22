@@ -426,7 +426,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       D distance = distance(entry.getRoutingObjectID(), q);
-      D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
+      D radius = entry.getCoveringRadius();
+      D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
 
       result.add(new DistanceEntry<D, E>(entry, minDist, i));
     }
@@ -448,11 +449,12 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
+      D radius = entry.getCoveringRadius();
 
       D minMinDist = getDistanceFactory().infiniteDistance();
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        D distance = distanceQuery.distance(entry.getRoutingObjectID(), DBIDUtil.deref(iter));
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
+        D distance = distanceQuery.distance(entry.getRoutingObjectID(), iter);
+        D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
         minMinDist = DistanceUtil.max(minMinDist, minDist);
       }
       result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
