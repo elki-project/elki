@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -145,7 +145,7 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
     }
     AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MetricalIndexKNNQuery<O, S>(idx, dq);
+    return MTreeQueryUtil.getKNNQuery(idx, dq, hints);
   }
 
   @SuppressWarnings("unchecked")
