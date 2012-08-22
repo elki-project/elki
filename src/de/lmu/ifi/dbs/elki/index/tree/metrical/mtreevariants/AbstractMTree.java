@@ -455,7 +455,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       E entry = node.getEntry(i);
       D radius = entry.getCoveringRadius();
 
-      D minMinDist = getDistanceFactory().infiniteDistance();
+      D minMinDist = getDistanceFactory().nullDistance();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         D distance = distanceQuery.distance(entry.getRoutingObjectID(), iter);
         D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
