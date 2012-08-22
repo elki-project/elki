@@ -67,6 +67,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
    * 
    * @param index Index to use
    * @param distanceQuery Distance query used
+   * @param distf Distance function
    */
   public DoubleDistanceMetricalIndexKNNQuery(AbstractMTree<O, DoubleDistance, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, PrimitiveDoubleDistanceFunction<? super O> distf) {
     super(distanceQuery);
