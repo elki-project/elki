@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.DoubleDistanceMetricalIndexKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MetricalIndexRangeQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.DoubleDistanceMetricalIndexRangeQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.DoubleDistanceRStarTreeRangeQuery;
@@ -114,7 +114,7 @@ public class TestIndexStructures implements JUnit4Test {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(StaticArrayDatabase.INDEX_ID, MTreeFactory.class);
     metparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 100);
-    testFileBasedDatabaseConnection(metparams, DoubleDistanceMetricalIndexKNNQuery.class, MetricalIndexRangeQuery.class);
+    testFileBasedDatabaseConnection(metparams, DoubleDistanceMetricalIndexKNNQuery.class, DoubleDistanceMetricalIndexRangeQuery.class);
   }
 
   /**
