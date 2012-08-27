@@ -182,12 +182,13 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public int getDimForVisibleAxis(int pos) {
     for(int i = 0; i < scales.length; i++) {
-      if (isAxisVisible(i)) {
-        if (pos == 0) {
-          return dimOrder[i];
-        }
-        pos--;
+      if (isDimHidden(dimOrder[i])) {
+        continue;
       }
+      if (pos == 0) {
+        return dimOrder[i];
+      }
+      pos--;
     }
     return -1;
   }

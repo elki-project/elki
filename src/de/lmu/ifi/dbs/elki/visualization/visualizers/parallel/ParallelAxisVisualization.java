@@ -123,12 +123,15 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       addCSSClasses(svgp);
-      final int dim = proj.getVisibleDimensions();
+      final int dim = proj.getInputDimensionality();
       try {
-        for(int i = 0; i < dim; i++) {
-          final int truedim = proj.getDimForVisibleAxis(i);
-          final double axisX = getVisibleAxisX(i);
-          if(!proj.isAxisInverted(i)) {
+        for(int i = 0, vdim = 0; i < dim; i++) {
+          if(!proj.isAxisVisible(i)) {
+            continue;
+          }
+          final int truedim = proj.getDimForVisibleAxis(vdim);
+          final double axisX = getVisibleAxisX(vdim);
+          if(!proj.isAxisInverted(vdim)) {
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
           }
           else {
@@ -147,6 +150,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
           SVGUtil.setCSSClass(button, INVERTEDAXIS);
           addEventListener(button, truedim);
           layer.appendChild(button);
+          vdim++;
         }
       }
       catch(CSSNamingConflict e) {
