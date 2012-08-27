@@ -65,7 +65,7 @@ public class SelectionAxisVisibility extends AbstractParallelVisualization<Numbe
 
   double hbs = bhs / 2.;
 
-  double ypos = getSizeY() + getMarginTop() * 1.5 + hs / 8;
+  double ypos = getSizeY() + getMarginTop() * .5 + hs / 8;
 
   /**
    * Constructor.
@@ -89,7 +89,7 @@ public class SelectionAxisVisibility extends AbstractParallelVisualization<Numbe
     addCSSClasses(svgp);
     int dim = DatabaseUtil.dimensionality(relation);
 
-    Element back = svgp.svgRect(-hs / 2, getSizeY() + getMarginTop() * 1.5, getSizeX() + hs, hs);
+    Element back = svgp.svgRect(-hs / 2, ypos, getSizeX() + hs, hs);
     SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
     layer.appendChild(back);
 
