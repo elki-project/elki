@@ -24,6 +24,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.histogram.ColoredHistogramVisualiz
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.LineVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.ParallelAxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AxisVisibilityVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AxisReorderVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterParallelMeanVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster.ClusterOutlineVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index.RTreeParallelVisualization

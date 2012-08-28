@@ -80,7 +80,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector<?, ?
     this.proj = task.getProj();
     this.relation = task.getRelation();
     
-    margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.2 * StyleLibrary.SCALE };
+    margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE };
     double ratio = (task.width * StyleLibrary.SCALE - margins[0] - margins[2]) / (task.height * StyleLibrary.SCALE - margins[1] - margins[3]);
     size = new double[] { ratio * StyleLibrary.SCALE, StyleLibrary.SCALE };
     recalcAxisPositions();
