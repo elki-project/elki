@@ -14,6 +14,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipStringVisualiza
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ToolBox2DVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ReferencePointsVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density.DensityEstimationOverlay
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.DistanceFunctionVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.MoveObjectsToolVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionDotVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionConvexHullVisualization
