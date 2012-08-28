@@ -1,4 +1,4 @@
-package experimentalcode.students.roedler.parallelCoordinates.visualizer;
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
 
 /*
  This file is part of ELKI:
@@ -44,31 +44,26 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
- * interactive SVG-Element for selecting visible axis.
+ * Interactive SVG-Elements for reordering the axes.
  * 
  * @author Robert Rödler
- */
-/**
- * Factory for dimension selection visualizer
- * 
- * @author RobertRödler
+ * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses DimensionOrderVisualization oneway - - «create»
+ * @apiviz.uses Instance oneway - - «create»
  */
-public class DimensionOrderVisualization extends AbstractVisFactory {
+public class AxisReorderVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Selection Dimension Order";
+  private static final String NAME = "Dimension Ordering Tool";
 
   /**
    * Constructor, adhering to
    */
-  public DimensionOrderVisualization() {
+  public AxisReorderVisualization() {
     super();
   }
 
@@ -89,12 +84,12 @@ public class DimensionOrderVisualization extends AbstractVisFactory {
     }
   }
 
-  @Override
-  public boolean allowThumbnails(VisualizationTask task) {
-    // Don't use thumbnails
-    return false;
-  }
-
+  /**
+   * Instance for a particular plot.
+   * 
+   * @author Robert Rödler
+   * @author Erich Schubert
+   */
   public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
@@ -134,55 +129,48 @@ public class DimensionOrderVisualization extends AbstractVisFactory {
     }
 
     @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
-    @Override
     protected void redraw() {
       addCSSClasses(svgp);
       final int dim = proj.getVisibleDimensions();
 
-      final double as = getSizeY() / 70.;
-      final double bs = as * 1.5;
-      final double hbs = bs / 2.;
-      final double qas = as / 4.;
-      final double ypos = getSizeY() + getMarginTop() * 1.5;
-      final double dist = 2.5 * as;
+      final double controlsize = 0.025 * getSizeY();
+      final double buttonsize = 0.75 * controlsize;
+      final double padding = 0.125 * controlsize;
+      final double arrowsize = .75 * buttonsize;
+      final double ypos = getSizeY() + getMarginTop() * .5 + controlsize;
+      final double spacing = 0.9 * controlsize;
 
-      Element back = svgp.svgRect(0.0, ypos, getSizeX(), getSizeY() / 35.);
+      Element back = svgp.svgRect(-controlsize / 2, ypos, getSizeX() + controlsize, controlsize);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
 
       if(selecteddim < 0) {
+        // Nothing selected
         for(int i = 0; i < dim; i++) {
+          final double xpos = getVisibleAxisX(i);
           if(i > 0) {
-            int j = 0;
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.LEFT, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.LEFT, xpos - spacing, ypos + controlsize / 2, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+            Element button = svgp.svgRect(xpos - spacing - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.LEFT);
             layer.appendChild(button);
           }
           {
-            int j = 1;
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, xpos, ypos + controlsize / 2, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+            Element button = svgp.svgRect(xpos - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.DOWN);
             layer.appendChild(button);
           }
           if(i < dim - 1) {
-            int j = 2;
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.RIGHT, (getVisibleAxisX(i) - dist) + j * dist, ypos + as, as);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.RIGHT, xpos + spacing, ypos + controlsize / 2, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect((getVisibleAxisX(i) - (dist + hbs)) + j * dist, ypos + qas, bs, bs);
+            Element button = svgp.svgRect(xpos + spacing - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.RIGHT);
             layer.appendChild(button);
@@ -192,19 +180,19 @@ public class DimensionOrderVisualization extends AbstractVisFactory {
       else {
         for(int i = 0; i < dim; i++) {
           {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, getVisibleAxisX(i), ypos + as, as);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, getVisibleAxisX(i), ypos + controlsize / 2, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(getVisibleAxisX(i) - hbs, ypos + qas, bs, bs);
+            Element button = svgp.svgRect(getVisibleAxisX(i) - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.DOWN);
             layer.appendChild(button);
           }
           if(i > 0.) {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.UP, getVisibleAxisX(i - .5), ypos + as, as);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.UP, getVisibleAxisX(i - .5), ypos + controlsize / 2, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(getVisibleAxisX(i - .5) - hbs, ypos + qas, bs, bs);
+            Element button = svgp.svgRect(getVisibleAxisX(i - .5) - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.UP);
             layer.appendChild(button);
@@ -224,34 +212,43 @@ public class DimensionOrderVisualization extends AbstractVisFactory {
       targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
         @Override
         public void handleEvent(Event evt) {
-          if(j == SVGArrow.Direction.DOWN) {
-            selecteddim = i;
-          }
-          if(j == SVGArrow.Direction.DOWN || j == SVGArrow.Direction.UP) {
-            if(j == SVGArrow.Direction.DOWN) {
-              proj.swapAxes(selecteddim, i);
-            }
-            else {
-              if(selecteddim != i) {
-                proj.moveAxis(selecteddim, i);
-              }
-            }
-            selecteddim = -1;
-          }
-          if(j == SVGArrow.Direction.LEFT || j == SVGArrow.Direction.RIGHT) {
-            if(j == SVGArrow.Direction.LEFT) {
+          if(selecteddim < 0) {
+            switch(j){
+            case DOWN:
+              selecteddim = i;
+              break;
+            case LEFT:
               int prev = i - 1;
               while(prev >= 0 && !proj.isAxisVisible(prev)) {
                 prev -= 1;
               }
               proj.swapAxes(i, prev);
-            }
-            else {
+              break;
+            case RIGHT:
               int next = i + 1;
               while(next < proj.getInputDimensionality() - 1 && !proj.isAxisVisible(next)) {
                 next += 1;
               }
               proj.swapAxes(i, next);
+              break;
+            default:
+              break;
+            }
+          }
+          else {
+            switch(j){
+            case DOWN:
+              proj.swapAxes(selecteddim, i);
+              selecteddim = -1;
+              break;
+            case UP:
+              if(selecteddim != i) {
+                proj.moveAxis(selecteddim, i);
+              }
+              selecteddim = -1;
+              break;
+            default:
+              break;
             }
           }
           // Notify
@@ -284,12 +281,13 @@ public class DimensionOrderVisualization extends AbstractVisFactory {
         CSSClass cls = new CSSClass(this, SDO_BUTTON);
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.01);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_GREY_VALUE);
+        cls.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
         svgp.addCSSClassOrLogError(cls);
       }
       if(!svgp.getCSSClassManager().contains(SDO_ARROW)) {
         CSSClass cls = new CSSClass(this, SDO_ARROW);
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_DARKGREY_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2.5);
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 3);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
         svgp.addCSSClassOrLogError(cls);
       }
