@@ -1,6 +1,7 @@
 package experimentalcode.students.roedler.parallelCoordinates.visualizer.algorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -26,10 +27,9 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  * HSM algorithm to arrange dimensions
  * 
  * Reference: <br>
- * Andrada Tatu, Georgia Albuquerque, Martin Eisemann, Peter
- * Bak, Holger Theisel, Marcus A. Magnor, and Daniel A. Keim. Automated
- * Analytical Methods to Support Visual Exploration of High-
- * Dimensional Data. <br>
+ * Andrada Tatu, Georgia Albuquerque, Martin Eisemann, Peter Bak, Holger
+ * Theisel, Marcus A. Magnor, and Daniel A. Keim. Automated Analytical Methods
+ * to Support Visual Exploration of High- Dimensional Data. <br>
  * IEEE Trans. Vis. Comput. Graph., pages 584–597, 2011.
  * 
  * @author Robert Rödler
@@ -44,16 +44,43 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
    * the result we work on
    */
   private Clustering<Model> clustering;
-  
+
   private int sum;
-  
+
   private int mode = 2;
+
+  /**
+   * Angular resolution
+   */
+  private final static int steps;
+
+  /**
+   * Precomputed sinus and cosinus lookup tables.
+   */
+  private final static double[] cost, sint;
+
+  /**
+   * Precompute sinus and cosinus tables.
+   */
+  static {
+    steps = 180;
+    cost = new double[steps];
+    sint = new double[steps];
+    {
+      double step = Math.toRadians(360. / steps);
+      double ang = 0.;
+      for(int i = 0; i < steps; i++, ang += step) {
+        cost[i] = Math.cos(ang);
+        sint[i] = Math.sin(ang);
+      }
+    }
+  }
 
   /**
    * The Logger for this class
    */
   private static final Logging logger = Logging.getLogger(HSMDimensionOrder.class);
-  
+
   /**
    * Constructor.
    * 
@@ -71,78 +98,76 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
   }
 
   private void arrange(int par) {
-    int dim = DatabaseUtil.dimensionality(relation);
+    final int dim = DatabaseUtil.dimensionality(relation);
+    final int resolution = 500;
     Matrix hsmmat = new Matrix(dim, dim, 0.);
-    int[][] pic = new int[500][500];
-    
+    int[][] pic = new int[resolution][resolution];
+
     long start, end;
 
     DBIDs ids = null;
-    
+
     switch(par){
-      case -2: {
-        ids = context.getSelection().getSelectedIds();
-        break;
-      }
-      case -1: {
-        ids = ResultUtil.getSamplingResult(relation).getSample();
-        break;
-      }
-      default: {
-        ids = clustering.getAllClusters().get(par).getIDs();
-      }
+    case -2: {
+      ids = context.getSelection().getSelectedIds();
+      break;
+    }
+    case -1: {
+      ids = ResultUtil.getSamplingResult(relation).getSample();
+      break;
+    }
+    default: {
+      ids = clustering.getAllClusters().get(par).getIDs();
+    }
     }
     start = System.nanoTime();
-    
+
     int progress = 0;
     int max = ((dim * dim) - dim) / 2;
-    
-    for (int i = 1; i < dim; i++){
-  //    if (!proj.isAxisVisible(i - 1)) { 
-  //      continue; 
-  //    }
-      
-      for (int j = i + 1; j <= dim; j++){
-  //      if (!proj.isAxisVisible(j - 1)) { continue; }
-        
-        for (int m = 0; m < 500; m++){
-          for(int n = 0; n < 500; n++){
-            pic[m][n] = 0;
-          }
+
+    for(int i = 1; i < dim; i++) {
+      // if (!proj.isAxisVisible(i - 1)) {
+      // continue;
+      // }
+
+      for(int j = i + 1; j <= dim; j++) {
+        // if (!proj.isAxisVisible(j - 1)) { continue; }
+
+        for(int m = 0; m < resolution; m++) {
+          Arrays.fill(pic[m], 0);
         }
-        
+
         for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-          double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(id));
-          line(0, (int)(5. * yPos[i-1]), 499, (int)(5. * yPos[j-1]), pic);
+          NumberVector<?, ?> obj = relation.get(id);
+          double xi = proj.getAxisScale(i - 1).getScaled(obj.doubleValue(i));
+          double xj = proj.getAxisScale(j - 1).getScaled(obj.doubleValue(j));
+          drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pic);
         }
-        
+
         int[][] hough = houghTransformation(pic);
-        
-        double median;
-        
-        median = (double)sum / (double)(hough[0].length * hough.length);
-        
+
+        double median = (double) sum / (double) (hough[0].length * hough.length);
         double bigCells = (double) sumMatrix(splitMatrixIntoCells(hough, mode, median));
-        
+
         hsmmat.set(i - 1, j - 1, 1. - (bigCells / 2500.));
         hsmmat.set(j - 1, i - 1, 1. - (bigCells / 2500.));
-        
-        if (logger.isVerbose()){
+
+        if(logger.isVerbose()) {
           progress++;
           logger.verbose("HSM Progress " + progress + " von " + max);
         }
-        else{
+        else {
           progress++;
           System.out.println("HSM Progress " + progress + " von " + max);
         }
       }
     }
     end = System.nanoTime();
-    
-    if (logger.isVerbose()){
-      logger.verbose("Runtime HSMDimensionOrder: " + (end - start)/1000000. + " ms for a dataset with " + ids.size() + " objects and " + dim + " dimensions");
+
+    if(logger.isVerbose()) {
+      logger.verbose("Runtime HSMDimensionOrder: " + (end - start) / 1000000. + " ms for a dataset with " + ids.size() + " objects and " + dim + " dimensions");
     }
-    
+
     ArrayList<Integer> arrange = new ArrayList<Integer>();
 
     int[] first = getMax(hsmmat);
@@ -170,7 +195,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         pos[1] = tmp2;
       }
     }
-    
+
     for(int i = 0; i < arrange.size(); i++) {
       System.out.print("" + arrange.get(i) + "  ");
     }
@@ -178,44 +203,42 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
     for(int i = 0; i < dim; i++) {
       proj.moveAxis(proj.getAxisForDim(arrange.get(i)), i);
     }
-    
+
     context.getHierarchy().resultChanged(proj);
   }
-  
-  private int sumMatrix(int[][] mat){
+
+  private int sumMatrix(int[][] mat) {
     int ret = 0;
-    for (int i = 0; i < mat[0].length; i++){
-      for (int j = 0; j < mat.length; j++){
-        if (mat[i][j] == 1){
+    for(int i = 0; i < mat[0].length; i++) {
+      for(int j = 0; j < mat.length; j++) {
+        if(mat[i][j] == 1) {
           ret++;
         }
       }
     }
     return ret;
   }
-  
-  private int[][] splitMatrixIntoCells(int[][] mat, int mode, double median){
-    
+
+  private int[][] splitMatrixIntoCells(int[][] mat, int mode, double median) {
     int[][] ret = new int[50][50];
-   
+
     double stepX = mat[0].length / 50.;
     double stepY = mat.length / 50.;
-    
-    for (int i = 0; i < 50; i++){
-      for (int j = 0; j < 50; j++){
+
+    for(int i = 0; i < 50; i++) {
+      for(int j = 0; j < 50; j++) {
         ret[i][j] = 0;
         double sum = 0.;
         int cells = 0;
         boolean bigger = true;
-        
-        for (int k = (int)(i * stepY); k < (int)((i + 1) * stepY); k++){
-          for (int l = (int) (j * stepX); l < (int)((j + 1) * stepX); l++){
-            
-            if (mode == 1 && mat[k][l] > median){
+
+        for(int k = (int) (i * stepY); k < (int) ((i + 1) * stepY); k++) {
+          for(int l = (int) (j * stepX); l < (int) ((j + 1) * stepX); l++) {
+            if(mode == 1 && mat[k][l] > median) {
               ret[i][j] = 1;
               break;
             }
-            if (mode == 2 && mat[k][l] <= median){
+            if(mode == 2 && mat[k][l] <= median) {
               bigger = false;
               break;
             }
@@ -223,73 +246,75 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
             cells++;
           }
         }
-        if (mode == 2 && bigger){
+        if(mode == 2 && bigger) {
           ret[i][j] = 1;
         }
-        if (mode == 3 && ((sum /(double)cells) > median)){
+        if(mode == 3 && ((sum / (double) cells) > median)) {
           ret[i][j] = 1;
         }
-      }
-    } 
-    return ret;
-  }
-  
-  private int[][] houghTransformation(int[][] mat){
-    
-    double theta;
-    int d;
-    //int max = (int) Math.sqrt(Math.pow((double) mat.getRowDimensionality() / 2., 2.) + Math.pow((double) mat.getColumnDimensionality() / 2., 2.));
-    int max = (int) Math.sqrt(Math.pow((double) mat.length, 2.) + Math.pow((double) mat[0].length, 2.));
-    
-    int[][] ret = new int[max][180];
-    for(int i = 0; i < ret.length; i++){
-      for(int j = 0; j < ret[0].length; j++){
-        ret[i][j] = 0;
       }
     }
-    
+    return ret;
+  }
+
+  private int[][] houghTransformation(int[][] mat) {
+
+    // int max = (int) Math.sqrt(Math.pow((double) mat.getRowDimensionality() /
+    // 2., 2.) + Math.pow((double) mat.getColumnDimensionality() / 2., 2.));
+    final int max = (int) Math.sqrt(Math.pow((double) mat.length, 2.) + Math.pow((double) mat[0].length, 2.));
+
+    int[][] ret = new int[max][steps];
+    for(int i = 0; i < ret.length; i++) {
+      Arrays.fill(ret[0], 0);
+    }
+
     sum = 0;
-    
-    for (int x = 0; x < mat.length; x++){
-      
-      for (int y = 0; y < mat[0].length; y++){
-       
-        if (mat[x][y] > 0){
-          
-          for (int ang = 0; ang < 180; ang+=2){
-            
-            theta = Math.toRadians(ang);
-            
-            d = (int)(x * Math.cos(theta) + y * Math.sin(theta));
-            
-            if (d > 0 && d < max){
-              ret[d][ang/2]++;
-              sum++;
+
+    for(int x = 0; x < mat.length; x++) {
+      for(int y = 0; y < mat[0].length; y++) {
+        if(mat[x][y] > 0) {
+          for(int i = 0; i < steps; i++) {
+            final int d = (int) (x * cost[i] + y * sint[i]);
+
+            if(d > 0 && d < max) {
+              ret[d][i] += mat[x][y];
+              sum += mat[x][y];
             }
           }
         }
       }
     }
-    
+
     return ret;
   }
-  
-  //Bresenham algorithm, copied from Wikipedia
-  private void line(int x0, int y0, int x1, int y1, int[][] pic)
-  {
-    if(y0 == 500){y0--;}
-    if(y1 == 500){y1--;}
-    int dx =  Math.abs(x1-x0), sx = x0<x1 ? 1 : -1;
-    int dy = -Math.abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-    int err = dx+dy, e2; 
-   
-    for(;;) { 
+
+  // Bresenham algorithm, copied from Wikipedia
+  private static void drawLine(int x0, int y0, int x1, int y1, int[][] pic) {
+    if(y0 == pic[0].length) {
+      y0--;
+    }
+    if(y1 == pic[0].length) {
+      y1--;
+    }
+    int dx = +Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    int dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy;
+
+    for(;;) {
       pic[x0][y0] = 1;
-      if (x0==x1 && y0==y1) break;
-      
-      e2 = 2*err;
-      if (e2 > dy) { err += dy; x0 += sx; } 
-      if (e2 < dx) { err += dx; y0 += sy; } 
+      if(x0 == x1 && y0 == y1) {
+        break;
+      }
+
+      final int e2 = err << 1;
+      if(e2 > dy) {
+        err += dy;
+        x0 += sx;
+      }
+      if(e2 < dx) {
+        err += dx;
+        y0 += sy;
+      }
     }
   }
 
@@ -321,7 +346,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         pos = i;
       }
     }
-    
+
     return pos;
   }
 
@@ -334,7 +359,6 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
   @Override
   public SubMenu getMenu() {
     SubMenu myMenu = new SubMenu(CLUSTERORDER, this);
-
     myMenu.addItem("arrange", Integer.toString(-1));
 
     int clus = clustering.getAllClusters().size();
@@ -401,4 +425,3 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
     }
   }
 }
-
