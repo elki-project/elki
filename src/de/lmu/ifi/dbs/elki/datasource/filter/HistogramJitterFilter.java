@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.datasource.filter;
 
 /*
  This file is part of ELKI:
@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -39,10 +39,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 /**
  * Add Jitter, preserving the histogram properties (same sum, nonnegative).
  * 
+ * For each vector, the total sum of all dimensions is computed.<br />
+ * Then <code>jitter * totalsum * random[0:1]</code> is added to each dimension<br />
+ * Finally, the vector is rescaled to have the original total sum.
+ * 
+ * This is designed to degrade the quality of a histogram, while preserving the
+ * total sum (e.g. to keep the normalization). The factor "jitter" can be used
+ * to control the degradation amount.
+ * 
+ * Note that the jitter amount added is uniform for this filter.
+ * 
  * @author Erich Schubert
  * 
  * @param <V> Vector type
  */
+@Description("Add uniform Jitter to a dataset, while preserving the total vector sum.")
 public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends AbstractStreamConversionFilter<V, V> {
   /**
    * Jitter amount
@@ -82,8 +93,9 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
       nsum += raw[i];
     }
     // Rescale to have the original sum back.
+    final double s = osum / nsum;
     for(int i = 0; i < raw.length; i++) {
-      raw[i] *= osum / nsum;
+      raw[i] *= s;
     }
     return obj.newNumberVector(raw);
   }
