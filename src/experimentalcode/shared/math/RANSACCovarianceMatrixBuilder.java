@@ -1,4 +1,4 @@
-package experimentalcode.erich.pca;
+package experimentalcode.shared.math;
 
 /*
  This file is part of ELKI:
