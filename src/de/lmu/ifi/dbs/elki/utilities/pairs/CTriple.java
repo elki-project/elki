@@ -103,18 +103,4 @@ public final class CTriple<FIRST extends Comparable<? super FIRST>, SECOND exten
     }
     return 0;
   }
-
-  /**
-   * Array constructor for generics
-   * 
-   * @param <F> First type
-   * @param <S> Second type
-   * @param <T> Third type
-   * @param size Size of array to be constructed.
-   * @return New array of requested size
-   */
-  public static final <F extends Comparable<F>, S extends Comparable<S>, T extends Comparable<T>> CTriple<F, S, T>[] newArray(int size) {
-    Class<CTriple<F, S, T>> tripcls = ClassGenericsUtil.uglyCastIntoSubclass(CTriple.class);
-    return ClassGenericsUtil.newArrayOfNull(size, tripcls);
-  }
 }
