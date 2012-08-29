@@ -3,7 +3,6 @@ de.lmu.ifi.dbs.elki.data.BitVector
 de.lmu.ifi.dbs.elki.data.FloatVector
 de.lmu.ifi.dbs.elki.data.IntegerVector
 de.lmu.ifi.dbs.elki.data.OneDimensionalDoubleVector
-de.lmu.ifi.dbs.elki.data.ParameterizationFunction
 de.lmu.ifi.dbs.elki.data.SparseFloatVector
 de.lmu.ifi.dbs.elki.data.SparseDoubleVector
 # de.lmu.ifi.dbs.elki.math.linearalgebra.Vector

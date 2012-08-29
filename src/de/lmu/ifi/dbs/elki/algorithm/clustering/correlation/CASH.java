@@ -31,11 +31,12 @@ import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHInterval;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.ParameterizationFunction;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationAnalysisSolution;
 import de.lmu.ifi.dbs.elki.data.model.LinearEquationModel;
@@ -65,7 +66,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.IntegerPriorityObject;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -86,10 +86,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Provides the CASH algorithm, an subspace clustering algorithm based on the
  * Hough transform.
  * 
- * <b>Note:</b> CASH requires explicitly setting the input vector type to
- * {@link ParameterizationFunction}:
- * (in the MiniGui, set option: parser.vector-type ParameterizationFunction).
- * 
  * <p>
  * Reference: E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek: Robust
  * clustering in arbitrarily oriented subspaces. <br>
@@ -106,7 +102,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the Hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
-public class CASH extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -225,49 +221,59 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param relation Relation
    * @return Clustering result
    */
-  public Clustering<Model> run(Database database, Relation<ParameterizationFunction> relation) {
-    this.fulldatabase = relation;
+  public Clustering<Model> run(Database database, Relation<V> vrel) {
+    this.fulldatabase = preprocess(database, vrel);
     if(logger.isVerbose()) {
       StringBuffer msg = new StringBuffer();
-      msg.append("DB size: ").append(relation.size());
+      msg.append("DB size: ").append(fulldatabase.size());
       msg.append("\nmin Dim: ").append(minDim);
       logger.verbose(msg.toString());
     }
 
-    try {
-      processedIDs = DBIDUtil.newHashSet(relation.size());
-      noiseDim = DatabaseUtil.dimensionality(relation);
+    processedIDs = DBIDUtil.newHashSet(fulldatabase.size());
+    noiseDim = dimensionality(fulldatabase);
 
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", relation.size(), logger) : null;
-      Clustering<Model> result = doRun(relation, progress);
-      if(progress != null) {
-        progress.ensureCompleted(logger);
-      }
+    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", fulldatabase.size(), logger) : null;
+    Clustering<Model> result = doRun(fulldatabase, progress);
+    if(progress != null) {
+      progress.ensureCompleted(logger);
+    }
 
-      if(logger.isVerbose()) {
-        StringBuffer msg = new StringBuffer();
-        for(Cluster<Model> c : result.getAllClusters()) {
-          if(c.getModel() instanceof LinearEquationModel) {
-            LinearEquationModel s = (LinearEquationModel) c.getModel();
-            msg.append("\n Cluster: Dim: " + s.getLes().subspacedim() + " size: " + c.size());
-          }
-          else {
-            msg.append("\n Cluster: " + c.getModel().getClass().getName() + " size: " + c.size());
-          }
+    if(logger.isVerbose()) {
+      StringBuffer msg = new StringBuffer();
+      for(Cluster<Model> c : result.getAllClusters()) {
+        if(c.getModel() instanceof LinearEquationModel) {
+          LinearEquationModel s = (LinearEquationModel) c.getModel();
+          msg.append("\n Cluster: Dim: " + s.getLes().subspacedim() + " size: " + c.size());
         }
-        logger.verbose(msg.toString());
+        else {
+          msg.append("\n Cluster: " + c.getModel().getClass().getName() + " size: " + c.size());
+        }
       }
-      return result;
+      logger.verbose(msg.toString());
     }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException(e);
+    return result;
+  }
+
+  /**
+   * Preprocess the dataset, precomputing the parameterization functions.
+   * 
+   * @param db Database
+   * @param vrel Vector relation
+   * @return Preprocessed relation
+   */
+  private Relation<ParameterizationFunction> preprocess(Database db, Relation<V> vrel) {
+    DBIDs ids = vrel.getDBIDs();
+    SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<ParameterizationFunction>(ParameterizationFunction.class);
+    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(db, type, ids);
+
+    // Project
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      ParameterizationFunction f = new ParameterizationFunction(vrel.get(iter));
+      prep.set(iter, f);
     }
-    catch(ParameterException e) {
-      throw new IllegalStateException(e);
-    }
-    catch(NonNumericFeaturesException e) {
-      throw new IllegalStateException(e);
-    }
+
+    return prep;
   }
 
   /**
@@ -277,15 +283,11 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param relation the Relation to run the CASH algorithm on
    * @param progress the progress object for verbose messages
    * @return a mapping of subspace dimensionalities to clusters
-   * @throws UnableToComplyException if an error according to the database
-   *         occurs
-   * @throws ParameterException if the parameter setting is wrong
-   * @throws NonNumericFeaturesException if non numeric feature vectors are used
    */
-  private Clustering<Model> doRun(Relation<ParameterizationFunction> relation, FiniteProgress progress) throws UnableToComplyException, ParameterException, NonNumericFeaturesException {
+  private Clustering<Model> doRun(Relation<ParameterizationFunction> relation, FiniteProgress progress) {
     Clustering<Model> res = new Clustering<Model>("CASH clustering", "cash-clustering");
 
-    final int dim = DatabaseUtil.dimensionality(relation);
+    final int dim = dimensionality(relation);
 
     // init heap
     Heap<IntegerPriorityObject<CASHInterval>> heap = new Heap<IntegerPriorityObject<CASHInterval>>();
@@ -410,6 +412,16 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
   }
 
   /**
+   * Get the dimensionality of a vector field.
+   * 
+   * @param relation Relation
+   * @return Dimensionality
+   */
+  private static int dimensionality(Relation<ParameterizationFunction> relation) {
+    return relation.get(relation.iterDBIDs()).getDimensionality();
+  }
+
+  /**
    * Initializes the heap with the root intervals.
    * 
    * @param heap the heap to be initialized
@@ -493,15 +505,13 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param relation the database storing the parameterization functions
    * @return a dim-1 dimensional database where the objects are projected into
    *         the specified subspace
-   * @throws UnableToComplyException if an error according to the database
-   *         occurs
    */
-  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> relation) throws UnableToComplyException {
+  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> relation) {
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    VectorFieldTypeInformation<ParameterizationFunction> type = VectorFieldTypeInformation.get(ParameterizationFunction.class, basis.getColumnDimensionality());
+    SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<ParameterizationFunction>(ParameterizationFunction.class);
     MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(proxy, type, ids);
     proxy.addRelation(prep);
-    
+
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       ParameterizationFunction f = project(basis, relation.get(iter));
@@ -527,7 +537,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
     Matrix m = f.getColumnVector().transposeTimes(basis);
-    ParameterizationFunction f_t = new ParameterizationFunction(m.getColumnPackedCopy());
+    ParameterizationFunction f_t = new ParameterizationFunction(new DoubleVector(m.getColumnPackedCopy()));
     return f_t;
   }
 
@@ -688,7 +698,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    *         occurs
    * @throws ParameterException if the parameter setting is wrong
    */
-  private Matrix runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) throws UnableToComplyException, ParameterException {
+  private Matrix runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) {
     // build database for derivator
     Database derivatorDB = buildDerivatorDB(relation, interval);
 
@@ -729,13 +739,11 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    * @param interval the interval to build the database from
    * @return a database for the derivator consisting of the ids in the specified
    *         interval
-   * @throws UnableToComplyException if an error according to the database
-   *         occurs
    */
-  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, CASHInterval interval) throws UnableToComplyException {
+  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, CASHInterval interval) {
     DBIDs ids = interval.getIDs();
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = DatabaseUtil.dimensionality(relation);
+    int dim = dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
@@ -800,7 +808,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
    */
   private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) throws UnableToComplyException {
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    int dim = DatabaseUtil.dimensionality(relation);
+    int dim = dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
@@ -816,7 +824,7 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(VectorFieldTypeInformation.get(ParameterizationFunction.class));
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override
@@ -868,8 +876,8 @@ public class CASH extends AbstractAlgorithm<Clustering<Model>> implements Cluste
     }
 
     @Override
-    protected CASH makeInstance() {
-      return new CASH(minpts, maxlevel, mindim, jitter, adjust);
+    protected CASH<NumberVector<?, ?>> makeInstance() {
+      return new CASH<NumberVector<?, ?>>(minpts, maxlevel, mindim, jitter, adjust);
     }
   }
 }

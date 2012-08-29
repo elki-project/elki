@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.data;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 
 /*
  This file is part of ELKI:
@@ -23,16 +23,11 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * A parameterization function describes all lines in a d-dimensional feature
@@ -42,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Elke Achtert
  */
-public class ParameterizationFunction extends DoubleVector implements TextWriteable {
+public class ParameterizationFunction {
   /**
    * Available types for the global extremum.
    * 
@@ -64,11 +59,6 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
   }
 
   /**
-   * Static factory
-   */
-  public static final ParameterizationFunction STATIC = new ParameterizationFunction(new double[] { 0.0 });
-
-  /**
    * A small number to handle numbers near 0 as 0.
    */
   public static final double DELTA = 1E-10;
@@ -82,48 +72,21 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    * Holds the type of the global extremum.
    */
   private ExtremumType extremumType;
+  
+  /**
+   * The actual vector
+   */
+  private NumberVector<?, ?> vec;
 
   /**
    * Provides a new parameterization function describing all lines in a
    * d-dimensional feature space intersecting in one point p.
    * 
-   * @param values the values of the point p
+   * @param vec Existing vector
    */
-  public ParameterizationFunction(double[] values) {
-    super(values);
-    determineGlobalExtremum();
-  }
-
-  /**
-   * Provides a new parameterization function describing all lines in a
-   * d-dimensional feature space intersecting in one point p.
-   * 
-   * @param values the values of the point p
-   */
-  public ParameterizationFunction(Double[] values) {
-    super(values);
-    determineGlobalExtremum();
-  }
-
-  /**
-   * Provides a new parameterization function describing all lines in a
-   * d-dimensional feature space intersecting in one point p.
-   * 
-   * @param values the values of the point p
-   */
-  public ParameterizationFunction(List<Double> values) {
-    super(values);
-    determineGlobalExtremum();
-  }
-
-  /**
-   * Provides a new parameterization function describing all lines in a
-   * d-dimensional feature space intersecting in one point p.
-   * 
-   * @param columnMatrix the values of the point p
-   */
-  public ParameterizationFunction(Vector columnMatrix) {
-    super(columnMatrix);
+  public ParameterizationFunction(NumberVector<?, ?> vec) {
+    super();
+    this.vec = vec;
     determineGlobalExtremum();
   }
 
@@ -134,7 +97,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    * @return the function value at alpha
    */
   public double function(double[] alpha) {
-    int d = getDimensionality();
+    final int d = vec.getDimensionality();
     if(alpha.length != d - 1) {
       throw new IllegalArgumentException("Parameter alpha must have a " + "dimensionality of " + (d - 1) + ", read: " + alpha.length);
     }
@@ -142,7 +105,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     double result = 0;
     for(int i = 0; i < d; i++) {
       double alpha_i = i == d - 1 ? 0 : alpha[i];
-      result += doubleValue(i + 1) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
+      result += vec.doubleValue(i + 1) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
     }
     return result;
   }
@@ -156,7 +119,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    *         in the given interval
    */
   public HyperBoundingBox determineAlphaMinMax(HyperBoundingBox interval) {
-    int dim = getDimensionality();
+    final int dim = vec.getDimensionality();
     if(interval.getDimensionality() != dim - 1) {
       throw new IllegalArgumentException("Interval needs to have dimensionality d=" + (dim - 1) + ", read: " + interval.getDimensionality());
     }
@@ -258,7 +221,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
       return ExtremumType.CONSTANT;
     }
 
-    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + getColumnVector() + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
+    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + vec.getColumnVector() + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
     // + "box min " + FormatUtil.format(interval.getMin()) + "\n"
     // + "box max " + FormatUtil.format(interval.getMax()) + "\n"
   }
@@ -435,15 +398,15 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    */
   public String toString(int offset) {
     StringBuffer result = new StringBuffer();
-    for(int d = 0; d < getDimensionality(); d++) {
+    for(int d = 0; d < vec.getDimensionality(); d++) {
       if(d != 0) {
         result.append(" + \n").append(FormatUtil.whitespace(offset));
       }
-      result.append(FormatUtil.format(doubleValue(d + 1)));
+      result.append(FormatUtil.format(vec.doubleValue(d + 1)));
       for(int j = 0; j < d; j++) {
         result.append(" * sin(a_").append(j + 1).append(")");
       }
-      if(d != getDimensionality() - 1) {
+      if(d != vec.getDimensionality() - 1) {
         result.append(" * cos(a_").append(d + 1).append(")");
       }
     }
@@ -472,11 +435,11 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    * Determines the global extremum of this parameterization function.
    */
   private void determineGlobalExtremum() {
-    alphaExtremum = new double[getDimensionality() - 1];
+    alphaExtremum = new double[vec.getDimensionality() - 1];
     for(int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
       if(Double.isNaN(alphaExtremum[n])) {
-        throw new IllegalStateException("Houston, we have a problem!" + "\n" + this + "\n" + this.getColumnVector() + "\n" + FormatUtil.format(alphaExtremum));
+        throw new IllegalStateException("Houston, we have a problem!" + "\n" + this + "\n" + vec.getColumnVector() + "\n" + FormatUtil.format(alphaExtremum));
       }
     }
 
@@ -487,7 +450,7 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    * Determines the type of the global extremum.
    */
   private void determineGlobalExtremumType() {
-    double f = function(alphaExtremum);
+    final double f = function(alphaExtremum);
 
     // create random alpha values
     double[] alpha_1 = new double[alphaExtremum.length];
@@ -513,7 +476,6 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     else {
       throw new IllegalStateException("Houston, we have a problem:" + "\n" + this + "\nextremum at " + FormatUtil.format(alphaExtremum) + "\nf  " + f + "\nf1 " + f1 + "\nf2 " + f2);
     }
-
   }
 
   /**
@@ -526,16 +488,16 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
    */
   private double extremum_alpha_n(int n, double[] alpha) {
     // arctan(infinity) = PI/2
-    if(doubleValue(n + 1) == 0) {
+    if(vec.doubleValue(n + 1) == 0) {
       return 0.5 * Math.PI;
     }
 
     double tan = 0;
-    for(int j = n + 1; j < getDimensionality(); j++) {
-      double alpha_j = j == getDimensionality() - 1 ? 0 : alpha[j];
-      tan += doubleValue(j + 1) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
+    for(int j = n + 1; j < vec.getDimensionality(); j++) {
+      double alpha_j = j == vec.getDimensionality() - 1 ? 0 : alpha[j];
+      tan += vec.doubleValue(j + 1) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
     }
-    tan /= doubleValue(n + 1);
+    tan /= vec.doubleValue(n + 1);
 
     // if (debug) {
     // debugFiner("tan alpha_" + (n + 1) + " = " + tan);
@@ -547,51 +509,21 @@ public class ParameterizationFunction extends DoubleVector implements TextWritea
     return alpha_n;
   }
 
-  @Override
-  public void writeToText(TextWriterStream out, String label) {
-    String pre = "";
-    if(label != null) {
-      pre = label + "=";
-    }
-    out.inlinePrintNoQuotes(pre + super.toString());
-  }
-
-  @Override
-  public ParameterizationFunction newNumberVector(double[] values) {
-    return new ParameterizationFunction(values);
-  }
-
-  @Override
-  public <A> ParameterizationFunction newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
-    final int dim = adapter.size(array);
-    double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = adapter.get(array, i);
-    }
-    return new ParameterizationFunction(values);
-  }
-
-  @Override
-  public <A> ParameterizationFunction newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    final int dim = adapter.size(array);
-    double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = adapter.getDouble(array, i);
-    }
-    return new ParameterizationFunction(values);
+  /**
+   * Get the actual vector used.
+   * 
+   * @return Vector, for projection
+   */
+  public Vector getColumnVector() {
+    return vec.getColumnVector();
   }
 
   /**
-   * Parameterization class
+   * Get the vector dimensionality.
    * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
+   * @return Vector dimensionality
    */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected ParameterizationFunction makeInstance() {
-      return STATIC;
-    }
+  public int getDimensionality() {
+    return vec.getDimensionality();
   }
 }
