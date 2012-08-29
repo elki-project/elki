@@ -28,10 +28,9 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.ParameterizationFunction;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -53,11 +52,8 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
    */
   @Test
   public void testCASHResults() {
-    ListParameterization inp = new ListParameterization();
-    // CASH input
-    inp.addParameter(NumberVectorLabelParser.VECTOR_TYPE_ID, ParameterizationFunction.class);
     // Input
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600, inp, null);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600, new ListParameterization(), null);
 
     // CASH parameters
     ListParameterization params = new ListParameterization();
@@ -67,7 +63,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addFlag(CASH.ADJUST_ID);
 
     // setup algorithm
-    CASH cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
+    CASH<DoubleVector> cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
     testParameterizationOk(params);
 
     // run CASH on database
@@ -85,9 +81,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
   @Test
   public void testCASHEmbedded() {
     // CASH input
-    ListParameterization inp = new ListParameterization();
-    inp.addParameter(NumberVectorLabelParser.VECTOR_TYPE_ID, ParameterizationFunction.class);
-    Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600, inp, null);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600, new ListParameterization(), null);
 
     // CASH parameters
     ListParameterization params = new ListParameterization();
@@ -96,7 +90,7 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addParameter(CASH.MAXLEVEL_ID, 40);
 
     // setup algorithm
-    CASH cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
+    CASH<DoubleVector> cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
     testParameterizationOk(params);
 
     // run CASH on database
