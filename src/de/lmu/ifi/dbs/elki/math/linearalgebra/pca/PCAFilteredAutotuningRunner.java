@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.ModifiableDistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
@@ -220,10 +221,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
         ModifiableDistanceDBIDResult.class.cast(results).sort();
       }
       catch(ClassCastException e) {
-        System.err.println("WARNING: results not sorted by distance!");
+        LoggingUtil.warning("WARNING: results not sorted by distance!");
       }
       catch(UnsupportedOperationException e) {
-        System.err.println("WARNING: results not sorted by distance!");
+        LoggingUtil.warning("WARNING: results not sorted by distance!");
       }
     }
   }

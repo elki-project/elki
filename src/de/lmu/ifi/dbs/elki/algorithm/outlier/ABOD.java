@@ -190,7 +190,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     for(DBIDIter objKey = relation.iterDBIDs(); objKey.valid(); objKey.advance()) {
       s.reset();
 
-      // System.out.println("Processing: " +objKey);
       KNNResult<DoubleDistance> neighbors = knnQuery.getKNNForDBID(objKey, k);
       for (DBIDIter key1 = neighbors.iter(); key1.valid(); key1.advance()) {
         for (DBIDIter key2 = neighbors.iter(); key2.valid(); key2.advance()) {
@@ -257,8 +256,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
       // get normalization
       double[] counter = calcFastNormalization(aKey, dists, staticids);
-      // System.out.println(counter[0] + " " + counter2[0] + " " + counter[1] +
-      // " " + counter2[1]);
       // umsetzen von Pq zu list
       ModifiableDBIDs neighbors = DBIDUtil.newArray(nn.size());
       while(!nn.isEmpty()) {
@@ -267,12 +264,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       // getFilter
       double var = getAbofFilter(kernelMatrix, aKey, dists, counter[1], counter[0], neighbors);
       pq.add(DBIDUtil.newPair(var, aKey));
-      // System.out.println("prog "+(prog++));
     }
     // refine Candidates
     Heap<DoubleDBIDPair> resqueue = new Heap<DoubleDBIDPair>(k);
-    // System.out.println(pq.size() + " objects ordered into candidate list.");
-    // int v = 0;
     MeanVariance s = new MeanVariance();
     while(!pq.isEmpty()) {
       if(resqueue.size() == k && pq.peek().doubleValue() > resqueue.peek().doubleValue()) {
@@ -280,14 +274,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       // double approx = pq.peek().getFirst();
       DBIDRef aKey = pq.remove();
-      // if(!result.isEmpty()) {
-      // System.out.println("Best Candidate " + aKey+" : " + pq.firstPriority()
-      // + " worst result: " + result.firstPriority());
-      // } else {
-      // System.out.println("Best Candidate " + aKey+" : " + pq.firstPriority()
-      // + " worst result: " + Double.MAX_VALUE);
-      // }
-      // v++;
       s.reset();
       for(DBIDIter bKey = relation.iterDBIDs(); bKey.valid(); bKey.advance()) {
         if(DBIDUtil.equal(bKey, aKey)) {
@@ -306,10 +292,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
           }
         }
       }
-      // System.out.println( aKey + "Sum " + sum + " SQRSum " +sqrSum +
-      // " Counter " + counter);
       double var = s.getSampleVariance();
-      // System.out.println(aKey+ " : " + approx +" " + var);
       if(resqueue.size() < k) {
         resqueue.add(DBIDUtil.newPair(var, aKey));
       }
@@ -321,7 +304,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
 
     }
-    // System.out.println(v + " Punkte von " + data.size() + " verfeinert !!");
     DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     for(DoubleDBIDPair pair : pq) {
@@ -465,7 +447,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @param data to get explanations for
    */
   // TODO: this should be done by the result classes.
-  public void getExplanations(Relation<V> data) {
+  public String getExplanations(Relation<V> data) {
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
     Heap<DoubleDBIDPair> pq = new Heap<DoubleDBIDPair>(data.size(), Collections.reverseOrder());
@@ -523,8 +505,8 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       explaintab.put(DBIDUtil.deref(objKey), expList);
     }
-    System.out.println("--------------------------------------------");
-    System.out.println("Result: ABOD");
+    StringBuffer buf = new StringBuffer();
+    buf.append("Result: ABOD\n");
     int count = 0;
     while(!pq.isEmpty()) {
       if(count > 10) {
@@ -532,28 +514,25 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       }
       double factor = pq.peek().doubleValue();
       DBIDRef key = pq.remove();
-      System.out.print(data.get(key) + " ");
-      System.out.println(count + " Factor=" + factor + " " + key);
+      buf.append(data.get(key)).append(" ");
+      buf.append(count).append(" Factor=").append(factor).append(" ").append(key).append("\n");
       DBIDs expList = explaintab.get(key);
-      generateExplanation(data, key, expList);
+      generateExplanation(buf, data, key, expList);
       count++;
     }
-    System.out.println("--------------------------------------------");
+    return buf.toString();
   }
 
-  private void generateExplanation(Relation<V> data, DBIDRef key, DBIDs expList) {
+  private void generateExplanation(StringBuffer buf, Relation<V> data, DBIDRef key, DBIDs expList) {
     Vector vect1 = data.get(key).getColumnVector();
     for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
-      System.out.println("Outlier: " + vect1);
+      buf.append("Outlier: ").append(vect1).append("\n");
       Vector exp = data.get(iter).getColumnVector();
-      System.out.println("Most common neighbor: " + exp);
+      buf.append("Most common neighbor: ").append(exp).append("\n");
       // determine difference Vector
       Vector vals = exp.minus(vect1);
-      System.out.println(vals);
-      // System.out.println(new FeatureVector(
-      // "Diff-"+vect1.getPrimaryKey(),vals ));
+      buf.append(vals).append("\n");
     }
-    System.out.println();
   }
 
   /**
