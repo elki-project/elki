@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public class SpacefillingKNNExperiment {
-  private static final Logging logger = Logging.getLogger(SpacefillingKNNExperiment.class);
+  private static final Logging LOG = Logging.getLogger(SpacefillingKNNExperiment.class);
 
   DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
 
@@ -290,7 +290,7 @@ public class SpacefillingKNNExperiment {
       new SpacefillingKNNExperiment().run();
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
   }
 }

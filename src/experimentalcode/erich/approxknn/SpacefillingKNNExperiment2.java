@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  */
 public class SpacefillingKNNExperiment2 {
-  private static final Logging logger = Logging.getLogger(SpacefillingKNNExperiment2.class);
+  private static final Logging LOG = Logging.getLogger(SpacefillingKNNExperiment2.class);
 
   PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>> distanceFunction = ManhattanDistanceFunction.STATIC;
 
@@ -440,7 +440,7 @@ public class SpacefillingKNNExperiment2 {
       new SpacefillingKNNExperiment2().run();
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
   }
 }

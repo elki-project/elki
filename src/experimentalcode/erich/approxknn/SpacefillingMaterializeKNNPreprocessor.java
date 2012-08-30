@@ -67,10 +67,10 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(SpacefillingMaterializeKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(SpacefillingMaterializeKNNPreprocessor.class);
 
   static {
-    logger.getWrappedLogger().setLevel(Level.INFO);
+    LOG.getWrappedLogger().setLevel(Level.INFO);
   }
 
   /**
@@ -178,8 +178,8 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
     }
 
     final long end = System.nanoTime();
-    if(logger.isVerbose()) {
-      logger.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds and " + mean.getMean() + " distance computations on average.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds and " + mean.getMean() + " distance computations on average.");
     }
   }
 
@@ -266,7 +266,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

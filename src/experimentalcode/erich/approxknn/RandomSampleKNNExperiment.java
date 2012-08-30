@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  */
 public class RandomSampleKNNExperiment {
-  private static final Logging logger = Logging.getLogger(RandomSampleKNNExperiment.class);
+  private static final Logging LOG = Logging.getLogger(RandomSampleKNNExperiment.class);
 
   DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
 
@@ -85,7 +85,7 @@ public class RandomSampleKNNExperiment {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         String s = srel.get(id);
         if(s == null) {
-          logger.warning("Object without label: " + id);
+          LOG.warning("Object without label: " + id);
         }
         else if(p.matcher(s).matches()) {
           pos.add(id);
@@ -103,7 +103,7 @@ public class RandomSampleKNNExperiment {
       database.addIndex(pp);
 
       {
-        FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("kNN iterations", iters, logger) : null;
+        FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN iterations", iters, LOG) : null;
         for(int i = 1; i <= iters; i++) {
           final int k = i * step;
           KNNOutlier<NumberVector<?, ?>, DoubleDistance> knn = new KNNOutlier<NumberVector<?, ?>, DoubleDistance>(distanceFunction, k);
@@ -112,16 +112,16 @@ public class RandomSampleKNNExperiment {
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][0] = auc;
           if(prog != null) {
-            prog.incrementProcessed(logger);
+            prog.incrementProcessed(LOG);
           }
         }
 
         if(prog != null) {
-          prog.ensureCompleted(logger);
+          prog.ensureCompleted(LOG);
         }
       }
       {
-        FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("LOF iterations", iters, logger) : null;
+        FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", iters, LOG) : null;
         for(int i = 1; i <= iters; i++) {
           final int k = i * step;
           LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, distanceFunction, distanceFunction);
@@ -130,12 +130,12 @@ public class RandomSampleKNNExperiment {
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][3] = auc;
           if(prog != null) {
-            prog.incrementProcessed(logger);
+            prog.incrementProcessed(LOG);
           }
         }
 
         if(prog != null) {
-          prog.ensureCompleted(logger);
+          prog.ensureCompleted(LOG);
         }
       }
 
@@ -151,7 +151,7 @@ public class RandomSampleKNNExperiment {
 
     // Partial kNN outlier
     {
-      FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Approximations.", iters - 1, logger) : null;
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Approximations.", iters - 1, LOG) : null;
       for(int i = 1; i < iters; i++) {
         final int k = i * step;
         double share = i / (double) iters;
@@ -202,12 +202,12 @@ public class RandomSampleKNNExperiment {
         System.gc();
 
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.incrementProcessed(LOG);
         }
         System.out.println(k + " " + FormatUtil.format(data[i - 1], " "));
       }
       if(prog != null) {
-        prog.ensureCompleted(logger);
+        prog.ensureCompleted(LOG);
       }
     }
     for(int i = 1; i < iters; i++) {
@@ -246,7 +246,7 @@ public class RandomSampleKNNExperiment {
       new RandomSampleKNNExperiment().run();
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
   }
 }
