@@ -52,7 +52,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   /**
    * The static factory instance
    */
-  public final static DoubleDistance FACTORY = UNDEFINED_DISTANCE;
+  public static final DoubleDistance FACTORY = UNDEFINED_DISTANCE;
 
   /**
    * The actual value.

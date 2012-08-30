@@ -40,7 +40,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   /**
    * The static factory instance
    */
-  public final static BitDistance FACTORY = new BitDistance();
+  public static final BitDistance FACTORY = new BitDistance();
 
   /**
    * The distance value

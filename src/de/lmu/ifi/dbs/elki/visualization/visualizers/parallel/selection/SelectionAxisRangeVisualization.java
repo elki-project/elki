@@ -114,12 +114,6 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
       incrementalRedraw();
     }
 
-    @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
     /**
      * Adds the required CSS-Classes
      * 
@@ -146,7 +140,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       DBIDSelection selContext = context.getSelection();
-      if(selContext == null || !(selContext instanceof RangeSelection)) {
+      if(!(selContext instanceof RangeSelection)) {
         return;
       }
       DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();

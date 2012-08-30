@@ -33,7 +33,6 @@ import gnu.trove.map.hash.TIntFloatHashMap;
 import java.util.Arrays;
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -241,7 +240,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   /**
    * <p>
    * Provides a String representation of this SparseFloatVector as suitable for
-   * {@link SparseNumberVectorLabelParser}.
+   * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}.
    * </p>
    * 
    * <p>

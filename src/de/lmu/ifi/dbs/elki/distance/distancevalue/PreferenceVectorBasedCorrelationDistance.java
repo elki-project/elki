@@ -40,7 +40,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
   /**
    * The static factory instance
    */
-  public final static PreferenceVectorBasedCorrelationDistance FACTORY = new PreferenceVectorBasedCorrelationDistance();
+  public static final PreferenceVectorBasedCorrelationDistance FACTORY = new PreferenceVectorBasedCorrelationDistance();
   
   /**
    * Serial version

@@ -218,7 +218,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       DBIDSelection selContext = context.getSelection();
-      if(selContext != null && selContext instanceof RangeSelection) {
+      if(selContext instanceof RangeSelection) {
         setSVGRect(svgp, proj);
       }
     }

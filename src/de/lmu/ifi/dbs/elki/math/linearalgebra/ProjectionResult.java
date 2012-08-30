@@ -38,12 +38,12 @@ public interface ProjectionResult {
    * 
    * @return number of strong (correlated) dimensions
    */
-  public int getCorrelationDimension();
+  int getCorrelationDimension();
   
   /**
    * Projection matrix
    * 
    * @return projection matrix
    */
-  public Matrix similarityMatrix();
+  Matrix similarityMatrix();
 }

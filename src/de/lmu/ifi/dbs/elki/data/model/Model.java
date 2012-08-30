@@ -23,12 +23,11 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Base interface for Model classes.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  */
 public interface Model {

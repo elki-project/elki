@@ -38,7 +38,7 @@ public class EnsembleVotingBayes implements EnsembleVoting {
   /**
    * Option ID for the minimum and maximum vote
    */
-  public final static OptionID MIN_ID = OptionID.getOrCreateOptionID("ensemble.bayes.min", "Minimum (and maximum) vote share.");
+  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("ensemble.bayes.min", "Minimum (and maximum) vote share.");
 
   /**
    * Minimum vote to cast.

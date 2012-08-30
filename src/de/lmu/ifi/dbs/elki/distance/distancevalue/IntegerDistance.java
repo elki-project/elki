@@ -39,7 +39,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   /**
    * The static factory instance
    */
-  public final static IntegerDistance FACTORY = new IntegerDistance();
+  public static final IntegerDistance FACTORY = new IntegerDistance();
 
   /**
    * The distance value

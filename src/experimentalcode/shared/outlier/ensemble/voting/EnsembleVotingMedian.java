@@ -40,7 +40,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
   /**
    * Option ID for the quantile
    */
-  public final static OptionID QUANTILE_ID = OptionID.getOrCreateOptionID("ensemble.median.quantile", "Quantile to use in median voting.");
+  public static final OptionID QUANTILE_ID = OptionID.getOrCreateOptionID("ensemble.median.quantile", "Quantile to use in median voting.");
 
   /**
    * Quantile parameter

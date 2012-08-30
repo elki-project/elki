@@ -76,7 +76,7 @@ public class GenericClusterOrderEntry<D extends Distance<D>> implements Comparab
     if(this == o) {
       return true;
     }
-    if(o == null || !(o instanceof ClusterOrderEntry)) {
+    if(!(o instanceof ClusterOrderEntry)) {
       return false;
     }
 

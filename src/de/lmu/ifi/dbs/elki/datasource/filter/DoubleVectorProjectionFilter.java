@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>Parser to project the ParsingResult obtained by a suitable base parser
@@ -72,11 +71,6 @@ public class DoubleVectorProjectionFilter extends AbstractFeatureSelectionFilter
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractFeatureSelectionFilter.Parameterizer<DoubleVector> {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
     @Override
     protected DoubleVectorProjectionFilter makeInstance() {
       return new DoubleVectorProjectionFilter(selectedAttributes);

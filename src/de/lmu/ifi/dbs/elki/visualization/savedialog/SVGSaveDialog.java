@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  */
 public class SVGSaveDialog {
   /** The default title. "Save as ...". */
-  public final static String DEFAULT_TITLE = "Save as ...";
+  public static final String DEFAULT_TITLE = "Save as ...";
 
   /** Static logger reference */
   private final static Logging logger = Logging.getLogger(SVGSaveDialog.class);

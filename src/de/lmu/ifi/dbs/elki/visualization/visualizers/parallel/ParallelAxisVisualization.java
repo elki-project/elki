@@ -102,12 +102,12 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
     /**
      * Axis label class
      */
-    public final static String AXIS_LABEL = "paxis-label";
+    public static final String AXIS_LABEL = "paxis-label";
 
     /**
      * Clickable area for the axis.
      */
-    public final static String INVERTEDAXIS = "paxis-button";
+    public static final String INVERTEDAXIS = "paxis-button";
 
     /**
      * Constructor.

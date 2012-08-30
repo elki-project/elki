@@ -39,7 +39,7 @@ public interface Arithmetic<N extends Number> extends Comparable<N> {
    * @return the result of arithmetic addition of this Number with the given
    *         number
    */
-  public N plus(N number);
+  N plus(N number);
 
   /**
    * Multiplies this number with the given number.
@@ -48,7 +48,7 @@ public interface Arithmetic<N extends Number> extends Comparable<N> {
    * @return the result of arithmetic multiplication of this Number with the
    *         given number
    */
-  public N times(N number);
+  N times(N number);
 
   /**
    * Subtracts the given number from this number.
@@ -57,7 +57,7 @@ public interface Arithmetic<N extends Number> extends Comparable<N> {
    * @return the result of arithmetic subtraction of the given number from this
    *         Number
    */
-  public N minus(N number);
+  N minus(N number);
 
   /**
    * Divides this number by the given number.
@@ -66,5 +66,5 @@ public interface Arithmetic<N extends Number> extends Comparable<N> {
    * @return the result of arithmetic division of this Number by the given
    *         number
    */
-  public N divided(N number);
+  N divided(N number);
 }

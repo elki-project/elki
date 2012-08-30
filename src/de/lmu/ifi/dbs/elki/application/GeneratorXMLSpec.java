@@ -66,7 +66,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
   /**
    * Line separator for output
    */
-  public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+  public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
   /**
    * Output file.

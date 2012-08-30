@@ -314,12 +314,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * Parameter for neighborhood predicate
      */
-    public final static OptionID NEIGHBORHOODPRED_ID = OptionID.getOrCreateOptionID("gdbscan.neighborhood", "Neighborhood predicate for GDBSCAN");
+    public static final OptionID NEIGHBORHOODPRED_ID = OptionID.getOrCreateOptionID("gdbscan.neighborhood", "Neighborhood predicate for GDBSCAN");
 
     /**
      * Parameter for core predicate
      */
-    public final static OptionID COREPRED_ID = OptionID.getOrCreateOptionID("gdbscan.core", "Core point predicate for GDBSCAN");
+    public static final OptionID COREPRED_ID = OptionID.getOrCreateOptionID("gdbscan.core", "Core point predicate for GDBSCAN");
 
     @Override
     protected void makeOptions(Parameterization config) {

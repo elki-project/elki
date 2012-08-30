@@ -296,7 +296,7 @@ public class LinearEquationSystem {
     for(int i = 0; i < coeff.length; i++) {
       for(int j = 0; j < coeff[row[0]].length; j++) {
         format(nf, buffer, coeff[row[i]][col[j]], coeffDigits[col[j]]);
-        buffer.append(" * x_" + col[j]);
+        buffer.append(" * x_").append(col[j]);
       }
       buffer.append(" =");
       format(nf, buffer, rhs[row[i]], rhsDigits);
@@ -362,7 +362,7 @@ public class LinearEquationSystem {
       format(nf, buffer, value, x0Digits);
       for(int j = 0; j < u[0].length; j++) {
         if(i == row) {
-          buffer.append("  +  a_" + j + " * ");
+          buffer.append("  +  a_").append(j).append(" * ");
         }
         else {
           buffer.append("          ");

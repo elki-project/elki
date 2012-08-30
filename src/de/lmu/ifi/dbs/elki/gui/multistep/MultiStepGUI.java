@@ -142,11 +142,10 @@ public class MultiStepGUI extends JPanel {
       settings.load();
     }
     catch(FileNotFoundException e) {
-      logger.warning("Error loading saved settings.");
+      logger.warning("Error loading saved settings.", e);
     }
     catch(IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.exception(e);
     }
     
     inputTab = new InputTabPanel();

@@ -148,7 +148,7 @@ public final class PairUtil {
    * @param <FIRST> First type
    * @param <SECOND> Second type
    */
-  public final static class CompareNatural<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
+  public static final class CompareNatural<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
     /**
      * Compare by first, then by second.
      * 
@@ -194,7 +194,7 @@ public final class PairUtil {
    * @param <FIRST> First type
    * @param <SECOND> Second type
    */
-  public final static class CompareNaturalFirst<FIRST extends Comparable<? super FIRST>, SECOND> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
+  public static final class CompareNaturalFirst<FIRST extends Comparable<? super FIRST>, SECOND> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
     /**
      * Compare by first component natural ordering
      * 
@@ -227,7 +227,7 @@ public final class PairUtil {
    * @param <FIRST> First type
    * @param <SECOND> Second type
    */
-  public final static class CompareNaturalSecond<FIRST, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
+  public static final class CompareNaturalSecond<FIRST, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
     /**
      * Compare by second components natural ordering
      * 
@@ -260,7 +260,7 @@ public final class PairUtil {
    * @param <FIRST> First type
    * @param <SECOND> Second type
    */
-  public final static class CompareNaturalSwapped<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
+  public static final class CompareNaturalSwapped<FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> implements Comparator<Pair<? extends FIRST, ? extends SECOND>> {
     /**
      * Compare by second component, using the ComparableSwapped interface.
      * 

@@ -38,7 +38,7 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
   /**
    * Option ID for the minimum and maximum vote
    */
-  public final static OptionID MIN_ID = OptionID.getOrCreateOptionID("ensemble.bayes.min", "Minimum vote share.");
+  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("ensemble.bayes.min", "Minimum vote share.");
 
   /**
    * Minimum vote to cast.
@@ -48,7 +48,7 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
   /**
    * Option ID for the minimum and maximum vote
    */
-  public final static OptionID MAX_ID = OptionID.getOrCreateOptionID("ensemble.bayes.max", "Maximum vote share.");
+  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("ensemble.bayes.max", "Maximum vote share.");
 
   /**
    * Minimum vote to cast.

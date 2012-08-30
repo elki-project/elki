@@ -241,10 +241,10 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
     else {
       buf.append(",field");
       if(mindim >= 0) {
-        buf.append(",mindim=" + mindim);
+        buf.append(",mindim=").append(mindim);
       }
       if(maxdim < Integer.MAX_VALUE) {
-        buf.append(",maxdim=" + maxdim);
+        buf.append(",maxdim=").append(maxdim);
       }
     }
     return buf.toString();

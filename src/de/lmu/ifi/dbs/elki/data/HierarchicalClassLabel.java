@@ -80,7 +80,7 @@ public class HierarchicalClassLabel extends ClassLabel {
     this.levelwiseNames = new Comparable<?>[levelwiseStrings.length];
     for(int i = 0; i < levelwiseStrings.length; i++) {
       try {
-        levelwiseNames[i] = new Integer(levelwiseStrings[i]);
+        levelwiseNames[i] = Integer.valueOf(levelwiseStrings[i]);
       }
       catch(NumberFormatException e) {
         levelwiseNames[i] = levelwiseStrings[i];
@@ -128,7 +128,7 @@ public class HierarchicalClassLabel extends ClassLabel {
         return comp;
       }
     }
-    return new Integer(this.levelwiseNames.length).compareTo(new Integer(h.levelwiseNames.length));
+    return Integer.compare(this.levelwiseNames.length, h.levelwiseNames.length);
   }
 
   /**

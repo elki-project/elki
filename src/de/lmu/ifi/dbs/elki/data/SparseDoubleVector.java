@@ -31,7 +31,6 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
 import java.util.Arrays;
 import java.util.BitSet;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -42,8 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * A SparseDoubleVector is to store real values as double values.
  * </p>
  * 
- * A SparseDoubleVector only requires storage for those attribute values that are
- * non-zero.
+ * A SparseDoubleVector only requires storage for those attribute values that
+ * are non-zero.
  * 
  * @author Arthur Zimek
  */
@@ -103,7 +102,7 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
     // Import and sort the indexes
     {
       TIntDoubleIterator iter = values.iterator();
-      for (int i = 0; iter.hasNext(); i++) {
+      for(int i = 0; iter.hasNext(); i++) {
         iter.advance();
         this.indexes[i] = iter.key();
       }
@@ -239,7 +238,8 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
   /**
    * <p>
    * Provides a String representation of this SparseDoubleVector as suitable for
-   * {@link SparseNumberVectorLabelParser}.
+   * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
+   * .
    * </p>
    * 
    * <p>
@@ -333,9 +333,9 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
       return STATIC;
     }
   }
-  
+
   /**
    * Empty map.
    */
-  public static final TIntDoubleMap EMPTYMAP = new TUnmodifiableIntDoubleMap(new TIntDoubleHashMap()); 
+  public static final TIntDoubleMap EMPTYMAP = new TUnmodifiableIntDoubleMap(new TIntDoubleHashMap());
 }

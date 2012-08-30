@@ -254,9 +254,8 @@ public final class HTMLUtil {
    * @param htmldoc Document to output
    * @param out Stream to write to
    * @throws IOException thrown on IO errors
-   * @throws Error thrown on other errors, such as HTML transformation
    */
-  public static void writeXHTML(Document htmldoc, OutputStream out) throws IOException, Error {
+  public static void writeXHTML(Document htmldoc, OutputStream out) throws IOException {
     javax.xml.transform.Result result = new StreamResult(out);
     // Use a transformer for pretty printing
     Transformer xformer;

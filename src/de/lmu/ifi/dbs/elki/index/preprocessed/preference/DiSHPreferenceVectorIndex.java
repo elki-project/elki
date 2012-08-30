@@ -273,8 +273,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     List<BitSet> frequentItemsets = aprioriResult.getSolution();
     Map<BitSet, Integer> supports = aprioriResult.getSupports();
     if(logger.isDebugging()) {
-      msg.append("\n Frequent itemsets: " + frequentItemsets);
-      msg.append("\n All supports: " + supports);
+      msg.append("\n Frequent itemsets: ").append(frequentItemsets);
+      msg.append("\n All supports: ").append(supports);
     }
     int maxSupport = 0;
     int maxCardinality = 0;
@@ -317,7 +317,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
     }
     if(logger.isDebugging()) {
-      msg.append("\n candidates " + candidates.keySet());
+      msg.append("\n candidates ").append(candidates.keySet());
     }
 
     if(!candidates.isEmpty()) {

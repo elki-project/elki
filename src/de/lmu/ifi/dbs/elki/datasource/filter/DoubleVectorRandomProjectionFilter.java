@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>
@@ -74,11 +73,6 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractRandomFeatureSelectionFilter.Parameterizer<DoubleVector> {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
     @Override
     protected DoubleVectorRandomProjectionFilter makeInstance() {
       return new DoubleVectorRandomProjectionFilter(k,seed);

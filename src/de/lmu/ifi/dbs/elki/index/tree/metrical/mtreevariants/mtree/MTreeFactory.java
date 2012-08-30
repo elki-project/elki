@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactor
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Factory for a M-Tree
@@ -74,11 +73,6 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
     @Override
     protected MTreeFactory<O, D> makeInstance() {
       return new MTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction);

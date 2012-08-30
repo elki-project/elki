@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * <p>
@@ -73,11 +72,6 @@ public class SparseNumberVectorProjectionFilter<V extends SparseNumberVector<V, 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends SparseNumberVector<V, ?>> extends AbstractFeatureSelectionFilter.Parameterizer<V> {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
     @Override
     protected SparseNumberVectorProjectionFilter<V> makeInstance() {
       return new SparseNumberVectorProjectionFilter<V>(selectedAttributes);

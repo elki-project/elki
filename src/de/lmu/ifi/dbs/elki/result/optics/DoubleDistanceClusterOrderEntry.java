@@ -75,7 +75,7 @@ public class DoubleDistanceClusterOrderEntry implements Comparable<ClusterOrderE
     if(this == o) {
       return true;
     }
-    if(o == null || !(o instanceof ClusterOrderEntry)) {
+    if(!(o instanceof ClusterOrderEntry)) {
       return false;
     }
 

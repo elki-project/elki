@@ -45,7 +45,7 @@ public class SVGHyperSphere {
    * 
    * kappa = 4 * (Math.sqrt(2)-1)/3
    */
-  public final static double EUCLIDEAN_KAPPA = 0.5522847498;
+  public static final double EUCLIDEAN_KAPPA = 0.5522847498;
 
   /**
    * Wireframe "manhattan" hypersphere

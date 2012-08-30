@@ -154,7 +154,8 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   }
 
   /**
-   * Pseudo constructor that is often convenient to use when T is not completely known.
+   * Pseudo constructor that is often convenient to use when T is not completely
+   * known.
    * 
    * @param <T> Type
    * @param cls Class restriction
@@ -167,7 +168,8 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   }
 
   /**
-   * Pseudo constructor that is often convenient to use when T is not completely known.
+   * Pseudo constructor that is often convenient to use when T is not completely
+   * known.
    * 
    * @param <T> Type
    * @param cls Class restriction
@@ -181,11 +183,11 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   public String toString() {
     StringBuffer buf = new StringBuffer(super.toString());
     buf.append(",variable");
-    if (mindim >= 0) {
-      buf.append(",mindim="+mindim);
+    if(mindim >= 0) {
+      buf.append(",mindim=").append(mindim);
     }
-    if (maxdim < Integer.MAX_VALUE) {
-      buf.append(",maxdim="+maxdim);
+    if(maxdim < Integer.MAX_VALUE) {
+      buf.append(",maxdim=").append(maxdim);
     }
     return buf.toString();
   }

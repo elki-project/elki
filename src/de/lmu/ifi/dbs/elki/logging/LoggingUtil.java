@@ -53,7 +53,7 @@ public final class LoggingUtil {
    * @param message Message to log.
    * @param e Exception to report.
    */
-  public final static void logExpensive(Level level, String message, Throwable e) {
+  public static final void logExpensive(Level level, String message, Throwable e) {
     String[] caller = inferCaller();
     if(caller != null) {
       Logger logger = Logger.getLogger(caller[0]);
@@ -74,7 +74,7 @@ public final class LoggingUtil {
    * @param level Logging level
    * @param message Message to log.
    */
-  public final static void logExpensive(Level level, String message) {
+  public static final void logExpensive(Level level, String message) {
     LogRecord rec = new ELKILogRecord(level, message);
     String[] caller = inferCaller();
     if(caller != null) {
@@ -93,7 +93,7 @@ public final class LoggingUtil {
    * 
    * @param e Exception to log
    */
-  public final static void exception(Throwable e) {
+  public static final void exception(Throwable e) {
     logExpensive(Level.SEVERE, e.getMessage(), e);
   }
 
@@ -103,7 +103,7 @@ public final class LoggingUtil {
    * @param message Exception message, may be null (defaults to e.getMessage())
    * @param e causing exception
    */
-  public final static void exception(String message, Throwable e) {
+  public static final void exception(String message, Throwable e) {
     if(message == null && e != null) {
       message = e.getMessage();
     }
@@ -115,7 +115,7 @@ public final class LoggingUtil {
    * 
    * @param message Warning message.
    */
-  public final static void warning(String message) {
+  public static final void warning(String message) {
     logExpensive(Level.WARNING, message);
   }
 
@@ -125,7 +125,7 @@ public final class LoggingUtil {
    * @param message Warning message, may be null (defaults to e.getMessage())
    * @param e causing exception
    */
-  public final static void warning(String message, Throwable e) {
+  public static final void warning(String message, Throwable e) {
     if(message == null && e != null) {
       message = e.getMessage();
     }
@@ -137,7 +137,7 @@ public final class LoggingUtil {
    * 
    * @param message Warning message.
    */
-  public final static void message(String message) {
+  public static final void message(String message) {
     logExpensive(Level.INFO, message);
   }
 
@@ -147,7 +147,7 @@ public final class LoggingUtil {
    * @param message Warning message, may be null (defaults to e.getMessage())
    * @param e causing exception
    */
-  public final static void message(String message, Throwable e) {
+  public static final void message(String message, Throwable e) {
     if(message == null && e != null) {
       message = e.getMessage();
     }

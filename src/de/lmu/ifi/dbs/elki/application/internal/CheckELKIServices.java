@@ -181,9 +181,9 @@ public class CheckELKIServices {
       Collections.sort(sorted);
       if(!update) {
         StringBuffer message = new StringBuffer();
-        message.append("Class " + prop + " lacks suggestions:" + FormatUtil.NEWLINE);
+        message.append("Class ").append(prop).append(" lacks suggestions:").append(FormatUtil.NEWLINE);
         for(String remaining : sorted) {
-          message.append("# " + remaining + FormatUtil.NEWLINE);
+          message.append("# ").append(remaining).append(FormatUtil.NEWLINE);
         }
         logger.warning(message.toString());
       }
@@ -193,7 +193,8 @@ public class CheckELKIServices {
         String fnam = f.getFile();
         if(fnam == null) {
           logger.warning("Cannot update: " + f + " seems to be in a jar file.");
-        } else {
+        }
+        else {
           try {
             FileOutputStream out = new FileOutputStream(fnam, true);
             PrintStream pr = new PrintStream(out);

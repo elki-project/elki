@@ -27,6 +27,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
@@ -95,11 +96,11 @@ public abstract class AbstractParameterization implements Parameterization {
    * @throws RuntimeException if any error has occurred.
    */
   // TODO: make a multi-exception class?
-  public void failOnErrors() throws RuntimeException {
+  public void failOnErrors() throws AbortException {
     final int numerror = getErrors().size();
     if(numerror > 0) {
       logAndClearReportedErrors();
-      throw new RuntimeException(numerror + " errors occurred during parameterization.");
+      throw new AbortException(numerror + " errors occurred during parameterization.");
     }
   }
 
@@ -148,10 +149,13 @@ public abstract class AbstractParameterization implements Parameterization {
   @Override
   public abstract boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException;
 
-  /** Upon destruction, report any errors that weren't handled yet. */
+  /** Upon destruction, report any errors that weren't handled yet.
+   *  
+   * @throws Throwable Errors */
   @Override
-  public void finalize() {
+  public void finalize() throws Throwable {
     failOnErrors();
+    super.finalize();
   }
 
   @Override

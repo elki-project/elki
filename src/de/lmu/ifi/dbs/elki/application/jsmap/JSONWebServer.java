@@ -73,7 +73,7 @@ public class JSONWebServer implements HttpHandler {
   /**
    * The base path we serve data from
    */
-  public final static String PATH_JSON = "/json/";
+  public static final String PATH_JSON = "/json/";
 
   /**
    * Server instance

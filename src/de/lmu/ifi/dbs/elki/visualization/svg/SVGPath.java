@@ -56,48 +56,48 @@ public class SVGPath {
   /**
    * The lower case version (relative) line to command.
    */
-  public final static String PATH_LINE_TO_RELATIVE = SVGConstants.PATH_LINE_TO.toLowerCase();
+  public static final String PATH_LINE_TO_RELATIVE = SVGConstants.PATH_LINE_TO.toLowerCase();
 
   /**
    * The lower case version (relative) move command.
    */
-  public final static String PATH_MOVE_RELATIVE = SVGConstants.PATH_MOVE.toLowerCase();
+  public static final String PATH_MOVE_RELATIVE = SVGConstants.PATH_MOVE.toLowerCase();
 
   /**
    * The lower case version (relative) horizontal line to command.
    */
-  public final static String PATH_HORIZONTAL_LINE_TO_RELATIVE = SVGConstants.PATH_HORIZONTAL_LINE_TO.toLowerCase();
+  public static final String PATH_HORIZONTAL_LINE_TO_RELATIVE = SVGConstants.PATH_HORIZONTAL_LINE_TO.toLowerCase();
 
   /**
    * The lower case version (relative) vertical line to command.
    */
-  public final static String PATH_VERTICAL_LINE_TO_RELATIVE = SVGConstants.PATH_VERTICAL_LINE_TO.toLowerCase();
+  public static final String PATH_VERTICAL_LINE_TO_RELATIVE = SVGConstants.PATH_VERTICAL_LINE_TO.toLowerCase();
 
   /**
    * The lower case version (relative) cubic line to command.
    */
-  public final static String PATH_CUBIC_TO_RELATIVE = SVGConstants.PATH_CUBIC_TO.toLowerCase();
+  public static final String PATH_CUBIC_TO_RELATIVE = SVGConstants.PATH_CUBIC_TO.toLowerCase();
 
   /**
    * The lower case version (relative) smooth cubic to command.
    */
-  public final static String PATH_SMOOTH_CUBIC_TO_RELATIVE = PATH_SMOOTH_CUBIC_TO.toLowerCase();
+  public static final String PATH_SMOOTH_CUBIC_TO_RELATIVE = PATH_SMOOTH_CUBIC_TO.toLowerCase();
 
   /**
    * The lower case version (relative) quadratic interpolation to command.
    */
-  public final static String PATH_QUAD_TO_RELATIVE = SVGConstants.PATH_QUAD_TO.toLowerCase();
+  public static final String PATH_QUAD_TO_RELATIVE = SVGConstants.PATH_QUAD_TO.toLowerCase();
 
   /**
    * The lower case version (relative) smooth quadratic interpolation to
    * command.
    */
-  public final static String PATH_SMOOTH_QUAD_TO_RELATIVE = SVGConstants.PATH_SMOOTH_QUAD_TO.toLowerCase();
+  public static final String PATH_SMOOTH_QUAD_TO_RELATIVE = SVGConstants.PATH_SMOOTH_QUAD_TO.toLowerCase();
 
   /**
    * The lower case version (relative) path arc command.
    */
-  public final static String PATH_ARC_RELATIVE = SVGConstants.PATH_ARC.toLowerCase();
+  public static final String PATH_ARC_RELATIVE = SVGConstants.PATH_ARC.toLowerCase();
 
   /**
    * Empty path constructor.

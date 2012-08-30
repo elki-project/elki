@@ -55,6 +55,26 @@ public class Matrix {
   public static final double DELTA = 1E-3;
 
   /**
+   * Error: matrix not square.
+   */
+  public static final String ERR_NOTSQUARE = "All rows must have the same length.";
+
+  /**
+   * Error: matrix indexes incorrect
+   */
+  public static final String ERR_REINDEX = "Submatrix indices incorrect.";
+
+  /**
+   * Error when matrix dimensions do not agree.
+   */
+  public static final String ERR_MATRIX_DIMENSIONS = "Matrix must consist of the same no of rows!";
+
+  /**
+   * Error when matrix inner dimensions do not agree.
+   */
+  private static final String ERR_MATRIX_INNERDIM = "Matrix inner dimensions must agree.";
+
+  /**
    * Array for internal storage of elements.
    * 
    * @serial internal array storage.
@@ -107,7 +127,7 @@ public class Matrix {
     columndimension = elements[0].length;
     for(int i = 0; i < elements.length; i++) {
       if(elements[i].length != columndimension) {
-        throw new IllegalArgumentException("All rows must have the same length.");
+        throw new IllegalArgumentException(ERR_NOTSQUARE);
       }
     }
     this.elements = elements;
@@ -152,7 +172,7 @@ public class Matrix {
 
   /**
    * Constructor, cloning an existing matrix.
-   *
+   * 
    * @param mat Matrix to clone
    */
   public Matrix(Matrix mat) {
@@ -166,13 +186,13 @@ public class Matrix {
    * @return new matrix
    * @throws IllegalArgumentException All rows must have the same length
    */
-  public final static Matrix constructWithCopy(final double[][] A) {
+  public static final Matrix constructWithCopy(final double[][] A) {
     final int m = A.length;
     final int n = A[0].length;
     final Matrix X = new Matrix(m, n);
     for(int i = 0; i < m; i++) {
       if(A[i].length != n) {
-        throw new IllegalArgumentException("All rows must have the same length.");
+        throw new IllegalArgumentException(ERR_NOTSQUARE);
       }
       System.arraycopy(A[i], 0, X.elements[i], 0, n);
     }
@@ -367,7 +387,7 @@ public class Matrix {
   public final Matrix increment(final int i, final int j, final double s) {
     elements[i][j] += s;
     return this;
-}
+  }
 
   /**
    * Make a one-dimensional row packed copy of the internal array.
@@ -419,7 +439,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
   }
@@ -442,7 +462,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
   }
@@ -466,7 +486,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
   }
@@ -490,7 +510,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
     return X;
   }
@@ -514,7 +534,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices: " + e);
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
 
@@ -535,7 +555,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
 
@@ -557,7 +577,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
 
@@ -579,7 +599,7 @@ public class Matrix {
       }
     }
     catch(ArrayIndexOutOfBoundsException e) {
-      throw new ArrayIndexOutOfBoundsException("Submatrix indices");
+      throw new ArrayIndexOutOfBoundsException(ERR_REINDEX);
     }
   }
 
@@ -602,7 +622,7 @@ public class Matrix {
    */
   public final void setRow(final int j, final Vector row) {
     if(row.elements.length != columndimension) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of columns!");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     for(int i = 0; i < columndimension; i++) {
       elements[j][i] = row.elements[i];
@@ -631,7 +651,7 @@ public class Matrix {
    */
   public final void setCol(final int j, final Vector column) {
     if(column.elements.length != elements.length) {
-      throw new IllegalArgumentException("Matrix must consist of the same no of rows!");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     for(int i = 0; i < elements.length; i++) {
       elements[i][j] = column.elements[i];
@@ -796,14 +816,13 @@ public class Matrix {
   public final Matrix times(final Matrix B) {
     // Optimized implementation, exploiting the storage layout
     if(B.elements.length != this.columndimension) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree: "+getRowDimensionality()+","+getColumnDimensionality()+" * "+B.getRowDimensionality()+","+B.getColumnDimensionality());
+      throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
     // Optimized ala Jama. jik order.
     final double[] Bcolj = new double[this.columndimension];
     for(int j = 0; j < X.columndimension; j++) {
       // Make a linear copy of column j from B
-      // TODO: use column getter from B?
       for(int k = 0; k < this.columndimension; k++) {
         Bcolj[k] = B.elements[k][j];
       }
@@ -829,7 +848,7 @@ public class Matrix {
    */
   public final Vector times(final Vector B) {
     if(B.elements.length != this.columndimension) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Vector X = new Vector(this.elements.length);
     // multiply it with each row from A
@@ -853,7 +872,7 @@ public class Matrix {
    */
   public final Vector transposeTimes(final Vector B) {
     if(B.elements.length != elements.length) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Vector X = new Vector(this.columndimension);
     // multiply it with each row from A
@@ -876,7 +895,7 @@ public class Matrix {
    */
   public final Matrix transposeTimes(final Matrix B) {
     if(B.elements.length != elements.length) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Matrix X = new Matrix(this.columndimension, B.columndimension);
     final double[] Bcolj = new double[elements.length];
@@ -906,7 +925,7 @@ public class Matrix {
    */
   public final Matrix timesTranspose(final Matrix B) {
     if(B.columndimension != this.columndimension) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+      throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
     for(int j = 0; j < X.elements.length; j++) {
@@ -934,7 +953,7 @@ public class Matrix {
   public final Matrix transposeTimesTranspose(Matrix B) {
     // Optimized implementation, exploiting the storage layout
     if(this.elements.length != B.columndimension) {
-      throw new IllegalArgumentException("Matrix inner dimensions must agree: "+getRowDimensionality()+","+getColumnDimensionality()+" * "+B.getRowDimensionality()+","+B.getColumnDimensionality());
+      throw new IllegalArgumentException("Matrix inner dimensions must agree: " + getRowDimensionality() + "," + getColumnDimensionality() + " * " + B.getRowDimensionality() + "," + B.getColumnDimensionality());
     }
     final Matrix X = new Matrix(this.columndimension, B.elements.length);
     // Optimized ala Jama. jik order.
@@ -1109,7 +1128,7 @@ public class Matrix {
       throw new IllegalArgumentException("a.getColumnDimension() != 1");
     }
     if(this.elements.length != columnMatrix.elements.length) {
-      throw new IllegalArgumentException("a.getRowDimension() != b.getRowDimension()");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     if(this.columndimension + columnMatrix.columndimension > this.elements.length) {
       return false;
@@ -1146,12 +1165,12 @@ public class Matrix {
     final double[] rhs = les.getRHS();
 
     if(msg != null) {
-      msg.append("\na' " + FormatUtil.format(this.getArrayRef()));
-      msg.append("\nb' " + FormatUtil.format(columnMatrix.getColumnPackedCopy()));
+      msg.append("\na' ").append(FormatUtil.format(this.getArrayRef()));
+      msg.append("\nb' ").append(FormatUtil.format(columnMatrix.getColumnPackedCopy()));
 
-      msg.append("\na " + FormatUtil.format(a));
-      msg.append("\nb " + FormatUtil.format(b));
-      msg.append("\nleq " + les.equationsToString(4));
+      msg.append("\na ").append(FormatUtil.format(a));
+      msg.append("\nb ").append(FormatUtil.format(b));
+      msg.append("\nleq ").append(les.equationsToString(4));
     }
 
     for(int i = 0; i < coefficients.length; i++) {
@@ -1168,8 +1187,8 @@ public class Matrix {
         final double value = rhs[i];
         if(Math.abs(value) < DELTA) {
           if(msg != null) {
-            msg.append("\nvalue " + value + "[" + i + "]");
-            msg.append("\nlinearly independent " + false);
+            msg.append("\nvalue ").append(value).append("[").append(i).append("]");
+            msg.append("\nlinearly independent ").append(false);
             Logger.getLogger(this.getClass().getName()).fine(msg.toString());
           }
           return false;
@@ -1178,7 +1197,7 @@ public class Matrix {
     }
 
     if(msg != null) {
-      msg.append("\nlinearly independent " + true);
+      msg.append("\nlinearly independent ").append(true);
       Logger.getLogger(this.getClass().getName()).fine(msg.toString());
     }
     return true;
@@ -1328,6 +1347,7 @@ public class Matrix {
       e_i.elements[0][i] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
+      // TODO: efficiency - appendColumns is expensive.
       if(li) {
         if(result == null) {
           result = e_i.copy();
@@ -1355,6 +1375,7 @@ public class Matrix {
       e_i.elements[i][0] = 1.0;
       final boolean li = basis.linearlyIndependent(e_i);
 
+      // TODO: efficiency - appendColumns is expensive.
       if(li) {
         if(result == null) {
           result = e_i.copy();
@@ -1377,7 +1398,7 @@ public class Matrix {
    */
   public final Matrix appendColumns(final Matrix columns) {
     if(elements.length != columns.elements.length) {
-      throw new IllegalArgumentException("m.getRowDimension() != column.getRowDimension()");
+      throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
 
     final Matrix result = new Matrix(elements.length, columndimension + columns.columndimension);

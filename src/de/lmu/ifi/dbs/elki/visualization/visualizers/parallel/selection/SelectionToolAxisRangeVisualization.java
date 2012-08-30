@@ -140,11 +140,6 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
     }
 
     @Override
-    public void destroy() {
-      super.destroy();
-    }
-
-    @Override
     protected void redraw() {
       addCSSClasses(svgp);
 

@@ -50,6 +50,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
  */
 public final class VectorUtil {
   /**
+   * Fake constructor. Do not instantiate, use static methods.
+   */
+  private VectorUtil() {
+    // Do not instantiate - utility class.
+  }
+
+  /**
    * Return the range across all dimensions. Useful in particular for time
    * series.
    * 
@@ -307,7 +314,7 @@ public final class VectorUtil {
     /**
      * Dimension to sort with
      */
-    public int d;
+    private int d;
 
     /**
      * The relation to sort.
@@ -359,7 +366,7 @@ public final class VectorUtil {
     /**
      * Dimension to sort with
      */
-    public int d;
+    private int d;
 
     /**
      * Constructor.

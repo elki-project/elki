@@ -183,14 +183,21 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * @apiviz.exclude
    */
   public static abstract class Parameterizer extends AbstractParameterizer {
+    /**
+     * Filters
+     */
     protected List<ObjectFilter> filters;
+    
+    /**
+     * Parser to use
+     */
     protected Parser parser = null;
 
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
+    /**
+     * Get the filters parameter
+     * 
+     * @param config Parameterization
+     */
     protected void configFilters(Parameterization config) {
       final ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class, true);
       if(config.grab(filterParam)) {
@@ -198,6 +205,13 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
       }
     }
 
+    /**
+     * Get the parser parameter
+     * 
+     * @param config Parameterization
+     * @param parserRestrictionClass Restriction class
+     * @param parserDefaultValueClass Default value
+     */
     protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
       ObjectParameter<Parser> parserParam = new ObjectParameter<Parser>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
       if(config.grab(parserParam)) {

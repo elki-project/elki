@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Provides a parser for parsing one sparse BitVector per line, where the
@@ -138,11 +137,6 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParser.Parameterizer {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
     @Override
     protected SparseBitVectorLabelParser makeInstance() {
       return new SparseBitVectorLabelParser(colSep, quoteChar);

@@ -71,17 +71,17 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * 
    * Type: Integer
    */
-  public final static String META_LEVEL = "level";
+  public static final String META_LEVEL = "level";
 
   /**
    * Flag to control visibility. Type: Boolean
    */
-  public final static String META_VISIBLE = "visible";
+  public static final String META_VISIBLE = "visible";
 
   /**
    * Flag to signal there is no thumbnail needed. Type: Boolean
    */
-  public final static String META_NOTHUMB = "no-thumbnail";
+  public static final String META_NOTHUMB = "no-thumbnail";
 
   /**
    * Mark as not having a (sensible) detail view.
@@ -91,12 +91,12 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   /**
    * Flag to signal the visualizer should not be exported. Type: Boolean
    */
-  public final static String META_NOEXPORT = "no-export";
+  public static final String META_NOEXPORT = "no-export";
 
   /**
    * Flag to signal the visualizer should not be embed. Type: Boolean
    */
-  public final static String META_NOEMBED = "no-embed";
+  public static final String META_NOEMBED = "no-embed";
 
   /**
    * Flag to signal default visibility of a visualizer. Type: Boolean
@@ -116,27 +116,27 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   /**
    * Background layer
    */
-  public final static int LEVEL_BACKGROUND = 0;
+  public static final int LEVEL_BACKGROUND = 0;
 
   /**
    * Data layer
    */
-  public final static int LEVEL_DATA = 100;
+  public static final int LEVEL_DATA = 100;
 
   /**
    * Static plot layer
    */
-  public final static int LEVEL_STATIC = 200;
+  public static final int LEVEL_STATIC = 200;
 
   /**
    * Passive foreground layer
    */
-  public final static int LEVEL_FOREGROUND = 300;
+  public static final int LEVEL_FOREGROUND = 300;
 
   /**
    * Active foreground layer (interactive elements)
    */
-  public final static int LEVEL_INTERACTIVE = 1000;
+  public static final int LEVEL_INTERACTIVE = 1000;
 
   /**
    * Name

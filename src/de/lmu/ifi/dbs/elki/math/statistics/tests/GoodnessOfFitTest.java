@@ -38,12 +38,12 @@ public interface GoodnessOfFitTest extends Parameterizable {
   /**
    * Measure the deviation of a full sample from a conditional sample.
    * 
-   * Sample arrays *may* be modified, e.g. sorted, by the test.
+   * Sample arrays <em>may</em> be modified, e.g. sorted, by the test.
    * 
    * @param fullSample Full sample
    * @param conditionalSample Conditional sample
    * 
    * @return Deviation
    */
-  public double deviation(double[] fullSample, double[] conditionalSample);
+  double deviation(double[] fullSample, double[] conditionalSample);
 }

@@ -94,8 +94,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
 
     if(getLogger().isDebugging()) {
       msg = new StringBuffer();
-      msg.append("referenceSetSize = " + referenceSetSize);
-      msg.append("\ndelta = " + delta);
+      msg.append("referenceSetSize = ").append(referenceSetSize);
+      msg.append("\ndelta = ").append(delta);
     }
 
     if(referenceSetSize == 0) {
@@ -124,8 +124,8 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     for(int d = 0; d < dim; d++) {
       if(Math.sqrt(sum[d]) / referenceSetSize <= delta) {
         if(msg != null) {
-          msg.append("\nsum[" + d + "]= " + sum[d]);
-          msg.append("\n  Math.sqrt(sum[d]) / referenceSetSize)= " + Math.sqrt(sum[d]) / referenceSetSize);
+          msg.append("\nsum[").append(d).append("]= ").append(sum[d]);
+          msg.append("\n  Math.sqrt(sum[d]) / referenceSetSize)= ").append(Math.sqrt(sum[d]) / referenceSetSize);
         }
         // projDim++;
         simMatrix.set(d, d, kappa);
@@ -144,8 +144,12 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
     }
 
     if(msg != null) {
-      msg.append("\nprojDim " /*+ database.getObjectLabelQuery().get(id)*/ + ": " + projDim);
-      msg.append("\nsimMatrix " /*+ database.getObjectLabelQuery().get(id)*/ + ": " + FormatUtil.format(simMatrix, FormatUtil.NF4));
+      msg.append("\nprojDim ");
+      // .append(database.getObjectLabelQuery().get(id));
+      msg.append(": ").append(projDim);
+      msg.append("\nsimMatrix ");
+      // .append(database.getObjectLabelQuery().get(id));
+      msg.append(": ").append(FormatUtil.format(simMatrix, FormatUtil.NF4));
       getLogger().debugFine(msg.toString());
     }
 
@@ -193,7 +197,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
      * The threshold for small eigenvalues.
      */
     protected double delta;
-    
+
     /**
      * Constructor.
      * 
