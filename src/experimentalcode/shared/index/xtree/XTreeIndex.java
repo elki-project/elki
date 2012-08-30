@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements RangeIndex<O>, KNNIndex<O> {
-  private static final Logging logger = Logging.getLogger(XTreeIndex.class);
+  private static final Logging LOG = Logging.getLogger(XTreeIndex.class);
 
   private Relation<O> relation;
 
@@ -164,6 +164,6 @@ public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements R
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

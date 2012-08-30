@@ -51,7 +51,7 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(XTree.class);
+  private static final Logging LOG = Logging.getLogger(XTree.class);
 
   /**
    * Constructor.
@@ -101,7 +101,7 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override
