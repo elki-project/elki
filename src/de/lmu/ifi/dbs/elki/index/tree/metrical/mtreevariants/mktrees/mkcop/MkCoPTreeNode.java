@@ -23,13 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.logging.Logger;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * Represents a node in an MkCop-Tree.
@@ -97,15 +94,6 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
       if(!Double.isInfinite(entry_y_kmax)) {
         y_kmax = Math.max(entry_y_kmax, y_kmax);
       }
-    }
-
-    if(LoggingConfiguration.DEBUG) {
-      StringBuffer msg = new StringBuffer();
-      msg.append("k_0 " + k_0);
-      msg.append("k_max " + k_max);
-      msg.append("y_1 " + y_1);
-      msg.append("y_kmax " + y_kmax);
-      Logger.getLogger(this.getClass().getName()).fine(msg.toString());
     }
 
     // determine m and t

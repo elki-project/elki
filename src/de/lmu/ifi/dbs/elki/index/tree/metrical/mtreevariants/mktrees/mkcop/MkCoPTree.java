@@ -398,9 +398,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        (insbes. Distanz 0)
    */
   private void approximateKnnDistances(MkCoPLeafEntry<D> entry, KNNResult<D> knnDistances) {
-    StringBuffer msg = new StringBuffer();
-    if(logger.isDebugging()) {
-      msg.append("\nknnDistances " + knnDistances);
+    StringBuffer msg = logger.isDebugging() ? new StringBuffer() : null;
+    if(msg != null) {
+      msg.append("\nknnDistances ").append(knnDistances);
     }
 
     // count the zero distances
@@ -438,16 +438,16 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       sum_log_k2 += (log_k[i] * log_k[i]);
     }
 
-    if(logger.isDebugging()) {
-      msg.append("\nk_0 " + k_0);
-      msg.append("\nk_max " + k_max);
-      msg.append("\nlog_k(" + log_k.length + ") " + FormatUtil.format(log_k));
-      msg.append("\nsum_log_k " + sum_log_k);
-      msg.append("\nsum_log_k^2 " + sum_log_k2);
-      msg.append("\nkDists " + knnDistances);
-      msg.append("\nlog_kDist(" + log_kDist.length + ") " + FormatUtil.format(log_kDist));
-      msg.append("\nsum_log_kDist " + sum_log_kDist);
-      msg.append("\nsum_log_k_kDist " + sum_log_k_kDist);
+    if(msg != null) {
+      msg.append("\nk_0 ").append(k_0);
+      msg.append("\nk_max ").append(k_max);
+      msg.append("\nlog_k(").append(log_k.length).append(") ").append(FormatUtil.format(log_k));
+      msg.append("\nsum_log_k ").append(sum_log_k);
+      msg.append("\nsum_log_k^2 ").append(sum_log_k2);
+      msg.append("\nkDists ").append(knnDistances);
+      msg.append("\nlog_kDist(").append(log_kDist.length).append(") ").append(FormatUtil.format(log_kDist));
+      msg.append("\nsum_log_kDist ").append(sum_log_kDist);
+      msg.append("\nsum_log_k_kDist ").append(sum_log_k_kDist);
     }
 
     // lower and upper hull
@@ -461,9 +461,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     double err1 = ssqerr(k_0, k_max, log_k, log_kDist, conservative.getM(), conservative.getT());
     double err2 = ssqerr(k_0, k_max, log_k, log_kDist, c2.getM(), c2.getT());
 
-    if(logger.isDebugging()) {
-      msg.append("err1 " + err1);
-      msg.append("err2 " + err2);
+    if(msg != null) {
+      msg.append("err1 ").append(err1);
+      msg.append("err2 ").append(err2);
     }
 
     if(err1 > err2 && err1 - err2 > 0.000000001) {
@@ -472,17 +472,17 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       StringBuffer warning = new StringBuffer();
       int u = convexHull.getNumberOfPointsInUpperHull();
       int[] upperHull = convexHull.getUpperHull();
-      warning.append("\nentry " + entry.getRoutingObjectID());
-      warning.append("\nlower Hull " + convexHull.getNumberOfPointsInLowerHull() + " " + FormatUtil.format(convexHull.getLowerHull()));
-      warning.append("\nupper Hull " + convexHull.getNumberOfPointsInUpperHull() + " " + FormatUtil.format(convexHull.getUpperHull()));
-      warning.append("\nerr1 " + err1);
-      warning.append("\nerr2 " + err2);
-      warning.append("\nconservative1 " + conservative);
-      warning.append("\nconservative2 " + c2);
+      warning.append("\nentry ").append(entry.getRoutingObjectID());
+      warning.append("\nlower Hull ").append(convexHull.getNumberOfPointsInLowerHull()).append(" ").append(FormatUtil.format(convexHull.getLowerHull()));
+      warning.append("\nupper Hull ").append(convexHull.getNumberOfPointsInUpperHull()).append(" ").append(FormatUtil.format(convexHull.getUpperHull()));
+      warning.append("\nerr1 ").append(err1);
+      warning.append("\nerr2 ").append(err2);
+      warning.append("\nconservative1 ").append(conservative);
+      warning.append("\nconservative2 ").append(c2);
 
       for(int i = 0; i < u; i++) {
-        warning.append("\nlog_k[" + upperHull[i] + "] = " + log_k[upperHull[i]]);
-        warning.append("\nlog_kDist[" + upperHull[i] + "] = " + log_kDist[upperHull[i]]);
+        warning.append("\nlog_k[").append(upperHull[i]).append("] = ").append(log_k[upperHull[i]]);
+        warning.append("\nlog_kDist[").append(upperHull[i]).append("] = ").append(log_kDist[upperHull[i]]);
       }
       // warning(warning.toString());
     }
@@ -493,10 +493,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     entry.setConservativeKnnDistanceApproximation(conservative);
     entry.setProgressiveKnnDistanceApproximation(progressive);
 
-    if(logger.isDebugging()) {
+    if(msg != null) {
       logger.debugFine(msg.toString());
     }
-
   }
 
   /**
@@ -515,7 +514,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     int k_0 = k_max - lowerHull.length + 1;
 
     // linear search on all line segments on the lower convex hull
-    msg.append("lower hull l = " + l + "\n");
+    msg.append("lower hull l = ").append(l).append("\n");
     double low_error = Double.MAX_VALUE;
     double low_m = 0.0;
     double low_t = 0.0;
@@ -524,7 +523,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       double cur_m = (log_kDist[lowerHull[i]] - log_kDist[lowerHull[i - 1]]) / (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]]);
       double cur_t = log_kDist[lowerHull[i]] - cur_m * log_k[lowerHull[i]];
       double cur_error = ssqerr(k_0, k_max, log_k, log_kDist, cur_m, cur_t);
-      msg.append("  Segment = " + i + " m = " + cur_m + " t = " + cur_t + " lowerror = " + cur_error + "\n");
+      msg.append("  Segment = ").append(i).append(" m = ").append(cur_m).append(" t = ").append(cur_t).append(" lowerror = ").append(cur_error).append("\n");
       if(cur_error < low_error) {
         low_error = cur_error;
         low_m = cur_m;
@@ -577,12 +576,12 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       ApproximationLine current_approx = new ApproximationLine(k_0, current_m, current_t);
 
       if(logger.isDebugging()) {
-        msg.append("\nlog_kDist[" + jj + "] " + log_kDist[jj]);
-        msg.append("\nlog_kDist[" + ii + "] " + log_kDist[ii]);
-        msg.append("\nlog_k[" + jj + "] " + log_k[jj]);
-        msg.append("\nlog_k[" + ii + "] " + log_k[ii]);
-        msg.append("\n" + (log_kDist[jj] - log_kDist[ii]));
-        msg.append("\ncurrent_approx_" + i + " " + current_approx);
+        msg.append("\nlog_kDist[").append(jj).append("] ").append(log_kDist[jj]);
+        msg.append("\nlog_kDist[").append(ii).append("] ").append(log_kDist[ii]);
+        msg.append("\nlog_k[").append(jj).append("] ").append(log_k[jj]);
+        msg.append("\nlog_k[").append(ii).append("] ").append(log_k[ii]);
+        msg.append("\n").append((log_kDist[jj] - log_kDist[ii]));
+        msg.append("\ncurrent_approx_").append(i).append(" ").append(current_approx);
       }
 
       boolean ok = true;
@@ -603,14 +602,14 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     if(logger.isDebugging()) {
-      msg.append("\nupper Approx " + approx);
+      msg.append("\nupper Approx ").append(approx);
       logger.debugFine(msg.toString());
     }
     return approx;
   }
 
   private ApproximationLine approximateUpperHull_PAPER(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-    StringBuffer msg = new StringBuffer();
+    StringBuffer msg = logger.isDebugging() ? new StringBuffer() : null;
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
@@ -628,9 +627,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       double m_a = optimize(k_0, k_max, sum_log_k, sum_log_k2, x_a, y_a, sum_log_k_kDist, sum_log_kDist);
       double t_a = y_a - m_a * x_a;
 
-      if(logger.isDebugging()) {
-        msg.append("\na=" + a + " m_a=" + m_a + ", t_a=" + t_a);
-        msg.append("\n err " + ssqerr(k_0, k_max, log_k, log_kDist, m_a, m_a));
+      if(msg != null) {
+        msg.append("\na=").append(a).append(" m_a=").append(m_a).append(", t_a=").append(t_a);
+        msg.append("\n err ").append(ssqerr(k_0, k_max, log_k, log_kDist, m_a, m_a));
       }
 
       double x_p = a == 0 ? Double.NaN : log_k[upperHull[a - 1]];
@@ -643,13 +642,12 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
       if(lessThanPre && lessThanSuc) {
         ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
-        if(logger.isDebugging()) {
-          msg.append("\n1 anchor = " + a);
+        if(msg != null) {
+          msg.append("\n1 anchor = ").append(a);
           logger.debugFine(msg.toString());
         }
         return appr;
       }
-
       else if(!lessThanPre) {
         if(marked.contains(a - 1)) {
           m_a = (y_a - y_p) / (x_a - x_p);
@@ -659,13 +657,13 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           t_a = y_a - m_a * x_a;
 
           ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
-          if(logger.isDebugging()) {
-            msg.append("2 anchor = " + a);
-            msg.append(" appr1 " + appr);
-            msg.append(" x_a " + x_a + ", y_a " + y_a);
-            msg.append(" x_p " + x_p + ", y_p " + y_p);
-            msg.append(" a " + a);
-            msg.append(" upperHull " + FormatUtil.format(upperHull));
+          if(msg != null) {
+            msg.append("2 anchor = ").append(a);
+            msg.append(" appr1 ").append(appr);
+            msg.append(" x_a ").append(x_a).append(", y_a ").append(y_a);
+            msg.append(" x_p ").append(x_p).append(", y_p ").append(y_p);
+            msg.append(" a ").append(a);
+            msg.append(" upperHull ").append(FormatUtil.format(upperHull));
             logger.debugFine(msg.toString());
           }
           return appr;
@@ -683,9 +681,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           t_a = y_a - m_a * x_a;
           ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
 
-          if(logger.isDebugging()) {
-            msg.append("3 anchor = " + a + " -- " + (a + 1));
-            msg.append(" appr2 " + appr);
+          if(msg != null) {
+            msg.append("3 anchor = ").append(a).append(" -- ").append((a + 1));
+            msg.append(" appr2 ").append(appr);
             logger.debugFine(msg.toString());
           }
           return appr;

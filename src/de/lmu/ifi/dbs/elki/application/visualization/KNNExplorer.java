@@ -412,8 +412,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
 
       DefaultListModel m = new DefaultListModel();
       for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        DBID dbid  = DBIDUtil.deref(iditer);
-        m.addElement(iditer);
+        m.addElement(DBIDUtil.deref(iditer));
       }
       seriesList.setModel(m);
 
