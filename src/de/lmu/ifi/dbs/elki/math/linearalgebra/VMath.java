@@ -1293,6 +1293,27 @@ public final class VMath {
   }
 
   /**
+   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
+   * 
+   * @param B matrix
+   * @param c vector on the right
+   * @return Matrix product, a<sup>T</sup> * B * c
+   */
+  public static double transposeTimesTimes(final double[] a, final double[][] B, final double[] c) {
+    assert (B.length == a.length) : ERR_MATRIX_INNERDIM;
+    double sum = 0.0;
+    for(int j = 0; j < B[0].length; j++) {
+      // multiply it with each row from A
+      double s = 0;
+      for(int k = 0; k < a.length; k++) {
+        s += a[k] * B[k][j];
+      }
+      sum += s * c[j];
+    }
+    return sum;
+  }
+
+  /**
    * Linear algebraic matrix multiplication, m1 * m2^T
    * 
    * @param m1 Input matrix

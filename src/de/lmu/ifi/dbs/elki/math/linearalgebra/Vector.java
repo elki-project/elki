@@ -396,7 +396,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * 
    * @param B matrix
    * @param c vector on the right
-   * @return Matrix product, a<sup>T</sup> * B
+   * @return Matrix product, a<sup>T</sup> * B * c
    */
   public final double transposeTimesTimes(final Matrix B, final Vector c) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
