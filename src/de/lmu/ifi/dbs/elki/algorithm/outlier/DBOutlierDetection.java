@@ -72,7 +72,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DBOutlierDetection.class);
+  private static final Logging LOG = Logging.getLogger(DBOutlierDetection.class);
 
   /**
    * Parameter to specify the minimum fraction of objects that must be outside
@@ -106,11 +106,11 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
     int m = (int) ((distFunc.getRelation().size()) * (1 - p));
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
-    if(logger.isVerbose()) {
-      logger.verbose("computing outlier flag");
+    if(LOG.isVerbose()) {
+      LOG.verbose("computing outlier flag");
     }
 
-    FiniteProgress progressOFlags = logger.isVerbose() ? new FiniteProgress("DBOutlier for objects", distFunc.getRelation().size(), logger) : null;
+    FiniteProgress progressOFlags = LOG.isVerbose() ? new FiniteProgress("DBOutlier for objects", distFunc.getRelation().size(), LOG) : null;
     int counter = 0;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
@@ -118,8 +118,8 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
       for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
         counter++;
         final KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, m);
-        if(logger.isDebugging()) {
-          logger.debugFine("distance to mth nearest neighbour" + knns.toString());
+        if(LOG.isDebugging()) {
+          LOG.debugFine("distance to mth nearest neighbour" + knns.toString());
         }
         if(knns.get(Math.min(m, knns.size()) - 1).getDistance().compareTo(neighborhoodSize) <= 0) {
           // flag as outlier
@@ -131,7 +131,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
         }
       }
       if(progressOFlags != null) {
-        progressOFlags.setProcessed(counter, logger);
+        progressOFlags.setProcessed(counter, LOG);
       }
     }
     else {
@@ -149,18 +149,18 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
       }
 
       if(progressOFlags != null) {
-        progressOFlags.setProcessed(counter, logger);
+        progressOFlags.setProcessed(counter, LOG);
       }
     }
     if(progressOFlags != null) {
-      progressOFlags.ensureCompleted(logger);
+      progressOFlags.ensureCompleted(LOG);
     }
     return scores;
   }
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

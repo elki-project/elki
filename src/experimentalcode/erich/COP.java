@@ -79,7 +79,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(COP.class);
+  private static final Logging LOG = Logging.getLogger(COP.class);
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
@@ -126,7 +126,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     WritableIntegerDataStore cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
     WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
-      FiniteProgress progressLocalPCA = logger.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), logger) : null;
+      FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), LOG) : null;
       double sqrt2 = Math.sqrt(2.0);
       for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
@@ -162,11 +162,11 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
         cop_sol.put(id, depsol);
 
         if(progressLocalPCA != null) {
-          progressLocalPCA.incrementProcessed(logger);
+          progressLocalPCA.incrementProcessed(LOG);
         }
       }
       if(progressLocalPCA != null) {
-        progressLocalPCA.ensureCompleted(logger);
+        progressLocalPCA.ensureCompleted(LOG);
       }
     }
     // combine results.
@@ -188,7 +188,7 @@ public class COP<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

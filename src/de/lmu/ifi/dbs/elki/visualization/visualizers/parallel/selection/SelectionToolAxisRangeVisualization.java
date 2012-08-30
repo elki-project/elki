@@ -66,7 +66,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
-  protected static final Logging logger = Logging.getLogger(SelectionToolAxisRangeVisualization.class);
+  private static final Logging LOG = Logging.getLogger(SelectionToolAxisRangeVisualization.class);
 
   /**
    * A short name characterizing this Visualizer.
@@ -202,8 +202,8 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
       for(int i = minaxis; i < maxaxis; i++) {
         double v1 = proj.fastProjectRenderToDataSpace(z1, i);
         double v2 = proj.fastProjectRenderToDataSpace(z2, i);
-        if(logger.isDebugging()) {
-          logger.debug("Axis " + i + " dimension " + proj.getDimForVisibleAxis(i) + " " + v1 + " to " + v2);
+        if(LOG.isDebugging()) {
+          LOG.debug("Axis " + i + " dimension " + proj.getDimForVisibleAxis(i) + " " + v1 + " to " + v2);
         }
         ranges[proj.getDimForVisibleAxis(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
       }
@@ -253,7 +253,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
       DoubleDoublePair[] ranges;
 
       if(p1 == null || p2 == null) {
-        logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
+        LOG.warning("no rect selected: p1: " + p1 + " p2: " + p2);
       }
       else {
         double x1 = Math.min(p1.getX(), p2.getX());

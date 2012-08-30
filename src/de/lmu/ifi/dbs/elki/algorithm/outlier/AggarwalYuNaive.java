@@ -74,7 +74,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(AggarwalYuNaive.class);
+  private static final Logging LOG = Logging.getLogger(AggarwalYuNaive.class);
 
   /**
    * Constructor.
@@ -171,7 +171,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

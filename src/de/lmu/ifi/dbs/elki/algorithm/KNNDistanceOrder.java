@@ -63,7 +63,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KNNDistanceOrder.class);
+  private static final Logging LOG = Logging.getLogger(KNNDistanceOrder.class);
 
   /**
    * Parameter to specify the distance of the k-distant object to be assessed,
@@ -132,7 +132,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

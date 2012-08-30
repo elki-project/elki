@@ -94,7 +94,7 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ChengAndChurch.class);
+  private static final Logging LOG = Logging.getLogger(ChengAndChurch.class);
   
   /**
    * The minimum number of columns that the database must have so that a removal
@@ -451,8 +451,8 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
     long t = System.currentTimeMillis();
 
     chengAndChurch();
-    if(logger.isVerbose()) {
-      logger.verbose("Runtime: " + (System.currentTimeMillis() - t));
+    if(LOG.isVerbose()) {
+      LOG.verbose("Runtime: " + (System.currentTimeMillis() - t));
     }
   }
 
@@ -497,11 +497,11 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
       bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
       addBiclusterToResult(bicluster);
 
-      if(logger.isVerbose()) {
-        logger.verbose("Score of bicluster" + (i + 1) + ": " + this.currentResidue);
-        logger.verbose("Number of rows: " + currentRows.cardinality());
-        logger.verbose("Number of columns: " + currentCols.cardinality());
-        logger.verbose("Total number of masked values: " + maskedVals.size() + "\n");
+      if(LOG.isVerbose()) {
+        LOG.verbose("Score of bicluster" + (i + 1) + ": " + this.currentResidue);
+        LOG.verbose("Number of rows: " + currentRows.cardinality());
+        LOG.verbose("Number of columns: " + currentCols.cardinality());
+        LOG.verbose("Total number of masked values: " + maskedVals.size() + "\n");
       }
       this.reset();
     }
@@ -1028,6 +1028,6 @@ public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractB
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

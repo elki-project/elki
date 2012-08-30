@@ -57,7 +57,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
   /**
    * Class logger.
    */
-  public static final Logging logger = Logging.getLogger(AttributeWiseVarianceNormalization.class);
+  private static final Logging LOG = Logging.getLogger(AttributeWiseVarianceNormalization.class);
 
   /**
    * Parameter for means.
@@ -115,7 +115,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
 
   @Override
   protected void prepareComplete() {
-    StringBuffer buf = logger.isVerbose() ? new StringBuffer() : null;
+    StringBuffer buf = LOG.isVerbose() ? new StringBuffer() : null;
     final int dimensionality = mvs.length;
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
@@ -134,7 +134,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
     mvs = null;
     if(buf != null) {
-      logger.debugFine(buf.toString());
+      LOG.debugFine(buf.toString());
     }
   }
 

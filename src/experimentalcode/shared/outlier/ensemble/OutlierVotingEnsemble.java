@@ -71,7 +71,7 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OutlierVotingEnsemble.class);
+  private static final Logging LOG = Logging.getLogger(OutlierVotingEnsemble.class);
   
   /**
    * Parameter for the individual algorithms
@@ -126,7 +126,7 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
-      FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, logger) : null;
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, LOG) : null;
       for(Algorithm alg : algorithms) {
         Result res = alg.run(database);
         List<OutlierResult> ors = ResultUtil.getOutlierResults(res);
@@ -135,18 +135,18 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
           ids.addDBIDs(or.getScores().getDBIDs());
         }
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.incrementProcessed(LOG);
         }
       }
       if(prog != null) {
-        prog.ensureCompleted(logger);
+        prog.ensureCompleted(LOG);
       }
     }
     // Combine
     WritableDoubleDataStore sumscore = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
     {
-      FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", ids.size(), logger) : null;
+      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", ids.size(), LOG) : null;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         ArrayList<Double> scores = new ArrayList<Double>(num);
         for(OutlierResult r : results) {
@@ -155,7 +155,7 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
             scores.add(score);
           }
           else {
-            logger.warning("DBID " + id + " was not given a score by result " + r);
+            LOG.warning("DBID " + id + " was not given a score by result " + r);
           }
         }
         if(scores.size() > 0) {
@@ -164,14 +164,14 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
           minmax.put(combined);
         }
         else {
-          logger.warning("DBID " + id + " was not given any score at all.");
+          LOG.warning("DBID " + id + " was not given any score at all.");
         }
         if(cprog != null) {
-          cprog.incrementProcessed(logger);
+          cprog.incrementProcessed(LOG);
         }
       }
       if(cprog != null) {
-        cprog.ensureCompleted(logger);
+        cprog.ensureCompleted(LOG);
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
@@ -181,7 +181,7 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

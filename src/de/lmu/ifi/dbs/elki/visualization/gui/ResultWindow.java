@@ -87,7 +87,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ResultWindow.class);
+  private static final Logging LOG = Logging.getLogger(ResultWindow.class);
 
   /**
    * The "Overview" button, which goes to the overview view.
@@ -348,7 +348,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
     }
     else {
-      logger.warning("saveCurrentPlot() called without a visible plot!");
+      LOG.warning("saveCurrentPlot() called without a visible plot!");
     }
   }
 

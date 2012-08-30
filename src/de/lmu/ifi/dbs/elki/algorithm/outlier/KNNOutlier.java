@@ -79,7 +79,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KNNOutlier.class);
+  private static final Logging LOG = Logging.getLogger(KNNOutlier.class);
 
   /**
    * Parameter to specify the k nearest neighbor
@@ -109,10 +109,10 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
-    if(logger.isVerbose()) {
-      logger.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Computing the kNN outlier degree (distance to the k nearest neighbor)");
     }
-    FiniteProgress progressKNNDistance = logger.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), logger) : null;
+    FiniteProgress progressKNNDistance = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knno_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -132,11 +132,11 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
       minmax.put(dkn);
 
       if(progressKNNDistance != null) {
-        progressKNNDistance.incrementProcessed(logger);
+        progressKNNDistance.incrementProcessed(LOG);
       }
     }
     if(progressKNNDistance != null) {
-      progressKNNDistance.ensureCompleted(logger);
+      progressKNNDistance.ensureCompleted(LOG);
     }
     Relation<Double> scoreres = new MaterializedRelation<Double>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, knno_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
@@ -150,7 +150,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

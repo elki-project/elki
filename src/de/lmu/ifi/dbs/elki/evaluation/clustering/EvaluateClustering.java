@@ -57,7 +57,7 @@ public class EvaluateClustering implements Evaluator {
   /**
    * Logger for debug output.
    */
-  protected static final Logging logger = Logging.getLogger(EvaluateClustering.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateClustering.class);
 
   /**
    * Parameter to obtain the reference clustering. Defaults to a flat label
@@ -134,20 +134,20 @@ public class EvaluateClustering implements Evaluator {
       }
     }
     if(refc == null) {
-      logger.debug("Generating a new reference clustering.");
+      LOG.debug("Generating a new reference clustering.");
       Result refres = referencealg.run(db);
       List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
       if(refcrs.size() == 0) {
-        logger.warning("Reference algorithm did not return a clustering result!");
+        LOG.warning("Reference algorithm did not return a clustering result!");
         return;
       }
       if(refcrs.size() > 1) {
-        logger.warning("Reference algorithm returned more than one result!");
+        LOG.warning("Reference algorithm returned more than one result!");
       }
       refc = refcrs.get(0);
     }
     else {
-      logger.debug("Using existing clustering: " + refc.getLongName() + " " + refc.getShortName());
+      LOG.debug("Using existing clustering: " + refc.getLongName() + " " + refc.getShortName());
     }
     for(Clustering<?> c : crs) {
       if(c == refc) {

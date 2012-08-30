@@ -43,7 +43,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(ShuffleObjectsFilter.class);
+  private static final Logging LOG = Logging.getLogger(ShuffleObjectsFilter.class);
 
   /**
    * Optional parameter to specify a seed for randomly shuffling the rows of the
@@ -74,8 +74,8 @@ public class ShuffleObjectsFilter implements ObjectFilter {
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    if(logger.isDebugging()) {
-      logger.debug("Shuffling the data set");
+    if(LOG.isDebugging()) {
+      LOG.debug("Shuffling the data set");
     }
     final Random random = (seed == null) ? new Random() : new Random(seed);
 

@@ -49,7 +49,7 @@ public abstract class AbstractParameterization implements Parameterization {
   /**
    * The logger of the class.
    */
-  private final static Logging logger = Logging.getLogger(AbstractParameterization.class);
+  private static final Logging LOG = Logging.getLogger(AbstractParameterization.class);
 
   @Override
   public Collection<ParameterException> getErrors() {
@@ -71,11 +71,11 @@ public abstract class AbstractParameterization implements Parameterization {
    */
   public synchronized void logAndClearReportedErrors() {
     for(ParameterException e : getErrors()) {
-      if(logger.isDebugging()) {
-        logger.warning(e.getMessage(), e);
+      if(LOG.isDebugging()) {
+        LOG.warning(e.getMessage(), e);
       }
       else {
-        logger.warning(e.getMessage());
+        LOG.warning(e.getMessage());
       }
     }
     clearErrors();
@@ -120,7 +120,7 @@ public abstract class AbstractParameterization implements Parameterization {
   @Override
   public final boolean grab(Parameter<?, ?> opt) {
     if(opt.isDefined()) {
-      logger.warning("Option " + opt.getName() + " is already set!");
+      LOG.warning("Option " + opt.getName() + " is already set!");
     }
     try {
       if(setValueForOption(opt)) {
@@ -176,7 +176,7 @@ public abstract class AbstractParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(r, c, this);
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
       reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
       return null;
     }
@@ -188,7 +188,7 @@ public abstract class AbstractParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(c, c, this);
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
       reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
       return null;
     }

@@ -85,7 +85,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(FeatureBagging.class);
+  private static final Logging LOG = Logging.getLogger(FeatureBagging.class);
 
   /**
    * Number of instances to use
@@ -140,7 +140,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
 
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
-      FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("LOF iterations", num, logger) : null;
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", num, LOG) : null;
       for(int i = 0; i < num; i++) {
         BitSet dimset = randomSubspace(dbdim, mindim, maxdim);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
@@ -150,18 +150,18 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         OutlierResult result = lof.run(relation);
         results.add(result);
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.incrementProcessed(LOG);
         }
       }
       if(prog != null) {
-        prog.ensureCompleted(logger);
+        prog.ensureCompleted(LOG);
       }
     }
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
     if(breadth) {
-      FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
+      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", relation.size(), LOG) : null;
       Pair<DBIDIter, Relation<Double>>[] IDVectorOntoScoreVector = Pair.newPairArray(results.size());
 
       // Mapping score-sorted DBID-Iterators onto their corresponding scores.
@@ -190,20 +190,20 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
             iter.advance();
           }
           else {
-            logger.warning("Incomplete result: Iterator does not contain |DB| DBIDs");
+            LOG.warning("Incomplete result: Iterator does not contain |DB| DBIDs");
           }
         }
         // Progress does not take the initial mapping into account.
         if(cprog != null) {
-          cprog.incrementProcessed(logger);
+          cprog.incrementProcessed(LOG);
         }
       }
       if(cprog != null) {
-        cprog.ensureCompleted(logger);
+        cprog.ensureCompleted(LOG);
       }
     }
     else {
-      FiniteProgress cprog = logger.isVerbose() ? new FiniteProgress("Combining results", relation.size(), logger) : null;
+      FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", relation.size(), LOG) : null;
       for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         double sum = 0.0;
         for(OutlierResult r : results) {
@@ -215,11 +215,11 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         scores.putDouble(iter, sum);
         minmax.put(sum);
         if(cprog != null) {
-          cprog.incrementProcessed(logger);
+          cprog.incrementProcessed(LOG);
         }
       }
       if(cprog != null) {
-        cprog.ensureCompleted(logger);
+        cprog.ensureCompleted(LOG);
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
@@ -257,7 +257,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

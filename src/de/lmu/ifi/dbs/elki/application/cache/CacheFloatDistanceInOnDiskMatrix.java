@@ -60,7 +60,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CacheFloatDistanceInOnDiskMatrix.class);
+  private static final Logging LOG = Logging.getLogger(CacheFloatDistanceInOnDiskMatrix.class);
 
   /**
    * Parameter that specifies the name of the directory to be re-parsed.
@@ -148,7 +148,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
           if(debugExtraCheckSymmetry) {
             float d2 = distanceQuery.distance(id2, id1).floatValue();
             if(Math.abs(d - d2) > 0.0000001) {
-              logger.warning("Distance function doesn't appear to be symmetric!");
+              LOG.warning("Distance function doesn't appear to be symmetric!");
             }
           }
           try {

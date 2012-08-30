@@ -77,7 +77,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
   /**
    * Get a logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SharedNearestNeighborPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(SharedNearestNeighborPreprocessor.class);
 
   /**
    * Holds the number of nearest neighbors to be used.
@@ -146,7 +146,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

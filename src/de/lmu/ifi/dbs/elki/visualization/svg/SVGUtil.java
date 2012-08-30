@@ -244,7 +244,7 @@ public final class SVGUtil {
   /**
    * CSS Stylesheet from Javax, to parse color values.
    */
-  private final static StyleSheet colorLookupStylesheet = new StyleSheet();
+  private static final StyleSheet colorLookupStylesheet = new StyleSheet();
 
   /**
    * Format a double according to the SVG specs.

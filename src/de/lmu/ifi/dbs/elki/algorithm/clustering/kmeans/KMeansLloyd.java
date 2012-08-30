@@ -74,7 +74,7 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KMeansLloyd.class);
+  private static final Logging LOG = Logging.getLogger(KMeansLloyd.class);
 
   /**
    * Constructor.
@@ -107,8 +107,8 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
     }
 
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(logger.isVerbose()) {
-        logger.verbose("K-Means iteration " + (iteration + 1));
+      if(LOG.isVerbose()) {
+        LOG.verbose("K-Means iteration " + (iteration + 1));
       }
       boolean changed = assignToNearestCluster(relation, means, clusters);
       // Stop if no cluster assignment changed.
@@ -130,7 +130,7 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

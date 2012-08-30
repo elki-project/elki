@@ -88,7 +88,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KNNJoin.class);
+  private static final Logging LOG = Logging.getLogger(KNNJoin.class);
 
   /**
    * Parameter that specifies the k-nearest neighbors to be assigned, must be an
@@ -148,10 +148,10 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
     // Build priority queue
     final int sqsize = ps_candidates.size() * (ps_candidates.size() - 1) / 2;
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Number of leaves: " + ps_candidates.size() + " so " + sqsize + " MBR computations.");
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Number of leaves: " + ps_candidates.size() + " so " + sqsize + " MBR computations.");
     }
-    FiniteProgress mprogress = logger.isVerbose() ? new FiniteProgress("Comparing leaf MBRs", sqsize, logger) : null;
+    FiniteProgress mprogress = LOG.isVerbose() ? new FiniteProgress("Comparing leaf MBRs", sqsize, LOG) : null;
     for(int i = 0; i < ps_candidates.size(); i++) {
       E pr_entry = ps_candidates.get(i);
       List<KNNHeap<D>> pr_heaps = heaps.get(i);
@@ -172,17 +172,17 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
           pq.add(new Task(minDist, i, j));
         }
         if(mprogress != null) {
-          mprogress.incrementProcessed(logger);
+          mprogress.incrementProcessed(LOG);
         }
       }
     }
     if(mprogress != null) {
-      mprogress.ensureCompleted(logger);
+      mprogress.ensureCompleted(LOG);
     }
 
     // Process the queue
-    FiniteProgress qprogress = logger.isVerbose() ? new FiniteProgress("Processing queue", pq.size(), logger) : null;
-    IndefiniteProgress fprogress = logger.isVerbose() ? new IndefiniteProgress("Full comparisons", logger) : null;
+    FiniteProgress qprogress = LOG.isVerbose() ? new FiniteProgress("Processing queue", pq.size(), LOG) : null;
+    IndefiniteProgress fprogress = LOG.isVerbose() ? new IndefiniteProgress("Full comparisons", LOG) : null;
     while(!pq.isEmpty()) {
       Task task = pq.poll();
       List<KNNHeap<D>> pr_heaps = heaps.get(task.i);
@@ -206,25 +206,25 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
           }
         }
         if(fprogress != null) {
-          fprogress.incrementProcessed(logger);
+          fprogress.incrementProcessed(LOG);
         }
       }
       if(qprogress != null) {
-        qprogress.incrementProcessed(logger);
+        qprogress.incrementProcessed(LOG);
       }
     }
     if(qprogress != null) {
-      qprogress.ensureCompleted(logger);
+      qprogress.ensureCompleted(LOG);
     }
     if(fprogress != null) {
-      fprogress.setCompleted(logger);
+      fprogress.setCompleted(LOG);
     }
 
     WritableDataStore<KNNResult<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNResult.class);
     // FiniteProgress progress = logger.isVerbose() ? new
     // FiniteProgress(this.getClass().getName(), relation.size(), logger) :
     // null;
-    FiniteProgress pageprog = logger.isVerbose() ? new FiniteProgress("Number of processed data pages", ps_candidates.size(), logger) : null;
+    FiniteProgress pageprog = LOG.isVerbose() ? new FiniteProgress("Number of processed data pages", ps_candidates.size(), LOG) : null;
     // int processed = 0;
     for(int i = 0; i < ps_candidates.size(); i++) {
       N pr = index.getNode(ps_candidates.get(i));
@@ -242,14 +242,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       // progress.setProcessed(processed, logger);
       // }
       if(pageprog != null) {
-        pageprog.incrementProcessed(logger);
+        pageprog.incrementProcessed(LOG);
       }
     }
     // if(progress != null) {
     // progress.ensureCompleted(logger);
     // }
     if(pageprog != null) {
-      pageprog.ensureCompleted(logger);
+      pageprog.ensureCompleted(LOG);
     }
     return knnLists;
   }
@@ -356,7 +356,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

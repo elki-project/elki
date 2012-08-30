@@ -68,7 +68,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
-  protected static final Logging logger = Logging.getLogger(SelectionToolCubeVisualization.class);
+  private static final Logging LOG = Logging.getLogger(SelectionToolCubeVisualization.class);
 
   /**
    * A short name characterizing this Visualizer.
@@ -233,7 +233,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      */
     private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
       if(p1 == null || p2 == null) {
-        logger.warning("no rect selected: p1: " + p1 + " p2: " + p2);
+        LOG.warning("no rect selected: p1: " + p1 + " p2: " + p2);
         return;
       }
 

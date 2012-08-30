@@ -50,7 +50,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(InputStreamDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(InputStreamDatabaseConnection.class);
 
   /**
    * Holds the instance of the parser.
@@ -76,16 +76,16 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
   @Override
   public MultipleObjectsBundle loadData() {
     // Run parser
-    if(logger.isDebugging()) {
-      logger.debugFine("Invoking parsers.");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("Invoking parsers.");
     }
     if(parser instanceof StreamingParser) {
       final StreamingParser streamParser = (StreamingParser)parser;
       streamParser.initStream(in);
 
       // normalize objects and transform labels
-      if(logger.isDebugging()) {
-        logger.debugFine("Invoking filters.");
+      if(LOG.isDebugging()) {
+        LOG.debugFine("Invoking filters.");
       }
       MultipleObjectsBundle objects = MultipleObjectsBundle.fromStream(invokeFilters(streamParser));
       return objects;
@@ -94,8 +94,8 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
       MultipleObjectsBundle parsingResult = parser.parse(in);
 
       // normalize objects and transform labels
-      if(logger.isDebugging()) {
-        logger.debugFine("Invoking filters.");
+      if(LOG.isDebugging()) {
+        LOG.debugFine("Invoking filters.");
       }
       MultipleObjectsBundle objects = invokeFilters(parsingResult);
       return objects;
@@ -104,7 +104,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -68,7 +68,7 @@ public class MaterializedRelation<O> extends AbstractHierarchicalResult implemen
    * 
    * Note: we only keep an unmodifiable reference.
    */
-  private final StaticDBIDs ids;
+  private static finalDBIDs ids;
 
   /**
    * The relation name.

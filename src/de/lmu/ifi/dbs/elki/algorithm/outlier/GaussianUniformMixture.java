@@ -82,7 +82,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(GaussianUniformMixture.class);
+  private static final Logging LOG = Logging.getLogger(GaussianUniformMixture.class);
 
   /**
    * Parameter to specify the fraction of expected outliers.
@@ -237,7 +237,7 @@ public class GaussianUniformMixture<V extends NumberVector<V, ?>> extends Abstra
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

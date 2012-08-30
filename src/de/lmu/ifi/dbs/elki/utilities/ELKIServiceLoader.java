@@ -45,7 +45,7 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
   /**
    * Class logger.
    */
-  private static final Logging logger = Logging.getLogger(ELKIServiceLoader.class);
+  private static final Logging LOG = Logging.getLogger(ELKIServiceLoader.class);
 
   /**
    * Prefix for the ELKI functionality discovery.
@@ -184,11 +184,11 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
         classes.add(cls);
       }
       else {
-        logger.warning("Class " + line + " does not implement " + parent + " but listed in service file " + nextElement);
+        LOG.warning("Class " + line + " does not implement " + parent + " but listed in service file " + nextElement);
       }
     }
     catch(ClassNotFoundException e) {
-      logger.warning("Class not found: " + line + "; listed in service file " + nextElement, e);
+      LOG.warning("Class not found: " + line + "; listed in service file " + nextElement, e);
     }
     return true;
   }

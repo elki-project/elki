@@ -82,7 +82,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(SparseNumberVectorLabelParser.class);
+  private static final Logging LOG = Logging.getLogger(SparseNumberVectorLabelParser.class);
 
   /**
    * Holds the dimensionality of the parsed data which is the maximum occurring
@@ -158,7 +158,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

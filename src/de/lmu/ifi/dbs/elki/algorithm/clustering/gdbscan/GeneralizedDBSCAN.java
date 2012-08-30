@@ -79,7 +79,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
   /**
    * Get a logger for this algorithm
    */
-  final static Logging logger = Logging.getLogger(GeneralizedDBSCAN.class);
+  private static final Logging LOG = Logging.getLogger(GeneralizedDBSCAN.class);
 
   /**
    * The neighborhood predicate factory.
@@ -120,7 +120,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**
@@ -177,8 +177,8 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     public Clustering<Model> run() {
       final DBIDs ids = npred.getIDs();
       // Setup progress logging
-      final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", ids.size(), logger) : null;
-      final IndefiniteProgress clusprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters", logger) : null;
+      final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustering", ids.size(), LOG) : null;
+      final IndefiniteProgress clusprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters", LOG) : null;
       // (Temporary) store the cluster ID assigned.
       final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, UNPROCESSED);
       // Note: these are not exact!
@@ -206,7 +206,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
           clustersize = 0;
           clusterid += 1;
           if(clusprogress != null) {
-            clusprogress.setProcessed(clusterid, logger);
+            clusprogress.setProcessed(clusterid, LOG);
           }
         }
         else {
@@ -216,15 +216,15 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         }
         // We've completed this element
         if(progress != null) {
-          progress.incrementProcessed(logger);
+          progress.incrementProcessed(LOG);
         }
       }
       // Finish progress logging.
       if(progress != null) {
-        progress.ensureCompleted(logger);
+        progress.ensureCompleted(LOG);
       }
       if(clusprogress != null) {
-        clusprogress.setCompleted(logger);
+        clusprogress.setCompleted(LOG);
       }
 
       // Transform cluster ID mapping into a clustering result:
@@ -285,7 +285,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
             npred.addDBIDs(activeSet, newneighbors);
           }
           if(progress != null) {
-            progress.incrementProcessed(logger);
+            progress.incrementProcessed(LOG);
           }
         }
       }

@@ -76,7 +76,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KNNWeightOutlier.class);
+  private static final Logging LOG = Logging.getLogger(KNNWeightOutlier.class);
 
   /**
    * Parameter to specify the k nearest neighbor
@@ -111,10 +111,10 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
-    if(logger.isVerbose()) {
-      logger.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
+    if(LOG.isVerbose()) {
+      LOG.verbose("computing outlier degree(sum of the distances to the k nearest neighbors");
     }
-    FiniteProgress progressKNNWeight = logger.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", relation.size(), logger) : null;
+    FiniteProgress progressKNNWeight = LOG.isVerbose() ? new FiniteProgress("KNNWOD_KNNWEIGHT for objects", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
 
@@ -140,11 +140,11 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
       minmax.put(skn);
 
       if(progressKNNWeight != null) {
-        progressKNNWeight.incrementProcessed(logger);
+        progressKNNWeight.incrementProcessed(LOG);
       }
     }
     if(progressKNNWeight != null) {
-      progressKNNWeight.ensureCompleted(logger);
+      progressKNNWeight.ensureCompleted(LOG);
     }
 
     Relation<Double> res = new MaterializedRelation<Double>("Weighted kNN Outlier Score", "knnw-outlier", TypeUtil.DOUBLE, knnw_score, relation.getDBIDs());
@@ -159,7 +159,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

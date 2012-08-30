@@ -94,7 +94,7 @@ public class MiniGUI extends JPanel {
   /**
    * ELKI logger for the GUI
    */
-  protected static final Logging logger = Logging.getLogger(MiniGUI.class);
+  private static final Logging LOG = Logging.getLogger(MiniGUI.class);
 
   /**
    * Logging output area.
@@ -180,7 +180,7 @@ public class MiniGUI extends JPanel {
             store.save();
           }
           catch(IOException e1) {
-            logger.exception(e1);
+            LOG.exception(e1);
           }
           savedSettingsModel.update();
         }
@@ -198,7 +198,7 @@ public class MiniGUI extends JPanel {
             store.save();
           }
           catch(IOException e1) {
-            logger.exception(e1);
+            LOG.exception(e1);
           }
           savedCombo.setSelectedItem("[Saved Settings]");
           savedSettingsModel.update();
@@ -287,7 +287,7 @@ public class MiniGUI extends JPanel {
       // Ignore - probably didn't save any settings yet.
     }
     catch(IOException e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
 
   }
@@ -336,7 +336,7 @@ public class MiniGUI extends JPanel {
         remo.setValue(FormatUtil.format(remainingParameters, " "));
       }
       catch(ParameterException e) {
-        logger.exception(e);
+        LOG.exception(e);
       }
       BitSet bits = new BitSet();
       bits.set(DynamicParameters.BIT_INVALID);
@@ -376,10 +376,10 @@ public class MiniGUI extends JPanel {
           else {
             reportErrors(config);
           }
-          logger.debug("Task completed successfully.");
+          LOG.debug("Task completed successfully.");
         }
         catch(Throwable e) {
-          logger.exception("Task failed", e);
+          LOG.exception("Task failed", e);
         }
         return null;
       }
@@ -404,7 +404,7 @@ public class MiniGUI extends JPanel {
     for(ParameterException e : config.getErrors()) {
       buf.append(e.getMessage() + NEWLINE);
     }
-    logger.warning(buf.toString());
+    LOG.warning(buf.toString());
     config.clearErrors();
   }
 

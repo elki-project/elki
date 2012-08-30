@@ -105,12 +105,12 @@ public class OnDiskArray implements Serializable {
   /**
    * Size of the classes header size.
    */
-  private final static int INTERNAL_HEADER_SIZE = 4 * ByteArrayUtil.SIZE_INT;
+  private static final int INTERNAL_HEADER_SIZE = 4 * ByteArrayUtil.SIZE_INT;
 
   /**
    * Position of file size (in records)
    */
-  private final static int HEADER_POS_SIZE = 3 * ByteArrayUtil.SIZE_INT;
+  private static final int HEADER_POS_SIZE = 3 * ByteArrayUtil.SIZE_INT;
 
   /**
    * Constructor to write a new file.

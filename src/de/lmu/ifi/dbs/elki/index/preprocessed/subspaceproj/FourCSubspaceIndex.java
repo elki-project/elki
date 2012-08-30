@@ -71,7 +71,7 @@ public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance
   /**
    * Our logger
    */
-  private final static Logging logger = Logging.getLogger(FourCSubspaceIndex.class);
+  private static final Logging LOG = Logging.getLogger(FourCSubspaceIndex.class);
 
   /**
    * The Filtered PCA Runner
@@ -100,18 +100,18 @@ public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance
     }
     PCAFilteredResult pcares = pca.processIds(ids, database);
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append(id).append(" "); //.append(database.getObjectLabelQuery().get(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
     return pcares;
   }
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

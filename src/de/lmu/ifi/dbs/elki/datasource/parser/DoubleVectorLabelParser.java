@@ -56,7 +56,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(DoubleVectorLabelParser.class);
+  private static final Logging LOG = Logging.getLogger(DoubleVectorLabelParser.class);
 
   /**
    * Constructor.
@@ -78,7 +78,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

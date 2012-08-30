@@ -69,7 +69,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MkCoPTree.class);
+  private static final Logging LOG = Logging.getLogger(MkCoPTree.class);
 
   /**
    * Parameter k.
@@ -126,8 +126,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       return;
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("insert " + entries + "\n");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("insert " + entries + "\n");
     }
 
     if(!initialized) {
@@ -260,7 +260,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // leafCapacity = (file.getPageSize() - overhead) / (objectID +
@@ -273,13 +273,13 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     initialized = true;
 
-    if(logger.isVerbose()) {
-      logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+    if(LOG.isVerbose()) {
+      LOG.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
 
@@ -398,7 +398,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        (insbes. Distanz 0)
    */
   private void approximateKnnDistances(MkCoPLeafEntry<D> entry, KNNResult<D> knnDistances) {
-    StringBuffer msg = logger.isDebugging() ? new StringBuffer() : null;
+    StringBuffer msg = LOG.isDebugging() ? new StringBuffer() : null;
     if(msg != null) {
       msg.append("\nknnDistances ").append(knnDistances);
     }
@@ -494,7 +494,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     entry.setProgressiveKnnDistanceApproximation(progressive);
 
     if(msg != null) {
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
   }
 
@@ -575,7 +575,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       double current_t = log_kDist[ii] - current_m * log_k[ii];
       ApproximationLine current_approx = new ApproximationLine(k_0, current_m, current_t);
 
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\nlog_kDist[").append(jj).append("] ").append(log_kDist[jj]);
         msg.append("\nlog_kDist[").append(ii).append("] ").append(log_kDist[ii]);
         msg.append("\nlog_k[").append(jj).append("] ").append(log_k[jj]);
@@ -601,15 +601,15 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nupper Approx ").append(approx);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
     return approx;
   }
 
   private ApproximationLine approximateUpperHull_PAPER(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-    StringBuffer msg = logger.isDebugging() ? new StringBuffer() : null;
+    StringBuffer msg = LOG.isDebugging() ? new StringBuffer() : null;
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
@@ -644,7 +644,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
         ApproximationLine appr = new ApproximationLine(k_0, m_a, t_a);
         if(msg != null) {
           msg.append("\n1 anchor = ").append(a);
-          logger.debugFine(msg.toString());
+          LOG.debugFine(msg.toString());
         }
         return appr;
       }
@@ -664,7 +664,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
             msg.append(" x_p ").append(x_p).append(", y_p ").append(y_p);
             msg.append(" a ").append(a);
             msg.append(" upperHull ").append(FormatUtil.format(upperHull));
-            logger.debugFine(msg.toString());
+            LOG.debugFine(msg.toString());
           }
           return appr;
         }
@@ -684,7 +684,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           if(msg != null) {
             msg.append("3 anchor = ").append(a).append(" -- ").append((a + 1));
             msg.append(" appr2 ").append(appr);
-            logger.debugFine(msg.toString());
+            LOG.debugFine(msg.toString());
           }
           return appr;
         }
@@ -796,6 +796,6 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

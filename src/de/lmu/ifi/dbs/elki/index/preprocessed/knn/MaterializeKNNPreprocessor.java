@@ -70,7 +70,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   /**
    * Logger to use.
    */
-  private static final Logging logger = Logging.getLogger(MaterializeKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(MaterializeKNNPreprocessor.class);
 
   /**
    * Flag to use bulk operations.
@@ -376,7 +376,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

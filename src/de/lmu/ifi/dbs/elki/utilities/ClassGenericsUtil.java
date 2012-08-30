@@ -65,7 +65,7 @@ public final class ClassGenericsUtil {
   /**
    * Static logger to use.
    */
-  private static final Logging logger = Logging.getLogger(ClassGenericsUtil.class);
+  private static final Logging LOG = Logging.getLogger(ClassGenericsUtil.class);
 
   /**
    * Class loader.
@@ -218,7 +218,7 @@ public final class ClassGenericsUtil {
           return inner.asSubclass(Parameterizer.class).newInstance();
         }
         catch(Exception e) {
-          logger.warning("Non-usable Parameterizer in class: " + c.getName());
+          LOG.warning("Non-usable Parameterizer in class: " + c.getName());
         }
       }
     }

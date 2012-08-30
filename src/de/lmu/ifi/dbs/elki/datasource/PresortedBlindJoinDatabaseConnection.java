@@ -47,7 +47,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(PresortedBlindJoinDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(PresortedBlindJoinDatabaseConnection.class);
 
   /**
    * The filters to invoke
@@ -89,7 +89,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

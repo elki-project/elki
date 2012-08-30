@@ -64,7 +64,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(GaussianModel.class);
+  private static final Logging LOG = Logging.getLogger(GaussianModel.class);
 
   /**
    * OptionID for inversion flag.
@@ -147,7 +147,7 @@ public class GaussianModel<V extends NumberVector<V, ?>> extends AbstractAlgorit
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -53,7 +53,7 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(PriorProbabilityClassifier.class);
+  private static final Logging LOG = Logging.getLogger(PriorProbabilityClassifier.class);
   
   /**
    * Holds the prior probabilities.
@@ -152,6 +152,6 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
   
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

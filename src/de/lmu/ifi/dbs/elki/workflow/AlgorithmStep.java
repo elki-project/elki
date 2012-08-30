@@ -55,7 +55,7 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(AlgorithmStep.class);
+  private static final Logging LOG = Logging.getLogger(AlgorithmStep.class);
 
   /**
    * Holds the algorithm to run.
@@ -86,20 +86,20 @@ public class AlgorithmStep implements WorkflowStep {
   public HierarchicalResult runAlgorithms(Database database) {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
-    if(logger.isVerbose() && database.getIndexes().size() > 0) {
+    if(LOG.isVerbose() && database.getIndexes().size() > 0) {
       StringBuffer buf = new StringBuffer();
       buf.append("Index statistics before running algorithms:").append(FormatUtil.NEWLINE);
       for(Index idx : database.getIndexes()) {
         PageFileStatistics stat = idx.getPageFileStatistics();
         PageFileUtil.appendPageFileStatistics(buf, stat);
       }
-      logger.verbose(buf.toString());
+      LOG.verbose(buf.toString());
     }
     for(Algorithm algorithm : algorithms) {
       long start = System.currentTimeMillis();
       Result res = algorithm.run(database);
       long end = System.currentTimeMillis();
-      if(logger.isVerbose()) {
+      if(LOG.isVerbose()) {
         long elapsedTime = end - start;
         StringBuffer buf = new StringBuffer();
         buf.append(algorithm.getClass().getName()).append(" runtime  : ");
@@ -108,7 +108,7 @@ public class AlgorithmStep implements WorkflowStep {
           PageFileStatistics stat = idx.getPageFileStatistics();
           PageFileUtil.appendPageFileStatistics(buf, stat);
         }
-        logger.verbose(buf.toString());
+        LOG.verbose(buf.toString());
       }
       if(res != null) {
         result.addChildResult(res);

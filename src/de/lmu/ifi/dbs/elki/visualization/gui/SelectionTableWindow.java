@@ -99,7 +99,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   /**
    * The logger
    */
-  static final Logging logger = Logging.getLogger(SelectionTableWindow.class);
+  private static final Logging LOG = Logging.getLogger(SelectionTableWindow.class);
 
   /**
    * The DBIDs to display
@@ -301,7 +301,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
       if(columnIndex == 0) {
-        logger.warning("Tried to edit DBID, this is not allowed.");
+        LOG.warning("Tried to edit DBID, this is not allowed.");
         return;
       }
       final DBID id = dbids.get(rowIndex);
@@ -314,7 +314,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
         crep.set(id, lbl);
       }
       if(!(aValue instanceof String)) {
-        logger.warning("Was expecting a String value from the input element, got: " + aValue.getClass());
+        LOG.warning("Was expecting a String value from the input element, got: " + aValue.getClass());
         return;
       }
       throw new AbortException("FIXME: INCOMPLETE TRANSITION");

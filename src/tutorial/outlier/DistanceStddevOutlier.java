@@ -42,7 +42,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(DistanceStddevOutlier.class);
+  private static final Logging LOG = Logging.getLogger(DistanceStddevOutlier.class);
 
   /**
    * Number of neighbors to get.
@@ -105,7 +105,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

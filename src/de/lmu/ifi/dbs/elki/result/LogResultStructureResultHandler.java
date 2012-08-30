@@ -47,17 +47,17 @@ public class LogResultStructureResultHandler implements ResultHandler {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(LogResultStructureResultHandler.class);
+  private static final Logging LOG = Logging.getLogger(LogResultStructureResultHandler.class);
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       if(newResult instanceof HierarchicalResult) {
         Hierarchy<Result> hier = ((HierarchicalResult) newResult).getHierarchy();
         if(hier != null) {
           StringBuffer buf = new StringBuffer();
           recursiveLogResult(buf, hier, newResult, 0);
-          logger.verbose(buf.toString());
+          LOG.verbose(buf.toString());
         }
       }
     }
@@ -73,11 +73,11 @@ public class LogResultStructureResultHandler implements ResultHandler {
   private void recursiveLogResult(StringBuffer buf, Hierarchy<Result> hier, Result result, int depth) {
     if(result == null) {
       buf.append("null");
-      logger.warning("null result!");
+      LOG.warning("null result!");
       return;
     }
     if(depth > 50) {
-      logger.warning("Probably infinitely nested results, aborting!");
+      LOG.warning("Probably infinitely nested results, aborting!");
       return;
     }
     for(int i = 0; i < depth; i++) {

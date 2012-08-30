@@ -76,7 +76,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   /**
    * Logging class.
    */
-  private static final Logging logger = Logging.getLogger(NumberVectorLabelParser.class);
+  private static final Logging LOG = Logging.getLogger(NumberVectorLabelParser.class);
 
   /**
    * A comma separated list of the indices of labels (may be numeric), counting
@@ -383,7 +383,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

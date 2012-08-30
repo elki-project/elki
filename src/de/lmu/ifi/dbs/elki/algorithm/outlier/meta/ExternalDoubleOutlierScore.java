@@ -77,7 +77,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ExternalDoubleOutlierScore.class);
+  private static final Logging LOG = Logging.getLogger(ExternalDoubleOutlierScore.class);
 
   /**
    * The comment character.
@@ -183,7 +183,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
             minmax.put(score);
           }
           else if(id == null && Double.isNaN(score)) {
-            logger.warning("Line did not match either ID nor score nor comment: " + line);
+            LOG.warning("Line did not match either ID nor score nor comment: " + line);
           }
           else {
             throw new AbortException("Line matched only ID or only SCORE patterns: " + line);
@@ -224,7 +224,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

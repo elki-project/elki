@@ -68,7 +68,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Logger to use
    */
-  protected static final Logging logger = Logging.getLogger(HiSCPreferenceVectorIndex.class);
+  private static final Logging LOG = Logging.getLogger(HiSCPreferenceVectorIndex.class);
 
   /**
    * Holds the value of parameter alpha.
@@ -104,12 +104,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     StringBuffer msg = new StringBuffer();
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
 
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, EuclideanDistanceFunction.STATIC, k);
 
     for (DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\n\nid = ").append(DBIDUtil.toString(it));
         ///msg.append(" ").append(database.getObjectLabelQuery().get(id));
         msg.append("\n knns: ");
@@ -120,22 +120,22 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       storage.put(it, preferenceVector);
 
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine(msg.toString());
+    if(LOG.isDebugging()) {
+      LOG.debugFine(msg.toString());
     }
 
     long end = System.currentTimeMillis();
     // TODO: re-add timing code!
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       long elapsedTime = end - start;
-      logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+      LOG.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
   }
 
@@ -161,7 +161,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
     }
 
-    if(msg != null && logger.isDebugging()) {
+    if(msg != null && LOG.isDebugging()) {
       msg.append("\nalpha ").append(alpha);
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));
@@ -174,7 +174,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

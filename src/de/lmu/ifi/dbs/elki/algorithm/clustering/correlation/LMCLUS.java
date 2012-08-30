@@ -83,17 +83,17 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(LMCLUS.class);
+  private static final Logging LOG = Logging.getLogger(LMCLUS.class);
 
   /**
    * Epsilon
    */
-  private final static double NOT_FROM_ONE_CLUSTER_PROBABILITY = 0.2;
+  private static final double NOT_FROM_ONE_CLUSTER_PROBABILITY = 0.2;
 
   /**
    * Histogram resolution
    */
-  private final static int BINS = 50;
+  private static final int BINS = 50;
 
   /**
    * The current threshold value calculated by the findSeperation Method.
@@ -152,8 +152,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    */
   public Clustering<Model> run(Database database, Relation<NumberVector<?, ?>> relation) throws UnableToComplyException {
     Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), logger) : null;
-    IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Clusters found", logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
+    IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;
     ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());
 
     final int maxdim = Math.min(maxLMDim, DatabaseUtil.dimensionality(relation));
@@ -202,10 +202,10 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       // Remove from main working set.
       unclustered.removeDBIDs(current);
       if(progress != null) {
-        progress.setProcessed(relation.size() - unclustered.size(), logger);
+        progress.setProcessed(relation.size() - unclustered.size(), LOG);
       }
       if(cprogress != null) {
-        cprogress.setProcessed(cnum, logger);
+        cprogress.setProcessed(cnum, LOG);
       }
     }
     // Remaining objects are noise
@@ -213,11 +213,11 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       ret.addCluster(new Cluster<Model>(unclustered, true));
     }
     if(progress != null) {
-      progress.setProcessed(relation.size(), logger);
-      progress.ensureCompleted(logger);
+      progress.setProcessed(relation.size(), LOG);
+      progress.ensureCompleted(LOG);
     }
     if(cprogress != null) {
-      cprogress.setCompleted(logger);
+      cprogress.setCompleted(LOG);
     }
     return ret;
   }
@@ -341,8 +341,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         Vector v_j = ret.getCol(j);
         double f = v_i.transposeTimes(v_j) / v_j.transposeTimes(v_j);
         if(Double.isNaN(f)) {
-          if(logger.isDebuggingFine()) {
-            logger.debugFine("Zero vector encountered? " + v_j);
+          if(LOG.isDebuggingFine()) {
+            LOG.debugFine("Zero vector encountered? " + v_j);
           }
           return null;
         }
@@ -351,8 +351,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       // check if the vectors weren't independent
       final double len_u_i = u_i.euclideanLength();
       if(len_u_i == 0.0) {
-        if(logger.isDebuggingFine()) {
-          logger.debugFine("Points not independent - no orthonormalization.");
+        if(LOG.isDebuggingFine()) {
+          LOG.debugFine("Points not independent - no orthonormalization.");
         }
         return null;
       }
@@ -452,7 +452,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

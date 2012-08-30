@@ -64,7 +64,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends OPTICS<V, PreferenceVect
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(HiSC.class);
+  private static final Logging LOG = Logging.getLogger(HiSC.class);
 
   /**
    * Constructor.
@@ -77,7 +77,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends OPTICS<V, PreferenceVect
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

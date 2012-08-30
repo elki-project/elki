@@ -97,7 +97,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(PROCLUS.class);
+  private static final Logging LOG = Logging.getLogger(PROCLUS.class);
 
   /**
    * Parameter to specify the multiplier for the initial number of medoids, must
@@ -161,8 +161,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
     // TODO: use a StepProgress!
     // initialization phase
-    if(logger.isVerbose()) {
-      logger.verbose("1. Initialization phase...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("1. Initialization phase...");
     }
     int sampleSize = Math.min(relation.size(), k_i * k);
     DBIDs sampleSet = DBIDUtil.randomSample(relation.getDBIDs(), sampleSize, random.nextLong());
@@ -170,33 +170,33 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     int medoidSize = Math.min(relation.size(), m_i * k);
     DBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n");
       msg.append("sampleSize ").append(sampleSize).append("\n");
       msg.append("sampleSet ").append(sampleSet).append("\n");
       msg.append("medoidSize ").append(medoidSize).append("\n");
       msg.append("m ").append(medoids).append("\n");
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     // iterative phase
-    if(logger.isVerbose()) {
-      logger.verbose("2. Iterative phase...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("2. Iterative phase...");
     }
     double bestObjective = Double.POSITIVE_INFINITY;
     ModifiableDBIDs m_best = null;
     ModifiableDBIDs m_bad = null;
     ModifiableDBIDs m_current = initialSet(medoids, k, random);
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n");
       msg.append("m_c ").append(m_current).append("\n");
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
-    IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
+    IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Current number of clusters:", LOG) : null;
 
     // TODO: Use DataStore and Trove for performance
     Map<DBID, PROCLUSCluster> clusters = null;
@@ -217,17 +217,17 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       m_current = computeM_current(medoids, m_best, m_bad, random);
       loops++;
       if(cprogress != null) {
-        cprogress.setProcessed(clusters.size(), logger);
+        cprogress.setProcessed(clusters.size(), LOG);
       }
     }
 
     if(cprogress != null) {
-      cprogress.setCompleted(logger);
+      cprogress.setCompleted(LOG);
     }
 
     // refinement phase
-    if(logger.isVerbose()) {
-      logger.verbose("3. Refinement phase...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("3. Refinement phase...");
     }
 
     List<Pair<V, Set<Integer>>> dimensions = findDimensions(new ArrayList<PROCLUSCluster>(clusters.values()), relation);
@@ -262,8 +262,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     // m_1 is random point of S
     DBID m_i = s.remove(random.nextInt(s.size()));
     medoids.add(m_i);
-    if(logger.isDebugging()) {
-      logger.debugFiner("medoids " + medoids);
+    if(LOG.isDebugging()) {
+      LOG.debugFiner("medoids " + medoids);
     }
 
     // compute distances between each point in S and m_i
@@ -295,8 +295,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
         distances.put(id, DBIDFactory.FACTORY.newDistancePair(dist, id));
       }
 
-      if(logger.isDebugging()) {
-        logger.debugFiner("medoids " + medoids);
+      if(LOG.isDebugging()) {
+        LOG.debugFiner("medoids " + medoids);
       }
     }
 
@@ -462,12 +462,12 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());
       dims_i.add(z_ij.getThird());
 
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\n");
         msg.append("z_ij ").append(z_ij).append("\n");
         msg.append("D_i ").append(dims_i).append("\n");
-        logger.debugFiner(msg.toString());
+        LOG.debugFiner(msg.toString());
       }
     }
     return dimensionMap;
@@ -539,12 +539,12 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       }
       dims_i.add(z_ij.getThird());
 
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("\n");
         msg.append("z_ij ").append(z_ij).append("\n");
         msg.append("D_i ").append(dims_i).append("\n");
-        logger.debugFiner(msg.toString());
+        LOG.debugFiner(msg.toString());
       }
     }
 
@@ -599,11 +599,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n");
       msg.append("clusters ").append(clusters).append("\n");
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
     return clusters;
   }
@@ -651,11 +651,11 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n");
       msg.append("clusters ").append(clusters).append("\n");
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
     return clusters;
   }
@@ -752,7 +752,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

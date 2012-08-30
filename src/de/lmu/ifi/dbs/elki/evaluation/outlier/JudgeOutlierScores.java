@@ -67,7 +67,7 @@ public class JudgeOutlierScores implements Evaluator {
   /**
    * Logger for debug output.
    */
-  protected static final Logging logger = Logging.getLogger(JudgeOutlierScores.class);
+  private static final Logging LOG = Logging.getLogger(JudgeOutlierScores.class);
 
   /**
    * The distance function to determine the reachability distance between
@@ -133,7 +133,7 @@ public class JudgeOutlierScores implements Evaluator {
     if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
       innerScaling = new IdentityScaling();
       // TODO: does the outlier score give us this guarantee?
-      logger.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:" + min + " max:" + max);
+      LOG.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:" + min + " max:" + max);
     }
     else {
       if(min == 0.0 && max == 1.0) {
@@ -160,7 +160,7 @@ public class JudgeOutlierScores implements Evaluator {
     posscore /= ids.size();
     negscore /= outlierIds.size();
 
-    logger.verbose("Scores: " + posscore + " " + negscore);
+    LOG.verbose("Scores: " + posscore + " " + negscore);
 
     ArrayList<Vector> s = new ArrayList<Vector>(1);
     s.add(new Vector(new double[] { (posscore + negscore) / 2, posscore, negscore }));

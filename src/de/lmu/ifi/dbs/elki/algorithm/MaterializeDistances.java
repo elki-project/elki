@@ -60,7 +60,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MaterializeDistances.class);
+  private static final Logging LOG = Logging.getLogger(MaterializeDistances.class);
 
   /**
    * Constructor.
@@ -95,7 +95,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

@@ -73,7 +73,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
   /**
    * The logger for this class.
    */
-  static final Logging logger = Logging.getLogger(OnlineLOF.class);
+  private static final Logging LOG = Logging.getLogger(OnlineLOF.class);
 
   /**
    * Constructor.
@@ -93,7 +93,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
    */
   @Override
   public OutlierResult run(Relation<O> relation) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress("OnlineLOF", 3) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("OnlineLOF", 3) : null;
 
     Pair<Pair<KNNQuery<O, D>, KNNQuery<O, D>>, Pair<RKNNQuery<O, D>, RKNNQuery<O, D>>> queries = getKNNAndRkNNQueries(relation, stepprog);
     KNNQuery<O, D> kNNRefer = queries.getFirst().getFirst();
@@ -128,7 +128,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     // No optimized kNN query or RkNN query - use a preprocessor!
     if(kNNRefer == null || rkNNRefer == null) {
       if(stepprog != null) {
-        stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", logger);
+        stepprog.beginStep(1, "Materializing neighborhood w.r.t. reference neighborhood distance function.", LOG);
       }
       MaterializeKNNAndRKNNPreprocessor<O, D> preproc = new MaterializeKNNAndRKNNPreprocessor<O, D>(relation, neighborhoodDistanceFunction, k);
       DistanceQuery<O, D> ndq = relation.getDatabase().getDistanceQuery(relation, neighborhoodDistanceFunction);
@@ -139,7 +139,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     }
     else {
       if(stepprog != null) {
-        stepprog.beginStep(1, "Optimized neighborhood w.r.t. reference neighborhood distance function provided by database.", logger);
+        stepprog.beginStep(1, "Optimized neighborhood w.r.t. reference neighborhood distance function provided by database.", LOG);
       }
     }
 
@@ -147,7 +147,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     RKNNQuery<O, D> rkNNReach = QueryUtil.getRKNNQuery(relation, reachabilityDistanceFunction, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     if(kNNReach == null || rkNNReach == null) {
       if(stepprog != null) {
-        stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", logger);
+        stepprog.beginStep(2, "Materializing neighborhood w.r.t. reachability distance function.", LOG);
       }
       ListParameterization config = new ListParameterization();
       config.addParameter(AbstractMaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, reachabilityDistanceFunction);
@@ -261,11 +261,11 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      * @param lofResult the result of the former LOF run
      */
     private void kNNsInserted(DBIDs insertions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
-      StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+      StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
       // recompute lrds
       if(stepprog != null) {
-        stepprog.beginStep(1, "Recompute LRDs.", logger);
+        stepprog.beginStep(1, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
       List<? extends DistanceDBIDResult<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
@@ -283,7 +283,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
       // recompute lofs
       if(stepprog != null) {
-        stepprog.beginStep(2, "Recompute LOFS.", logger);
+        stepprog.beginStep(2, "Recompute LOFS.", LOG);
       }
       List<? extends DistanceDBIDResult<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
@@ -291,12 +291,12 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
       // fire result changed
       if(stepprog != null) {
-        stepprog.beginStep(3, "Inform listeners.", logger);
+        stepprog.beginStep(3, "Inform listeners.", LOG);
       }
       lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
 
       if(stepprog != null) {
-        stepprog.setCompleted(logger);
+        stepprog.setCompleted(LOG);
       }
     }
 
@@ -311,11 +311,11 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      * @param lofResult the result of the former LOF run
      */
     private void kNNsRemoved(DBIDs deletions, DBIDs updates1, DBIDs updates2, LOFResult<O, D> lofResult) {
-      StepProgress stepprog = logger.isVerbose() ? new StepProgress(4) : null;
+      StepProgress stepprog = LOG.isVerbose() ? new StepProgress(4) : null;
 
       // delete lrds and lofs
       if(stepprog != null) {
-        stepprog.beginStep(1, "Delete old LRDs and LOFs.", logger);
+        stepprog.beginStep(1, "Delete old LRDs and LOFs.", LOG);
       }
       for (DBIDIter iter = deletions.iter(); iter.valid(); iter.advance()) {
         lofResult.getLrds().delete(iter);
@@ -324,7 +324,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
       // recompute lrds
       if(stepprog != null) {
-        stepprog.beginStep(2, "Recompute LRDs.", logger);
+        stepprog.beginStep(2, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
       List<? extends DistanceDBIDResult<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
@@ -342,7 +342,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
       // recompute lofs
       if(stepprog != null) {
-        stepprog.beginStep(3, "Recompute LOFS.", logger);
+        stepprog.beginStep(3, "Recompute LOFS.", LOG);
       }
       List<? extends DistanceDBIDResult<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
@@ -350,12 +350,12 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
       // fire result changed
       if(stepprog != null) {
-        stepprog.beginStep(4, "Inform listeners.", logger);
+        stepprog.beginStep(4, "Inform listeners.", LOG);
       }
       lofResult.getResult().getHierarchy().resultChanged(lofResult.getResult());
 
       if(stepprog != null) {
-        stepprog.setCompleted(logger);
+        stepprog.setCompleted(LOG);
       }
     }
 
@@ -408,7 +408,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

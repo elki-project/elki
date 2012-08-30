@@ -46,7 +46,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
   /**
    * Logger for debug.
    */
-  static Logging logger = Logging.getLogger(DiSHDistanceFunction.class);
+  private static final Logging LOG = Logging.getLogger(DiSHDistanceFunction.class);
 
   /**
    * Constructor.
@@ -119,7 +119,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
         double d = weightedDistance(v1, v2, commonPreferenceVector);
         if(d > 2 * epsilon) {
           subspaceDim++;
-          if(logger.isDebugging()) {
+          if(LOG.isDebugging()) {
             //Representation<String> rep = database.getObjectLabelQuery();
             StringBuffer msg = new StringBuffer();
             msg.append("d ").append(d);
@@ -127,7 +127,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
             //msg.append("\nv2 ").append(rep.get(v2.getID()));
             msg.append("\nsubspaceDim ").append(subspaceDim);
             msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
-            logger.debugFine(msg.toString());
+            LOG.debugFine(msg.toString());
           }
         }
       }

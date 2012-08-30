@@ -91,7 +91,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Get static logger
    */
-  private static final Logging logger = Logging.getLogger(VisualizePairwiseGainMatrix.class);
+  private static final Logging LOG = Logging.getLogger(VisualizePairwiseGainMatrix.class);
 
   /**
    * The data input part.
@@ -199,7 +199,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       data[a][a] = 0;
     }
 
-    logger.verbose(minmax.toString());
+    LOG.verbose(minmax.toString());
 
     boolean hasneg = (minmax.getMin() < -1E-3);
     LinearScaling scale;

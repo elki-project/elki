@@ -73,7 +73,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ByLabelHierarchicalClustering.class);
+  private static final Logging LOG = Logging.getLogger(ByLabelHierarchicalClustering.class);
 
   /**
    * Constructor without parameters
@@ -189,6 +189,6 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

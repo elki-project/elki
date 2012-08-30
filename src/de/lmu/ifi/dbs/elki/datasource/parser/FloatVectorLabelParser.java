@@ -59,7 +59,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(FloatVectorLabelParser.class);
+  private static final Logging LOG = Logging.getLogger(FloatVectorLabelParser.class);
 
   /**
    * Constructor.
@@ -74,7 +74,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

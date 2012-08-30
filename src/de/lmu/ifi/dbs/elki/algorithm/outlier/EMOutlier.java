@@ -66,7 +66,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(EMOutlier.class);
+  private static final Logging LOG = Logging.getLogger(EMOutlier.class);
 
   /**
    * Inner algorithm.
@@ -120,7 +120,7 @@ public class EMOutlier<V extends NumberVector<V, ?>> extends AbstractAlgorithm<O
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

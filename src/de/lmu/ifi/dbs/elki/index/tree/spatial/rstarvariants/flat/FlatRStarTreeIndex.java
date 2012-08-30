@@ -75,7 +75,7 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
   /**
    * The appropriate logger for this index.
    */
-  private static final Logging logger = Logging.getLogger(FlatRStarTreeIndex.class);
+  private static final Logging LOG = Logging.getLogger(FlatRStarTreeIndex.class);
 
   /**
    * Wrap a vector as spatial point leaf entry.
@@ -191,6 +191,6 @@ public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarT
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

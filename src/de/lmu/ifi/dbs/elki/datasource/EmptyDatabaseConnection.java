@@ -39,7 +39,7 @@ public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Static logger
    */
-  private static final Logging logger = Logging.getLogger(EmptyDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(EmptyDatabaseConnection.class);
   
   /**
    * Constructor.
@@ -57,6 +57,6 @@ public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

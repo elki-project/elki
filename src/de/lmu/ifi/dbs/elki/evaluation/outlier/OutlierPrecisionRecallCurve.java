@@ -59,7 +59,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   /**
    * The logger.
    */
-  private static final Logging logger = Logging.getLogger(OutlierPrecisionRecallCurve.class);
+  private static final Logging LOG = Logging.getLogger(OutlierPrecisionRecallCurve.class);
 
   /**
    * The pattern to identify positive classes.
@@ -92,7 +92,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if(positiveids.size() == 0) {
-      logger.warning("Computing a ROC curve failed - no objects matched.");
+      LOG.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
 

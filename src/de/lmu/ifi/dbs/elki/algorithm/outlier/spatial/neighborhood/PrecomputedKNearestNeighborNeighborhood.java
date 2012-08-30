@@ -55,7 +55,7 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(PrecomputedKNearestNeighborNeighborhood.class);
+  private static final Logging LOG = Logging.getLogger(PrecomputedKNearestNeighborNeighborhood.class);
 
   /**
    * Constructor.
@@ -78,7 +78,7 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

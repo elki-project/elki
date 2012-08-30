@@ -49,7 +49,7 @@ public class RectangleArranger<T> {
   /**
    * Logging class
    */
-  private static final Logging logger = Logging.getLogger(RectangleArranger.class);
+  private static final Logging LOG = Logging.getLogger(RectangleArranger.class);
 
   /**
    * Target height/width ratio
@@ -122,8 +122,8 @@ public class RectangleArranger<T> {
    * @param data Data object to add (key)
    */
   public void put(double w, double h, T data) {
-    if(logger.isDebuggingFinest()) {
-      logger.finest("Add: " + w + "x" + h);
+    if(LOG.isDebuggingFinest()) {
+      LOG.finest("Add: " + w + "x" + h);
     }
     final int cols = widths.size();
     final int rows = heights.size();
@@ -237,8 +237,8 @@ public class RectangleArranger<T> {
         double hinc = Math.max(0.0, h - avh);
         double inc = computeIncreaseArea(winc, hinc);
 
-        if(logger.isDebuggingFinest()) {
-          logger.debugFinest("Candidate: " + sx + "," + sy + " - " + ex + "," + ey + ": " + avw + "x" + avh + " " + inc);
+        if(LOG.isDebuggingFinest()) {
+          LOG.debugFinest("Candidate: " + sx + "," + sy + " - " + ex + "," + ey + ": " + avw + "x" + avh + " " + inc);
         }
         if(inc < bestinc) {
           bestinc = inc;
@@ -257,8 +257,8 @@ public class RectangleArranger<T> {
       }
       assert assertConsistent();
     }
-    if(logger.isDebuggingFinest()) {
-      logger.debugFinest("Best: " + bestsx + "," + bestsy + " - " + bestex + "," + bestey + " inc: " + bestwi + "x" + besthi + " " + bestinc);
+    if(LOG.isDebuggingFinest()) {
+      LOG.debugFinest("Best: " + bestsx + "," + bestsy + " - " + bestex + "," + bestey + " inc: " + bestwi + "x" + besthi + " " + bestinc);
     }
     // Need to increase the total area
     if(bestinc > 0) {
@@ -298,7 +298,7 @@ public class RectangleArranger<T> {
       }
     }
     map.put(data, new double[] { xpos, ypos, w, h });
-    if(logger.isDebuggingFinest()) {
+    if(LOG.isDebuggingFinest()) {
       logSizes();
     }
   }
@@ -314,8 +314,8 @@ public class RectangleArranger<T> {
     if(heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
       return;
     }
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Split row " + bestey);
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Split row " + bestey);
     }
     heights.insert(bestey + 1, besthi);
     heights.set(bestey, heights.get(bestey) - besthi);
@@ -329,8 +329,8 @@ public class RectangleArranger<T> {
       return;
     }
     final int rows = heights.size();
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Split column " + bestex);
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Split column " + bestex);
     }
     widths.insert(bestex + 1, bestwi);
     widths.set(bestex, widths.get(bestex) - bestwi);
@@ -344,9 +344,9 @@ public class RectangleArranger<T> {
   private void resize(double inc) {
     final int cols = widths.size();
     final int rows = heights.size();
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Resize by " + inc + "x" + (inc / ratio));
-      if(logger.isDebuggingFinest()) {
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Resize by " + inc + "x" + (inc / ratio));
+      if(LOG.isDebuggingFinest()) {
         logSizes();
       }
     }
@@ -368,7 +368,7 @@ public class RectangleArranger<T> {
       usage.add(row);
     }
     assert assertConsistent();
-    if(logger.isDebuggingFinest()) {
+    if(LOG.isDebuggingFinest()) {
       logSizes();
     }
   }
@@ -454,7 +454,7 @@ public class RectangleArranger<T> {
       }
       buf.append("+\n");
     }
-    logger.debug(buf);
+    LOG.debug(buf);
   }
 
   /**
@@ -521,7 +521,7 @@ public class RectangleArranger<T> {
    * @param args
    */
   public static void main(String[] args) {
-    logger.getWrappedLogger().setLevel(Level.FINEST);
+    LOG.getWrappedLogger().setLevel(Level.FINEST);
     RectangleArranger<String> r = new RectangleArranger<String>(1.3);
     r.put(4., 1., "Histogram");
     r.put(4., 4., "3D view");

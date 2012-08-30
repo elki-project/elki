@@ -122,17 +122,17 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
     /**
      * CSS class name for center of the means
      */
-    private final static String CSS_MEAN_CENTER = "mean-center";
+    private static final String CSS_MEAN_CENTER = "mean-center";
 
     /**
      * CSS class name for center of the means
      */
-    private final static String CSS_MEAN = "mean-marker";
+    private static final String CSS_MEAN = "mean-marker";
 
     /**
      * CSS class name for center of the means
      */
-    private final static String CSS_MEAN_STAR = "mean-star";
+    private static final String CSS_MEAN_STAR = "mean-star";
 
     /**
      * Clustering to visualize.

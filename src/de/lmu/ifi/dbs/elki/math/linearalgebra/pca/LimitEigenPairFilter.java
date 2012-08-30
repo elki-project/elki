@@ -57,7 +57,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(LimitEigenPairFilter.class);
+  private static final Logging LOG = Logging.getLogger(LimitEigenPairFilter.class);
 
   /**
    * "absolute" Flag
@@ -99,7 +99,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("delta = ").append(delta);
     }
 
@@ -119,7 +119,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       }
       limit = max * delta;
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nlimit = ").append(limit);
     }
 
@@ -138,10 +138,10 @@ public class LimitEigenPairFilter implements EigenPairFilter {
         weakEigenPairs.add(eigenPair);
       }
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

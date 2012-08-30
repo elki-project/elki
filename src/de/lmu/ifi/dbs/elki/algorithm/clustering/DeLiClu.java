@@ -88,7 +88,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DeLiClu.class);
+  private static final Logging LOG = Logging.getLogger(DeLiClu.class);
 
   /**
    * Parameter to specify the threshold for minimum number of points within a
@@ -138,12 +138,12 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
     SpatialPrimitiveDistanceFunction<NV, D> distFunction = (SpatialPrimitiveDistanceFunction<NV, D>) getDistanceFunction();
 
     // first do the knn-Join
-    if(logger.isVerbose()) {
-      logger.verbose("knnJoin...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("knnJoin...");
     }
     DataStore<KNNResult<D>> knns = knnJoin.run(database, relation);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), LOG) : null;
     final int size = relation.size();
 
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("DeLiClu Clustering", "deliclu-clustering");
@@ -185,12 +185,12 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
         reinsertExpanded(distFunction, index, path, knns);
 
         if(progress != null) {
-          progress.setProcessed(numHandled, logger);
+          progress.setProcessed(numHandled, LOG);
         }
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
     return clusterOrder;
   }
@@ -239,8 +239,8 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param node2 the second node
    */
   private void expandDirNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2) {
-    if(logger.isDebuggingFinest()) {
-      logger.debugFinest("ExpandDirNodes: " + node1.getPageID() + " + " + node2.getPageID());
+    if(LOG.isDebuggingFinest()) {
+      LOG.debugFinest("ExpandDirNodes: " + node1.getPageID() + " + " + node2.getPageID());
     }
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
@@ -275,8 +275,8 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
    * @param knns the knn list
    */
   private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNResult<D>> knns) {
-    if(logger.isDebuggingFinest()) {
-      logger.debugFinest("ExpandLeafNodes: " + node1.getPageID() + " + " + node2.getPageID());
+    if(LOG.isDebuggingFinest()) {
+      LOG.debugFinest("ExpandLeafNodes: " + node1.getPageID() + " + " + node2.getPageID());
     }
     int numEntries_1 = node1.getNumEntries();
     int numEntries_2 = node2.getNumEntries();
@@ -368,7 +368,7 @@ public class DeLiClu<NV extends NumberVector<NV, ?>, D extends Distance<D>> exte
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

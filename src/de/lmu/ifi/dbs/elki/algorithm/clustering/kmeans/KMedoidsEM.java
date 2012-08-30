@@ -78,7 +78,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KMedoidsEM.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsEM.class);
 
   /**
    * Holds the value of {@link AbstractKMeans#K_ID}.
@@ -230,7 +230,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

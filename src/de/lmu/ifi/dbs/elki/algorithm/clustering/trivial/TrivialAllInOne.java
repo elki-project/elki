@@ -51,7 +51,7 @@ public class TrivialAllInOne extends AbstractAlgorithm<Clustering<Model>> implem
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(TrivialAllInOne.class);
+  private static final Logging LOG = Logging.getLogger(TrivialAllInOne.class);
 
   /**
    * Constructor, adhering to
@@ -76,6 +76,6 @@ public class TrivialAllInOne extends AbstractAlgorithm<Clustering<Model>> implem
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

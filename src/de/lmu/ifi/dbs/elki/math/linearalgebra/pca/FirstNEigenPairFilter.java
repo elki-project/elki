@@ -50,7 +50,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(FirstNEigenPairFilter.class);
+  private static final Logging LOG = Logging.getLogger(FirstNEigenPairFilter.class);
 
   /**
    * Paremeter n
@@ -76,7 +76,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("sortedEigenPairs ").append(eigenPairs.toString());
       msg.append("\nn = ").append(n);
     }
@@ -96,10 +96,10 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

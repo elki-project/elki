@@ -87,7 +87,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(LOCI.class);
+  private static final Logging LOG = Logging.getLogger(LOCI.class);
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -146,7 +146,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     RangeQuery<O, D> rangeQuery = database.getRangeQuery(distFunc);
 
-    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("LOCI preprocessing", relation.size(), logger) : null;
+    FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("LOCI preprocessing", relation.size(), LOG) : null;
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -181,14 +181,14 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
       interestingDistances.put(iditer, cdist);
       if(progressPreproc != null) {
-        progressPreproc.incrementProcessed(logger);
+        progressPreproc.incrementProcessed(LOG);
       }
     }
     if(progressPreproc != null) {
-      progressPreproc.ensureCompleted(logger);
+      progressPreproc.ensureCompleted(LOG);
     }
     // LOCI main step
-    FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), logger) : null;
+    FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("LOCI scores", relation.size(), LOG) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore mdef_radius = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
@@ -250,11 +250,11 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       mdef_radius.putDouble(iditer, maxnormr);
       minmax.put(maxmdefnorm);
       if(progressLOCI != null) {
-        progressLOCI.incrementProcessed(logger);
+        progressLOCI.incrementProcessed(LOG);
       }
     }
     if(progressLOCI != null) {
-      progressLOCI.ensureCompleted(logger);
+      progressLOCI.ensureCompleted(LOG);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
@@ -292,7 +292,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

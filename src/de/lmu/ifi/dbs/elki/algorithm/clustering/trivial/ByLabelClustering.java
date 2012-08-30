@@ -79,7 +79,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ByLabelClustering.class);
+  private static final Logging LOG = Logging.getLogger(ByLabelClustering.class);
 
   /**
    * Flag to indicate that multiple cluster assignment is possible. If an
@@ -237,7 +237,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

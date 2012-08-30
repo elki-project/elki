@@ -84,7 +84,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(Segments.class);
+  private static final Logging LOG = Logging.getLogger(Segments.class);
 
   /**
    * Clusterings
@@ -254,7 +254,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
     }
     if(ids != null) {
       if(seg.getDBIDs() != null) {
-        logger.warning("Expected segment to not have IDs.");
+        LOG.warning("Expected segment to not have IDs.");
       }
       seg.objIDs = ids;
     }

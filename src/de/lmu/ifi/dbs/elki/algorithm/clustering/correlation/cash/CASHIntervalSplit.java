@@ -68,7 +68,7 @@ public class CASHIntervalSplit {
   /**
    * The logger of the class.
    */
-  private final static Logging logger = Logging.getLogger(CASHIntervalSplit.class);
+  private static final Logging LOG = Logging.getLogger(CASHIntervalSplit.class);
 
   /**
    * Initializes the logger and sets the debug status to the given value.
@@ -98,8 +98,8 @@ public class CASHIntervalSplit {
    *         exceeds minPts, null otherwise
    */
   public ModifiableDBIDs determineIDs(DBIDs superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
-    StringBuffer msg = new StringBuffer();
-    if(logger.isDebugging()) {
+    StringBuffer msg = LOG.isDebugging() ? new StringBuffer() : null;
+    if(msg != null) {
       msg.append("interval ").append(interval);
     }
 
@@ -128,7 +128,7 @@ public class CASHIntervalSplit {
         maxima.put(id, f_max);
       }
 
-      if(logger.isDebugging()) {
+      if(msg != null) {
         msg.append("\n\nf_min ").append(f_min);
         msg.append("\nf_max ").append(f_max);
         msg.append("\nd_min ").append(d_min);
@@ -141,21 +141,21 @@ public class CASHIntervalSplit {
 
       if(f_min <= d_max && f_max >= d_min) {
         childIDs.add(id);
-        if(logger.isDebugging()) {
+        if(msg != null) {
           msg.append("\nid ").append(id).append(" appended");
         }
       }
 
       else {
-        if(logger.isDebugging()) {
+        if(msg != null) {
           msg.append("\nid ").append(id).append(" NOT appended");
         }
       }
     }
 
-    if(logger.isDebugging()) {
+    if(msg != null) {
       msg.append("\nchildIds ").append(childIDs.size());
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     if(childIDs.size() < minPts) {

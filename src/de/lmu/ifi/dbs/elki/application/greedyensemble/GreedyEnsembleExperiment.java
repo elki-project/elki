@@ -87,7 +87,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
    * Get static logger
    */
-  private static final Logging logger = Logging.getLogger(GreedyEnsembleExperiment.class);
+  private static final Logging LOG = Logging.getLogger(GreedyEnsembleExperiment.class);
 
   /**
    * The data input part.
@@ -151,7 +151,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           heap.add(new DoubleIntPair(vec.doubleValue(i + 1), i));
         }
         if(heap.size() >= 2 * estimated_outliers) {
-          logger.warning("Too many ties. Expected: " + estimated_outliers + " got: " + heap.size());
+          LOG.warning("Too many ties. Expected: " + estimated_outliers + " got: " + heap.size());
         }
         for(DoubleIntPair pair : heap) {
           if(outliers_seen[pair.second] == 0) {
@@ -164,7 +164,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         }
       }
     }
-    logger.verbose("Merged top " + estimated_outliers + " outliers to: " + union_outliers + " outliers");
+    LOG.verbose("Merged top " + estimated_outliers + " outliers to: " + union_outliers + " outliers");
     // Build the final weight vector.
     final double[] estimated_weights = new double[dim];
     final double[] estimated_truth = new double[dim];
@@ -211,7 +211,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         double auc = computeROCAUC(vec, positive, dim);
         double estimated = wdist.doubleDistance(vec, estimated_truth_vec);
         double cost = tdist.doubleDistance(vec, refvec);
-        logger.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
+        LOG.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
         if(auc > bestauc) {
           bestauc = auc;
           bestaucstr = labels.get(iditer);
@@ -228,9 +228,9 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
 
     // Initialize ensemble with "best" method
-    logger.verbose("Distance function: " + wdist);
-    logger.verbose("Initial estimation of outliers: " + union_outliers);
-    logger.verbose("Initializing ensemble with: " + labels.get(bestid));
+    LOG.verbose("Distance function: " + wdist);
+    LOG.verbose("Initial estimation of outliers: " + union_outliers);
+    LOG.verbose("Initializing ensemble with: " + labels.get(bestid));
     ModifiableDBIDs ensemble = DBIDUtil.newArray(bestid);
     ModifiableDBIDs enscands = DBIDUtil.newHashSet(relation.getDBIDs());
     enscands.remove(bestid);
@@ -312,26 +312,26 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       }
     }
     NumberVector<?, ?> greedyvec = refvec.newNumberVector(greedyensemble);
-    logger.verbose("Estimated outliers remaining: " + union_outliers);
-    logger.verbose("Greedy ensemble: " + greedylbl.toString());
+    LOG.verbose("Estimated outliers remaining: " + union_outliers);
+    LOG.verbose("Greedy ensemble: " + greedylbl.toString());
 
-    logger.verbose("Best single ROC AUC: " + bestauc + " (" + bestaucstr + ")");
-    logger.verbose("Best single cost:    " + bestcost + " (" + bestcoststr + ")");
+    LOG.verbose("Best single ROC AUC: " + bestauc + " (" + bestaucstr + ")");
+    LOG.verbose("Best single cost:    " + bestcost + " (" + bestcoststr + ")");
     // Evaluate the naive ensemble and the "shrunk" ensemble
     double naiveauc, naivecost;
     {
       naiveauc = computeROCAUC(naivevec, positive, dim);
       naivecost = tdist.doubleDistance(naivevec, refvec);
-      logger.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
-      logger.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
+      LOG.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
+      LOG.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
     }
     double greedyauc, greedycost;
     {
       greedyauc = computeROCAUC(greedyvec, positive, dim);
       greedycost = tdist.doubleDistance(greedyvec, refvec);
-      logger.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
-      logger.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
-      logger.verbose("Greedy ensemble Gain to naive: " + gain(greedyauc, naiveauc, 1) + " cost gain: " + gain(greedycost, naivecost, 0));
+      LOG.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
+      LOG.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
+      LOG.verbose("Greedy ensemble Gain to naive: " + gain(greedyauc, naiveauc, 1) + " cost gain: " + gain(greedycost, naivecost, 0));
     }
     {
       MeanVariance meanauc = new MeanVariance();
@@ -361,15 +361,15 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         double cost = tdist.doubleDistance(randomvec, refvec);
         meancost.put(cost);
       }
-      logger.verbose("Random ensemble AUC:  " + meanauc.getMean() + " + stddev: " + meanauc.getSampleStddev() + " = " + (meanauc.getMean() + meanauc.getSampleStddev()));
-      logger.verbose("Random ensemble Gain: " + gain(meanauc.getMean(), bestauc, 1));
-      logger.verbose("Greedy improvement:   " + (greedyauc - meanauc.getMean()) / meanauc.getSampleStddev() + " standard deviations.");
-      logger.verbose("Random ensemble Cost: " + meancost.getMean() + " + stddev: " + meancost.getSampleStddev() + " = " + (meancost.getMean() + meanauc.getSampleStddev()));
-      logger.verbose("Random ensemble Gain: " + gain(meancost.getMean(), bestcost, 0));
-      logger.verbose("Greedy improvement:   " + (meancost.getMean() - greedycost) / meancost.getSampleStddev() + " standard deviations.");
-      logger.verbose("Naive ensemble Gain to random: " + gain(naiveauc, meanauc.getMean(), 1) + " cost gain: " + gain(naivecost, meancost.getMean(), 0));
-      logger.verbose("Random ensemble Gain to naive: " + gain(meanauc.getMean(), naiveauc, 1) + " cost gain: " + gain(meancost.getMean(), naivecost, 0));
-      logger.verbose("Greedy ensemble Gain to random: " + gain(greedyauc, meanauc.getMean(), 1) + " cost gain: " + gain(greedycost, meancost.getMean(), 0));
+      LOG.verbose("Random ensemble AUC:  " + meanauc.getMean() + " + stddev: " + meanauc.getSampleStddev() + " = " + (meanauc.getMean() + meanauc.getSampleStddev()));
+      LOG.verbose("Random ensemble Gain: " + gain(meanauc.getMean(), bestauc, 1));
+      LOG.verbose("Greedy improvement:   " + (greedyauc - meanauc.getMean()) / meanauc.getSampleStddev() + " standard deviations.");
+      LOG.verbose("Random ensemble Cost: " + meancost.getMean() + " + stddev: " + meancost.getSampleStddev() + " = " + (meancost.getMean() + meanauc.getSampleStddev()));
+      LOG.verbose("Random ensemble Gain: " + gain(meancost.getMean(), bestcost, 0));
+      LOG.verbose("Greedy improvement:   " + (meancost.getMean() - greedycost) / meancost.getSampleStddev() + " standard deviations.");
+      LOG.verbose("Naive ensemble Gain to random: " + gain(naiveauc, meanauc.getMean(), 1) + " cost gain: " + gain(naivecost, meancost.getMean(), 0));
+      LOG.verbose("Random ensemble Gain to naive: " + gain(meanauc.getMean(), naiveauc, 1) + " cost gain: " + gain(meancost.getMean(), naivecost, 0));
+      LOG.verbose("Greedy ensemble Gain to random: " + gain(greedyauc, meanauc.getMean(), 1) + " cost gain: " + gain(greedycost, meancost.getMean(), 0));
     }
   }
 

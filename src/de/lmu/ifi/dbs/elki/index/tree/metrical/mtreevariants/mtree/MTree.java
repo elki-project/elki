@@ -55,7 +55,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MTree.class);
+  private static final Logging LOG = Logging.getLogger(MTree.class);
 
   /**
    * Constructor.
@@ -103,7 +103,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
     // 1
@@ -118,11 +118,11 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+    if(LOG.isVerbose()) {
+      LOG.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
 
@@ -161,6 +161,6 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

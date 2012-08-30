@@ -75,7 +75,7 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
   /**
    * The appropriate logger for this index.
    */
-  private static final Logging logger = Logging.getLogger(DeLiCluTreeIndex.class);
+  private static final Logging LOG = Logging.getLogger(DeLiCluTreeIndex.class);
 
   /**
    * Creates a new leaf entry representing the specified data object.
@@ -95,8 +95,8 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
    * @return the path of node ids from the root to the objects's parent
    */
   public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(DBID id, O obj) {
-    if(logger.isDebugging()) {
-      logger.debugFine("setHandled " + id + ", " + obj + "\n");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("setHandled " + id + ", " + obj + "\n");
     }
 
     // find the leaf node containing o
@@ -232,6 +232,6 @@ public class DeLiCluTreeIndex<O extends NumberVector<?, ?>> extends DeLiCluTree 
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

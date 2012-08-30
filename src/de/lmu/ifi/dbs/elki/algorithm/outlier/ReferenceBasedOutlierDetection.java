@@ -90,7 +90,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ReferenceBasedOutlierDetection.class);
+  private static final Logging LOG = Logging.getLogger(ReferenceBasedOutlierDetection.class);
 
   /**
    * Parameter for the reference points heuristic.
@@ -292,7 +292,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?, ?>, D exte
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

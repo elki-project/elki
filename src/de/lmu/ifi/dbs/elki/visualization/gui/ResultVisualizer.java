@@ -51,7 +51,7 @@ public class ResultVisualizer implements ResultHandler {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ResultVisualizer.class);
+  private static final Logging LOG = Logging.getLogger(ResultVisualizer.class);
 
   /**
    * Parameter to specify the window title
@@ -81,7 +81,7 @@ public class ResultVisualizer implements ResultHandler {
   /**
    * Default title
    */
-  protected final static String DEFAULT_TITLE = "ELKI Result Visualization";
+  protected static final String DEFAULT_TITLE = "ELKI Result Visualization";
 
   /**
    * Visualization manager.
@@ -130,7 +130,7 @@ public class ResultVisualizer implements ResultHandler {
           window.showOverview();
         }
         catch(Throwable e) {
-          logger.exception("Error in starting visualizer window.", e);
+          LOG.exception("Error in starting visualizer window.", e);
         }
       }
     });

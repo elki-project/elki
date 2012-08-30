@@ -57,7 +57,7 @@ public class CheckELKIServices {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CheckELKIServices.class);
+  private static final Logging LOG = Logging.getLogger(CheckELKIServices.class);
 
   /**
    * Pattern to strip comments, while keeping commented class names.
@@ -101,8 +101,8 @@ public class CheckELKIServices {
         if(".svn".equals(prop)) {
           continue;
         }
-        if(logger.isVerbose()) {
-          logger.verbose("Checking property: " + prop);
+        if(LOG.isVerbose()) {
+          LOG.verbose("Checking property: " + prop);
         }
         checkService(prop, update, noskip);
       }
@@ -126,7 +126,7 @@ public class CheckELKIServices {
       cls = Class.forName(prop);
     }
     catch(ClassNotFoundException e) {
-      logger.warning("Property is not a class name: " + prop);
+      LOG.warning("Property is not a class name: " + prop);
       return;
     }
     List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false);
@@ -162,17 +162,17 @@ public class CheckELKIServices {
               names.remove(stripped);
             }
             else {
-              logger.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or referenced twice?).");
+              LOG.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or referenced twice?).");
             }
           }
         }
         else {
-          logger.warning("Line: " + line + " didn't match regexp.");
+          LOG.warning("Line: " + line + " didn't match regexp.");
         }
       }
     }
     catch(IOException e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
     if(names.size() > 0) {
       // format for copy & paste to properties file:
@@ -185,14 +185,14 @@ public class CheckELKIServices {
         for(String remaining : sorted) {
           message.append("# ").append(remaining).append(FormatUtil.NEWLINE);
         }
-        logger.warning(message.toString());
+        LOG.warning(message.toString());
       }
       else {
         // Try to automatically update:
         URL f = getClass().getClassLoader().getResource(ELKIServiceLoader.PREFIX + cls.getName());
         String fnam = f.getFile();
         if(fnam == null) {
-          logger.warning("Cannot update: " + f + " seems to be in a jar file.");
+          LOG.warning("Cannot update: " + f + " seems to be in a jar file.");
         }
         else {
           try {
@@ -206,10 +206,10 @@ public class CheckELKIServices {
             pr.close();
             out.flush();
             out.close();
-            logger.warning("Updated: " + fnam);
+            LOG.warning("Updated: " + fnam);
           }
           catch(IOException e) {
-            logger.exception(e);
+            LOG.exception(e);
           }
         }
       }

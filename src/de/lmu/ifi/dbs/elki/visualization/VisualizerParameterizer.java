@@ -75,7 +75,7 @@ public class VisualizerParameterizer implements Parameterizable {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(VisualizerParameterizer.class);
+  private static final Logging LOG = Logging.getLogger(VisualizerParameterizer.class);
 
   /**
    * Parameter to get the style properties file.
@@ -308,11 +308,11 @@ public class VisualizerParameterizer implements Parameterizable {
           factories.add(a);
         }
         catch(Throwable e) {
-          if(logger.isDebugging()) {
-            logger.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
+          if(LOG.isDebugging()) {
+            LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
           }
           else {
-            logger.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
+            LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
           }
         }
       }
@@ -338,11 +338,11 @@ public class VisualizerParameterizer implements Parameterizable {
           factories.add(a);
         }
         catch(Throwable e) {
-          if(logger.isDebugging()) {
-            logger.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
+          if(LOG.isDebugging()) {
+            LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
           }
           else {
-            logger.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
+            LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
           }
         }
       }

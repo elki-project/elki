@@ -45,7 +45,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SigmoidOutlierScalingFunction.class);
+  private static final Logging LOG = Logging.getLogger(SigmoidOutlierScalingFunction.class);
   
   /**
    * Sigmoid parameter
@@ -108,13 +108,13 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
 
       iter++;
       if(iter > 100) {
-        logger.warning("Max iterations met in sigmoid fitting.");
+        LOG.warning("Max iterations met in sigmoid fitting.");
         break;
       }
     }
     Afinal = a;
     Bfinal = b;
-    logger.debugFine("A = "+Afinal+" B = "+Bfinal);
+    LOG.debugFine("A = "+Afinal+" B = "+Bfinal);
   }
 
   /**
@@ -225,12 +225,12 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
           stepsize /= 2.0;
         }
         if(stepsize < minstep) {
-          logger.debug("Minstep hit.");
+          LOG.debug("Minstep hit.");
           break;
         }
       }
       if(it + 1 >= maxiter) {
-        logger.debug("Maximum iterations hit.");
+        LOG.debug("Maximum iterations hit.");
         break;
       }
     }

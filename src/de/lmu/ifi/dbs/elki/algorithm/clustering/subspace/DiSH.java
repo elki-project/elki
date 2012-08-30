@@ -105,7 +105,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DiSH.class);
+  private static final Logging LOG = Logging.getLogger(DiSH.class);
 
   /**
    * Parameter that specifies the maximum radius of the neighborhood to be
@@ -169,13 +169,13 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    */
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     // Instantiate DiSH distance (and thus run the preprocessor)
-    if(logger.isVerbose()) {
-      logger.verbose("*** Run DiSH preprocessor.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("*** Run DiSH preprocessor.");
     }
     DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(relation);
     // Configure and run OPTICS.
-    if(logger.isVerbose()) {
-      logger.verbose("*** Run OPTICS algorithm.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("*** Run OPTICS algorithm.");
     }
     ListParameterization opticsconfig = new ListParameterization(opticsAlgorithmParameters);
     opticsconfig.addParameter(OPTICS.DISTANCE_FUNCTION_ID, ProxyDistanceFunction.proxy(dishDistanceQuery));
@@ -185,8 +185,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     optics = opticsconfig.tryInstantiate(cls);
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database, relation);
 
-    if(logger.isVerbose()) {
-      logger.verbose("*** Compute Clusters.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("*** Compute Clusters.");
     }
     return computeClusters(relation, opticsResult, dishDistanceQuery);
   }
@@ -205,41 +205,41 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     // extract clusters
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = extractClusters(database, distFunc, clusterOrder);
 
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 1: extract clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
         }
       }
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     // check if there are clusters < minpts
     checkClusters(database, distFunc, clustersMap, minpts);
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 2: check clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
         }
       }
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     // sort the clusters
     List<Cluster<SubspaceModel<V>>> clusters = sortClusters(database, clustersMap);
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 3: sort clusters");
       for(Cluster<SubspaceModel<V>> c : clusters) {
         msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspace().getDimensions())).append(" ids ").append(c.size());
       }
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     // build the hierarchy
     buildHierarchy(database, distFunc, clusters, dimensionality);
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer("Step 4: build hierarchy");
       for(Cluster<SubspaceModel<V>> c : clusters) {
         msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getDimensions())).append(" ids ").append(c.size());
@@ -250,7 +250,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
           msg.append("\n   child ").append(cluster);
         }
       }
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     // build result
@@ -272,7 +272,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @return the extracted clusters
    */
   private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), LOG) : null;
     int processed = 0;
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
     Map<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>>();
@@ -312,21 +312,21 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       entryToClusterMap.put(entry.getID(), cluster);
 
       if(progress != null) {
-        progress.setProcessed(++processed, logger);
+        progress.setProcessed(++processed, LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
-    if(logger.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer("Step 0");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(DatabaseUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
         }
       }
-      logger.debugFiner(msg.toString());
+      LOG.debugFiner(msg.toString());
     }
 
     // add the predecessor to the cluster
@@ -531,7 +531,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         int subspaceDim_j = dimensionality - c_j.getModel().getSubspace().dimensionality();
 
         if(subspaceDim_i < subspaceDim_j) {
-          if(logger.isDebugging()) {
+          if(LOG.isDebugging()) {
             msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions())).append("]");
             msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions())).append("]");
           }
@@ -542,7 +542,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
             if(c_i.getParents().isEmpty()) {
               c_j.getChildren().add(c_i);
               c_i.getParents().add(c_j);
-              if(logger.isDebugging()) {
+              if(LOG.isDebugging()) {
                 msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                 msg.append("] is parent of [").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
                 msg.append("]");
@@ -553,12 +553,12 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
             V cj_centroid = ProjectedCentroid.make(c_j.getModel().getDimensions(), database, c_j.getIDs()).toVector(database);
             PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspace().getDimensions(), c_j.getModel().getSubspace().getDimensions());
             double d = distFunc.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
-            if(logger.isDebugging()) {
+            if(LOG.isDebugging()) {
               msg.append("\n dist = ").append(distance.getCorrelationValue());
             }
 
             if(distance.getCorrelationValue() == subspaceDim_j) {
-              if(logger.isDebugging()) {
+              if(LOG.isDebugging()) {
                 msg.append("\n d = ").append(d);
               }
               if(d <= 2 * epsilon) {
@@ -567,7 +567,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
                 if(c_i.getParents().isEmpty() || !isParent(database, distFunc, c_j, c_i.getParents())) {
                   c_j.getChildren().add(c_i);
                   c_i.getParents().add(c_j);
-                  if(logger.isDebugging()) {
+                  if(LOG.isDebugging()) {
                     msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                     msg.append("] is parent of [");
                     msg.append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
@@ -583,8 +583,8 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         }
       }
     }
-    if(logger.isDebugging()) {
-      logger.debug(msg.toString());
+    if(LOG.isDebugging()) {
+      LOG.debug(msg.toString());
     }
   }
 
@@ -623,7 +623,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -74,7 +74,7 @@ public class TextWriterStream {
   /**
    * System newline character(s)
    */
-  private final static String NEWLINE = System.getProperty("line.separator");
+  private static final String NEWLINE = System.getProperty("line.separator");
 
   /**
    * Marker used in text serialization (and re-parsing)

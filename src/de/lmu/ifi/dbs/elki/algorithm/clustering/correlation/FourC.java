@@ -61,7 +61,7 @@ public class FourC<V extends NumberVector<V, ?>> extends AbstractProjectedDBSCAN
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(FourC.class);
+  private static final Logging LOG = Logging.getLogger(FourC.class);
 
   /**
    * Constructor.
@@ -92,7 +92,7 @@ public class FourC<V extends NumberVector<V, ?>> extends AbstractProjectedDBSCAN
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

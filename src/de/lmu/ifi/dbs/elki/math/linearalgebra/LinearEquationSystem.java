@@ -44,7 +44,7 @@ public class LinearEquationSystem {
   /**
    * Logger.
    */
-  private static final Logging logger = Logging.getLogger(LinearEquationSystem.class);
+  private static final Logging LOG = Logging.getLogger(LinearEquationSystem.class);
 
   /**
    * Indicates trivial pivot search strategy.
@@ -419,11 +419,11 @@ public class LinearEquationSystem {
       pivotCol = pivotPos.second;
       pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         StringBuffer msg = new StringBuffer();
         msg.append("equations ").append(equationsToString(4));
         msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
-        logger.debugFine(msg.toString());
+        LOG.debugFine(msg.toString());
       }
 
       // permute rows and columns to get this entry onto
@@ -546,10 +546,10 @@ public class LinearEquationSystem {
     }
     rhs[row[k]] /= pivot;
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("set pivot element to 1 ").append(equationsToString(4));
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     // for (int i = k + 1; i < coeff.length; i++) {
@@ -573,10 +573,10 @@ public class LinearEquationSystem {
       rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
     }// end for k
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("after pivot operation ").append(equationsToString(4));
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
   }
 
@@ -597,8 +597,8 @@ public class LinearEquationSystem {
     }
 
     if(!isSolvable(method)) {
-      if(logger.isDebugging()) {
-        logger.debugFine("Equation system is not solvable!");
+      if(LOG.isDebugging()) {
+        LOG.debugFine("Equation system is not solvable!");
       }
       return;
     }
@@ -625,7 +625,7 @@ public class LinearEquationSystem {
     }
 
     StringBuffer msg = new StringBuffer();
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", 4)).append("]");
       msg.append("\nbound Indices ").append(boundIndices);
       msg.append("\nfree Indices ").append(freeIndices);
@@ -654,12 +654,12 @@ public class LinearEquationSystem {
 
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nU");
       for(double[] anU : u) {
         msg.append("\n").append(FormatUtil.format(anU, ",", 4));
       }
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     solved = true;

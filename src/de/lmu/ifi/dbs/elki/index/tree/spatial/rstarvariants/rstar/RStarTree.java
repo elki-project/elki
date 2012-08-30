@@ -48,7 +48,7 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(RStarTree.class);
+  private static final Logging LOG = Logging.getLogger(RStarTree.class);
 
   /**
    * Constructor.
@@ -91,6 +91,6 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

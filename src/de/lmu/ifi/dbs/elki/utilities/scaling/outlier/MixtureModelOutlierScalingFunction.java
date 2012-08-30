@@ -44,7 +44,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MixtureModelOutlierScalingFunction.class);
+  private static final Logging LOG = Logging.getLogger(MixtureModelOutlierScalingFunction.class);
   
   /**
    * Parameter mu of the gaussian distribution (outliers)
@@ -159,7 +159,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
         sqsum += ti * val * val; // (val - curMu) * (val - curMu);
       }
       if(tisum <= 0.0 || wsum <= 0.0) {
-        logger.warning("MixtureModel Outlier Scaling converged to extreme.");
+        LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
       double newMu = wsum / tisum;
@@ -186,7 +186,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
         }
       }
       if(newSigma <= 0.0 || newAlpha <= 0.0) {
-        logger.warning("MixtureModel Outlier Scaling converged to extreme.");
+        LOG.warning("MixtureModel Outlier Scaling converged to extreme.");
         break;
       }
       // logger.debugFine("iter #"+iter+" mu = " + newMu + " sigma = " +
@@ -198,7 +198,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
 
       iter++;
       if(iter > 100) {
-        logger.warning("Max iterations met in mixture model fitting.");
+        LOG.warning("Max iterations met in mixture model fitting.");
         break;
       }
     }

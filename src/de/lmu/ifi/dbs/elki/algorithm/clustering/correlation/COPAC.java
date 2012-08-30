@@ -96,7 +96,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(COPAC.class);
+  private static final Logging LOG = Logging.getLogger(COPAC.class);
 
   /**
    * Parameter to specify the local PCA preprocessor to derive partition
@@ -178,8 +178,8 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
    */
   @SuppressWarnings("unchecked")
   public Clustering<Model> run(Relation<V> relation) {
-    if(logger.isVerbose()) {
-      logger.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + DatabaseUtil.dimensionality(relation));
+    if(LOG.isVerbose()) {
+      LOG.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + DatabaseUtil.dimensionality(relation));
     }
 
     partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(relation);
@@ -187,7 +187,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
 
     // partitioning
     Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
-    FiniteProgress partitionProgress = logger.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), logger) : null;
+    FiniteProgress partitionProgress = LOG.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), LOG) : null;
     int processed = 1;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -199,17 +199,17 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
 
       partitionMap.get(corrdim).add(iditer);
       if(partitionProgress != null) {
-        partitionProgress.setProcessed(processed++, logger);
+        partitionProgress.setProcessed(processed++, LOG);
       }
     }
 
     if(partitionProgress != null) {
-      partitionProgress.ensureCompleted(logger);
+      partitionProgress.ensureCompleted(LOG);
     }
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       for(Integer corrDim : partitionMap.keySet()) {
         ModifiableDBIDs list = partitionMap.get(corrDim);
-        logger.verbose("Partition [corrDim = " + corrDim + "]: " + list.size() + " objects.");
+        LOG.verbose("Partition [corrDim = " + corrDim + "]: " + list.size() + " objects.");
       }
     }
 
@@ -245,8 +245,8 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
         ProxyDatabase proxy = new ProxyDatabase(partids, relation);
         
         ClusteringAlgorithm<Clustering<Model>> partitionAlgorithm = getPartitionAlgorithm(query);
-        if(logger.isVerbose()) {
-          logger.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + pair.getKey() + "]...");
+        if(LOG.isVerbose()) {
+          LOG.verbose("Running " + partitionAlgorithm.getClass().getName() + " on partition [corrDim = " + pair.getKey() + "]...");
         }
         Clustering<Model> p = partitionAlgorithm.run(proxy);
         // Re-Wrap resulting Clusters as DimensionModel clusters.
@@ -295,7 +295,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -59,7 +59,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KNNClassifier.class);
+  private static final Logging LOG = Logging.getLogger(KNNClassifier.class);
   
   /**
    * OptionID for
@@ -161,6 +161,6 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

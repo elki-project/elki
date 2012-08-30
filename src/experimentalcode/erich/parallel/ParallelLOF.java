@@ -61,7 +61,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(ParallelLOF.class);
+  private static final Logging LOG = Logging.getLogger(ParallelLOF.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -132,7 +132,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

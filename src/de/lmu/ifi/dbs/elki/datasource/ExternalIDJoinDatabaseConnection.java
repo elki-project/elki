@@ -51,7 +51,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(ExternalIDJoinDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(ExternalIDJoinDatabaseConnection.class);
 
   /**
    * The filters to invoke
@@ -98,12 +98,12 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
       for(int i = 0; i < first.dataLength(); i++) {
         ExternalID data = (ExternalID) first.data(i, lblcol);
         if(data == null) {
-          logger.debug("Object without ID encountered.");
+          LOG.debug("Object without ID encountered.");
           continue;
         }
         Integer old = labelmap.put(data, i);
         if(old != null) {
-          logger.debug("Duplicate id encountered: " + data + " in rows " + old + " and " + i);
+          LOG.debug("Duplicate id encountered: " + data + " in rows " + old + " and " + i);
         }
       }
     }
@@ -150,12 +150,12 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
       for(int i = 0; i < cur.dataLength(); i++) {
         ExternalID data = (ExternalID) cur.data(i, lblcol);
         if(data == null) {
-          logger.warning("Object without label encountered.");
+          LOG.warning("Object without label encountered.");
           continue;
         }
         Integer row = labelmap.get(data);
         if(row == null) {
-          logger.debug("ID not found for join: " + data + " in row " + i);
+          LOG.debug("ID not found for join: " + data + " in row " + i);
           continue;
         }
         for(int d = 0; d < cur.metaLength(); d++) {
@@ -183,7 +183,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
               buf.append(first.data(i, d2));
             }
           }
-          logger.warning("null value in joined data, row " + i + " column " + d + FormatUtil.NEWLINE + "[" + buf.toString() + "]");
+          LOG.warning("null value in joined data, row " + i + " column " + d + FormatUtil.NEWLINE + "[" + buf.toString() + "]");
           break;
         }
       }
@@ -194,7 +194,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

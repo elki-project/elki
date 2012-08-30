@@ -95,7 +95,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SLINK.class);
+  private static final Logging LOG = Logging.getLogger(SLINK.class);
 
   /**
    * The minimum number of clusters to extract
@@ -141,7 +141,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     // Temporary storage for m.
     WritableDataStore<D> m = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Clustering", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustering", relation.size(), LOG) : null;
     // has to be an array for monotonicity reasons!
     ModifiableDBIDs processedIDs = DBIDUtil.newArray(relation.size());
 
@@ -156,12 +156,12 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       processedIDs.add(id);
 
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
 
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
     // We don't need m anymore.
     m.destroy();
@@ -285,7 +285,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @return Hierarchical clustering
    */
   private Clustering<DendrogramModel<D>> extractClusters(DBIDs ids, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
     // stopdist
     D stopdist = null;
@@ -322,11 +322,11 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
       // Decrement counter
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
     // build hierarchy
@@ -408,7 +408,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
       // Decrement counter
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     // root = parent
@@ -429,7 +429,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     }
     else {
       if(parents.size() > 1) {
-        logger.warning("More than one parent in Single-Link dendrogram: " + cluster + " parents: " + parents);
+        LOG.warning("More than one parent in Single-Link dendrogram: " + cluster + " parents: " + parents);
         return null;
       }
       return lastAncestor(parents.get(0), hier);
@@ -473,7 +473,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     Map<DBID, Cluster<Model>> clusters = new HashMap<DBID, Cluster<Model>>();
     Map<DBID, ModifiableDBIDs> cids = new HashMap<DBID, ModifiableDBIDs>();
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
     for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
       DBID dest = pi.get(it);
@@ -524,7 +524,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             }
             clusters.put(key, cluster);
           }
-          if(logger.isDebuggingFine()) {
+          if(LOG.isDebuggingFine()) {
             StringBuffer buf = new StringBuffer();
             buf.append("Number of clusters at depth ");
             buf.append((curdist != null ? curdist.toString() : "null"));
@@ -533,7 +533,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             for(DBID id : clusters.keySet()) {
               buf.append(" ").append(id.toString());
             }
-            logger.debugFine(buf.toString());
+            LOG.debugFine(buf.toString());
           }
           cids.clear();
           curdist = l;
@@ -551,15 +551,15 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       }
       // Decrement counter
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
     // There should be one cluster remaining at infinite distance...
     if(clusters.size() != 1) {
-      logger.warning("Single-link is expected to have a single cluster at the top level!");
+      LOG.warning("Single-link is expected to have a single cluster at the top level!");
       return null;
     }
     final Clustering<Model> clustering = new Clustering<Model>("Single-Link-Clustering", "slink-clustering");
@@ -577,7 +577,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

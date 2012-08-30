@@ -120,7 +120,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(LOF.class);
+  private static final Logging LOG = Logging.getLogger(LOF.class);
 
   /**
    * The distance function to determine the reachability distance between
@@ -193,7 +193,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * @param relation Data to process
    */
   public OutlierResult run(Relation<O> relation) {
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress("LOF", 3) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(relation, stepprog);
     KNNQuery<O, D> kNNRefer = pair.getFirst();
     KNNQuery<O, D> kNNReach = pair.getSecond();
@@ -214,10 +214,10 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     if(!(knnReach instanceof PreprocessorKNNQuery)) {
       if(stepprog != null) {
         if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
-          stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", logger);
+          stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", LOG);
         }
         else {
-          stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", logger);
+          stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
         }
       }
       MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, reachabilityDistanceFunction, k);
@@ -262,13 +262,13 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
 
     // Compute LRDs
     if(stepprog != null) {
-      stepprog.beginStep(2, "Computing LRDs.", logger);
+      stepprog.beginStep(2, "Computing LRDs.", LOG);
     }
     WritableDoubleDataStore lrds = computeLRDs(ids, kNNReach);
 
     // compute LOF_SCORE of each db object
     if(stepprog != null) {
-      stepprog.beginStep(3, "Computing LOFs.", logger);
+      stepprog.beginStep(3, "Computing LOFs.", LOG);
     }
     Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
     WritableDoubleDataStore lofs = lofsAndMax.getFirst();
@@ -276,7 +276,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     DoubleMinMax lofminmax = lofsAndMax.getSecond();
 
     if(stepprog != null) {
-      stepprog.setCompleted(logger);
+      stepprog.setCompleted(LOG);
     }
 
     // Build result representation.
@@ -297,7 +297,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    */
   protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-    FiniteProgress lrdsProgress = logger.isVerbose() ? new FiniteProgress("LRD", ids.size(), logger) : null;
+    FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
       final int size = neighbors.size() - 1; // estimated
@@ -337,11 +337,11 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       }
       lrds.putDouble(iter, lrd);
       if(lrdsProgress != null) {
-        lrdsProgress.incrementProcessed(logger);
+        lrdsProgress.incrementProcessed(LOG);
       }
     }
     if(lrdsProgress != null) {
-      lrdsProgress.ensureCompleted(logger);
+      lrdsProgress.ensureCompleted(LOG);
     }
     return lrds;
   }
@@ -360,7 +360,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
 
-    FiniteProgress progressLOFs = logger.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), logger) : null;
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lrdp = lrds.doubleValue(iter);
       final double lof;
@@ -393,11 +393,11 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       lofminmax.put(lof);
 
       if(progressLOFs != null) {
-        progressLOFs.incrementProcessed(logger);
+        progressLOFs.incrementProcessed(LOG);
       }
     }
     if(progressLOFs != null) {
-      progressLOFs.ensureCompleted(logger);
+      progressLOFs.ensureCompleted(LOG);
     }
     return new Pair<WritableDoubleDataStore, DoubleMinMax>(lofs, lofminmax);
   }
@@ -416,7 +416,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

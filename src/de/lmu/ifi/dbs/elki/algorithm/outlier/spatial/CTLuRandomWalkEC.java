@@ -88,7 +88,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(CTLuRandomWalkEC.class);
+  private static final Logging LOG = Logging.getLogger(CTLuRandomWalkEC.class);
 
   /**
    * Parameter alpha: Attribute difference exponent
@@ -153,7 +153,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
           heap.add(distance, n);
           double dist = distance.doubleValue();
           if(dist == 0) {
-            logger.warning("Zero distances are not supported - skipping: " + DBIDUtil.toString(id) + " " + DBIDUtil.toString(n));
+            LOG.warning("Zero distances are not supported - skipping: " + DBIDUtil.toString(id) + " " + DBIDUtil.toString(n));
             e = 0;
           }
           else {
@@ -238,7 +238,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

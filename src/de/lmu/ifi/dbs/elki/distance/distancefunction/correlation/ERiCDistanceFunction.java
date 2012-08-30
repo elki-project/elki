@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.BitDistance;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -51,11 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @apiviz.has Instance
  */
 public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, BitDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, BitDistance> {
-  /**
-   * Logger for debug.
-   */
-  static Logging logger = Logging.getLogger(PCABasedCorrelationDistanceFunction.class);
-
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
    * strong eigenvectors of q are approximately linear dependent from the strong

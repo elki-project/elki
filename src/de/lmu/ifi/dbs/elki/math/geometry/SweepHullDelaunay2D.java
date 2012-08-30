@@ -54,7 +54,7 @@ public class SweepHullDelaunay2D {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(SweepHullDelaunay2D.class);
+  private static final Logging LOG = Logging.getLogger(SweepHullDelaunay2D.class);
 
   /**
    * The current set of points.
@@ -178,7 +178,7 @@ public class SweepHullDelaunay2D {
     hull.add(new IntIntPair(besttri.b, 0));
     hull.add(new IntIntPair(besttri.c, 0));
 
-    if(logger.isDebuggingFinest()) {
+    if(LOG.isDebuggingFinest()) {
       debugHull();
     }
 
@@ -286,8 +286,8 @@ public class SweepHullDelaunay2D {
         lasttri = tristart + newtris.size() - 1;
       }
       final int hullsize = hull.size();
-      if(logger.isDebuggingFinest()) {
-        logger.debugFinest("Size: " + hullsize + " start: " + hstart + " end: " + hend);
+      if(LOG.isDebuggingFinest()) {
+        LOG.debugFinest("Size: " + hullsize + " start: " + hstart + " end: " + hend);
       }
       if(hend < hullsize) {
         ListIterator<IntIntPair> iter = hull.listIterator();
@@ -338,7 +338,7 @@ public class SweepHullDelaunay2D {
           iter.remove();
         }
       }
-      if(logger.isDebuggingFinest()) {
+      if(LOG.isDebuggingFinest()) {
         debugHull();
       }
       if(!hullonly) {
@@ -414,7 +414,7 @@ public class SweepHullDelaunay2D {
     for(IntIntPair p : hull) {
       buf.append(p).append(" ");
     }
-    logger.debugFinest(buf);
+    LOG.debugFinest(buf);
   }
 
   /**

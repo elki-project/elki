@@ -53,7 +53,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * The logger to use.
    */
-  static final Logging logger = Logging.getLogger(ExtendedNeighborhood.class);
+  private static final Logging LOG = Logging.getLogger(ExtendedNeighborhood.class);
 
   /**
    * Constructor.
@@ -66,7 +66,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override
@@ -131,7 +131,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
       final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
 
       // Expand multiple steps
-      FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), logger) : null;
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Expanding neighborhoods", database.size(), LOG) : null;
       for(DBIDIter iter = database.iterDBIDs(); iter.valid(); iter.advance()) {
         HashSetModifiableDBIDs res = DBIDUtil.newHashSet();
         res.add(iter);
@@ -157,11 +157,11 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
         }
         store.put(iter, res);
         if(progress != null) {
-          progress.incrementProcessed(logger);
+          progress.incrementProcessed(LOG);
         }
       }
       if(progress != null) {
-        progress.ensureCompleted(logger);
+        progress.ensureCompleted(LOG);
       }
 
       return store;

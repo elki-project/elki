@@ -70,7 +70,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KMediansLloyd.class);
+  private static final Logging LOG = Logging.getLogger(KMediansLloyd.class);
 
   /**
    * Constructor.
@@ -103,8 +103,8 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
     }
 
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(logger.isVerbose()) {
-        logger.verbose("K-Medians iteration " + (iteration + 1));
+      if(LOG.isVerbose()) {
+        LOG.verbose("K-Medians iteration " + (iteration + 1));
       }
       boolean changed = assignToNearestCluster(relation, medians, clusters);
       // Stop if no cluster assignment changed.
@@ -126,7 +126,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

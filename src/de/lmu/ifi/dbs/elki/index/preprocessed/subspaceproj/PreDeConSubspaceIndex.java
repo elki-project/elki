@@ -59,7 +59,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(PreDeConSubspaceIndex.class);
+  private static final Logging LOG = Logging.getLogger(PreDeConSubspaceIndex.class);
 
   /**
    * The threshold for small eigenvalues.
@@ -168,7 +168,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

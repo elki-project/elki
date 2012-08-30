@@ -76,7 +76,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(RankingQualityHistogram.class);
+  private static final Logging LOG = Logging.getLogger(RankingQualityHistogram.class);
 
   /**
    * Option to configure the number of bins to use.
@@ -103,18 +103,18 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
 
-    if(logger.isVerbose()) {
-      logger.verbose("Preprocessing clusters...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(numbins, 0.0, 1.0);
 
-    if(logger.isVerbose()) {
-      logger.verbose("Processing points...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Processing points...");
     }
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
 
     MeanVariance mv = new MeanVariance();
     // sort neighbors
@@ -127,12 +127,12 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
         hist.aggregate(result, 1. / relation.size());
 
         if(progress != null) {
-          progress.incrementProcessed(logger);
+          progress.incrementProcessed(LOG);
         }
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
     // Transform Histogram into a Double Vector array.
@@ -153,7 +153,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
   
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -84,7 +84,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
   /**
    * Logger class to use.
    */
-  public static final Logging logger = Logging.getLogger(KMLOutputHandler.class);
+  private static final Logging LOG = Logging.getLogger(KMLOutputHandler.class);
 
   /**
    * Number of styles to use (lower reduces rendering complexity a bit)
@@ -151,11 +151,11 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         }
       }
       catch(XMLStreamException e) {
-        logger.exception(e);
+        LOG.exception(e);
         throw new AbortException("XML error in KML output.", e);
       }
       catch(IOException e) {
-        logger.exception(e);
+        LOG.exception(e);
         throw new AbortException("IO error in KML output.", e);
       }
     }
@@ -233,10 +233,10 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
       PolygonsObject poly = polys.get(iter);
       String label = labels.get(iter);
       if(score == null) {
-        logger.warning("No score for object " + DBIDUtil.toString(iter));
+        LOG.warning("No score for object " + DBIDUtil.toString(iter));
       }
       if(poly == null) {
-        logger.warning("No polygon for object " + DBIDUtil.toString(iter) + " - skipping.");
+        LOG.warning("No polygon for object " + DBIDUtil.toString(iter) + " - skipping.");
         continue;
       }
       out.writeStartElement("Placemark");
@@ -335,7 +335,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
    * @throws XMLStreamException
    */
   private void writeNewlineOnDebug(XMLStreamWriter out) throws XMLStreamException {
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       out.writeCharacters("\n");
     }
   }

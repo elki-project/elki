@@ -46,7 +46,7 @@ public class LoggingStep implements WorkflowStep {
   /**
    * Logger
    */
-  private final static Logging logger = Logging.getLogger(LoggingStep.class);
+  private static final Logging LOG = Logging.getLogger(LoggingStep.class);
 
   /**
    * Constructor.
@@ -78,7 +78,7 @@ public class LoggingStep implements WorkflowStep {
           }
         }
         catch(IllegalArgumentException e) {
-          logger.warning("Invalid logging statement for package " + pair[0] + ": " + e.getMessage());
+          LOG.warning("Invalid logging statement for package " + pair[0] + ": " + e.getMessage());
         }
       }
     }

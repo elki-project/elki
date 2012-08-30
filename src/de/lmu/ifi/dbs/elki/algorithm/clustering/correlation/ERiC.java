@@ -96,7 +96,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ERiC.class);
+  private static final Logging LOG = Logging.getLogger(ERiC.class);
 
   /**
    * The COPAC clustering algorithm.
@@ -122,11 +122,11 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
   public Clustering<CorrelationModel<V>> run(Relation<V> relation) {
     final int dimensionality = DatabaseUtil.dimensionality(relation);
 
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(3) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
 
     // run COPAC
     if(stepprog != null) {
-      stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data", logger);
+      stepprog.beginStep(1, "Preprocessing local correlation dimensionalities and partitioning data", LOG);
     }
     Clustering<Model> copacResult = copacAlgorithm.run(relation);
 
@@ -134,10 +134,10 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
 
     // extract correlation clusters
     if(stepprog != null) {
-      stepprog.beginStep(2, "Extract correlation clusters", logger);
+      stepprog.beginStep(2, "Extract correlation clusters", LOG);
     }
     SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality);
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
       for(Integer corrDim : clusterMap.keySet()) {
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
@@ -150,22 +150,22 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
           // "  ids " + cluster.getIDs().size());
         }
       }
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       int clusters = 0;
       for(List<Cluster<CorrelationModel<V>>> correlationClusters : clusterMap.values()) {
         clusters += correlationClusters.size();
       }
-      logger.verbose(clusters + " clusters extracted.");
+      LOG.verbose(clusters + " clusters extracted.");
     }
 
     // build hierarchy
     if(stepprog != null) {
-      stepprog.beginStep(3, "Building hierarchy", logger);
+      stepprog.beginStep(3, "Building hierarchy", LOG);
     }
     buildHierarchy(clusterMap, query);
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
       for(Integer corrDim : clusterMap.keySet()) {
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
@@ -180,10 +180,10 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
           }
         }
       }
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
     if(stepprog != null) {
-      stepprog.setCompleted(logger);
+      stepprog.setCompleted(LOG);
     }
 
     Clustering<CorrelationModel<V>> result = new Clustering<CorrelationModel<V>>("ERiC clustering", "eric-clustering");
@@ -222,7 +222,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
         PCAFilteredRunner<V> pca = parameters.tryInstantiate(cls);
         for(ParameterException e : parameters.getErrors()) {
-          logger.warning("Error in internal parameterization: " + e.getMessage());
+          LOG.warning("Error in internal parameterization: " + e.getMessage());
         }
 
         // get cluster list for this dimension.
@@ -265,7 +265,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
       PCAFilteredRunner<V> pca = parameters.tryInstantiate(cls);
       for(ParameterException e : parameters.getErrors()) {
-        logger.warning("Error in internal parameterization: " + e.getMessage());
+        LOG.warning("Error in internal parameterization: " + e.getMessage());
       }
       PCAFilteredResult pcares = pca.processIds(noise.getIDs(), database);
 
@@ -311,7 +311,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
     for(Integer childCorrDim : clusterMap.keySet()) {
       List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
       SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> parentMap = clusterMap.tailMap(childCorrDim + 1);
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\ncorrdim ").append(childCorrDim);
         msg.append("\nparents ").append(parentMap.keySet());
       }
@@ -324,7 +324,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
             if(subspaceDim_parent == lambda_max && child.getParents().isEmpty()) {
               parent.getChildren().add(child);
               child.getParents().add(parent);
-              if(logger.isDebugging()) {
+              if(LOG.isDebugging()) {
                 msg.append("\n").append(parent).append(" is parent of ").append(child);
               }
             }
@@ -333,7 +333,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
               if(!dist.bitValue() && (child.getParents().isEmpty() || !isParent(distanceFunction, parent, child.getParents()))) {
                 parent.getChildren().add(child);
                 child.getParents().add(parent);
-                if(logger.isDebugging()) {
+                if(LOG.isDebugging()) {
                   msg.append("\n").append(parent).append(" is parent of ").append(child);
                 }
               }
@@ -342,8 +342,8 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
         }
       }
     }
-    if(logger.isDebugging()) {
-      logger.debugFine(msg.toString());
+    if(LOG.isDebugging()) {
+      LOG.debugFine(msg.toString());
     }
 
   }
@@ -369,19 +369,19 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       }
 
       BitDistance dist = distanceFunction.distance(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
       }
       if(!dist.bitValue()) {
-        if(logger.isDebugging()) {
-          logger.debugFine(msg.toString());
+        if(LOG.isDebugging()) {
+          LOG.debugFine(msg.toString());
         }
         return true;
       }
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine(msg.toString());
+    if(LOG.isDebugging()) {
+      LOG.debugFine(msg.toString());
     }
     return false;
   }
@@ -393,7 +393,7 @@ public class ERiC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
   
   /**

@@ -49,7 +49,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   /**
    * Logger
    */
-  protected static final Logging logger = Logging.getLogger(PropertiesBasedStyleLibrary.class);
+  private static final Logging LOG = Logging.getLogger(PropertiesBasedStyleLibrary.class);
 
   /**
    * Name of the default color scheme.
@@ -323,7 +323,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
         linelib = (LineStyleLibrary) cls.getConstructor(StyleLibrary.class).newInstance(this);
       }
       catch(Exception e) {
-        logger.exception(e);
+        LOG.exception(e);
         linelib = new SolidLineStyleLibrary(this);
       }
     }
@@ -345,7 +345,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
         markerlib = (MarkerLibrary) cls.getConstructor(StyleLibrary.class).newInstance(this);
       }
       catch(Exception e) {
-        logger.exception(e);
+        LOG.exception(e);
         markerlib = new PrettyMarkers(this);
       }
     }

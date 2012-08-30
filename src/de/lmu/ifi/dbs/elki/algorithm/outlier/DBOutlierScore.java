@@ -60,7 +60,7 @@ public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DBOutlierScore.class);
+  private static final Logging LOG = Logging.getLogger(DBOutlierScore.class);
 
   /**
    * Constructor with parameters.
@@ -90,7 +90,7 @@ public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

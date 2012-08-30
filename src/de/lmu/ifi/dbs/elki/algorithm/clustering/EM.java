@@ -91,7 +91,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(EM.class);
+  private static final Logging LOG = Logging.getLogger(EM.class);
 
   /**
    * Small value to increment diagonally of a matrix in order to avoid
@@ -176,8 +176,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       throw new IllegalArgumentException("database empty: must contain elements");
     }
     // initial models
-    if(logger.isVerbose()) {
-      logger.verbose("initializing " + k + " models");
+    if(LOG.isVerbose()) {
+      LOG.verbose("initializing " + k + " models");
     }
     List<Vector> means = new ArrayList<Vector>();
     for(NumberVector<?, ?> nv : initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC)) {
@@ -196,7 +196,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       normDistrFactor[i] = 1.0 / Math.sqrt(Math.pow(MathUtil.TWOPI, dimensionality) * m.det());
       invCovMatr.add(m.inverse());
       clusterWeights[i] = 1.0 / k;
-      if(logger.isDebuggingFinest()) {
+      if(LOG.isDebuggingFinest()) {
         StringBuffer msg = new StringBuffer();
         msg.append(" model ").append(i).append(":\n");
         msg.append(" mean:    ").append(means.get(i)).append("\n");
@@ -204,17 +204,17 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         msg.append(" m.det(): ").append(m.det()).append("\n");
         msg.append(" cluster weight: ").append(clusterWeights[i]).append("\n");
         msg.append(" normDistFact:   ").append(normDistrFactor[i]).append("\n");
-        logger.debugFine(msg.toString());
+        LOG.debugFine(msg.toString());
       }
     }
     double emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
 
     // iteration unless no change
-    if(logger.isVerbose()) {
-      logger.verbose("iterating EM");
+    if(LOG.isVerbose()) {
+      LOG.verbose("iterating EM");
     }
-    if(logger.isVerbose()) {
-      logger.verbose("iteration " + 0 + " - expectation value: " + emNew);
+    if(LOG.isVerbose()) {
+      LOG.verbose("iteration " + 0 + " - expectation value: " + emNew);
     }
 
     double em;
@@ -266,16 +266,16 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       // reassign probabilities
       emNew = assignProbabilitiesToInstances(relation, normDistrFactor, means, invCovMatr, clusterWeights, probClusterIGivenX);
 
-      if(logger.isVerbose()) {
-        logger.verbose("iteration " + it + " - expectation value: " + emNew);
+      if(LOG.isVerbose()) {
+        LOG.verbose("iteration " + it + " - expectation value: " + emNew);
       }
       if(Math.abs(em - emNew) <= delta) {
         break;
       }
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("assigning clusters");
+    if(LOG.isVerbose()) {
+      LOG.verbose("assigning clusters");
     }
 
     // fill result with clusters and models
@@ -336,8 +336,8 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
         double rowTimesCovTimesCol = difference.transposeTimesTimes(invCovMatr.get(i), difference);
         double power = rowTimesCovTimesCol / 2.0;
         double prob = normDistrFactor[i] * Math.exp(-power);
-        if(logger.isDebuggingFinest()) {
-          logger.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
+        if(LOG.isDebuggingFinest()) {
+          LOG.debugFinest(" difference vector= ( " + difference.toString() + " )\n" + " difference:\n" + FormatUtil.format(difference, "    ") + "\n" + " rowTimesCovTimesCol:\n" + rowTimesCovTimesCol + "\n" + " power= " + power + "\n" + " prob=" + prob + "\n" + " inv cov matrix: \n" + FormatUtil.format(invCovMatr.get(i), "     "));
         }
         probabilities[i] = prob;
       }
@@ -385,7 +385,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

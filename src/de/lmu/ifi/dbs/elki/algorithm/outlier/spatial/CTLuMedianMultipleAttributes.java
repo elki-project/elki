@@ -76,7 +76,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
   /**
    * logger
    */
-  public static final Logging logger = Logging.getLogger(CTLuMedianMultipleAttributes.class);
+  private static final Logging LOG = Logging.getLogger(CTLuMedianMultipleAttributes.class);
 
   /**
    * Constructor
@@ -89,7 +89,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**
@@ -101,8 +101,8 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
    */
   public OutlierResult run(Relation<N> spatial, Relation<O> attributes) {
     final int dim = DatabaseUtil.dimensionality(attributes);
-    if(logger.isDebugging()) {
-      logger.debug("Dimensionality: " + dim);
+    if(LOG.isDebugging()) {
+      LOG.debug("Dimensionality: " + dim);
     }
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
 

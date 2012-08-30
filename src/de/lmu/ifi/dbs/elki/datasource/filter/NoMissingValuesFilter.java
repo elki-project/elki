@@ -39,7 +39,7 @@ public class NoMissingValuesFilter extends AbstractStreamFilter {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(NoMissingValuesFilter.class);
+  private static final Logging LOG = Logging.getLogger(NoMissingValuesFilter.class);
 
   /**
    * Number of columns
@@ -91,8 +91,8 @@ public class NoMissingValuesFilter extends AbstractStreamFilter {
 
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if(logger.isDebugging()) {
-      logger.debug("Filtering the data set");
+    if(LOG.isDebugging()) {
+      LOG.debug("Filtering the data set");
     }
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();

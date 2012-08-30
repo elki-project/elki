@@ -59,7 +59,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(SparseBitVectorLabelParser.class);
+  private static final Logging LOG = Logging.getLogger(SparseBitVectorLabelParser.class);
 
   /**
    * Constructor.
@@ -126,7 +126,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
   
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

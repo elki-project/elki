@@ -97,7 +97,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SOD.class);
+  private static final Logging LOG = Logging.getLogger(SOD.class);
 
   /**
    * Parameter to specify the number of shared nearest neighbors to be
@@ -154,12 +154,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    */
   public OutlierResult run(Relation<V> relation) {
     SimilarityQuery<V, D> snnInstance = similarityFunction.instantiate(relation);
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), LOG) : null;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
       DBIDs knnList = getNearestNeighbors(relation, snnInstance, iter);
       SODModel<V> model = new SODModel<V>(relation, knnList, alpha, relation.get(iter));
@@ -167,7 +167,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
       minmax.put(model.getSod());
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
     // combine results.
     Relation<SODModel<?>> models = new MaterializedRelation<SODModel<?>>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<SODModel<?>>(SODModel.class), sod_models, relation.getDBIDs());
@@ -216,7 +216,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

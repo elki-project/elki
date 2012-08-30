@@ -74,7 +74,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SLOM.class);
+  private static final Logging LOG = Logging.getLogger(SLOM.class);
 
   /**
    * Constructor.
@@ -196,7 +196,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

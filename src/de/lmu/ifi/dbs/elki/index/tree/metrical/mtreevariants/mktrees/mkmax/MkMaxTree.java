@@ -65,7 +65,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MkMaxTree.class);
+  private static final Logging LOG = Logging.getLogger(MkMaxTree.class);
 
   /**
    * Provides some statistics about performed reverse knn-queries.
@@ -234,8 +234,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @param knns_q the knns of q
    */
   private void preInsert(MkMaxEntry<D> q, MkMaxEntry<D> nodeEntry, KNNHeap<D> knns_q) {
-    if(logger.isDebugging()) {
-      logger.debugFine("preInsert " + q + " - " + nodeEntry + "\n");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("preInsert " + q + " - " + nodeEntry + "\n");
     }
 
     D knnDist_q = knns_q.getKNNDistance();
@@ -290,8 +290,8 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
       }
     }
-    if(logger.isDebugging()) {
-      logger.debugFine(nodeEntry + "set knn dist " + knnDist_node);
+    if(LOG.isDebugging()) {
+      LOG.debugFine(nodeEntry + "set knn dist " + knnDist_node);
     }
     nodeEntry.setKnnDistance(knnDist_node);
   }
@@ -315,7 +315,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // leafCapacity = (file.getPageSize() - overhead) / (objectID +
@@ -328,7 +328,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
   }
 
@@ -367,6 +367,6 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

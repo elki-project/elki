@@ -65,7 +65,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OPTICSPlotSelectionVisualization.class);
+  private static final Logging LOG = Logging.getLogger(OPTICSPlotSelectionVisualization.class);
 
   /**
    * A short name characterizing this Visualizer.
@@ -306,7 +306,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
     protected void updateSelection(Mode mode, int begin, int end) {
       List<ClusterOrderEntry<D>> order = getClusterOrder();
       if(begin < 0 || begin > end || end >= order.size()) {
-        logger.warning("Invalid range in updateSelection: " + begin + " .. " + end);
+        LOG.warning("Invalid range in updateSelection: " + begin + " .. " + end);
         return;
       }
 

@@ -81,7 +81,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SNNClustering.class);
+  private static final Logging LOG = Logging.getLogger(SNNClustering.class);
 
   /**
    * Parameter to specify the minimum SNN density, must be an integer greater
@@ -149,8 +149,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   public Clustering<Model> run(Database database, Relation<O> relation) {
     SimilarityQuery<O, IntegerDistance> snnInstance = similarityFunction.instantiate(relation);
 
-    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), logger) : null;
-    IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
+    FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), LOG) : null;
+    IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(relation.size());
@@ -163,8 +163,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
           }
         }
         if(objprog != null && clusprog != null) {
-          objprog.setProcessed(processedIDs.size(), logger);
-          clusprog.setProcessed(resultList.size(), logger);
+          objprog.setProcessed(processedIDs.size(), LOG);
+          clusprog.setProcessed(resultList.size(), LOG);
         }
       }
     }
@@ -172,15 +172,15 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       for(DBIDIter id = snnInstance.getRelation().iterDBIDs(); id.valid(); id.advance()) {
         noise.add(id);
         if(objprog != null && clusprog != null) {
-          objprog.setProcessed(noise.size(), logger);
-          clusprog.setProcessed(resultList.size(), logger);
+          objprog.setProcessed(noise.size(), LOG);
+          clusprog.setProcessed(resultList.size(), LOG);
         }
       }
     }
     // Finish progress logging
     if(objprog != null && clusprog != null) {
-      objprog.ensureCompleted(logger);
-      clusprog.setCompleted(logger);
+      objprog.ensureCompleted(LOG);
+      clusprog.setCompleted(LOG);
     }
 
     Clustering<Model> result = new Clustering<Model>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
@@ -230,8 +230,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), logger);
-        clusprog.setProcessed(resultList.size(), logger);
+        objprog.setProcessed(processedIDs.size(), LOG);
+        clusprog.setProcessed(resultList.size(), LOG);
       }
       return;
     }
@@ -271,9 +271,9 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       }
 
       if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), logger);
+        objprog.setProcessed(processedIDs.size(), LOG);
         int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        clusprog.setProcessed(numClusters, logger);
+        clusprog.setProcessed(numClusters, LOG);
       }
 
       if(processedIDs.size() == snnInstance.getRelation().size() && noise.size() == 0) {
@@ -297,7 +297,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**
