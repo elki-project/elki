@@ -63,7 +63,7 @@ public class ExportVisualizations implements ResultHandler {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ExportVisualizations.class);
+  private static final Logging LOG = Logging.getLogger(ExportVisualizations.class);
 
   /**
    * Parameter to specify the canvas ratio
@@ -142,7 +142,7 @@ public class ExportVisualizations implements ResultHandler {
       this.baseResult = baseResult;
       context = null;
       counter = 0;
-      logger.verbose("Note: Reusing visualization exporter for more than one result is untested.");
+      LOG.verbose("Note: Reusing visualization exporter for more than one result is untested.");
     }
     if(context == null) {
       context = manager.newContext(baseResult);
@@ -244,7 +244,7 @@ public class ExportVisualizations implements ResultHandler {
       svgp.saveAsSVG(outname);
     }
     catch(Exception e) {
-      logger.warning("Export of visualization failed.", e);
+      LOG.warning("Export of visualization failed.", e);
     }
     for(Visualization layer : layers) {
       layer.destroy();

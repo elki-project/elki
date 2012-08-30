@@ -67,7 +67,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(AveragePrecisionAtK.class);
+  private static final Logging LOG = Logging.getLogger(AveragePrecisionAtK.class);
 
   /**
    * The parameter k - the number of neighbors to retrieve.
@@ -115,10 +115,10 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       ids = relation.getDBIDs();
     }
     
-    if(logger.isVerbose()) {
-      logger.verbose("Processing points...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Processing points...");
     }
-    FiniteProgress objloop = logger.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), logger) : null;
+    FiniteProgress objloop = LOG.isVerbose() ? new FiniteProgress("Computing nearest neighbors", ids.size(), LOG) : null;
     // sort neighbors
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNResult<D> knn = knnQuery.getKNNForDBID(iter, k);
@@ -141,11 +141,11 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
         mvs[i].put(precision);
       }
       if(objloop != null) {
-        objloop.incrementProcessed(logger);
+        objloop.incrementProcessed(LOG);
       }
     }
     if(objloop != null) {
-      objloop.ensureCompleted(logger);
+      objloop.ensureCompleted(LOG);
     }
     // Collections.sort(results);
 
@@ -165,7 +165,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -70,7 +70,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OPTICSXi.class);
+  private static final Logging LOG = Logging.getLogger(OPTICSXi.class);
 
   /**
    * Parameter to specify the actual OPTICS algorithm to use.
@@ -109,12 +109,12 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     ClusterOrderResult<N> opticsresult = optics.run(database);
 
     if(!NumberDistance.class.isInstance(optics.getDistanceFactory())) {
-      logger.verbose("Xi cluster extraction only supported for number distances!");
+      LOG.verbose("Xi cluster extraction only supported for number distances!");
       return null;
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("Extracting clusters with Xi: " + xi);
+    if(LOG.isVerbose()) {
+      LOG.verbose("Extracting clusters with Xi: " + xi);
     }
     return extractClusters(opticsresult, relation, 1.0 - xi, optics.getMinPts());
   }
@@ -175,8 +175,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
           }
           mib = clusterOrder.get(endsteep).getReachability().doubleValue();
           final SteepDownArea sda = new SteepDownArea(startsteep, endsteep, startval, 0);
-          if(logger.isDebuggingFinest()) {
-            logger.debugFinest("Xi " + sda.toString());
+          if(LOG.isDebuggingFinest()) {
+            LOG.debugFinest("Xi " + sda.toString());
           }
           sdaset.add(sda);
           if(salist != null) {
@@ -220,8 +220,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
               }
             }
             sua = new SteepUpArea(startsteep, endsteep, esuccr);
-            if(logger.isDebuggingFinest()) {
-              logger.debugFinest("Xi " + sua.toString());
+            if(LOG.isDebuggingFinest()) {
+              LOG.debugFinest("Xi " + sua.toString());
             }
             if(salist != null) {
               salist.add(sua);
@@ -280,8 +280,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
                 dbids.add(dbid);
               }
             }
-            if(logger.isDebuggingFine()) {
-              logger.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
+            if(LOG.isDebuggingFine()) {
+              LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
             }
             OPTICSModel model = new OPTICSModel(cstart, cend);
             Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_" + cstart + "_" + cend, dbids, model, hier);
@@ -362,7 +362,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

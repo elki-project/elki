@@ -84,7 +84,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DistanceStatisticsWithClasses.class);
+  private static final Logging LOG = Logging.getLogger(DistanceStatisticsWithClasses.class);
 
   /**
    * Flag to compute exact value range for binning.
@@ -136,7 +136,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
-    final StepProgress stepprog = logger.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
+    final StepProgress stepprog = LOG.isVerbose() ? new StepProgress("Distance statistics", 2) : null;
 
     // determine binning ranges.
     DoubleMinMax gminmax = new DoubleMinMax();
@@ -159,7 +159,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     // Histogram
     final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
     if(stepprog != null) {
-      stepprog.beginStep(1, "Prepare histogram.", logger);
+      stepprog.beginStep(1, "Prepare histogram.", LOG);
     }
     if(exact) {
       gminmax = exactMinMax(relation, distFunc);
@@ -174,9 +174,9 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
 
     if(stepprog != null) {
-      stepprog.beginStep(2, "Build histogram.", logger);
+      stepprog.beginStep(2, "Build histogram.", LOG);
     }
-    final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), logger) : null;
+    final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), LOG) : null;
     // iterate per cluster
     final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
     final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
@@ -229,19 +229,19 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         gominmax.put(ominmax.getMin());
         gominmax.put(ominmax.getMax());
         if(progress != null) {
-          progress.incrementProcessed(logger);
+          progress.incrementProcessed(LOG);
         }
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
     // Update values (only needed for sampling case).
     gminmax.setFirst(Math.min(giminmax.getMin(), gominmax.getMin()));
     gminmax.setSecond(Math.max(giminmax.getMax(), gominmax.getMax()));
 
     if(stepprog != null) {
-      stepprog.setCompleted(logger);
+      stepprog.setCompleted(LOG);
     }
 
     // count the number of samples we have in the data
@@ -390,7 +390,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -67,7 +67,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Debugging flag: do extra integrity checks
    */
-  protected final static boolean extraIntegrityChecks = true;
+  protected static final boolean extraIntegrityChecks = true;
 
   /**
    * Holds the instance of the trees distance function

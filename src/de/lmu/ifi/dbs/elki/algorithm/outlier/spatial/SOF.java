@@ -73,7 +73,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(SOF.class);
+  private static final Logging LOG = Logging.getLogger(SOF.class);
 
   /**
    * Constructor.
@@ -88,7 +88,7 @@ public class SOF<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceB
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

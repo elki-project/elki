@@ -59,7 +59,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> 
   /**
    * Logger.
    */
-  private static final Logging logger = Logging.getLogger(KNNQueryFilteredPCAIndex.class);
+  private static final Logging LOG = Logging.getLogger(KNNQueryFilteredPCAIndex.class);
 
   /**
    * The kNN query instance we use
@@ -102,7 +102,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> 
 
   @Override
   public Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

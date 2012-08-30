@@ -42,12 +42,12 @@ public class MultipleFilesOutput implements StreamFactory {
   /**
    * File name extension.
    */
-  private final static String EXTENSION = ".txt";
+  private static final String EXTENSION = ".txt";
 
   /**
    * GZip extra file extension
    */
-  private final static String GZIP_EXTENSION = ".gz";
+  private static final String GZIP_EXTENSION = ".gz";
 
   /**
    * Default stream to write to when no name is supplied.
@@ -72,7 +72,7 @@ public class MultipleFilesOutput implements StreamFactory {
   /**
    * Logger for debugging.
    */
-  private final static Logging logger = Logging.getLogger(MultipleFilesOutput.class);
+  private static final Logging LOG = Logging.getLogger(MultipleFilesOutput.class);
 
   /**
    * Constructor
@@ -116,8 +116,8 @@ public class MultipleFilesOutput implements StreamFactory {
    * @throws IOException
    */
   private PrintStream newStream(String name) throws IOException {
-    if (logger.isDebuggingFiner()) {
-      logger.debugFiner("Requested stream: "+name);
+    if (LOG.isDebuggingFiner()) {
+      LOG.debugFiner("Requested stream: "+name);
     }
     PrintStream res = map.get(name);
     if(res != null) {
@@ -138,8 +138,8 @@ public class MultipleFilesOutput implements StreamFactory {
       os = new GZIPOutputStream(os);
     }
     res = new PrintStream(os);
-    if (logger.isDebuggingFiner()) {
-      logger.debugFiner("Opened new output stream:"+fn);
+    if (LOG.isDebuggingFiner()) {
+      LOG.debugFiner("Opened new output stream:"+fn);
     }
     // cache.
     map.put(name, res);

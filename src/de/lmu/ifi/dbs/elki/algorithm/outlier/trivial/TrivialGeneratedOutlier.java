@@ -65,7 +65,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(TrivialGeneratedOutlier.class);
+  private static final Logging LOG = Logging.getLogger(TrivialGeneratedOutlier.class);
 
   /**
    * Expected share of outliers
@@ -136,7 +136,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       }
     }
     if(generators.size() == 0) {
-      logger.warning("No generator models found for dataset - all points will be considered outliers.");
+      LOG.warning("No generator models found for dataset - all points will be considered outliers.");
     }
 
     for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -179,7 +179,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

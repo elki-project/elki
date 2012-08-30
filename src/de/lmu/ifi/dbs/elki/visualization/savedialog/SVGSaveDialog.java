@@ -60,7 +60,7 @@ public class SVGSaveDialog {
   public static final String DEFAULT_TITLE = "Save as ...";
 
   /** Static logger reference */
-  private final static Logging logger = Logging.getLogger(SVGSaveDialog.class);
+  private static final Logging LOG = Logging.getLogger(SVGSaveDialog.class);
 
   /** Automagic file format */
   final static String automagic_format = "automatic";
@@ -143,23 +143,23 @@ public class SVGSaveDialog {
         showError(fc, "Error saving image.", "A class was not found when saving this image. Maybe installing Apache FOP will help (for PDF, PS and EPS output).\n" + e.toString());
       }
       catch(IOException e) {
-        logger.exception(e);
+        LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
       catch(TranscoderException e) {
-        logger.exception(e);
+        LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
       catch(TransformerFactoryConfigurationError e) {
-        logger.exception(e);
+        LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
       catch(TransformerException e) {
-        logger.exception(e);
+        LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
       catch(Exception e) {
-        logger.exception(e);
+        LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
     }

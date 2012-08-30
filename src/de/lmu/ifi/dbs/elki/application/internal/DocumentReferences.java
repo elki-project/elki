@@ -66,7 +66,7 @@ public class DocumentReferences {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(DocumentReferences.class);
+  private static final Logging LOG = Logging.getLogger(DocumentReferences.class);
 
   /**
    * @param args Command line arguments
@@ -316,11 +316,11 @@ public class DocumentReferences {
     }
     catch(NoClassDefFoundError e) {
       if(!cls.getCanonicalName().startsWith("experimentalcode.")) {
-        logger.warning("Exception in finding references for class " + cls.getCanonicalName() + " - missing referenced class?");
+        LOG.warning("Exception in finding references for class " + cls.getCanonicalName() + " - missing referenced class?");
       }
     }
     catch(Error e) {
-      logger.warning("Exception in finding references for class " + cls.getCanonicalName() + ": " + e, e);
+      LOG.warning("Exception in finding references for class " + cls.getCanonicalName() + ": " + e, e);
     }
   }
 

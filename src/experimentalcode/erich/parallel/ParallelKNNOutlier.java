@@ -57,7 +57,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(ParallelKNNOutlier.class);
+  private static final Logging LOG = Logging.getLogger(ParallelKNNOutlier.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -93,7 +93,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -98,7 +98,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(PartialVAFile.class);
+  private static final Logging LOG = Logging.getLogger(PartialVAFile.class);
 
   /**
    * Partial VA files
@@ -216,13 +216,13 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       if(val < split[0]) {
         approximation[d] = 0;
         if(id != null) {
-          logger.warning("Vector outside of VAFile grid!");
+          LOG.warning("Vector outside of VAFile grid!");
         }
       } // Value is above data grid
       else if(val > split[lastBorderIndex]) {
         approximation[d] = lastBorderIndex - 1;
         if(id != null) {
-          logger.warning("Vector outside of VAFile grid!");
+          LOG.warning("Vector outside of VAFile grid!");
         }
       } // normal case
       else {
@@ -518,9 +518,9 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
 
       stats.queryTime += System.nanoTime() - t;
 
-      if(logger.isDebuggingFine()) {
-        logger.fine("query = " + query);
-        logger.fine("database: " + relation.size() + ", candidates: " + candidates + ", results: " + result.size());
+      if(LOG.isDebuggingFine()) {
+        LOG.fine("query = " + query);
+        LOG.fine("database: " + relation.size() + ", candidates: " + candidates + ", results: " + result.size());
       }
 
       return result;
@@ -572,14 +572,14 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       final int currentSubspaceDims = subspace.cardinality();
       int reducedDims = (2 * currentSubspaceDims) / 3;
       reducedDims = Math.max(1, reducedDims);
-      if(logger.isDebuggingFine()) {
-        logger.fine("subspaceDims=" + currentSubspaceDims + ", reducedDims=" + reducedDims);
+      if(LOG.isDebuggingFine()) {
+        LOG.fine("subspaceDims=" + currentSubspaceDims + ", reducedDims=" + reducedDims);
       }
 
       // filter 1
       LinkedList<PartialVACandidate> candidates1 = filter1(k, reducedDims, daFiles, queryApprox, currentSubspaceDims, dist);
-      if(logger.isDebuggingFine()) {
-        logger.fine("candidate set after filter 1: " + candidates1.size());
+      if(LOG.isDebuggingFine()) {
+        LOG.fine("candidate set after filter 1: " + candidates1.size());
       }
 
       // filters 2+
@@ -594,8 +594,8 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
         // continue filtering until I/O costs of refining candidates < I/O
         // costs of loading new DA files
         while(candidates2 == null || (getIOCosts(candidates2.size(), currentSubspaceDims) >= getIOCosts(daFiles.get(0), currentSubspaceDims - addition)) && addition < currentSubspaceDims) {
-          if(candidates2 != null && logger.isDebuggingFine()) {
-            logger.fine("filter " + filterStep + ": refining costs " + getIOCosts(candidates2.size(), currentSubspaceDims) + " (" + candidates2.size() + "/" + currentSubspaceDims + "), DA file costs " + getIOCosts(daFiles.get(0), currentSubspaceDims - addition) + " (dim " + (addition + 1) + " of " + currentSubspaceDims + ")");
+          if(candidates2 != null && LOG.isDebuggingFine()) {
+            LOG.fine("filter " + filterStep + ": refining costs " + getIOCosts(candidates2.size(), currentSubspaceDims) + " (" + candidates2.size() + "/" + currentSubspaceDims + "), DA file costs " + getIOCosts(daFiles.get(0), currentSubspaceDims - addition) + " (dim " + (addition + 1) + " of " + currentSubspaceDims + ")");
           }
           if(candidates2 != null) {
             candidates1 = candidates2;
@@ -616,8 +616,8 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
             }
           }
 
-          if(logger.isDebuggingFine()) {
-            logger.fine("candidate set after filter " + filterStep + ": " + candidates2.size());
+          if(LOG.isDebuggingFine()) {
+            LOG.fine("candidate set after filter " + filterStep + ": " + candidates2.size());
           }
 
           addition++;

@@ -56,7 +56,7 @@ public final class EmptyIterator<T> implements Iterator<T>, Iterable<T> {
   /**
    * Static instance
    */
-  protected final static EmptyIterator<?> STATIC_INSTANCE = new EmptyIterator<Object>();
+  protected static final EmptyIterator<?> STATIC_INSTANCE = new EmptyIterator<Object>();
   
   /**
    * Access the static instance.

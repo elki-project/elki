@@ -77,7 +77,7 @@ public class ComputeOutlierHistogram implements Evaluator {
   /**
    * Logger for debugging.
    */
-  protected static final Logging logger = Logging.getLogger(ComputeOutlierHistogram.class);
+  private static final Logging LOG = Logging.getLogger(ComputeOutlierHistogram.class);
 
   /**
    * The object pattern to identify positive classes

@@ -43,7 +43,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Result> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(NullAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(NullAlgorithm.class);
   
   /**
    * Constructor.
@@ -59,7 +59,7 @@ public class NullAlgorithm extends AbstractAlgorithm<Result> {
   
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

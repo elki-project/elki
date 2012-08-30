@@ -48,7 +48,7 @@ public class PrettyMarkers implements MarkerLibrary {
   /**
    * Default prefix to use.
    */
-  private final static String DEFAULT_PREFIX = "s";
+  private static final String DEFAULT_PREFIX = "s";
 
   /**
    * Prefix for the IDs generated.

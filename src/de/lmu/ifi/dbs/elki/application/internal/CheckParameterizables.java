@@ -48,7 +48,7 @@ public class CheckParameterizables {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CheckParameterizables.class);
+  private static final Logging LOG = Logging.getLogger(CheckParameterizables.class);
 
   /**
    * Validate all "Parameterizable" objects for parts of the API contract that
@@ -63,7 +63,7 @@ public class CheckParameterizables {
         constructor = cls.getDeclaredConstructor(Parameterization.class);
       }
       catch(NoClassDefFoundError e) {
-        logger.verbose("Class discovered but not found?!? " + cls.getName());
+        LOG.verbose("Class discovered but not found?!? " + cls.getName());
         // Not found ?!?
         continue;
       }
@@ -87,7 +87,7 @@ public class CheckParameterizables {
             }
           }
           catch(Exception e) {
-            logger.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e);
+            LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e);
             // continue. Probably non-public
           }
         }
@@ -100,7 +100,7 @@ public class CheckParameterizables {
         // logger.debugFine("Found factory method for class: "+ cls.getName());
       }
       catch(NoClassDefFoundError e) {
-        logger.verbose("Class discovered but not found?!? " + cls.getName());
+        LOG.verbose("Class discovered but not found?!? " + cls.getName());
         // Not found ?!?
         continue;
       }
@@ -112,7 +112,7 @@ public class CheckParameterizables {
         hasConstructor = true;
       }
       catch(NoClassDefFoundError e) {
-        logger.verbose("Class discovered but not found?!? " + cls.getName());
+        LOG.verbose("Class discovered but not found?!? " + cls.getName());
         // Not found ?!?
         continue;
       }
@@ -124,7 +124,7 @@ public class CheckParameterizables {
         hasConstructor = true;
       }
       catch(NoClassDefFoundError e) {
-        logger.verbose("Class discovered but not found?!? " + cls.getName());
+        LOG.verbose("Class discovered but not found?!? " + cls.getName());
         // Not found ?!?
         continue;
       }
@@ -132,7 +132,7 @@ public class CheckParameterizables {
         // do nothing.
       }
       if(!hasConstructor) {
-        logger.verbose("Class " + cls.getName() + " is Parameterizable but doesn't have a constructor with the appropriate signature!");
+        LOG.verbose("Class " + cls.getName() + " is Parameterizable but doesn't have a constructor with the appropriate signature!");
       }
     }
   }
@@ -159,10 +159,10 @@ public class CheckParameterizables {
       }
     }
     catch(Exception e) {
-      logger.warning("No proper Parameterizer.makeInstance for " + cls.getName() + ": " + e);
+      LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + ": " + e);
       return false;
     }
-    logger.warning("No proper Parameterizer.makeInstance for " + cls.getName() + " found!");
+    LOG.warning("No proper Parameterizer.makeInstance for " + cls.getName() + " found!");
     return false;
   }
 
@@ -170,10 +170,10 @@ public class CheckParameterizables {
     // Classes in the same package are special and don't cause warnings.
     if(!cls.getName().startsWith(Parameterizable.class.getPackage().getName())) {
       if(!Modifier.isPublic(constructor.getModifiers())) {
-        logger.verbose("Constructor for class " + cls.getName() + " is not public!");
+        LOG.verbose("Constructor for class " + cls.getName() + " is not public!");
       }
       if(!Parameterizable.class.isAssignableFrom(cls)) {
-        logger.verbose("Class " + cls.getName() + " should implement Parameterizable!");
+        LOG.verbose("Class " + cls.getName() + " should implement Parameterizable!");
       }
     }
   }

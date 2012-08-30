@@ -82,7 +82,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(TrimmedMeanApproach.class);
+  private static final Logging LOG = Logging.getLogger(TrimmedMeanApproach.class);
 
   /**
    * the parameter p
@@ -115,7 +115,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDoubleDataStore errors = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP);
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Computing trimmed means", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       int num = 0;
@@ -145,15 +145,15 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       errors.putDouble(iditer, relation.get(iditer).doubleValue(1) - tm);
 
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("Computing median error.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Computing median error.");
     }
     double median_dev_from_median;
     {
@@ -175,8 +175,8 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       median_dev_from_median = QuickSelect.median(ei);
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("Normalizing scores.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Normalizing scores.");
     }
     // calculate score
     DoubleMinMax minmax = new DoubleMinMax();
@@ -195,7 +195,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

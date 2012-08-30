@@ -66,7 +66,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ToolBox2DVisualization.class);
+  private static final Logging LOG = Logging.getLogger(ToolBox2DVisualization.class);
 
   /**
    * Constructor
@@ -176,7 +176,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       double maxy = viewport.getMaxY();
       double y = (miny + maxy) / 2 - (vis.size() * height * 1.4) / 2;
       if(y < miny) {
-        logger.warning("Too many Tools");
+        LOG.warning("Too many Tools");
       }
 
       // add tools

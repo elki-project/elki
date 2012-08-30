@@ -48,7 +48,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DeLiCluTree.class);
+  private static final Logging LOG = Logging.getLogger(DeLiCluTree.class);
 
   /**
    * Holds the ids of the expanded nodes.
@@ -168,6 +168,6 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

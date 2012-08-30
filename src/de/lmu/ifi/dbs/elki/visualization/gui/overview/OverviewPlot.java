@@ -76,7 +76,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Our logging class
    */
-  private static final Logging logger = Logging.getLogger(OverviewPlot.class);
+  private static final Logging LOG = Logging.getLogger(OverviewPlot.class);
 
   /**
    * Visualizer context
@@ -200,7 +200,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       Collection<PlotItem> projs = p.arrange();
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
-          logger.warning("Plot item with improper size information: " + it);
+          LOG.warning("Plot item with improper size information: " + it);
         }
         else {
           plotmap.put(it.w, it.h, it);
@@ -217,7 +217,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
         }
       }
       if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
-        logger.warning("Task with improper size information: " + task);
+        LOG.warning("Task with improper size information: " + task);
       }
       else {
         PlotItem it = new PlotItem(task.getWidth(), task.getHeight(), null);
@@ -360,12 +360,12 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   synchronized void refresh() {
     pendingRefresh = null;
     if(reinitOnRefresh) {
-      logger.debug("Reinitialize");
+      LOG.debug("Reinitialize");
       reinitialize();
       reinitOnRefresh = false;
     }
     else {
-      logger.debug("Incremental refresh");
+      LOG.debug("Incremental refresh");
       boolean refreshcss = false;
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(PlotItem pi : plotmap.keySet()) {
@@ -394,7 +394,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
                 }
                 // if not yet rendered, add a thumbnail
                 if(!pair.first.hasChildNodes()) {
-                  logger.warning("This codepath should no longer be needed.");
+                  LOG.warning("This codepath should no longer be needed.");
                   Visualization visualization = embedOrThumbnail(thumbsize, it, task, pair.first);
                   vistoelem.put(it, task, pair.first, visualization);
                   refreshcss = true;
@@ -554,7 +554,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * Trigger a redraw, but avoid excessive redraws.
    */
   public final void lazyRefresh() {
-    logger.debug("Scheduling refresh.");
+    LOG.debug("Scheduling refresh.");
     Runnable pr = new Runnable() {
       @Override
       public void run() {
@@ -569,7 +569,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
 
   @Override
   public void resultAdded(Result child, Result parent) {
-    logger.debug("result added: " + child);
+    LOG.debug("result added: " + child);
     if(child instanceof VisualizationTask) {
       reinitOnRefresh = true;
     }
@@ -578,13 +578,13 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
 
   @Override
   public void resultChanged(Result current) {
-    logger.debug("result changed: " + current);
+    LOG.debug("result changed: " + current);
     lazyRefresh();
   }
 
   @Override
   public void resultRemoved(Result child, Result parent) {
-    logger.debug("result removed: " + child);
+    LOG.debug("result removed: " + child);
     lazyRefresh();
   }
 }

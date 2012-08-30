@@ -57,7 +57,7 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
   /**
    * The appropriate logger for this index.
    */
-  private static final Logging logger = Logging.getLogger(RStarTreeIndex.class);
+  private static final Logging LOG = Logging.getLogger(RStarTreeIndex.class);
 
   /**
    * Relation
@@ -190,6 +190,6 @@ public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree impl
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

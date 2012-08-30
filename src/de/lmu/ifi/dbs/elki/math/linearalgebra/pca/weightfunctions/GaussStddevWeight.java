@@ -40,7 +40,7 @@ public final class GaussStddevWeight implements WeightFunction {
    * 
    * In fact, in most use cases we could leave this away.
    */
-  private final static double scaling = 1 / MathUtil.SQRTTWOPI;
+  private static final double scaling = 1 / MathUtil.SQRTTWOPI;
 
   /**
    * Get Gaussian Weight using standard deviation for scaling. max is ignored.

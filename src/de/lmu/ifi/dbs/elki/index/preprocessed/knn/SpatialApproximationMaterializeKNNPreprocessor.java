@@ -75,7 +75,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   /**
    * Logger to use
    */
-  private static final Logging logger = Logging.getLogger(SpatialApproximationMaterializeKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(SpatialApproximationMaterializeKNNPreprocessor.class);
 
   /**
    * Constructor
@@ -161,7 +161,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

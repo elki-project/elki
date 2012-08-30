@@ -73,7 +73,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KMeansMacQueen.class);
+  private static final Logging LOG = Logging.getLogger(KMeansMacQueen.class);
 
   /**
    * Constructor.
@@ -113,8 +113,8 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
 
     // Refine result
     for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(logger.isVerbose()) {
-        logger.verbose("K-Means iteration " + (iteration + 1));
+      if(LOG.isVerbose()) {
+        LOG.verbose("K-Means iteration " + (iteration + 1));
       }
       boolean changed = macQueenIterate(relation, means, clusters);
       if(!changed) {
@@ -133,7 +133,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

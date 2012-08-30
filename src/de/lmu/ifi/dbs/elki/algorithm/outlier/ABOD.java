@@ -94,7 +94,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ABOD.class);
+  private static final Logging LOG = Logging.getLogger(ABOD.class);
 
   /**
    * Parameter for k, the number of neighbors used in kNN queries.
@@ -558,7 +558,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

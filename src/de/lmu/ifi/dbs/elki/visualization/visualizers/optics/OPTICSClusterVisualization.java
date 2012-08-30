@@ -62,7 +62,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OPTICSClusterVisualization.class);
+  private static final Logging LOG = Logging.getLogger(OPTICSClusterVisualization.class);
 
   /**
    * A short name characterizing this Visualizer.
@@ -130,7 +130,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
       }
       catch(Exception e) {
         // Empty clustering? Shouldn't happen.
-        logger.warning("Clustering with no cluster detected.", e);
+        LOG.warning("Clustering with no cluster detected.", e);
       }
     }
     return null;
@@ -208,7 +208,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
           layer.appendChild(e);
         }
         catch(ClassCastException e) {
-          logger.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
+          LOG.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
         }
         // Descend
         final List<Cluster<OPTICSModel>> children = cluster.getChildren();

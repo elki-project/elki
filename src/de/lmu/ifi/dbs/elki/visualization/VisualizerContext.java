@@ -76,7 +76,7 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Logger.
    */
-  private static final Logging logger = Logging.getLogger(VisualizerContext.class);
+  private static final Logging LOG = Logging.getLogger(VisualizerContext.class);
 
   /**
    * The full result object
@@ -321,7 +321,7 @@ public class VisualizerContext implements DataStoreListener, Result {
         p.processNewResult(baseResult, newResult);
       }
       catch(Throwable e) {
-        logger.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
+        LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
       }
     }
     // Collect all visualizers.
@@ -330,7 +330,7 @@ public class VisualizerContext implements DataStoreListener, Result {
         f.processNewResult(baseResult, newResult);
       }
       catch(Throwable e) {
-        logger.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
+        LOG.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
       }
     }
   }

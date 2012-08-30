@@ -65,7 +65,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ByModelClustering.class);
+  private static final Logging LOG = Logging.getLogger(ByModelClustering.class);
 
   /**
    * Pattern to recognize noise clusters with
@@ -133,7 +133,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

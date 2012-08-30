@@ -52,7 +52,7 @@ public final class ArrayLikeUtil {
   /**
    * Static instance
    */
-  private final static IdentityArrayAdapter<?> IDENTITYADAPTER = new IdentityArrayAdapter<Object>();
+  private static final IdentityArrayAdapter<?> IDENTITYADAPTER = new IdentityArrayAdapter<Object>();
 
   /**
    * Static instance

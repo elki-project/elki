@@ -42,7 +42,7 @@ public class ParametersModel extends AbstractTableModel {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(ParametersModel.class);
+  private static final Logging LOG = Logging.getLogger(ParametersModel.class);
 
   /**
    * Parameter storage
@@ -131,7 +131,7 @@ public class ParametersModel extends AbstractTableModel {
       }
     }
     else {
-      logger.warning("Edited value is not a String!");
+      LOG.warning("Edited value is not a String!");
     }
   }
 }

@@ -70,7 +70,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MkAppTree.class);
+  private static final Logging LOG = Logging.getLogger(MkAppTree.class);
 
   /**
    * Parameter k.
@@ -131,8 +131,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       return;
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("insert " + entries + "\n");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("insert " + entries + "\n");
     }
 
     if(!initialized) {
@@ -262,7 +262,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // leafCapacity = (file.getPageSize() - overhead) / (objectID +
@@ -275,13 +275,13 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     initialized = true;
 
-    if(logger.isVerbose()) {
-      logger.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
+    if(LOG.isVerbose()) {
+      LOG.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
     }
   }
 
@@ -399,9 +399,9 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     PolynomialRegression regression = new PolynomialRegression(y, x, p);
     PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getArrayCopy());
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("approximation ").append(approximation);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
     return approximation;
 
@@ -452,6 +452,6 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

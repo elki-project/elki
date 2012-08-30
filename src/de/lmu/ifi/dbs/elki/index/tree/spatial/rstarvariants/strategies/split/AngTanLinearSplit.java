@@ -56,7 +56,7 @@ public class AngTanLinearSplit implements SplitStrategy {
   /**
    * Logger class
    */
-  private static final Logging logger = Logging.getLogger(AngTanLinearSplit.class);
+  private static final Logging LOG = Logging.getLogger(AngTanLinearSplit.class);
 
   /**
    * Static instance.
@@ -135,7 +135,7 @@ public class AngTanLinearSplit implements SplitStrategy {
         }
       }
       if(bestset == null) {
-        logger.warning("No Ang-Tan-Split found. Probably all points are the same? Returning random split.");
+        LOG.warning("No Ang-Tan-Split found. Probably all points are the same? Returning random split.");
         return Util.randomBitSet(num / 2, num, new Random());
       }
       return bestset;

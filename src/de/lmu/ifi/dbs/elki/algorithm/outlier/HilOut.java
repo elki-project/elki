@@ -96,7 +96,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(HilOut.class);
+  private static final Logging LOG = Logging.getLogger(HilOut.class);
 
   /**
    * Number of nearest neighbors
@@ -192,8 +192,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
         min[i] -= diff;
         max[i] += diff;
       }
-      if(logger.isVerbose()) {
-        logger.verbose("Rescaling dataset by " + (1 / diameter) + " to fit the unit cube.");
+      if(LOG.isVerbose()) {
+        LOG.verbose("Rescaling dataset by " + (1 / diameter) + " to fit the unit cube.");
       }
     }
 
@@ -201,8 +201,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
     capital_n_star = capital_n = relation.size();
     HilbertFeatures h = new HilbertFeatures(relation, min, diameter);
 
-    FiniteProgress progressHilOut = logger.isVerbose() ? new FiniteProgress("HilOut iterations", d + 1, logger) : null;
-    FiniteProgress progressTrueOut = logger.isVerbose() ? new FiniteProgress("True outliers found", n, logger) : null;
+    FiniteProgress progressHilOut = LOG.isVerbose() ? new FiniteProgress("HilOut iterations", d + 1, LOG) : null;
+    FiniteProgress progressTrueOut = LOG.isVerbose() ? new FiniteProgress("True outliers found", n, LOG) : null;
     // Main part: 1. Phase max. d+1 loops
     for(int j = 0; j <= d && n_star < n; j++) {
       // initialize (clear) out and wlb - not 100% clear in the paper
@@ -215,7 +215,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       // determine the true outliers (n_star)
       trueOutliers(h);
       if(progressTrueOut != null) {
-        progressTrueOut.setProcessed(n_star, logger);
+        progressTrueOut.setProcessed(n_star, LOG);
       }
       // Build the top Set as out + wlb
       h.top.clear();
@@ -231,7 +231,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
         }
       }
       if(progressHilOut != null) {
-        progressHilOut.incrementProcessed(logger);
+        progressHilOut.incrementProcessed(LOG);
       }
     }
     // 2. Phase: Additional Scan if less than n true outliers determined
@@ -242,12 +242,12 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       scan(h, capital_n);
     }
     if(progressHilOut != null) {
-      progressHilOut.setProcessed(d, logger);
-      progressHilOut.ensureCompleted(logger);
+      progressHilOut.setProcessed(d, LOG);
+      progressHilOut.ensureCompleted(LOG);
     }
     if(progressTrueOut != null) {
-      progressTrueOut.setProcessed(n, logger);
-      progressTrueOut.ensureCompleted(logger);
+      progressTrueOut.setProcessed(n, LOG);
+      progressTrueOut.ensureCompleted(LOG);
     }
     DoubleMinMax minmax = new DoubleMinMax();
     // Return weights in out
@@ -282,8 +282,8 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
    */
   private void scan(HilbertFeatures hf, int k0) {
     final int mink0 = Math.min(2 * k0, capital_n - 1);
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Scanning with k0=" + k0 + " (" + mink0 + ")" + " N*=" + capital_n_star);
     }
     for(int i = 0; i < hf.pf.length; i++) {
       if(hf.pf[i].ubound < omega_star) {
@@ -409,7 +409,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

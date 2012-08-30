@@ -80,7 +80,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
-  protected final static boolean extraIntegrityChecks = false;
+  protected static final boolean extraIntegrityChecks = false;
 
   /**
    * The height of this R*-Tree.

@@ -79,7 +79,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DBSCAN.class);
+  private static final Logging LOG = Logging.getLogger(DBSCAN.class);
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -138,15 +138,15 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
-    FiniteProgress objprog = logger.isVerbose() ? new FiniteProgress("Processing objects", size, logger) : null;
-    IndefiniteProgress clusprog = logger.isVerbose() ? new IndefiniteProgress("Number of clusters", logger) : null;
+    FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
+    IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
     resultList = new ArrayList<ModifiableDBIDs>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(size);
     if(size < minpts) {
       // The can't be any clusters
       noise.addDBIDs(relation.getDBIDs());
-      objprog.setProcessed(noise.size(), logger);
+      objprog.setProcessed(noise.size(), LOG);
     }
     else {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -154,8 +154,8 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
           expandCluster(relation, rangeQuery, iditer, objprog, clusprog);
         }
         if(objprog != null && clusprog != null) {
-          objprog.setProcessed(processedIDs.size(), logger);
-          clusprog.setProcessed(resultList.size(), logger);
+          objprog.setProcessed(processedIDs.size(), LOG);
+          clusprog.setProcessed(resultList.size(), LOG);
         }
         if(processedIDs.size() == size) {
           break;
@@ -164,10 +164,10 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     }
     // Finish progress logging
     if(objprog != null) {
-      objprog.ensureCompleted(logger);
+      objprog.ensureCompleted(LOG);
     }
     if(clusprog != null) {
-      clusprog.setCompleted(logger);
+      clusprog.setCompleted(LOG);
     }
 
     Clustering<Model> result = new Clustering<Model>("DBSCAN Clustering", "dbscan-clustering");
@@ -200,8 +200,8 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
       if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), logger);
-        clusprog.setProcessed(resultList.size(), logger);
+        objprog.setProcessed(processedIDs.size(), LOG);
+        clusprog.setProcessed(resultList.size(), LOG);
       }
       return;
     }
@@ -249,9 +249,9 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       }
 
       if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), logger);
+        objprog.setProcessed(processedIDs.size(), LOG);
         int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        clusprog.setProcessed(numClusters, logger);
+        clusprog.setProcessed(numClusters, LOG);
       }
     }
     if(currentCluster.size() >= minpts) {
@@ -271,7 +271,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

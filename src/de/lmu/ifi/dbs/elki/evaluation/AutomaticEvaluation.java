@@ -60,7 +60,7 @@ public class AutomaticEvaluation implements Evaluator {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(AutomaticEvaluation.class);
+  private static final Logging LOG = Logging.getLogger(AutomaticEvaluation.class);
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
@@ -70,14 +70,14 @@ public class AutomaticEvaluation implements Evaluator {
 
   protected void autoEvaluateOutliers(HierarchicalResult baseResult, Result newResult) {
     Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
-    if(logger.isDebugging()) {
-      logger.debug("Number of new outlier results: " + outliers.size());
+    if(LOG.isDebugging()) {
+      LOG.debug("Number of new outlier results: " + outliers.size());
     }
     if(outliers.size() > 0) {
       ResultUtil.ensureClusteringResult(ResultUtil.findDatabase(baseResult), baseResult);
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(baseResult, Clustering.class);
       if(clusterings.size() == 0) {
-        logger.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
+        LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
         return;
       }
       Clustering<?> basec = clusterings.iterator().next();
@@ -96,16 +96,16 @@ public class AutomaticEvaluation implements Evaluator {
         }
       }
       if(label == null) {
-        logger.warning("Could not evaluate outlier results, as I could not find a minority label.");
+        LOG.warning("Could not evaluate outlier results, as I could not find a minority label.");
         return;
       }
       if(min == 1) {
-        logger.warning("The minority class label had a single object. Try using 'ClassLabelFilter' to identify the class label column.");
+        LOG.warning("The minority class label had a single object. Try using 'ClassLabelFilter' to identify the class label column.");
       }
       if(min > 0.05 * total) {
-        logger.warning("The minority class I discovered (labeled '" + label + "') has " + (min * 100. / total) + "% of objects. Outlier classes should be more rare!");
+        LOG.warning("The minority class I discovered (labeled '" + label + "') has " + (min * 100. / total) + "% of objects. Outlier classes should be more rare!");
       }
-      logger.verbose("Evaluating using minority class: " + label);
+      LOG.verbose("Evaluating using minority class: " + label);
       Pattern pat = Pattern.compile("^" + Pattern.quote(label) + "$");
       // Compute ROC curve
       new OutlierROCCurve(pat).processNewResult(baseResult, newResult);
@@ -120,8 +120,8 @@ public class AutomaticEvaluation implements Evaluator {
 
   protected void autoEvaluateClusterings(HierarchicalResult baseResult, Result newResult) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-    if(logger.isDebugging()) {
-      logger.warning("Number of new clustering results: " + clusterings.size());
+    if(LOG.isDebugging()) {
+      LOG.warning("Number of new clustering results: " + clusterings.size());
     }
     for (Iterator<Clustering<?>> c = clusterings.iterator(); c.hasNext();) {
       Clustering<?> test = c.next();

@@ -91,7 +91,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ALOCI.class);
+  private static final Logging LOG = Logging.getLogger(ALOCI.class);
 
   /**
    * Minimum size for a leaf.
@@ -138,7 +138,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
 
   public OutlierResult run(Database database, Relation<O> relation) {
     final int dim = DatabaseUtil.dimensionality(relation);
-    FiniteProgress progressPreproc = logger.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, logger) : null;
+    FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, LOG) : null;
 
     // Compute extend of dataset.
     double[] min, max;
@@ -166,7 +166,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     ALOCIQuadTree qt = new ALOCIQuadTree(min, max, nshift, nmin, relation);
     qts.add(qt);
     if(progressPreproc != null) {
-      progressPreproc.incrementProcessed(logger);
+      progressPreproc.incrementProcessed(LOG);
     }
     /*
      * create the remaining g-1 shifted QuadTrees. This not clearly described in
@@ -181,15 +181,15 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       qt = new ALOCIQuadTree(min, max, svec, nmin, relation);
       qts.add(qt);
       if(progressPreproc != null) {
-        progressPreproc.incrementProcessed(logger);
+        progressPreproc.incrementProcessed(LOG);
       }
     }
     if(progressPreproc != null) {
-      progressPreproc.ensureCompleted(logger);
+      progressPreproc.ensureCompleted(LOG);
     }
 
     // aLOCI main loop: evaluate
-    FiniteProgress progressLOCI = logger.isVerbose() ? new FiniteProgress("Compute aLOCI scores", relation.size(), logger) : null;
+    FiniteProgress progressLOCI = LOG.isVerbose() ? new FiniteProgress("Compute aLOCI scores", relation.size(), LOG) : null;
     WritableDoubleDataStore mdef_norm = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
 
@@ -242,11 +242,11 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       mdef_norm.putDouble(iditer, maxmdefnorm);
       minmax.put(maxmdefnorm);
       if(progressLOCI != null) {
-        progressLOCI.incrementProcessed(logger);
+        progressLOCI.incrementProcessed(LOG);
       }
     }
     if(progressLOCI != null) {
-      progressLOCI.ensureCompleted(logger);
+      progressLOCI.ensureCompleted(LOG);
     }
     Relation<Double> scoreResult = new MaterializedRelation<Double>("aLOCI normalized MDEF", "aloci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
@@ -294,7 +294,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

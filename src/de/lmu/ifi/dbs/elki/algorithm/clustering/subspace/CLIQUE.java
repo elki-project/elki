@@ -100,7 +100,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CLIQUE.class);
+  private static final Logging LOG = Logging.getLogger(CLIQUE.class);
 
   /**
    * Parameter to specify the number of intervals (units) in each dimension,
@@ -169,18 +169,18 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
   public Clustering<SubspaceModel<V>> run(Relation<V> relation) {
     // 1. Identification of subspaces that contain clusters
     // TODO: use step logging.
-    if(logger.isVerbose()) {
-      logger.verbose("*** 1. Identification of subspaces that contain clusters ***");
+    if(LOG.isVerbose()) {
+      LOG.verbose("*** 1. Identification of subspaces that contain clusters ***");
     }
     SortedMap<Integer, List<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, List<CLIQUESubspace<V>>>();
     List<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(relation);
     dimensionToDenseSubspaces.put(0, denseSubspaces);
-    if(logger.isVerbose()) {
-      logger.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
+    if(LOG.isVerbose()) {
+      LOG.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       for(CLIQUESubspace<V> s : denseSubspaces) {
-        logger.debug(s.toString("      "));
+        LOG.debug(s.toString("      "));
       }
     }
 
@@ -188,19 +188,19 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     for(int k = 2; k <= dimensionality && !denseSubspaces.isEmpty(); k++) {
       denseSubspaces = findDenseSubspaces(relation, denseSubspaces);
       dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
-      if(logger.isVerbose()) {
-        logger.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
+      if(LOG.isVerbose()) {
+        LOG.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
       }
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         for(CLIQUESubspace<V> s : denseSubspaces) {
-          logger.debug(s.toString("      "));
+          LOG.debug(s.toString("      "));
         }
       }
     }
 
     // 2. Identification of clusters
-    if(logger.isVerbose()) {
-      logger.verbose("*** 2. Identification of clusters ***");
+    if(LOG.isVerbose()) {
+      LOG.verbose("*** 2. Identification of clusters ***");
     }
     // build result
     int numClusters = 1;
@@ -209,8 +209,8 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
       List<Pair<Subspace<V>, ModifiableDBIDs>> modelsAndClusters = determineClusters(subspaces);
 
-      if(logger.isVerbose()) {
-        logger.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
+      if(LOG.isVerbose()) {
+        LOG.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
       }
 
       for(Pair<Subspace<V>, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
@@ -237,8 +237,8 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
     for(CLIQUESubspace<V> subspace : denseSubspaces) {
       List<Pair<Subspace<V>, ModifiableDBIDs>> clustersInSubspace = subspace.determineClusters();
-      if(logger.isDebugging()) {
-        logger.debugFine("Subspace " + subspace + " clusters " + clustersInSubspace.size());
+      if(LOG.isDebugging()) {
+        LOG.debugFine("Subspace " + subspace + " clusters " + clustersInSubspace.size());
       }
       clusters.addAll(clustersInSubspace);
     }
@@ -312,12 +312,12 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       unit_lengths[d] = (maxima[d] - minima[d]) / xsi;
     }
 
-    if(logger.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
       msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
       msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
-      logger.debugFiner(msg.toString());
+      LOG.debugFiner(msg.toString());
     }
 
     // determine the boundaries of the units
@@ -332,10 +332,10 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
         }
       }
     }
-    if(logger.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("   unit bounds ").append(FormatUtil.format(new Matrix(unit_bounds), "   "));
-      logger.debugFiner(msg.toString());
+      LOG.debugFiner(msg.toString());
     }
 
     // build the 1 dimensional units
@@ -346,10 +346,10 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       }
     }
 
-    if(logger.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("   total number of 1-dim units: ").append(units.size());
-      logger.debugFiner(msg.toString());
+      LOG.debugFiner(msg.toString());
     }
 
     return units;
@@ -413,11 +413,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("   number of 1-dim dense units: ").append(denseUnits.size());
       msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     List<CLIQUESubspace<V>> subspaceCandidates = new ArrayList<CLIQUESubspace<V>>(denseSubspaces.values());
@@ -573,7 +573,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

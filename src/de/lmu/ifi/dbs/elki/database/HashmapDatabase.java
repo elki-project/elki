@@ -70,7 +70,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   /**
    * Our logger
    */
-  private static final Logging logger = Logging.getLogger(HashmapDatabase.class);
+  private static final Logging LOG = Logging.getLogger(HashmapDatabase.class);
 
   /**
    * IDs of this database
@@ -295,7 +295,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

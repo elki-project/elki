@@ -106,7 +106,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CASH.class);
+  private static final Logging LOG = Logging.getLogger(CASH.class);
 
   /**
    * Parameter to specify the threshold for minimum number of points in a
@@ -223,23 +223,23 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
    */
   public Clustering<Model> run(Database database, Relation<V> vrel) {
     this.fulldatabase = preprocess(database, vrel);
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer();
       msg.append("DB size: ").append(fulldatabase.size());
       msg.append("\nmin Dim: ").append(minDim);
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     processedIDs = DBIDUtil.newHashSet(fulldatabase.size());
     noiseDim = dimensionality(fulldatabase);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("CASH Clustering", fulldatabase.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("CASH Clustering", fulldatabase.size(), LOG) : null;
     Clustering<Model> result = doRun(fulldatabase, progress);
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer();
       for(Cluster<Model> c : result.getAllClusters()) {
         if(c.getModel() instanceof LinearEquationModel) {
@@ -250,7 +250,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
           msg.append("\n Cluster: " + c.getModel().getClass().getName() + " size: " + c.size());
         }
       }
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
     return result;
   }
@@ -294,28 +294,28 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
     ModifiableDBIDs noiseIDs = DBIDUtil.newHashSet(relation.getDBIDs());
     initHeap(heap, relation, dim, noiseIDs);
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       msg.append("\nXXXX dim ").append(dim);
       msg.append("\nXXXX database.size ").append(relation.size());
       msg.append("\nXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
-    else if(logger.isVerbose()) {
+    else if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer();
       msg.append("XXXX dim ").append(dim).append(" database.size ").append(relation.size());
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     // get the ''best'' d-dimensional intervals at max level
     while(!heap.isEmpty()) {
       CASHInterval interval = determineNextIntervalAtMaxLevel(heap);
-      if(logger.isDebugging()) {
-        logger.debugFine("next interval in dim " + dim + ": " + interval);
+      if(LOG.isDebugging()) {
+        LOG.debugFine("next interval in dim " + dim + ": " + interval);
       }
-      else if(logger.isVerbose()) {
-        logger.verbose("next interval in dim " + dim + ": " + interval);
+      else if(LOG.isVerbose()) {
+        LOG.verbose("next interval in dim " + dim + ": " + interval);
       }
 
       // only noise left
@@ -370,7 +370,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
       }
 
       if(progress != null) {
-        progress.setProcessed(processedIDs.size(), logger);
+        progress.setProcessed(processedIDs.size(), LOG);
       }
     }
 
@@ -389,7 +389,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("noise fuer dim ").append(dim).append(": ").append(noiseIDs.size());
 
@@ -402,11 +402,11 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
           msg.append("\n Cluster: " + c.getModel().getClass().getName() + " size: " + c.size());
         }
       }
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     if(progress != null) {
-      progress.setProcessed(processedIDs.size(), logger);
+      progress.setProcessed(processedIDs.size(), LOG);
     }
     return res;
   }
@@ -443,21 +443,21 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
     double[] d_mins = new double[numDIntervals];
     double[] d_maxs = new double[numDIntervals];
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("d_min ").append(d_min);
       msg.append("\nd_max ").append(d_max);
       msg.append("\nnumDIntervals ").append(numDIntervals);
       msg.append("\ndIntervalSize ").append(dIntervalSize);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
-    else if(logger.isVerbose()) {
+    else if(LOG.isVerbose()) {
       StringBuffer msg = new StringBuffer();
       msg.append("d_min ").append(d_min);
       msg.append("\nd_max ").append(d_max);
       msg.append("\nnumDIntervals ").append(numDIntervals);
       msg.append("\ndIntervalSize ").append(dIntervalSize);
-      logger.verbose(msg.toString());
+      LOG.verbose(msg.toString());
     }
 
     // alpha intervals
@@ -488,10 +488,10 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
       }
     }
 
-    if(logger.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("heap.size ").append(heap.size());
-      logger.debugFiner(msg.toString());
+      LOG.debugFiner(msg.toString());
     }
   }
 
@@ -518,8 +518,8 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
       prep.set(iter, f);
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("db fuer dim " + (dim - 1) + ": " + ids.size());
+    if(LOG.isDebugging()) {
+      LOG.debugFine("db fuer dim " + (dim - 1) + ": " + ids.size());
     }
 
     return prep;
@@ -612,18 +612,18 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
         return interval;
       }
 
-      if(heap.size() % 10000 == 0 && logger.isVerbose()) {
-        logger.verbose("heap size " + heap.size());
+      if(heap.size() % 10000 == 0 && LOG.isVerbose()) {
+        LOG.verbose("heap size " + heap.size());
       }
 
       if(heap.size() >= 40000) {
-        logger.warning("Heap size > 40.000!!!");
+        LOG.warning("Heap size > 40.000!!!");
         heap.clear();
         return null;
       }
 
-      if(logger.isDebuggingFiner()) {
-        logger.debugFiner("split " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
+      if(LOG.isDebuggingFiner()) {
+        LOG.debugFiner("split " + interval.toString() + " " + interval.getLevel() + "-" + interval.getMaxSplitDimension());
       }
       interval.split();
 
@@ -754,8 +754,8 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
       prep.set(iter, v);
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("db fuer derivator : " + prep.size());
+    if(LOG.isDebugging()) {
+      LOG.debugFine("db fuer derivator : " + prep.size());
     }
 
     return proxy;
@@ -829,7 +829,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

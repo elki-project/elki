@@ -74,7 +74,7 @@ public class MultiStepGUI extends JPanel {
   /**
    * ELKI logger for the GUI
    */
-  protected static final Logging logger = Logging.getLogger(MultiStepGUI.class);
+  private static final Logging LOG = Logging.getLogger(MultiStepGUI.class);
 
   /**
    * Logging output area.
@@ -142,10 +142,10 @@ public class MultiStepGUI extends JPanel {
       settings.load();
     }
     catch(FileNotFoundException e) {
-      logger.warning("Error loading saved settings.", e);
+      LOG.warning("Error loading saved settings.", e);
     }
     catch(IOException e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
     
     inputTab = new InputTabPanel();

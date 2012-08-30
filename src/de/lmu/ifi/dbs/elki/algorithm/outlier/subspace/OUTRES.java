@@ -94,7 +94,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OUTRES.class);
+  private static final Logging LOG = Logging.getLogger(OUTRES.class);
 
   /**
    * The epsilon (in 2d) parameter
@@ -129,7 +129,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
     KernelDensityEstimator kernel = new KernelDensityEstimator(relation);
     BitSet subspace = new BitSet(kernel.dim);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OutRank scores", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OutRank scores", relation.size(), LOG) : null;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       subspace.clear();
@@ -137,11 +137,11 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
       ranks.putDouble(iditer, score);
       minmax.put(score);
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., 1., 1.);
@@ -388,7 +388,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

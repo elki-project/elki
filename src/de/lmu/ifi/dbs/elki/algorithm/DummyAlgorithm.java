@@ -57,7 +57,7 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DummyAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(DummyAlgorithm.class);
 
   /**
    * Constructor, adhering to
@@ -96,6 +96,6 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

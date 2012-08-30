@@ -57,7 +57,7 @@ public class ELKILogRecord extends LogRecord {
   /**
    * Name of this class.
    */
-  private final static String START_TRACE_AT = Logger.class.getCanonicalName();
+  private static final String START_TRACE_AT = Logger.class.getCanonicalName();
 
   /**
    * Constructor.

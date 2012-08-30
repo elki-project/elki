@@ -105,7 +105,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   /**
    * The Logger for this class
    */
-  private static final Logging logger = Logging.getLogger(HiCS.class);
+  private static final Logging LOG = Logging.getLogger(HiCS.class);
 
   /**
    * Maximum number of retries.
@@ -176,18 +176,18 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
     Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex);
 
-    if(logger.isVerbose()) {
-      logger.verbose("Number of high-contrast subspaces: " + subspaces.size());
+    if(LOG.isVerbose()) {
+      LOG.verbose("Number of high-contrast subspaces: " + subspaces.size());
     }
     List<Relation<Double>> results = new ArrayList<Relation<Double>>();
-    FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), logger) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), LOG) : null;
 
     // run outlier detection and collect the result
     // TODO extend so that any outlierAlgorithm can be used (use materialized
     // relation instead of SubspaceEuclideanDistanceFunction?)
     for(HiCSSubspace dimset : subspaces) {
-      if(logger.isVerbose()) {
-        logger.verbose("Performing outlier detection in subspace " + dimset);
+      if(LOG.isVerbose()) {
+        LOG.verbose("Performing outlier detection in subspace " + dimset);
       }
 
       ProxyDatabase pdb = new ProxyDatabase(ids);
@@ -198,11 +198,11 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       OutlierResult result = outlierAlgorithm.run(pdb);
       results.add(result.getScores());
       if(prog != null) {
-        prog.incrementProcessed(logger);
+        prog.incrementProcessed(LOG);
       }
     }
     if(prog != null) {
-      prog.ensureCompleted(logger);
+      prog.ensureCompleted(LOG);
     }
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
@@ -258,14 +258,14 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?, ?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
     final int dbdim = DatabaseUtil.dimensionality(relation);
 
-    FiniteProgress dprog = logger.isVerbose() ? new FiniteProgress("Subspace dimensionality", dbdim, logger) : null;
+    FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Subspace dimensionality", dbdim, LOG) : null;
     if(dprog != null) {
-      dprog.setProcessed(2, logger);
+      dprog.setProcessed(2, LOG);
     }
 
     TreeSet<HiCSSubspace> subspaceList = new TreeSet<HiCSSubspace>(HiCSSubspace.SORT_BY_SUBSPACE);
     TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<HiCSSubspace>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
-    FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Generating two-element subsets", dbdim * (dbdim - 1) / 2, logger) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Generating two-element subsets", dbdim * (dbdim - 1) / 2, LOG) : null;
     // compute two-element sets of subspaces
     for(int i = 0; i < dbdim; i++) {
       for(int j = i + 1; j < dbdim; j++) {
@@ -275,18 +275,18 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
         calculateContrast(relation, ts, subspaceIndex);
         dDimensionalList.add(ts);
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.incrementProcessed(LOG);
         }
       }
     }
     if(prog != null) {
-      prog.ensureCompleted(logger);
+      prog.ensureCompleted(LOG);
     }
 
-    IndefiniteProgress qprog = logger.isVerbose() ? new IndefiniteProgress("Testing subspace candidates", logger) : null;
+    IndefiniteProgress qprog = LOG.isVerbose() ? new IndefiniteProgress("Testing subspace candidates", LOG) : null;
     for(int d = 3; !dDimensionalList.isEmpty(); d++) {
       if(dprog != null) {
-        dprog.setProcessed(d, logger);
+        dprog.setProcessed(d, LOG);
       }
       subspaceList.addAll(dDimensionalList);
       // result now contains all d-dimensional sets of subspaces
@@ -312,7 +312,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
           calculateContrast(relation, joinedSet, subspaceIndex);
           dDimensionalList.add(joinedSet);
           if(qprog != null) {
-            qprog.incrementProcessed(logger);
+            qprog.incrementProcessed(LOG);
           }
         }
       }
@@ -327,11 +327,11 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       }
     }
     if(qprog != null) {
-      qprog.setCompleted(logger);
+      qprog.setCompleted(LOG);
     }
     if(dprog != null) {
-      dprog.setProcessed(dbdim, logger);
-      dprog.ensureCompleted(logger);
+      dprog.setProcessed(dbdim, LOG);
+      dprog.ensureCompleted(LOG);
     }
     return subspaceList;
   }
@@ -347,7 +347,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     final int card = subspace.cardinality();
     final double alpha1 = Math.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
-    final FiniteProgress prog = logger.isDebugging() ? new FiniteProgress("Monte-Carlo iterations", m, logger) : null;
+    final FiniteProgress prog = LOG.isDebugging() ? new FiniteProgress("Monte-Carlo iterations", m, LOG) : null;
 
     int retries = 0;
     double deviationSum = 0.0;
@@ -377,11 +377,11 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       }
       if(conditionalSample.size() < 10) {
         retries++;
-        if(logger.isDebugging()) {
-          logger.debug("Sample size very small. Retry no. " + retries);
+        if(LOG.isDebugging()) {
+          LOG.debug("Sample size very small. Retry no. " + retries);
         }
         if(retries >= MAX_RETRIES) {
-          logger.warning("Too many retries, for small samples: " + retries);
+          LOG.warning("Too many retries, for small samples: " + retries);
         }
         else {
           i--;
@@ -409,16 +409,16 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
       double contrast = statTest.deviation(fullValues, sampleValues);
       if(Double.isNaN(contrast)) {
         i--;
-        logger.warning("Contrast was NaN");
+        LOG.warning("Contrast was NaN");
         continue;
       }
       deviationSum += contrast;
       if(prog != null) {
-        prog.incrementProcessed(logger);
+        prog.incrementProcessed(LOG);
       }
     }
     if(prog != null) {
-      prog.ensureCompleted(logger);
+      prog.ensureCompleted(LOG);
     }
     subspace.contrast = deviationSum / m;
   }
@@ -430,7 +430,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

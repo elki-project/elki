@@ -78,7 +78,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OutRankS1.class);
+  private static final Logging LOG = Logging.getLogger(OutRankS1.class);
 
   /**
    * Clustering algorithm to run.
@@ -147,7 +147,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

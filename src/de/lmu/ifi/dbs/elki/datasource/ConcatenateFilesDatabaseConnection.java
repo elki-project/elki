@@ -56,7 +56,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(ConcatenateFilesDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(ConcatenateFilesDatabaseConnection.class);
 
   /**
    * Input file list.
@@ -136,15 +136,15 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
       }
     }
     // Invoke filters
-    if(logger.isDebugging()) {
-      logger.debugFine("Invoking filters.");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("Invoking filters.");
     }
     return invokeFilters(objects);
   }
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

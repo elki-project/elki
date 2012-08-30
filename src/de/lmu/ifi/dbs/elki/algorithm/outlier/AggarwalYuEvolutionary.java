@@ -88,7 +88,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   /**
    * The logger for this class.
    */
-  protected static final Logging logger = Logging.getLogger(AggarwalYuEvolutionary.class);
+  private static final Logging LOG = Logging.getLogger(AggarwalYuEvolutionary.class);
 
   /**
    * Parameter to specify the number of solutions must be an integer greater
@@ -174,7 +174,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**
@@ -251,7 +251,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
             bestSol.add(ind);
           }
         }
-        if(logger.isDebuggingFinest()) {
+        if(LOG.isDebuggingFinest()) {
           StringBuffer buf = new StringBuffer();
           buf.append("Top solutions:\n");
           for(Individuum ind : bestSol) {
@@ -261,11 +261,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
           for(Individuum ind : pop) {
             buf.append(ind.toString()).append("\n");
           }
-          logger.debugFinest(buf.toString());
+          LOG.debugFinest(buf.toString());
         }
         iterations++;
         if(iterations > MAX_ITERATIONS) {
-          logger.warning("Maximum iterations reached.");
+          LOG.warning("Maximum iterations reached.");
           break;
         }
       }
@@ -288,7 +288,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
         for(int d = 0; d < dim; d++) {
           int val = gene[d] + DONT_CARE;
           if(val < 0 || val >= phi + 1) {
-            logger.warning("Invalid gene value encountered: " + val + " in " + ind.toString());
+            LOG.warning("Invalid gene value encountered: " + val + " in " + ind.toString());
             continue;
           }
           occur[d][val] += 1;
@@ -296,8 +296,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
       }
 
       int conv = (int) (pop.size() * 0.95);
-      if(logger.isDebuggingFine()) {
-        logger.debugFine("Convergence at " + conv + " of " + pop.size() + " individuums.");
+      if(LOG.isDebuggingFine()) {
+        LOG.debugFine("Convergence at " + conv + " of " + pop.size() + " individuums.");
       }
       for(int d = 0; d < dim; d++) {
         boolean converged = false;

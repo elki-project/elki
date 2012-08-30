@@ -46,7 +46,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(ByLabelFilter.class);
+  private static final Logging LOG = Logging.getLogger(ByLabelFilter.class);
 
   /**
    * The filter pattern
@@ -92,7 +92,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
       switch(ev){
       case END_OF_STREAM:
         if (lblcol < 0) {
-          logger.warning("By label filter was used, but never saw a label relation!");
+          LOG.warning("By label filter was used, but never saw a label relation!");
         }
         return Event.END_OF_STREAM;
       case META_CHANGED:
@@ -136,7 +136,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
         }
         return Event.NEXT_OBJECT;
       default:
-        logger.warning("Unknown event: " + ev);
+        LOG.warning("Unknown event: " + ev);
       }
     }
   }

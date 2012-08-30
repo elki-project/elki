@@ -68,7 +68,7 @@ public class ArffParser implements Parser {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(ArffParser.class);
+  private static final Logging LOG = Logging.getLogger(ArffParser.class);
 
   /**
    * Arff file marker
@@ -276,7 +276,7 @@ public class ArffParser implements Parser {
           }
           String v = (String) iter.value();
           if(ll.size() < i - s) {
-            logger.warning("Sparse consecutive labels are currently not correctly supported.");
+            LOG.warning("Sparse consecutive labels are currently not correctly supported.");
           }
           ll.add(v);
         }
@@ -598,21 +598,21 @@ public class ArffParser implements Parser {
     else if((tokenizer.ttype == StreamTokenizer.TT_WORD) && (tokenizer.sval.equals("?"))) {
       tokenizer.ttype = '?';
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       if(tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
-        logger.debug("token: " + tokenizer.nval);
+        LOG.debug("token: " + tokenizer.nval);
       }
       else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
-        logger.debug("token: " + tokenizer.sval);
+        LOG.debug("token: " + tokenizer.sval);
       }
       else if(tokenizer.ttype == StreamTokenizer.TT_EOF) {
-        logger.debug("token: EOF");
+        LOG.debug("token: EOF");
       }
       else if(tokenizer.ttype == StreamTokenizer.TT_EOL) {
-        logger.debug("token: EOL");
+        LOG.debug("token: EOL");
       }
       else {
-        logger.debug("token type: " + tokenizer.ttype);
+        LOG.debug("token type: " + tokenizer.ttype);
       }
     }
   }

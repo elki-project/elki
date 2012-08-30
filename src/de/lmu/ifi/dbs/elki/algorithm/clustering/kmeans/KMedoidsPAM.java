@@ -83,7 +83,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(KMedoidsPAM.class);
+  private static final Logging LOG = Logging.getLogger(KMedoidsPAM.class);
 
   /**
    * Holds the value of {@link AbstractKMeans#K_ID}.
@@ -192,8 +192,8 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
           }
         }
       }
-      if(logger.isDebugging()) {
-        logger.debug("Best cost: " + best);
+      if(LOG.isDebugging()) {
+        LOG.debug("Best cost: " + best);
       }
       if(bestid != null) {
         changed = true;
@@ -271,7 +271,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

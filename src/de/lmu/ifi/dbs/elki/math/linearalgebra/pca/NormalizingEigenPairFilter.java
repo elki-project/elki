@@ -45,7 +45,7 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(NormalizingEigenPairFilter.class);
+  private static final Logging LOG = Logging.getLogger(NormalizingEigenPairFilter.class);
 
   /**
    * Provides a new EigenPairFilter that normalizes all eigenvectors s.t.
@@ -67,11 +67,11 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
       normalizeEigenPair(eigenPair);
       strongEigenPairs.add(eigenPair);
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       final StringBuffer msg = new StringBuffer();
       msg.append("strong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

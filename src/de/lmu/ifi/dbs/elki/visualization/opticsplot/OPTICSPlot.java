@@ -56,7 +56,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
   /**
    * Logger
    */
-  protected static final Logging logger = Logging.getLogger(OPTICSPlot.class);
+  private static final Logging LOG = Logging.getLogger(OPTICSPlot.class);
 
   /**
    * Scale to use
@@ -200,7 +200,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
         }
       }
       catch(ArrayIndexOutOfBoundsException e) {
-        logger.error("Plotting out of range: " + x + "," + y + " >= " + width + "x" + height);
+        LOG.error("Plotting out of range: " + x + "," + y + " >= " + width + "x" + height);
       }
       x++;
     }

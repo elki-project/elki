@@ -58,7 +58,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    * This is the postfix added to the first cluster, which will be removed when
    * there is only one cluster of this name.
    */
-  private final static String nullpostfix = " " + Integer.toString(0);
+  private static final String nullpostfix = " " + Integer.toString(0);
 
   /**
    * Constructor.

@@ -74,7 +74,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     this.seed = seed;
   }
 
-  private static final Logging logger = Logging.getLogger(RandomDoubleVectorDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(RandomDoubleVectorDatabaseConnection.class);
 
   @Override
   public MultipleObjectsBundle loadData() {
@@ -101,7 +101,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

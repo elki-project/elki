@@ -50,7 +50,7 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(TrivialAllNoise.class);
+  private static final Logging LOG = Logging.getLogger(TrivialAllNoise.class);
 
   /**
    * Constructor, adhering to
@@ -75,6 +75,6 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

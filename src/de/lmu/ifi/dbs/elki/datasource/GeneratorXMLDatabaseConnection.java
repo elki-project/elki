@@ -80,7 +80,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Logger
    */
-  private static Logging logger = Logging.getLogger(GeneratorXMLDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(GeneratorXMLDatabaseConnection.class);
 
   /**
    * A pattern defining whitespace.
@@ -146,8 +146,8 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
   @Override
   public MultipleObjectsBundle loadData() {
-    if(logger.isVerbose()) {
-      logger.verbose("Loading specification ...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Loading specification ...");
     }
     GeneratorMain gen;
     try {
@@ -156,8 +156,8 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     catch(UnableToComplyException e) {
       throw new AbortException("Cannot load XML specification", e);
     }
-    if(logger.isVerbose()) {
-      logger.verbose("Generating clusters ...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Generating clusters ...");
     }
     if(testAgainstModel != null) {
       gen.setTestAgainstModel(testAgainstModel);
@@ -190,11 +190,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
           dbf.setIgnoringElementContentWhitespace(true);
         }
         catch(Exception e) {
-          logger.warning("Could not set up XML Schema validation for speciciation file.");
+          LOG.warning("Could not set up XML Schema validation for speciciation file.");
         }
       }
       else {
-        logger.warning("Could not set up XML Schema validation for speciciation file.");
+        LOG.warning("Could not set up XML Schema validation for speciciation file.");
       }
       Document doc = dbf.newDocumentBuilder().parse(in);
       Node root = doc.getDocumentElement();
@@ -249,7 +249,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         processElementStatic(gen, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -311,7 +311,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         processElementClipping(cluster, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
 
@@ -348,7 +348,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -382,7 +382,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -416,7 +416,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -463,7 +463,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -493,7 +493,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -529,7 +529,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }
@@ -556,15 +556,15 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         processElementPoint(points, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
     // *** add new cluster object
     GeneratorStatic cluster = new GeneratorStatic(name, points);
 
     gen.addCluster(cluster);
-    if(logger.isVerbose()) {
-      logger.verbose("Loaded cluster " + cluster.name + " from specification.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Loaded cluster " + cluster.name + " from specification.");
     }
   }
 
@@ -593,7 +593,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     while(iter.hasNext()) {
       Node child = iter.next();
       if(child.getNodeType() == Node.ELEMENT_NODE) {
-        logger.warning("Unknown element in XML specification file: " + child.getNodeName());
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
       }
     }
   }

@@ -81,7 +81,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
   /**
    * Logger to use.
    */
-  private static final Logging logger = Logging.getLogger(MaterializeKNNAndRKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(MaterializeKNNAndRKNNPreprocessor.class);
 
   /**
    * Additional data storage for RkNN.
@@ -416,7 +416,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

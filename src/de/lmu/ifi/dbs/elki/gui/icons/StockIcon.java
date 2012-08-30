@@ -88,7 +88,7 @@ public class StockIcon {
 
   public static final String PROCESS_STOP = "process-stop";
 
-  private final static Map<String, SoftReference<Icon>> iconcache = new HashMap<String, SoftReference<Icon>>();
+  private static final Map<String, SoftReference<Icon>> iconcache = new HashMap<String, SoftReference<Icon>>();
 
   /**
    * Get a particular stock icon.

@@ -51,7 +51,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   /**
    * Our logger
    */
-  private static final Logging logger = Logging.getLogger(PersistentPageFile.class);
+  private static final Logging LOG = Logging.getLogger(PersistentPageFile.class);
 
   /**
    * Indicates an empty page.
@@ -341,7 +341,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   public boolean initialize(PageHeader header) {
     try {
       if(existed) {
-        logger.debug("Initializing from an existing page file.");
+        LOG.debug("Initializing from an existing page file.");
 
         // init the header
         this.header = header;
@@ -384,7 +384,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
       }
       // create new file
       else {
-        logger.debug("Initializing with a new page file.");
+        LOG.debug("Initializing with a new page file.");
 
         // writing header
         this.header = header;

@@ -48,7 +48,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
   /**
    * Logger for debug.
    */
-  static Logging logger = Logging.getLogger(DiSHDistanceFunction.class);
+  private static final Logging LOG = Logging.getLogger(HiSCDistanceFunction.class);
 
   /**
    * Constructor.
@@ -114,7 +114,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
 
       if(Math.max(dist1, dist2) > epsilon) {
         subspaceDim++;
-        if(logger.isDebugging()) {
+        if(LOG.isDebugging()) {
           //Representation<String> rep = rep.getObjectLabelQuery();
           StringBuffer msg = new StringBuffer();
           msg.append("\ndist1 ").append(dist1);
@@ -123,7 +123,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
           // msg.append("\nv2 ").append(rep.get(v2.getID()));
           msg.append("\nsubspaceDim ").append(subspaceDim);
           msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
-          logger.debugFine(msg.toString());
+          LOG.debugFine(msg.toString());
         }
       }
 

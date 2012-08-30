@@ -66,17 +66,17 @@ public class SVGSimpleLinearAxis {
   /**
    * CSS class name for the axes
    */
-  private final static String CSS_AXIS = "axis";
+  private static final String CSS_AXIS = "axis";
 
   /**
    * CSS class name for the axes
    */
-  private final static String CSS_AXIS_TICK = "axis-tick";
+  private static final String CSS_AXIS_TICK = "axis-tick";
 
   /**
    * CSS class name for the axes
    */
-  private final static String CSS_AXIS_LABEL = "axis-label";
+  private static final String CSS_AXIS_LABEL = "axis-label";
 
   /**
    * Register CSS classes with a {@link CSSClassManager}

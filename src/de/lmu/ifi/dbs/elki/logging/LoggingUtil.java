@@ -163,7 +163,7 @@ public final class LoggingUtil {
    * 
    * @return calling class name and calling method name
    */
-  private final static String[] inferCaller() {
+  private static final String[] inferCaller() {
     StackTraceElement stack[] = (new Throwable()).getStackTrace();
     int ix = 0;
     while(ix < stack.length) {

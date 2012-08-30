@@ -58,7 +58,7 @@ public class SavedSettingsTabPanel extends JPanel {
   /**
    * Logger
    */
-  protected static final Logging logger = Logging.getLogger(SavedSettingsTabPanel.class);
+  private static final Logging LOG = Logging.getLogger(SavedSettingsTabPanel.class);
 
   /**
    * The settings file to display.
@@ -139,7 +139,7 @@ public class SavedSettingsTabPanel extends JPanel {
             store.save();
           }
           catch(IOException e1) {
-            logger.exception(e1);
+            LOG.exception(e1);
           }
           savedSettingsModel.update();
         }
@@ -157,7 +157,7 @@ public class SavedSettingsTabPanel extends JPanel {
             store.save();
           }
           catch(IOException e1) {
-            logger.exception(e1);
+            LOG.exception(e1);
           }
           savedCombo.setSelectedItem("[Saved Settings]");
           savedSettingsModel.update();

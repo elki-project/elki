@@ -59,7 +59,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(BitVectorLabelParser.class);
+  private static final Logging LOG = Logging.getLogger(BitVectorLabelParser.class);
 
   /**
    * Constructor.
@@ -122,7 +122,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

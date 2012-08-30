@@ -69,7 +69,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(NumberDistanceParser.class);
+  private static final Logging LOG = Logging.getLogger(NumberDistanceParser.class);
 
   /**
    * The distance function.
@@ -97,8 +97,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     Map<DBIDPair, D> distanceCache = new HashMap<DBIDPair, D>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(lineNumber % 10000 == 0 && logger.isDebugging()) {
-          logger.debugFine("parse " + lineNumber / 10000);
+        if(lineNumber % 10000 == 0 && LOG.isDebugging()) {
+          LOG.debugFine("parse " + lineNumber / 10000);
           // logger.fine("parse " + lineNumber / 10000);
         }
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -138,8 +138,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("check");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("check");
     }
 
     // check if all distance values are specified
@@ -154,8 +154,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
       }
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("add to objectAndLabelsList");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("add to objectAndLabelsList");
     }
 
     // This is unusual for ELKI, but here we really need an ArrayList, not a
@@ -209,7 +209,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

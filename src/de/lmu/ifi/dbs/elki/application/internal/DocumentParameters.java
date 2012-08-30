@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @apiviz.uses Parameter
  */
 public class DocumentParameters {
-  static final Logging logger = Logging.getLogger(DocumentParameters.class);
+  private static final Logging LOG = Logging.getLogger(DocumentParameters.class);
 
   private static final String HEADER_PARAMETER_FOR = "Parameter for: ";
 
@@ -104,15 +104,15 @@ public class DocumentParameters {
    */
   public static void main(String[] args) {
     if(args.length != 2) {
-      logger.warning("I need exactly two file names to operate!");
+      LOG.warning("I need exactly two file names to operate!");
       System.exit(1);
     }
     if(!args[0].endsWith(".html")) {
-      logger.warning("First file name doesn't end with .html!");
+      LOG.warning("First file name doesn't end with .html!");
       System.exit(1);
     }
     if(!args[1].endsWith(".html")) {
-      logger.warning("Second file name doesn't end with .html!");
+      LOG.warning("Second file name doesn't end with .html!");
       System.exit(1);
     }
     File byclsname = new File(args[0]);
@@ -124,7 +124,7 @@ public class DocumentParameters {
       buildParameterIndex(byclass, byopt);
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
       System.exit(1);
     }
 
@@ -134,7 +134,7 @@ public class DocumentParameters {
         byclassfo = new FileOutputStream(byclsname);
       }
       catch(FileNotFoundException e) {
-        logger.exception("Can't create output stream!", e);
+        LOG.exception("Can't create output stream!", e);
         throw new RuntimeException(e);
       }
       OutputStream byclassstream = new BufferedOutputStream(byclassfo);
@@ -146,7 +146,7 @@ public class DocumentParameters {
         byclassfo.close();
       }
       catch(IOException e) {
-        logger.exception("IO Exception writing output.", e);
+        LOG.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
     }
@@ -157,7 +157,7 @@ public class DocumentParameters {
         byoptfo = new FileOutputStream(byoptname);
       }
       catch(FileNotFoundException e) {
-        logger.exception("Can't create output stream!", e);
+        LOG.exception("Can't create output stream!", e);
         throw new RuntimeException(e);
       }
       OutputStream byoptstream = new BufferedOutputStream(byoptfo);
@@ -169,7 +169,7 @@ public class DocumentParameters {
         byoptfo.close();
       }
       catch(IOException e) {
-        logger.exception("IO Exception writing output.", e);
+        LOG.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
     }
@@ -204,7 +204,7 @@ public class DocumentParameters {
               ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
             }
             catch(java.lang.NoSuchMethodException e) {
-              logger.warning("Could not instantiate class " + cls.getName() + " - no appropriate constructor or parameterizer found.");
+              LOG.warning("Could not instantiate class " + cls.getName() + " - no appropriate constructor or parameterizer found.");
             }
             catch(java.lang.reflect.InvocationTargetException e) {
               if(e.getCause() instanceof RuntimeException) {
@@ -261,10 +261,10 @@ public class DocumentParameters {
       }
     }
 
-    logger.debug("Documenting " + options.size() + " parameter instances.");
+    LOG.debug("Documenting " + options.size() + " parameter instances.");
     for(Pair<Object, Parameter<?, ?>> pp : options) {
       if(pp.first == null || pp.second == null) {
-        logger.debugFiner("Null: " + pp.first + " " + pp.second);
+        LOG.debugFiner("Null: " + pp.first + " " + pp.second);
         continue;
       }
       Class<?> c;
@@ -309,7 +309,7 @@ public class DocumentParameters {
       }
     }
     es.shutdownNow();
-    logger.debug("byClass: " + byclass.size() + " byOpt: " + byopt.size());
+    LOG.debug("byClass: " + byclass.size() + " byOpt: " + byopt.size());
   }
 
   protected static Constructor<?> getConstructor(final Class<?> cls) {
@@ -321,14 +321,14 @@ public class DocumentParameters {
     }
     catch(RuntimeException e) {
       // Not parameterizable, usually not even found ...
-      logger.warning("RuntimeException: ", e);
+      LOG.warning("RuntimeException: ", e);
     }
     catch(Exception e) {
       // Not parameterizable.
     }
     catch(java.lang.Error e) {
       // Not parameterizable.
-      logger.warning("Error: ", e);
+      LOG.warning("Error: ", e);
     }
     return null;
   }
@@ -608,7 +608,7 @@ public class DocumentParameters {
 
   private static void appendClassRestriction(Document htmldoc, Class<?> restriction, Element elemdd) {
     if(restriction == null) {
-      logger.warning("No restriction class!");
+      LOG.warning("No restriction class!");
       return;
     }
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
@@ -654,7 +654,7 @@ public class DocumentParameters {
       // Report when not in properties file.
       Iterator<Class<?>> clss = new ELKIServiceLoader(opt.getRestrictionClass());
       if (!clss.hasNext()) {
-        logger.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
+        LOG.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
       }
     }
   }

@@ -72,7 +72,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(APRIORI.class);
+  private static final Logging LOG = Logging.getLogger(APRIORI.class);
 
   /**
    * Optional parameter to specify the threshold for minimum frequency, must be
@@ -147,7 +147,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       while(candidates.length > 0) {
         StringBuffer msg = new StringBuffer();
         BitSet[] frequentItemsets = frequentItemsets(support, candidates, relation);
-        if(logger.isVerbose()) {
+        if(LOG.isVerbose()) {
           msg.append("\ncandidates").append(Arrays.asList(candidates));
           msg.append("\nfrequentItemsets").append(Arrays.asList(frequentItemsets));
         }
@@ -156,9 +156,9 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         }
         BitSet[] joined = join(frequentItemsets);
         candidates = prune(support, joined, size);
-        if(logger.isVerbose()) {
+        if(LOG.isVerbose()) {
           msg.append("\ncandidates after pruning").append(Arrays.asList(candidates));
-          logger.verbose(msg.toString());
+          LOG.verbose(msg.toString());
         }
       }
     }
@@ -300,7 +300,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
   
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

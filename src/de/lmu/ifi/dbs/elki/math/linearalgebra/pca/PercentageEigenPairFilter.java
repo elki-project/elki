@@ -51,7 +51,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(PercentageEigenPairFilter.class);
+  private static final Logging LOG = Logging.getLogger(PercentageEigenPairFilter.class);
 
   /**
    * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
@@ -89,7 +89,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuffer msg = new StringBuffer();
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("alpha = ").append(alpha);
       msg.append("\nsortedEigenPairs = ").append(eigenPairs);
     }
@@ -104,7 +104,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\ntotalSum = ").append(totalSum);
     }
 
@@ -127,10 +127,10 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
         strongEigenPairs.add(eigenPair);
       }
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);

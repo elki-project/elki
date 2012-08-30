@@ -57,7 +57,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(TermFrequencyParser.class);
+  private static final Logging LOG = Logging.getLogger(TermFrequencyParser.class);
 
   /**
    * Maximum dimension used
@@ -158,7 +158,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

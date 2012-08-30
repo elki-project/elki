@@ -82,7 +82,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(LDOF.class);
+  private static final Logging LOG = Logging.getLogger(LDOF.class);
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
@@ -129,10 +129,10 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     WritableDoubleDataStore ldofs = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
 
     // compute LOF_SCORE of each db object
-    if(logger.isVerbose()) {
-      logger.verbose("Computing LDOFs");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Computing LDOFs");
     }
-    FiniteProgress progressLDOFs = logger.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", relation.size(), logger) : null;
+    FiniteProgress progressLDOFs = LOG.isVerbose() ? new FiniteProgress("LDOF_SCORE for objects", relation.size(), LOG) : null;
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -159,11 +159,11 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       ldofminmax.put(ldof);
 
       if(progressLDOFs != null) {
-        progressLDOFs.incrementProcessed(logger);
+        progressLDOFs.incrementProcessed(LOG);
       }
     }
     if(progressLDOFs != null) {
-      progressLDOFs.ensureCompleted(logger);
+      progressLDOFs.ensureCompleted(LOG);
     }
 
     // Build result representation.
@@ -179,7 +179,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

@@ -75,7 +75,7 @@ public class OutlierROCCurve implements Evaluator {
   /**
    * The logger.
    */
-  private static final Logging logger = Logging.getLogger(OutlierROCCurve.class);
+  private static final Logging LOG = Logging.getLogger(OutlierROCCurve.class);
 
   /**
    * The pattern to identify positive classes.
@@ -107,8 +107,8 @@ public class OutlierROCCurve implements Evaluator {
     }
     XYCurve roccurve = ROC.materializeROC(size, positiveids, new ROC.SimpleAdapter(order.iter()));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
-    if(logger.isVerbose()) {
-      logger.verbose(ROCAUC_LABEL + ": " + rocauc);
+    if(LOG.isVerbose()) {
+      LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
     }
 
     final ROCResult rocresult = new ROCResult(roccurve, rocauc);
@@ -119,8 +119,8 @@ public class OutlierROCCurve implements Evaluator {
   private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
     XYCurve roccurve = ROC.materializeROC(size, positiveids, new ROC.OutlierScoreAdapter(or));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
-    if(logger.isVerbose()) {
-      logger.verbose(ROCAUC_LABEL + ": " + rocauc);
+    if(LOG.isVerbose()) {
+      LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
     }
 
     final ROCResult rocresult = new ROCResult(roccurve, rocauc);
@@ -135,7 +135,7 @@ public class OutlierROCCurve implements Evaluator {
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if(positiveids.size() == 0) {
-      logger.warning("Computing a ROC curve failed - no objects matched.");
+      LOG.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
 

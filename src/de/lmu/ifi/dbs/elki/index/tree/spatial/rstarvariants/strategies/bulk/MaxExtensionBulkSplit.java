@@ -45,7 +45,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
   /**
    * Logger.
    */
-  private static final Logging logger = Logging.getLogger(MaxExtensionBulkSplit.class);
+  private static final Logging LOG = Logging.getLogger(MaxExtensionBulkSplit.class);
   
   /**
    * Static instance
@@ -79,7 +79,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);
       int splitPoint = chooseBulkSplitPoint(objects.size(), minEntries, maxEntries);
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\nsplitAxis ").append(splitAxis);
         msg.append("\nsplitPoint ").append(splitPoint);
       }
@@ -96,15 +96,15 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
       partitions.add(partition1);
 
       // copy array
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\ncurrent partition ").append(partition1);
         msg.append("\nremaining objects # ").append(objects.size());
-        logger.debugFine(msg.toString());
+        LOG.debugFine(msg.toString());
       }
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("partitions " + partitions);
+    if(LOG.isDebugging()) {
+      LOG.debugFine("partitions " + partitions);
     }
     return partitions;
   }

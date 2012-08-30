@@ -88,7 +88,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(LoOP.class);
+  private static final Logging LOG = Logging.getLogger(LoOP.class);
 
   /**
    * The distance function to determine the reachability distance between
@@ -184,7 +184,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       // No optimized kNN query - use a preprocessor!
       if(knnComp == null) {
         if(stepprog != null) {
-          stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", logger);
+          stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", LOG);
         }
         MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, comparisonDistanceFunction, kcomp);
         database.addIndex(preproc);
@@ -193,14 +193,14 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       }
       else {
         if(stepprog != null) {
-          stepprog.beginStep(1, "Optimized neighborhoods provided by database.", logger);
+          stepprog.beginStep(1, "Optimized neighborhoods provided by database.", LOG);
         }
       }
       knnReach = knnComp;
     }
     else {
       if(stepprog != null) {
-        stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", logger);
+        stepprog.beginStep(1, "Not materializing distance functions, since we request each DBID once only.", LOG);
       }
       knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach);
       knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
@@ -218,7 +218,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   public OutlierResult run(Database database, Relation<O> relation) {
     final double sqrt2 = Math.sqrt(2.0);
 
-    StepProgress stepprog = logger.isVerbose() ? new StepProgress(5) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress(5) : null;
 
     Pair<KNNQuery<O, D>, KNNQuery<O, D>> pair = getKNNQueries(database, relation, stepprog);
     KNNQuery<O, D> knnComp = pair.getFirst();
@@ -237,9 +237,9 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     Mean mean = new Mean();
     {// computing PRDs
       if(stepprog != null) {
-        stepprog.beginStep(3, "Computing pdists", logger);
+        stepprog.beginStep(3, "Computing pdists", LOG);
       }
-      FiniteProgress prdsProgress = logger.isVerbose() ? new FiniteProgress("pdists", relation.size(), logger) : null;
+      FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         final KNNResult<D> neighbors = knnReach.getKNNForDBID(iditer, kreach);
         mean.reset();
@@ -273,7 +273,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         double pdist = lambda * Math.sqrt(mean.getMean());
         pdists.putDouble(iditer, pdist);
         if(prdsProgress != null) {
-          prdsProgress.incrementProcessed(logger);
+          prdsProgress.incrementProcessed(LOG);
         }
       }
     }
@@ -282,10 +282,10 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     MeanVariance mvplof = new MeanVariance();
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
-        stepprog.beginStep(4, "Computing PLOF", logger);
+        stepprog.beginStep(4, "Computing PLOF", LOG);
       }
 
-      FiniteProgress progressPLOFs = logger.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), logger) : null;
+      FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
       MeanVariance mv = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         final KNNResult<D> neighbors = knnComp.getKNNForDBID(iditer, kcomp);
@@ -309,35 +309,35 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         mvplof.put((plof - 1.0) * (plof - 1.0));
 
         if(progressPLOFs != null) {
-          progressPLOFs.incrementProcessed(logger);
+          progressPLOFs.incrementProcessed(LOG);
         }
       }
     }
 
     double nplof = lambda * Math.sqrt(mvplof.getMean());
-    if(logger.isDebugging()) {
-      logger.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getSampleStddev());
+    if(LOG.isDebugging()) {
+      LOG.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean() + " " + mvplof.getSampleStddev());
     }
 
     // Compute final LoOP values.
     WritableDoubleDataStore loops = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     {// compute LOOP_SCORE of each db object
       if(stepprog != null) {
-        stepprog.beginStep(5, "Computing LoOP scores", logger);
+        stepprog.beginStep(5, "Computing LoOP scores", LOG);
       }
 
-      FiniteProgress progressLOOPs = logger.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), logger) : null;
+      FiniteProgress progressLOOPs = LOG.isVerbose() ? new FiniteProgress("LoOP for objects", relation.size(), LOG) : null;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         loops.putDouble(iditer, NormalDistribution.erf((plofs.doubleValue(iditer) - 1) / (nplof * sqrt2)));
 
         if(progressLOOPs != null) {
-          progressLOOPs.incrementProcessed(logger);
+          progressLOOPs.incrementProcessed(LOG);
         }
       }
     }
 
     if(stepprog != null) {
-      stepprog.setCompleted(logger);
+      stepprog.setCompleted(LOG);
     }
 
     // Build result representation.
@@ -360,7 +360,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

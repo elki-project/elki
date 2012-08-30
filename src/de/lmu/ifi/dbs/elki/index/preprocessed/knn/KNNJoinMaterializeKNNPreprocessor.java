@@ -45,7 +45,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D e
   /**
    * Logging class.
    */
-  private static final Logging logger = Logging.getLogger(KNNJoinMaterializeKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(KNNJoinMaterializeKNNPreprocessor.class);
 
   /**
    * Constructor.
@@ -67,7 +67,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D e
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

@@ -80,7 +80,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   /**
    * Logger to use
    */
-  protected static final Logging logger = Logging.getLogger(DiSHPreferenceVectorIndex.class);
+  private static final Logging LOG = Logging.getLogger(DiSHPreferenceVectorIndex.class);
 
   /**
    * Available strategies for determination of the preference vector.
@@ -136,16 +136,16 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("\n eps ").append(Arrays.asList(epsilon));
       msg.append("\n minpts ").append(minpts);
       msg.append("\n strategy ").append(strategy);
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     long start = System.currentTimeMillis();
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
 
     // only one epsilon value specified
     int dim = DatabaseUtil.dimensionality(relation);
@@ -161,7 +161,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       StringBuffer msg = new StringBuffer();
 
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         msg.append("\nid = ").append(DBIDUtil.toString(it));
         // msg.append(" ").append(database.get(id));
         // msg.append(" ").append(database.getObjectLabelQuery().get(id));
@@ -174,7 +174,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         allNeighbors[d] = DBIDUtil.newHashSet(qrList);
       }
 
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         for(int d = 0; d < dim; d++) {
           msg.append("\n neighbors [").append(d).append("]");
           msg.append(" (").append(allNeighbors[d].size()).append(") = ");
@@ -189,23 +189,23 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         throw new IllegalStateException(e);
       }
 
-      if(logger.isDebugging()) {
-        logger.debugFine(msg.toString());
+      if(LOG.isDebugging()) {
+        LOG.debugFine(msg.toString());
       }
 
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
     long end = System.currentTimeMillis();
     // TODO: re-add timing code!
-    if(logger.isVerbose()) {
+    if(LOG.isVerbose()) {
       long elapsedTime = end - start;
-      logger.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
+      LOG.verbose(this.getClass().getName() + " runtime: " + elapsedTime + " milliseconds.");
     }
   }
 
@@ -272,7 +272,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     // result of apriori
     List<BitSet> frequentItemsets = aprioriResult.getSolution();
     Map<BitSet, Integer> supports = aprioriResult.getSupports();
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\n Frequent itemsets: ").append(frequentItemsets);
       msg.append("\n All supports: ").append(supports);
     }
@@ -288,11 +288,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\n preference ");
       msg.append(FormatUtil.format(dimensionality, preferenceVector));
       msg.append("\n");
-      logger.debugFine(msg.toString());
+      LOG.debugFine(msg.toString());
     }
 
     return preferenceVector;
@@ -316,7 +316,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
         candidates.put(i, s_i);
       }
     }
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\n candidates ").append(candidates.keySet());
     }
 
@@ -341,11 +341,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
       }
     }
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\n preference ");
       msg.append(FormatUtil.format(dimensionality, preferenceVector));
       msg.append("\n");
-      logger.debug(msg.toString());
+      LOG.debug(msg.toString());
     }
 
     return preferenceVector;
@@ -414,7 +414,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

@@ -61,7 +61,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(GeneratorXMLSpec.class);
+  private static final Logging LOG = Logging.getLogger(GeneratorXMLSpec.class);
 
   /**
    * Line separator for output
@@ -97,13 +97,13 @@ public class GeneratorXMLSpec extends AbstractApplication {
   @Override
   public void run() throws UnableToComplyException {
     MultipleObjectsBundle data = generator.loadData();
-    if(logger.isVerbose()) {
-      logger.verbose("Writing output ...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Writing output ...");
     }
     try {
       if(outputFile.exists()) {
-        if(logger.isVerbose()) {
-          logger.verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
+        if(LOG.isVerbose()) {
+          LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be appended.");
         }
       }
 
@@ -119,8 +119,8 @@ public class GeneratorXMLSpec extends AbstractApplication {
     catch(IOException e) {
       throw new UnableToComplyException(e);
     }
-    if(logger.isVerbose()) {
-      logger.verbose("Done.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Done.");
     }
   }
 

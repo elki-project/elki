@@ -108,7 +108,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
     /**
      * CSS-Styles
      */
-    protected final static String CSS_EPSILON = "opticsPlotEpsilonValue";
+    protected static final String CSS_EPSILON = "opticsPlotEpsilonValue";
 
     /**
      * The current epsilon value.

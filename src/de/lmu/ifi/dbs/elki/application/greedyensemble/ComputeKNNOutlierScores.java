@@ -94,7 +94,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
   /**
    * Our logger class.
    */
-  private static final Logging logger = Logging.getLogger(ComputeKNNOutlierScores.class);
+  private static final Logging LOG = Logging.getLogger(ComputeKNNOutlierScores.class);
 
   /**
    * Input step
@@ -163,14 +163,14 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
   public void run() {
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
-    logger.verbose("Running preprocessor ...");
+    LOG.verbose("Running preprocessor ...");
     MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, distf, maxk + 2);
     database.addIndex(preproc);
 
     // Test that we did get a proper index query
     KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, distf);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
-      logger.warning("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
+      LOG.warning("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
 
     final DBIDs ids = relation.getDBIDs();
@@ -213,7 +213,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     }
 
     // KNN
-    logger.verbose("Running KNN");
+    LOG.verbose("Running KNN");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -227,7 +227,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       }
     });
     // KNN Weight
-    logger.verbose("Running KNNweight");
+    LOG.verbose("Running KNNweight");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -241,7 +241,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       }
     });
     // Run LOF
-    logger.verbose("Running LOF");
+    LOG.verbose("Running LOF");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -255,7 +255,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       }
     });
     // LoOP
-    logger.verbose("Running LoOP");
+    LOG.verbose("Running LoOP");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -266,7 +266,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       }
     });
     // LDOF
-    logger.verbose("Running LDOF");
+    LOG.verbose("Running LDOF");
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
@@ -285,7 +285,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
         @SuppressWarnings("unchecked")
         final DistanceFunction<DoubleVector, DoubleDistance> df = DistanceFunction.class.cast(distf);
-        logger.verbose("Running ABOD");
+        LOG.verbose("Running ABOD");
         runForEachK(new AlgRunner() {
           @Override
           public void run(int k, String kstr) {
@@ -301,7 +301,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       }
       catch(ClassCastException e) {
         // ABOD might just be not appropriate.
-        logger.warning("Running ABOD failed - probably not appropriate to this data type / distance?", e);
+        LOG.warning("Running ABOD failed - probably not appropriate to this data type / distance?", e);
       }
     }
   }

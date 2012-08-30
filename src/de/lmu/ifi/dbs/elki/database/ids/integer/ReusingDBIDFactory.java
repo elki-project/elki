@@ -45,7 +45,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**
    * Logging for error messages.
    */
-  private static final Logging logger = Logging.getLogger(ReusingDBIDFactory.class);
+  private static final Logging LOG = Logging.getLogger(ReusingDBIDFactory.class);
   
   /**
    * Bit set to keep track of dynamic DBIDs
@@ -81,7 +81,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   @Override
   public synchronized void deallocateSingleDBID(DBID id) {
     if (asInteger(id) >= 0) {
-      logger.warning("Single DBID returned is from a range allocation!");
+      LOG.warning("Single DBID returned is from a range allocation!");
       return;
     }
     final int pos = - asInteger(id) - 1;

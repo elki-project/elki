@@ -51,7 +51,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(LabelJoinDatabaseConnection.class);
+  private static final Logging LOG = Logging.getLogger(LabelJoinDatabaseConnection.class);
 
   /**
    * The filters to invoke
@@ -98,20 +98,20 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
       for(int i = 0; i < first.dataLength(); i++) {
         Object data = first.data(i, lblcol);
         if(data == null) {
-          logger.warning("Object without label encountered.");
+          LOG.warning("Object without label encountered.");
           continue;
         }
         if(data instanceof String) {
           Integer old = labelmap.put((String) data, i);
           if(old != null) {
-            logger.warning("Duplicate label encountered: " + data + " in rows " + old + " and " + i);
+            LOG.warning("Duplicate label encountered: " + data + " in rows " + old + " and " + i);
           }
         }
         else if(data instanceof LabelList) {
           for(String lbl : (LabelList) data) {
             Integer old = labelmap.put(lbl, i);
             if(old != null) {
-              logger.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
+              LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
             }
           }
         }
@@ -119,7 +119,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
           String lbl = data.toString();
           Integer old = labelmap.put(lbl, i);
           if(old != null) {
-            logger.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
+            LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
           }
         }
       }
@@ -160,7 +160,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
       for(int i = 0; i < cur.dataLength(); i++) {
         Object data = cur.data(i, lblcol);
         if(data == null) {
-          logger.warning("Object without label encountered.");
+          LOG.warning("Object without label encountered.");
           continue;
         }
         Integer row = null;
@@ -179,7 +179,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
           row = labelmap.get(data.toString());
         }
         if(row == null) {
-          logger.warning("Label not found for join: " + data + " in row " + i);
+          LOG.warning("Label not found for join: " + data + " in row " + i);
           continue;
         }
         for(int d = 0; d < cur.metaLength(); d++) {
@@ -207,7 +207,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
               buf.append(first.data(i, d2));
             }
           }
-          logger.warning("null value in joined data, row " + i + " column " + d + FormatUtil.NEWLINE + "[" + buf.toString() + "]");
+          LOG.warning("null value in joined data, row " + i + " column " + d + FormatUtil.NEWLINE + "[" + buf.toString() + "]");
           break;
         }
       }
@@ -218,7 +218,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

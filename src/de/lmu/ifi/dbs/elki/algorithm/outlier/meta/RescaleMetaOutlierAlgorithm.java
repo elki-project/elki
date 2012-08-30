@@ -62,7 +62,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(RescaleMetaOutlierAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(RescaleMetaOutlierAlgorithm.class);
 
   /**
    * Parameter to specify a scaling function to use.
@@ -137,7 +137,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

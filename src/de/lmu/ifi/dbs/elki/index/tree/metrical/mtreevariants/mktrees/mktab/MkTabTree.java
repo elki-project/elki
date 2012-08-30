@@ -58,7 +58,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(MkTabTree.class);
+  private static final Logging LOG = Logging.getLogger(MkTabTree.class);
   
   /**
    * Constructor.
@@ -122,7 +122,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // leafCapacity = (pageSize - overhead) / (objectID + parentDistance + +
@@ -134,7 +134,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
   }
   
@@ -277,6 +277,6 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

@@ -68,7 +68,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends OPTICS<V, PCACorrelation
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(HiCO.class);
+  private static final Logging LOG = Logging.getLogger(HiCO.class);
 
   /**
    * Parameter to specify the smoothing factor, must be an integer greater than
@@ -141,7 +141,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends OPTICS<V, PCACorrelation
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

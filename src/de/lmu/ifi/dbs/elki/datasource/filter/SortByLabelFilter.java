@@ -43,7 +43,7 @@ public class SortByLabelFilter implements ObjectFilter {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(SortByLabelFilter.class);
+  private static final Logging LOG = Logging.getLogger(SortByLabelFilter.class);
 
   /**
    * Constructor.
@@ -54,8 +54,8 @@ public class SortByLabelFilter implements ObjectFilter {
 
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if(logger.isDebugging()) {
-      logger.debug("Shuffling the data set");
+    if(LOG.isDebugging()) {
+      LOG.debug("Shuffling the data set");
     }
 
     // Prepare a reposition array for cheap resorting

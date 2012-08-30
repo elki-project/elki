@@ -89,7 +89,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
   /**
    * ELKI logger for the GUI
    */
-  protected static final Logging logger = Logging.getLogger(ParameterTabPanel.class);
+  private static final Logging LOG = Logging.getLogger(ParameterTabPanel.class);
 
   /**
    * The parameter table
@@ -239,7 +239,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       buf.append(e.getMessage()).append(FormatUtil.NEWLINE);
     }
     if(buf.length() > 0) {
-      logger.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
+      LOG.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
     }
     // config.clearErrors();
   }
@@ -256,7 +256,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       if(config.hasUnusedParameters()) {
         // List<Pair<OptionID, Object>> remainingParameters =
         // config.getRemainingParameters();
-        logger.warning("Unused parameters: " + "FIXME");
+        LOG.warning("Unused parameters: " + "FIXME");
       }
       if(config.getErrors().size() > 0) {
         reportErrors(config);
@@ -266,7 +266,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       }
     }
     catch(Exception e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
     updateStatus();
     observers.notifyObservers(this);

@@ -53,26 +53,26 @@ public class PoissonDistribution implements Distribution {
   private double p;
 
   /** Stirling error constants: 1./12 */
-  private final static double S0 = 0.08333333333333333333333d;
+  private static final double S0 = 0.08333333333333333333333d;
 
   /** Stirling error constants: 1./360 */
-  private final static double S1 = 0.0027777777777777777777777777778d;
+  private static final double S1 = 0.0027777777777777777777777777778d;
 
   /** Stirling error constants: 1./1260 */
-  private final static double S2 = 0.00079365079365079365079365d;
+  private static final double S2 = 0.00079365079365079365079365d;
 
   /** Stirling error constants: 1./1680 */
-  private final static double S3 = 0.000595238095238095238095238095d;
+  private static final double S3 = 0.000595238095238095238095238095d;
 
   /** Stirling error constants: 1./1188 */
-  private final static double S4 = 0.00084175084175084175084175084175d;
+  private static final double S4 = 0.00084175084175084175084175084175d;
 
   /**
    * Exact table values for n <= 15 in steps of 0.5
    * 
    * sfe[n] = ln( (n!*e^n)/((n^n)*sqrt(2*pi*n)) )
    */
-  private final static double STIRLING_EXACT_ERROR[] = {//
+  private static final double STIRLING_EXACT_ERROR[] = {//
   0.0, // 0.0
   0.1534264097200273452913848, // 0.5
   0.0810614667953272582196702, // 1.0

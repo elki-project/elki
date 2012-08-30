@@ -40,7 +40,7 @@ public class ProxyDatabase extends AbstractDatabase {
   /**
    * Logger class.
    */
-  private static final Logging logger = Logging.getLogger(ProxyDatabase.class);
+  private static final Logging LOG = Logging.getLogger(ProxyDatabase.class);
 
   /**
    * Our DBIDs
@@ -120,6 +120,6 @@ public class ProxyDatabase extends AbstractDatabase {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

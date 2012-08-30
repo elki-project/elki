@@ -78,7 +78,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CTLuScatterplotOutlier.class);
+  private static final Logging LOG = Logging.getLogger(CTLuScatterplotOutlier.class);
 
   /**
    * Constructor
@@ -169,7 +169,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

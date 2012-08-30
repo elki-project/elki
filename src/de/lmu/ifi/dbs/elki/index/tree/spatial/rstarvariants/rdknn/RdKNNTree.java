@@ -89,7 +89,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(RdKNNTree.class);
+  private static final Logging LOG = Logging.getLogger(RdKNNTree.class);
 
   /**
    * Parameter k.
@@ -303,7 +303,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     }
 
     if(dirCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // minimum entries per directory node
@@ -321,7 +321,7 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
     }
 
     if(leafCapacity < 10) {
-      logger.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     // minimum entries per leaf node
@@ -330,8 +330,8 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
       leafMinimum = 2;
     }
 
-    if(logger.isVerbose()) {
-      logger.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
+    if(LOG.isVerbose()) {
+      LOG.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
     }
   }
 
@@ -691,6 +691,6 @@ public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D,
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

@@ -62,7 +62,7 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends AbstractProjectedDBS
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(PreDeCon.class);
+  private static final Logging LOG = Logging.getLogger(PreDeCon.class);
 
   /**
    * Constructor.
@@ -88,7 +88,7 @@ public class PreDeCon<V extends NumberVector<V, ?>> extends AbstractProjectedDBS
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

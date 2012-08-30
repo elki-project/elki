@@ -69,7 +69,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
   /**
    * Logger to use
    */
-  private static final Logging logger = Logging.getLogger(PartitionApproximationMaterializeKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(PartitionApproximationMaterializeKNNPreprocessor.class);
 
   /**
    * Number of partitions to use.
@@ -94,14 +94,14 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     DistanceQuery<O, D> distanceQuery = relation.getDatabase().getDistanceQuery(relation, distanceFunction);
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
     MeanVariance ksize = new MeanVariance();
-    if(logger.isVerbose()) {
-      logger.verbose("Approximating nearest neighbor lists to database objects");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Approximating nearest neighbor lists to database objects");
     }
 
     ArrayDBIDs aids = DBIDUtil.ensureArray(relation.getDBIDs());
     int minsize = (int) Math.floor(aids.size() / partitions);
 
-    FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, logger) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, LOG) : null;
     for(int part = 0; part < partitions; part++) {
       int size = (partitions * minsize + part >= aids.size()) ? minsize : minsize + 1;
       // Collect the ids in this node.
@@ -137,26 +137,26 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
         ksize.put(kNN.size());
         storage.put(iter, kNN.toKNNList());
       }
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         if(cache.size() > 0) {
-          logger.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
+          LOG.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
         }
       }
       if(progress != null) {
-        progress.incrementProcessed(logger);
+        progress.incrementProcessed(LOG);
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
-    if(logger.isVerbose()) {
-      logger.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
+    if(LOG.isVerbose()) {
+      LOG.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
   }
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

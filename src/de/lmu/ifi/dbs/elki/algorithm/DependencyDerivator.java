@@ -80,7 +80,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(DependencyDerivator.class);
+  private static final Logging LOG = Logging.getLogger(DependencyDerivator.class);
 
   /**
    * Flag to use random sample (use knn query around centroid, if flag is not
@@ -150,8 +150,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    *         DependencyDerivator
    */
   public CorrelationAnalysisSolution<V> run(Database database, Relation<V> relation) {
-    if(logger.isVerbose()) {
-      logger.verbose("retrieving database objects...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("retrieving database objects...");
     }
     Centroid centroid = Centroid.make(relation);
     V centroidDV = centroid.toVector(relation);
@@ -195,8 +195,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    */
   public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, Vector centroid) {
     CorrelationAnalysisSolution<V> sol;
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("PCA...");
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("PCA...");
     }
 
     PCAFilteredResult pcares = pca.processIds(ids, db);
@@ -213,7 +213,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     }
     else {
       Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Strong Eigenvectors:\n");
         log.append(FormatUtil.format(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()), NF)).append('\n');
@@ -221,15 +221,15 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         log.append(FormatUtil.format(transposedWeakEigenvectors, NF)).append('\n');
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", 2));
-        logger.debugFine(log.toString());
+        LOG.debugFine(log.toString());
       }
       Vector B = transposedWeakEigenvectors.times(centroid);
-      if(logger.isDebugging()) {
+      if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Centroid:\n").append(centroid).append('\n');
         log.append("tEV * Centroid\n");
         log.append(B);
-        logger.debugFine(log.toString());
+        LOG.debugFine(log.toString());
       }
 
       // +1 == + B.getColumnDimensionality()
@@ -237,8 +237,8 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
       gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), B);
 
-      if(logger.isDebuggingFiner()) {
-        logger.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, NF));
+      if(LOG.isDebuggingFiner()) {
+        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, NF));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
@@ -251,12 +251,12 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
 
       sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
 
-      if(logger.isDebuggingFine()) {
+      if(LOG.isDebuggingFine()) {
         StringBuilder log = new StringBuilder();
         log.append("Solution:\n");
         log.append("Standard deviation ").append(sol.getStandardDeviation());
         log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
-        logger.debugFine(log.toString());
+        LOG.debugFine(log.toString());
       }
     }
     return sol;
@@ -269,7 +269,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

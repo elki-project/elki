@@ -48,7 +48,7 @@ public class ResultWriter implements ResultHandler {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ResultWriter.class);
+  private static final Logging LOG = Logging.getLogger(ResultWriter.class);
 
   /**
    * Flag to control GZIP compression.
@@ -107,13 +107,13 @@ public class ResultWriter implements ResultHandler {
       else if(out.exists()) {
         if(out.isDirectory()) {
           if(warnoverwrite && out.listFiles().length > 0) {
-            logger.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
+            LOG.warning("Output directory specified is not empty. Files will be overwritten and old files may be left over.");
           }
           output = new MultipleFilesOutput(out, gzip);
         }
         else {
           if(warnoverwrite) {
-            logger.warning("Output file exists and will be overwritten!");
+            LOG.warning("Output file exists and will be overwritten!");
           }
           output = new SingleStreamOutput(out, gzip);
         }

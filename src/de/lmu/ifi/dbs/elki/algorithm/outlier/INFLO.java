@@ -81,7 +81,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(INFLO.class);
+  private static final Logging LOG = Logging.getLogger(INFLO.class);
 
   /**
    * Parameter to specify if any object is a Core Object must be a double
@@ -220,7 +220,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

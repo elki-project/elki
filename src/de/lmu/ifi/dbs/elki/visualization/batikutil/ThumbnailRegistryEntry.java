@@ -75,7 +75,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   /**
    * The logger class.
    */
-  private static final Logging logger = Logging.getLogger(ThumbnailRegistryEntry.class);
+  private static final Logging LOG = Logging.getLogger(ThumbnailRegistryEntry.class);
 
   /**
    * The image cache.
@@ -95,8 +95,8 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
    */
   public ThumbnailRegistryEntry() {
     super("Internal", PRIORITY, new String[0], new String[] { INTERNAL_MIME_TYPE });
-    if(logger.isDebuggingFiner()) {
-      logger.debugFiner("Registry initialized.");
+    if(LOG.isDebuggingFiner()) {
+      LOG.debugFiner("Registry initialized.");
     }
   }
 
@@ -122,8 +122,8 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
           }
         }
       }
-      if(logger.isDebuggingFiner()) {
-        logger.debugFiner("Registered image: " + key);
+      if(LOG.isDebuggingFiner()) {
+        LOG.debugFiner("Registered image: " + key);
       }
       return key;
     }
@@ -162,8 +162,8 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
    * @return Image, or null
    */
   public static Filter handleURL(ParsedURL url) {
-    if(logger.isDebuggingFiner()) {
-      logger.debugFiner("handleURL " + url.toString());
+    if(LOG.isDebuggingFiner()) {
+      LOG.debugFiner("handleURL " + url.toString());
     }
     if(!isCompatibleURLStatic(url)) {
       return null;
@@ -179,7 +179,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
     if(ref != null) {
       RenderedImage ri = ref.get();
       if(ri == null) {
-        logger.warning("Referenced image has expired from the cache!");
+        LOG.warning("Referenced image has expired from the cache!");
       }
       else {
         return new RedRable(GraphicsUtil.wrap(ri));
@@ -225,8 +225,8 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
 
   @Override
   public ParsedURLData parseURL(String urlStr) {
-    if(logger.isDebuggingFinest()) {
-      logger.debugFinest("parseURL: " + urlStr);
+    if(LOG.isDebuggingFinest()) {
+      LOG.debugFinest("parseURL: " + urlStr);
     }
     if(urlStr.startsWith(INTERNAL_PREFIX)) {
       InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length()));

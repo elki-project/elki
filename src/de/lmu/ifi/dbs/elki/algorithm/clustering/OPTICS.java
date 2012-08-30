@@ -79,7 +79,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OPTICS.class);
+  private static final Logging LOG = Logging.getLogger(OPTICS.class);
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -136,7 +136,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     RangeQuery<O, D> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction(), epsilon);
 
     int size = relation.size();
-    final FiniteProgress progress = logger.isVerbose() ? new FiniteProgress("OPTICS", size, logger) : null;
+    final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", size, LOG) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
     ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
@@ -164,7 +164,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       }
     }
     if(progress != null) {
-      progress.ensureCompleted(logger);
+      progress.ensureCompleted(LOG);
     }
 
     return clusterOrder;
@@ -204,7 +204,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         }
       }
       if(progress != null) {
-        progress.setProcessed(processedIDs.size(), logger);
+        progress.setProcessed(processedIDs.size(), LOG);
       }
     }
   }
@@ -258,7 +258,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         }
       }
       if(progress != null) {
-        progress.setProcessed(processedIDs.size(), logger);
+        progress.setProcessed(processedIDs.size(), LOG);
       }
     }
   }
@@ -280,7 +280,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

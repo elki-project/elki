@@ -59,7 +59,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
   /**
    * The logger.
    */
-  private static final Logging logger = Logging.getLogger(OutlierPrecisionAtKCurve.class);
+  private static final Logging LOG = Logging.getLogger(OutlierPrecisionAtKCurve.class);
 
   /**
    * The pattern to identify positive classes.
@@ -108,7 +108,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if(positiveids.size() == 0) {
-      logger.warning("Computing a ROC curve failed - no objects matched.");
+      LOG.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
 
@@ -145,8 +145,8 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       }
       curve.addAndSimplify(k, pos / (double) k);
     }
-    if(logger.isVerbose()) {
-      logger.verbose("Precision @ " + lastk + " " + ((pos * 1.0) / lastk));
+    if(LOG.isVerbose()) {
+      LOG.verbose("Precision @ " + lastk + " " + ((pos * 1.0) / lastk));
     }
     return curve;
   }

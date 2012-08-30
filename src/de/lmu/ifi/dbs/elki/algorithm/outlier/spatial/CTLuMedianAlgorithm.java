@@ -72,7 +72,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(CTLuMedianAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(CTLuMedianAlgorithm.class);
 
   /**
    * Constructor
@@ -141,7 +141,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

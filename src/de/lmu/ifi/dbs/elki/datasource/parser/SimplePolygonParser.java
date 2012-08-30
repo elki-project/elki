@@ -62,7 +62,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(SimplePolygonParser.class);
+  private static final Logging LOG = Logging.getLogger(SimplePolygonParser.class);
 
   /**
    * Pattern to catch coordinates
@@ -155,7 +155,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
           continue;
         }
         catch(NumberFormatException e) {
-          logger.warning("Looked like a coordinate pair but didn't parse: " + cur);
+          LOG.warning("Looked like a coordinate pair but didn't parse: " + cur);
         }
       }
       // Polygon separator.
@@ -187,7 +187,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

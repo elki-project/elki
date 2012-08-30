@@ -57,7 +57,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
   /**
    * Our logger.
    */
-  private static final Logging logger = Logging.getLogger(ByLabelOutlier.class);
+  private static final Logging LOG = Logging.getLogger(ByLabelOutlier.class);
 
   /**
    * The default pattern to use.
@@ -124,7 +124,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

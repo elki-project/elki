@@ -92,7 +92,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(EvaluateRankingQuality.class);
+  private static final Logging LOG = Logging.getLogger(EvaluateRankingQuality.class);
 
   /**
    * Option to configure the number of bins to use.
@@ -121,8 +121,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());
 
-    if(logger.isVerbose()) {
-      logger.verbose("Preprocessing clusters...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
@@ -138,10 +138,10 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
     AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
 
-    if(logger.isVerbose()) {
-      logger.verbose("Processing points...");
+    if(LOG.isVerbose()) {
+      LOG.verbose("Processing points...");
     }
-    FiniteProgress rocloop = logger.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), logger) : null;
+    FiniteProgress rocloop = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
 
     // sort neighbors
     for(Cluster<?> clus : split) {
@@ -164,12 +164,12 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
         hist.aggregate(((double) ind) / clus.size(), result);
 
         if(rocloop != null) {
-          rocloop.incrementProcessed(logger);
+          rocloop.incrementProcessed(LOG);
         }
       }
     }
     if(rocloop != null) {
-      rocloop.ensureCompleted(logger);
+      rocloop.ensureCompleted(LOG);
     }
     // Collections.sort(results);
 
@@ -189,7 +189,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

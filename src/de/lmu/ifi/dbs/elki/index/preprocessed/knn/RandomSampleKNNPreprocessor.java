@@ -59,7 +59,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(RandomSampleKNNPreprocessor.class);
+  private static final Logging LOG = Logging.getLogger(RandomSampleKNNPreprocessor.class);
 
   /**
    * Relative share of objects to get
@@ -120,7 +120,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   @Override

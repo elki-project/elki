@@ -55,7 +55,7 @@ public class InspectionUtil {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(InspectionUtil.class);
+  private static final Logging LOG = Logging.getLogger(InspectionUtil.class);
 
   /**
    * Default package ignores.
@@ -147,7 +147,7 @@ public class InspectionUtil {
     }
     if(!InspectionUtil.NONSTATIC_CLASSPATH) {
       if(list.size() == 0) {
-        logger.warning("No implementations for " + c.getName() + " were found using index files.");
+        LOG.warning("No implementations for " + c.getName() + " were found using index files.");
       }
     }
     else {
@@ -236,7 +236,7 @@ public class InspectionUtil {
       }
     }
     catch(IOException e) {
-      logger.exception(e);
+      LOG.exception(e);
     }
     Collections.sort(res, new ClassSorter());
     return res;

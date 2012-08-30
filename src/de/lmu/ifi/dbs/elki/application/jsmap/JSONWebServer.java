@@ -68,7 +68,7 @@ public class JSONWebServer implements HttpHandler {
   /**
    * Our logger
    */
-  protected final static Logging logger = Logging.getLogger(JSONWebServer.class);
+  private static final Logging LOG = Logging.getLogger(JSONWebServer.class);
 
   /**
    * The base path we serve data from
@@ -110,7 +110,7 @@ public class JSONWebServer implements HttpHandler {
       server.setExecutor(Executors.newCachedThreadPool());
       server.start();
 
-      logger.verbose("Webserver started on port " + port + ".");
+      LOG.verbose("Webserver started on port " + port + ".");
     }
     catch(IOException e) {
       throw new AbortException("Could not start mini web server.", e);
@@ -172,7 +172,7 @@ public class JSONWebServer implements HttpHandler {
         else {
           re.appendKeyValue(bundle.meta(j), data);
         }
-        if(logger.isDebuggingFiner()) {
+        if(LOG.isDebuggingFiner()) {
           re.appendNewline();
         }
       }
@@ -308,7 +308,7 @@ public class JSONWebServer implements HttpHandler {
           re.appendKeyValue("offset", offset);
           re.appendKeyValue("pagesize", pagesize);
           re.closeHash();
-          if(logger.isDebuggingFiner()) {
+          if(LOG.isDebuggingFiner()) {
             re.appendNewline();
           }
 
@@ -354,7 +354,7 @@ public class JSONWebServer implements HttpHandler {
     re.appendKeyValue("base", meta.getTheoreticalBaseline());
     re.appendKeyValue("type", meta.getClass().getSimpleName());
     re.closeHash();
-    if(logger.isDebuggingFiner()) {
+    if(LOG.isDebuggingFiner()) {
       re.appendNewline();
     }
   }
@@ -371,7 +371,7 @@ public class JSONWebServer implements HttpHandler {
       path = path.substring(PATH_JSON.length());
     }
     else {
-      logger.warning("Unexpected path in request handler: " + path);
+      LOG.warning("Unexpected path in request handler: " + path);
       throw new AbortException("Unexpected path: " + path);
     }
 
@@ -411,7 +411,7 @@ public class JSONWebServer implements HttpHandler {
         jsonbuf.closeHash();
       }
       catch(Throwable e) {
-        logger.exception("Exception occurred in embedded web server:", e);
+        LOG.exception("Exception occurred in embedded web server:", e);
         throw (new IOException(e));
       }
       // wrap up

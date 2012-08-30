@@ -63,7 +63,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * Logger
    */
-  static final Logging logger = Logging.getLogger(ExternalNeighborhood.class);
+  private static final Logging LOG = Logging.getLogger(ExternalNeighborhood.class);
 
   /**
    * Parameter to specify the neighborhood file
@@ -91,7 +91,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**
@@ -136,12 +136,12 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     private DataStore<DBIDs> loadNeighbors(Relation<?> database) {
       final WritableDataStore<DBIDs> store = DataStoreUtil.makeStorage(database.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_TEMP, DBIDs.class);
 
-      if(logger.isVerbose()) {
-        logger.verbose("Loading external neighborhoods.");
+      if(LOG.isVerbose()) {
+        LOG.verbose("Loading external neighborhoods.");
       }
 
-      if(logger.isDebugging()) {
-        logger.verbose("Building reverse label index...");
+      if(LOG.isDebugging()) {
+        LOG.verbose("Building reverse label index...");
       }
       // Build a map label/ExternalId -> DBID
       // (i.e. a reverse index!)
@@ -169,8 +169,8 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       }
 
       try {
-        if(logger.isDebugging()) {
-          logger.verbose("Loading neighborhood file.");
+        if(LOG.isDebugging()) {
+          LOG.verbose("Loading neighborhood file.");
         }
         InputStream in = new FileInputStream(file);
         in = FileUtil.tryGzipInput(in);
@@ -186,16 +186,16 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
                 neighbours.add(neigh);
               }
               else {
-                if(logger.isDebugging()) {
-                  logger.debug("No object found for label " + entries[i]);
+                if(LOG.isDebugging()) {
+                  LOG.debug("No object found for label " + entries[i]);
                 }
               }
             }
             store.put(id, neighbours);
           }
           else {
-            if(logger.isDebugging()) {
-              logger.warning("No object found for label " + entries[0]);
+            if(LOG.isDebugging()) {
+              LOG.warning("No object found for label " + entries[0]);
             }
           }
         }

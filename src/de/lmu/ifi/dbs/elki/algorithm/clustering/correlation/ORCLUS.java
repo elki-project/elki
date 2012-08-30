@@ -87,7 +87,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(ORCLUS.class);
+  private static final Logging LOG = Logging.getLogger(ORCLUS.class);
 
   /**
    * Parameter to specify the factor for reducing the number of current clusters
@@ -162,11 +162,11 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
       double beta = StrictMath.exp(-StrictMath.log((double) dim_c / (double) l) * StrictMath.log(1 / alpha) / StrictMath.log((double) k_c / (double) k));
 
-      IndefiniteProgress cprogress = logger.isVerbose() ? new IndefiniteProgress("Current number of clusters:", logger) : null;
+      IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Current number of clusters:", LOG) : null;
 
       while(k_c > k) {
         if(cprogress != null) {
-          cprogress.setProcessed(clusters.size(), logger);
+          cprogress.setProcessed(clusters.size(), LOG);
         }
 
         // find partitioning induced by the seeds of the clusters
@@ -189,7 +189,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
       if(cprogress != null) {
         cprogress.setProcessed(clusters.size());
-        cprogress.setCompleted(logger);
+        cprogress.setCompleted(LOG);
       }
 
       // get the result
@@ -336,7 +336,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
     while(clusters.size() > k_new) {
       if(cprogress != null) {
-        cprogress.setProcessed(clusters.size(), logger);
+        cprogress.setProcessed(clusters.size(), LOG);
       }
       // find the smallest value of r_ij
       ProjectedEnergy minPE = Collections.min(projectedEnergies);
@@ -474,7 +474,7 @@ public class ORCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClust
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

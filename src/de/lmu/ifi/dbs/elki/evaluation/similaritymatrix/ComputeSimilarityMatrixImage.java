@@ -75,7 +75,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * The logger.
    */
-  static final Logging logger = Logging.getLogger(ComputeSimilarityMatrixImage.class);
+  private static final Logging LOG = Logging.getLogger(ComputeSimilarityMatrixImage.class);
 
   /**
    * OptionID for the scaling function to use
@@ -137,7 +137,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     // When the logging is in the outer loop, it's just 2*size (providing enough
     // resolution)
     final int ltotal = 2 * size; // size * (size + 1);
-    FiniteProgress prog = logger.isVerbose() ? new FiniteProgress("Similarity Matrix Image", ltotal, logger) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Similarity Matrix Image", ltotal, LOG) : null;
 
     // Note: we assume that we have an efficient distance cache available,
     // since we are using 2*O(n*n) distance computations.
@@ -156,7 +156,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
           }
         }
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.incrementProcessed(LOG);
         }
       }
     }
@@ -187,12 +187,12 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
           img.setRGB(y, x, col);
         }
         if(prog != null) {
-          prog.incrementProcessed(logger);
+          prog.incrementProcessed(LOG);
         }
       }
     }
     if(prog != null) {
-      prog.ensureCompleted(logger);
+      prog.ensureCompleted(LOG);
     }
 
     return new SimilarityMatrix(img, relation, order);

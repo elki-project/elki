@@ -83,7 +83,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(OPTICSOF.class);
+  private static final Logging LOG = Logging.getLogger(OPTICSOF.class);
 
   /**
    * Parameter to specify the threshold MinPts.
@@ -177,7 +177,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

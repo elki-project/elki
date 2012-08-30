@@ -48,7 +48,7 @@ public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implement
   /**
    * Our logger.
    */
-  private static final Logging logger = Logging.getLogger(TrivialNoOutlier.class);
+  private static final Logging LOG = Logging.getLogger(TrivialNoOutlier.class);
 
   /**
    * Constructor.
@@ -80,6 +80,6 @@ public class TrivialNoOutlier extends AbstractAlgorithm<OutlierResult> implement
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }

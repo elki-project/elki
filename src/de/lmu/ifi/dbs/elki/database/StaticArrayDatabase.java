@@ -68,7 +68,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
   /**
    * Our logger
    */
-  private static final Logging logger = Logging.getLogger(StaticArrayDatabase.class);
+  private static final Logging LOG = Logging.getLogger(StaticArrayDatabase.class);
 
   /**
    * IDs of this database
@@ -117,8 +117,8 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
   @Override
   public void initialize() {
     if(databaseConnection != null) {
-      if(logger.isDebugging()) {
-        logger.debugFine("Loading data from database connection.");
+      if(LOG.isDebugging()) {
+        LOG.debugFine("Loading data from database connection.");
       }
       MultipleObjectsBundle objpackages = databaseConnection.loadData();
       // Run at most once.
@@ -184,8 +184,8 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
 
   @Override
   public void addIndex(Index index) {
-    if(logger.isDebuggingFiner()) {
-      logger.debugFine("Adding index: " + index);
+    if(LOG.isDebuggingFiner()) {
+      LOG.debugFine("Adding index: " + index);
     }
     this.indexes.add(index);
     // TODO: actually add index to the representation used?
@@ -257,7 +257,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 
   /**

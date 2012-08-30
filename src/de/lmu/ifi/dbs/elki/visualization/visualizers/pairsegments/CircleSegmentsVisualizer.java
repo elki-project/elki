@@ -92,7 +92,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(CircleSegmentsVisualizer.class);
+  private static final Logging LOG = Logging.getLogger(CircleSegmentsVisualizer.class);
 
   /**
    * CircleSegments visualizer name
@@ -147,22 +147,22 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
    */
   public class Instance extends AbstractVisualization implements ResultListener {
     /** Minimum width (radian) of Segment */
-    private final static double SEGMENT_MIN_ANGLE = 0.01;
+    private static final double SEGMENT_MIN_ANGLE = 0.01;
 
     /** Gap (radian) between segments */
-    private final static double SEGMENT_MIN_SEP_ANGLE = 0.005;
+    private static final double SEGMENT_MIN_SEP_ANGLE = 0.005;
 
     /** Offset from center to first ring */
-    private final static double RADIUS_INNER = 0.04 * StyleLibrary.SCALE;
+    private static final double RADIUS_INNER = 0.04 * StyleLibrary.SCALE;
 
     /** Margin between two rings */
-    private final static double RADIUS_DISTANCE = 0.01 * StyleLibrary.SCALE;
+    private static final double RADIUS_DISTANCE = 0.01 * StyleLibrary.SCALE;
 
     /** Radius of whole CircleSegments except selection border */
-    private final static double RADIUS_OUTER = 0.47 * StyleLibrary.SCALE;
+    private static final double RADIUS_OUTER = 0.47 * StyleLibrary.SCALE;
 
     /** Radius of highlight selection (outer ring) */
-    private final static double RADIUS_SELECTION = 0.02 * StyleLibrary.SCALE;
+    private static final double RADIUS_SELECTION = 0.02 * StyleLibrary.SCALE;
 
     /**
      * CSS class name for the clusterings.
@@ -288,7 +288,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
     @Override
     public void redraw() {
-      logger.debug("Full redraw");
+      LOG.debug("Full redraw");
       noIncrementalRedraw = false; // Done that.
 
       // initialize css (needs clusterSize!)
@@ -496,7 +496,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     }
 
     private void redrawSelection() {
-      logger.debug("Updating selection only.");
+      LOG.debug("Updating selection only.");
       for(Entry<Segment, List<Element>> entry : segmentToElements.entrySet()) {
         Segment segment = entry.getKey();
         // The selection marker is the extra element in the list
@@ -605,8 +605,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
         if(segment.isNone()) {
           return;
         }
-        if(logger.isDebugging()) {
-          logger.debug("Hover on segment: " + segment + " unpaired: " + segment.isUnpaired());
+        if(LOG.isDebugging()) {
+          LOG.debug("Hover on segment: " + segment + " unpaired: " + segment.isUnpaired());
         }
 
         if(!segment.isUnpaired()) {

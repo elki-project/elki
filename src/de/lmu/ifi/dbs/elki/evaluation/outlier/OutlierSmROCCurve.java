@@ -83,7 +83,7 @@ public class OutlierSmROCCurve implements Evaluator {
   /**
    * The logger.
    */
-  private static final Logging logger = Logging.getLogger(OutlierSmROCCurve.class);
+  private static final Logging LOG = Logging.getLogger(OutlierSmROCCurve.class);
 
   /**
    * Stores the "positive" class.
@@ -169,8 +169,8 @@ public class OutlierSmROCCurve implements Evaluator {
     }
 
     double rocauc = XYCurve.areaUnderCurve(curve) / (x * y);
-    if(logger.isVerbose()) {
-      logger.verbose(SMROCAUC_LABEL + ": " + rocauc);
+    if(LOG.isVerbose()) {
+      LOG.verbose(SMROCAUC_LABEL + ": " + rocauc);
     }
     curve.rocauc = rocauc;
 
@@ -184,7 +184,7 @@ public class OutlierSmROCCurve implements Evaluator {
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if(positiveids.size() == 0) {
-      logger.warning("Computing a ROC curve failed - no objects matched.");
+      LOG.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
 

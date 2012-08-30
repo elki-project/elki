@@ -48,7 +48,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   /**
    * Our logger
    */
-  private static final Logging logger = Logging.getLogger(LRUCache.class);
+  private static final Logging LOG = Logging.getLogger(LRUCache.class);
 
   /**
    * Cache size in bytes.
@@ -96,13 +96,13 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
     readAccess++;
     P page = map.get(pageID);
     if(page != null) {
-      if(logger.isDebuggingFine()) {
-        logger.debugFine("Read from cache: " + pageID);
+      if(LOG.isDebuggingFine()) {
+        LOG.debugFine("Read from cache: " + pageID);
       }
     }
     else {
-      if(logger.isDebuggingFine()) {
-        logger.debugFine("Read from backing: " + pageID);
+      if(LOG.isDebuggingFine()) {
+        LOG.debugFine("Read from backing: " + pageID);
       }
       page = file.readPage(pageID);
       map.put(pageID, page);
@@ -115,8 +115,8 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
     writeAccess++;
     page.setDirty(true);
     map.put(pageID, page);
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Write to cache: " + pageID);
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Write to cache: " + pageID);
     }
   }
 
@@ -133,8 +133,8 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
    * @param page page
    */
   protected void expirePage(P page) {
-    if(logger.isDebuggingFine()) {
-      logger.debugFine("Write to backing:" + page.getPageID());
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Write to backing:" + page.getPageID());
     }
     if (page.isDirty()) {
       file.writePage(page);
@@ -172,8 +172,8 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
       throw new AbortException("Invalid cache size: " + cacheSizeBytes + " / " + header.getPageSize() + " = " + cacheSize);
     }
 
-    if(logger.isDebugging()) {
-      logger.debug("LRU cache size is " + cacheSize + " pages.");
+    if(LOG.isDebugging()) {
+      LOG.debug("LRU cache size is " + cacheSize + " pages.");
     }
 
     float hashTableLoadFactor = 0.75f;

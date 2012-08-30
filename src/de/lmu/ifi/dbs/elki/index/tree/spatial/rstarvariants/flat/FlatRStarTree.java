@@ -46,7 +46,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
   /**
    * The logger for this class.
    */
-  private static final Logging logger = Logging.getLogger(FlatRStarTree.class);
+  private static final Logging LOG = Logging.getLogger(FlatRStarTree.class);
 
   /**
    * The root of this flat RTree.
@@ -78,8 +78,8 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
       root.addDirectoryEntry(createNewDirectoryEntry(node));
     }
 
-    if(logger.isDebugging()) {
-      logger.debugFine("root: " + root + " with " + nextPageID + " leafNodes.");
+    if(LOG.isDebugging()) {
+      LOG.debugFine("root: " + root + " with " + nextPageID + " leafNodes.");
     }
   }
 
@@ -116,8 +116,8 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     getFile().setNextPageID(getRootID() + 1);
     List<SpatialEntry> nodes = createBulkLeafNodes(spatialObjects);
     int numNodes = nodes.size();
-    if(logger.isDebugging()) {
-      logger.debugFine("  numLeafNodes = " + numNodes);
+    if(LOG.isDebugging()) {
+      LOG.debugFine("  numLeafNodes = " + numNodes);
     }
 
     // create root
@@ -129,12 +129,12 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     numNodes++;
     setHeight(2);
 
-    if(logger.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuffer msg = new StringBuffer();
       msg.append("  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(getHeight());
-      logger.debugFine(msg.toString() + "\n");
+      LOG.debugFine(msg.toString() + "\n");
     }
     doExtraIntegrityChecks();
   }
@@ -221,6 +221,6 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   @Override
   protected Logging getLogger() {
-    return logger;
+    return LOG;
   }
 }
