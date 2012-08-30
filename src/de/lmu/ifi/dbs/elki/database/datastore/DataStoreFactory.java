@@ -46,27 +46,27 @@ public interface DataStoreFactory {
   /**
    * Storage will be used only temporary.
    */
-  public final static int HINT_TEMP = 0x01;
+  public static final int HINT_TEMP = 0x01;
 
   /**
    * "Hot" data, that will be used a lot, preferring memory storage.
    */
-  public final static int HINT_HOT = 0x02;
+  public static final int HINT_HOT = 0x02;
 
   /**
    * "static" data, that will not change often
    */
-  public final static int HINT_STATIC = 0x04;
+  public static final int HINT_STATIC = 0x04;
 
   /**
    * Data that might require sorted access (so hashmaps are suboptimal)
    */
-  public final static int HINT_SORTED = 0x08;
+  public static final int HINT_SORTED = 0x08;
 
   /**
    * Data that is the main database. Includes HOT, STATIC, SORTED
    */
-  public final static int HINT_DB = 0x1E;
+  public static final int HINT_DB = 0x1E;
 
   /**
    * Make a new storage, to associate the given ids with an object of class

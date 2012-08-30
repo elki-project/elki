@@ -37,5 +37,5 @@ public interface FittingFunction {
    * @param params Function parameters parameters
    * @return Array consisting of y value and parameter gradients
    */
-  public FittingFunctionResult eval(double x, double[] params);
+  FittingFunctionResult eval(double x, double[] params);
 }

@@ -33,13 +33,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Global parameter constraint describing the dependency of a parameter (
- * {@link AbstractParameter}) on a given flag ({@link Flag}). Depending on the status of
- * the flag the parameter is tested for keeping its constraints or not.
+ * {@link AbstractParameter}) on a given flag ({@link Flag}). Depending on the
+ * status of the flag the parameter is tested for keeping its constraints or
+ * not.
  * 
  * @author Steffi Wanka
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag
- * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
+ * @apiviz.uses 
+ *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
  * 
  * @param <C> Constraint type
  * @param <S> Parameter type
@@ -71,7 +73,8 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
    * the status of the flag given.
    * 
    * @param p parameter possibly to be checked
-   * @param c a list of parameter constraints, if the value is null, the parameter is just tested if it is set.
+   * @param c a list of parameter constraints, if the value is null, the
+   *        parameter is just tested if it is set.
    * @param f flag controlling the checking of the parameter constraints
    * @param flagConstraint indicates at which status of the flag the parameter
    *        is to be checked
@@ -123,7 +126,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
         }
       }
       else {
-        description.append(param.getName()+" must be set.");
+        description.append(param.getName()).append(" must be set.");
       }
     }
     return description.toString();

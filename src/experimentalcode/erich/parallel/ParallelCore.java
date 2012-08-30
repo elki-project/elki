@@ -37,7 +37,7 @@ public class ParallelCore {
   /**
    * The number of CPUs to use.
    */
-  public final static int processors = Runtime.getRuntime().availableProcessors();
+  public static final int processors = Runtime.getRuntime().availableProcessors();
 
   /**
    * Static core

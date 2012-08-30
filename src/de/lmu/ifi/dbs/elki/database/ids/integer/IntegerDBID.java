@@ -286,10 +286,10 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   /**
    * The public instance to use for dynamic serialization.
    */
-  public final static DynamicSerializer dynamicSerializer = new DynamicSerializer();
+  public static final DynamicSerializer dynamicSerializer = new DynamicSerializer();
 
   /**
    * The public instance to use for static serialization.
    */
-  public final static StaticSerializer staticSerializer = new StaticSerializer();
+  public static final StaticSerializer staticSerializer = new StaticSerializer();
 }

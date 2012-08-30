@@ -43,6 +43,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public final class OptionUtil {
   /**
+   * Fake constructor. Use static method.
+   */
+  private OptionUtil() {
+    // Do not instantiate.
+  }
+
+  /**
    * Returns a string representation of the specified list of options containing
    * the names of the options.
    * 
@@ -198,7 +205,7 @@ public final class OptionUtil {
     }
     catch(Exception e) {
       LoggingUtil.exception("Error instantiating class to describe.", e.getCause());
-      buf.append("No description available: " + e);
+      buf.append("No description available: ").append(e);
       return buf;
     }
   }

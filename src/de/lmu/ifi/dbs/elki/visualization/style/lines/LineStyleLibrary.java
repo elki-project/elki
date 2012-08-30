@@ -50,17 +50,17 @@ public interface LineStyleLibrary {
   /**
    * Meta flag to request a 'stronger' version of the style
    */
-  public final static String FLAG_STRONG = "strong";
+  public static final String FLAG_STRONG = "strong";
 
   /**
    * Meta flag to request a 'weaker' version of the style
    */
-  public final static String FLAG_WEAK = "weak";
+  public static final String FLAG_WEAK = "weak";
 
   /**
    * Meta flag to request an 'interpolated' version of the style
    */
-  public final static String FLAG_INTERPOLATED = "interpolated";
+  public static final String FLAG_INTERPOLATED = "interpolated";
 
   /**
    * Add the formatting statements to the given CSS class.

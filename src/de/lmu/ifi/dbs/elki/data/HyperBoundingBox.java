@@ -47,12 +47,12 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
   /**
    * The coordinates of the 'lower left' (= minimum) hyper point.
    */
-  protected double[] min;
+  double[] min;
 
   /**
    * The coordinates of the 'upper right' (= maximum) hyper point.
    */
-  protected double[] max;
+  double[] max;
 
   /**
    * Empty constructor for Externalizable interface.
@@ -136,7 +136,7 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
    */
   @Override
   public String toString() {
-    return "[Min(" + FormatUtil.format(min, ",", 10) + "), Max(" + FormatUtil.format(max, ",", 10) + ")]";
+    return "[Min(" + FormatUtil.format(min, ",", FormatUtil.NF8) + "), Max(" + FormatUtil.format(max, ",", FormatUtil.NF8) + ")]";
   }
 
   /**

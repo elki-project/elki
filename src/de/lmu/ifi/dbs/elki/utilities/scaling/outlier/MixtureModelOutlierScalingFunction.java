@@ -69,7 +69,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
   /**
    * Precomputed static value
    */
-  public final static double ONEBYSQRT2PI = 1.0 / MathUtil.SQRTTWOPI;
+  public static final double ONEBYSQRT2PI = 1.0 / MathUtil.SQRTTWOPI;
 
   /**
    * Convergence parameter

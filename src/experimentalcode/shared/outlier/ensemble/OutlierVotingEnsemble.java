@@ -86,7 +86,7 @@ public class OutlierVotingEnsemble<O> extends AbstractAlgorithm<OutlierResult> {
   /**
    * Voting strategy to use in the ensemble.
    */
-  public final static OptionID VOTING_ID = OptionID.getOrCreateOptionID("ensemble.voting", "Voting strategy to use in the ensemble.");
+  public static final OptionID VOTING_ID = OptionID.getOrCreateOptionID("ensemble.voting", "Voting strategy to use in the ensemble.");
 
   /**
    * Voting strategy parameter

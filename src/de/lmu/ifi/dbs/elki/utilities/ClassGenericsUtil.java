@@ -76,6 +76,13 @@ public final class ClassGenericsUtil {
    * Name for a static "parameterize" factory method.
    */
   public static final String FACTORY_METHOD_NAME = "parameterize";
+  
+  /**
+   * Fake Constructor. Use static methods.
+   */
+  private ClassGenericsUtil() {
+    // Do not instantiate
+  }
 
   /**
    * <p>
@@ -240,7 +247,7 @@ public final class ClassGenericsUtil {
     // Try a V3 parameterization class
     Parameterizer par = getParameterizer(c);
     // TODO: API good?
-    if(par != null && par instanceof AbstractParameterizer) {
+    if(par instanceof AbstractParameterizer) {
       final Object instance = ((AbstractParameterizer) par).make(config);
       return r.cast(instance);
     }

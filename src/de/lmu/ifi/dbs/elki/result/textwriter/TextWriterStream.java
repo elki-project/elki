@@ -79,7 +79,7 @@ public class TextWriterStream {
   /**
    * Marker used in text serialization (and re-parsing)
    */
-  public final static String SER_MARKER = "Serialization class:";
+  public static final String SER_MARKER = "Serialization class:";
   
   /**
    * Force incomments flag

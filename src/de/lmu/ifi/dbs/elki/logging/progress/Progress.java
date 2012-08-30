@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.logging.progress;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Generic Progress logging interface.
  * 
@@ -36,14 +35,14 @@ public interface Progress {
    * @param buf Buffer to serialize to
    * @return Buffer the data was serialized to.
    */
-  public StringBuffer appendToBuffer(StringBuffer buf);
+  StringBuffer appendToBuffer(StringBuffer buf);
 
   /**
    * Test whether a progress is complete (and thus doesn't need to be shown anymore)
    * 
    * @return Whether the progress was completed.
    */
-  public boolean isComplete();
+  boolean isComplete();
   
   /**
    * Returns a String representation of the progress suitable as a message for
@@ -52,5 +51,5 @@ public interface Progress {
    * @see java.lang.Object#toString()
    */
   @Override
-  public String toString();
+  String toString();
 }

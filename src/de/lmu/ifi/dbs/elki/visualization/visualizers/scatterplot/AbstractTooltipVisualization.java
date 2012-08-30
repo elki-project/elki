@@ -88,12 +88,6 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
   }
 
   @Override
-  public void destroy() {
-    super.destroy();
-    context.removeDataStoreListener(this);
-  }
-
-  @Override
   public void redraw() {
     setupCSS(svgp);
 
@@ -130,7 +124,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
     if(evt.getTarget() instanceof Element) {
       Element e = (Element) evt.getTarget();
       Node next = e.getNextSibling();
-      if(next != null && next instanceof Element) {
+      if(next instanceof Element) {
         toggleTooltip((Element) next, evt.getType());
       }
       else {

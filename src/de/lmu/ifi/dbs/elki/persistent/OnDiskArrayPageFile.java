@@ -203,13 +203,11 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
       }
     }
     catch(IOException e) {
-      // TODO exception handling
-      e.printStackTrace();
+      LoggingUtil.exception(e);
       return null;
     }
     catch(ClassNotFoundException e) {
-      // TODO exception handling
-      e.printStackTrace();
+      LoggingUtil.exception(e);
       return null;
     }
   }

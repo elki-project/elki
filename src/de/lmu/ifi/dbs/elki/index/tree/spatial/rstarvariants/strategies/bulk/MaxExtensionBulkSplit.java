@@ -97,7 +97,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
 
       // copy array
       if(logger.isDebugging()) {
-        msg.append("\ncurrent partition " + partition1);
+        msg.append("\ncurrent partition ").append(partition1);
         msg.append("\nremaining objects # ").append(objects.size());
         logger.debugFine(msg.toString());
       }

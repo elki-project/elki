@@ -38,7 +38,7 @@ public class PCACorrelationDistance extends CorrelationDistance<PCACorrelationDi
   /**
    * The static factory instance
    */
-  public final static PCACorrelationDistance FACTORY = new PCACorrelationDistance();
+  public static final PCACorrelationDistance FACTORY = new PCACorrelationDistance();
   
   /**
    * Serial

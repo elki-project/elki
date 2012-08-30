@@ -162,7 +162,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     }
 
     if(msg != null && logger.isDebugging()) {
-      msg.append("\nalpha " + alpha);
+      msg.append("\nalpha ").append(alpha);
       msg.append("\nvariances ");
       msg.append(FormatUtil.format(variances, ", ", 4));
       msg.append("\npreference ");

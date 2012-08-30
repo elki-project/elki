@@ -33,5 +33,5 @@ public interface DistributionWithRandom extends Distribution {
    * 
    * @return new random value
    */
-  public double nextRandom();
+  double nextRandom();
 }

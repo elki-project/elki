@@ -48,5 +48,5 @@ public interface EigenPairFilter extends Parameterizable {
    * @param eigenPairs the eigenPairs (i.e. the eigenvectors and
    * @return the filtered eigenpairs
    */
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs);
+  FilteredEigenPairs filter(SortedEigenPairs eigenPairs);
 }

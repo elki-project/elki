@@ -41,7 +41,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
   /**
    * The static factory instance
    */
-  public final static SubspaceDistance FACTORY = new SubspaceDistance();
+  public static final SubspaceDistance FACTORY = new SubspaceDistance();
   
   /**
    * Serial version number.

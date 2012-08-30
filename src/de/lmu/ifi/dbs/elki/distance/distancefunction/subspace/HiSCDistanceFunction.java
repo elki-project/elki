@@ -117,12 +117,12 @@ public class HiSCDistanceFunction<V extends NumberVector<?, ?>> extends Abstract
         if(logger.isDebugging()) {
           //Representation<String> rep = rep.getObjectLabelQuery();
           StringBuffer msg = new StringBuffer();
-          msg.append("\ndist1 " + dist1);
-          msg.append("\ndist2 " + dist2);
-          // msg.append("\nv1 " + rep.get(v1.getID()));
-          // msg.append("\nv2 " + rep.get(v2.getID()));
-          msg.append("\nsubspaceDim " + subspaceDim);
-          msg.append("\ncommon pv " + FormatUtil.format(dim, commonPreferenceVector));
+          msg.append("\ndist1 ").append(dist1);
+          msg.append("\ndist2 ").append(dist2);
+          // msg.append("\nv1 ").append(rep.get(v1.getID()));
+          // msg.append("\nv2 ").append(rep.get(v2.getID()));
+          msg.append("\nsubspaceDim ").append(subspaceDim);
+          msg.append("\ncommon pv ").append(FormatUtil.format(dim, commonPreferenceVector));
           logger.debugFine(msg.toString());
         }
       }

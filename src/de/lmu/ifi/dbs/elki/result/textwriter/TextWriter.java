@@ -96,7 +96,7 @@ public class TextWriter {
   /**
    * Hash map for supported classes in writer.
    */
-  public final static HandlerList<TextWriterWriterInterface<?>> writers = new HandlerList<TextWriterWriterInterface<?>>();
+  public static final HandlerList<TextWriterWriterInterface<?>> writers = new HandlerList<TextWriterWriterInterface<?>>();
 
   /**
    * Add some default handlers

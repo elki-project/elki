@@ -71,7 +71,7 @@ public class ResultVisualizer implements ResultHandler {
    * Key: -vis.single
    * </p>
    */
-  public final static OptionID SINGLE_ID = OptionID.getOrCreateOptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
+  public static final OptionID SINGLE_ID = OptionID.getOrCreateOptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
   
   /**
    * Stores the set title.

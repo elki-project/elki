@@ -165,8 +165,8 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     }
     if(msg != null) {
       msg.append("\n  height = ").append(getHeight());
-      msg.append("\n  root " + getRoot());
-      getLogger().debugFine(msg.toString() + "\n");
+      msg.append("\n  root ").append(getRoot());
+      getLogger().debugFine(msg.toString());
     }
   }
 
@@ -230,7 +230,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     if(getLogger().isDebuggingFiner()) {
       StringBuffer msg = new StringBuffer();
       msg.append("pageNo ").append(root.getPageID());
-      getLogger().debugFiner(msg.toString() + "\n");
+      getLogger().debugFiner(msg.toString());
     }
 
     return root;

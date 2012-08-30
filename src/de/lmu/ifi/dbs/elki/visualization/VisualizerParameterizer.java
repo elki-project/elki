@@ -86,12 +86,12 @@ public class VisualizerParameterizer implements Parameterizable {
    * Default: default properties file
    * </p>
    */
-  public final static OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
+  public static final OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
 
   /**
    * Default pattern for visualizer enabling.
    */
-  public final static String DEFAULT_ENABLEVIS = "^" + Pattern.quote(VisualizerParameterizer.class.getPackage().getName()) + "\\..*";
+  public static final String DEFAULT_ENABLEVIS = "^" + Pattern.quote(VisualizerParameterizer.class.getPackage().getName()) + "\\..*";
 
   /**
    * Parameter to enable visualizers
@@ -102,7 +102,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * Default: ELKI core
    * </p>
    */
-  public final static OptionID ENABLEVIS_ID = OptionID.getOrCreateOptionID("vis.enable", "Visualizers to enable by default.");
+  public static final OptionID ENABLEVIS_ID = OptionID.getOrCreateOptionID("vis.enable", "Visualizers to enable by default.");
 
   /**
    * Parameter to set the sampling level
@@ -111,7 +111,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * Key: -vis.sampling
    * </p>
    */
-  public final static OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
+  public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
 
   /**
    * Style library to use.
@@ -213,14 +213,14 @@ public class VisualizerParameterizer implements Parameterizable {
     if(algorithm != null) {
       // shorten the algorithm
       if(algorithm.contains(".")) {
-        algorithm = algorithm.substring(algorithm.lastIndexOf(".") + 1);
+        algorithm = algorithm.substring(algorithm.lastIndexOf('.') + 1);
       }
       buf.append(algorithm);
     }
     if(distance != null) {
       // shorten the distance
       if(distance.contains(".")) {
-        distance = distance.substring(distance.lastIndexOf(".") + 1);
+        distance = distance.substring(distance.lastIndexOf('.') + 1);
       }
       if(buf.length() > 0) {
         buf.append(" using ");

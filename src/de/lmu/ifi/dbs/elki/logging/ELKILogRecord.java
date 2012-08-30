@@ -52,7 +52,7 @@ public class ELKILogRecord extends LogRecord {
   /**
    * Classes to ignore when finding the relevant caller.
    */
-  public final static String[] IGNORE_CLASSES = { Logger.class.getCanonicalName(), Logging.class.getCanonicalName(), LoggingUtil.class.getCanonicalName(), ELKILogRecord.class.getCanonicalName(), AbstractParameterization.class.getCanonicalName(), AbstractApplication.class.getCanonicalName() };
+  public static final String[] IGNORE_CLASSES = { Logger.class.getCanonicalName(), Logging.class.getCanonicalName(), LoggingUtil.class.getCanonicalName(), ELKILogRecord.class.getCanonicalName(), AbstractParameterization.class.getCanonicalName(), AbstractApplication.class.getCanonicalName() };
 
   /**
    * Name of this class.

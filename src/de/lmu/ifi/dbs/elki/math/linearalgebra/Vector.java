@@ -46,6 +46,21 @@ public class Vector implements NumberVector<Vector, Double> {
   protected final double[] elements;
 
   /**
+   * Error message (in assertions!) when vector dimensionalities do not agree.
+   */
+  public static final String ERR_VEC_DIMENSIONS = "Vector dimensions do not agree.";
+
+  /**
+   * Error message (in assertions!) when matrix dimensionalities do not agree.
+   */
+  public static final String ERR_MATRIX_INNERDIM = "Matrix inner dimensions do not agree.";
+
+  /**
+   * Error message (in assertions!) when dimensionalities do not agree.
+   */
+  private static final String ERR_DIMENSIONS = "Dimensionalities do not agree.";
+
+  /**
    * Construct a vector from a given array.
    * 
    * @param values array of doubles
@@ -173,7 +188,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return the resulting vector
    */
   public final Vector plus(final Vector v) {
-    assert (this.elements.length == v.elements.length) : "Vector dimensions must agree.";
+    assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
     final Vector result = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i];
@@ -190,7 +205,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return the resulting vector
    */
   public final Vector plusTimes(final Vector v, final double s) {
-    assert (this.elements.length == v.elements.length) : "Vector dimensions must agree.";
+    assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
     final Vector result = new Vector(elements.length);
     for(int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i] * s;
@@ -205,7 +220,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A + B in this Matrix
    */
   public final Vector plusEquals(final Vector B) {
-    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
+    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
       elements[i] += B.elements[i];
     }
@@ -220,7 +235,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A + s * B in this Matrix
    */
   public final Vector plusTimesEquals(final Vector B, final double s) {
-    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
+    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
       elements[i] += s * B.elements[i];
     }
@@ -276,7 +291,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A - B in this Matrix
    */
   public final Vector minusEquals(final Vector B) {
-    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
+    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
       elements[i] -= B.elements[i];
     }
@@ -291,7 +306,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return A - s * B in this Matrix
    */
   public final Vector minusTimesEquals(final Vector B, final double s) {
-    assert (this.elements.length == B.elements.length) : "Vector dimensions must agree.";
+    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
       elements[i] -= s * B.elements[i];
     }
@@ -346,7 +361,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return Matrix product, A * B
    */
   public final Matrix times(final Matrix B) {
-    assert (B.elements.length == 1) : "Matrix inner dimensions must agree.";
+    assert (B.elements.length == 1) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
     for(int j = 0; j < B.columndimension; j++) {
       for(int i = 0; i < this.elements.length; i++) {
@@ -363,7 +378,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return Matrix product, A<sup>T</sup> * B
    */
   public final Matrix transposeTimes(final Matrix B) {
-    assert (B.elements.length == this.elements.length) : "Matrix inner dimensions must agree.";
+    assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(1, B.columndimension);
     for(int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
@@ -384,7 +399,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return Matrix product, a<sup>T</sup> * B
    */
   public final double transposeTimesTimes(final Matrix B, final Vector c) {
-    assert (B.elements.length == this.elements.length) : "Matrix inner dimensions must agree.";
+    assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
     for(int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
@@ -404,7 +419,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return Matrix product, A<sup>T</sup> * B
    */
   public final double transposeTimes(final Vector B) {
-    assert (B.elements.length == this.elements.length) : "Matrix inner dimensions must agree.";
+    assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     double s = 0;
     for(int k = 0; k < this.elements.length; k++) {
       s += this.elements[k] * B.elements[k];
@@ -419,7 +434,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return Matrix product, A * B^T
    */
   public final Matrix timesTranspose(final Matrix B) {
-    assert (B.columndimension == 1) : "Matrix inner dimensions must agree.";
+    assert (B.columndimension == 1) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
     for(int j = 0; j < B.elements.length; j++) {
       for(int i = 0; i < this.elements.length; i++) {
@@ -480,7 +495,7 @@ public class Vector implements NumberVector<Vector, Double> {
    * @return the projection of p into the subspace formed by v
    */
   public final Vector projection(final Matrix v) {
-    assert (elements.length == v.elements.length) : "p and v differ in row dimensionality!";
+    assert (elements.length == v.elements.length) : ERR_DIMENSIONS;
     Vector sum = new Vector(elements.length);
     for(int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less?

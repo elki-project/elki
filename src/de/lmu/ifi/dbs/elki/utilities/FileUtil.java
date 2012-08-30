@@ -38,6 +38,14 @@ import java.util.zip.GZIPInputStream;
  */
 public final class FileUtil {
   /**
+   * Fake Constructor. Use static methods.
+   *
+   */
+  private FileUtil() {
+    // Do not instantiate.
+  }
+
+  /**
    * Returns the lower case extension of the selected file.
    * 
    * If no file is selected, <code>null</code> is returned.
@@ -63,11 +71,11 @@ public final class FileUtil {
     if(name == null) {
       return null;
     }
-    int index = name.lastIndexOf(".");
+    int index = name.lastIndexOf('.');
     if(index >= name.length() - 1) {
       return null;
     }
-    return name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+    return name.substring(name.lastIndexOf('.') + 1).toLowerCase();
   }
 
   /**

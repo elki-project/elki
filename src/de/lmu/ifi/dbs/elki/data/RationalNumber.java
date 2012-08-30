@@ -23,11 +23,7 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.math.BigInteger;
-import java.util.Random;
 
 /**
  * RationalNumber represents rational numbers in arbitrary precision. Note that
@@ -74,7 +70,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
    * @throws IllegalArgumentException if {@link BigInteger#equals(Object)
    *         denominator.equals(}{@link BigInteger#ZERO BigInteger.ZERO)}
    */
-  public RationalNumber(final BigInteger numerator, final BigInteger denominator) throws IllegalArgumentException {
+  public RationalNumber(final BigInteger numerator, final BigInteger denominator) {
     if(denominator.equals(BigInteger.ZERO)) {
       throw new IllegalArgumentException("denominator is 0");
     }
@@ -388,108 +384,5 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
    */
   public RationalNumber copy() {
     return new RationalNumber(numerator, denominator);
-  }
-
-  /**
-   * Compares doubles and RationalNumbers wrt efficiency and accuracy.
-   * 
-   * @param n the number of random numbers
-   * @param out target to print results to
-   */
-  public static void test(final int n, final PrintStream out) {
-    Random rnd = new Random();
-    int[] testNumbers1 = new int[n];
-    int[] testNumbers2 = new int[n];
-    RationalNumber[] rationalNumbers = new RationalNumber[n];
-    double[] doubles = new double[n];
-
-    for(int i = 0; i < n; i++) {
-      testNumbers1[i] = rnd.nextInt();
-      int second = rnd.nextInt();
-      while(second == 0) {
-        second = rnd.nextInt();
-      }
-      testNumbers2[i] = second;
-      rationalNumbers[i] = new RationalNumber(testNumbers1[i], testNumbers2[i]);
-      doubles[i] = (double) testNumbers1[i] / (double) testNumbers2[i];
-    }
-
-    long doubleStart = System.currentTimeMillis();
-    for(int i = 0; i < n; i++) {
-      doubles[i] = doubles[i] * 7.0 / 5.0 * 5.0 / 7.0 * testNumbers2[i];
-    }
-    long doubleTime = System.currentTimeMillis() - doubleStart;
-    long rnStart = System.currentTimeMillis();
-    for(int i = 0; i < n; i++) {
-      rationalNumbers[i] = rationalNumbers[i].times(new RationalNumber(7, 1)).divided(new RationalNumber(5, 1)).times(new RationalNumber(5, 1)).divided(new RationalNumber(7, 1)).times(new RationalNumber(testNumbers2[i], 1));
-    }
-    long rnTime = System.currentTimeMillis() - rnStart;
-    out.println("Efficiency: ");
-    out.println("  time required for a predefined sequence of operations on " + n + " random numbers:");
-    out.println("    double:         " + doubleTime);
-    out.println("    RationalNumber: " + rnTime);
-    int accuracyDouble = n;
-    double deviationDouble = 0.0;
-    int accuracyRN = n;
-    double deviationRN = 0.0;
-    for(int i = 0; i < n; i++) {
-      if((int) doubles[i] != testNumbers1[i]) {
-        accuracyDouble--;
-        deviationDouble += testNumbers1[i] - doubles[i];
-      }
-      if(rationalNumbers[i].intValue() != testNumbers1[i]) {
-        accuracyRN--;
-        deviationRN += testNumbers1[i] - rationalNumbers[i].doubleValue();
-      }
-    }
-    out.println("\nAccuracy: ");
-    out.println("  percentage of correctly recomputed " + n + " random numbers for a sequence of predefined operations:");
-    out.println("    double:         " + (double) accuracyDouble / (double) n);
-    out.println("    RationalNumber: " + (double) accuracyRN / (double) n);
-    out.println("  average deviation:");
-    out.println("    double:         " + deviationDouble / n);
-    out.println("    RationalNumber: " + deviationRN / n);
-
-    out.print("Overview:\n--------------------------------------------\n");
-    for(int i = 0; i < n; i++) {
-      out.print("target:     ");
-      out.print((double) testNumbers1[i]);
-      out.print("\ndouble:     ");
-      out.print(doubles[i]);
-      out.print("\nrationalnr: ");
-      out.print(rationalNumbers[i].doubleValue());
-      out.print("\n--------------------------------------------\n");
-    }
-  }
-
-  /**
-   * Calls test for a given number of numbers and a optionally given target
-   * file.
-   * 
-   * @param args &lt;int&gt; [&lt;filename&gt;]
-   */
-  public static void main(String[] args) {
-    try {
-      int numbers = Integer.parseInt(args[0]);
-      PrintStream out;
-      try {
-        out = new PrintStream(new File(args[1]));
-      }
-      catch(FileNotFoundException e) {
-        System.err.println(e.getMessage());
-        System.err.println("printing output to STDOUT");
-        out = System.out;
-      }
-      catch(ArrayIndexOutOfBoundsException e) {
-        out = System.out;
-      }
-      test(numbers, out);
-    }
-    catch(Exception e) {
-      System.err.print("Usage:\njava ");
-      System.err.print(RationalNumber.class.getName());
-      System.err.println(" <numberOfTestnumbers> [<filename>]");
-      System.err.println("If <filename> is ommitted, output will be printed to STDOUT.");
-    }
   }
 }

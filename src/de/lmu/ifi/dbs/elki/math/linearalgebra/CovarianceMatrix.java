@@ -39,8 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * easier to use APIs.
  * 
  * For use in algorithms, it is more appropriate to use
- * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder StandardCovarianceMatrixBuilder}
- * since this class can be overriden with a stabilized covariance matrix builder!
+ * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder
+ * StandardCovarianceMatrixBuilder} since this class can be overridden with a
+ * stabilized covariance matrix builder!
  * 
  * @author Erich Schubert
  * 
@@ -49,6 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * @apiviz.has Matrix oneway - - «produces»
  */
 public class CovarianceMatrix {
+  /**
+   * Error message reported when too little data (weight &lt;= 1) in matrix.
+   */
+  public static final String ERR_TOO_LITTLE_WEIGHT = "Too few elements (too little total weight) used to obtain a valid covariance matrix.";
+
   /**
    * The means
    */
@@ -261,7 +267,7 @@ public class CovarianceMatrix {
    */
   public Matrix makeSampleMatrix() {
     if(wsum <= 1.0) {
-      throw new IllegalStateException("Too few elements used to obtain a valid covariance matrix.");
+      throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements);
     return mat.times(1.0 / (wsum - 1));
@@ -279,7 +285,7 @@ public class CovarianceMatrix {
    */
   public Matrix makeNaiveMatrix() {
     if(wsum <= 0.0) {
-      throw new IllegalStateException("Too few elements used to obtain a valid covariance matrix.");
+      throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements);
     return mat.times(1.0 / wsum);
@@ -297,7 +303,7 @@ public class CovarianceMatrix {
    */
   public Matrix destroyToSampleMatrix() {
     if(wsum <= 1.0) {
-      throw new IllegalStateException("Too few elements used to obtain a valid covariance matrix.");
+      throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements).timesEquals(1.0 / (wsum - 1));
     this.elements = null;
@@ -316,7 +322,7 @@ public class CovarianceMatrix {
    */
   public Matrix destroyToNaiveMatrix() {
     if(wsum <= 0.0) {
-      throw new IllegalStateException("Too few elements used to obtain a valid covariance matrix.");
+      throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
     Matrix mat = new Matrix(elements).timesEquals(1.0 / wsum);
     this.elements = null;
@@ -359,7 +365,7 @@ public class CovarianceMatrix {
    */
   public static CovarianceMatrix make(Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
     CovarianceMatrix c = new CovarianceMatrix(DatabaseUtil.dimensionality(relation));
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }
     return c;

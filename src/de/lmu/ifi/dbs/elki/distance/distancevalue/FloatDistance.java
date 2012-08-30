@@ -37,7 +37,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   /**
    * The static factory instance
    */
-  public final static FloatDistance FACTORY = new FloatDistance();
+  public static final FloatDistance FACTORY = new FloatDistance();
 
   /**
    * The distance value.

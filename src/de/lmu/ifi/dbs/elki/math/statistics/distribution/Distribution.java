@@ -37,7 +37,7 @@ public interface Distribution {
    * @param val existing value
    * @return distribution density
    */
-  public double pdf(double val);
+  double pdf(double val);
 
   /**
    * Return the cumulative density function at the given value.
@@ -45,7 +45,7 @@ public interface Distribution {
    * @param val existing value
    * @return cumulative density
    */
-  public double cdf(double val);
+  double cdf(double val);
 
   /**
    * Quantile aka probit (for normal) aka inverse CDF (invcdf, cdf^-1) function.
@@ -53,7 +53,7 @@ public interface Distribution {
    * @param val Quantile to find
    * @return Quantile position
    */
-  public double quantile(double val);
+  double quantile(double val);
 
   /**
    * Describe the distribution
@@ -61,5 +61,5 @@ public interface Distribution {
    * @return description
    */
   @Override
-  public String toString();
+  String toString();
 }

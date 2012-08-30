@@ -154,7 +154,9 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
 
     {
       // Create parameter table
-      parameterTable = new ConfiguratorPanel(); // new ParameterTable(parameterModel, parameters);
+      parameterTable = new ConfiguratorPanel(); // new
+                                                // ParameterTable(parameterModel,
+                                                // parameters);
       parameterTable.addChangeListener(this);
       // Create the scroll pane and add the table to it.
       JScrollPane scrollPane = new JScrollPane(parameterTable);
@@ -198,12 +200,12 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     // update parameter table
     {
       parameterTable.setEnabled(false);
-      
+
       parameterTable.clear();
-      for (Pair<Object, Parameter<?,?>> pair : track.getAllParameters()) {
+      for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
         parameterTable.addParameter(pair.first, pair.getSecond(), track);
       }
-      //parameters.updateFromTrackParameters(track);
+      // parameters.updateFromTrackParameters(track);
 
       parameterTable.revalidate();
       parameterTable.setEnabled(true);
@@ -213,7 +215,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     updateStatus();
     observers.notifyObservers(this);
   }
-  
+
   /**
    * Collect parameters
    * 
@@ -234,12 +236,12 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       if(e instanceof UnspecifiedParameterException) {
         continue;
       }
-      buf.append(e.getMessage() + FormatUtil.NEWLINE);
+      buf.append(e.getMessage()).append(FormatUtil.NEWLINE);
     }
     if(buf.length() > 0) {
       logger.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
     }
-    //config.clearErrors();
+    // config.clearErrors();
   }
 
   /**
@@ -251,9 +253,10 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     runButton.setEnabled(false);
     try {
       configureStep(config);
-      if (config.hasUnusedParameters()) {
-        //List<Pair<OptionID, Object>> remainingParameters = config.getRemainingParameters();
-        logger.warning("Unused parameters: "+"FIXME");
+      if(config.hasUnusedParameters()) {
+        // List<Pair<OptionID, Object>> remainingParameters =
+        // config.getRemainingParameters();
+        logger.warning("Unused parameters: " + "FIXME");
       }
       if(config.getErrors().size() > 0) {
         reportErrors(config);
@@ -329,11 +332,11 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
   public void removeObserver(Observer<? super ParameterTabPanel> o) {
     observers.remove(o);
   }
-  
+
   @Override
   public void stateChanged(ChangeEvent e) {
-    if (e.getSource() == this.parameterTable) {
-      //logger.warning("stateChanged!");
+    if(e.getSource() == this.parameterTable) {
+      // logger.warning("stateChanged!");
       updateParameterTable();
     }
   }

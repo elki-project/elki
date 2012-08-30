@@ -39,7 +39,7 @@ public interface SpatialSorter {
    * @param <T> actual type we sort
    * @param objs the spatial objects to be sorted
    */
-  public <T extends SpatialComparable> void sort(List<T> objs);
+  <T extends SpatialComparable> void sort(List<T> objs);
 
   /**
    * Sort part of the list (start to end).
@@ -50,5 +50,5 @@ public interface SpatialSorter {
    * @param end End of range (e.g. <code>site()</code>)
    * @param minmax Array with dim pairs of (min, max) of value ranges
    */
-  public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax);
+  <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax);
 }

@@ -77,7 +77,7 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
    * @return the name of the ConstantObject
    */
   public String getName() {
-    return new String(name);
+    return name;
   }
 
   /**

@@ -39,7 +39,7 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
    * The String to separate attribute values in a String that represents the
    * values.
    */
-  public final static String ATTRIBUTE_SEPARATOR = " ";
+  public static final String ATTRIBUTE_SEPARATOR = " ";
 
   /**
    * An Object obj is equal to this AbstractNumberVector if it is an instance of
@@ -67,11 +67,6 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
     else {
       return false;
     }
-  }
-
-  @Override
-  public int hashCode() {
-    return super.hashCode();
   }
 
   @Override

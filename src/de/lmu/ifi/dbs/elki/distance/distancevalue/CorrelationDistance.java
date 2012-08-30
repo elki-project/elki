@@ -43,12 +43,12 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
    * 
    * Note: Do NOT use regular expression syntax characters!
    */
-  public final static String SEPARATOR = "x";
+  public static final String SEPARATOR = "x";
 
   /**
    * The pattern used for correlation distances
    */
-  public final static Pattern CORRELATION_DISTANCE_PATTERN = Pattern.compile("\\d+" + Pattern.quote(SEPARATOR) + "\\d+(\\.\\d+)?([eE][-]?\\d+)?");  
+  public static final Pattern CORRELATION_DISTANCE_PATTERN = Pattern.compile("\\d+" + Pattern.quote(SEPARATOR) + "\\d+(\\.\\d+)?([eE][-]?\\d+)?");  
   
   /**
    * Generated SerialVersionUID.

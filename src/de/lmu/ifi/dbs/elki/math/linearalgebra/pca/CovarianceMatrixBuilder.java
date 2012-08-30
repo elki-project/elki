@@ -44,7 +44,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>>
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processDatabase(Relation<? extends V> database);
+  Matrix processDatabase(Relation<? extends V> database);
 
   /**
    * Compute Covariance Matrix for a collection of database IDs
@@ -53,7 +53,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>>
    * @param database the database used
    * @return Covariance Matrix
    */
-  public Matrix processIds(DBIDs ids, Relation<? extends V> database);
+  Matrix processIds(DBIDs ids, Relation<? extends V> database);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -65,7 +65,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>>
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  public <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database, int k);
+  <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database, int k);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection
@@ -76,5 +76,5 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>>
    * @param database the database used
    * @return Covariance Matrix
    */
-  public <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database);
+  <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database);
 }

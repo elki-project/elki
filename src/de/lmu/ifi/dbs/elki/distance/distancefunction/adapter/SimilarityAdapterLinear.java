@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Adapter from a normalized similarity function to a distance function using
@@ -91,11 +90,6 @@ public class SimilarityAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O> {
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-    }
-
     @Override
     protected SimilarityAdapterLinear<O> makeInstance() {
       return new SimilarityAdapterLinear<O>(similarityFunction);
