@@ -1,0 +1,10 @@
+de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.ConstantDistribution
