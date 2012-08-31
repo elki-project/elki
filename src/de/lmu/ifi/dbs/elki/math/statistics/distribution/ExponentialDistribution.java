@@ -96,7 +96,7 @@ public class ExponentialDistribution implements DistributionWithRandom {
 
   @Override
   public double quantile(double val) {
-    return -Math.log1p(-val) / rate;
+    return -Math.log(1 - val) / rate;
   }
 
   /**
@@ -107,7 +107,7 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * @return
    */
   public static double quantile(double val, double rate) {
-    return -Math.log1p(-val) / rate;
+    return -Math.log(1 - val) / rate;
   }
 
   /**
