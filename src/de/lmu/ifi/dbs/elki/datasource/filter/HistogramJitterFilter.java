@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -40,14 +41,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * Add Jitter, preserving the histogram properties (same sum, nonnegative).
  * 
  * For each vector, the total sum of all dimensions is computed.<br />
- * Then <code>jitter * totalsum * random[0:1]</code> is added to each dimension<br />
- * Finally, the vector is rescaled to have the original total sum.
+ * Then a random vector of the average length <code>jitter * scale</code> is
+ * added and the result normalized to the original vectors sum. The individual
+ * dimensions are drawn from an exponential distribution with scale
+ * <code>jitter / dimensionality</code>, so it is expected that the error in
+ * most dimensions will be low, and higher in few.
  * 
  * This is designed to degrade the quality of a histogram, while preserving the
  * total sum (e.g. to keep the normalization). The factor "jitter" can be used
  * to control the degradation amount.
- * 
- * Note that the jitter amount added is uniform for this filter.
  * 
  * @author Erich Schubert
  * 
@@ -63,7 +65,7 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
   /**
    * Random generator
    */
-  Random rnd;
+  ExponentialDistribution rnd;
 
   /**
    * Constructor.
@@ -74,28 +76,31 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
   public HistogramJitterFilter(double jitter, Long seed) {
     super();
     this.jitter = jitter;
-    this.rnd = (seed == null) ? new Random() : new Random(seed);
+    Random random = (seed == null) ? new Random() : new Random(seed);
+    rnd = new ExponentialDistribution(1, random);
   }
 
   @Override
   protected V filterSingleObject(V obj) {
-    double[] raw = new double[obj.getDimensionality()];
+    final int dim = obj.getDimensionality();
     // Compute the total sum.
     double osum = 0;
-    for(int i = 0; i < raw.length; i++) {
-      raw[i] = obj.doubleValue(i + 1);
-      osum += raw[i];
+    for(int i = 0; i < dim; i++) {
+      osum += obj.doubleValue(i + 1);
     }
-    double nsum = 0;
+    // Actual maximum jitter amount:
+    final double maxjitter = 2 * jitter / dim * osum;
+    // Generate jitter vector
+    double[] raw = new double[dim];
+    double jsum = 0; // Sum of jitter
     for(int i = 0; i < raw.length; i++) {
-      double v = rnd.nextDouble() * jitter * osum;
-      raw[i] += v;
-      nsum += raw[i];
+      raw[i] = rnd.nextRandom() * maxjitter;
+      jsum += raw[i];
     }
-    // Rescale to have the original sum back.
-    final double s = osum / nsum;
+    final double mix = jsum / osum;
+    // Combine the two vector
     for(int i = 0; i < raw.length; i++) {
-      raw[i] *= s;
+      raw[i] = raw[i] + (1 - mix) * obj.doubleValue(i + 1);
     }
     return obj.newNumberVector(raw);
   }
