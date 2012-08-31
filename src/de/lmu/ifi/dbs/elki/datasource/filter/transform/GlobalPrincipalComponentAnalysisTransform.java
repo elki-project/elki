@@ -23,19 +23,26 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Apply principal component analysis to the data set.
@@ -47,21 +54,49 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <O> Vector type
  */
 public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O, ?>> extends AbstractConversionFilter<O, O> {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(GlobalPrincipalComponentAnalysisTransform.class);
+
+  /**
+   * Filter to use for dimensionality reduction.
+   */
+  EigenPairFilter filter = null;
+
+  /**
+   * Actual dataset dimensionality
+   */
   int dim = -1;
 
+  /**
+   * Covariance matrix builder
+   */
   CovarianceMatrix covmat = null;
 
+  /**
+   * Final projection after analysis run
+   */
   double[][] proj = null;
 
+  /**
+   * Projection buffer
+   */
   double[] buf = null;
 
+  /**
+   * Vector for data set centering
+   */
   double[] mean = null;
 
   /**
    * Constructor.
+   * 
+   * @param filter Filter to use for dimensionality reduction.
    */
-  public GlobalPrincipalComponentAnalysisTransform() {
+  public GlobalPrincipalComponentAnalysisTransform(EigenPairFilter filter) {
     super();
+    this.filter = filter;
   }
 
   @Override
@@ -81,19 +116,38 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
 
   @Override
   protected void prepareComplete() {
-    mean  = covmat.getMeanVector().getArrayRef();
+    mean = covmat.getMeanVector().getArrayRef();
     PCAResult pcares = (new PCARunner<O>(null)).processCovarMatrix(covmat.destroyToSampleMatrix());
     SortedEigenPairs eps = pcares.getEigenPairs();
     covmat = null;
 
-    proj = new double[dim][dim];
-    for(int d = 0; d < dim; d++) {
-      EigenPair ep = eps.getEigenPair(d);
-      double[] ev = ep.getEigenvector().getArrayRef();
-      double eval = Math.sqrt(ep.getEigenvalue());
-      // Fill weighted and transposed:
-      for(int i = 0; i < dim; i++) {
-        proj[d][i] = ev[i] / eval;
+    if(filter == null) {
+      proj = new double[dim][dim];
+      for(int d = 0; d < dim; d++) {
+        EigenPair ep = eps.getEigenPair(d);
+        double[] ev = ep.getEigenvector().getArrayRef();
+        double eval = Math.sqrt(ep.getEigenvalue());
+        // Fill weighted and transposed:
+        for(int i = 0; i < dim; i++) {
+          proj[d][i] = ev[i] / eval;
+        }
+      }
+    }
+    else {
+      List<EigenPair> axes = filter.filter(eps).getStrongEigenPairs();
+      final int pdim = axes.size(); // Projection dimensionality
+      if (LOG.isVerbose()) {
+        LOG.verbose("Reducing dimensionality from "+dim+" to "+pdim+" via PCA.");
+      }
+      proj = new double[pdim][dim];
+      for(int d = 0; d < pdim; d++) {
+        EigenPair ep = axes.get(d);
+        double[] ev = ep.getEigenvector().getArrayRef();
+        double eval = Math.sqrt(ep.getEigenvalue());
+        // Fill weighted and transposed:
+        for(int i = 0; i < dim; i++) {
+          proj[d][i] = ev[i] / eval;
+        }
       }
     }
     buf = new double[dim];
@@ -116,7 +170,13 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
 
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
-    return in;
+    if(proj.length == dim) {
+      return in;
+    }
+    else {
+      O factory = ((VectorFieldTypeInformation<O>) in).getFactory();
+      return new VectorFieldTypeInformation<O>(in.getRestrictionClass(), proj.length, factory);
+    }
   }
 
   /**
@@ -127,9 +187,29 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
+    /**
+     * To specify the eigenvectors to keep
+     */
+    public static final OptionID FILTER_ID = OptionID.getOrCreateOptionID("globalpca.filter", "Filter to use for dimensionality reduction.");
+
+    /**
+     * Filter to use for dimensionality reduction.
+     */
+    EigenPairFilter filter = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(FILTER_ID, EigenPairFilter.class, true);
+      if(config.grab(filterP)) {
+        filter = filterP.instantiateClass(config);
+      }
+    }
+
     @Override
     protected Object makeInstance() {
-      return new GlobalPrincipalComponentAnalysisTransform<O>();
+      return new GlobalPrincipalComponentAnalysisTransform<O>(filter);
     }
   }
 }
