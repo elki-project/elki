@@ -108,13 +108,22 @@ public class Logging {
   public boolean isLoggable(Level lev) {
     return logger.isLoggable(lev);
   }
-  
+
   /**
-   * Test whether to log 'verbose'.
+   * Test whether to log 'verbose' aka 'info'.
    * 
    * @return true if verbose
    */
   public boolean isVerbose() {
+    return logger.isLoggable(Level.INFO);
+  }
+
+  /**
+   * Test whether to log 'info' aka 'verbose'.
+   * 
+   * @return true if verbose
+   */
+  public boolean isInfo() {
     return logger.isLoggable(Level.INFO);
   }
 
@@ -249,6 +258,29 @@ public class Logging {
    * @param message Informational log message.
    */
   public void verbose(CharSequence message) {
+    log(Level.INFO, message);
+  }
+
+  /**
+   * Log a message at the 'info' ('verbose') level.
+   * 
+   * You should check isVerbose() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void info(CharSequence message, Throwable e) {
+    log(Level.INFO, message, e);
+  }
+
+  /**
+   * Log a message at the 'info' ('verbose') level.
+   * 
+   * You should check isVerbose() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void info(CharSequence message) {
     log(Level.INFO, message);
   }
 
