@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -74,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * set.
  * 
  * @author Erich Schubert
+ *
  * @param <O> Object type
  * @param <D> Distance type
  */
@@ -92,7 +94,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   public static final OptionID EXACT_ID = OptionID.getOrCreateOptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
 
   /**
-   * Flag to enable sampling
+   * Flag to enable sampling.
    */
   public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
 
@@ -107,12 +109,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   private int numbin;
 
   /**
-   * Sampling
+   * Sampling flag.
    */
   private boolean sampling = false;
 
   /**
-   * Sampling
+   * Compute exactly (slower).
    */
   private boolean exact = false;
 
@@ -275,67 +277,70 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     return result;
   }
 
-  private DoubleMinMax sampleMinMax(Relation<O> database, DistanceQuery<O, D> distFunc) {
-    int size = database.size();
+  /**
+   * Estimate minimum and maximum via sampling.
+   * 
+   * @param relation Relation to process
+   * @param distFunc Distance function to use
+   * @return Minimum and maximum
+   */
+  private DoubleMinMax sampleMinMax(Relation<O> relation, DistanceQuery<O, D> distFunc) {
+    int size = relation.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
-    int k = (int) Math.max(25, Math.pow(database.size(), 0.2));
-    TreeSet<DoubleObjPair<DBID>> minhotset = new TreeSet<DoubleObjPair<DBID>>();
-    TreeSet<DoubleObjPair<DBID>> maxhotset = new TreeSet<DoubleObjPair<DBID>>(Collections.reverseOrder());
+    int k = (int) Math.max(25, Math.pow(relation.size(), 0.2));
+    TreeSet<DoubleDBIDPair> minhotset = new TreeSet<DoubleDBIDPair>();
+    TreeSet<DoubleDBIDPair> maxhotset = new TreeSet<DoubleDBIDPair>(Collections.reverseOrder());
 
-    int randomsize = (int) Math.max(25, Math.pow(database.size(), 0.2));
+    int randomsize = (int) Math.max(25, Math.pow(relation.size(), 0.2));
     double rprob = ((double) randomsize) / size;
     ArrayModifiableDBIDs randomset = DBIDUtil.newArray(randomsize);
 
-    DBIDIter iter = database.iterDBIDs();
+    DBIDIter iter = relation.iterDBIDs();
     if(!iter.valid()) {
       throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
     }
     DBID firstid = DBIDUtil.deref(iter);
     iter.advance();
-    minhotset.add(new DoubleObjPair<DBID>(Double.MAX_VALUE, firstid));
-    maxhotset.add(new DoubleObjPair<DBID>(Double.MIN_VALUE, firstid));
+    minhotset.add(DBIDUtil.newPair(Double.MAX_VALUE, firstid));
+    maxhotset.add(DBIDUtil.newPair(Double.MIN_VALUE, firstid));
     while(iter.valid()) {
       DBID id1 = DBIDUtil.deref(iter);
       iter.advance();
       // generate candidates for min distance.
-      ArrayList<DoubleObjPair<DBID>> np = new ArrayList<DoubleObjPair<DBID>>(k * 2 + randomsize * 2);
-      for(DoubleObjPair<DBID> pair : minhotset) {
-        DBID id2 = pair.getSecond();
+      ArrayList<DoubleDBIDPair> np = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
+      for(DoubleDBIDPair pair : minhotset) {
         // skip the object itself
-        if(id1.compareTo(id2) == 0) {
+        if(DBIDUtil.equal(id1, pair)) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new DoubleObjPair<DBID>(d, id1));
-        np.add(new DoubleObjPair<DBID>(d, id2));
+        double d = distFunc.distance(id1, pair).doubleValue();
+        np.add(DBIDUtil.newPair(d, id1));
+        np.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        DBID id2 = DBIDUtil.deref(iter2);
-        double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new DoubleObjPair<DBID>(d, id1));
-        np.add(new DoubleObjPair<DBID>(d, id2));
+        double d = distFunc.distance(id1, iter2).doubleValue();
+        np.add(DBIDUtil.newPair(d, id1));
+        np.add(DBIDUtil.newPair(d, iter2));
       }
       minhotset.addAll(np);
       shrinkHeap(minhotset, k);
 
       // generate candidates for max distance.
-      ArrayList<DoubleObjPair<DBID>> np2 = new ArrayList<DoubleObjPair<DBID>>(k * 2 + randomsize * 2);
-      for(DoubleObjPair<DBID> pair : minhotset) {
-        DBID id2 = pair.getSecond();
+      ArrayList<DoubleDBIDPair> np2 = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
+      for(DoubleDBIDPair pair : minhotset) {
         // skip the object itself
-        if(id1.compareTo(id2) == 0) {
+        if(DBIDUtil.equal(id1, pair)) {
           continue;
         }
-        double d = distFunc.distance(id1, id2).doubleValue();
-        np2.add(new DoubleObjPair<DBID>(d, id1));
-        np2.add(new DoubleObjPair<DBID>(d, id2));
+        double d = distFunc.distance(id1, pair).doubleValue();
+        np2.add(DBIDUtil.newPair(d, id1));
+        np2.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        DBID id2 = DBIDUtil.deref(iter2);
-        double d = distFunc.distance(id1, id2).doubleValue();
-        np.add(new DoubleObjPair<DBID>(d, id1));
-        np.add(new DoubleObjPair<DBID>(d, id2));
+        double d = distFunc.distance(id1, iter2).doubleValue();
+        np.add(DBIDUtil.newPair(d, id1));
+        np.add(DBIDUtil.newPair(d, iter2));
       }
       maxhotset.addAll(np2);
       shrinkHeap(maxhotset, k);
@@ -348,14 +353,21 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         randomset.set((int) Math.floor(rnd.nextDouble() * randomsize), id1);
       }
     }
-    return new DoubleMinMax(minhotset.first().first, maxhotset.first().first);
+    return new DoubleMinMax(minhotset.first().doubleValue(), maxhotset.first().doubleValue());
   }
 
-  private DoubleMinMax exactMinMax(Relation<O> database, DistanceQuery<O, D> distFunc) {
+  /**
+   * Compute the exact maximum and minimum.
+   * 
+   * @param relation Relation to process
+   * @param distFunc Distance function
+   * @return Exact maximum and minimum
+   */
+  private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
-    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      for(DBIDIter iditer2 = database.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
         // skip the point itself.
         if(DBIDUtil.equal(iditer, iditer2)) {
           continue;
@@ -367,17 +379,23 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     return minmax;
   }
 
-  private void shrinkHeap(TreeSet<DoubleObjPair<DBID>> hotset, int k) {
+  /**
+   * Shrink the heap of "hot" (extreme) items.
+   * 
+   * @param hotset Set of hot items
+   * @param k target size
+   */
+  private static void shrinkHeap(TreeSet<DoubleDBIDPair> hotset, int k) {
     // drop duplicates
     ModifiableDBIDs seenids = DBIDUtil.newHashSet(2 * k);
     int cnt = 0;
-    for(Iterator<DoubleObjPair<DBID>> i = hotset.iterator(); i.hasNext();) {
-      DoubleObjPair<DBID> p = i.next();
-      if(cnt > k || seenids.contains(p.getSecond())) {
+    for(Iterator<DoubleDBIDPair> i = hotset.iterator(); i.hasNext();) {
+      DoubleDBIDPair p = i.next();
+      if(cnt > k || seenids.contains(p)) {
         i.remove();
       }
       else {
-        seenids.add(p.getSecond());
+        seenids.add(p);
         cnt++;
       }
     }
@@ -407,12 +425,12 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     private int numbin = 20;
 
     /**
-     * Sampling
+     * Sampling.
      */
     private boolean sampling = false;
 
     /**
-     * Sampling
+     * Exactness flag.
      */
     private boolean exact = false;
 
@@ -424,19 +442,19 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         numbin = numbinP.getValue();
       }
 
-      final Flag EXACT_FLAG = new Flag(EXACT_ID);
-      if(config.grab(EXACT_FLAG)) {
-        exact = EXACT_FLAG.getValue();
+      final Flag exactF = new Flag(EXACT_ID);
+      if(config.grab(exactF)) {
+        exact = exactF.getValue();
       }
 
-      final Flag SAMPLING_FLAG = new Flag(SAMPLING_ID);
-      if(config.grab(SAMPLING_FLAG)) {
-        sampling = SAMPLING_FLAG.getValue();
+      final Flag samplingF = new Flag(SAMPLING_ID);
+      if(config.grab(samplingF)) {
+        sampling = samplingF.getValue();
       }
 
       ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
-      exclusive.add(EXACT_FLAG);
-      exclusive.add(SAMPLING_FLAG);
+      exclusive.add(exactF);
+      exclusive.add(samplingF);
       config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
     }
 
