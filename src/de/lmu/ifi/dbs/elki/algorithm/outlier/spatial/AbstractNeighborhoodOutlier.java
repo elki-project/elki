@@ -79,7 +79,7 @@ public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<O
    * 
    * @param <O> Object type
    */
-  public static abstract class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * The predicate to obtain the neighbors.
      */

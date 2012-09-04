@@ -42,11 +42,11 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  */
 public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   /**
-   * Get the array store
+   * Get the array store.
    * 
    * @return the store
    */
-  abstract protected TIntList getStore();
+  protected abstract TIntList getStore();
 
   @Override
   public DBIDArrayMIter iter() {
@@ -93,7 +93,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   }
 
   /**
-   * Iterate over a Trove IntList, ELKI/C-style
+   * Iterate over a Trove IntList, ELKI/C-style.
    * 
    * @author Erich Schubert
    * 
@@ -101,12 +101,12 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
    */
   protected static class DBIDItr implements DBIDArrayMIter, IntegerDBIDRef {
     /**
-     * Current position
+     * Current position.
      */
     int pos = 0;
 
     /**
-     * The actual store we use
+     * The actual store we use.
      */
     TIntList store;
 
@@ -165,11 +165,17 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
       store.removeAt(pos);
       pos--;
     }
+    
+    @Override
+    public int hashCode() {
+      // Since we add a warning to 'equals', we also override hashCode.
+      return super.hashCode();
+    }
 
     @Override
     public boolean equals(Object other) {
       if(other instanceof DBID) {
-        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
+        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use DBIDUtil.equal(iter, id)!", new Throwable());
       }
       return super.equals(other);
     }

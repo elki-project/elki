@@ -127,7 +127,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
     /**
      * The index factory we use.
      */

@@ -73,6 +73,10 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
 
   /**
    * Iterates over all points in the database.
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
+   * @return Distance matrix
    */
   public CollectionResult<CTriple<DBID, DBID, Double>> run(Database database, Relation<O> relation) {
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());

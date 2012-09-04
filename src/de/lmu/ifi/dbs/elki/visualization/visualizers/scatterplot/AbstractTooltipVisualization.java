@@ -113,7 +113,16 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
     }
   }
 
-  abstract protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize);
+  /**
+   * Make a tooltip Element for this id.
+   * 
+   * @param id Id to make a tooltip for
+   * @param x X position
+   * @param y Y position
+   * @param dotsize Size of a dot
+   * @return Element
+   */
+  protected abstract Element makeTooltip(DBIDRef id, double x, double y, double dotsize);
 
   /**
    * Handle the hover events.
@@ -169,7 +178,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
    * 
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
-  abstract protected void setupCSS(SVGPlot svgp);
+  protected abstract void setupCSS(SVGPlot svgp);
 
   @Override
   public void resultChanged(Result current) {

@@ -84,7 +84,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
    * @param <O> Non-spatial object type
    * @param <D> Distance value type
    */
-  public static abstract class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public abstract static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**
      * The distance function to use on the non-spatial attributes.
      */

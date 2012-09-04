@@ -53,7 +53,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
   /**
    * Preprocessing step.
    */
-  abstract protected void preprocess();
+  protected abstract void preprocess();
 
   @Override
   public BitSet getPreferenceVector(DBIDRef objid) {
@@ -64,14 +64,14 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
   }
 
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractPreferenceVectorIndex oneway - - «create»
    */
-  public static abstract class Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
+  public abstract static class Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
     @Override
     public abstract I instantiate(Relation<V> relation);
 

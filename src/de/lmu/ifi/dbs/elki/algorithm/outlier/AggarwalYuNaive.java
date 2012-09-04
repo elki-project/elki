@@ -65,6 +65,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * @author Ahmed Hettab
  * @author Erich Schubert
+ * 
+ * @param <V> Vector type
  */
 // TODO: progress logging!
 @Title("BruteForce: Outlier detection for high dimensional data")
@@ -144,7 +146,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
     // calculate the sparsity coefficient
     for(Vector<IntIntPair> sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);
-      final double sparsityC = sparsity(ids.size(), size, k);
+      final double sparsityC = sparsity(ids.size(), size, k, phi);
 
       if(sparsityC < 0) {
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {

@@ -45,6 +45,9 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
    * 
    * In the main pass, each object is then filtered using
    * {@link #filterSingleObject}.
+   * 
+   * @param objects Objects to filter
+   * @return Filtered bundle
    */
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
@@ -100,14 +103,14 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
    * @param obj Database object to normalize
    * @return Normalized database object
    */
-  abstract protected O filterSingleObject(I obj);
+  protected abstract O filterSingleObject(I obj);
 
   /**
    * Get the input type restriction used for negotiating the data query.
    * 
    * @return Type restriction
    */
-  abstract protected SimpleTypeInformation<? super I> getInputTypeRestriction();
+  protected abstract SimpleTypeInformation<? super I> getInputTypeRestriction();
 
   /**
    * Get the output type from the input type after conversion.
@@ -115,10 +118,10 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
    * @param in input type restriction
    * @return output type restriction
    */
-  abstract protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<I> in);
+  protected abstract SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<I> in);
 
   /**
-   * Return "true" when the normalization needs initialization (two-pass filtering!)
+   * Return "true" when the normalization needs initialization (two-pass filtering!).
    * 
    * @param in Input type information
    * @return true or false
@@ -137,7 +140,7 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
   }
 
   /**
-   * Complete the initialization phase
+   * Complete the initialization phase.
    */
   protected void prepareComplete() {
     // optional - default NOOP.

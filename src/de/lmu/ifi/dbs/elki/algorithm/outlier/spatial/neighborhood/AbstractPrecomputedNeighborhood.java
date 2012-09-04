@@ -70,7 +70,7 @@ public abstract class AbstractPrecomputedNeighborhood implements NeighborSetPred
    * 
    * @return Logger
    */
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 
   /**
    * Factory class.

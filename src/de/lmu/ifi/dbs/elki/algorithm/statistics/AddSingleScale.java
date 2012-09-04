@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 @Description("Setup a scaling so that all dimensions are scaled equally in visualization.")
 public class AddSingleScale implements Algorithm {
   /**
-   * Minimum and maximum to use
+   * Minimum and maximum to use.
    */
   double[] minmax = null;
 
@@ -90,14 +90,14 @@ public class AddSingleScale implements Algorithm {
     final int dim = DatabaseUtil.dimensionality(rel);
     LinearScale[] scales = new LinearScale[dim];
     if(minmax == null) {
-      DoubleMinMax minmax = new DoubleMinMax();
+      DoubleMinMax mm = new DoubleMinMax();
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector<?, ?> vec = rel.get(iditer);
         for(int d = 1; d <= dim; d++) {
-          minmax.put(vec.doubleValue(d));
+          mm.put(vec.doubleValue(d));
         }
       }
-      LinearScale scale = new LinearScale(minmax.getMin(), minmax.getMax());
+      LinearScale scale = new LinearScale(mm.getMin(), mm.getMax());
       for(int i = 0; i < dim; i++) {
         scales[i] = scale;
       }
@@ -119,7 +119,7 @@ public class AddSingleScale implements Algorithm {
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 
@@ -127,12 +127,12 @@ public class AddSingleScale implements Algorithm {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Minimum and maximum to use
+     * Minimum and maximum to use.
      */
     double[] minmax = null;
 
     /**
-     * Minimum and maximum values
+     * Minimum and maximum values.
      */
     public static final OptionID MINMAX_ID = OptionID.getOrCreateOptionID("scales.minmax", "Forcibly set the scales to the given range.");
 

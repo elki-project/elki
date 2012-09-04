@@ -174,10 +174,10 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
    * 
    * @return the static logger
    */
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 
   /**
-   * Make a default distance function configuration option
+   * Make a default distance function configuration option.
    * 
    * @param <F> Distance function type
    * @param defaultDistanceFunction Default value

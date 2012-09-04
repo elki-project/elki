@@ -53,7 +53,7 @@ public class AggregatingHistogram<T, D> extends ReplacingHistogram<T> {
    * @param <T> Histogram bin type
    * @param <D> Incoming data type
    */
-  public static abstract class Adapter<T, D> extends ReplacingHistogram.Adapter<T> {
+  public abstract static class Adapter<T, D> extends ReplacingHistogram.Adapter<T> {
     /**
      * Update an existing histogram value with new data.
      * 

@@ -254,7 +254,7 @@ public abstract class AbstractApplication implements Parameterizable {
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Verbose flag
      */

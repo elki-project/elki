@@ -87,7 +87,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
    * @apiviz.has ClassLabel - - «creates»
    * @apiviz.stereotype factory
    */
-  public static abstract class Factory<L extends ClassLabel> implements InspectionUtilFrequentlyScanned {
+  public abstract static class Factory<L extends ClassLabel> implements InspectionUtilFrequentlyScanned {
     /**
      * Set for reusing the same objects.
      */

@@ -138,7 +138,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     protected int k;
 
     protected int k_i;

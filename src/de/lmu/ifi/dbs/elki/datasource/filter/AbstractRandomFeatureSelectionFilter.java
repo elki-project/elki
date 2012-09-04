@@ -137,7 +137,7 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
     protected int k = 0;
     
     protected long seed = System.currentTimeMillis();

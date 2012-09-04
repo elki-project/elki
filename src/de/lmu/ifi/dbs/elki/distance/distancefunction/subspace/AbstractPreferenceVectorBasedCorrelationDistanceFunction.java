@@ -210,7 +210,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<F> {
+  public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<F> {
     protected double epsilon = 0.0;
 
     @Override

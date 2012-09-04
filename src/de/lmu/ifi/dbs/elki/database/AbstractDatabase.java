@@ -85,12 +85,12 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   protected final List<Relation<?>> relations = new java.util.Vector<Relation<?>>();
 
   /**
-   * Indexes
+   * Indexes.
    */
   protected final List<Index> indexes = new java.util.Vector<Index>();
 
   /**
-   * Index factories
+   * Index factories.
    */
   protected final Collection<IndexFactory<?, ?>> indexFactories = new java.util.Vector<IndexFactory<?, ?>>();
 
@@ -302,5 +302,5 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
     return "database";
   }
 
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 }

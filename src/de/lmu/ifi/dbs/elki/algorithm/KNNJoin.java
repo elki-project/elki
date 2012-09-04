@@ -97,7 +97,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
 
   /**
-   * The k parameter
+   * The k parameter.
    */
   int k;
 
@@ -121,11 +121,11 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   @SuppressWarnings("unchecked")
   public WritableDataStore<KNNResult<D>> run(Database database, Relation<V> relation) {
-    if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
+    if (!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
     Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(database, SpatialIndexTree.class);
-    if(indexes.size() != 1) {
+    if (indexes.size() != 1) {
       throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
     // FIXME: Ensure were looking at the right relation!
@@ -140,7 +140,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     Heap<Task> pq = new Heap<Task>(ps_candidates.size() * ps_candidates.size() / 10);
 
     // Initialize with the page self-pairing
-    for(int i = 0; i < ps_candidates.size(); i++) {
+    for (int i = 0; i < ps_candidates.size(); i++) {
       E pr_entry = ps_candidates.get(i);
       N pr = index.getNode(pr_entry);
       heaps.add(initHeaps(distFunction, pr));
@@ -148,42 +148,41 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
 
     // Build priority queue
     final int sqsize = ps_candidates.size() * (ps_candidates.size() - 1) / 2;
-    if(LOG.isDebuggingFine()) {
+    if (LOG.isDebuggingFine()) {
       LOG.debugFine("Number of leaves: " + ps_candidates.size() + " so " + sqsize + " MBR computations.");
     }
     FiniteProgress mprogress = LOG.isVerbose() ? new FiniteProgress("Comparing leaf MBRs", sqsize, LOG) : null;
-    for(int i = 0; i < ps_candidates.size(); i++) {
+    for (int i = 0; i < ps_candidates.size(); i++) {
       E pr_entry = ps_candidates.get(i);
       List<KNNHeap<D>> pr_heaps = heaps.get(i);
       D pr_knn_distance = computeStopDistance(pr_heaps);
 
-      for(int j = i + 1; j < ps_candidates.size(); j++) {
+      for (int j = i + 1; j < ps_candidates.size(); j++) {
         E ps_entry = ps_candidates.get(j);
         List<KNNHeap<D>> ps_heaps = heaps.get(j);
         D ps_knn_distance = computeStopDistance(ps_heaps);
         D minDist = distFunction.minDist(pr_entry, ps_entry);
         // Resolve immediately:
-        if(minDist.isNullDistance()) {
+        if (minDist.isNullDistance()) {
           N pr = index.getNode(ps_candidates.get(i));
           N ps = index.getNode(ps_candidates.get(j));
           processDataPagesOptimize(distFunction, pr_heaps, ps_heaps, pr, ps);
-        }
-        else if(minDist.compareTo(pr_knn_distance) <= 0 || minDist.compareTo(ps_knn_distance) <= 0) {
+        } else if (minDist.compareTo(pr_knn_distance) <= 0 || minDist.compareTo(ps_knn_distance) <= 0) {
           pq.add(new Task(minDist, i, j));
         }
-        if(mprogress != null) {
+        if (mprogress != null) {
           mprogress.incrementProcessed(LOG);
         }
       }
     }
-    if(mprogress != null) {
+    if (mprogress != null) {
       mprogress.ensureCompleted(LOG);
     }
 
     // Process the queue
     FiniteProgress qprogress = LOG.isVerbose() ? new FiniteProgress("Processing queue", pq.size(), LOG) : null;
     IndefiniteProgress fprogress = LOG.isVerbose() ? new IndefiniteProgress("Full comparisons", LOG) : null;
-    while(!pq.isEmpty()) {
+    while (!pq.isEmpty()) {
       Task task = pq.poll();
       List<KNNHeap<D>> pr_heaps = heaps.get(task.i);
       List<KNNHeap<D>> ps_heaps = heaps.get(task.j);
@@ -191,32 +190,30 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       D ps_knn_distance = computeStopDistance(ps_heaps);
       boolean dor = task.mindist.compareTo(pr_knn_distance) <= 0;
       boolean dos = task.mindist.compareTo(ps_knn_distance) <= 0;
-      if(dor || dos) {
+      if (dor || dos) {
         N pr = index.getNode(ps_candidates.get(task.i));
         N ps = index.getNode(ps_candidates.get(task.j));
-        if(dor && dos) {
+        if (dor && dos) {
           processDataPagesOptimize(distFunction, pr_heaps, ps_heaps, pr, ps);
-        }
-        else {
-          if(dor) {
+        } else {
+          if (dor) {
             processDataPagesOptimize(distFunction, pr_heaps, null, pr, ps);
-          }
-          else /* dos */{
+          } else /* dos */{
             processDataPagesOptimize(distFunction, ps_heaps, null, ps, pr);
           }
         }
-        if(fprogress != null) {
+        if (fprogress != null) {
           fprogress.incrementProcessed(LOG);
         }
       }
-      if(qprogress != null) {
+      if (qprogress != null) {
         qprogress.incrementProcessed(LOG);
       }
     }
-    if(qprogress != null) {
+    if (qprogress != null) {
       qprogress.ensureCompleted(LOG);
     }
-    if(fprogress != null) {
+    if (fprogress != null) {
       fprogress.setCompleted(LOG);
     }
 
@@ -226,12 +223,12 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
     // null;
     FiniteProgress pageprog = LOG.isVerbose() ? new FiniteProgress("Number of processed data pages", ps_candidates.size(), LOG) : null;
     // int processed = 0;
-    for(int i = 0; i < ps_candidates.size(); i++) {
+    for (int i = 0; i < ps_candidates.size(); i++) {
       N pr = index.getNode(ps_candidates.get(i));
       List<KNNHeap<D>> pr_heaps = heaps.get(i);
 
       // Finalize lists
-      for(int j = 0; j < pr.getNumEntries(); j++) {
+      for (int j = 0; j < pr.getNumEntries(); j++) {
         knnLists.put(((LeafEntry) pr.getEntry(j)).getDBID(), pr_heaps.get(j).toKNNList());
       }
       // Forget heaps and pq
@@ -241,23 +238,30 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       // if(progress != null) {
       // progress.setProcessed(processed, logger);
       // }
-      if(pageprog != null) {
+      if (pageprog != null) {
         pageprog.incrementProcessed(LOG);
       }
     }
     // if(progress != null) {
     // progress.ensureCompleted(logger);
     // }
-    if(pageprog != null) {
+    if (pageprog != null) {
       pageprog.ensureCompleted(LOG);
     }
     return knnLists;
   }
 
+  /**
+   * Initialize the heaps
+   * 
+   * @param distFunction Distance function
+   * @param pr Node to initialize for
+   * @return List of heaps
+   */
   private List<KNNHeap<D>> initHeaps(SpatialPrimitiveDistanceFunction<V, D> distFunction, N pr) {
     List<KNNHeap<D>> pr_heaps = new ArrayList<KNNHeap<D>>(pr.getNumEntries());
     // Create for each data object a knn heap
-    for(int j = 0; j < pr.getNumEntries(); j++) {
+    for (int j = 0; j < pr.getNumEntries(); j++) {
       pr_heaps.add(KNNUtil.newHeap(distFunction, k));
     }
     // Self-join first, as this is expected to improve most and cannot be
@@ -278,20 +282,19 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   @SuppressWarnings("unchecked")
   private void processDataPagesOptimize(SpatialPrimitiveDistanceFunction<V, D> distFunction, List<? extends KNNHeap<D>> pr_heaps, List<? extends KNNHeap<D>> ps_heaps, N pr, N ps) {
-    if(DistanceUtil.isDoubleDistanceFunction(distFunction)) {
+    if (DistanceUtil.isDoubleDistanceFunction(distFunction)) {
       List<?> khp = (List<?>) pr_heaps;
       List<?> khs = (List<?>) ps_heaps;
       processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<DoubleDistanceKNNHeap>) khp, (List<DoubleDistanceKNNHeap>) khs);
-    }
-    else {
-      for(int j = 0; j < ps.getNumEntries(); j++) {
+    } else {
+      for (int j = 0; j < ps.getNumEntries(); j++) {
         final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
         DBID s_id = s_e.getDBID();
-        for(int i = 0; i < pr.getNumEntries(); i++) {
+        for (int i = 0; i < pr.getNumEntries(); i++) {
           final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
           D distance = distFunction.minDist(s_e, r_e);
           pr_heaps.get(i).add(distance, s_id);
-          if(pr != ps && ps_heaps != null) {
+          if (pr != ps && ps_heaps != null) {
             ps_heaps.get(j).add(distance, r_e.getDBID());
           }
         }
@@ -311,14 +314,14 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<DoubleDistanceKNNHeap> pr_heaps, List<DoubleDistanceKNNHeap> ps_heaps) {
     // Compare pairwise
-    for(int j = 0; j < ps.getNumEntries(); j++) {
+    for (int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
       DBID s_id = s_e.getDBID();
-      for(int i = 0; i < pr.getNumEntries(); i++) {
+      for (int i = 0; i < pr.getNumEntries(); i++) {
         final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
         double distance = df.doubleMinDist(s_e, r_e);
         pr_heaps.get(i).add(distance, s_id);
-        if(pr != ps && ps_heaps != null) {
+        if (pr != ps && ps_heaps != null) {
           ps_heaps.get(j).add(distance, r_e.getDBID());
         }
       }
@@ -326,24 +329,23 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   }
 
   /**
-   * Compute the maximum stop distance
+   * Compute the maximum stop distance.
    * 
-   * @param heaps
+   * @param heaps Heaps list
    * @return the k-nearest neighbor distance of pr in ps
    */
   private D computeStopDistance(List<KNNHeap<D>> heaps) {
     // Update pruning distance
     D pr_knn_distance = null;
-    for(KNNHeap<D> knnList : heaps) {
+    for (KNNHeap<D> knnList : heaps) {
       // set kNN distance of r
-      if(pr_knn_distance == null) {
+      if (pr_knn_distance == null) {
         pr_knn_distance = knnList.getKNNDistance();
-      }
-      else {
+      } else {
         pr_knn_distance = DistanceUtil.max(knnList.getKNNDistance(), pr_knn_distance);
       }
     }
-    if(pr_knn_distance == null) {
+    if (pr_knn_distance == null) {
       return getDistanceFunction().getDistanceFactory().infiniteDistance();
     }
     return pr_knn_distance;
@@ -360,25 +362,34 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   }
 
   /**
-   * Task in the processing queue
+   * Task in the processing queue.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
   private class Task implements Comparable<Task> {
+    /**
+     * Minimum distance
+     */
     final D mindist;
 
+    /**
+     * First offset
+     */
     final int i;
 
+    /**
+     * Second offset
+     */
     final int j;
 
     /**
      * Constructor.
      * 
-     * @param mindist
-     * @param i
-     * @param j
+     * @param mindist Minimum distance
+     * @param i First offset
+     * @param j Second offset
      */
     public Task(D mindist, int i, int j) {
       super();
@@ -401,6 +412,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+    /**
+     * K parameter
+     */
     protected int k;
 
     @Override
@@ -408,7 +422,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID, 1);
       kP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      if (config.grab(kP)) {
         k = kP.getValue();
       }
     }

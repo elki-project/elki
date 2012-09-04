@@ -166,7 +166,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O> extends AbstractParameterizer {
+  public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Holds the similarity function.
      */

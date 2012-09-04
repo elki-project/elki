@@ -88,6 +88,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * Constructor.
    * 
    * @param distanceFunction Distance function
+   * @param k K parameter
    * @param sampling Sampling rate
    * @param seed Random sampling seed (may be null)
    */
@@ -182,22 +183,22 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     private static final OptionID K_ID = OptionID.getOrCreateOptionID("avep.k", "K to compute the average precision at.");
 
     /**
-     * Parameter to enable sampling
+     * Parameter to enable sampling.
      */
     public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("avep.sampling", "Relative amount of object to sample.");
 
     /**
-     * Parameter to control the sampling random seed
+     * Parameter to control the sampling random seed.
      */
     public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("avep.sampling-seed", "Random seed for deterministic sampling.");
 
     /**
-     * Neighborhood size
+     * Neighborhood size.
      */
     protected int k = 20;
     
     /**
-     * Relative amount of data to sample
+     * Relative amount of data to sample.
      */
     protected double sampling = 1.0;
     

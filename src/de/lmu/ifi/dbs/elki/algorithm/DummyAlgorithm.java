@@ -60,8 +60,7 @@ public class DummyAlgorithm<O extends NumberVector<?, ?>> extends AbstractAlgori
   private static final Logging LOG = Logging.getLogger(DummyAlgorithm.class);
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public DummyAlgorithm() {
     super();

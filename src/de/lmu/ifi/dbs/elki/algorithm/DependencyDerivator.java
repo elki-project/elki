@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * attributes of a given dataset based on a linear correlation PCA.
  * </p>
  * 
+ * <p>
  * Reference: <br>
  * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek: Deriving
  * Quantitative Dependencies for Correlation Clusters. <br>
@@ -97,7 +98,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   /**
    * Optional parameter to specify the threshold for the size of the random
    * sample to use, must be an integer greater than 0.
-   * <p/>
+   * <p>
    * Default value: the size of the complete dataset
    * </p>
    */
@@ -116,7 +117,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
   /**
    * Number format for output of solution.
    */
-  public final NumberFormat NF;
+  private final NumberFormat nf;
 
   /**
    * Flag for random sampling vs. kNN
@@ -134,7 +135,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    */
   public DependencyDerivator(PrimitiveDistanceFunction<V, D> distanceFunction, NumberFormat nf, PCAFilteredRunner<V> pca, int sampleSize, boolean randomsample) {
     super(distanceFunction);
-    this.NF = nf;
+    this.nf = nf;
     this.pca = pca;
     this.sampleSize = sampleSize;
     this.randomsample = randomsample;
@@ -158,7 +159,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {
-        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1l);
+        ids = DBIDUtil.randomSample(relation.getDBIDs(), this.sampleSize, 1L);
       }
       else {
         DistanceQuery<V, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
@@ -216,37 +217,36 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
       if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Strong Eigenvectors:\n");
-        log.append(FormatUtil.format(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()), NF)).append('\n');
+        log.append(FormatUtil.format(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()), nf)).append('\n');
         log.append("Transposed weak Eigenvectors:\n");
-        log.append(FormatUtil.format(transposedWeakEigenvectors, NF)).append('\n');
+        log.append(FormatUtil.format(transposedWeakEigenvectors, nf)).append('\n');
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), " , ", 2));
         LOG.debugFine(log.toString());
       }
-      Vector B = transposedWeakEigenvectors.times(centroid);
+      Vector b = transposedWeakEigenvectors.times(centroid);
       if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Centroid:\n").append(centroid).append('\n');
         log.append("tEV * Centroid\n");
-        log.append(B);
+        log.append(b);
         LOG.debugFine(log.toString());
       }
 
       // +1 == + B.getColumnDimensionality()
       Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + 1);
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
-      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), B);
+      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), b);
 
       if(LOG.isDebuggingFiner()) {
-        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, NF));
+        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, nf));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
       double[][] we = transposedWeakEigenvectors.getArrayRef();
-      double[] b = B.getArrayRef();
       System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimensionality());
 
-      LinearEquationSystem lq = new LinearEquationSystem(a, b);
+      LinearEquationSystem lq = new LinearEquationSystem(a, b.getArrayRef());
       lq.solveByTotalPivotSearch();
 
       sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
@@ -255,7 +255,7 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
         StringBuilder log = new StringBuilder();
         log.append("Solution:\n");
         log.append("Standard deviation ").append(sol.getStandardDeviation());
-        log.append(lq.equationsToString(NF.getMaximumFractionDigits()));
+        log.append(lq.equationsToString(nf.getMaximumFractionDigits()));
         LOG.debugFine(log.toString());
       }
     }
@@ -280,54 +280,57 @@ public class DependencyDerivator<V extends NumberVector<V, ?>, D extends Distanc
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+    /**
+     * Output accuracy.
+     */
     protected int outputAccuracy = 0;
 
+    /**
+     * Sample size.
+     */
     protected int sampleSize = 0;
 
+    /**
+     * Flag to enable random sampling
+     */
     protected boolean randomSample = false;
 
+    /**
+     * Class to compute PCA with
+     */
     protected PCAFilteredRunner<V> pca = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configAccuracy(config);
-      configSampleSize(config);
-      configRandomSampleFlag(config);
-      Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
-      pca = config.tryInstantiate(cls);
-    }
-
-    public void configRandomSampleFlag(Parameterization config) {
-      Flag randomSampleF = new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
-      if(config.grab(randomSampleF)) {
-        randomSample = randomSampleF.getValue();
-      }
-    }
-
-    public void configSampleSize(Parameterization config) {
-      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID, true);
-      sampleSizeP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(sampleSizeP)) {
-        sampleSize = sampleSizeP.getValue();
-      }
-    }
-
-    public void configAccuracy(Parameterization config) {
+      
       IntParameter outputAccuracyP = new IntParameter(OUTPUT_ACCURACY_ID, 4);
       outputAccuracyP.addConstraint(new GreaterEqualConstraint(0));
       if(config.grab(outputAccuracyP)) {
         outputAccuracy = outputAccuracyP.getValue();
       }
+      
+      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID, true);
+      sampleSizeP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(sampleSizeP)) {
+        sampleSize = sampleSizeP.getValue();
+      }
+      
+      Flag randomSampleF = new Flag(DEPENDENCY_DERIVATOR_RANDOM_SAMPLE);
+      if(config.grab(randomSampleF)) {
+        randomSample = randomSampleF.getValue();
+      }
+      Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
+      pca = config.tryInstantiate(cls);
     }
 
     @Override
     protected DependencyDerivator<V, D> makeInstance() {
-      NumberFormat NF = NumberFormat.getInstance(Locale.US);
-      NF.setMaximumFractionDigits(outputAccuracy);
-      NF.setMinimumFractionDigits(outputAccuracy);
+      NumberFormat nf = NumberFormat.getInstance(Locale.US);
+      nf.setMaximumFractionDigits(outputAccuracy);
+      nf.setMinimumFractionDigits(outputAccuracy);
 
-      return new DependencyDerivator<V, D>(distanceFunction, NF, pca, sampleSize, randomSample);
+      return new DependencyDerivator<V, D>(distanceFunction, nf, pca, sampleSize, randomSample);
     }
   }
 }

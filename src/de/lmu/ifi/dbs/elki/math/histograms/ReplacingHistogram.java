@@ -49,7 +49,7 @@ public class ReplacingHistogram<T> implements Iterable<DoubleObjPair<T>> {
    * 
    * @param <T> Data type
    */
-  public static abstract class Adapter<T> {
+  public abstract static class Adapter<T> {
     /**
      * Construct a new T when needed.
      * 

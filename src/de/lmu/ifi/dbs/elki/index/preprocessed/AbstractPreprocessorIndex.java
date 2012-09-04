@@ -41,12 +41,14 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  */
 public abstract class AbstractPreprocessorIndex<O, R> extends AbstractIndex<O> {
   /**
-   * The data store
+   * The data store.
    */
   protected WritableDataStore<R> storage = null;
 
   /**
    * Constructor.
+   * 
+   * @param relation Relation to index
    */
   public AbstractPreprocessorIndex(Relation<O> relation) {
     super(relation);
@@ -57,5 +59,5 @@ public abstract class AbstractPreprocessorIndex<O, R> extends AbstractIndex<O> {
    * 
    * @return Logger
    */
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 }

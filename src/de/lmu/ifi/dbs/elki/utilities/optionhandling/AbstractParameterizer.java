@@ -37,22 +37,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 public abstract class AbstractParameterizer implements Parameterizer {
   /**
-   * Constant for "fresh" state
+   * Constant for "fresh" state.
    */
   private static final int STATE_FRESH = 0;
 
   /**
-   * Constant for "initializing" state
+   * Constant for "initializing" state.
    */
   private static final int STATE_INIT = 1;
 
   /**
-   * Constant for "complete" state
+   * Constant for "complete" state.
    */
   private static final int STATE_COMPLETE = 2;
 
   /**
-   * Constant for "errors" state
+   * Constant for "errors" state.
    */
   private static final int STATE_ERRORS = -1;
 
@@ -84,7 +84,7 @@ public abstract class AbstractParameterizer implements Parameterizer {
    * 
    * @return instance
    */
-  abstract protected Object makeInstance();
+  protected abstract Object makeInstance();
 
   /**
    * Method to configure a class, then instantiate when the configuration step

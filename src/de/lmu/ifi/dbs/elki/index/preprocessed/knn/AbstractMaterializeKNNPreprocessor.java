@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  * @param <D> Distance type
+ * @param <T> Result type
  */
 public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D>, T extends KNNResult<D>> extends AbstractPreprocessorIndex<O, T> implements KNNIndex<O> {
   /**
@@ -155,8 +156,8 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
 
   @SuppressWarnings("unchecked")
   @Override
-  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    if(!this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
+  public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distQ, Object... hints) {
+    if(!this.distanceFunction.equals(distQ.getDistanceFunction())) {
       return null;
     }
     // k max supported?
@@ -185,7 +186,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static abstract class Factory<O, D extends Distance<D>, T extends KNNResult<D>> implements IndexFactory<O, KNNIndex<O>> {
+  public abstract static class Factory<O, D extends Distance<D>, T extends KNNResult<D>> implements IndexFactory<O, KNNIndex<O>> {
     /**
      * Parameter to specify the number of nearest neighbors of an object to be
      * materialized. must be an integer greater than 1.
@@ -231,7 +232,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
     }
 
     @Override
-    abstract public AbstractMaterializeKNNPreprocessor<O, D, T> instantiate(Relation<O> relation);
+    public abstract AbstractMaterializeKNNPreprocessor<O, D, T> instantiate(Relation<O> relation);
 
     /**
      * Get the distance function.
@@ -264,7 +265,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
      * 
      * @apiviz.exclude
      */
-    public static abstract class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
+    public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
       /**
        * Holds the value of {@link #K_ID}.
        */
@@ -292,7 +293,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
       }
 
       @Override
-      abstract protected Factory<O, D, ?> makeInstance();
+      protected abstract Factory<O, D, ?> makeInstance();
     }
   }
 }

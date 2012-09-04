@@ -37,12 +37,12 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
  */
 public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStreamFilter {
   /**
-   * The filtered meta
+   * The filtered meta.
    */
   BundleMeta meta;
 
   /**
-   * The column to filter
+   * The column to filter.
    */
   int column = -1;
 
@@ -98,14 +98,14 @@ public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStrea
    * @param obj Database object to normalize
    * @return Normalized database object
    */
-  abstract protected O filterSingleObject(I obj);
+  protected abstract O filterSingleObject(I obj);
 
   /**
    * Get the input type restriction used for negotiating the data query.
    * 
    * @return Type restriction
    */
-  abstract protected SimpleTypeInformation<? super I> getInputTypeRestriction();
+  protected abstract SimpleTypeInformation<? super I> getInputTypeRestriction();
 
   /**
    * Get the output type from the input type after conversion.
@@ -113,5 +113,5 @@ public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStrea
    * @param in input type restriction
    * @return output type restriction
    */
-  abstract protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<I> in);
+  protected abstract SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<I> in);
 }

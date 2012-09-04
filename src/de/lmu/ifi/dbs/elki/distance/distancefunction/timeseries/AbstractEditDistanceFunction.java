@@ -84,7 +84,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     protected double bandSize = 0.0;
 
     @Override

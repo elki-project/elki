@@ -182,7 +182,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Filters
      */

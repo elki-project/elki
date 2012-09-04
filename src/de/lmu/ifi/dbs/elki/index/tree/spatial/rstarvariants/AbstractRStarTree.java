@@ -80,7 +80,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
-  protected static final boolean extraIntegrityChecks = false;
+  protected static final boolean EXTRA_INTEGRITY_CHECKS = false;
 
   /**
    * The height of this R*-Tree.
@@ -93,7 +93,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   public int distanceCalcs = 0;
 
   /**
-   * The last inserted entry
+   * The last inserted entry.
    */
   E lastInsertedEntry = null;
 
@@ -103,27 +103,27 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected BulkSplit bulkSplitter;
 
   /**
-   * The split strategy
+   * The split strategy.
    */
   protected SplitStrategy nodeSplitter = TopologicalSplitter.STATIC;
 
   /**
-   * The insertion strategy to use
+   * The insertion strategy to use.
    */
   protected InsertionStrategy insertionStrategy = LeastOverlapInsertionStrategy.STATIC;
 
   /**
-   * Overflow treatment
+   * Overflow treatment.
    */
   protected OverflowTreatment overflowTreatment = LimitedReinsertOverflowTreatment.RSTAR_OVERFLOW;
 
   /**
-   * Relative minimum fill
+   * Relative minimum fill.
    */
   protected double relativeMinFill = 0.4;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param pagefile Page file
    */
@@ -132,7 +132,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
-   * Set the bulk loading strategy
+   * Set the bulk loading strategy.
    * 
    * @param bulkSplitter Bulk loading strategy
    */
@@ -155,7 +155,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
-   * Set insertion strategy
+   * Set insertion strategy.
    * 
    * @param insertionStrategy the insertion strategy to set
    */
@@ -319,6 +319,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Initializes this R*-Tree from an existing persistent file.
+   * 
+   * {@inheritDoc}
    */
   @Override
   public void initializeFromFile(TreeIndexHeader header, PageFile<N> file) {
@@ -454,8 +456,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor.
+   * 
+   * @param entries Entries to bulk load
    */
-  abstract protected void bulkLoad(List<E> entrys);
+  protected abstract void bulkLoad(List<E> entries);
 
   /**
    * Returns the height of this R*-Tree.
@@ -480,7 +484,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * 
    * @return the height of this RTree
    */
-  abstract protected int computeHeight();
+  protected abstract int computeHeight();
 
   /**
    * Returns true if in the specified node an overflow occurred, false
@@ -489,7 +493,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occurred, false otherwise
    */
-  abstract protected boolean hasOverflow(N node);
+  protected abstract boolean hasOverflow(N node);
 
   /**
    * Returns true if in the specified node an underflow occurred, false
@@ -499,7 +503,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @return true if in the specified node an underflow occurred, false
    *         otherwise
    */
-  abstract protected boolean hasUnderflow(N node);
+  protected abstract boolean hasUnderflow(N node);
 
   /**
    * Creates a new directory entry representing the specified node.
@@ -507,7 +511,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param node the node to be represented by the new entry
    * @return the newly created directory entry
    */
-  abstract protected E createNewDirectoryEntry(N node);
+  protected abstract E createNewDirectoryEntry(N node);
 
   /**
    * Creates a new root node that points to the two specified child nodes and
@@ -889,7 +893,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   }
 
   /**
-   * Determines the entries pointing to the leaf nodes of the specified subtree
+   * Determines the entries pointing to the leaf nodes of the specified subtree.
    * 
    * @param node the subtree
    * @param result the result to store the ids in
@@ -914,7 +918,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * Perform additional integrity checks.
    */
   public void doExtraIntegrityChecks() {
-    if(extraIntegrityChecks) {
+    if(EXTRA_INTEGRITY_CHECKS) {
       getRoot().integrityCheck(this);
     }
   }

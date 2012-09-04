@@ -83,7 +83,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
     protected int k_max;
 
     @Override

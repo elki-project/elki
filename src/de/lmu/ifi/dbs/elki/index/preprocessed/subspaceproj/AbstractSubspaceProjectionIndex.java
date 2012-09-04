@@ -177,7 +177,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractSubspaceProjectionIndex oneway - - «create»
    */
-  public static abstract class Factory<NV extends NumberVector<?, ?>, D extends Distance<D>, I extends AbstractSubspaceProjectionIndex<NV, D, ?>> implements SubspaceProjectionIndex.Factory<NV, I>, Parameterizable {
+  public abstract static class Factory<NV extends NumberVector<?, ?>, D extends Distance<D>, I extends AbstractSubspaceProjectionIndex<NV, D, ?>> implements SubspaceProjectionIndex.Factory<NV, I>, Parameterizable {
     /**
      * Contains the value of parameter epsilon;
      */
@@ -222,7 +222,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?,
      * 
      * @apiviz.exclude
      */
-    public static abstract class Parameterizer<NV extends NumberVector<?, ?>, D extends Distance<D>, C> extends AbstractParameterizer {
+    public abstract static class Parameterizer<NV extends NumberVector<?, ?>, D extends Distance<D>, C> extends AbstractParameterizer {
       /**
        * Contains the value of parameter epsilon;
        */

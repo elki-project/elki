@@ -68,7 +68,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Reinsertion share
      */

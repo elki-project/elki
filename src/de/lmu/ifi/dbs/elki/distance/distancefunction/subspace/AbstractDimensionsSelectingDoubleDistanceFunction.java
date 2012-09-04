@@ -102,7 +102,7 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     protected BitSet dimensions = null;
 
     @Override

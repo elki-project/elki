@@ -107,7 +107,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   /**
    * Maximum iteration count for evolutionary search.
    */
-  protected final int MAX_ITERATIONS = 1000;
+  protected final static int MAX_ITERATIONS = 1000;
 
   /**
    * Holds the value of {@link #M_ID}.
@@ -149,7 +149,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     WritableDoubleDataStore outlierScore = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     for(Individuum ind : individuums) {
       DBIDs ids = computeSubspaceForGene(ind.getGene(), ranges);
-      double sparsityC = sparsity(ids.size(), dbsize, k);
+      double sparsityC = sparsity(ids.size(), dbsize, k, phi);
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double prev = outlierScore.doubleValue(iter);
         if(Double.isNaN(prev) || sparsityC < prev) {
@@ -186,17 +186,17 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    */
   private class EvolutionarySearch {
     /**
-     * Database size
+     * Database size.
      */
     final int dbsize;
 
     /**
-     * Database dimensionality
+     * Database dimensionality.
      */
     final int dim;
 
     /**
-     * Database ranges
+     * Database ranges.
      */
     final ArrayList<ArrayList<DBIDs>> ranges;
 
@@ -206,23 +206,24 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     final int m;
 
     /**
-     * random generator
+     * random generator.
      */
     final private Random random;
 
     /**
      * Constructor.
      * 
-     * @param database Database to use
+     * @param relation Database to use
+     * @param ranges DBID ranges to process
      * @param m Population size
      * @param seed Random generator seed
      */
-    public EvolutionarySearch(Relation<V> database, ArrayList<ArrayList<DBIDs>> ranges, int m, Long seed) {
+    public EvolutionarySearch(Relation<V> relation, ArrayList<ArrayList<DBIDs>> ranges, int m, Long seed) {
       super();
       this.ranges = ranges;
       this.m = m;
-      this.dbsize = database.size();
-      this.dim = DatabaseUtil.dimensionality(database);
+      this.dbsize = relation.size();
+      this.dim = DatabaseUtil.dimensionality(relation);
       if(seed != null) {
         this.random = new Random(seed);
       }
@@ -273,7 +274,10 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     }
 
     /**
-     * check the termination criterion
+     * check the termination criterion.
+     * 
+     * @param pop Population
+     * @return Convergence
      */
     private boolean checkConvergence(Collection<Individuum> pop) {
       if(pop.size() == 0) {
@@ -350,13 +354,16 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     }
 
     /**
+     * Select surviving individuums weighted by rank.
+     * 
      * the selection criterion for the genetic algorithm: <br>
      * roulette wheel mechanism: <br>
      * where the probability of sampling an individual of the population was
      * proportional to p - r(i), where p is the size of population and r(i) the
      * rank of i-th individual
      * 
-     * @param population
+     * @param population Population
+     * @return Survivors
      */
     private ArrayList<Individuum> rouletteRankSelection(ArrayList<Individuum> population) {
       final int popsize = population.size();
@@ -389,7 +396,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
     }
 
     /**
-     * method implements the mutation algorithm
+     * Apply the mutation alogrithm.
      */
     private ArrayList<Individuum> mutation(ArrayList<Individuum> population, double perc1, double perc2) {
       // the Mutations
@@ -467,7 +474,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
      */
     private Individuum makeIndividuum(int[] gene) {
       final DBIDs ids = computeSubspaceForGene(gene, ranges);
-      final double fitness = (ids.size() > 0) ? sparsity(ids.size(), dbsize, k) : Double.MAX_VALUE;
+      final double fitness = (ids.size() > 0) ? sparsity(ids.size(), dbsize, k, phi) : Double.MAX_VALUE;
       return new Individuum(fitness, gene);
     }
 
@@ -540,8 +547,8 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
             l1[next] = parent1.getGene()[next];
             l2[next] = parent2.getGene()[next];
 
-            final double sparsityL1 = sparsity(computeSubspaceForGene(l1, ranges).size(), dbsize, k);
-            final double sparsityL2 = sparsity(computeSubspaceForGene(l2, ranges).size(), dbsize, k);
+            final double sparsityL1 = sparsity(computeSubspaceForGene(l1, ranges).size(), dbsize, k, phi);
+            final double sparsityL2 = sparsity(computeSubspaceForGene(l2, ranges).size(), dbsize, k, phi);
 
             if(sparsityL1 <= sparsityL2) {
               b = l1.clone();

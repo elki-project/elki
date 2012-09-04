@@ -93,7 +93,7 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
     protected DistanceFunction<O, D> distanceFunction = null;
 
     @Override

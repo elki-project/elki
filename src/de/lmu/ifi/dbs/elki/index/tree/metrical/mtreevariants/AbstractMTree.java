@@ -65,17 +65,17 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
  */
 public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndexTree<O, D, N, E> {
   /**
-   * Debugging flag: do extra integrity checks
+   * Debugging flag: do extra integrity checks.
    */
-  protected static final boolean extraIntegrityChecks = true;
+  protected static final boolean EXTRA_INTEGRITY_CHECKS = false;
 
   /**
-   * Holds the instance of the trees distance function
+   * Holds the instance of the trees distance function.
    */
   protected DistanceFunction<O, D> distanceFunction;
 
   /**
-   * The distance query
+   * The distance query.
    */
   protected DistanceQuery<O, D> distanceQuery;
 
@@ -103,7 +103,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   /**
-   * Get the distance factory
+   * Get the distance factory.
    * 
    * @return the distance factory used
    */
@@ -211,7 +211,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     adjustTree(subtree);
 
     // test
-    if(extraIntegrityChecks) {
+    if(EXTRA_INTEGRITY_CHECKS) {
       if(withPreInsert) {
         getRoot().integrityCheck(this, getRootEntry());
       }
@@ -221,7 +221,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Bulk insert.
    * 
-   * @param entries
+   * @param entries Entries to insert
    */
   public void insertAll(List<E> entries) {
     if(!initialized && entries.size() > 0) {
@@ -491,7 +491,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    *        the routing object of the parent node
    * @return the newly created directory entry
    */
-  abstract protected E createNewDirectoryEntry(N node, DBID routingObjectID, D parentDistance);
+  protected abstract E createNewDirectoryEntry(N node, DBID routingObjectID, D parentDistance);
 
   /**
    * Splits the specified node and returns the split result.
@@ -674,10 +674,22 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @apiviz.composedOf MTreeSplit
    */
   private class SplitResult {
+    /**
+     * Split used
+     */
     protected MTreeSplit<O, D, N, E> split;
 
+    /**
+     * New sibling
+     */
     protected N newNode;
 
+    /**
+     * Constructor.
+     *
+     * @param split Split that was used
+     * @param newNode New sibling
+     */
     public SplitResult(MTreeSplit<O, D, N, E> split, N newNode) {
       this.split = split;
       this.newNode = newNode;
@@ -691,10 +703,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     while(enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();
-      if(entry.isLeafEntry()) {
-        // ignore, we are within a leaf!
-      }
-      else {
+      if(!entry.isLeafEntry()) {
         // TODO: any way to skip unnecessary reads?
         N node = getNode(entry);
         if(node.isLeaf()) {

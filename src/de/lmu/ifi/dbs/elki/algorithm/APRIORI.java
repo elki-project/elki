@@ -312,12 +312,12 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter for minFreq
+     * Parameter for minFreq.
      */
     protected Double minfreq = null;
 
     /**
-     * Parameter for minSupp
+     * Parameter for minSupp.
      */
     protected Integer minsupp = null;
 
