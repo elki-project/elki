@@ -129,7 +129,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> imple
         double lon = x * 360. / width - 180.;
         double lat = y * -180. / height + 90.;
         // ..und übergeben
-        double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),lat,lon);    
+        double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),lat,lon,0);    
         cross_track_distances [x][y] = ctd;
         minmax.put(ctd);
       }
