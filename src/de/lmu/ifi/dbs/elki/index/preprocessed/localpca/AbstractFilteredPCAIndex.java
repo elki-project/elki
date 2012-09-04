@@ -146,7 +146,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
-  public static abstract class Factory<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
+  public abstract static class Factory<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
     /**
      * Parameter to specify the distance function used for running PCA.
      * 
@@ -192,7 +192,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
      * 
      * @apiviz.exclude
      */
-    public static abstract class Parameterizer<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
+    public abstract static class Parameterizer<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**
        * Holds the instance of the distance function specified by
        * {@link #PCA_DISTANCE_ID}.

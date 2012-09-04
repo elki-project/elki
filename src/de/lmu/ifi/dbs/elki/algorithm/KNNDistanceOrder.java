@@ -143,10 +143,19 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * Parameter k.
+     */
     protected int k;
 
+    /**
+     * Percentage.
+     */
     protected double percentage;
 
+    /**
+     * Constructor.
+     */
     public Parameterizer() {
       super();
     }

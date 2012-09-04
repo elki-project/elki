@@ -111,7 +111,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
     // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
 
-    if(extraIntegrityChecks) {
+    if(EXTRA_INTEGRITY_CHECKS) {
       getRoot().integrityCheck(this, getRootEntry());
     }
   }

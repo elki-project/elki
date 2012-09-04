@@ -102,8 +102,8 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
   /**
    * Constructor.
    * 
-   * @param distanceFunction
-   * @param numbins
+   * @param distanceFunction Distance function
+   * @param numbins Number of bins
    */
   public EvaluateRankingQuality(DistanceFunction<? super V, D> distanceFunction, int numbins) {
     super(distanceFunction);
@@ -200,6 +200,9 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+    /**
+     * Number of bins to use.
+     */
     protected int numbins = 20;
 
     @Override

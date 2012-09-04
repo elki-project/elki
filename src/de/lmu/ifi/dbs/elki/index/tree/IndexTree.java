@@ -44,7 +44,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * The file storing the entries of this index.
    */
-  final private PageFile<N> file;
+  private final PageFile<N> file;
 
   /**
    * True if this index is already initialized.
@@ -105,7 +105,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * 
    * @return the static logger
    */
-  abstract protected Logging getLogger();
+  protected abstract Logging getLogger();
 
   /**
    * Returns the entry representing the root if this index.
@@ -213,6 +213,9 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Initializes this index from an existing persistent file.
+   * 
+   * @param header File header
+   * @param file Page file
    */
   public void initializeFromFile(TreeIndexHeader header, PageFile<N> file) {
     this.dirCapacity = header.getDirCapacity();

@@ -57,7 +57,7 @@ public abstract class AbstractFilteredIterator<IN, OUT extends IN> implements It
   }
 
   /**
-   * Init the iterators
+   * Init the iterators.
    */
   protected void init() {
     this.itr = getParentIterator();
@@ -71,7 +71,7 @@ public abstract class AbstractFilteredIterator<IN, OUT extends IN> implements It
    * 
    * @return iterator
    */
-  abstract protected Iterator<IN> getParentIterator();
+  protected abstract Iterator<IN> getParentIterator();
 
   /**
    * Test the filter predicate for a new object.
@@ -79,7 +79,7 @@ public abstract class AbstractFilteredIterator<IN, OUT extends IN> implements It
    * @param nextobj Object to test
    * @return cast object when true, {@code null} otherwise
    */
-  abstract protected OUT testFilter(IN nextobj);
+  protected abstract OUT testFilter(IN nextobj);
 
   /**
    * Find the next visualizer.

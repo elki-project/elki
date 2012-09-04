@@ -70,10 +70,10 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
    * @param relation Relation to index
    * @param ids database ids
    */
-  abstract protected void initialize(Relation<O> relation, DBIDs ids);
+  protected abstract void initialize(Relation<O> relation, DBIDs ids);
 
   /**
-   * Refine a given object (and count the refinement!)
+   * Refine a given object (and count the refinement!).
    * 
    * @param id Object id
    * @return refined object
@@ -166,7 +166,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
    * 
    * @author Erich Schubert
    */
-  abstract public class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
+  public abstract class AbstractKNNQuery<D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
     /**
      * Constructor.
      * 

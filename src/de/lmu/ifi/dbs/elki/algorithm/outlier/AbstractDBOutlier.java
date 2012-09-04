@@ -113,7 +113,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     /**
      * Query radius
      */

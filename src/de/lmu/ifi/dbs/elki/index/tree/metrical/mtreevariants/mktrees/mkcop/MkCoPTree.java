@@ -160,7 +160,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
 
-    if(extraIntegrityChecks) {
+    if(EXTRA_INTEGRITY_CHECKS) {
       getRoot().integrityCheck(this, getRootEntry());
     }
   }

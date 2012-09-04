@@ -79,6 +79,9 @@ public abstract class AbstractPrimitiveDistanceBasedAlgorithm<O, D extends Dista
    * @apiviz.exclude
    */
   public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractParameterizer {
+    /**
+     * Distance function to use.
+     */
     protected PrimitiveDistanceFunction<O, D> distanceFunction;
     
     @Override

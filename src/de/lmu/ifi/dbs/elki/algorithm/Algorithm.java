@@ -61,5 +61,5 @@ public interface Algorithm extends Parameterizable {
    * 
    * @return Type restriction
    */
-  public TypeInformation[] getInputTypeRestriction();
+  TypeInformation[] getInputTypeRestriction();
 }

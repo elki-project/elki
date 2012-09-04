@@ -191,6 +191,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * calling {@link #doRunInTime}.
    * 
    * @param relation Data to process
+   * @return LOF outlier result
    */
   public OutlierResult run(Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
@@ -478,6 +479,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the knn query for the reference set.
+     * 
      * @return the kNN query w.r.t. the reference neighborhood distance
      */
     public KNNQuery<O, D> getKNNRefer() {
@@ -485,6 +488,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the knn query for the reachability set.
+     * 
      * @return the kNN query w.r.t. the reachability distance
      */
     public KNNQuery<O, D> getKNNReach() {
@@ -492,6 +497,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the LRD data store.
+     * 
      * @return the LRD values of the objects
      */
     public WritableDoubleDataStore getLrds() {
@@ -499,6 +506,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the LOF data store.
+     * 
      * @return the LOF values of the objects
      */
     public WritableDoubleDataStore getLofs() {
@@ -506,6 +515,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the outlier result.
+     * 
      * @return the result of the run of the {@link LOF} algorithm
      */
     public OutlierResult getResult() {
@@ -522,6 +533,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the RkNN query for the reference set.
+     * 
      * @return the RkNN query w.r.t. the reference neighborhood distance
      */
     public RKNNQuery<O, D> getRkNNRefer() {
@@ -529,6 +542,8 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     /**
+     * Get the RkNN query for the reachability set.
+     * 
      * @return the RkNN query w.r.t. the reachability distance
      */
     public RKNNQuery<O, D> getRkNNReach() {
@@ -554,7 +569,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     /**
-     * The neighborhood size to use
+     * The neighborhood size to use.
      */
     protected int k = 2;
 

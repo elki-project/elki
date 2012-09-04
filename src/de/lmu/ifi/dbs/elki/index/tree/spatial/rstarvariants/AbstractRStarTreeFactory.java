@@ -140,7 +140,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<O extends NumberVector<O, ?>> extends TreeIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O extends NumberVector<O, ?>> extends TreeIndexFactory.Parameterizer<O> {
     /**
      * Insertion strategy
      */

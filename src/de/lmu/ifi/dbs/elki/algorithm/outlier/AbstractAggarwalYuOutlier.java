@@ -63,19 +63,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * @author Ahmed Hettab
  * @author Erich Schubert
+ * 
+ * @param <V> Vector type
  */
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
 public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
-  /**
-   * OptionID for the grid size
-   */
-  public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("ay.phi", "The number of equi-depth grid ranges to use in each dimension.");
-
-  /**
-   * OptionID for the target dimensionality
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("ay.k", "Subspace dimensionality to search for.");
-
   /**
    * Symbolic value for subspaces not in use.
    * 
@@ -85,7 +77,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   public static final int DONT_CARE = 0;
 
   /**
-   * The number of partitions for each dimension
+   * The number of partitions for each dimension.
    */
   protected int phi;
 
@@ -111,13 +103,13 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * Each attribute of data is divided into phi equi-depth ranges.<br />
    * Each range contains a fraction f=1/phi of the records.
    * 
-   * @param database
+   * @param relation Relation to process
    * @return range map
    */
-  protected ArrayList<ArrayList<DBIDs>> buildRanges(Relation<V> database) {
-    final int dim = DatabaseUtil.dimensionality(database);
-    final int size = database.size();
-    final DBIDs allids = database.getDBIDs();
+  protected ArrayList<ArrayList<DBIDs>> buildRanges(Relation<V> relation) {
+    final int dim = DatabaseUtil.dimensionality(relation);
+    final int size = relation.size();
+    final DBIDs allids = relation.getDBIDs();
     final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<ArrayList<DBIDs>>();
 
     // Temporary projection storage of the database
@@ -128,7 +120,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
     }
     // Project
     for(DBIDIter iter = allids.iter(); iter.valid(); iter.advance()) {
-      final V obj = database.get(iter);
+      final V obj = relation.get(iter);
       for(int d = 1; d <= dim; d++) {
         dbAxis.get(d - 1).add(DBIDUtil.newPair(obj.doubleValue(d), iter));
       }
@@ -159,14 +151,15 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   }
 
   /**
-   * Method to calculate the sparsity coefficient of
+   * Method to calculate the sparsity coefficient of.
    * 
    * @param setsize Size of subset
    * @param dbsize Size of database
    * @param k Dimensionality
+   * @param phi Phi parameter
    * @return sparsity coefficient
    */
-  protected double sparsity(final int setsize, final int dbsize, final int k) {
+  protected static double sparsity(final int setsize, final int dbsize, final int k, final double phi) {
     // calculate sparsity c
     final double f = 1. / phi;
     final double fK = Math.pow(f, k);
@@ -175,9 +168,10 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
   }
 
   /**
-   * Method to get the ids in the given subspace
+   * Method to get the ids in the given subspace.
    * 
-   * @param subspace
+   * @param subspace Subspace to process
+   * @param ranges List of DBID ranges
    * @return ids
    */
   protected DBIDs computeSubspace(Vector<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
@@ -224,10 +218,26 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?, ?>> ex
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
-    protected Integer phi;
+  public abstract static class Parameterizer extends AbstractParameterizer {
+    /**
+     * OptionID for the grid size.
+     */
+    public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("ay.phi", "The number of equi-depth grid ranges to use in each dimension.");
 
-    protected Integer k;
+    /**
+     * OptionID for the target dimensionality.
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("ay.k", "Subspace dimensionality to search for.");
+
+    /**
+     * Phi parameter.
+     */
+    protected int phi;
+
+    /**
+     * k Parameter.
+     */
+    protected int k;
 
     @Override
     protected void makeOptions(Parameterization config) {

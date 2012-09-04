@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -117,12 +116,12 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("abod.knnquery", "Processor to compute the kNN neighborhoods.");
 
   /**
-   * use alternate code below
+   * use alternate code below.
    */
-  private static final boolean useRNDSample = false;
+  private static final boolean USE_RND_SAMPLE = false;
 
   /**
-   * k parameter
+   * k parameter.
    */
   private int k;
 
@@ -132,10 +131,13 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   int sampleSize = 0;
 
   /**
-   * Store the configured Kernel version
+   * Store the configured Kernel version.
    */
   private PrimitiveSimilarityFunction<? super V, DoubleDistance> primitiveKernelFunction;
 
+  /**
+   * Static DBID map.
+   */
   private ArrayModifiableDBIDs staticids = null;
 
   /**
@@ -171,10 +173,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * Main part of the algorithm. Exact version.
    * 
    * @param relation Relation to query
-   * @param k k for kNN queries
    * @return result
    */
-  public OutlierResult getRanking(Relation<V> relation, int k) {
+  public OutlierResult getRanking(Relation<V> relation) {
     // Fix a static set of IDs
     staticids = DBIDUtil.newArray(relation.getDBIDs());
     staticids.sort();
@@ -183,7 +184,6 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
     Heap<DoubleDBIDPair> pq = new Heap<DoubleDBIDPair>(relation.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
-    assert (k == this.k);
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
 
     MeanVariance s = new MeanVariance();
@@ -227,11 +227,9 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * Main part of the algorithm. Fast version.
    * 
    * @param relation Relation to use
-   * @param k k for kNN queries
-   * @param sampleSize Sample size
    * @return result
    */
-  public OutlierResult getFastRanking(Relation<V> relation, int k, int sampleSize) {
+  public OutlierResult getFastRanking(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
     // Fix a static set of IDs
     // TODO: add a DBIDUtil.ensureSorted?
@@ -246,7 +244,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
       WritableDoubleDataStore dists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
       // determine kNearestNeighbors and pairwise distances
       Heap<DoubleDBIDPair> nn;
-      if(!useRNDSample) {
+      if(!USE_RND_SAMPLE) {
         nn = calcDistsandNN(relation, kernelMatrix, sampleSize, aKey, dists);
       }
       else {
@@ -445,6 +443,7 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * Get explanations for points in the database.
    * 
    * @param data to get explanations for
+   * @return String explanation
    */
   // TODO: this should be done by the result classes.
   public String getExplanations(Relation<V> data) {
@@ -536,18 +535,17 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
   }
 
   /**
-   * Run ABOD on the data set
+   * Run ABOD on the data set.
    * 
-   * @param database
-   * @param relation
+   * @param relation Relation to process
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<V> relation) {
+  public OutlierResult run(Relation<V> relation) {
     if(sampleSize > 0) {
-      return getFastRanking(relation, k, sampleSize);
+      return getFastRanking(relation);
     }
     else {
-      return getRanking(relation, k);
+      return getRanking(relation);
     }
   }
 
@@ -569,10 +567,19 @@ public class ABOD<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlg
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, DoubleDistance> {
+    /**
+     * k Parameter.
+     */
     protected int k = 0;
 
+    /**
+     * Sample size.
+     */
     protected int sampleSize = 0;
 
+    /**
+     * Distance function.
+     */
     protected PrimitiveSimilarityFunction<V, DoubleDistance> primitiveKernelFunction = null;
 
     @Override

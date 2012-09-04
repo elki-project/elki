@@ -196,7 +196,7 @@ public abstract class AbstractParser {
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractParameterizer {
+  public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Stores the column separator pattern
      */

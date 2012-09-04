@@ -68,7 +68,7 @@ public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
    * @param <T> Type of data in histogram
    * @param <D> Type of input data
    */
-  public static abstract class Adapter<T, D> extends AggregatingHistogram.Adapter<T, D> {
+  public abstract static class Adapter<T, D> extends AggregatingHistogram.Adapter<T, D> {
     /**
      * Rule to combine two bins into one.
      * 

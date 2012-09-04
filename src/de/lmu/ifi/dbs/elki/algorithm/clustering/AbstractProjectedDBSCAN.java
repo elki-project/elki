@@ -383,7 +383,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * 
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
     protected DistanceFunction<V, D> innerdist;
 
     protected D epsilon;

@@ -133,7 +133,7 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index, D e
    * 
    * @param <F> Factory type
    */
-  public static abstract class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
     /**
      * The index factory we use.
      */

@@ -99,6 +99,13 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     this.numbins = numbins;
   }
 
+  /**
+   * Process a database
+   * 
+   * @param database Database to process
+   * @param relation Relation to process
+   * @return Histogram of ranking qualities
+   */
   public HistogramResult<DoubleVector> run(Database database, Relation<O> relation) {
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
@@ -164,6 +171,9 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
+    /**
+     * Number of bins.
+     */
     protected int numbins = 20;
 
     @Override

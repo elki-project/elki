@@ -79,7 +79,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @apiviz.has KNNQuery
  * 
- * @param <O> the type of DatabaseObjects handled by this Algorithm
+ * @param <O> type of objects handled by this algorithm
+ * @param <D> type of distances used
  */
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
@@ -136,12 +137,12 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   double lambda;
 
   /**
-   * Preprocessor Step 1
+   * Preprocessor Step 1.
    */
   protected DistanceFunction<? super O, D> reachabilityDistanceFunction;
 
   /**
-   * Preprocessor Step 2
+   * Preprocessor Step 2.
    */
   protected DistanceFunction<? super O, D> comparisonDistanceFunction;
 
@@ -153,11 +154,11 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   /**
    * Constructor with parameters.
    * 
-   * @param kreach
-   * @param kcomp
-   * @param reachabilityDistanceFunction
-   * @param comparisonDistanceFunction
-   * @param lambda
+   * @param kreach k for reachability
+   * @param kcomp k for comparison
+   * @param reachabilityDistanceFunction distance function for reachability
+   * @param comparisonDistanceFunction distance function for comparison 
+   * @param lambda Lambda parameter
    */
   public LoOP(int kreach, int kcomp, DistanceFunction<? super O, D> reachabilityDistanceFunction, DistanceFunction<? super O, D> comparisonDistanceFunction, double lambda) {
     super();
@@ -171,8 +172,9 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
   /**
    * Get the kNN queries for the algorithm.
    * 
-   * @param database Database
-   * @param stepprog Progress logger
+   * @param database Database to analyze
+   * @param relation Relation to analyze
+   * @param stepprog Progress logger, may be {@code null}
    * @return result
    */
   protected Pair<KNNQuery<O, D>, KNNQuery<O, D>> getKNNQueries(Database database, Relation<O> relation, StepProgress stepprog) {
@@ -387,12 +389,12 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     double lambda = 2.0;
 
     /**
-     * Preprocessor Step 1
+     * Preprocessor Step 1.
      */
     protected DistanceFunction<O, D> reachabilityDistanceFunction = null;
 
     /**
-     * Preprocessor Step 2
+     * Preprocessor Step 2.
      */
     protected DistanceFunction<O, D> comparisonDistanceFunction = null;
 
