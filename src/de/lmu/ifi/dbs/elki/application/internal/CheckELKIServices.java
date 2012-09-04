@@ -198,7 +198,8 @@ public class CheckELKIServices {
           try {
             FileOutputStream out = new FileOutputStream(fnam, true);
             PrintStream pr = new PrintStream(out);
-            pr.println("# Automatically appended entries:");
+            pr.println();
+            pr.println("### Automatically appended entries:");
             for(String remaining : sorted) {
               pr.println(remaining);
             }
