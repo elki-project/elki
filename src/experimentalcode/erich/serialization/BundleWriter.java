@@ -31,61 +31,81 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource.Event;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Write an object bundle stream to a file channel.
  * 
- * Bundles that add new columns are not supported.
+ * Bundle streams that add new columns are not supported.
  * 
  * @author Erich Schubert
  */
 public class BundleWriter {
   /**
-   * Initial buffer size
+   * Class logger for the bundle writer.
+   */
+  private static final Logging LOG = Logging.getLogger(BundleWriter.class);
+  
+  /**
+   * Initial buffer size.
    */
   private static final int INITIAL_BUFFER = 4096;
 
   /**
-   * Random magic number
+   * Random magic number.
    */
   public static final int MAGIC = 0xa8123b12;
 
+  /**
+   * Write a bundle stream to a file output channel.
+   * 
+   * @param source Data source
+   * @param output Output channel
+   * @throws IOException on IO errors
+   */
   public void writeBundleStream(BundleStreamSource source, FileChannel output) throws IOException {
     ByteBuffer buffer = ByteBuffer.allocateDirect(INITIAL_BUFFER);
 
     ByteBufferSerializer<Object>[] serializers = null;
-    loop: while(true) {
+    loop: while (true) {
       Event ev = source.nextEvent();
-      switch(ev){
-      case END_OF_STREAM:
-        break loop;
-      case META_CHANGED:
-        if(serializers != null) {
-          throw new AbortException("Meta changes are not supported, once the block header has been written.");
-        }
-        break;
+      switch(ev) {
       case NEXT_OBJECT:
-        if(serializers == null) {
+        if (serializers == null) {
           serializers = writeHeader(source, buffer, output);
         }
-        for(int i = 0; i < serializers.length; i++) {
+        for (int i = 0; i < serializers.length; i++) {
           int size = serializers[i].getByteSize(source.data(i));
           buffer = ensureBuffer(size, buffer, output);
           serializers[i].toByteBuffer(buffer, source.data(i));
         }
         break;
+      case META_CHANGED:
+        if (serializers != null) {
+          throw new AbortException("Meta changes are not supported, once the block header has been written.");
+        }
+        break;
+      case END_OF_STREAM:
+        break loop;
       default:
-        LoggingUtil.warning("Unknown event: " + ev);
+        LOG.warning("Unknown bundle stream event. API inconsistent? "+ev);
+        break;
       }
     }
-    if(buffer.position() > 0) {
+    if (buffer.position() > 0) {
       flushBuffer(buffer, output);
     }
   }
 
+  /**
+   * Flush the current write buffer to disk.
+   * 
+   * @param buffer Buffer to write
+   * @param output Output channel
+   * @throws IOException on IO errors
+   */
   private void flushBuffer(ByteBuffer buffer, FileChannel output) throws IOException {
     buffer.flip();
     output.write(buffer);
@@ -93,18 +113,36 @@ public class BundleWriter {
     buffer.limit(buffer.capacity());
   }
 
+  /**
+   * Ensure the buffer is large enough.
+   * 
+   * @param size Required size to add
+   * @param buffer Existing buffer
+   * @param output Output channel
+   * @return Buffer, eventually resized
+   * @throws IOException on IO errors
+   */
   private ByteBuffer ensureBuffer(int size, ByteBuffer buffer, FileChannel output) throws IOException {
-    if(buffer.remaining() >= size) {
+    if (buffer.remaining() >= size) {
       return buffer;
     }
     flushBuffer(buffer, output);
-    if(buffer.remaining() >= size) {
+    if (buffer.remaining() >= size) {
       return buffer;
     }
     // Aggressively grow the buffer
     return ByteBuffer.allocateDirect(buffer.capacity() + size);
   }
 
+  /**
+   * Write the header for the given stream to the stream.
+   * 
+   * @param source Bundle stream
+   * @param buffer Buffer to use for writing
+   * @param output Output channel
+   * @return Array of serializers
+   * @throws IOException on IO errors
+   */
   private ByteBufferSerializer<Object>[] writeHeader(BundleStreamSource source, ByteBuffer buffer, FileChannel output) throws IOException {
     final BundleMeta meta = source.getMeta();
     final int nummeta = meta.size();
@@ -120,7 +158,7 @@ public class BundleWriter {
       @SuppressWarnings("unchecked")
       ByteBufferSerializer<Object> ser = (ByteBufferSerializer<Object>) TypeSerializerRegistry.getSerializerForType(type);
       if (ser == null) {
-        throw new AbortException("Cannot serialize - no serializer found for type: "+type.toString());
+        throw new AbortException("Cannot serialize - no serializer found for type: " + type.toString());
       }
       serializers[i] = ser;
     }
