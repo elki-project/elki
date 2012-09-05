@@ -45,25 +45,42 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.landmark
  */
-public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> implements ByteBufferSerializer<DoubleVector> {
+public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
   /**
-   * Static factory instance
+   * Static factory instance.
    */
   public static final DoubleVector STATIC = new DoubleVector(new double[0], true);
 
   /**
-   * Keeps the values of the real vector
+   * Serializer for up to 127 dimensions.
+   */
+  public static final ByteBufferSerializer<DoubleVector> BYTE_SERIALIZER = new SmallSerializer();
+
+  /**
+   * Serializer for up to 2^15-1 dimensions.
+   */
+  public static final ByteBufferSerializer<DoubleVector> SHORT_SERIALIZER = new ShortSerializer();
+
+  /**
+   * Serializer using varint encoding.
+   */
+  public static final ByteBufferSerializer<DoubleVector> VARIABLE_SERIALIZER = new VariableSerializer();
+
+  /**
+   * Stores the values of the real vector.
    */
   private double[] values;
 
   /**
    * Private constructor. NOT for public use.
+   * 
+   * @param values Values to use
+   * @param nocopy Flag to not copy the array
    */
   private DoubleVector(double[] values, boolean nocopy) {
-    if(nocopy) {
+    if (nocopy) {
       this.values = values;
-    }
-    else {
+    } else {
       this.values = new double[values.length];
       System.arraycopy(values, 0, this.values, 0, values.length);
     }
@@ -78,7 +95,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   public DoubleVector(List<Double> values) {
     int i = 0;
     this.values = new double[values.size()];
-    for(Iterator<Double> iter = values.iterator(); iter.hasNext(); i++) {
+    for (Iterator<Double> iter = values.iterator(); iter.hasNext(); i++) {
       this.values[i] = (iter.next());
     }
   }
@@ -100,7 +117,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
    */
   public DoubleVector(Double[] values) {
     this.values = new double[values.length];
-    for(int i = 0; i < values.length; i++) {
+    for (int i = 0; i < values.length; i++) {
       this.values[i] = values[i];
     }
   }
@@ -112,7 +129,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
    */
   public DoubleVector(Vector columnMatrix) {
     values = new double[columnMatrix.getDimensionality()];
-    for(int i = 0; i < values.length; i++) {
+    for (int i = 0; i < values.length; i++) {
       values[i] = columnMatrix.get(i);
     }
   }
@@ -122,59 +139,29 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
     return values.length;
   }
 
-  /**
-   * Returns the value of the specified attribute.
-   * 
-   * @param dimension the selected attribute. Attributes are counted starting
-   *        with 1.
-   * 
-   * @throws IllegalArgumentException if the specified dimension is out of range
-   *         of the possible attributes
-   */
   @Override
   public Double getValue(int dimension) {
     try {
       return values[dimension - 1];
-    }
-    catch(IndexOutOfBoundsException e) {
+    } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
   }
 
-  /**
-   * Returns the value of the specified attribute.
-   * 
-   * @param dimension the selected attribute. Attributes are counted starting
-   *        with 1.
-   * 
-   * @throws IllegalArgumentException if the specified dimension is out of range
-   *         of the possible attributes
-   */
   @Override
   public double doubleValue(int dimension) {
     try {
       return values[dimension - 1];
-    }
-    catch(IndexOutOfBoundsException e) {
+    } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
   }
 
-  /**
-   * Returns the value of the specified attribute as long.
-   * 
-   * @param dimension the selected attribute. Attributes are counted starting
-   *        with 1.
-   * 
-   * @throws IllegalArgumentException if the specified dimension is out of range
-   *         of the possible attributes
-   */
   @Override
   public long longValue(int dimension) {
     try {
       return (long) values[dimension - 1];
-    }
-    catch(IndexOutOfBoundsException e) {
+    } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
   }
@@ -200,9 +187,9 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   @Override
   public String toString() {
     StringBuffer featureLine = new StringBuffer();
-    for(int i = 0; i < values.length; i++) {
+    for (int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
-      if(i + 1 < values.length) {
+      if (i + 1 < values.length) {
         featureLine.append(ATTRIBUTE_SEPARATOR);
       }
     }
@@ -218,7 +205,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
   public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
     int dim = adapter.size(array);
     double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       values[i] = adapter.get(array, i);
     }
     return new DoubleVector(values, true);
@@ -226,47 +213,131 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> imp
 
   @Override
   public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    if(adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
+    if (adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
       return new DoubleVector(((TDoubleList) array).toArray(), true);
     }
     final int dim = adapter.size(array);
     double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       values[i] = adapter.getDouble(array, i);
     }
     return new DoubleVector(values, true);
   }
 
-  @Override
-  public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
-    final short dimensionality = buffer.getShort();
-    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
-    if(buffer.remaining() < len) {
-      throw new IOException("Not enough data for a double vector!");
+  /**
+   * Serialization class for dense double vectors with up to
+   * 127 dimensions, by using a byte for storing the
+   * dimensionality.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has DoubleVector
+   */
+  private static class SmallSerializer implements ByteBufferSerializer<DoubleVector> {
+    @Override
+    public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final byte dimensionality = buffer.get();
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
+      final double[] values = new double[dimensionality];
+      for (int i = 0; i < dimensionality; i++) {
+        values[i] = buffer.getDouble();
+      }
+      return new DoubleVector(values, true);
     }
-    final double[] values = new double[dimensionality];
-    buffer.asDoubleBuffer().get(values);
-    return new DoubleVector(values, true);
-  }
-
-  @Override
-  public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-    final short dimensionality = buffer.getShort();
-    final int len = ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * dimensionality;
-    if(buffer.remaining() < len) {
-      throw new IOException("Not enough space for the double vector!");
+  
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
+      assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
+      buffer.put((byte) vec.values.length);
+      for (int i = 0; i < vec.values.length; i++) {
+        buffer.putDouble(vec.values[i]);
+      }
     }
-    buffer.putShort(dimensionality);
-    buffer.asDoubleBuffer().put(vec.values);
-  }
-
-  @Override
-  public int getByteSize(DoubleVector vec) {
-    return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+  
+    @Override
+    public int getByteSize(DoubleVector vec) {
+      assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+    }
   }
 
   /**
-   * Parameterization class
+   * Serialization class for dense double vectors with up to
+   * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
+   * dimensionality.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has DoubleVector
+   */
+  private static class ShortSerializer implements ByteBufferSerializer<DoubleVector> {
+    @Override
+    public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final short dimensionality = buffer.getShort();
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
+      final double[] values = new double[dimensionality];
+      for (int i = 0; i < dimensionality; i++) {
+        values[i] = buffer.getDouble();
+      }
+      return new DoubleVector(values, true);
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
+      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
+      buffer.putShort((short) vec.values.length);
+      for (int i = 0; i < vec.values.length; i++) {
+        buffer.putDouble(vec.values[i]);
+      }
+    }
+
+    @Override
+    public int getByteSize(DoubleVector vec) {
+      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
+    }
+  }
+
+  /**
+   * Serialization class for variable dimensionality by using VarInt encoding.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has DoubleVector
+   */
+  private static class VariableSerializer implements ByteBufferSerializer<DoubleVector> {
+    @Override
+    public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality);
+      final double[] values = new double[dimensionality];
+      for (int i = 0; i < dimensionality; i++) {
+        values[i] = buffer.getDouble();
+      }
+      return new DoubleVector(values, true);
+    }
+  
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
+      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length);
+      ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
+      for (int i = 0; i < vec.values.length; i++) {
+        buffer.putDouble(vec.values[i]);
+      }
+    }
+  
+    @Override
+    public int getByteSize(DoubleVector vec) {
+      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_DOUBLE * vec.values.length;
+    }
+  }
+
+  /**
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 

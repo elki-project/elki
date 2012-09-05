@@ -62,34 +62,41 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 public final class ByteArrayUtil {
   /**
+   * Fake constructor.
+   */
+  private ByteArrayUtil() {
+    // Do not instantiate
+  }
+  
+  /**
    * Size of a byte in bytes.
    */
-  public static final int SIZE_BYTE = 1;
+  public static int SIZE_BYTE = 1;
 
   /**
    * Size of a short in bytes.
    */
-  public static final int SIZE_SHORT = 2;
+  public static int SIZE_SHORT = 2;
 
   /**
    * Size of an integer in bytes.
    */
-  public static final int SIZE_INT = 4;
+  public static int SIZE_INT = 4;
 
   /**
    * Size of a long in bytes.
    */
-  public static final int SIZE_LONG = 8;
+  public static int SIZE_LONG = 8;
 
   /**
    * Size of a float in bytes.
    */
-  public static final int SIZE_FLOAT = 4;
+  public static int SIZE_FLOAT = 4;
 
   /**
    * Size of a double in bytes.
    */
-  public static final int SIZE_DOUBLE = 8;
+  public static int SIZE_DOUBLE = 8;
 
   /**
    * Write a short to the byte array at the given offset.
@@ -99,7 +106,7 @@ public final class ByteArrayUtil {
    * @param v data
    * @return number of bytes written
    */
-  public static final int writeShort(byte[] array, int offset, int v) {
+  public static int writeShort(byte[] array, int offset, int v) {
     array[offset + 0] = (byte) (v >>> 8);
     array[offset + 1] = (byte) (v >>> 0);
     return SIZE_SHORT;
@@ -113,7 +120,7 @@ public final class ByteArrayUtil {
    * @param v data
    * @return number of bytes written
    */
-  public static final int writeInt(byte[] array, int offset, int v) {
+  public static int writeInt(byte[] array, int offset, int v) {
     array[offset + 0] = (byte) (v >>> 24);
     array[offset + 1] = (byte) (v >>> 16);
     array[offset + 2] = (byte) (v >>> 8);
@@ -129,7 +136,7 @@ public final class ByteArrayUtil {
    * @param v data
    * @return number of bytes written
    */
-  public static final int writeLong(byte[] array, int offset, long v) {
+  public static int writeLong(byte[] array, int offset, long v) {
     array[offset + 0] = (byte) (v >>> 56);
     array[offset + 1] = (byte) (v >>> 48);
     array[offset + 2] = (byte) (v >>> 40);
@@ -149,7 +156,7 @@ public final class ByteArrayUtil {
    * @param v data
    * @return number of bytes written
    */
-  public static final int writeFloat(byte[] array, int offset, float v) {
+  public static int writeFloat(byte[] array, int offset, float v) {
     return writeInt(array, offset, Float.floatToIntBits(v));
   }
 
@@ -161,7 +168,7 @@ public final class ByteArrayUtil {
    * @param v data
    * @return number of bytes written
    */
-  public static final int writeDouble(byte[] array, int offset, double v) {
+  public static int writeDouble(byte[] array, int offset, double v) {
     return writeLong(array, offset, Double.doubleToLongBits(v));
   }
 
@@ -172,7 +179,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return (signed) short
    */
-  public static final short readShort(byte[] array, int offset) {
+  public static short readShort(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
     int b0 = array[offset + 0] & 0xFF;
     int b1 = array[offset + 1] & 0xFF;
@@ -186,7 +193,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return short
    */
-  public static final int readUnsignedShort(byte[] array, int offset) {
+  public static int readUnsignedShort(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
     int b0 = array[offset + 0] & 0xFF;
     int b1 = array[offset + 1] & 0xFF;
@@ -200,7 +207,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return data
    */
-  public static final int readInt(byte[] array, int offset) {
+  public static int readInt(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
     int b0 = array[offset + 0] & 0xFF;
     int b1 = array[offset + 1] & 0xFF;
@@ -216,7 +223,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return data
    */
-  public static final long readLong(byte[] array, int offset) {
+  public static long readLong(byte[] array, int offset) {
     // First make integers to resolve signed vs. unsigned issues.
     long b0 = array[offset + 0];
     long b1 = array[offset + 1] & 0xFF;
@@ -236,7 +243,7 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return data
    */
-  public static final float readFloat(byte[] array, int offset) {
+  public static float readFloat(byte[] array, int offset) {
     return Float.intBitsToFloat(readInt(array, offset));
   }
 
@@ -247,12 +254,12 @@ public final class ByteArrayUtil {
    * @param offset Offset to read at
    * @return data
    */
-  public static final double readDouble(byte[] array, int offset) {
+  public static double readDouble(byte[] array, int offset) {
     return Double.longBitsToDouble(readLong(array, offset));
   }
 
   /**
-   * Serializer for byte objects
+   * Serializer for byte objects.
    * 
    * @author Erich Schubert
    */
@@ -264,16 +271,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Byte fromByteBuffer(ByteBuffer buffer) {
       return buffer.get();
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Byte obj) {
       buffer.put(obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Byte object) {
       return getFixedByteSize();
@@ -286,7 +296,7 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for short objects
+   * Serializer for short objects.
    * 
    * @author Erich Schubert
    */
@@ -298,16 +308,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Short fromByteBuffer(ByteBuffer buffer) {
       return buffer.getShort();
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Short obj) {
       buffer.putShort(obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Short object) {
       return getFixedByteSize();
@@ -320,7 +333,7 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for integer objects
+   * Serializer for integer objects.
    * 
    * @author Erich Schubert
    */
@@ -332,16 +345,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Integer fromByteBuffer(ByteBuffer buffer) {
       return buffer.getInt();
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Integer obj) {
       buffer.putInt(obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Integer object) {
       return getFixedByteSize();
@@ -354,7 +370,7 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for long objects
+   * Serializer for long objects.
    * 
    * @author Erich Schubert
    */
@@ -366,16 +382,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Long fromByteBuffer(ByteBuffer buffer) {
       return buffer.getLong();
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Long obj) {
       buffer.putLong(obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Long object) {
       return getFixedByteSize();
@@ -388,7 +407,7 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for float objects
+   * Serializer for float objects.
    * 
    * @author Erich Schubert
    */
@@ -400,16 +419,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Float fromByteBuffer(ByteBuffer buffer) {
       return buffer.getFloat();
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Float obj) {
       buffer.putFloat(obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Float object) {
       return getFixedByteSize();
@@ -422,7 +444,7 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for double objects
+   * Serializer for double objects.
    * 
    * @author Erich Schubert
    */
@@ -434,16 +456,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Double fromByteBuffer(ByteBuffer buffer) {
       return buffer.getDouble();
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Double obj) {
       buffer.putDouble(obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Double object) {
       return getFixedByteSize();
@@ -456,23 +481,23 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for String objects
+   * Serializer for String objects.
    * 
    * @author Erich Schubert
    */
   public static class StringSerializer implements ByteBufferSerializer<String> {
     /**
-     * Character set to use
+     * Character set to use.
      */
     Charset charset = Charset.forName("UTF-8");
 
     /**
-     * Encoder
+     * Encoder.
      */
     CharsetEncoder encoder = charset.newEncoder();
 
     /**
-     * Decoder
+     * Decoder.
      */
     CharsetDecoder decoder = charset.newDecoder();
 
@@ -526,7 +551,7 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Serializer for Integer objects using a variable size encoding
+   * Serializer for Integer objects using a variable size encoding.
    * 
    * @author Erich Schubert
    */
@@ -538,16 +563,19 @@ public final class ByteArrayUtil {
       super();
     }
 
+    @Deprecated
     @Override
     public Integer fromByteBuffer(ByteBuffer buffer) {
       return readSignedVarint(buffer);
     }
 
+    @Deprecated
     @Override
     public void toByteBuffer(ByteBuffer buffer, Integer obj) {
       writeSignedVarint(buffer, obj);
     }
 
+    @Deprecated
     @Override
     public int getByteSize(Integer object) {
       return getSignedVarintSize(object);
@@ -557,42 +585,42 @@ public final class ByteArrayUtil {
   /**
    * Static instance.
    */
-  public static final ByteSerializer BYTE_SERIALIZER = new ByteSerializer();
+  public static ByteSerializer BYTE_SERIALIZER = new ByteSerializer();
 
   /**
    * Static instance.
    */
-  public static final ShortSerializer SHORT_SERIALIZER = new ShortSerializer();
+  public static ShortSerializer SHORT_SERIALIZER = new ShortSerializer();
 
   /**
    * Static instance.
    */
-  public static final IntegerSerializer INT_SERIALIZER = new IntegerSerializer();
+  public static IntegerSerializer INT_SERIALIZER = new IntegerSerializer();
 
   /**
    * Static instance.
    */
-  public static final LongSerializer LONG_SERIALIZER = new LongSerializer();
+  public static LongSerializer LONG_SERIALIZER = new LongSerializer();
 
   /**
    * Static instance.
    */
-  public static final FloatSerializer FLOAT_SERIALIZER = new FloatSerializer();
+  public static FloatSerializer FLOAT_SERIALIZER = new FloatSerializer();
 
   /**
    * Static instance.
    */
-  public static final DoubleSerializer DOUBLE_SERIALIZER = new DoubleSerializer();
+  public static DoubleSerializer DOUBLE_SERIALIZER = new DoubleSerializer();
 
   /**
    * Static instance.
    */
-  public static final StringSerializer STRING_SERIALIZER = new StringSerializer();
+  public static StringSerializer STRING_SERIALIZER = new StringSerializer();
 
   /**
    * Static instance.
    */
-  public static final VarintSerializer VARINT_SERIALIZER = new VarintSerializer();
+  public static VarintSerializer VARINT_SERIALIZER = new VarintSerializer();
 
   /**
    * Write an signed integer using a variable-length encoding.
@@ -605,7 +633,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to write to
    * @param val number to write
    */
-  public static final void writeSignedVarint(ByteBuffer buffer, int val) {
+  public static void writeSignedVarint(ByteBuffer buffer, int val) {
     // Move sign to lowest bit
     writeUnsignedVarint(buffer, (val << 1) ^ (val >> 31));
   }
@@ -621,7 +649,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to write to
    * @param val number to write
    */
-  public static final void writeSignedVarintLong(ByteBuffer buffer, long val) {
+  public static void writeSignedVarintLong(ByteBuffer buffer, long val) {
     // Move sign to lowest bit
     writeUnsignedVarintLong(buffer, (val << 1) ^ (val >> 63));
   }
@@ -635,7 +663,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to write to
    * @param val number to write
    */
-  public static final void writeUnsignedVarint(ByteBuffer buffer, int val) {
+  public static void writeUnsignedVarint(ByteBuffer buffer, int val) {
     // Extra bytes have the high bit set
     while((val & 0x7F) != val) {
       buffer.put((byte) ((val & 0x7F) | 0x80));
@@ -657,7 +685,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to write to
    * @param val number to write
    */
-  public static final void writeUnsignedVarintLong(ByteBuffer buffer, long val) {
+  public static void writeUnsignedVarintLong(ByteBuffer buffer, long val) {
     // Extra bytes have the high bit set
     while((val & 0x7F) != val) {
       buffer.put((byte) ((val & 0x7F) | 0x80));
@@ -668,23 +696,23 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Compute the size of the varint encoding for this signed integer
+   * Compute the size of the varint encoding for this signed integer.
    * 
    * @param val integer to write
    * @return Encoding size of this integer
    */
-  public static final int getSignedVarintSize(int val) {
+  public static int getSignedVarintSize(int val) {
     // Move sign to lowest bit
     return getUnsignedVarintSize((val << 1) ^ (val >> 31));
   }
 
   /**
-   * Compute the size of the varint encoding for this unsigned integer
+   * Compute the size of the varint encoding for this unsigned integer.
    * 
    * @param obj integer to write
    * @return Encoding size of this integer
    */
-  public static final int getUnsignedVarintSize(int obj) {
+  public static int getUnsignedVarintSize(int obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
     while((obj & 0x7F) != obj) {
@@ -695,23 +723,23 @@ public final class ByteArrayUtil {
   }
 
   /**
-   * Compute the size of the varint encoding for this signed integer
+   * Compute the size of the varint encoding for this signed integer.
    * 
    * @param val integer to write
    * @return Encoding size of this integer
    */
-  public static final int getSignedVarintLongSize(long val) {
+  public static int getSignedVarintLongSize(long val) {
     // Move sign to lowest bit
     return getUnsignedVarintLongSize((val << 1) ^ (val >> 31));
   }
 
   /**
-   * Compute the size of the varint encoding for this unsigned integer
+   * Compute the size of the varint encoding for this unsigned integer.
    * 
    * @param obj integer to write
    * @return Encoding size of this integer
    */
-  public static final int getUnsignedVarintLongSize(long obj) {
+  public static int getUnsignedVarintLongSize(long obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
     while((obj & 0x7F) != obj) {
@@ -727,7 +755,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to read from
    * @return Integer value
    */
-  public static final int readSignedVarint(ByteBuffer buffer) {
+  public static int readSignedVarint(ByteBuffer buffer) {
     final int raw = readUnsignedVarint(buffer);
     return (raw >>> 1) ^ -(raw & 1);
   }
@@ -738,7 +766,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to read from
    * @return Integer value
    */
-  public static final int readUnsignedVarint(ByteBuffer buffer) {
+  public static int readUnsignedVarint(ByteBuffer buffer) {
     int val = 0;
     int bits = 0;
     while(true) {
@@ -760,7 +788,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to read from
    * @return long value
    */
-  public static final long readSignedVarintLong(ByteBuffer buffer) {
+  public static long readSignedVarintLong(ByteBuffer buffer) {
     final long raw = readUnsignedVarintLong(buffer);
     return (raw >>> 1) ^ -(raw & 1);
   }
@@ -771,7 +799,7 @@ public final class ByteArrayUtil {
    * @param buffer Buffer to read from
    * @return long value
    */
-  public static final long readUnsignedVarintLong(ByteBuffer buffer) {
+  public static long readUnsignedVarintLong(ByteBuffer buffer) {
     long val = 0;
     int bits = 0;
     while(true) {
