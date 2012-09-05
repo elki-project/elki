@@ -45,10 +45,10 @@ public class TestAggarwalYuEvolutionary extends AbstractSimpleAlgorithmTest impl
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(AggarwalYuEvolutionary.K_ID, 2);
-    params.addParameter(AggarwalYuEvolutionary.PHI_ID, 8);
-    params.addParameter(AggarwalYuEvolutionary.M_ID, 5);
-    params.addParameter(AggarwalYuEvolutionary.SEED_ID, 0);
+    params.addParameter(AggarwalYuEvolutionary.Parameterizer.K_ID, 2);
+    params.addParameter(AggarwalYuEvolutionary.Parameterizer.PHI_ID, 8);
+    params.addParameter(AggarwalYuEvolutionary.Parameterizer.M_ID, 5);
+    params.addParameter(AggarwalYuEvolutionary.Parameterizer.SEED_ID, 0);
 
     // setup Algorithm
     AggarwalYuEvolutionary<DoubleVector> aggarwalYuEvolutionary = ClassGenericsUtil.parameterizeOrAbort(AggarwalYuEvolutionary.class, params);

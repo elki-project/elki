@@ -91,20 +91,6 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
   private static final Logging LOG = Logging.getLogger(AggarwalYuEvolutionary.class);
 
   /**
-   * Parameter to specify the number of solutions must be an integer greater
-   * than 1.
-   * <p>
-   * Key: {@code -eafod.m}
-   * </p>
-   */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("ay.m", "Population size for evolutionary algorithm.");
-
-  /**
-   * Parameter to specify the random generator seed.
-   */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ay.seed", "The random number generator seed.");
-
-  /**
    * Maximum iteration count for evolutionary search.
    */
   protected final static int MAX_ITERATIONS = 1000;
@@ -698,6 +684,20 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier.Parameterizer {
+    /**
+     * Parameter to specify the number of solutions must be an integer greater
+     * than 1.
+     * <p>
+     * Key: {@code -eafod.m}
+     * </p>
+     */
+    public static final OptionID M_ID = OptionID.getOrCreateOptionID("ay.m", "Population size for evolutionary algorithm.");
+
+    /**
+     * Parameter to specify the random generator seed.
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ay.seed", "The random number generator seed.");
+
     protected int m = 0;
 
     protected Long seed = null;
