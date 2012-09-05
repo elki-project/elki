@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.data;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
@@ -159,6 +161,11 @@ public class SimpleClassLabel extends ClassLabel {
         existing.put(lbl, l);
       }
       return l;
+    }
+
+    @Override
+    public SimpleTypeInformation<? super SimpleClassLabel> getTypeInformation() {
+      return TypeUtil.SIMPLE_CLASSLABEL;
     }
   }
 }
