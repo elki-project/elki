@@ -45,8 +45,8 @@ public class TestAggarwalYuNaive extends AbstractSimpleAlgorithmTest implements 
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(AggarwalYuNaive.K_ID, 2);
-    params.addParameter(AggarwalYuNaive.PHI_ID, 8);
+    params.addParameter(AggarwalYuNaive.Parameterizer.K_ID, 2);
+    params.addParameter(AggarwalYuNaive.Parameterizer.PHI_ID, 8);
 
     // setup Algorithm
     AggarwalYuNaive<DoubleVector> aggarwalYuNaive = ClassGenericsUtil.parameterizeOrAbort(AggarwalYuNaive.class, params);
