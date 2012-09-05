@@ -131,7 +131,7 @@ public class BundleWriter {
       return buffer;
     }
     // Aggressively grow the buffer
-    return ByteBuffer.allocateDirect(buffer.capacity() + size);
+    return ByteBuffer.allocateDirect(Math.max(buffer.capacity() << 1, buffer.capacity() + size));
   }
 
   /**
