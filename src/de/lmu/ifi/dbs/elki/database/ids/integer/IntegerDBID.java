@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -55,7 +56,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   /**
    * The actual object ID.
    */
-  final protected int id;
+  protected final int id;
 
   /**
    * Constructor from integer id.
@@ -200,6 +201,12 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     public boolean valid() {
       return (pos == 0);
     }
+    
+    @Override
+    public int hashCode() {
+      // Override, because we also are overriding equals.
+      return super.hashCode();
+    }
 
     @Override
     public boolean equals(Object other) {
@@ -247,6 +254,11 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     public int getByteSize(DBID object) throws UnsupportedOperationException {
       return ByteArrayUtil.getSignedVarintSize(((IntegerDBID) object).id);
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -281,15 +293,20 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     public int getFixedByteSize() {
       return ByteArrayUtil.SIZE_INT;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
    * The public instance to use for dynamic serialization.
    */
-  public static final DynamicSerializer dynamicSerializer = new DynamicSerializer();
+  public static final ByteBufferSerializer<DBID> DYNAMIC_SERIALIZER = new DynamicSerializer();
 
   /**
    * The public instance to use for static serialization.
    */
-  public static final StaticSerializer staticSerializer = new StaticSerializer();
+  public static final FixedSizeByteBufferSerializer<DBID> STATIC_SERIALIZER = new StaticSerializer();
 }

@@ -160,6 +160,7 @@ public class BundleWriter {
       if (ser == null) {
         throw new AbortException("Cannot serialize - no serializer found for type: " + type.toString());
       }
+      ser.writeMetadata(buffer);
       serializers[i] = ser;
     }
     return serializers;

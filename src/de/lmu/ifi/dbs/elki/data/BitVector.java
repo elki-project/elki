@@ -322,6 +322,11 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     public int getByteSize(BitVector vec) {
       return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**

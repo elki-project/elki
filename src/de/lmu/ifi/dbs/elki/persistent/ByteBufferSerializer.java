@@ -27,12 +27,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * Class to convert from and to byte arrays (in index structures)
+ * Class to convert from and to byte arrays (in index structures).
  * 
  * @author Erich Schubert
  * 
  * @apiviz.uses ByteBuffer
- *
+ * 
  * @param <T> Object type processed
  */
 public interface ByteBufferSerializer<T> {
@@ -41,22 +41,41 @@ public interface ByteBufferSerializer<T> {
    * 
    * @param buffer Data array to process
    * @return Deserialized object
+   * @throws IOException on IO errors
+   * @throws UnsupportedOperationException When functionality not implemented or
+   *         available
    */
-  public T fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException;
+  T fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException;
 
   /**
    * Serialize the object to a byte array (e.g. disk)
    * 
    * @param buffer Buffer to serialize to
    * @param object Object to serialize
+   * @throws IOException on IO errors
+   * @throws UnsupportedOperationException When functionality not implemented or
+   *         available
    */
-  public void toByteBuffer(ByteBuffer buffer, T object) throws IOException, UnsupportedOperationException;
+  void toByteBuffer(ByteBuffer buffer, T object) throws IOException, UnsupportedOperationException;
 
   /**
    * Get the size of the object in bytes.
    * 
    * @param object Object to serialize
    * @return maximum size in serialized form
+   * @throws IOException on IO errors
+   * @throws UnsupportedOperationException When functionality not implemented or
+   *         available
    */
-  public int getByteSize(T object) throws IOException, UnsupportedOperationException;
+  int getByteSize(T object) throws IOException, UnsupportedOperationException;
+
+  /**
+   * Write the metadata about the serializer to the buffer.
+   * 
+   * @param buffer Buffer to write to
+   * @throws IOException on IO errors
+   * @throws UnsupportedOperationException When functionality not implemented or
+   *         available
+   */
+  void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException;
 }
