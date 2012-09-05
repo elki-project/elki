@@ -39,12 +39,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class BitVector extends AbstractNumberVector<BitVector, Bit> implements ByteBufferSerializer<BitVector> {
+public class BitVector extends AbstractNumberVector<BitVector, Bit> {
   /**
    * Static instance.
    */
   public static final BitVector STATIC = new BitVector(new BitSet(0), 0);
 
+  /**
+   * Serializer for up to 2^15-1 dimensions.
+   */
+  public static final ByteBufferSerializer<BitVector> SHORT_SERIALIZER = new ShortSerializer();
+  
   /**
    * Storing the bits.
    */
@@ -65,7 +70,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    *         small to match the given BitSet
    */
   public BitVector(BitSet bits, int dimensionality) throws IllegalArgumentException {
-    if(dimensionality < bits.length()) {
+    if (dimensionality < bits.length()) {
       throw new IllegalArgumentException("Specified dimensionality " + dimensionality + " is to low for specified BitSet of length " + bits.length());
     }
     this.bits = bits;
@@ -79,18 +84,12 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    */
   public BitVector(Bit[] bits) {
     this.bits = new BitSet(bits.length);
-    for(int i = 0; i < bits.length; i++) {
+    for (int i = 0; i < bits.length; i++) {
       this.bits.set(i, bits[i].bitValue());
     }
     this.dimensionality = bits.length;
   }
 
-  /**
-   * The dimensionality of the binary vector space of which this BitVector is an
-   * element.
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getDimensionality()
-   */
   @Override
   public int getDimensionality() {
     return dimensionality;
@@ -107,7 +106,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    */
   @Override
   public Bit getValue(int dimension) {
-    if(dimension < 1 || dimension > dimensionality) {
+    if (dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
     return new Bit(bits.get(dimension - 1));
@@ -124,7 +123,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    */
   @Override
   public double doubleValue(int dimension) {
-    if(dimension < 1 || dimension > dimensionality) {
+    if (dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
     return bits.get(dimension - 1) ? 1.0 : 0.0;
@@ -141,7 +140,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    */
   @Override
   public long longValue(int dimension) {
-    if(dimension < 1 || dimension > dimensionality) {
+    if (dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
     return bits.get(dimension - 1) ? 1 : 0;
@@ -161,7 +160,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   @Override
   public Vector getColumnVector() {
     double[] values = new double[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
+    for (int i = 0; i < dimensionality; i++) {
       values[i] = bits.get(i) ? 1 : 0;
     }
     return new Vector(values);
@@ -177,7 +176,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    */
   public boolean contains(BitSet bitset) {
     boolean contains = true;
-    for(int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset.nextSetBit(i + 1)) {
+    for (int i = bitset.nextSetBit(0); i >= 0 && contains; i = bitset.nextSetBit(i + 1)) {
       // noinspection ConstantConditions
       contains &= bits.get(i);
     }
@@ -199,17 +198,17 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
    * BitVectorLabelParser}.
    * 
-   * @see Object#toString()
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
     Bit[] bitArray = new Bit[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
+    for (int i = 0; i < dimensionality; i++) {
       bitArray[i] = new Bit(bits.get(i));
     }
     StringBuffer representation = new StringBuffer();
-    for(Bit bit : bitArray) {
-      if(representation.length() > 0) {
+    for (Bit bit : bitArray) {
+      if (representation.length() > 0) {
         representation.append(ATTRIBUTE_SEPARATOR);
       }
       representation.append(bit.toString());
@@ -221,15 +220,16 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
    * Indicates whether some other object is "equal to" this BitVector. This
    * BitVector is equal to the given object, if the object is a BitVector of
    * same dimensionality and with identical bits set.
+   * 
+   * {@inheritDoc}
    */
   @Override
   public boolean equals(Object obj) {
-    if(obj instanceof BitVector) {
+    if (obj instanceof BitVector) {
       BitVector bv = (BitVector) obj;
       return this.getDimensionality() == bv.getDimensionality() && this.bits.equals(bv.bits);
 
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -238,7 +238,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
     int dim = adapter.size(array);
     BitSet bits = new BitSet(dim);
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       bits.set(i, adapter.get(array, i).bitValue());
       i++;
     }
@@ -249,73 +249,83 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> implements B
   public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
     int dim = adapter.size(array);
     BitSet bits = new BitSet(dim);
-    for(int i = 0; i < dim; i++) {
-      if(adapter.getDouble(array, i) >= 0.5) {
+    for (int i = 0; i < dim; i++) {
+      if (adapter.getDouble(array, i) >= 0.5) {
         bits.set(i);
       }
     }
     return new BitVector(bits, dim);
   }
 
-  @Override
-  public BitVector fromByteBuffer(ByteBuffer buffer) throws IOException {
-    short dimensionality = buffer.getShort();
-    final int len = ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8;
-    if(buffer.remaining() < len) {
-      throw new IOException("Not enough data for a bit vector!");
-    }
-    // read values
-    BitSet values = new BitSet(dimensionality);
-    byte b = 0;
-    for(int i = 0; i < dimensionality; i++) {
-      // read the next byte when needed.
-      if((i & 7) == 0) {
-        b = buffer.get();
+  /**
+   * Serialization class for dense integer vectors with up to
+   * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
+   * dimensionality.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has IntegerVector
+   */
+  private static class ShortSerializer implements ByteBufferSerializer<BitVector> {
+    @Override
+    public BitVector fromByteBuffer(ByteBuffer buffer) throws IOException {
+      short dimensionality = buffer.getShort();
+      final int len = ByteArrayUtil.SIZE_SHORT + (dimensionality + 7) / 8;
+      if (buffer.remaining() < len) {
+        throw new IOException("Not enough data for a bit vector!");
       }
-      final byte bit = (byte) (1 << (i & 7));
-      if((b & bit) != 0) {
-        values.set(i + 1);
+      // read values
+      BitSet values = new BitSet(dimensionality);
+      byte b = 0;
+      for (int i = 0; i < dimensionality; i++) {
+        // read the next byte when needed.
+        if ((i & 7) == 0) {
+          b = buffer.get();
+        }
+        final byte bit = (byte) (1 << (i & 7));
+        if ((b & bit) != 0) {
+          values.set(i + 1);
+        }
       }
+      return new BitVector(values, dimensionality);
     }
-    return new BitVector(values, dimensionality);
-  }
 
-  @Override
-  public void toByteBuffer(ByteBuffer buffer, BitVector vec) throws IOException {
-    final int len = getByteSize(vec);
-    assert (vec.getDimensionality() <= Short.MAX_VALUE);
-    final short dim = (short) vec.getDimensionality();
-    if(buffer.remaining() < len) {
-      throw new IOException("Not enough space for the bit vector!");
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, BitVector vec) throws IOException {
+      final int len = getByteSize(vec);
+      assert (vec.getDimensionality() <= Short.MAX_VALUE);
+      final short dim = (short) vec.getDimensionality();
+      if (buffer.remaining() < len) {
+        throw new IOException("Not enough space for the bit vector!");
+      }
+      // write size
+      buffer.putShort(dim);
+      // write values
+      // Next byte to write:
+      byte b = 0;
+      for (int i = 0; i < dim; i++) {
+        final byte mask = (byte) (1 << (i & 7));
+        if (vec.bits.get(i)) {
+          b |= mask;
+        } else {
+          b &= ~mask;
+        }
+        // Write when appropriate
+        if ((i & 7) == 7 || i == dim - 1) {
+          buffer.put(b);
+          b = 0;
+        }
+      }
     }
-    // write size
-    buffer.putShort(dim);
-    // write values
-    // Next byte to write:
-    byte b = 0;
-    for(int i = 0; i < dim; i++) {
-      final byte mask = (byte) (1 << (i & 7));
-      if(vec.bits.get(i)) {
-        b |= mask;
-      }
-      else {
-        b &= ~mask;
-      }
-      // Write when appropriate
-      if((i & 7) == 7 || i == dim - 1) {
-        buffer.put(b);
-        b = 0;
-      }
-    }
-  }
 
-  @Override
-  public int getByteSize(BitVector vec) {
-    return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
+    @Override
+    public int getByteSize(BitVector vec) {
+      return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
+    }
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 
