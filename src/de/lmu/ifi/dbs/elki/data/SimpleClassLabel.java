@@ -1,5 +1,11 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -30,7 +36,7 @@ package de.lmu.ifi.dbs.elki.data;
  * 
  * @apiviz.composedOf String
  */
-public class SimpleClassLabel extends ClassLabel {
+public class SimpleClassLabel extends ClassLabel implements ByteBufferSerializer<SimpleClassLabel> {
   /**
    * Holds the String designating the label.
    */
@@ -51,6 +57,8 @@ public class SimpleClassLabel extends ClassLabel {
    * Strings they represent.
    * <p/>
    * That is, the result equals <code>this.label.compareTo(o.label)</code>.
+   * 
+   * {@inheritDoc}
    */
   @Override
   public int compareTo(ClassLabel o) {
@@ -61,6 +69,8 @@ public class SimpleClassLabel extends ClassLabel {
   /**
    * The hash code of a simple class label is the hash code of the String
    * represented by the ClassLabel.
+   * 
+   * {@inheritDoc}
    */
   @Override
   public int hashCode() {
@@ -78,13 +88,13 @@ public class SimpleClassLabel extends ClassLabel {
    */
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
     final SimpleClassLabel that = (SimpleClassLabel) o;
@@ -102,8 +112,23 @@ public class SimpleClassLabel extends ClassLabel {
     return label;
   }
 
+  @Override
+  public SimpleClassLabel fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+    return new SimpleClassLabel(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
+  }
+
+  @Override
+  public void toByteBuffer(ByteBuffer buffer, SimpleClassLabel object) throws IOException, UnsupportedOperationException {
+    ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.label);
+  }
+
+  @Override
+  public int getByteSize(SimpleClassLabel object) throws IOException, UnsupportedOperationException {
+    return ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.label);
+  }
+
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
@@ -115,7 +140,7 @@ public class SimpleClassLabel extends ClassLabel {
     public SimpleClassLabel makeFromString(String lbl) {
       lbl = lbl.intern();
       SimpleClassLabel l = existing.get(lbl);
-      if(l == null) {
+      if (l == null) {
         l = new SimpleClassLabel(lbl);
         existing.put(lbl, l);
       }
