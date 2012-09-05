@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+
 /**
  * A HierarchicalClassLabel is a ClassLabel to reflect a hierarchical structure
  * of classes.
@@ -43,6 +45,11 @@ public class HierarchicalClassLabel extends ClassLabel {
    * The default separator, a point ('.').
    */
   public static final String DEFAULT_SEPARATOR_STRING = ".";
+
+  /**
+   * Type information.
+   */
+  public static final SimpleTypeInformation<HierarchicalClassLabel> TYPE = new SimpleTypeInformation<HierarchicalClassLabel>(HierarchicalClassLabel.class);
 
   /**
    * Holds the Pattern to separate different levels parsing input.
@@ -78,11 +85,10 @@ public class HierarchicalClassLabel extends ClassLabel {
     this.separatorString = separator;
     String[] levelwiseStrings = separatorPattern.split(name);
     this.levelwiseNames = new Comparable<?>[levelwiseStrings.length];
-    for(int i = 0; i < levelwiseStrings.length; i++) {
+    for (int i = 0; i < levelwiseStrings.length; i++) {
       try {
         levelwiseNames[i] = Integer.valueOf(levelwiseStrings[i]);
-      }
-      catch(NumberFormatException e) {
+      } catch (NumberFormatException e) {
         levelwiseNames[i] = levelwiseStrings[i];
       }
     }
@@ -107,24 +113,24 @@ public class HierarchicalClassLabel extends ClassLabel {
    * equal. Names at a level are tried to be compared as integer values. If this
    * does not succeed, both names are compared as Strings.
    * 
+   * {@inheritDoc}
    */
-  @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
+  @Override
   public int compareTo(ClassLabel o) {
     HierarchicalClassLabel h = (HierarchicalClassLabel) o;
-    for(int i = 0; i < this.levelwiseNames.length && i < h.levelwiseNames.length; i++) {
+    for (int i = 0; i < this.levelwiseNames.length && i < h.levelwiseNames.length; i++) {
       int comp = 0;
       try {
         Comparable first = this.levelwiseNames[i];
         Comparable second = h.levelwiseNames[i];
         comp = first.compareTo(second);
-      }
-      catch(RuntimeException e) {
+      } catch (RuntimeException e) {
         String h1 = (String) (this.levelwiseNames[i] instanceof Integer ? this.levelwiseNames[i].toString() : this.levelwiseNames[i]);
         String h2 = (String) (h.levelwiseNames[i] instanceof Integer ? h.levelwiseNames[i].toString() : h.levelwiseNames[i]);
         comp = h1.compareTo(h2);
       }
-      if(comp != 0) {
+      if (comp != 0) {
         return comp;
       }
     }
@@ -154,7 +160,7 @@ public class HierarchicalClassLabel extends ClassLabel {
    * Returns a String representation of this HierarchicalClassLabel using
    * {@link #separatorString separatorString} to separate levels.
    * 
-   * @see #toString(int)
+   * {@inheritDoc}
    */
   @Override
   public String toString() {
@@ -170,14 +176,14 @@ public class HierarchicalClassLabel extends ClassLabel {
    *         first <code>level</code> levels
    */
   public String toString(int level) {
-    if(level > levelwiseNames.length) {
+    if (level > levelwiseNames.length) {
       throw new IllegalArgumentException("Specified level exceeds depth of hierarchy.");
     }
 
     StringBuffer name = new StringBuffer();
-    for(int i = 0; i < level; i++) {
+    for (int i = 0; i < level; i++) {
       name.append(this.getNameAt(i));
-      if(i < level - 1) {
+      if (i < level - 1) {
         name.append(this.separatorString);
       }
     }
@@ -185,7 +191,7 @@ public class HierarchicalClassLabel extends ClassLabel {
   }
 
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
@@ -197,11 +203,16 @@ public class HierarchicalClassLabel extends ClassLabel {
     public HierarchicalClassLabel makeFromString(String lbl) {
       lbl = lbl.intern();
       HierarchicalClassLabel l = existing.get(lbl);
-      if(l == null) {
+      if (l == null) {
         l = new HierarchicalClassLabel(lbl);
         existing.put(lbl, l);
       }
       return l;
+    }
+
+    @Override
+    public SimpleTypeInformation<? super HierarchicalClassLabel> getTypeInformation() {
+      return TYPE;
     }
   }
 }

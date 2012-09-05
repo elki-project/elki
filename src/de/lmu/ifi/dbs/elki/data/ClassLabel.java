@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.HashMap;
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
 
 /**
@@ -53,7 +54,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
    */
   @Override
   public boolean equals(Object obj) {
-    if(!(obj instanceof ClassLabel)) {
+    if (!(obj instanceof ClassLabel)) {
       return false;
     }
     return this == obj || this.compareTo((ClassLabel) obj) == 0;
@@ -64,7 +65,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
    * <code>ClassLabel a.equals((ClassLabel) b)</code>, then also
    * <code>a.toString().equals(b.toString())</code> should hold.
    * 
-   * @see java.lang.Object#toString()
+   * {@inheritDoc}
    */
   @Override
   public abstract String toString();
@@ -72,7 +73,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
   /**
    * Returns the hashCode of the String-representation of this ClassLabel.
    * 
-   * @see java.lang.Object#hashCode()
+   * {@inheritDoc}
    */
   @Override
   public int hashCode() {
@@ -80,7 +81,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
   }
 
   /**
-   * Class label factory
+   * Class label factory.
    * 
    * @author Erich Schubert
    * 
@@ -94,11 +95,18 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
     protected HashMap<String, L> existing = new HashMap<String, L>();
 
     /**
-     * Convert a string into a class label
+     * Convert a string into a class label.
      * 
      * @param lbl String to convert
      * @return Class label instance.
      */
     public abstract L makeFromString(String lbl);
+
+    /**
+     * Get type information for the labels.
+     * 
+     * @return Type information
+     */
+    public abstract SimpleTypeInformation<? super L> getTypeInformation();
   }
 }

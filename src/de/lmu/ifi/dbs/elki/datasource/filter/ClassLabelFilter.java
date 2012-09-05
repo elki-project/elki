@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -129,7 +128,7 @@ public class ClassLabelFilter implements ObjectFilter {
           lblcol.add(null);
         }
       }
-      bundle.appendColumn(TypeUtil.CLASSLABEL, clscol);
+      bundle.appendColumn(classLabelFactory.getTypeInformation(), clscol);
       // Only add the label column when it's not empty.
       if(keeplabelcol) {
         bundle.appendColumn(meta, lblcol);
