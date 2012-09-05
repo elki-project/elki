@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -71,32 +72,32 @@ public final class ByteArrayUtil {
   /**
    * Size of a byte in bytes.
    */
-  public static int SIZE_BYTE = 1;
+  public static final int SIZE_BYTE = 1;
 
   /**
    * Size of a short in bytes.
    */
-  public static int SIZE_SHORT = 2;
+  public static final int SIZE_SHORT = 2;
 
   /**
    * Size of an integer in bytes.
    */
-  public static int SIZE_INT = 4;
+  public static final int SIZE_INT = 4;
 
   /**
    * Size of a long in bytes.
    */
-  public static int SIZE_LONG = 8;
+  public static final int SIZE_LONG = 8;
 
   /**
    * Size of a float in bytes.
    */
-  public static int SIZE_FLOAT = 4;
+  public static final int SIZE_FLOAT = 4;
 
   /**
    * Size of a double in bytes.
    */
-  public static int SIZE_DOUBLE = 8;
+  public static final int SIZE_DOUBLE = 8;
 
   /**
    * Write a short to the byte array at the given offset.
@@ -293,6 +294,11 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_BYTE;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -329,6 +335,11 @@ public final class ByteArrayUtil {
     @Override
     public int getFixedByteSize() {
       return SIZE_SHORT;
+    }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -367,6 +378,11 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_INT;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -403,6 +419,11 @@ public final class ByteArrayUtil {
     @Override
     public int getFixedByteSize() {
       return SIZE_LONG;
+    }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -441,6 +462,11 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_FLOAT;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -478,6 +504,11 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_DOUBLE;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -510,7 +541,7 @@ public final class ByteArrayUtil {
 
     @Override
     public String fromByteBuffer(ByteBuffer buffer) {
-      int len = buffer.getInt();
+      int len = readUnsignedVarint(buffer);
       // Create and limit a view
       ByteBuffer subbuffer = buffer.slice();
       subbuffer.limit(len);
@@ -535,18 +566,24 @@ public final class ByteArrayUtil {
       catch(CharacterCodingException e) {
         throw new AbortException("String not representable as UTF-8.", e);
       }
-      buffer.putInt(data.remaining());
+      writeUnsignedVarint(buffer, data.remaining());
       buffer.put(data);
     }
 
     @Override
     public int getByteSize(String object) {
       try {
-        return SIZE_INT + encoder.encode(CharBuffer.wrap(object)).remaining();
+        final int len = encoder.encode(CharBuffer.wrap(object)).remaining();
+        return getUnsignedVarintSize(len) + len;
       }
       catch(CharacterCodingException e) {
         throw new AbortException("String not representable as UTF-8.", e);
       }
+    }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -580,47 +617,52 @@ public final class ByteArrayUtil {
     public int getByteSize(Integer object) {
       return getSignedVarintSize(object);
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
    * Static instance.
    */
-  public static ByteSerializer BYTE_SERIALIZER = new ByteSerializer();
+  public static final ByteSerializer BYTE_SERIALIZER = new ByteSerializer();
 
   /**
    * Static instance.
    */
-  public static ShortSerializer SHORT_SERIALIZER = new ShortSerializer();
+  public static final ShortSerializer SHORT_SERIALIZER = new ShortSerializer();
 
   /**
    * Static instance.
    */
-  public static IntegerSerializer INT_SERIALIZER = new IntegerSerializer();
+  public static final IntegerSerializer INT_SERIALIZER = new IntegerSerializer();
 
   /**
    * Static instance.
    */
-  public static LongSerializer LONG_SERIALIZER = new LongSerializer();
+  public static final LongSerializer LONG_SERIALIZER = new LongSerializer();
 
   /**
    * Static instance.
    */
-  public static FloatSerializer FLOAT_SERIALIZER = new FloatSerializer();
+  public static final FloatSerializer FLOAT_SERIALIZER = new FloatSerializer();
 
   /**
    * Static instance.
    */
-  public static DoubleSerializer DOUBLE_SERIALIZER = new DoubleSerializer();
+  public static final DoubleSerializer DOUBLE_SERIALIZER = new DoubleSerializer();
 
   /**
    * Static instance.
    */
-  public static StringSerializer STRING_SERIALIZER = new StringSerializer();
+  public static final StringSerializer STRING_SERIALIZER = new StringSerializer();
 
   /**
    * Static instance.
    */
-  public static VarintSerializer VARINT_SERIALIZER = new VarintSerializer();
+  public static final VarintSerializer VARINT_SERIALIZER = new VarintSerializer();
 
   /**
    * Write an signed integer using a variable-length encoding.

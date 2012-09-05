@@ -90,7 +90,7 @@ public class LabelList extends ArrayList<String> {
   private static class Serializer implements ByteBufferSerializer<LabelList> {
     @Override
     public LabelList fromByteBuffer(ByteBuffer buffer) throws IOException {
-      final int cnt = ByteArrayUtil.VARINT_SERIALIZER.fromByteBuffer(buffer);
+      final int cnt = ByteArrayUtil.readUnsignedVarint(buffer);
       LabelList ret = new LabelList(cnt);
       for (int i = 0; i < cnt; i++) {
         ret.add(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
@@ -101,7 +101,7 @@ public class LabelList extends ArrayList<String> {
     @Override
     public void toByteBuffer(ByteBuffer buffer, LabelList object) throws IOException {
       final int cnt = object.size();
-      ByteArrayUtil.VARINT_SERIALIZER.toByteBuffer(buffer, cnt);
+      ByteArrayUtil.writeUnsignedVarint(buffer, cnt);
       for (int i = 0; i < cnt; i++) {
         ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.get(i));
       }
@@ -110,11 +110,16 @@ public class LabelList extends ArrayList<String> {
     @Override
     public int getByteSize(LabelList object) throws IOException {
       final int cnt = object.size();
-      int size = ByteArrayUtil.VARINT_SERIALIZER.getByteSize(cnt);
+      int size = ByteArrayUtil.getUnsignedVarintSize(cnt);
       for (int i = 0; i < cnt; i++) {
         size += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.get(i));
       }
       return size;
+    }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 }

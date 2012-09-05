@@ -232,6 +232,11 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_INT * vec.getDimensionality();
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -269,6 +274,11 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
     public int getByteSize(IntegerVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_INT * vec.getDimensionality();
+    }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -309,10 +319,15 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
       }
       return len;
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 

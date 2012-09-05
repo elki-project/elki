@@ -234,6 +234,11 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -272,6 +277,11 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**
@@ -307,6 +317,11 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     public int getByteSize(FloatVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_FLOAT * vec.values.length;
+    }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 

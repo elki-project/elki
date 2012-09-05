@@ -141,6 +141,11 @@ public class SimpleClassLabel extends ClassLabel {
     public int getByteSize(SimpleClassLabel object) throws IOException {
       return ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.label);
     }
+
+    @Override
+    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
+    }
   }
 
   /**

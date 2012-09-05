@@ -201,12 +201,12 @@ public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public ByteBufferSerializer<DBID> getDBIDSerializer() {
-    return IntegerDBID.dynamicSerializer;
+    return IntegerDBID.DYNAMIC_SERIALIZER;
   }
 
   @Override
   public FixedSizeByteBufferSerializer<DBID> getDBIDSerializerStatic() {
-    return IntegerDBID.staticSerializer;
+    return IntegerDBID.STATIC_SERIALIZER;
   }
 
   @Override
