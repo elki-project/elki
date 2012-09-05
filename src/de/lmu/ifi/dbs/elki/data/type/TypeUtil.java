@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.FloatVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 
 /**
- * Utility package containing various common types
+ * Utility package containing various common types.
  * 
  * @author Erich Schubert
  * 
@@ -53,29 +54,41 @@ import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
  */
 public final class TypeUtil {
   /**
-   * Input type for algorithms that accept anything
+   * Fake Constructor.
+   */
+  private TypeUtil() {
+    // Do not instantiate.
+  }
+  
+  /**
+   * Input type for algorithms that accept anything.
    */
   public static final SimpleTypeInformation<Object> ANY = new SimpleTypeInformation<Object>(Object.class);
 
   /**
-   * Database IDs
+   * Database IDs.
    */
   public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<DBID>(DBID.class, DBIDFactory.FACTORY.getDBIDSerializer());
 
   /**
-   * Database ID lists
+   * Database ID lists.
    */
   public static final SimpleTypeInformation<DBIDs> DBIDS = new SimpleTypeInformation<DBIDs>(DBIDs.class);
 
   /**
-   * A string
+   * A string.
    */
   public static final SimpleTypeInformation<String> STRING = new SimpleTypeInformation<String>(String.class, ByteArrayUtil.STRING_SERIALIZER);
 
   /**
-   * A class label
+   * A class label.
    */
   public static final SimpleTypeInformation<ClassLabel> CLASSLABEL = new SimpleTypeInformation<ClassLabel>(ClassLabel.class);
+
+  /**
+   * Simple class labels.
+   */
+  public static final SimpleTypeInformation<SimpleClassLabel> SIMPLE_CLASSLABEL = new SimpleTypeInformation<SimpleClassLabel>(SimpleClassLabel.class);
 
   /**
    * A list of labels.
@@ -83,14 +96,14 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<LabelList> LABELLIST = new SimpleTypeInformation<LabelList>(LabelList.class);
 
   /**
-   * A list of neighbors
+   * A list of neighbors.
    */
   public static final SimpleTypeInformation<DistanceDBIDResult<?>> NEIGHBORLIST = new SimpleTypeInformation<DistanceDBIDResult<?>>(DistanceDBIDResult.class);
 
   /**
    * Either class label, object labels or a string - anything that will be
    * accepted by
-   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessObjectLabelRepresentation}
+   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessObjectLabelRepresentation}.
    */
   public static final TypeInformation GUESSED_LABEL = new AlternativeTypeInformation(LABELLIST, CLASSLABEL, STRING);
 
@@ -148,12 +161,12 @@ public final class TypeUtil {
   public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = new VectorFieldTypeInformation<SparseDoubleVector>(SparseDoubleVector.class);
 
   /**
-   * External ID type
+   * External ID type.
    */
   public static final SimpleTypeInformation<ExternalID> EXTERNALID = new SimpleTypeInformation<ExternalID>(ExternalID.class);
 
   /**
-   * Type for polygons
+   * Type for polygons.
    */
   public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = new SimpleTypeInformation<PolygonsObject>(PolygonsObject.class);
 
@@ -188,7 +201,7 @@ public final class TypeUtil {
    * @param ts Types
    * @return array
    */
-  public static final TypeInformation[] array(TypeInformation... ts) {
+  public static TypeInformation[] array(TypeInformation... ts) {
     return ts;
   }
 }

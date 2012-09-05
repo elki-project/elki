@@ -23,13 +23,17 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
- * A list of string labels
+ * A list of string labels.
  * 
  * @author Erich Schubert
  * 
@@ -37,7 +41,12 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  */
 public class LabelList extends ArrayList<String> {
   /**
-   * Serial number
+   * Serializer.
+   */
+  public static final ByteBufferSerializer<LabelList> SERIALIZER = new Serializer();
+
+  /**
+   * Serial number.
    */
   private static final long serialVersionUID = 1L;
 
@@ -69,5 +78,43 @@ public class LabelList extends ArrayList<String> {
   @Override
   public String toString() {
     return FormatUtil.format(this, " ");
+  }
+
+  /**
+   * Serialization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has SimpleClassLabel - - «serializes»
+   */
+  private static class Serializer implements ByteBufferSerializer<LabelList> {
+    @Override
+    public LabelList fromByteBuffer(ByteBuffer buffer) throws IOException {
+      final int cnt = ByteArrayUtil.VARINT_SERIALIZER.fromByteBuffer(buffer);
+      LabelList ret = new LabelList(cnt);
+      for (int i = 0; i < cnt; i++) {
+        ret.add(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
+      }
+      return ret;
+    }
+
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, LabelList object) throws IOException {
+      final int cnt = object.size();
+      ByteArrayUtil.VARINT_SERIALIZER.toByteBuffer(buffer, cnt);
+      for (int i = 0; i < cnt; i++) {
+        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.get(i));
+      }
+    }
+
+    @Override
+    public int getByteSize(LabelList object) throws IOException {
+      final int cnt = object.size();
+      int size = ByteArrayUtil.VARINT_SERIALIZER.getByteSize(cnt);
+      for (int i = 0; i < cnt; i++) {
+        size += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.get(i));
+      }
+      return size;
+    }
   }
 }

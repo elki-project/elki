@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,6 +23,12 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+
 /**
  * A simple class label casting a String as it is as label.
  * 
@@ -36,7 +36,12 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @apiviz.composedOf String
  */
-public class SimpleClassLabel extends ClassLabel implements ByteBufferSerializer<SimpleClassLabel> {
+public class SimpleClassLabel extends ClassLabel {
+  /**
+   * Serializer.
+   */
+  public static final ByteBufferSerializer<SimpleClassLabel> SERIALIZER = new Serializer();
+
   /**
    * Holds the String designating the label.
    */
@@ -112,19 +117,28 @@ public class SimpleClassLabel extends ClassLabel implements ByteBufferSerializer
     return label;
   }
 
-  @Override
-  public SimpleClassLabel fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-    return new SimpleClassLabel(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
-  }
+  /**
+   * Serialization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has SimpleClassLabel - - «serializes»
+   */
+  private static class Serializer implements ByteBufferSerializer<SimpleClassLabel> {
+    @Override
+    public SimpleClassLabel fromByteBuffer(ByteBuffer buffer) throws IOException {
+      return new SimpleClassLabel(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
+    }
 
-  @Override
-  public void toByteBuffer(ByteBuffer buffer, SimpleClassLabel object) throws IOException, UnsupportedOperationException {
-    ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.label);
-  }
+    @Override
+    public void toByteBuffer(ByteBuffer buffer, SimpleClassLabel object) throws IOException {
+      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.label);
+    }
 
-  @Override
-  public int getByteSize(SimpleClassLabel object) throws IOException, UnsupportedOperationException {
-    return ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.label);
+    @Override
+    public int getByteSize(SimpleClassLabel object) throws IOException {
+      return ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.label);
+    }
   }
 
   /**
