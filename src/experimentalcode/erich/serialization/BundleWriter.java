@@ -156,11 +156,11 @@ public class BundleWriter {
     for (int i = 0; i < nummeta; i++) {
       SimpleTypeInformation<?> type = meta.get(i);
       @SuppressWarnings("unchecked")
-      ByteBufferSerializer<Object> ser = (ByteBufferSerializer<Object>) TypeSerializerRegistry.getSerializerForType(type);
+      ByteBufferSerializer<Object> ser = (ByteBufferSerializer<Object>) type.getSerializer();
       if (ser == null) {
         throw new AbortException("Cannot serialize - no serializer found for type: " + type.toString());
       }
-      ser.writeMetadata(buffer);
+      TypeInformationSerializer.STATIC.toByteBuffer(buffer, type);
       serializers[i] = ser;
     }
     return serializers;
