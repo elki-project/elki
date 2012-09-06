@@ -1,4 +1,4 @@
-package experimentalcode.erich.serialization;
+package de.lmu.ifi.dbs.elki.data.type;
 
 /*
  This file is part of ELKI:
@@ -27,10 +27,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 

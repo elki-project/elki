@@ -1,4 +1,4 @@
-package experimentalcode.erich.serialization;
+package de.lmu.ifi.dbs.elki.datasource;
 
 /*
  This file is part of ELKI:
@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleReader;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;

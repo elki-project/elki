@@ -1,4 +1,4 @@
-package experimentalcode.erich.serialization;
+package de.lmu.ifi.dbs.elki.datasource.bundle;
 
 /*
  This file is part of ELKI:
@@ -28,8 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformationSerializer;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource.Event;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
