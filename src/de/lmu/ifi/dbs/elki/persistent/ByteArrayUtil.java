@@ -67,7 +67,7 @@ public final class ByteArrayUtil {
   private ByteArrayUtil() {
     // Do not instantiate
   }
-  
+
   /**
    * Size of a byte in bytes.
    */
@@ -263,11 +263,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class ByteSerializer implements FixedSizeByteBufferSerializer<Byte> {
+  public static final class ByteSerializer implements FixedSizeByteBufferSerializer<Byte> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected ByteSerializer() {
+    private ByteSerializer() {
       super();
     }
 
@@ -300,11 +300,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class ShortSerializer implements FixedSizeByteBufferSerializer<Short> {
+  public static final class ShortSerializer implements FixedSizeByteBufferSerializer<Short> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected ShortSerializer() {
+    private ShortSerializer() {
       super();
     }
 
@@ -337,11 +337,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class IntegerSerializer implements FixedSizeByteBufferSerializer<Integer> {
+  public static final class IntegerSerializer implements FixedSizeByteBufferSerializer<Integer> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected IntegerSerializer() {
+    private IntegerSerializer() {
       super();
     }
 
@@ -374,11 +374,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class LongSerializer implements FixedSizeByteBufferSerializer<Long> {
+  public static final class LongSerializer implements FixedSizeByteBufferSerializer<Long> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected LongSerializer() {
+    private LongSerializer() {
       super();
     }
 
@@ -411,11 +411,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class FloatSerializer implements FixedSizeByteBufferSerializer<Float> {
+  public static final class FloatSerializer implements FixedSizeByteBufferSerializer<Float> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected FloatSerializer() {
+    private FloatSerializer() {
       super();
     }
 
@@ -448,11 +448,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class DoubleSerializer implements FixedSizeByteBufferSerializer<Double> {
+  public static final class DoubleSerializer implements FixedSizeByteBufferSerializer<Double> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected DoubleSerializer() {
+    private DoubleSerializer() {
       super();
     }
 
@@ -485,7 +485,7 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class StringSerializer implements ByteBufferSerializer<String> {
+  public static final class StringSerializer implements ByteBufferSerializer<String> {
     /**
      * Character set to use.
      */
@@ -504,7 +504,7 @@ public final class ByteArrayUtil {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected StringSerializer() {
+    private StringSerializer() {
       super();
     }
 
@@ -517,8 +517,7 @@ public final class ByteArrayUtil {
       CharBuffer res;
       try {
         res = decoder.decode(subbuffer);
-      }
-      catch(CharacterCodingException e) {
+      } catch (CharacterCodingException e) {
         throw new AbortException("String not representable as UTF-8.", e);
       }
       // TODO: assert that the decoding did not yet advance the buffer!
@@ -531,8 +530,7 @@ public final class ByteArrayUtil {
       ByteBuffer data;
       try {
         data = encoder.encode(CharBuffer.wrap(obj));
-      }
-      catch(CharacterCodingException e) {
+      } catch (CharacterCodingException e) {
         throw new AbortException("String not representable as UTF-8.", e);
       }
       writeUnsignedVarint(buffer, data.remaining());
@@ -544,8 +542,7 @@ public final class ByteArrayUtil {
       try {
         final int len = encoder.encode(CharBuffer.wrap(object)).remaining();
         return getUnsignedVarintSize(len) + len;
-      }
-      catch(CharacterCodingException e) {
+      } catch (CharacterCodingException e) {
         throw new AbortException("String not representable as UTF-8.", e);
       }
     }
@@ -556,11 +553,11 @@ public final class ByteArrayUtil {
    * 
    * @author Erich Schubert
    */
-  public static class VarintSerializer implements ByteBufferSerializer<Integer> {
+  public static final class VarintSerializer implements ByteBufferSerializer<Integer> {
     /**
      * Constructor. Protected: use static instance!
      */
-    protected VarintSerializer() {
+    private VarintSerializer() {
       super();
     }
 
@@ -666,7 +663,7 @@ public final class ByteArrayUtil {
    */
   public static void writeUnsignedVarint(ByteBuffer buffer, int val) {
     // Extra bytes have the high bit set
-    while((val & 0x7F) != val) {
+    while ((val & 0x7F) != val) {
       buffer.put((byte) ((val & 0x7F) | 0x80));
       val >>>= 7;
     }
@@ -688,12 +685,27 @@ public final class ByteArrayUtil {
    */
   public static void writeUnsignedVarintLong(ByteBuffer buffer, long val) {
     // Extra bytes have the high bit set
-    while((val & 0x7F) != val) {
+    while ((val & 0x7F) != val) {
       buffer.put((byte) ((val & 0x7F) | 0x80));
       val >>>= 7;
     }
     // Last byte doesn't have high bit set
     buffer.put((byte) (val & 0x7F));
+  }
+
+  /**
+   * Write a string to the buffer.
+   * 
+   * See {@link StringSerializer} for details.
+   * 
+   * @param buffer Buffer to write to
+   * @param s String to write
+   */
+  public static void writeString(ByteBuffer buffer, String s) {
+    if (s == null) {
+      s = ""; // Which will be written as Varint 0 = single byte 0.
+    }
+    ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, s);
   }
 
   /**
@@ -716,7 +728,7 @@ public final class ByteArrayUtil {
   public static int getUnsignedVarintSize(int obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
-    while((obj & 0x7F) != obj) {
+    while ((obj & 0x7F) != obj) {
       bytes++;
       obj >>>= 7;
     }
@@ -743,11 +755,21 @@ public final class ByteArrayUtil {
   public static int getUnsignedVarintLongSize(long obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
-    while((obj & 0x7F) != obj) {
+    while ((obj & 0x7F) != obj) {
       bytes++;
       obj >>>= 7;
     }
     return bytes;
+  }
+
+  /**
+   * Compute the size of the string after encoding.
+   * 
+   * @param s String to encode
+   * @return Byte size
+   */
+  public static int getStringSize(String s) {
+    return STRING_SERIALIZER.getByteSize(s);
   }
 
   /**
@@ -770,14 +792,14 @@ public final class ByteArrayUtil {
   public static int readUnsignedVarint(ByteBuffer buffer) {
     int val = 0;
     int bits = 0;
-    while(true) {
+    while (true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
-      if((data & 0x80) == 0) {
+      if ((data & 0x80) == 0) {
         return val;
       }
       bits += 7;
-      if(bits > 35) {
+      if (bits > 35) {
         throw new AbortException("Variable length quantity is too long for expected integer.");
       }
     }
@@ -803,17 +825,30 @@ public final class ByteArrayUtil {
   public static long readUnsignedVarintLong(ByteBuffer buffer) {
     long val = 0;
     int bits = 0;
-    while(true) {
+    while (true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
-      if((data & 0x80) == 0) {
+      if ((data & 0x80) == 0) {
         return val;
       }
       bits += 7;
-      if(bits > 63) {
+      if (bits > 63) {
         throw new AbortException("Variable length quantity is too long for expected integer.");
       }
     }
+  }
+
+  /**
+   * Read a string from the buffer.
+   * 
+   * Note: this is not 100% symmetric to writeString, as a {@code null} value
+   * and the empty string are encoded the same way.
+   * 
+   * @param buffer Buffer to read from.
+   * @return Deserialized string
+   */
+  public static String readString(ByteBuffer buffer) {
+    return STRING_SERIALIZER.fromByteBuffer(buffer);
   }
 
   /**
@@ -822,7 +857,7 @@ public final class ByteArrayUtil {
    * @param map Byte buffer to unmap.
    */
   public static void unmapByteBuffer(final MappedByteBuffer map) {
-    if(map == null) {
+    if (map == null) {
       return;
     }
     map.force();
@@ -833,19 +868,18 @@ public final class ByteArrayUtil {
       public Object run() {
         try {
           Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
-          if(getCleanerMethod == null) {
+          if (getCleanerMethod == null) {
             return null;
           }
 
           getCleanerMethod.setAccessible(true);
           Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
           Method cleanMethod = cleaner.getClass().getMethod("clean");
-          if(cleanMethod == null) {
+          if (cleanMethod == null) {
             return null;
           }
           cleanMethod.invoke(cleaner);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
           LoggingUtil.exception(e);
         }
         return null;

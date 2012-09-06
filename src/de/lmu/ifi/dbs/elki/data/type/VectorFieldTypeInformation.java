@@ -61,16 +61,17 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   }
 
   /**
-   * Constructor for a request with minimum and maximum dimensionality.
+   * Constructor with given dimensionality and factory, so usually an instance.
    * 
-   * @param cls Vector restriction class.
+   * @param cls Restriction java class
    * @param serializer Serializer
-   * @param mindim Minimum dimensionality request
-   * @param maxdim Maximum dimensionality request
+   * @param mindim Minimum dimensionality
+   * @param maxdim Maximum dimensionality
+   * @param factory Factory class
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim) {
+  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, V factory) {
     super(cls, serializer, mindim, maxdim);
-    this.factory = null;
+    this.factory = factory;
   }
 
   /**
@@ -84,29 +85,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim, V factory) {
     super(cls, serializer, dim, dim);
     this.factory = factory;
-  }
-
-  /**
-   * Constructor for a request with fixed dimensionality.
-   * 
-   * @param cls Vector restriction class.
-   * @param serializer Serializer
-   * @param dim Dimensionality request
-   */
-  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim) {
-    super(cls, serializer, dim, dim);
-    this.factory = null;
-  }
-
-  /**
-   * Constructor for a request without fixed dimensionality.
-   * 
-   * @param cls Vector restriction class.
-   * @param serializer Serializer
-   */
-  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer) {
-    super(cls, serializer);
-    this.factory = null;
   }
 
   /**
@@ -172,12 +150,12 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
     // Do all checks from superclass
-    if(!super.isAssignableFromType(type)) {
+    if (!super.isAssignableFromType(type)) {
       return false;
     }
     // Additionally check that mindim == maxdim.
     VectorTypeInformation<?> other = (VectorTypeInformation<?>) type;
-    if(other.mindim != other.maxdim) {
+    if (other.mindim != other.maxdim) {
       return false;
     }
     return true;
@@ -189,7 +167,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * @return dimensionality
    */
   public int dimensionality() {
-    if(mindim != maxdim) {
+    if (mindim != maxdim) {
       throw new UnsupportedOperationException("Requesting dimensionality for a type request without defined dimensionality!");
     }
     return mindim;
@@ -201,7 +179,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * @return the factory
    */
   public V getFactory() {
-    if(factory == null) {
+    if (factory == null) {
       throw new UnsupportedOperationException("Requesting factory for a type request!");
     }
     return factory;
@@ -235,15 +213,14 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(getRestrictionClass().getSimpleName());
-    if(mindim == maxdim) {
+    if (mindim == maxdim) {
       buf.append(",dim=").append(mindim);
-    }
-    else {
+    } else {
       buf.append(",field");
-      if(mindim >= 0) {
+      if (mindim >= 0) {
         buf.append(",mindim=").append(mindim);
       }
-      if(maxdim < Integer.MAX_VALUE) {
+      if (maxdim < Integer.MAX_VALUE) {
         buf.append(",maxdim=").append(maxdim);
       }
     }
@@ -257,9 +234,18 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * @return Label
    */
   public String getLabel(int col) {
-    if(labels == null) {
+    if (labels == null) {
       return null;
     }
     return labels[col - 1];
+  }
+
+  /**
+   * Get the column labels.
+   * 
+   * @return labels
+   */
+  protected String[] getLabels() {
+    return labels;
   }
 }

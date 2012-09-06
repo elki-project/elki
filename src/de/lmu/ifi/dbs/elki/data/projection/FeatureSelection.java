@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -41,22 +42,22 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter
  */
 public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Projection<V, V> {
   /**
-   * Minimum dimensionality required for projection
+   * Minimum dimensionality required for projection.
    */
   private int mindim;
 
   /**
-   * Object factory
+   * Object factory.
    */
   private V factory;
 
   /**
-   * Output dimensionality
+   * Output dimensionality.
    */
   private int dimensionality;
 
   /**
-   * Array adapter
+   * Array adapter.
    */
   protected ArrayAdapter<F, V> adapter;
   
@@ -71,11 +72,11 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
     this.factory = factory;
     this.dimensionality = dims.length;
 
-    int mindim = 0;
+    int mind = 0;
     for(int dim : dims) {
-      mindim = Math.max(mindim, dim + 1);
+      mind = Math.max(mind, dim + 1);
     }
-    this.mindim = mindim;
+    this.mindim = mind;
   }
 
   @Override
@@ -87,6 +88,8 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
    * Choose the best adapter for this.
    * 
    * @param factory Object factory, for type inference
+   * @param <V> Vector type
+   * @param <F> Value type
    * @return Adapter
    */
   @SuppressWarnings("unchecked")
@@ -102,7 +105,7 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
     @SuppressWarnings("unchecked")
     final Class<V> cls = (Class<V>) factory.getClass();
-    return new VectorTypeInformation<V>(cls, dimensionality, dimensionality);
+    return new VectorFieldTypeInformation<V>(cls, dimensionality);
   }
 
   @Override

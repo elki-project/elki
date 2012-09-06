@@ -112,57 +112,57 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   protected BitSet labelIndices;
 
   /**
-   * Vector factory class
+   * Vector factory class.
    */
   protected V factory;
 
   /**
-   * Buffer reader
+   * Buffer reader.
    */
   private BufferedReader reader;
 
   /**
-   * Current line number
+   * Current line number.
    */
   protected int lineNumber;
 
   /**
-   * Dimensionality reported
+   * Dimensionality reported.
    */
   protected int dimensionality;
 
   /**
-   * Metadata
+   * Metadata.
    */
   protected BundleMeta meta = null;
 
   /**
-   * Column names
+   * Column names.
    */
   protected List<String> columnnames = null;
 
   /**
-   * Bitset to indicate which columns are not numeric
+   * Bitset to indicate which columns are not numeric.
    */
   protected BitSet labelcolumns = null;
 
   /**
-   * Current vector
+   * Current vector.
    */
   protected V curvec = null;
 
   /**
-   * Current labels
+   * Current labels.
    */
   protected LabelList curlbl = null;
 
   /**
-   * Event to report next
+   * Event to report next.
    */
   Event nextevent = null;
 
   /**
-   * Constructor with defaults
+   * Constructor with defaults.
    * 
    * @param factory Vector factory
    */
@@ -171,7 +171,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   }
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param colSep Column separator
    * @param quoteChar Quote character
@@ -203,34 +203,32 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
 
   @Override
   public Event nextEvent() {
-    if(nextevent != null) {
+    if (nextevent != null) {
       Event ret = nextevent;
       nextevent = null;
       return ret;
     }
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(!line.startsWith(COMMENT) && line.length() > 0) {
+      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+        if (!line.startsWith(COMMENT) && line.length() > 0) {
           parseLineInternal(line);
           // Maybe a header column?
-          if(curvec == null) {
+          if (curvec == null) {
             continue;
           }
-          if(dimensionality == DIMENSIONALITY_UNKNOWN) {
+          if (dimensionality == DIMENSIONALITY_UNKNOWN) {
             dimensionality = curvec.getDimensionality();
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
-          }
-          else if(dimensionality > 0) {
-            if(dimensionality != curvec.getDimensionality()) {
+          } else if (dimensionality > 0) {
+            if (dimensionality != curvec.getDimensionality()) {
               dimensionality = DIMENSIONALITY_VARIABLE;
               buildMeta();
               nextevent = Event.NEXT_OBJECT;
               return Event.META_CHANGED;
             }
-          }
-          else if(curlbl != null && meta != null && meta.size() == 1) {
+          } else if (curlbl != null && meta != null && meta.size() == 1) {
             buildMeta();
             nextevent = Event.NEXT_OBJECT;
             return Event.META_CHANGED;
@@ -241,8 +239,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       reader.close();
       reader = null;
       return Event.END_OF_STREAM;
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
   }
@@ -251,12 +248,11 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * Update the meta element.
    */
   protected void buildMeta() {
-    if(labelcolumns.cardinality() > 0 || (labelIndices != null && labelIndices.cardinality() > 0)) {
+    if (labelcolumns.cardinality() > 0 || (labelIndices != null && labelIndices.cardinality() > 0)) {
       meta = new BundleMeta(2);
       meta.add(getTypeInformation(dimensionality));
       meta.add(TypeUtil.LABELLIST);
-    }
-    else {
+    } else {
       meta = new BundleMeta(1);
       meta.add(getTypeInformation(dimensionality));
     }
@@ -264,10 +260,10 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
 
   @Override
   public Object data(int rnum) {
-    if(rnum == 0) {
+    if (rnum == 0) {
       return curvec;
     }
-    if(rnum == 1) {
+    if (rnum == 1) {
       return curlbl;
     }
     throw new ArrayIndexOutOfBoundsException();
@@ -287,28 +283,27 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     LabelList labels = null;
 
     Iterator<String> itr = entries.iterator();
-    for(int i = 0; itr.hasNext(); i++) {
+    for (int i = 0; itr.hasNext(); i++) {
       String ent = itr.next();
-      if(labelIndices == null || !labelIndices.get(i)) {
+      if (labelIndices == null || !labelIndices.get(i)) {
         try {
           double attribute = Double.parseDouble(ent);
           attributes.add(attribute);
           continue;
-        }
-        catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
           // Ignore attempt, add to labels below.
           labelcolumns.set(i);
         }
       }
       // Else: labels.
-      if(labels == null) {
+      if (labels == null) {
         labels = new LabelList(1);
       }
       // Make a new string, to not keep the whole file in memory!
       labels.add(new String(ent));
     }
     // Maybe a label row?
-    if(lineNumber == 1 && attributes.size() == 0) {
+    if (lineNumber == 1 && attributes.size() == 0) {
       columnnames = labels;
       labelcolumns.clear();
       if (labelIndices != null) {
@@ -324,11 +319,11 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   }
 
   /**
-   * <p>
    * Creates a database object of type V.
-   * </p>
    * 
    * @param attributes the attributes of the vector to create.
+   * @param adapter Array adapter
+   * @param <A> attribute type
    * @return a RalVector of type V containing the given attribute values
    */
   protected <A> V createDBObject(A attributes, NumberArrayAdapter<?, A> adapter) {
@@ -344,13 +339,13 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
-    if(dimensionality > 0) {
+    if (dimensionality > 0) {
       String[] colnames = null;
-      if(columnnames != null) {
-        if(columnnames.size() - labelcolumns.cardinality() == dimensionality) {
+      if (columnnames != null) {
+        if (columnnames.size() - labelcolumns.cardinality() == dimensionality) {
           colnames = new String[dimensionality];
-          for(int i = 0, j = 0; i < columnnames.size(); i++) {
-            if(!labelcolumns.get(i)) {
+          for (int i = 0, j = 0; i < columnnames.size(); i++) {
+            if (!labelcolumns.get(i)) {
               colnames[j] = columnnames.get(i);
               j++;
             }
@@ -361,7 +356,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       return new VectorFieldTypeInformation<V>(cls, f.getDefaultSerializer(), dimensionality, colnames, f);
     }
     // Variable dimensionality - return non-vector field type
-    if(dimensionality == DIMENSIONALITY_VARIABLE) {
+    if (dimensionality == DIMENSIONALITY_VARIABLE) {
       V f = factory.newNumberVector(new double[0]);
       return new SimpleTypeInformation<V>(cls, f.getDefaultSerializer());
     }
@@ -387,7 +382,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     protected BitSet labelIndices = null;
 
     /**
-     * Factory
+     * Factory object.
      */
     protected V factory;
 
@@ -398,20 +393,30 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
       getFactory(config);
     }
 
+    /**
+     * Get the object factory.
+     * 
+     * @param config Parameterization
+     */
     protected void getFactory(Parameterization config) {
       ObjectParameter<V> factoryP = new ObjectParameter<V>(VECTOR_TYPE_ID, NumberVector.class, DoubleVector.class);
-      if(config.grab(factoryP)) {
+      if (config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
     }
 
+    /**
+     * Get the label indices.
+     * 
+     * @param config Parameterization
+     */
     protected void getLabelIndices(Parameterization config) {
       IntListParameter labelIndicesP = new IntListParameter(LABEL_INDICES_ID, true);
 
-      if(config.grab(labelIndicesP)) {
+      if (config.grab(labelIndicesP)) {
         labelIndices = new BitSet();
         List<Integer> labelcols = labelIndicesP.getValue();
-        for(Integer idx : labelcols) {
+        for (Integer idx : labelcols) {
           labelIndices.set(idx);
         }
       }
