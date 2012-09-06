@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.data;
  */
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -95,8 +96,14 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
     return new OneDimensionalDoubleVector(adapter.getDouble(array, 0));
   }
 
+  @Override
+  public ByteBufferSerializer<OneDimensionalDoubleVector> getDefaultSerializer() {
+    // FIXME: add a serializer
+    return null;
+  }
+
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 

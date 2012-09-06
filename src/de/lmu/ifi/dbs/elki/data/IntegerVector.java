@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> {
   /**
-   * Static instance (object factory)
+   * Static instance (object factory).
    */
   public static final IntegerVector STATIC = new IntegerVector(new int[0], true);
 
@@ -60,12 +60,15 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
   public static final ByteBufferSerializer<IntegerVector> VARIABLE_SERIALIZER = new VariableSerializer();
 
   /**
-   * Keeps the values of the real vector
+   * Keeps the values of the real vector.
    */
   private int[] values;
 
   /**
    * Private constructor. NOT for public use.
+   * 
+   * @param values Value data
+   * @param nocopy Flag to use without copying.
    */
   private IntegerVector(int[] values, boolean nocopy) {
     if (nocopy) {
@@ -99,6 +102,8 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
+   *         
+   * {@inheritDoc}
    */
   @Override
   public Integer getValue(int dimension) {
@@ -117,6 +122,8 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
+   *         
+   * {@inheritDoc}
    */
   @Override
   public double doubleValue(int dimension) {
@@ -135,6 +142,8 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
+   *
+   * {@inheritDoc}
    */
   @Override
   public long longValue(int dimension) {
@@ -197,6 +206,11 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
     return new IntegerVector(values, true);
   }
 
+  @Override
+  public ByteBufferSerializer<IntegerVector> getDefaultSerializer() {
+    return VARIABLE_SERIALIZER;
+  }
+
   /**
    * Serialization class for dense integer vectors with up to 127 dimensions, by
    * using a byte for storing the dimensionality.
@@ -205,7 +219,7 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @apiviz.has IntegerVector
    */
-  private static class SmallSerializer implements ByteBufferSerializer<IntegerVector> {
+  public static class SmallSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
     public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
@@ -232,11 +246,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_INT * vec.getDimensionality();
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -248,7 +257,7 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @apiviz.has IntegerVector
    */
-  private static class ShortSerializer implements ByteBufferSerializer<IntegerVector> {
+  public static class ShortSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
     public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final short dimensionality = buffer.getShort();
@@ -275,11 +284,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_INT * vec.getDimensionality();
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -289,7 +293,7 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @apiviz.has IntegerVector
    */
-  private static class VariableSerializer implements ByteBufferSerializer<IntegerVector> {
+  public static class VariableSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
     public IntegerVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
@@ -318,11 +322,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
         len += ByteArrayUtil.getSignedVarintSize(vec.values[i]);
       }
       return len;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 

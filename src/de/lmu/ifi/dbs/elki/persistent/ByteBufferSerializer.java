@@ -68,14 +68,4 @@ public interface ByteBufferSerializer<T> {
    *         available
    */
   int getByteSize(T object) throws IOException, UnsupportedOperationException;
-
-  /**
-   * Write the metadata about the serializer to the buffer.
-   * 
-   * @param buffer Buffer to write to
-   * @throws IOException on IO errors
-   * @throws UnsupportedOperationException When functionality not implemented or
-   *         available
-   */
-  void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException;
 }

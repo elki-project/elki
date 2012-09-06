@@ -42,8 +42,8 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
   /**
    * Constructor.
    * 
-   * @param dim
-   * @param seed
+   * @param dim Dimensionality
+   * @param seed Random seed
    */
   public DoubleVectorRandomProjectionFilter(int dim, long seed) {
     super(dim, seed);
@@ -62,7 +62,7 @@ public class DoubleVectorRandomProjectionFilter extends AbstractRandomFeatureSel
   @Override
   protected SimpleTypeInformation<? super DoubleVector> convertedType(SimpleTypeInformation<DoubleVector> in) {
     initializeRandomAttributes(in);
-    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC, k, DoubleVector.STATIC);
+    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, in.getSerializer(), k, DoubleVector.STATIC);
   }
   
   /**

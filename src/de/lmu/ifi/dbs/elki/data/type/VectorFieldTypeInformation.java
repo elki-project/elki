@@ -35,12 +35,12 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  */
 public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends VectorTypeInformation<V> {
   /**
-   * Object factory for producing new instances
+   * Object factory for producing new instances.
    */
   private final V factory;
 
   /**
-   * Labels
+   * Labels.
    */
   private String[] labels = null;
 
@@ -251,7 +251,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   }
 
   /**
-   * Get the column label
+   * Get the column label.
    * 
    * @param col Column number
    * @return Label

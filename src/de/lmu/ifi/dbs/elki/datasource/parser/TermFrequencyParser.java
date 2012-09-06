@@ -55,22 +55,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 @Description("Parse a file containing term frequencies. The expected format is 'label term1 <freq> term2 <freq> ...'. Terms must not contain the separator character!")
 public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVector> {
   /**
-   * Class logger
+   * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(TermFrequencyParser.class);
 
   /**
-   * Maximum dimension used
+   * Maximum dimension used.
    */
   int maxdim;
 
   /**
-   * Map
+   * Map.
    */
   HashMap<String, Integer> keymap;
 
   /**
-   * Normalize
+   * Normalize.
    */
   boolean normalize;
 
@@ -148,10 +148,10 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   @Override
   protected SimpleTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
     if(dimensionality > 0) {
-      return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimensionality, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimensionality));
+      return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, factory.getDefaultSerializer(), dimensionality, factory);
     }
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+      return new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class, factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
@@ -170,12 +170,12 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
    */
   public static class Parameterizer extends NumberVectorLabelParser.Parameterizer<SparseFloatVector> {
     /**
-     * Option ID for normalization
+     * Option ID for normalization.
      */
     public static final OptionID NORMALIZE_FLAG = OptionID.getOrCreateOptionID("tf.normalize", "Normalize vectors to manhattan length 1 (convert term counts to term frequencies)");
 
     /**
-     * Normalization flag
+     * Normalization flag.
      */
     boolean normalize = false;
 

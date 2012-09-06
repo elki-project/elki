@@ -126,7 +126,7 @@ public class SimpleClassLabel extends ClassLabel {
    * 
    * @apiviz.has SimpleClassLabel - - «serializes»
    */
-  private static class Serializer implements ByteBufferSerializer<SimpleClassLabel> {
+  public static class Serializer implements ByteBufferSerializer<SimpleClassLabel> {
     @Override
     public SimpleClassLabel fromByteBuffer(ByteBuffer buffer) throws IOException {
       return new SimpleClassLabel(ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer));
@@ -140,11 +140,6 @@ public class SimpleClassLabel extends ClassLabel {
     @Override
     public int getByteSize(SimpleClassLabel object) throws IOException {
       return ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.label);
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 

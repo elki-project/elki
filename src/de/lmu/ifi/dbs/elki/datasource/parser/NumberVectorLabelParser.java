@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -351,7 +350,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
         if(columnnames.size() - labelcolumns.cardinality() == dimensionality) {
           colnames = new String[dimensionality];
           for(int i = 0, j = 0; i < columnnames.size(); i++) {
-            if(labelcolumns.get(i) == false) {
+            if(!labelcolumns.get(i)) {
               colnames[j] = columnnames.get(i);
               j++;
             }
@@ -359,24 +358,12 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
         }
       }
       V f = factory.newNumberVector(new double[dimensionality]);
-      if(f instanceof ByteBufferSerializer) {
-        // TODO: Remove, once we have serializers for all types
-        @SuppressWarnings("unchecked")
-        final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
-        return new VectorFieldTypeInformation<V>(cls, ser, dimensionality, colnames, f);
-      }
-      return new VectorFieldTypeInformation<V>(cls, dimensionality, colnames, f);
+      return new VectorFieldTypeInformation<V>(cls, f.getDefaultSerializer(), dimensionality, colnames, f);
     }
     // Variable dimensionality - return non-vector field type
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
       V f = factory.newNumberVector(new double[0]);
-      if(f instanceof ByteBufferSerializer) {
-        // TODO: Remove, once we have serializers for all types
-        @SuppressWarnings("unchecked")
-        final ByteBufferSerializer<V> ser = (ByteBufferSerializer<V>) f;
-        return new SimpleTypeInformation<V>(cls, ser);
-      }
-      return new SimpleTypeInformation<V>(cls);
+      return new SimpleTypeInformation<V>(cls, f.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }

@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -320,8 +321,14 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
     return b;
   }
 
+  @Override
+  public ByteBufferSerializer<SparseDoubleVector> getDefaultSerializer() {
+    // FIXME: add a serializer
+    return null;
+  }
+
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 

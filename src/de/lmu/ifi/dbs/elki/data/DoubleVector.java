@@ -224,6 +224,11 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return new DoubleVector(values, true);
   }
 
+  @Override
+  public ByteBufferSerializer<DoubleVector> getDefaultSerializer() {
+    return VARIABLE_SERIALIZER;
+  }
+
   /**
    * Serialization class for dense double vectors with up to
    * 127 dimensions, by using a byte for storing the
@@ -233,7 +238,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * 
    * @apiviz.has DoubleVector
    */
-  private static class SmallSerializer implements ByteBufferSerializer<DoubleVector> {
+  public static class SmallSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
@@ -260,11 +265,6 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -276,7 +276,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * 
    * @apiviz.has DoubleVector
    */
-  private static class ShortSerializer implements ByteBufferSerializer<DoubleVector> {
+  public static class ShortSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final short dimensionality = buffer.getShort();
@@ -303,11 +303,6 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -317,7 +312,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
    * 
    * @apiviz.has DoubleVector
    */
-  private static class VariableSerializer implements ByteBufferSerializer<DoubleVector> {
+  public static class VariableSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
@@ -343,11 +338,6 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     public int getByteSize(DoubleVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_DOUBLE * vec.values.length;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 

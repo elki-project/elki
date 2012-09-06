@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -332,6 +333,12 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
       b.set(key);
     }
     return b;
+  }
+  
+  @Override
+  public ByteBufferSerializer<SparseFloatVector> getDefaultSerializer() {
+    // FIXME: add a serializer
+    return null;
   }
 
   /**

@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -644,5 +645,11 @@ public class Vector implements NumberVector<Vector, Double> {
       raw[i] = adapter.get(array, i);
     }
     return new Vector(raw);
+  }
+
+  @Override
+  public ByteBufferSerializer<Vector> getDefaultSerializer() {
+    // FIXME: add a serializer?
+    return null;
   }
 }

@@ -87,7 +87,7 @@ public class LabelList extends ArrayList<String> {
    * 
    * @apiviz.has SimpleClassLabel - - «serializes»
    */
-  private static class Serializer implements ByteBufferSerializer<LabelList> {
+  public static class Serializer implements ByteBufferSerializer<LabelList> {
     @Override
     public LabelList fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int cnt = ByteArrayUtil.readUnsignedVarint(buffer);
@@ -115,11 +115,6 @@ public class LabelList extends ArrayList<String> {
         size += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.get(i));
       }
       return size;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 }

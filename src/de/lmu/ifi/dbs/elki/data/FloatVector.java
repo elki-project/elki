@@ -199,6 +199,11 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return new FloatVector(values, true);
   }
 
+  @Override
+  public ByteBufferSerializer<FloatVector> getDefaultSerializer() {
+    return VARIABLE_SERIALIZER;
+  }
+
   /**
    * Serialization class for dense float vectors with up to 127 dimensions, by
    * using a byte for storing the dimensionality.
@@ -207,7 +212,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * 
    * @apiviz.has FloatVector
    */
-  private static class SmallSerializer implements ByteBufferSerializer<FloatVector> {
+  public static class SmallSerializer implements ByteBufferSerializer<FloatVector> {
     @Override
     public FloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
@@ -234,11 +239,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -250,7 +250,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * 
    * @apiviz.has FloatVector
    */
-  private static class ShortSerializer implements ByteBufferSerializer<FloatVector> {
+  public static class ShortSerializer implements ByteBufferSerializer<FloatVector> {
     @Override
     public FloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final short dimensionality = buffer.getShort();
@@ -277,11 +277,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_FLOAT * vec.getDimensionality();
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -291,7 +286,7 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
    * 
    * @apiviz.has FloatVector
    */
-  private static class VariableSerializer implements ByteBufferSerializer<FloatVector> {
+  public static class VariableSerializer implements ByteBufferSerializer<FloatVector> {
     @Override
     public FloatVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
@@ -317,11 +312,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     public int getByteSize(FloatVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_FLOAT * vec.values.length;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
