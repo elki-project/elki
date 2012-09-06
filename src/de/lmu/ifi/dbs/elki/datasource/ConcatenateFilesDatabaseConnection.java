@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileListParameter
  */
 public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnection {
   /**
-   * Class logger
+   * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(ConcatenateFilesDatabaseConnection.class);
 
@@ -64,7 +64,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   private List<File> files;
 
   /**
-   * The parser
+   * The parser.
    */
   private Parser parser;
 
@@ -148,7 +148,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Erich Schubert
    * 
@@ -156,18 +156,19 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     /**
-     * The input files
+     * The input files.
      */
     private List<File> files;
 
     @Override
     protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
       FileListParameter filesP = new FileListParameter(FileBasedDatabaseConnection.INPUT_ID, FilesType.INPUT_FILES);
       if(config.grab(filesP)) {
         files = filesP.getValue();
       }
+      configFilters(config);
       configParser(config, Parser.class, NumberVectorLabelParser.class);
-      super.makeOptions(config);
     }
 
     @Override
