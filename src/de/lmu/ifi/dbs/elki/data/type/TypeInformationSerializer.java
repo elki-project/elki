@@ -147,9 +147,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         Class<Object> clz = (Class<Object>) Class.forName(typename);
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        if ("".equals(label)) {
-          label = null;
-        }
+        label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<Object> serializer = (ByteBufferSerializer<Object>) Class.forName(sername).newInstance();
         return new SimpleTypeInformation<Object>(clz, label, serializer);
@@ -178,15 +176,11 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       // Type class
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.getRestrictionClass().getName());
+      ByteArrayUtil.writeString(buffer, object.getRestrictionClass().getName());
       // Name, or an empty string.
-      if (object.getLabel() == null) {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, "");
-      } else {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.getLabel());
-      }
+      ByteArrayUtil.writeString(buffer, object.getLabel());
       // Serializer class
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, serializer.getClass().getName());
+      ByteArrayUtil.writeString(buffer, serializer.getClass().getName());
     }
 
     @Override
@@ -208,11 +202,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       // Type class
       total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getRestrictionClass().getName());
       // Name, or an empty string.
-      if (object.getLabel() == null) {
-        total += ByteArrayUtil.STRING_SERIALIZER.getByteSize("");
-      } else {
-        total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getLabel());
-      }
+      total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getLabel());
       // Serializer class
       total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(serializer.getClass().getName());
       return total;
@@ -234,9 +224,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         Class<DoubleVector> clz = (Class<DoubleVector>) Class.forName(typename);
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        if ("".equals(label)) {
-          label = null;
-        }
+        label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<DoubleVector> serializer = (ByteBufferSerializer<DoubleVector>) Class.forName(sername).newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
@@ -267,15 +255,11 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       // Type class
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.getRestrictionClass().getName());
+      ByteArrayUtil.writeString(buffer, object.getRestrictionClass().getName());
       // Name, or an empty string.
-      if (object.getLabel() == null) {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, "");
-      } else {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.getLabel());
-      }
+      ByteArrayUtil.writeString(buffer, object.getLabel());
       // Serializer class
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, serializer.getClass().getName());
+      ByteArrayUtil.writeString(buffer, serializer.getClass().getName());
       ByteArrayUtil.writeSignedVarint(buffer, object.mindim());
       ByteArrayUtil.writeSignedVarint(buffer, object.maxdim());
     }
@@ -299,11 +283,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       // Type class
       total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getRestrictionClass().getName());
       // Name, or an empty string.
-      if (object.getLabel() == null) {
-        total += ByteArrayUtil.STRING_SERIALIZER.getByteSize("");
-      } else {
-        total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getLabel());
-      }
+      total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getLabel());
       // Serializer class
       total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(serializer.getClass().getName());
       // Dimensionality
@@ -325,17 +305,31 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     @Override
     public VectorFieldTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
       try {
+        // Data type
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         Class<DoubleVector> clz = (Class<DoubleVector>) Class.forName(typename);
+        DoubleVector factory = null; // FIXME: find a prototype!
+        // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        if ("".equals(label)) {
-          label = null;
-        }
+        label = ("".equals(label)) ? null : label;
+        // Serialization class
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<DoubleVector> serializer = (ByteBufferSerializer<DoubleVector>) Class.forName(sername).newInstance();
+        // Dimensionalities
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
-        return new VectorFieldTypeInformation<DoubleVector>(clz, serializer, mindim, maxdim);
+        // Column names
+        int cols = ByteArrayUtil.readUnsignedVarint(buffer);
+        if (cols > 0) {
+          assert(mindim == maxdim && maxdim == cols) : "Inconsistent dimensionality and column names!";
+          String[] labels = new String[cols];
+          for (int i = 0; i < cols; i++) {
+            labels[i] = ByteArrayUtil.readString(buffer);
+          }
+          return new VectorFieldTypeInformation<DoubleVector>(clz, serializer, mindim, labels, factory);
+        } else {
+          return new VectorFieldTypeInformation<DoubleVector>(clz, serializer, mindim, maxdim, factory);
+        }
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
       } catch (InstantiationException e) {
@@ -361,17 +355,24 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
       // Type class
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.getRestrictionClass().getName());
+      ByteArrayUtil.writeString(buffer, object.getRestrictionClass().getName());
       // Name, or an empty string.
-      if (object.getLabel() == null) {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, "");
-      } else {
-        ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, object.getLabel());
-      }
+      ByteArrayUtil.writeString(buffer, object.getLabel());
       // Serializer class
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, serializer.getClass().getName());
+      ByteArrayUtil.writeString(buffer, serializer.getClass().getName());
+      // Dimensionality
       ByteArrayUtil.writeSignedVarint(buffer, object.mindim());
       ByteArrayUtil.writeSignedVarint(buffer, object.maxdim());
+      // Column names
+      String[] labels = object.getLabels();
+      if (labels == null) {
+        ByteArrayUtil.writeUnsignedVarint(buffer, 0);
+      } else {
+        ByteArrayUtil.writeUnsignedVarint(buffer, labels.length);
+        for (String s : labels) {
+          ByteArrayUtil.writeString(buffer, s);            
+        }
+      }
     }
 
     @Override
@@ -393,16 +394,22 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       // Type class
       total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getRestrictionClass().getName());
       // Name, or an empty string.
-      if (object.getLabel() == null) {
-        total += ByteArrayUtil.STRING_SERIALIZER.getByteSize("");
-      } else {
-        total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getLabel());
-      }
+      total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(object.getLabel());
       // Serializer class
       total += ByteArrayUtil.STRING_SERIALIZER.getByteSize(serializer.getClass().getName());
       // Dimensionality
       total += ByteArrayUtil.getSignedVarintSize(object.mindim());
       total += ByteArrayUtil.getSignedVarintSize(object.maxdim());
+      // Column names
+      String[] labels = object.getLabels();
+      if (labels == null) {
+        total += ByteArrayUtil.getUnsignedVarintSize(0);
+      } else {
+        total += ByteArrayUtil.getUnsignedVarintSize(labels.length);
+        for (String s : labels) {
+          total += ByteArrayUtil.getStringSize(s);            
+        }
+      }
       return total;
     }
   }

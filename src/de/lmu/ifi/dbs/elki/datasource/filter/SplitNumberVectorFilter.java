@@ -82,8 +82,8 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
       final VectorFieldTypeInformation<V> vtype = VectorFieldTypeInformation.class.cast(type);
 
       // Get the replacement type informations
-      VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), type.getSerializer(), dims.length, dims.length);
-      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), type.getSerializer(), vtype.dimensionality() - dims.length, vtype.dimensionality() - dims.length);
+      VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), type.getSerializer(), dims.length, vtype.getFactory());
+      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), type.getSerializer(), vtype.dimensionality() - dims.length, vtype.getFactory());
       final List<V> col1 = new ArrayList<V>(column.size());
       final List<V> col2 = new ArrayList<V>(column.size());
       bundle.appendColumn(type1, col1);

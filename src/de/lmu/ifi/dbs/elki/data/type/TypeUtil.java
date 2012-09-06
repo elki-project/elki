@@ -122,14 +122,14 @@ public final class TypeUtil {
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
-  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.VARIABLE_SERIALIZER);
+  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
-  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = new VectorFieldTypeInformation<FloatVector>(FloatVector.class, FloatVector.VARIABLE_SERIALIZER);
+  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = new VectorFieldTypeInformation<FloatVector>(FloatVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.

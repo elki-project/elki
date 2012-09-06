@@ -28,6 +28,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 
 /**
@@ -39,22 +40,22 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
  */
 public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements Projection<V, V> {
   /**
-   * Minimum dimensionality required for projection
+   * Minimum dimensionality required for projection.
    */
   private int mindim;
 
   /**
-   * Object factory
+   * Object factory.
    */
   private V factory;
 
   /**
-   * Output dimensionality
+   * Output dimensionality.
    */
   private int dimensionality;
 
   /**
-   * Subspace
+   * Subspace.
    */
   private BitSet bits;
 
@@ -70,11 +71,11 @@ public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements 
     this.factory = factory;
     this.dimensionality = bits.cardinality();
 
-    int mindim = 0;
+    int mind = 0;
     for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
-      mindim = Math.max(mindim, i + 1);
+      mind = Math.max(mind, i + 1);
     }
-    this.mindim = mindim;
+    this.mindim = mind;
   }
 
   @Override
@@ -90,7 +91,7 @@ public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements 
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
     @SuppressWarnings("unchecked")
     final Class<V> cls = (Class<V>) factory.getClass();
-    return new VectorTypeInformation<V>(cls, dimensionality, dimensionality);
+    return new VectorFieldTypeInformation<V>(cls, dimensionality);
   }
 
   @Override

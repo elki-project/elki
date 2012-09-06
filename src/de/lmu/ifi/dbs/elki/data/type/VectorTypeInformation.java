@@ -45,7 +45,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   protected final int maxdim;
 
   /**
-   * Constructor.
+   * Constructor for an actual type.
    * 
    * @param cls base class
    * @param serializer Serializer
@@ -60,17 +60,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   }
 
   /**
-   * Constructor without size constraints.
-   * 
-   * @param cls base class
-   * @param serializer Serializer
-   */
-  public VectorTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer) {
-    this(cls, serializer, -1, Integer.MAX_VALUE);
-  }
-
-  /**
-   * Constructor.
+   * Constructor for a type request.
    * 
    * @param cls base class
    * @param mindim Minimum dimensionality
@@ -81,7 +71,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   }
 
   /**
-   * Constructor without size constraints.
+   * Constructor for a type request without dimensionality constraints.
    * 
    * @param cls Class constraint
    */
