@@ -1,4 +1,4 @@
-package experimentalcode.erich.serialization;
+package de.lmu.ifi.dbs.elki.application;
 
 /*
  This file is part of ELKI:
@@ -28,9 +28,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleWriter;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.StreamFromBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -44,11 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Erich Schubert
  */
-public class ConvertToBundle extends AbstractApplication {
+public class ConvertToBundleApplication extends AbstractApplication {
   /**
    * Logging class.
    */
-  private static final Logging LOG = Logging.getLogger(ConvertToBundle.class);
+  private static final Logging LOG = Logging.getLogger(ConvertToBundleApplication.class);
 
   /**
    * The data input step.
@@ -67,7 +67,7 @@ public class ConvertToBundle extends AbstractApplication {
    * @param input Data source configuration
    * @param outfile Output filename
    */
-  public ConvertToBundle(boolean verbose, DatabaseConnection input, File outfile) {
+  public ConvertToBundleApplication(boolean verbose, DatabaseConnection input, File outfile) {
     super(verbose);
     this.input = input;
     this.outfile = outfile;
@@ -124,8 +124,8 @@ public class ConvertToBundle extends AbstractApplication {
     }
 
     @Override
-    protected ConvertToBundle makeInstance() {
-      return new ConvertToBundle(verbose, input, outfile);
+    protected ConvertToBundleApplication makeInstance() {
+      return new ConvertToBundleApplication(verbose, input, outfile);
     }
   }
 
@@ -135,6 +135,6 @@ public class ConvertToBundle extends AbstractApplication {
    * @param args Command line parameters
    */
   public static void main(String[] args) {
-    runCLIApplication(ConvertToBundle.class, args);
+    runCLIApplication(ConvertToBundleApplication.class, args);
   }
 }
