@@ -88,12 +88,12 @@ public final class TypeUtil {
   /**
    * Simple class labels.
    */
-  public static final SimpleTypeInformation<SimpleClassLabel> SIMPLE_CLASSLABEL = new SimpleTypeInformation<SimpleClassLabel>(SimpleClassLabel.class);
+  public static final SimpleTypeInformation<SimpleClassLabel> SIMPLE_CLASSLABEL = new SimpleTypeInformation<SimpleClassLabel>(SimpleClassLabel.class, SimpleClassLabel.SERIALIZER);
 
   /**
    * A list of labels.
    */
-  public static final SimpleTypeInformation<LabelList> LABELLIST = new SimpleTypeInformation<LabelList>(LabelList.class);
+  public static final SimpleTypeInformation<LabelList> LABELLIST = new SimpleTypeInformation<LabelList>(LabelList.class, LabelList.SERIALIZER);
 
   /**
    * A list of neighbors.

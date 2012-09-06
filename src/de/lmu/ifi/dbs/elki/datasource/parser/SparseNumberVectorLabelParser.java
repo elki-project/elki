@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -74,13 +73,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.has SparseNumberVector
+ * 
+ * @param <V> vector type
  */
 // FIXME: Maxdim!
 @Title("Sparse Vector Label Parser")
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored.")
 public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> extends NumberVectorLabelParser<V> {
   /**
-   * Class logger
+   * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(SparseNumberVectorLabelParser.class);
 
@@ -148,10 +149,10 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
     if(dimensionality > 0) {
-      return new VectorFieldTypeInformation<V>(cls, dimensionality, factory.newNumberVector(SparseDoubleVector.EMPTYMAP, dimensionality));
+      return new VectorFieldTypeInformation<V>(cls, factory.getDefaultSerializer(), dimensionality, factory);
     }
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<V>(cls);
+      return new SimpleTypeInformation<V>(cls, factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }

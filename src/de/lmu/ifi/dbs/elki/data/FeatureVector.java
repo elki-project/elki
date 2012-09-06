@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 
 /**
@@ -71,4 +72,13 @@ public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> {
    * @return a new FeatureVector of V for the given values
    */
   <A> V newFeatureVector(A array, ArrayAdapter<D, A> adapter);
+
+  /**
+   * Get the default serializer for this type.
+   * 
+   * Note, this may be {@code null} when no serializer is available.
+   * 
+   * @return Serializer
+   */
+  ByteBufferSerializer<V> getDefaultSerializer();
 }

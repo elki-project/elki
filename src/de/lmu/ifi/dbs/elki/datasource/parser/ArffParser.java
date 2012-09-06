@@ -66,22 +66,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  */
 public class ArffParser implements Parser {
   /**
-   * Logger
+   * Logger.
    */
   private static final Logging LOG = Logging.getLogger(ArffParser.class);
 
   /**
-   * Arff file marker
+   * Arff file marker.
    */
   public static final Pattern ARFF_HEADER_RELATION = Pattern.compile("@relation\\s+(.*)", Pattern.CASE_INSENSITIVE);
 
   /**
-   * Arff attribute declaration marker
+   * Arff attribute declaration marker.
    */
   public static final Pattern ARFF_HEADER_ATTRIBUTE = Pattern.compile("@attribute\\s+([^ ]+|['\"].*?['\"])\\s+(numeric|real|integer|string|double|date(\\s.*)|\\{.*\\})\\s*", Pattern.CASE_INSENSITIVE);
 
   /**
-   * Arff data marker
+   * Arff data marker.
    */
   public static final Pattern ARFF_HEADER_DATA = Pattern.compile("@data\\s*", Pattern.CASE_INSENSITIVE);
 
@@ -101,7 +101,7 @@ public class ArffParser implements Parser {
   public static final String DEFAULT_ARFF_MAGIC_CLASS = "(Class|Class-?Label)";
 
   /**
-   * Pattern for numeric columns
+   * Pattern for numeric columns.
    */
   public static final Pattern ARFF_NUMERIC = Pattern.compile("(numeric|real|integer|double)", Pattern.CASE_INSENSITIVE);
 
@@ -111,12 +111,12 @@ public class ArffParser implements Parser {
   public static final Pattern EMPTY = Pattern.compile("^\\s*$");
 
   /**
-   * Pattern to recognize external ids
+   * Pattern to recognize external ids.
    */
   Pattern magic_eid;
 
   /**
-   * Pattern to recognize class label columns
+   * Pattern to recognize class label columns.
    */
   Pattern magic_class;
 
@@ -421,7 +421,7 @@ public class ArffParser implements Parser {
           labels[i] = names.get(out + i);
         }
         if(!sparse) {
-          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC, dimsize[out], labels, new DoubleVector(new double[dimsize[out]]));
+          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC.getDefaultSerializer(), dimsize[out], labels, new DoubleVector(new double[dimsize[out]]));
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else {

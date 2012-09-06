@@ -256,6 +256,11 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     }
     return new BitVector(bits, dim);
   }
+  
+  @Override
+  public ByteBufferSerializer<BitVector> getDefaultSerializer() {
+    return SHORT_SERIALIZER;
+  }
 
   /**
    * Serialization class for dense integer vectors with up to
@@ -266,7 +271,7 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
    * 
    * @apiviz.has IntegerVector
    */
-  private static class ShortSerializer implements ByteBufferSerializer<BitVector> {
+  public static class ShortSerializer implements ByteBufferSerializer<BitVector> {
     @Override
     public BitVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       short dimensionality = buffer.getShort();
@@ -321,11 +326,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     @Override
     public int getByteSize(BitVector vec) {
       return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 

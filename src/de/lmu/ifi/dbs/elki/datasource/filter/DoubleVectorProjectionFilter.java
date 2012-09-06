@@ -42,7 +42,7 @@ public class DoubleVectorProjectionFilter extends AbstractFeatureSelectionFilter
   /**
    * Constructor.
    *
-   * @param selectedAttributes
+   * @param selectedAttributes Selected attributes
    */
   public DoubleVectorProjectionFilter(BitSet selectedAttributes) {
     super(selectedAttributes);
@@ -60,7 +60,7 @@ public class DoubleVectorProjectionFilter extends AbstractFeatureSelectionFilter
 
   @Override
   protected SimpleTypeInformation<? super DoubleVector> convertedType(SimpleTypeInformation<DoubleVector> in) {
-    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC, getDimensionality(), DoubleVector.STATIC);
+    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, in.getSerializer(), getDimensionality(), DoubleVector.STATIC);
   }
 
   /**

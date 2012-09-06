@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -294,11 +293,6 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_BYTE;
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -335,11 +329,6 @@ public final class ByteArrayUtil {
     @Override
     public int getFixedByteSize() {
       return SIZE_SHORT;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -378,11 +367,6 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_INT;
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -419,11 +403,6 @@ public final class ByteArrayUtil {
     @Override
     public int getFixedByteSize() {
       return SIZE_LONG;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -462,11 +441,6 @@ public final class ByteArrayUtil {
     public int getFixedByteSize() {
       return SIZE_FLOAT;
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -503,11 +477,6 @@ public final class ByteArrayUtil {
     @Override
     public int getFixedByteSize() {
       return SIZE_DOUBLE;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
@@ -580,11 +549,6 @@ public final class ByteArrayUtil {
         throw new AbortException("String not representable as UTF-8.", e);
       }
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -616,11 +580,6 @@ public final class ByteArrayUtil {
     @Override
     public int getByteSize(Integer object) {
       return getSignedVarintSize(object);
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 

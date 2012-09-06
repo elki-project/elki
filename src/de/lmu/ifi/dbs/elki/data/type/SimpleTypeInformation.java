@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.type;
 
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,6 +23,8 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+
 /**
  * Class wrapping a particular data type.
  * 
@@ -39,12 +39,12 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   private Class<? super T> cls;
 
   /**
-   * Type label
+   * Type label.
    */
   private String label = null;
 
   /**
-   * Type serializer
+   * Type serializer.
    */
   private ByteBufferSerializer<? super T> serializer = null;
 
@@ -96,7 +96,6 @@ public class SimpleTypeInformation<T> implements TypeInformation {
     this.serializer = serializer;
   }
 
-  
   /**
    * Get the raw restriction class.
    * 
@@ -108,7 +107,7 @@ public class SimpleTypeInformation<T> implements TypeInformation {
 
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
-    if(!(type instanceof SimpleTypeInformation)) {
+    if (!(type instanceof SimpleTypeInformation)) {
       return false;
     }
     final SimpleTypeInformation<?> simpleType = (SimpleTypeInformation<?>) type;
@@ -121,7 +120,7 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   }
 
   /**
-   * Cast the object to type T (actually to the given restriction class!)
+   * Cast the object to type T (actually to the given restriction class!).
    * 
    * @param other Object to cast.
    * @return Instance
@@ -137,7 +136,7 @@ public class SimpleTypeInformation<T> implements TypeInformation {
   }
 
   /**
-   * Get the type label
+   * Get the type label.
    * 
    * @return Label
    */
@@ -152,5 +151,14 @@ public class SimpleTypeInformation<T> implements TypeInformation {
    */
   public ByteBufferSerializer<? super T> getSerializer() {
     return serializer;
+  }
+
+  /**
+   * Set the serializer for this type.
+   * 
+   * @param serializer Serializer to use
+   */
+  public void setSerializer(ByteBufferSerializer<? super T> serializer) {
+    this.serializer = serializer;
   }
 }

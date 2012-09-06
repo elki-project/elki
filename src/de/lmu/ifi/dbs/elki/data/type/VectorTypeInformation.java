@@ -35,12 +35,12 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  */
 public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends SimpleTypeInformation<V> {
   /**
-   * Minimum dimensionality
+   * Minimum dimensionality.
    */
   protected final int mindim;
 
   /**
-   * Maximum dimensionality
+   * Maximum dimensionality.
    */
   protected final int maxdim;
 
@@ -83,7 +83,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
   /**
    * Constructor without size constraints.
    * 
-   * @param cls
+   * @param cls Class constraint
    */
   public VectorTypeInformation(Class<? super V> cls) {
     this(cls, null, -1, Integer.MAX_VALUE);

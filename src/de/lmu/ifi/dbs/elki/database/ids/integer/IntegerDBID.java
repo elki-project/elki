@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -254,11 +253,6 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     public int getByteSize(DBID object) throws UnsupportedOperationException {
       return ByteArrayUtil.getSignedVarintSize(((IntegerDBID) object).id);
     }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
-    }
   }
 
   /**
@@ -292,11 +286,6 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     @Override
     public int getFixedByteSize() {
       return ByteArrayUtil.SIZE_INT;
-    }
-
-    @Override
-    public void writeMetadata(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
-      ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, getClass().getName());
     }
   }
 
