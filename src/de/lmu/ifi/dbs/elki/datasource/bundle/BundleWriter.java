@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformationSerializer;
@@ -64,7 +64,7 @@ public class BundleWriter {
    * @param output Output channel
    * @throws IOException on IO errors
    */
-  public void writeBundleStream(BundleStreamSource source, FileChannel output) throws IOException {
+  public void writeBundleStream(BundleStreamSource source, WritableByteChannel output) throws IOException {
     ByteBuffer buffer = ByteBuffer.allocateDirect(INITIAL_BUFFER);
 
     ByteBufferSerializer<Object>[] serializers = null;
@@ -105,7 +105,7 @@ public class BundleWriter {
    * @param output Output channel
    * @throws IOException on IO errors
    */
-  private void flushBuffer(ByteBuffer buffer, FileChannel output) throws IOException {
+  private void flushBuffer(ByteBuffer buffer, WritableByteChannel output) throws IOException {
     buffer.flip();
     output.write(buffer);
     buffer.flip();
@@ -121,7 +121,7 @@ public class BundleWriter {
    * @return Buffer, eventually resized
    * @throws IOException on IO errors
    */
-  private ByteBuffer ensureBuffer(int size, ByteBuffer buffer, FileChannel output) throws IOException {
+  private ByteBuffer ensureBuffer(int size, ByteBuffer buffer, WritableByteChannel output) throws IOException {
     if (buffer.remaining() >= size) {
       return buffer;
     }
@@ -142,7 +142,7 @@ public class BundleWriter {
    * @return Array of serializers
    * @throws IOException on IO errors
    */
-  private ByteBufferSerializer<Object>[] writeHeader(BundleStreamSource source, ByteBuffer buffer, FileChannel output) throws IOException {
+  private ByteBufferSerializer<Object>[] writeHeader(BundleStreamSource source, ByteBuffer buffer, WritableByteChannel output) throws IOException {
     final BundleMeta meta = source.getMeta();
     final int nummeta = meta.size();
     @SuppressWarnings("unchecked")
