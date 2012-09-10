@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  * 
  * @author Florian Frankenberger
  */
-public class KDTree<V extends NumberVector<?, ?>> {
+public class KDTree<V extends NumberVector<?>> {
   private final Relation<V> relation;
 
   private final KDTreeNode root;
@@ -126,7 +126,7 @@ public class KDTree<V extends NumberVector<?, ?>> {
    * @param dimension Dimension to use
    * @param position Split position
    */
-  public static <V extends NumberVector<?, ?>> ArrayModifiableDBIDs[] splitAtMedian(Relation<V> relation, DBIDs ids, int dimension, double position) {
+  public static <V extends NumberVector<?>> ArrayModifiableDBIDs[] splitAtMedian(Relation<V> relation, DBIDs ids, int dimension, double position) {
     ArrayModifiableDBIDs dataSetLower = DBIDUtil.newArray((int) (ids.size() * 0.51));
     ArrayModifiableDBIDs dataSetExact = DBIDUtil.newArray((int) (ids.size() * 0.05));
     ArrayModifiableDBIDs dataSetHigher = DBIDUtil.newArray((int) (ids.size() * 0.51));

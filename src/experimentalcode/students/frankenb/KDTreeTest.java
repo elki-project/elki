@@ -25,7 +25,7 @@ public class KDTreeTest {
 
   @Test
   public void simpleTest() {
-    List<NumberVector<?, ?>> items = new ArrayList<NumberVector<?, ?>>();
+    List<NumberVector<?>> items = new ArrayList<NumberVector<?>>();
     items.add(new IntegerVector(new int[] { -4, -5 }));
     items.add(new IntegerVector(new int[] { -9, 3 }));
     items.add(new IntegerVector(new int[] { 9, -1 }));
@@ -36,7 +36,7 @@ public class KDTreeTest {
     items.add(new IntegerVector(new int[] { 4, 1 }));
     items.add(new IntegerVector(new int[] { 7, -6 }));
     items.add(new IntegerVector(new int[] { 9, -3 }));
-    Relation<NumberVector<?, ?>> dataSet = null; // new ListDataSet(2, items);
+    Relation<NumberVector<?>> dataSet = null; // new ListDataSet(2, items);
 
     KDTree tree = new KDTree(dataSet);
 

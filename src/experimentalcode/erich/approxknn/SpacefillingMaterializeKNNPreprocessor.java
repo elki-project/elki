@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @author Erich Schubert
  */
-public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
+public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   /**
    * Class logger
    */
@@ -316,7 +316,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
    * @param <V> Vector type
    * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<V, D, KNNResult<D>> {
+  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<V, D, KNNResult<D>> {
     /**
      * Spatial curve generators
      */
@@ -366,7 +366,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?, ?>
      * @param <V> Vector type
      * @param <D> Distance type
      */
-    public static class Parameterizer<V extends NumberVector<?, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<V, D> {
+    public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<V, D> {
       /**
        * Parameter for choosing the space filling curves to use.
        */

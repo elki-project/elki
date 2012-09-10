@@ -24,17 +24,17 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * 
  * @author Florian Frankenberger
  */
-public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance> {
+public class PINNKnnQuery implements KNNQuery<NumberVector<?>, DoubleDistance> {
   /**
    * The logger
    */
   private static final Logging logger = Logging.getLogger(PINNKnnQuery.class);
 
-  private final Relation<? extends NumberVector<?, ?>> dataBase;
+  private final Relation<? extends NumberVector<?>> dataBase;
   private final KDTree tree;
   private final int kFactor;
   
-  protected PINNKnnQuery(Relation<? extends NumberVector<?, ?>> database, KDTree tree, int kFactor) {
+  protected PINNKnnQuery(Relation<? extends NumberVector<?>> database, KDTree tree, int kFactor) {
     this.tree = tree;
     this.dataBase = database;
     this.kFactor = kFactor;
@@ -46,7 +46,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   
   @Override
   public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
-    NumberVector<?, ?> vector = dataBase.get(id);
+    NumberVector<?> vector = dataBase.get(id);
     
     KNNResult<DoubleDistance> projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor*k, EuclideanDistanceFunction.STATIC);
     
@@ -60,7 +60,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
     
     DoubleDistanceKNNHeap newDistanceList = new DoubleDistanceKNNHeap(k);
     for (DistanceDBIDResultIter<DoubleDistance> distance = projectedDistanceList.iter(); distance.valid(); distance.advance()) {
-      NumberVector<?, ?> otherVector = dataBase.get(distance);
+      NumberVector<?> otherVector = dataBase.get(distance);
       newDistanceList.add(DBIDFactory.FACTORY.newDistancePair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance));
     }
     
@@ -81,7 +81,7 @@ public class PINNKnnQuery implements KNNQuery<NumberVector<?, ?>, DoubleDistance
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForObject(NumberVector<?, ?> obj, int k) {
+  public KNNResult<DoubleDistance> getKNNForObject(NumberVector<?> obj, int k) {
     // TODO Auto-generated method stub
     return null;
   }

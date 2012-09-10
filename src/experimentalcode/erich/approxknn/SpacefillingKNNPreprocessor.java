@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @author Erich Schubert
  */
-public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends AbstractIndex<O> implements KNNIndex<O> {
+public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends AbstractIndex<O> implements KNNIndex<O> {
   /**
    * Class logger
    */
@@ -151,7 +151,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
     }
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final NumberVector<?, ?> v = relation.get(iditer);
+      final NumberVector<?> v = relation.get(iditer);
       SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
       for(List<SpatialRef> curve : curves) {
         curve.add(ref);
@@ -308,7 +308,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
   static class SpatialRef implements SpatialComparable {
     protected DBID id;
 
-    protected NumberVector<?, ?> vec;
+    protected NumberVector<?> vec;
 
     /**
      * Constructor.
@@ -316,7 +316,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
      * @param id
      * @param vec
      */
-    protected SpatialRef(DBID id, NumberVector<?, ?> vec) {
+    protected SpatialRef(DBID id, NumberVector<?> vec) {
       super();
       this.id = id;
       this.vec = vec;
@@ -345,7 +345,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?, ?>> extends A
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?, ?>> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
+  public static class Factory<V extends NumberVector<?>> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
     /**
      * Spatial curve generators
      */

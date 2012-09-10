@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  * 
  * @author Florian Frankenberger
  */
-public class PINNKnnIndex<V extends NumberVector<?, ?>> implements KNNIndex<V> {
+public class PINNKnnIndex<V extends NumberVector<?>> implements KNNIndex<V> {
 
   private final KDTree<V> tree;
   private final int kFactor;

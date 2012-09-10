@@ -73,11 +73,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 public class SpacefillingKNNExperiment2 {
   private static final Logging LOG = Logging.getLogger(SpacefillingKNNExperiment2.class);
 
-  PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>> distanceFunction = ManhattanDistanceFunction.STATIC;
+  PrimitiveDoubleDistanceFunction<? super NumberVector<?>> distanceFunction = ManhattanDistanceFunction.STATIC;
 
   private void run() {
     Database database = loadDatabase();
-    Relation<NumberVector<?, ?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
     Random rnd = new Random(0);
 
@@ -92,7 +92,7 @@ public class SpacefillingKNNExperiment2 {
     List<SpatialRef> hs3 = new ArrayList<SpatialRef>(ids.size());
     {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        final NumberVector<?, ?> v = rel.get(id);
+        final NumberVector<?> v = rel.get(id);
         SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
         zs.add(ref);
         ps.add(ref);
@@ -205,8 +205,8 @@ public class SpacefillingKNNExperiment2 {
     final int k = 50;
     final int maxoff = 50 * k + 1;
     final int numcurves = 29;
-    DistanceQuery<NumberVector<?, ?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
-    KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
+    DistanceQuery<NumberVector<?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
+    KNNQuery<NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
     ArrayList<MeanVariance[]> mrec = new ArrayList<MeanVariance[]>();
     ArrayList<MeanVariance[]> mdic = new ArrayList<MeanVariance[]>();
@@ -225,7 +225,7 @@ public class SpacefillingKNNExperiment2 {
     }
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      final NumberVector<?, ?> vec = rel.get(id);
+      final NumberVector<?> vec = rel.get(id);
       final KNNResult<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
       final DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       final int[] posi = positions.get(id);
@@ -349,7 +349,7 @@ public class SpacefillingKNNExperiment2 {
     heapz.add(DBIDFactory.FACTORY.newDistancePair(0, id));
   }
 
-  protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?, ?> vec, Relation<NumberVector<?, ?>> rel, List<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> pairs, int... runs) {
+  protected void addCandidates(List<SpatialRef> zs, final int pos, int off, NumberVector<?> vec, Relation<NumberVector<?>> rel, List<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> pairs, int... runs) {
     if(pos - off >= 0) {
       final DBID cid = zs.get(pos - off).id;
       double d = Double.NaN;
@@ -403,7 +403,7 @@ public class SpacefillingKNNExperiment2 {
   static class SpatialRef implements SpatialComparable {
     protected DBID id;
 
-    protected NumberVector<?, ?> vec;
+    protected NumberVector<?> vec;
 
     /**
      * Constructor.
@@ -411,7 +411,7 @@ public class SpacefillingKNNExperiment2 {
      * @param id
      * @param vec
      */
-    protected SpatialRef(DBID id, NumberVector<?, ?> vec) {
+    protected SpatialRef(DBID id, NumberVector<?> vec) {
       super();
       this.id = id;
       this.vec = vec;

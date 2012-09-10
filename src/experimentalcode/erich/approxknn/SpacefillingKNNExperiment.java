@@ -66,11 +66,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class SpacefillingKNNExperiment {
   private static final Logging LOG = Logging.getLogger(SpacefillingKNNExperiment.class);
 
-  DistanceFunction<? super NumberVector<?, ?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
+  DistanceFunction<? super NumberVector<?>, DoubleDistance> distanceFunction = ManhattanDistanceFunction.STATIC;
 
   private void run() {
     Database database = loadDatabase();
-    Relation<NumberVector<?, ?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
 
     List<SpatialRef> zs = new ArrayList<SpatialRef>(ids.size());
@@ -78,7 +78,7 @@ public class SpacefillingKNNExperiment {
     List<SpatialRef> hs = new ArrayList<SpatialRef>(ids.size());
     {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        final NumberVector<?, ?> v = rel.get(id);
+        final NumberVector<?> v = rel.get(id);
         SpatialRef ref = new SpatialRef(DBIDUtil.deref(id), v);
         zs.add(ref);
         ps.add(ref);
@@ -121,8 +121,8 @@ public class SpacefillingKNNExperiment {
     // True kNN value
     final int k = 50;
     final int maxoff = 2 * k + 1;
-    DistanceQuery<NumberVector<?, ?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
-    KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
+    DistanceQuery<NumberVector<?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
+    KNNQuery<NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
     ArrayList<MeanVariance[]> mvs = new ArrayList<MeanVariance[]>();
     for(int i = 0; i < maxoff; i++) {
@@ -253,7 +253,7 @@ public class SpacefillingKNNExperiment {
   static class SpatialRef implements SpatialComparable {
     protected DBID id;
 
-    protected NumberVector<?, ?> vec;
+    protected NumberVector<?> vec;
 
     /**
      * Constructor.
@@ -261,7 +261,7 @@ public class SpacefillingKNNExperiment {
      * @param id
      * @param vec
      */
-    protected SpatialRef(DBID id, NumberVector<?, ?> vec) {
+    protected SpatialRef(DBID id, NumberVector<?> vec) {
       super();
       this.id = id;
       this.vec = vec;

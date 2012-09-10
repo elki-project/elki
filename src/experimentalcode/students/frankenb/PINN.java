@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Florian Frankenberger
  */
-public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
+public class PINN<V extends NumberVector<?>> extends AbstractApplication {
   /**
    * The logger
    */
@@ -89,7 +89,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
 
     logger.verbose("Running LOF ...");
 
-    OutlierAlgorithm algorithm = new LOF<NumberVector<?, ?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
+    OutlierAlgorithm algorithm = new LOF<NumberVector<?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
     OutlierResult result = algorithm.run(database);
 
     logger.verbose("Calculating ROC ...");
@@ -125,7 +125,7 @@ public class PINN<V extends NumberVector<V, ?>> extends AbstractApplication {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractApplication.Parameterizer {
     private Database database;
 
     private RandomProjection<V> randomProjection;
