@@ -252,7 +252,7 @@ public class ResultUtil {
    * @param rel Relation
    * @return associated scales result
    */
-  public static ScalesResult getScalesResult(final Relation<? extends NumberVector<?, ?>> rel) {
+  public static ScalesResult getScalesResult(final Relation<? extends NumberVector<?>> rel) {
     Collection<ScalesResult> scas = ResultUtil.filterResults(rel, ScalesResult.class);
     if(scas.size() == 0) {
       final ScalesResult newsca = new ScalesResult(rel);

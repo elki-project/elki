@@ -13,15 +13,14 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.visualization.ExportVisualizations;
  * @author Niels Dörre
  * Visualization function for Cross-track distance function
  */
-public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> implements ResultHandler {
+public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implements ResultHandler {
   /**
    * Get a logger for this class.
    */
@@ -86,7 +85,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<V, ?>> imple
 
   private void processRelation(Database db, Relation<V> rel) {
 
-    V factory = DatabaseUtil.assumeVectorField(rel).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(rel);
 
     SpatialPrimitiveDoubleDistanceFunction<? super V> df2 = LatLngDistanceFunction.STATIC;
     

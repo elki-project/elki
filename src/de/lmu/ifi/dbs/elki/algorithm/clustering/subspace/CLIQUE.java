@@ -46,10 +46,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -96,7 +96,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("CLIQUE: Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications")
 @Description("Grid-based algorithm to identify dense clusters in subspaces of maximum dimensionality.")
 @Reference(authors = "R. Agrawal, J. Gehrke, D. Gunopulos, P. Raghavan", title = "Automatic Subspace Clustering of High Dimensional Data for Data Mining Applications", booktitle = "Proc. SIGMOD Conference, Seattle, WA, 1998", url = "http://dx.doi.org/10.1145/276304.276314")
-public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -184,7 +184,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
       }
     }
 
-    int dimensionality = DatabaseUtil.dimensionality(relation);
+    int dimensionality = RelationUtil.dimensionality(relation);
     for(int k = 2; k <= dimensionality && !denseSubspaces.isEmpty(); k++) {
       denseSubspaces = findDenseSubspaces(relation, denseSubspaces);
       dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
@@ -207,13 +207,13 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("CLIQUE clustering", "clique-clustering");
     for(Integer dim : dimensionToDenseSubspaces.keySet()) {
       List<CLIQUESubspace<V>> subspaces = dimensionToDenseSubspaces.get(dim);
-      List<Pair<Subspace<V>, ModifiableDBIDs>> modelsAndClusters = determineClusters(subspaces);
+      List<Pair<Subspace, ModifiableDBIDs>> modelsAndClusters = determineClusters(subspaces);
 
       if(LOG.isVerbose()) {
         LOG.verbose("    " + (dim + 1) + "-dimensional clusters: " + modelsAndClusters.size());
       }
 
-      for(Pair<Subspace<V>, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
+      for(Pair<Subspace, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
         Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(modelAndCluster.second);
         newCluster.setModel(new SubspaceModel<V>(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second).toVector(relation)));
         newCluster.setName("cluster_" + numClusters++);
@@ -232,11 +232,11 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * @return the clusters in the specified dense subspaces and the corresponding
    *         cluster models
    */
-  private List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters(List<CLIQUESubspace<V>> denseSubspaces) {
-    List<Pair<Subspace<V>, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace<V>, ModifiableDBIDs>>();
+  private List<Pair<Subspace, ModifiableDBIDs>> determineClusters(List<CLIQUESubspace<V>> denseSubspaces) {
+    List<Pair<Subspace, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace, ModifiableDBIDs>>();
 
     for(CLIQUESubspace<V> subspace : denseSubspaces) {
-      List<Pair<Subspace<V>, ModifiableDBIDs>> clustersInSubspace = subspace.determineClusters();
+      List<Pair<Subspace, ModifiableDBIDs>> clustersInSubspace = subspace.determineClusters();
       if(LOG.isDebugging()) {
         LOG.debugFine("Subspace " + subspace + " clusters " + clustersInSubspace.size());
       }
@@ -289,7 +289,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * @return the created one dimensional units
    */
   private Collection<CLIQUEUnit<V>> initOneDimensionalUnits(Relation<V> database) {
-    int dimensionality = DatabaseUtil.dimensionality(database);
+    int dimensionality = RelationUtil.dimensionality(database);
     // initialize minima and maxima
     double[] minima = new double[dimensionality];
     double[] maxima = new double[dimensionality];
@@ -583,7 +583,7 @@ public class CLIQUE<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clus
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     protected int xsi;
 
     protected double tau;

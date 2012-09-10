@@ -46,7 +46,7 @@ public class ScalesResult extends BasicResult {
    * 
    * @param relation Relation to use
    */
-  public ScalesResult(Relation<? extends NumberVector<?, ?>> relation) {
+  public ScalesResult(Relation<? extends NumberVector<?>> relation) {
     this(Scales.calcScales(relation));
   }
 

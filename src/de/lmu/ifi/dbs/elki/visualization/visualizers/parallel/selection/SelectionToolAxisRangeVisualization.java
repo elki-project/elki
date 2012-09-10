@@ -112,7 +112,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
    * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has RangeSelection oneway - - updates
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> implements DragableArea.DragListener {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -273,7 +273,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
         selection.clear();
 
         candidates: for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          NumberVector<?, ?> dbTupel = relation.get(iditer);
+          NumberVector<?> dbTupel = relation.get(iditer);
           for(int i = 0; i < dim; i++) {
             if(ranges != null && ranges[i] != null) {
               if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {

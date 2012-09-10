@@ -45,12 +45,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -87,7 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("EM-Clustering: Clustering by Expectation Maximization")
 @Description("Provides k Gaussian mixtures maximizing the probability of the given data")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", title = "Maximum Likelihood from Incomplete Data via the EM algorithm", booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", url = "http://www.jstor.org/stable/2984875")
-public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
+public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<EMModel<V>>> implements ClusteringAlgorithm<Clustering<EMModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -180,7 +180,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       LOG.verbose("initializing " + k + " models");
     }
     List<Vector> means = new ArrayList<Vector>();
-    for(NumberVector<?, ?> nv : initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC)) {
+    for(NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC)) {
       means.add(nv.getColumnVector());
     }
     List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
@@ -297,7 +297,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
       }
       hardClusters.get(maxIndex).add(iditer);
     }
-    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<EMModel<V>> result = new Clustering<EMModel<V>>("EM Clustering", "em-clustering");
     // provide models within the result
     for(int i = 0; i < k; i++) {
@@ -395,7 +395,7 @@ public class EM<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clusteri
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     protected int k;
 
     protected double delta;

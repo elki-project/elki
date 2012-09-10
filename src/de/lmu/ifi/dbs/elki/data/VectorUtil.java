@@ -33,10 +33,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
@@ -63,7 +63,7 @@ public final class VectorUtil {
    * @param vec Vector to process.
    * @return [min, max]
    */
-  public static DoubleMinMax getRangeDouble(NumberVector<?, ?> vec) {
+  public static DoubleMinMax getRangeDouble(NumberVector<?> vec) {
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < vec.getDimensionality(); i++) {
@@ -74,26 +74,28 @@ public final class VectorUtil {
   }
 
   /**
-   * Produce a new vector based on random numbers in [0:1] of the same type and
-   * dimensionality as the given vector.
-   * 
-   * @param template existing instance of wanted dimensionality.
+   * Produce a new vector based on random numbers in [0:1].
+   *
+   * @param factory Vector factory
+   * @param dim desired dimensionality
    * @param r Random generator
+   * @param <V> vector type
    * @return new instance
    */
-  public static <V extends NumberVector<V, ?>> V randomVector(V template, Random r) {
-    return template.newNumberVector(MathUtil.randomDoubleArray(template.getDimensionality(), r));
+  public static <V extends NumberVector<?>> V randomVector(NumberVector.Factory<V, ?> factory, int dim, Random r) {
+    return factory.newNumberVector(MathUtil.randomDoubleArray(dim, r));
   }
 
   /**
-   * Produce a new vector based on random numbers in [0:1] of the same type and
-   * dimensionality as the given vector.
+   * Produce a new vector based on random numbers in [0:1].
    * 
-   * @param template existing instance of wanted dimensionality.
+   * @param factory Vector factory
+   * @param dim desired dimensionality
+   * @param <V> vector type
    * @return new instance
    */
-  public static <V extends NumberVector<V, ?>> V randomVector(V template) {
-    return randomVector(template, new Random());
+  public static <V extends NumberVector<?>> V randomVector(NumberVector.Factory<V, ?> factory, int dim) {
+    return randomVector(factory, dim, new Random());
   }
 
   /**
@@ -103,7 +105,7 @@ public final class VectorUtil {
    * @param v2 Second vector
    * @return angle
    */
-  public static double angleSparse(SparseNumberVector<?, ?> v1, SparseNumberVector<?, ?> v2) {
+  public static double angleSparse(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
     BitSet b1 = v1.getNotNullMask();
     BitSet b2 = v2.getNotNullMask();
     BitSet both = (BitSet) b1.clone();
@@ -141,7 +143,7 @@ public final class VectorUtil {
    * @param o Origin
    * @return Angle
    */
-  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2, Vector o) {
+  public static double angle(NumberVector<?> v1, NumberVector<?> v2, Vector o) {
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
@@ -167,7 +169,7 @@ public final class VectorUtil {
    * @param o Origin
    * @return Angle
    */
-  public static double angle(NumberVector<?, ?> v1, NumberVector<?, ?> v2, NumberVector<?, ?> o) {
+  public static double angle(NumberVector<?> v1, NumberVector<?> v2, NumberVector<?> o) {
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
@@ -193,9 +195,9 @@ public final class VectorUtil {
    * @param v2 second vector
    * @return Angle
    */
-  public static double cosAngle(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
-    if(v1 instanceof SparseNumberVector<?, ?> && v2 instanceof SparseNumberVector<?, ?>) {
-      return angleSparse((SparseNumberVector<?, ?>) v1, (SparseNumberVector<?, ?>) v2);
+  public static double cosAngle(NumberVector<?> v1, NumberVector<?> v2) {
+    if(v1 instanceof SparseNumberVector<?> && v2 instanceof SparseNumberVector<?>) {
+      return angleSparse((SparseNumberVector<?>) v1, (SparseNumberVector<?>) v2);
     }
     // Essentially, we want to compute this:
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
@@ -234,8 +236,8 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double minCosAngle(SpatialComparable v1, SpatialComparable v2) {
-    if(v1 instanceof NumberVector<?, ?> && v2 instanceof NumberVector<?, ?>) {
-      return cosAngle((NumberVector<?, ?>) v1, (NumberVector<?, ?>) v2);
+    if(v1 instanceof NumberVector<?> && v2 instanceof NumberVector<?>) {
+      return cosAngle((NumberVector<?>) v1, (NumberVector<?>) v2);
     }
     // Essentially, we want to compute this:
     // absmax(v1.transposeTimes(v2))/(min(v1.euclideanLength())*min(v2.euclideanLength()));
@@ -275,7 +277,7 @@ public final class VectorUtil {
    * @return the scalar product (inner product) of this and the given
    *         DoubleVector
    */
-  public static double scalarProduct(NumberVector<?, ?> d1, NumberVector<?, ?> d2) {
+  public static double scalarProduct(NumberVector<?> d1, NumberVector<?> d2) {
     final int dim = d1.getDimensionality();
     double result = 0.0;
     for(int i = 1; i <= dim; i++) {
@@ -291,8 +293,8 @@ public final class VectorUtil {
    * @param sample Sample set
    * @return Medoid vector
    */
-  public static Vector computeMedoid(Relation<? extends NumberVector<?, ?>> relation, DBIDs sample) {
-    final int dim = DatabaseUtil.dimensionality(relation);
+  public static Vector computeMedoid(Relation<? extends NumberVector<?>> relation, DBIDs sample) {
+    final int dim = RelationUtil.dimensionality(relation);
     ArrayModifiableDBIDs mids = DBIDUtil.newArray(sample);
     SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
     Vector medoid = new Vector(dim);
@@ -304,7 +306,7 @@ public final class VectorUtil {
   }
 
   /**
-   * Compare number vectors by a single dimension
+   * Compare number vectors by a single dimension.
    * 
    * @author Erich Schubert
    *
@@ -312,27 +314,27 @@ public final class VectorUtil {
    */
   public static class SortDBIDsBySingleDimension implements Comparator<DBIDRef> {
     /**
-     * Dimension to sort with
+     * Dimension to sort with.
      */
     private int d;
 
     /**
      * The relation to sort.
      */
-    private Relation<? extends NumberVector<?, ?>> data;
+    private Relation<? extends NumberVector<?>> data;
 
     /**
      * Constructor.
      * 
      * @param data Vector data source
      */
-    public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?, ?>> data) {
+    public SortDBIDsBySingleDimension(Relation<? extends NumberVector<?>> data) {
       super();
       this.data = data;
     };
 
     /**
-     * Get the dimension to sort by
+     * Get the dimension to sort by.
      * 
      * @return Dimension to sort with
      */
@@ -341,12 +343,12 @@ public final class VectorUtil {
     }
 
     /**
-     * Set the dimension to sort by
+     * Set the dimension to sort by.
      * 
-     * @param d Dimension to sort with
+     * @param d2 Dimension to sort with
      */
-    public void setDimension(int d) {
-      this.d = d;
+    public void setDimension(int d2) {
+      this.d = d2;
     }
 
     @Override
@@ -356,15 +358,15 @@ public final class VectorUtil {
   }
 
   /**
-   * Compare number vectors by a single dimension
+   * Compare number vectors by a single dimension.
    * 
    * @author Erich Schubert
    *
    * @apiviz.exclude
    */
-  public static class SortVectorsBySingleDimension implements Comparator<NumberVector<?, ?>> {
+  public static class SortVectorsBySingleDimension implements Comparator<NumberVector<?>> {
     /**
-     * Dimension to sort with
+     * Dimension to sort with.
      */
     private int d;
 
@@ -376,7 +378,7 @@ public final class VectorUtil {
     };
 
     /**
-     * Get the dimension to sort by
+     * Get the dimension to sort by.
      * 
      * @return Dimension to sort with
      */
@@ -385,16 +387,16 @@ public final class VectorUtil {
     }
 
     /**
-     * Set the dimension to sort by
+     * Set the dimension to sort by.
      * 
-     * @param d Dimension to sort with
+     * @param d2 Dimension to sort with
      */
-    public void setDimension(int d) {
-      this.d = d;
+    public void setDimension(int d2) {
+      this.d = d2;
     }
 
     @Override
-    public int compare(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+    public int compare(NumberVector<?> o1, NumberVector<?> o2) {
       return Double.compare(o1.doubleValue(d), o2.doubleValue(d));
     }
   }

@@ -29,10 +29,10 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
@@ -50,14 +50,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
  * 
  * @param <V> Vector type
  */
-public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
+public class HistogramProjector<V extends NumberVector<?>> extends AbstractHierarchicalResult implements Projector {
   /**
-   * Relation we project
+   * Relation we project.
    */
   Relation<V> rel;
 
   /**
-   * Database dimensionality
+   * Database dimensionality.
    */
   int dmax;
 
@@ -71,7 +71,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    assert (maxdim <= DatabaseUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
+    assert (maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
   @Override
@@ -94,7 +94,7 @@ public class HistogramProjector<V extends NumberVector<?, ?>> extends AbstractHi
       // Add labels
       for(int d1 = 0; d1 < dmax; d1++) {
         PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
-        LabelVisualization lbl = new LabelVisualization(DatabaseUtil.getColumnLabel(rel, d1 + 1));
+        LabelVisualization lbl = new LabelVisualization(RelationUtil.getColumnLabel(rel, d1 + 1));
         final VisualizationTask task = new VisualizationTask("", null, null, lbl);
         task.height = lheight;
         task.width = 1;

@@ -36,14 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensionalDoubleVector, Double> {
+public class OneDimensionalDoubleVector extends AbstractNumberVector<Double> {
   /**
-   * Static factory instance
+   * Static factory instance.
    */
-  public static final OneDimensionalDoubleVector STATIC = new OneDimensionalDoubleVector(Double.NaN);
+  public static final OneDimensionalDoubleVector.Factory STATIC = new OneDimensionalDoubleVector.Factory();
 
   /**
-   * The actual data value
+   * The actual data value.
    */
   double val;
 
@@ -84,35 +84,47 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<OneDimensio
     return new Vector(new double[] { val });
   }
 
-  @Override
-  public <A> OneDimensionalDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
-    assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
-    return new OneDimensionalDoubleVector(adapter.get(array, 0));
-  }
-
-  @Override
-  public <A> OneDimensionalDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
-    return new OneDimensionalDoubleVector(adapter.getDouble(array, 0));
-  }
-
-  @Override
-  public ByteBufferSerializer<OneDimensionalDoubleVector> getDefaultSerializer() {
-    // FIXME: add a serializer
-    return null;
-  }
-
   /**
-   * Parameterization class.
+   * Factory class.
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Factory extends AbstractNumberVector.Factory<OneDimensionalDoubleVector, Double> {
     @Override
-    protected OneDimensionalDoubleVector makeInstance() {
-      return STATIC;
+    public <A> OneDimensionalDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+      assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
+      return new OneDimensionalDoubleVector(adapter.get(array, 0));
+    }
+
+    @Override
+    public <A> OneDimensionalDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
+      return new OneDimensionalDoubleVector(adapter.getDouble(array, 0));
+    }
+
+    @Override
+    public ByteBufferSerializer<OneDimensionalDoubleVector> getDefaultSerializer() {
+      // FIXME: add a serializer
+      return null;
+    }
+    
+    @Override
+    public Class<? super OneDimensionalDoubleVector> getRestrictionClass() {
+      return OneDimensionalDoubleVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected OneDimensionalDoubleVector.Factory makeInstance() {
+        return STATIC;
+      }
     }
   }
 }

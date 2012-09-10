@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -61,12 +62,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Elke Achtert
  * 
  * @see HiSC
+ * 
+ * @param <V> Vector type
  */
 @Title("HiSC Preprocessor")
 @Description("Computes the preference vector of objects of a certain database according to the HiSC algorithm.")
-public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
+public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
   /**
-   * Logger to use
+   * Logger to use.
    */
   private static final Logging LOG = Logging.getLogger(HiSCPreferenceVectorIndex.class);
 
@@ -188,7 +191,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   }
 
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
@@ -197,7 +200,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorIndex.Factory<V, HiSCPreferenceVectorIndex<V>> {
+  public static class Factory<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex.Factory<V, HiSCPreferenceVectorIndex<V>> {
     /**
      * The default value for alpha.
      */
@@ -254,7 +257,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     public HiSCPreferenceVectorIndex<V> instantiate(Relation<V> relation) {
       final int usek;
       if(k == null) {
-        usek = 3 * DatabaseUtil.dimensionality(relation);
+        usek = 3 * RelationUtil.dimensionality(relation);
       }
       else {
         usek = k;
@@ -269,7 +272,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParameterizer {
+    public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
       /**
        * Holds the value of parameter {@link #ALPHA_ID}.
        */
@@ -283,14 +286,14 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final DoubleParameter ALPHA_PARAM = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
-        if(config.grab(ALPHA_PARAM)) {
-          alpha = ALPHA_PARAM.getValue();
+        final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
+        if(config.grab(alphaP)) {
+          alpha = alphaP.getValue();
         }
 
-        final IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0), true);
-        if(config.grab(K_PARAM)) {
-          k = K_PARAM.getValue();
+        final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
+        if(config.grab(kP)) {
+          k = kP.getValue();
         }
       }
 

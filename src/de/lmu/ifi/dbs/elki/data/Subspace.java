@@ -32,10 +32,8 @@ import java.util.Comparator;
  * @author Elke Achtert
  * 
  * @apiviz.owns de.lmu.ifi.dbs.elki.data.Subspace.DimensionComparator
- * 
- * @param <V> the type of FeatureVector this subspace contains
  */
-public class Subspace<V extends FeatureVector<V, ?>> {
+public class Subspace {
   /**
    * The dimensions building this subspace.
    */
@@ -96,13 +94,13 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    *         condition is fulfilled, null otherwise.
    * @see Subspace#joinLastDimensions(Subspace)
    */
-  public Subspace<V> join(Subspace<V> other) {
+  public Subspace join(Subspace other) {
     BitSet newDimensions = joinLastDimensions(other);
     if(newDimensions == null) {
       return null;
     }
 
-    return new Subspace<V>(newDimensions);
+    return new Subspace(newDimensions);
   }
 
   /**
@@ -178,7 +176,7 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    * @return true if this subspace is a subspace of the specified subspace,
    *         false otherwise
    */
-  public boolean isSubspace(Subspace<V> subspace) {
+  public boolean isSubspace(Subspace subspace) {
     if(this.dimensionality > subspace.dimensionality) {
       return false;
     }
@@ -202,7 +200,7 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    *         specified subspace if the join condition is fulfilled, null
    *         otherwise.
    */
-  protected BitSet joinLastDimensions(Subspace<V> other) {
+  protected BitSet joinLastDimensions(Subspace other) {
     if(this.dimensionality != other.dimensionality) {
       return null;
     }
@@ -244,9 +242,8 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    * specified object is a Subspace and is built of the same dimensions than
    * this subspace.
    * 
-   * @see java.lang.Object#equals(java.lang.Object)
+   * {@inheritDoc}
    */
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
     if(this == obj) {
@@ -258,7 +255,7 @@ public class Subspace<V extends FeatureVector<V, ?>> {
     if(getClass() != obj.getClass()) {
       return false;
     }
-    Subspace<V> other = (Subspace<V>) obj;
+    Subspace other = (Subspace) obj;
     return new DimensionComparator().compare(this, other) == 0;
   }
 
@@ -268,7 +265,7 @@ public class Subspace<V extends FeatureVector<V, ?>> {
    * 
    * @author Elke Achtert
    */
-  public static class DimensionComparator implements Comparator<Subspace<?>> {
+  public static class DimensionComparator implements Comparator<Subspace> {
     /**
      * Compares the two specified subspaces for order. If the two subspaces have
      * different dimensionalities a negative integer or a positive integer will
@@ -280,9 +277,10 @@ public class Subspace<V extends FeatureVector<V, ?>> {
      * d1} is less than or greater than {@code d2}. Otherwise the two subspaces
      * have equal dimensions and zero will be returned.
      * 
+     * {@inheritDoc}
      */
     @Override
-    public int compare(Subspace<?> s1, Subspace<?> s2) {
+    public int compare(Subspace s1, Subspace s2) {
       if(s1 == s2 || s1.getDimensions() == null && s2.getDimensions() == null) {
         return 0;
       }

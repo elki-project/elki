@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
@@ -43,7 +44,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Non Spatial Vector
  */
 @Reference(authors = "Chang-Tien Lu and Dechang Chen and Yufeng Kou", title = "Detecting Spatial Outliers with Multiple Attributes", booktitle = "Proc. 15th IEEE International Conference on Tools with Artificial Intelligence, 2003", url = "http://dx.doi.org/10.1109/TAI.2003.1250179")
-public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> extends AbstractNeighborhoodOutlier<N> {
+public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier<N> {
   /**
    * logger
    */
@@ -100,7 +100,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
    * @return Outlier detection result
    */
   public OutlierResult run(Relation<N> spatial, Relation<O> attributes) {
-    final int dim = DatabaseUtil.dimensionality(attributes);
+    final int dim = RelationUtil.dimensionality(attributes);
     if(LOG.isDebugging()) {
       LOG.debug("Dimensionality: " + dim);
     }
@@ -172,7 +172,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?, ?>> exten
    * @param <N> Neighborhood type
    * @param <O> Attributes vector type
    */
-  public static class Parameterizer<N, O extends NumberVector<?, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Parameterizer<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
     protected CTLuMedianMultipleAttributes<N, O> makeInstance() {
       return new CTLuMedianMultipleAttributes<N, O>(npredf);

@@ -39,17 +39,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class BitVector extends AbstractNumberVector<BitVector, Bit> {
+public class BitVector extends AbstractNumberVector<Bit> {
   /**
    * Static instance.
    */
-  public static final BitVector STATIC = new BitVector(new BitSet(0), 0);
+  public static final BitVector.Factory FACTORY = new BitVector.Factory();
 
   /**
    * Serializer for up to 2^15-1 dimensions.
    */
   public static final ByteBufferSerializer<BitVector> SHORT_SERIALIZER = new ShortSerializer();
-  
+
   /**
    * Storing the bits.
    */
@@ -234,32 +234,58 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     }
   }
 
-  @Override
-  public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
-    int dim = adapter.size(array);
-    BitSet bits = new BitSet(dim);
-    for (int i = 0; i < dim; i++) {
-      bits.set(i, adapter.get(array, i).bitValue());
-      i++;
+  /**
+   * Factory for bit vectors.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory extends AbstractNumberVector.Factory<BitVector, Bit> {
+    @Override
+    public <A> BitVector newFeatureVector(A array, ArrayAdapter<Bit, A> adapter) {
+      int dim = adapter.size(array);
+      BitSet bits = new BitSet(dim);
+      for (int i = 0; i < dim; i++) {
+        bits.set(i, adapter.get(array, i).bitValue());
+        i++;
+      }
+      return new BitVector(bits, dim);
     }
-    return new BitVector(bits, dim);
-  }
 
-  @Override
-  public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    int dim = adapter.size(array);
-    BitSet bits = new BitSet(dim);
-    for (int i = 0; i < dim; i++) {
-      if (adapter.getDouble(array, i) >= 0.5) {
-        bits.set(i);
+    @Override
+    public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      int dim = adapter.size(array);
+      BitSet bits = new BitSet(dim);
+      for (int i = 0; i < dim; i++) {
+        if (adapter.getDouble(array, i) >= 0.5) {
+          bits.set(i);
+        }
+      }
+      return new BitVector(bits, dim);
+    }
+
+    @Override
+    public ByteBufferSerializer<BitVector> getDefaultSerializer() {
+      return SHORT_SERIALIZER;
+    }
+    
+    @Override
+    public Class<? super BitVector> getRestrictionClass() {
+      return BitVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected BitVector.Factory makeInstance() {
+        return FACTORY;
       }
     }
-    return new BitVector(bits, dim);
-  }
-  
-  @Override
-  public ByteBufferSerializer<BitVector> getDefaultSerializer() {
-    return SHORT_SERIALIZER;
   }
 
   /**
@@ -326,20 +352,6 @@ public class BitVector extends AbstractNumberVector<BitVector, Bit> {
     @Override
     public int getByteSize(BitVector vec) {
       return ByteArrayUtil.SIZE_SHORT + (vec.getDimensionality() + 7) / 8;
-    }
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected BitVector makeInstance() {
-      return STATIC;
     }
   }
 }

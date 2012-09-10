@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter
  */
 @Title("Range Query Based Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database. The PCA is based on epsilon range queries.")
-public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> extends AbstractFilteredPCAIndex<NV> {
+public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?>> extends AbstractFilteredPCAIndex<NV> {
   // TODO: lose DoubleDistance restriction.
   /**
    * Logger.
@@ -60,14 +60,14 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>
   private static final Logging LOG = Logging.getLogger(RangeQueryFilteredPCAIndex.class);
 
   /**
-   * The kNN query instance we use
+   * The kNN query instance we use.
    */
-  final private RangeQuery<NV, DoubleDistance> rangeQuery;
+  private final RangeQuery<NV, DoubleDistance> rangeQuery;
 
   /**
-   * Query epsilon
+   * Query epsilon.
    */
-  final private DoubleDistance epsilon;
+  private final DoubleDistance epsilon;
 
   /**
    * Constructor.
@@ -104,14 +104,14 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>
   }
 
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses RangeQueryFilteredPCAIndex oneway - - «create»
    */
-  public static class Factory<V extends NumberVector<V, ?>> extends AbstractFilteredPCAIndex.Factory<V, RangeQueryFilteredPCAIndex<V>> {
+  public static class Factory<V extends NumberVector<?>> extends AbstractFilteredPCAIndex.Factory<V, RangeQueryFilteredPCAIndex<V>> {
     /**
      * Parameter to specify the maximum radius of the neighborhood to be
      * considered in the PCA, must be suitable to the distance function
@@ -152,7 +152,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<NV extends NumberVector<NV, ?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, RangeQueryFilteredPCAIndex<NV>> {
+    public static class Parameterizer<NV extends NumberVector<?>> extends AbstractFilteredPCAIndex.Factory.Parameterizer<NV, RangeQueryFilteredPCAIndex<NV>> {
       protected DoubleDistance epsilon = null;
 
       @Override

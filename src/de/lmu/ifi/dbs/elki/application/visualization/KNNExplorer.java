@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
@@ -129,7 +130,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @param <D> Distance type
  */
 @Reference(authors = "E. Achtert, T. Bernecker, H.-P. Kriegel, E. Schubert, A. Zimek", title = "ELKI in Time: ELKI 0.2 for the Performance Evaluation of Distance Measures for Time Series", booktitle = "Proceedings of the 11th International Symposium on Spatial and Temporal Databases (SSTD), Aalborg, Denmark, 2009", url = "http://dx.doi.org/10.1007/978-3-642-02982-0_35")
-public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractApplication {
+public class KNNExplorer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractApplication {
   // TODO: replace by a wrapper creating appropriate visualization modules.
 
   /**
@@ -372,7 +373,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
       this.db = db;
       this.data = distanceQuery.getRelation();
       this.labelRep = DatabaseUtil.guessObjectLabelRepresentation(db);
-      this.dim = DatabaseUtil.dimensionality(distanceQuery.getRelation());
+      this.dim = RelationUtil.dimensionality(distanceQuery.getRelation());
       this.distanceQuery = distanceQuery;
       this.updateK(k);
 
@@ -548,7 +549,7 @@ public class KNNExplorer<O extends NumberVector<?, ?>, D extends NumberDistance<
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
     protected Database database = null;
 
     protected DistanceFunction<O, D> distanceFunction = null;

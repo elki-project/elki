@@ -110,12 +110,12 @@ public final class TypeUtil {
   /**
    * Number vectors of <em>variable</em> length.
    */
-  public static final SimpleTypeInformation<? super NumberVector<?, ?>> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<NumberVector<?, ?>>(NumberVector.class);
+  public static final SimpleTypeInformation<? super NumberVector<?>> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<NumberVector<?>>(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<NumberVector<?, ?>> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<NumberVector<?, ?>>(NumberVector.class);
+  public static final VectorFieldTypeInformation<NumberVector<?>> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
@@ -139,12 +139,12 @@ public final class TypeUtil {
   /**
    * Sparse float vector field.
    */
-  public static final SimpleTypeInformation<SparseNumberVector<?, ?>> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<SparseNumberVector<?, ?>>(SparseNumberVector.class);
+  public static final SimpleTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<SparseNumberVector<?>>(SparseNumberVector.class);
 
   /**
    * Sparse vector field.
    */
-  public static final VectorFieldTypeInformation<SparseNumberVector<?, ?>> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<SparseNumberVector<?, ?>>(SparseNumberVector.class);
+  public static final VectorFieldTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<SparseNumberVector<?>>(SparseNumberVector.class);
 
   /**
    * Sparse float vector field.

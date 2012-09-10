@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
  * 
  * @param <V> Vector type
  */
-public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements Projection<V, V> {
+public class NumericalFeatureSelection<V extends NumberVector<?>> implements Projection<V, V> {
   /**
    * Minimum dimensionality required for projection.
    */
@@ -47,7 +47,7 @@ public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements 
   /**
    * Object factory.
    */
-  private V factory;
+  private NumberVector.Factory<V, ?> factory;
 
   /**
    * Output dimensionality.
@@ -65,7 +65,7 @@ public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements 
    * @param bits Dimensions
    * @param factory Object factory
    */
-  public NumericalFeatureSelection(BitSet bits, V factory) {
+  public NumericalFeatureSelection(BitSet bits, NumberVector.Factory<V, ?> factory) {
     super();
     this.bits = bits;
     this.factory = factory;
@@ -90,14 +90,14 @@ public class NumericalFeatureSelection<V extends NumberVector<V, ?>> implements 
   @Override
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
     @SuppressWarnings("unchecked")
-    final Class<V> cls = (Class<V>) factory.getClass();
+    final Class<V> cls = (Class<V>) factory.getRestrictionClass();
     return new VectorFieldTypeInformation<V>(cls, dimensionality);
   }
 
   @Override
   public TypeInformation getInputDataTypeInformation() {
     @SuppressWarnings("unchecked")
-    final Class<V> cls = (Class<V>) factory.getClass();
+    final Class<V> cls = (Class<V>) factory.getRestrictionClass();
     return new VectorTypeInformation<V>(cls, mindim, Integer.MAX_VALUE);
   }
 }

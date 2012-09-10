@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
@@ -53,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Vector type
  */
-public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O, ?>> extends AbstractConversionFilter<O, O> {
+public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>> extends AbstractConversionFilter<O, O> {
   /**
-   * Class logger
+   * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(GlobalPrincipalComponentAnalysisTransform.class);
 
@@ -65,29 +66,34 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
   EigenPairFilter filter = null;
 
   /**
-   * Actual dataset dimensionality
+   * Actual dataset dimensionality.
    */
   int dim = -1;
 
   /**
-   * Covariance matrix builder
+   * Covariance matrix builder.
    */
   CovarianceMatrix covmat = null;
 
   /**
-   * Final projection after analysis run
+   * Final projection after analysis run.
    */
   double[][] proj = null;
 
   /**
-   * Projection buffer
+   * Projection buffer.
    */
   double[] buf = null;
 
   /**
-   * Vector for data set centering
+   * Vector for data set centering.
    */
   double[] mean = null;
+
+  /**
+   * Vector factory.
+   */
+  NumberVector.Factory<O, ?> factory;
 
   /**
    * Constructor.
@@ -160,7 +166,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
       buf[i] = obj.doubleValue(i + 1) - mean[i];
     }
     double[] p = VMath.times(proj, buf);
-    return obj.newNumberVector(p);
+    return factory.newNumberVector(p);
   }
 
   @Override
@@ -174,8 +180,8 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
       return in;
     }
     else {
-      O factory = ((VectorFieldTypeInformation<O>) in).getFactory();
-      return new VectorFieldTypeInformation<O>(in.getRestrictionClass(), proj.length, factory);
+      factory = FilterUtil.guessFactory(in);
+      return new VectorFieldTypeInformation<O>(factory, proj.length);
     }
   }
 
@@ -186,9 +192,9 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<O,
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
     /**
-     * To specify the eigenvectors to keep
+     * To specify the eigenvectors to keep.
      */
     public static final OptionID FILTER_ID = OptionID.getOrCreateOptionID("globalpca.filter", "Filter to use for dimensionality reduction.");
 

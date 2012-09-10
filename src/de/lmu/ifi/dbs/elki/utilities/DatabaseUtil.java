@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -49,6 +48,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ConvertToStringView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -61,33 +61,23 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public final class DatabaseUtil {
   /**
-   * Get the dimensionality of a database
-   * 
-   * @param relation relation
-   * @return Vector field type information
+   * Fake constructor: Do not instantiate!
    */
-  public static <V extends FeatureVector<?, ?>> VectorFieldTypeInformation<V> assumeVectorField(Relation<V> relation) {
-    try {
-      return ((VectorFieldTypeInformation<V>) relation.getDataTypeInformation());
-    }
-    catch(Exception e) {
-      throw new UnsupportedOperationException("Expected a vector field, got type information: " + relation.getDataTypeInformation().toString());
-    }
+  private DatabaseUtil() {
+    // Do not instantiate!
   }
-
+  
   /**
-   * Get the dimensionality of a database
+   * Get the dimensionality of a relation.
    * 
-   * @param relation relation
-   * @return Database dimensionality
+   * @param relation Relation
+   * @return Dimensionality
+   * 
+   * @deprecated Use {@link RelationUtil#dimensionality(Relation)} instead!
    */
-  public static int dimensionality(Relation<? extends FeatureVector<?, ?>> relation) {
-    try {
-      return ((VectorFieldTypeInformation<? extends FeatureVector<?, ?>>) relation.getDataTypeInformation()).dimensionality();
-    }
-    catch(Exception e) {
-      return -1;
-    }
+  @Deprecated
+  public static <V extends FeatureVector<?>> int dimensionality(Relation<V> relation) {
+    return RelationUtil.dimensionality(relation);
   }
 
   /**
@@ -99,13 +89,13 @@ public final class DatabaseUtil {
    * @param centroid the centroid or reference vector of the ids
    * @return the variances in each dimension of the specified objects
    */
-  public static double[] variances(Relation<? extends NumberVector<?, ?>> database, NumberVector<?, ?> centroid, DBIDs ids) {
+  public static double[] variances(Relation<? extends NumberVector<?>> database, NumberVector<?> centroid, DBIDs ids) {
     final int size = ids.size();
     double[] variances = new double[centroid.getDimensionality()];
 
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      NumberVector<?, ?> o = database.get(iter);
-      for(int d = 1; d <= centroid.getDimensionality(); d++) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      NumberVector<?> o = database.get(iter);
+      for (int d = 1; d <= centroid.getDimensionality(); d++) {
         final double diff = o.doubleValue(d) - centroid.doubleValue(d);
         variances[d - 1] += diff * diff / size;
       }
@@ -118,26 +108,26 @@ public final class DatabaseUtil {
    * stored in the given database.
    * 
    * @param <NV> vector type
-   * @param database the database storing the objects
+   * @param relation the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
-  public static <NV extends NumberVector<NV, ?>> Pair<NV, NV> computeMinMax(Relation<NV> database) {
-    int dim = dimensionality(database);
+  public static <NV extends NumberVector<?>> Pair<NV, NV> computeMinMax(Relation<NV> relation) {
+    int dim = RelationUtil.dimensionality(relation);
     double[] mins = new double[dim];
     double[] maxs = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       mins[i] = Double.MAX_VALUE;
       maxs[i] = -Double.MAX_VALUE;
     }
-    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final NV o = database.get(iditer);
-      for(int d = 0; d < dim; d++) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      final NV o = relation.get(iditer);
+      for (int d = 0; d < dim; d++) {
         final double v = o.doubleValue(d + 1);
         mins[d] = Math.min(mins[d], v);
         maxs[d] = Math.max(maxs[d], v);
       }
     }
-    NV factory = assumeVectorField(database).getFactory();
+    NumberVector.Factory<NV, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     NV min = factory.newNumberVector(mins);
     NV max = factory.newNumberVector(maxs);
     return new Pair<NV, NV>(min, max);
@@ -153,18 +143,17 @@ public final class DatabaseUtil {
    * @param numberOfSamples Number of samples to draw
    * @return Median value
    */
-  public static <V extends NumberVector<?, ?>> double quickMedian(Relation<V> relation, ArrayDBIDs ids, int dimension, int numberOfSamples) {
+  public static <V extends NumberVector<?>> double quickMedian(Relation<V> relation, ArrayDBIDs ids, int dimension, int numberOfSamples) {
     final int everyNthItem = (int) Math.max(1, Math.floor(ids.size() / (double) numberOfSamples));
     final double[] vals = new double[numberOfSamples];
-    for(int i = 0; i < numberOfSamples; i++) {
+    for (int i = 0; i < numberOfSamples; i++) {
       final DBID id = ids.get(i * everyNthItem);
       vals[i] = relation.get(id).doubleValue(dimension);
     }
     Arrays.sort(vals);
-    if(vals.length % 2 == 1) {
+    if (vals.length % 2 == 1) {
       return vals[((vals.length + 1) / 2) - 1];
-    }
-    else {
+    } else {
       final double v1 = vals[vals.length / 2];
       final double v2 = vals[(vals.length / 2) - 1];
       return (v1 + v2) / 2.0;
@@ -179,18 +168,17 @@ public final class DatabaseUtil {
    * @param dimension Dimensionality
    * @return Median value
    */
-  public static <V extends NumberVector<?, ?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
+  public static <V extends NumberVector<?>> double exactMedian(Relation<V> relation, DBIDs ids, int dimension) {
     final double[] vals = new double[ids.size()];
     int i = 0;
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       vals[i] = relation.get(iter).doubleValue(dimension);
       i++;
     }
     Arrays.sort(vals);
-    if(vals.length % 2 == 1) {
+    if (vals.length % 2 == 1) {
       return vals[((vals.length + 1) / 2) - 1];
-    }
-    else {
+    } else {
       final double v1 = vals[vals.length / 2];
       final double v2 = vals[(vals.length / 2) - 1];
       return (v1 + v2) / 2.0;
@@ -206,29 +194,26 @@ public final class DatabaseUtil {
   public static Relation<String> guessLabelRepresentation(Database database) throws NoSupportedDataTypeException {
     try {
       Relation<? extends ClassLabel> classrep = database.getRelation(TypeUtil.CLASSLABEL);
-      if(classrep != null) {
+      if (classrep != null) {
         return new ConvertToStringView(classrep);
       }
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // retry.
     }
     try {
       Relation<? extends LabelList> labelsrep = database.getRelation(TypeUtil.LABELLIST);
-      if(labelsrep != null) {
+      if (labelsrep != null) {
         return new ConvertToStringView(labelsrep);
       }
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // retry.
     }
     try {
       Relation<String> stringrep = database.getRelation(TypeUtil.STRING);
-      if(stringrep != null) {
+      if (stringrep != null) {
         return stringrep;
       }
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // retry.
     }
     throw new NoSupportedDataTypeException("No label-like representation was found.");
@@ -243,29 +228,26 @@ public final class DatabaseUtil {
   public static Relation<String> guessObjectLabelRepresentation(Database database) throws NoSupportedDataTypeException {
     try {
       Relation<? extends LabelList> labelsrep = database.getRelation(TypeUtil.LABELLIST);
-      if(labelsrep != null) {
+      if (labelsrep != null) {
         return new ConvertToStringView(labelsrep);
       }
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // retry.
     }
     try {
       Relation<String> stringrep = database.getRelation(TypeUtil.STRING);
-      if(stringrep != null) {
+      if (stringrep != null) {
         return stringrep;
       }
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // retry.
     }
     try {
       Relation<? extends ClassLabel> classrep = database.getRelation(TypeUtil.CLASSLABEL);
-      if(classrep != null) {
+      if (classrep != null) {
         return new ConvertToStringView(classrep);
       }
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // retry.
     }
     throw new NoSupportedDataTypeException("No label-like representation was found.");
@@ -280,7 +262,7 @@ public final class DatabaseUtil {
    */
   public static SortedSet<ClassLabel> getClassLabels(Relation<? extends ClassLabel> database) {
     SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
-    for(DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
+    for (DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
       labels.add(database.get(it));
     }
     return labels;
@@ -326,25 +308,25 @@ public final class DatabaseUtil {
     List<Class<?>> candidates = new ArrayList<Class<?>>();
     DBIDIter iditer = database.iterDBIDs();
     // empty database?!
-    if(!iditer.valid()) {
+    if (!iditer.valid()) {
       return null;
     }
     // put first class into result set.
     candidates.add(database.get(iditer).getClass());
     iditer.advance();
     // other objects
-    for(; iditer.valid(); iditer.advance()) {
+    for (; iditer.valid(); iditer.advance()) {
       Class<?> newcls = database.get(iditer).getClass();
       // validate all candidates
       Iterator<Class<?>> ci = candidates.iterator();
-      while(ci.hasNext()) {
+      while (ci.hasNext()) {
         Class<?> cand = ci.next();
-        if(cand.isAssignableFrom(newcls)) {
+        if (cand.isAssignableFrom(newcls)) {
           continue;
         }
         // TODO: resolve conflicts by finding all superclasses!
         // Does this code here work?
-        for(Class<?> interf : cand.getInterfaces()) {
+        for (Class<?> interf : cand.getInterfaces()) {
           candidates.add(interf);
         }
         candidates.add(cand.getSuperclass());
@@ -352,13 +334,13 @@ public final class DatabaseUtil {
       }
     }
     // if we have any candidates left ...
-    if(candidates != null && candidates.size() > 0) {
+    if (candidates != null && candidates.size() > 0) {
       // remove subclasses
       Iterator<Class<?>> ci = candidates.iterator();
-      while(ci.hasNext()) {
+      while (ci.hasNext()) {
         Class<?> cand = ci.next();
-        for(Class<?> oc : candidates) {
-          if(oc != cand && cand.isAssignableFrom(oc)) {
+        for (Class<?> oc : candidates) {
+          if (oc != cand && cand.isAssignableFrom(oc)) {
             ci.remove();
             break;
           }
@@ -367,8 +349,7 @@ public final class DatabaseUtil {
       assert (candidates.size() > 0);
       try {
         return candidates.get(0);
-      }
-      catch(ClassCastException e) {
+      } catch (ClassCastException e) {
         // ignore, and retry with next
       }
     }
@@ -385,12 +366,12 @@ public final class DatabaseUtil {
    */
   public static ArrayModifiableDBIDs getObjectsByLabelMatch(Database database, Pattern name_pattern) {
     Relation<String> relation = guessLabelRepresentation(database);
-    if(name_pattern == null) {
+    if (name_pattern == null) {
       return DBIDUtil.newArray();
     }
     ArrayModifiableDBIDs ret = DBIDUtil.newArray();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      if(name_pattern.matcher(relation.get(iditer)).find()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      if (name_pattern.matcher(relation.get(iditer)).find()) {
         ret.add(iditer);
       }
     }
@@ -406,25 +387,8 @@ public final class DatabaseUtil {
    * @return Database
    */
   @SuppressWarnings("unchecked")
-  public static <V extends NumberVector<?, ?>, T extends NumberVector<?, ?>> Relation<V> relationUglyVectorCast(Relation<T> database) {
+  public static <V extends NumberVector<?>, T extends NumberVector<?>> Relation<V> relationUglyVectorCast(Relation<T> database) {
     return (Relation<V>) database;
-  }
-
-  /**
-   * Get the column name or produce a generic label "Column XY".
-   * 
-   * @param rel Relation
-   * @param col Column
-   * @return Label
-   */
-  public static <V extends FeatureVector<?, ?>> String getColumnLabel(Relation<? extends V> rel, int col) {
-    String lbl = assumeVectorField(rel).getLabel(col);
-    if(lbl != null) {
-      return lbl;
-    }
-    else {
-      return "Column " + col;
-    }
   }
 
   /**
@@ -439,7 +403,7 @@ public final class DatabaseUtil {
     final DBIDIter iter;
 
     /**
-     * The database we use
+     * The database we use.
      */
     final Relation<? extends O> database;
 
@@ -491,7 +455,7 @@ public final class DatabaseUtil {
    */
   public static class CollectionFromRelation<O> extends AbstractCollection<O> implements Collection<O> {
     /**
-     * The database we query
+     * The database we query.
      */
     Relation<? extends O> db;
 

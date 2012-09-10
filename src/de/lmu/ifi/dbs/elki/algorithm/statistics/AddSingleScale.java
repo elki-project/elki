@@ -29,12 +29,12 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -73,7 +73,7 @@ public class AddSingleScale implements Algorithm {
   public Result run(Database database) {
     for(Relation<?> rel : database.getRelations()) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        ScalesResult res = run((Relation<? extends NumberVector<?, ?>>) rel);
+        ScalesResult res = run((Relation<? extends NumberVector<?>>) rel);
         ResultUtil.addChildResult(rel, res);
       }
     }
@@ -86,13 +86,13 @@ public class AddSingleScale implements Algorithm {
    * @param rel Relation
    * @return Scales
    */
-  private ScalesResult run(Relation<? extends NumberVector<?, ?>> rel) {
-    final int dim = DatabaseUtil.dimensionality(rel);
+  private ScalesResult run(Relation<? extends NumberVector<?>> rel) {
+    final int dim = RelationUtil.dimensionality(rel);
     LinearScale[] scales = new LinearScale[dim];
     if(minmax == null) {
       DoubleMinMax mm = new DoubleMinMax();
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        NumberVector<?, ?> vec = rel.get(iditer);
+        NumberVector<?> vec = rel.get(iditer);
         for(int d = 1; d <= dim; d++) {
           mm.put(vec.doubleValue(d));
         }

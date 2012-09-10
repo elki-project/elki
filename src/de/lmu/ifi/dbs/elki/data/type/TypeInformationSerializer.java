@@ -27,8 +27,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * Class to handle the serialization and deserialization of type information.
@@ -305,10 +308,9 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
     @Override
     public VectorFieldTypeInformation<?> fromByteBuffer(ByteBuffer buffer) throws IOException, UnsupportedOperationException {
       try {
-        // Data type
+        // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        Class<DoubleVector> clz = (Class<DoubleVector>) Class.forName(typename);
-        DoubleVector factory = null; // FIXME: find a prototype!
+        NumberVector.Factory<DoubleVector, ?> factory = (NumberVector.Factory<DoubleVector, ?>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
         // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
@@ -326,10 +328,12 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
           for (int i = 0; i < cols; i++) {
             labels[i] = ByteArrayUtil.readString(buffer);
           }
-          return new VectorFieldTypeInformation<DoubleVector>(clz, serializer, mindim, labels, factory);
+          return new VectorFieldTypeInformation<DoubleVector>(factory, mindim, labels, serializer);
         } else {
-          return new VectorFieldTypeInformation<DoubleVector>(clz, serializer, mindim, maxdim, factory);
+          return new VectorFieldTypeInformation<DoubleVector>(factory, mindim, maxdim, serializer);
         }
+      } catch (UnableToComplyException e) {
+        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
       } catch (InstantiationException e) {
@@ -354,8 +358,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       } catch (SecurityException e) {
         throw new UnsupportedOperationException("Serialization not possible.", e);
       }
-      // Type class
-      ByteArrayUtil.writeString(buffer, object.getRestrictionClass().getName());
+      // Use *factory* class!
+      ByteArrayUtil.writeString(buffer, object.getFactory().getClass().getName());
       // Name, or an empty string.
       ByteArrayUtil.writeString(buffer, object.getLabel());
       // Serializer class

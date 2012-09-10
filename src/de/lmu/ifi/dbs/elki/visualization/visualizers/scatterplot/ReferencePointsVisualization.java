@@ -104,7 +104,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
     /**
      * Serves reference points.
      */
-    protected ReferencePointsResult<? extends NumberVector<?, ?>> result;
+    protected ReferencePointsResult<? extends NumberVector<?>> result;
 
     /**
      * Constructor.
@@ -120,11 +120,11 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
     @Override
     public void redraw() {
       setupCSS(svgp);
-      Iterator<? extends NumberVector<?, ?>> iter = result.iterator();
+      Iterator<? extends NumberVector<?>> iter = result.iterator();
 
       final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
       while(iter.hasNext()) {
-        NumberVector<?, ?> v = iter.next();
+        NumberVector<?> v = iter.next();
         double[] projected = proj.fastProjectDataToRenderSpace(v);
         Element dot = svgp.svgCircle(projected[0], projected[1], dotsize);
         SVGUtil.addCSSClass(dot, REFPOINT);

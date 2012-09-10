@@ -66,7 +66,7 @@ public class DoubleVectorLabelParser extends NumberVectorLabelParser<DoubleVecto
    * @param labelIndices
    */
   public DoubleVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, DoubleVector.STATIC);
+    super(colSep, quoteChar, labelIndices, DoubleVector.FACTORY);
   }
 
   /**

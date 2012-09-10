@@ -44,10 +44,16 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * For helper methods related to special application fields see other utilities
  * classes.
  * 
- * 
  * @see de.lmu.ifi.dbs.elki.utilities
  */
 public final class Util {
+  /**
+   * Fake constructor: do not instantiate.
+   */
+  private Util() {
+    // Do not instantiate.
+  }
+
   /**
    * Returns a new double array containing the same objects as are contained in
    * the given array.
@@ -141,9 +147,6 @@ public final class Util {
    * @param v a DoubleVector to project
    * @param selectedAttributes the attributes selected for projection
    * @return a new DoubleVector as a projection on the specified attributes
-   * @throws IllegalArgumentException if the given selected attributes specify
-   *         an attribute as selected which is out of range for the given
-   *         DoubleVector.
    * @see DoubleVector#doubleValue(int)
    */
   public static DoubleVector project(DoubleVector v, BitSet selectedAttributes) {
@@ -169,19 +172,18 @@ public final class Util {
    * 
    * @param v a SparseFloatVector to project
    * @param selectedAttributes the attributes selected for projection
+   * @param factory Object factory
+   * @param <V> Vector type
    * @return a new SparseFloatVector as a projection on the specified attributes
-   * @throws IllegalArgumentException if the given selected attributes specify
-   *         an attribute as selected which is out of range for the given
-   *         SparseFloatVector.
    */
-  public static <V extends SparseNumberVector<V, ?>> V project(V v, BitSet selectedAttributes) {
+  public static <V extends SparseNumberVector<?>> V project(V v, BitSet selectedAttributes, SparseNumberVector.Factory<V, ?> factory) {
     TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
     for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
       if(v.doubleValue(d + 1) != 0.0) {
         values.put(d, v.doubleValue(d + 1));
       }
     }
-    V projectedVector = v.newNumberVector(values, selectedAttributes.cardinality());
+    V projectedVector = factory.newNumberVector(values, selectedAttributes.cardinality());
     return projectedVector;
   }
 
@@ -191,7 +193,7 @@ public final class Util {
    * @param hash Hashcodes to mix
    * @return Mixed hash code
    */
-  public static final int mixHashCodes(int... hash) {
+  public static int mixHashCodes(int... hash) {
     final long prime = 2654435761L;
     if(hash.length == 0) {
       return 0;
@@ -204,7 +206,7 @@ public final class Util {
   }
 
   /**
-   * Static instance
+   * Static instance.
    */
   private static final Comparator<?> FORWARD = new ForwardComparator();
 
@@ -227,10 +229,11 @@ public final class Util {
    * Compare two objects, forward. See
    * {@link java.util.Collections#reverseOrder()} for a reverse comparator.
    * 
+   * @param <T> Object type
    * @return Forward comparator
    */
   @SuppressWarnings("unchecked")
-  public static final <T> Comparator<T> forwardOrder() {
+  public static <T> Comparator<T> forwardOrder() {
     return (Comparator<T>) FORWARD;
   }
 }

@@ -176,7 +176,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
     /**
      * Parameter k to compute the average precision at.
      */

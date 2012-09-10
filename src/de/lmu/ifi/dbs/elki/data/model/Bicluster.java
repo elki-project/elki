@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Result
  */
-public class Bicluster<V extends FeatureVector<?, ?>> implements TextWriteable, Model {
+public class Bicluster<V extends FeatureVector<?>> implements TextWriteable, Model {
   /**
    * The ids of the rows included in the bicluster.
    */

@@ -52,7 +52,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim = weights.length;
     if(dim != v1.getDimensionality()) {
       throw new IllegalArgumentException("Dimensionality of FeatureVector doesn't match weights!");
@@ -75,7 +75,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
     // Optimization for the simplest case
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?, ?>) mbr1, (NumberVector<?, ?>) mbr2);
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?

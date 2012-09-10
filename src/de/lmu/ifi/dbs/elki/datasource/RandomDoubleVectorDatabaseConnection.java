@@ -39,23 +39,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
- * Produce a database of random double vectors with each dimension in [0:1]
+ * Produce a database of random double vectors with each dimension in [0:1].
  * 
  * @author Erich Schubert
  */
 public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnection {
   /**
-   * Dimensionality
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(RandomDoubleVectorDatabaseConnection.class);
+
+  /**
+   * Dimensionality.
    */
   protected int dim = -1;
 
   /**
-   * Size of database to generate
+   * Size of database to generate.
    */
   protected int size = -1;
 
   /**
-   * Seed to use
+   * Seed to use.
    */
   protected Long seed;
 
@@ -65,7 +70,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
    * @param dim Dimensionality
    * @param size Database size
    * @param seed Random seed
-   * @param filters
+   * @param filters Filters to use
    */
   public RandomDoubleVectorDatabaseConnection(int dim, int size, Long seed, List<ObjectFilter> filters) {
     super(filters);
@@ -74,11 +79,9 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     this.seed = seed;
   }
 
-  private static final Logging LOG = Logging.getLogger(RandomDoubleVectorDatabaseConnection.class);
-
   @Override
   public MultipleObjectsBundle loadData() {
-    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, DoubleVector.STATIC);
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
     List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 
     // Setup random generator
@@ -91,9 +94,8 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     }
 
     // Produce random vectors
-    DoubleVector factory = new DoubleVector(new double[dim]);
     for(int i = 0; i < size; i++) {
-      vectors.add(VectorUtil.randomVector(factory, rand));
+      vectors.add(VectorUtil.randomVector(DoubleVector.FACTORY, dim, rand));
     }
 
     return MultipleObjectsBundle.makeSimple(type, vectors);
@@ -121,7 +123,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.genseed", "Seed for randomly generating vectors");
 
     /**
-     * Database to specify the random vector dimensionality
+     * Database to specify the random vector dimensionality.
      * <p>
      * Key: {@code -dbc.dim}
      * </p>
@@ -136,39 +138,36 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
      */
     public static final OptionID SIZE_ID = OptionID.getOrCreateOptionID("dbc.size", "Database size to generate.");
 
+    /**
+     * Dimensionality.
+     */
     int dim = -1;
 
+    /**
+     * Database size.
+     */
     int size = -1;
 
+    /**
+     * Random generator seed.
+     */
     Long seed = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       configFilters(config);
-      configDimensionality(config);
-      configSize(config);
-      configSeed(config);
-    }
-
-    protected void configSeed(Parameterization config) {
-      LongParameter seedParam = new LongParameter(SEED_ID, true);
-      if(config.grab(seedParam)) {
-        seed = seedParam.getValue();
-      }
-    }
-
-    protected void configDimensionality(Parameterization config) {
       IntParameter dimParam = new IntParameter(DIM_ID);
       if(config.grab(dimParam)) {
         dim = dimParam.getValue();
       }
-    }
-
-    protected void configSize(Parameterization config) {
       IntParameter sizeParam = new IntParameter(SIZE_ID);
       if(config.grab(sizeParam)) {
         size = sizeParam.getValue();
+      }
+      LongParameter seedParam = new LongParameter(SEED_ID, true);
+      if(config.grab(seedParam)) {
+        seed = seedParam.getValue();
       }
     }
 

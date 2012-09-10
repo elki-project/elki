@@ -37,12 +37,19 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @param <V> Vector type
  */
-public class SparseNumberVectorProjectionFilter<V extends SparseNumberVector<V, ?>> extends AbstractFeatureSelectionFilter<V> {
+public class SparseNumberVectorProjectionFilter<V extends SparseNumberVector<?>> extends AbstractFeatureSelectionFilter<V> {
+  /**
+   * Object factory.
+   */
+  SparseNumberVector.Factory<V, ?> factory;
+
   /**
    * Constructor.
    * 
-   * @param selectedAttributes
+   * @param selectedAttributes Selected attributes
    */
   public SparseNumberVectorProjectionFilter(BitSet selectedAttributes) {
     super(selectedAttributes);
@@ -50,7 +57,7 @@ public class SparseNumberVectorProjectionFilter<V extends SparseNumberVector<V, 
 
   @Override
   protected V filterSingleObject(V obj) {
-    return Util.project(obj, getSelectedAttributes());
+    return Util.project(obj, getSelectedAttributes(), factory);
   }
 
   @Override
@@ -60,8 +67,8 @@ public class SparseNumberVectorProjectionFilter<V extends SparseNumberVector<V, 
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    V factory = FilterUtil.guessFactory(in);
-    return new VectorFieldTypeInformation<V>(in.getRestrictionClass(), getDimensionality(), factory);
+    factory = (SparseNumberVector.Factory<V, ?>) FilterUtil.guessFactory(in);
+    return new VectorFieldTypeInformation<V>(factory, getDimensionality());
   }
 
   /**
@@ -71,7 +78,7 @@ public class SparseNumberVectorProjectionFilter<V extends SparseNumberVector<V, 
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends SparseNumberVector<V, ?>> extends AbstractFeatureSelectionFilter.Parameterizer<V> {
+  public static class Parameterizer<V extends SparseNumberVector<?>> extends AbstractFeatureSelectionFilter.Parameterizer<V> {
     @Override
     protected SparseNumberVectorProjectionFilter<V> makeInstance() {
       return new SparseNumberVectorProjectionFilter<V>(selectedAttributes);

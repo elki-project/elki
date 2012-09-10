@@ -81,7 +81,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
 
     // FIXME: simulate a proper feature size!
-    int featuresize = 0; // DatabaseUtil.dimensionality(relation);
+    int featuresize = 0; // RelationUtil.dimensionality(relation);
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;

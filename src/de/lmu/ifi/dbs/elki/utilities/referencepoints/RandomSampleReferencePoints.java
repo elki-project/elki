@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <V> Vector type
  */
-public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>> implements ReferencePointsHeuristic<V> {
+public class RandomSampleReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
   // TODO: use reproducible Random
 
   /**
@@ -59,9 +59,9 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
   public static final OptionID N_ID = OptionID.getOrCreateOptionID("sample.n", "The number of samples to draw.");
 
   /**
-   * Constant used in choosing optimal table sizes
+   * Constant used in choosing optimal table sizes.
    */
-  private static final double log4 = Math.log(4);
+  private static final double LOG4 = Math.log(4);
 
   /**
    * Holds the value of {@link #N_ID}.
@@ -71,7 +71,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
   /**
    * Constructor.
    * 
-   * @param samplesize
+   * @param samplesize Sampling size
    */
   public RandomSampleReferencePoints(int samplesize) {
     super();
@@ -99,7 +99,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
     // If the hashmap is likely to become too big, lazy-shuffle a list instead.
     int setsize = 21;
     if(samplesize > 5) {
-      setsize += 2 << (int) Math.ceil(Math.log(samplesize * 3) / log4);
+      setsize += 2 << (int) Math.ceil(Math.log(samplesize * 3) / LOG4);
     }
     // logger.debug("Setsize: "+setsize);
     ArrayDBIDs ids = DBIDUtil.ensureArray(db.getDBIDs());
@@ -141,7 +141,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<? extends V, ?>>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #N_ID}.
      */

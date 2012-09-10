@@ -36,12 +36,19 @@ import de.lmu.ifi.dbs.elki.utilities.Util;
  * </p>
  * 
  * @author Arthur Zimek
+ * 
+ * @param <V> Vector type
  */
-public class SparseNumberVectorRandomProjectionFilter<V extends SparseNumberVector<V, ?>> extends AbstractRandomFeatureSelectionFilter<V> {
+public class SparseNumberVectorRandomProjectionFilter<V extends SparseNumberVector<?>> extends AbstractRandomFeatureSelectionFilter<V> {
+  /**
+   * Object factory.
+   */
+  SparseNumberVector.Factory<V, ?> factory;
+
   /**
    * Constructor.
    * 
-   * @param dim
+   * @param dim Desired dimensionality
    */
   public SparseNumberVectorRandomProjectionFilter(int dim) {
     super(dim);
@@ -49,7 +56,7 @@ public class SparseNumberVectorRandomProjectionFilter<V extends SparseNumberVect
 
   @Override
   protected V filterSingleObject(V obj) {
-    return Util.project(obj, selectedAttributes);
+    return Util.project(obj, selectedAttributes, factory);
   }
 
   @Override
@@ -60,8 +67,8 @@ public class SparseNumberVectorRandomProjectionFilter<V extends SparseNumberVect
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     initializeRandomAttributes(in);
-    V factory = FilterUtil.guessFactory(in);
-    return new VectorFieldTypeInformation<V>(in.getRestrictionClass(), k, factory);
+    factory = (SparseNumberVector.Factory<V, ?>) FilterUtil.guessFactory(in);
+    return new VectorFieldTypeInformation<V>(factory, k);
   }
 
   /**
@@ -71,7 +78,7 @@ public class SparseNumberVectorRandomProjectionFilter<V extends SparseNumberVect
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends SparseNumberVector<V, ?>> extends AbstractRandomFeatureSelectionFilter.Parameterizer<V> {
+  public static class Parameterizer<V extends SparseNumberVector<?>> extends AbstractRandomFeatureSelectionFilter.Parameterizer<V> {
     @Override
     protected SparseNumberVectorRandomProjectionFilter<V> makeInstance() {
       return new SparseNumberVectorRandomProjectionFilter<V>(k);

@@ -50,12 +50,12 @@ public class LatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     return MathUtil.latlngDistance(o1.doubleValue(1), o1.doubleValue(2), o2.doubleValue(1), o2.doubleValue(2));
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return VectorFieldTypeInformation.get(NumberVector.class, 2);
   }
 

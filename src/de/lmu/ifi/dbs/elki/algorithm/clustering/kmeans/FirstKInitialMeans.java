@@ -77,7 +77,7 @@ public class FirstKInitialMeans<V> implements KMeansInitialization<V>, KMedoidsI
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     @Override
     protected FirstKInitialMeans<V> makeInstance() {
       return new FirstKInitialMeans<V>();

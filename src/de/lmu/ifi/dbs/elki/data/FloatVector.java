@@ -37,15 +37,15 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * A FloatVector is to store real values approximately as float values.
+ * A FloatVector is to store real values with lower memory requirements by using float values.
  * 
  * @author Elke Achtert
  */
-public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
+public class FloatVector extends AbstractNumberVector<Float> {
   /**
    * Static factory instance.
    */
-  public static final FloatVector STATIC = new FloatVector(new float[0], true);
+  public static final FloatVector.Factory FACTORY = new FloatVector.Factory();
 
   /**
    * Serializer for up to 127 dimensions.
@@ -179,29 +179,55 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     return featureLine.toString();
   }
 
-  @Override
-  public <A> FloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
-    int dim = adapter.size(array);
-    float[] values = new float[dim];
-    for (int i = 0; i < dim; i++) {
-      values[i] = adapter.get(array, i);
+  /**
+   * Factory for float vectors.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory extends AbstractNumberVector.Factory<FloatVector, Float> {
+    @Override
+    public <A> FloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
+      int dim = adapter.size(array);
+      float[] values = new float[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.get(array, i);
+      }
+      return new FloatVector(values, true);
     }
-    return new FloatVector(values, true);
-  }
 
-  @Override
-  public <A> FloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    int dim = adapter.size(array);
-    float[] values = new float[dim];
-    for (int i = 0; i < dim; i++) {
-      values[i] = adapter.getFloat(array, i);
+    @Override
+    public <A> FloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      int dim = adapter.size(array);
+      float[] values = new float[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.getFloat(array, i);
+      }
+      return new FloatVector(values, true);
     }
-    return new FloatVector(values, true);
-  }
 
-  @Override
-  public ByteBufferSerializer<FloatVector> getDefaultSerializer() {
-    return VARIABLE_SERIALIZER;
+    @Override
+    public ByteBufferSerializer<FloatVector> getDefaultSerializer() {
+      return VARIABLE_SERIALIZER;
+    }
+    
+    @Override
+    public Class<? super FloatVector> getRestrictionClass() {
+      return FloatVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected FloatVector.Factory makeInstance() {
+        return FACTORY;
+      }
+    }
   }
 
   /**
@@ -312,20 +338,6 @@ public class FloatVector extends AbstractNumberVector<FloatVector, Float> {
     public int getByteSize(FloatVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_FLOAT * vec.values.length;
-    }
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected FloatVector makeInstance() {
-      return STATIC;
     }
   }
 }

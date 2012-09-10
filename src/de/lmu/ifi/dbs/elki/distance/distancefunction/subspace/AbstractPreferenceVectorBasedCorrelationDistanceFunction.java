@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> the type of NumberVector to compute the distances in between
  * @param <P> the type of Preprocessor used
  */
-public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?, ?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
+public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V extends NumberVector<?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction<V, P, PreferenceVectorBasedCorrelationDistance> {
   /**
    * Parameter to specify the maximum distance between two vectors with equal
    * preference vectors before considering them as parallel, must be a double
@@ -106,7 +106,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<V extends NumberVector<?, ?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction.Instance<V, P, PreferenceVectorBasedCorrelationDistance, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, ?>> {
+  abstract public static class Instance<V extends NumberVector<?>, P extends PreferenceVectorIndex<V>> extends AbstractIndexBasedDistanceFunction.Instance<V, P, PreferenceVectorBasedCorrelationDistance, AbstractPreferenceVectorBasedCorrelationDistanceFunction<? super V, ?>> {
     /**
      * The epsilon value
      */

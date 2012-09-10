@@ -40,29 +40,29 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  */
 public final class ArrayLikeUtil {
   /**
-   * Static instance for lists
+   * Static instance for lists.
    */
   private static final ListArrayAdapter<Object> LISTADAPTER = new ListArrayAdapter<Object>();
 
   /**
-   * Static instance for lists of numbers
+   * Static instance for lists of numbers.
    */
   private static final NumberListArrayAdapter<Number> NUMBERLISTADAPTER = new NumberListArrayAdapter<Number>();
 
   /**
-   * Static instance
+   * Static instance.
    */
   private static final IdentityArrayAdapter<?> IDENTITYADAPTER = new IdentityArrayAdapter<Object>();
 
   /**
-   * Static instance
+   * Static instance.
    */
-  private static final FeatureVectorAdapter<?> FEATUREVECTORADAPTER = new FeatureVectorAdapter<Number>();
+  public static final FeatureVectorAdapter<?> FEATUREVECTORADAPTER = new FeatureVectorAdapter<Number>();
 
   /**
    * Use a number vector in the array API.
    */
-  private static final NumberVectorAdapter<?> NUMBERVECTORADAPTER = new NumberVectorAdapter<Double>();
+  public static final NumberVectorAdapter<?> NUMBERVECTORADAPTER = new NumberVectorAdapter<Double>();
 
   /**
    * Use a double array in the array API.
@@ -83,6 +83,13 @@ public final class ArrayLikeUtil {
    * Use ArrayDBIDs as array.
    */
   public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
+  
+  /**
+   * Fake constructor. Do not instantiate!
+   */
+  private ArrayLikeUtil() {
+    // Do not instantiate
+  }
 
   /**
    * Cast the static instance.
@@ -124,7 +131,7 @@ public final class ArrayLikeUtil {
    * @return Instance
    */
   @SuppressWarnings("unchecked")
-  public static <F> FeatureVectorAdapter<F> featureVectorAdapter(FeatureVector<?, F> prototype) {
+  public static <F> FeatureVectorAdapter<F> featureVectorAdapter(FeatureVector<F> prototype) {
     return (FeatureVectorAdapter<F>) FEATUREVECTORADAPTER;
   }
 
@@ -135,7 +142,7 @@ public final class ArrayLikeUtil {
    * @return Instance
    */
   @SuppressWarnings("unchecked")
-  public static <N extends Number> NumberVectorAdapter<N> numberVectorAdapter(NumberVector<?, N> prototype) {
+  public static <N extends Number> NumberVectorAdapter<N> numberVectorAdapter(NumberVector<N> prototype) {
     return (NumberVectorAdapter<N>) NUMBERVECTORADAPTER;
   }
 
@@ -185,7 +192,7 @@ public final class ArrayLikeUtil {
   }
 
   /**
-   * Convert a numeric array-like to a <code>double[]</code>
+   * Convert a numeric array-like to a <code>double[]</code>.
    * 
    * @param array Array-like
    * @param adapter Adapter
@@ -215,12 +222,12 @@ public final class ArrayLikeUtil {
    * @param obj Object to convert
    * @return primitive double array
    */
-  public static <N extends Number> double[] toPrimitiveDoubleArray(NumberVector<?, N> obj) {
+  public static <N extends Number> double[] toPrimitiveDoubleArray(NumberVector<N> obj) {
     return toPrimitiveDoubleArray(obj, numberVectorAdapter(obj));
   }
 
   /**
-   * Convert a numeric array-like to a <code>float[]</code>
+   * Convert a numeric array-like to a <code>float[]</code>.
    * 
    * @param array Array-like
    * @param adapter Adapter
@@ -250,7 +257,7 @@ public final class ArrayLikeUtil {
    * @param obj Object to convert
    * @return primitive float array
    */
-  public static <N extends Number> float[] toPrimitiveFloatArray(NumberVector<?, N> obj) {
+  public static <N extends Number> float[] toPrimitiveFloatArray(NumberVector<N> obj) {
     return toPrimitiveFloatArray(obj, numberVectorAdapter(obj));
   }
 }

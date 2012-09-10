@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * 
  * @param <V> the type of NumberVector this unit contains
  */
-public class CLIQUEUnit<V extends NumberVector<V, ?>> {
+public class CLIQUEUnit<V extends NumberVector<?>> {
   /**
    * The one-dimensional intervals of which this unit is build.
    */

@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.landmark
  */
-public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * OptionID for the "p" parameter
    */
@@ -72,7 +72,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
    *         the currently set p
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality();
     if(dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
@@ -87,7 +87,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
   }
 
   @Override
-  public double doubleNorm(NumberVector<?, ?> v) {
+  public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double sqrDist = 0;
     for(int i = 1; i <= dim; i++) {
@@ -111,7 +111,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
     // Optimization for the simplest case
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?, ?>) mbr1, (NumberVector<?, ?>) mbr2);
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       }
     }
     // TODO: optimize for more simpler cases: obj vs. rect?
@@ -167,7 +167,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+  public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 

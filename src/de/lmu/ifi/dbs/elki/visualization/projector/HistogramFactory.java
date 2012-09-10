@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public class HistogramFactory implements ProjectorFactory {
   /**
-   * Maximum dimensionality
+   * Maximum dimensionality.
    */
   private int maxdim = ScatterPlotFactory.MAX_DIMENSIONS_DEFAULT;
 
@@ -66,9 +66,9 @@ public class HistogramFactory implements ProjectorFactory {
     for(Relation<?> rel : rels) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;
-        final int dim = DatabaseUtil.dimensionality(vrel);
-        HistogramProjector<NumberVector<?, ?>> proj = new HistogramProjector<NumberVector<?, ?>>(vrel, Math.min(dim, maxdim));
+        Relation<NumberVector<?>> vrel = (Relation<NumberVector<?>>) rel;
+        final int dim = RelationUtil.dimensionality(vrel);
+        HistogramProjector<NumberVector<?>> proj = new HistogramProjector<NumberVector<?>>(vrel, Math.min(dim, maxdim));
         baseResult.getHierarchy().add(vrel, proj);
       }
     }

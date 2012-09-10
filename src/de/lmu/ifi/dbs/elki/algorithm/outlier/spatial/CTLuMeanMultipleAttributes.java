@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -44,7 +45,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Attribute Vector
  */
 @Reference(authors = "Chang-Tien Lu and Dechang Chen and Yufeng Kou", title = "Detecting Spatial Outliers with Multiple Attributes", booktitle = "Proc. 15th IEEE International Conference on Tools with Artificial Intelligence, 2003", url = "http://dx.doi.org/10.1109/TAI.2003.1250179")
-public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?, ?>> extends AbstractNeighborhoodOutlier<N> {
+public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier<N> {
   /**
    * logger
    */
@@ -93,11 +93,11 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?, ?>> extends
 
   public OutlierResult run(Relation<N> spatial, Relation<O> attributes) {
     if(LOG.isDebugging()) {
-      LOG.debug("Dimensionality: " + DatabaseUtil.dimensionality(attributes));
+      LOG.debug("Dimensionality: " + RelationUtil.dimensionality(attributes));
     }
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(spatial);
 
-    CovarianceMatrix covmaker = new CovarianceMatrix(DatabaseUtil.dimensionality(attributes));
+    CovarianceMatrix covmaker = new CovarianceMatrix(RelationUtil.dimensionality(attributes));
     WritableDataStore<Vector> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final O obj = attributes.get(iditer);
@@ -146,7 +146,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector<?, ?>> extends
    * @param <N> Neighborhood type
    * @param <O> Attribute object type
    */
-  public static class Parameterizer<N, O extends NumberVector<?, ?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
+  public static class Parameterizer<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
     protected CTLuMeanMultipleAttributes<N, O> makeInstance() {
       return new CTLuMeanMultipleAttributes<N, O>(npredf);

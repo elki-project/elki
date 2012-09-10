@@ -29,23 +29,23 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 
 /**
  * Defines the requirements for a leaf entry in an DeLiClu-Tree node.
- * Additionally to a leaf entry in an R*-Tree two boolean flags that indicate whether this entry's node
- * contains handled or unhandled data objects.
- *
+ * Additionally to a leaf entry in an R*-Tree two boolean flags that indicate
+ * whether this entry's node contains handled or unhandled data objects.
+ * 
  * @author Elke Achtert
  */
 public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEntry {
   private static final long serialVersionUID = 1;
 
   /**
-   * Indicates that the node (or its child nodes) which is represented by this entry
-   * contains handled data objects.
+   * Indicates that the node (or its child nodes) which is represented by this
+   * entry contains handled data objects.
    */
   private boolean hasHandled;
 
   /**
-   * Indicates that the node (or its child nodes) which is represented by this entry
-   * contains unhandled data objects.
+   * Indicates that the node (or its child nodes) which is represented by this
+   * entry contains unhandled data objects.
    */
   private boolean hasUnhandled;
 
@@ -53,16 +53,16 @@ public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEn
    * Empty constructor for serialization purposes.
    */
   public DeLiCluLeafEntry() {
-	  // empty constructor
+    // empty constructor
   }
 
   /**
    * Constructs a new LeafEntry object with the given parameters.
-   *
-   * @param id     the unique id of the underlying data object
+   * 
+   * @param id the unique id of the underlying data object
    * @param vector the vector to store
    */
-  public DeLiCluLeafEntry(DBID id, NumberVector<?,?> vector) {
+  public DeLiCluLeafEntry(DBID id, NumberVector<?> vector) {
     super(id, vector);
     this.hasHandled = false;
     this.hasUnhandled = true;
@@ -90,7 +90,7 @@ public class DeLiCluLeafEntry extends SpatialPointLeafEntry implements DeLiCluEn
 
   /**
    * Returns the id as a string representation of this entry.
-   *
+   * 
    * @return a string representation of this entry
    */
   @Override

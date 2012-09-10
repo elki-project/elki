@@ -248,7 +248,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
     @Override
     public int getColumnCount() {
-      return 3; //DatabaseUtil.dimensionality(database) + 3;
+      return 3; //RelationUtil.dimensionality(database) + 3;
     }
 
     @Override
@@ -323,7 +323,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
         logger.warning("Tried to edit removed object?");
         return;
       }
-      final int dimensionality = DatabaseUtil.dimensionality(database);
+      final int dimensionality = RelationUtil.dimensionality(database);
       double[] vals = new double[dimensionality];
       for(int d = 0; d < dimensionality; d++) {
         if(d == columnIndex - 3) {

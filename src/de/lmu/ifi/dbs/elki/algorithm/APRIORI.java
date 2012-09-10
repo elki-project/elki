@@ -36,9 +36,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -134,7 +134,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
     if(size > 0) {
       int dim;
       try {
-        dim = DatabaseUtil.dimensionality(relation);
+        dim = RelationUtil.dimensionality(relation);
       }
       catch(UnsupportedOperationException e) {
         dim = 0;

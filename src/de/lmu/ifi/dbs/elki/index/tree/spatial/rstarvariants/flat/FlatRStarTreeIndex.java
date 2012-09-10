@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class FlatRStarTreeIndex<O extends NumberVector<?, ?>> extends FlatRStarTree implements RangeIndex<O>, KNNIndex<O> {
+public class FlatRStarTreeIndex<O extends NumberVector<?>> extends FlatRStarTree implements RangeIndex<O>, KNNIndex<O> {
   /**
    * The relation we index
    */

@@ -90,7 +90,7 @@ public class AxisReorderVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

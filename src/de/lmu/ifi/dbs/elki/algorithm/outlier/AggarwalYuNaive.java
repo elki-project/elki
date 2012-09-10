@@ -35,12 +35,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 @Title("BruteForce: Outlier detection for high dimensional data")
 @Description("Examines all possible sets of k dimensional projections")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
-public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier<V> {
+public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier<V> {
   /**
    * The logger for this class.
    */
@@ -95,7 +95,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
    * @return Outlier detection result
    */
   public OutlierResult run(Relation<V> relation) {
-    final int dimensionality = DatabaseUtil.dimensionality(relation);
+    final int dimensionality = RelationUtil.dimensionality(relation);
     final int size = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
@@ -183,7 +183,7 @@ public class AggarwalYuNaive<V extends NumberVector<?, ?>> extends AbstractAggar
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier.Parameterizer {
     @Override
     protected AggarwalYuNaive<V> makeInstance() {
       return new AggarwalYuNaive<V>(k, phi);

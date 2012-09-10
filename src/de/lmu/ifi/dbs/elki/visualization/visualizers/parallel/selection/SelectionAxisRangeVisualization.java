@@ -96,7 +96,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
    * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> {
     /**
      * CSS Class for the range marker
      */

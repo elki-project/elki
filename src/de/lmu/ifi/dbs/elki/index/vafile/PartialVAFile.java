@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction;
@@ -92,36 +93,38 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @apiviz.uses PartialVACandidate
  * @apiviz.has PartialVAFileRangeQuery
  * @apiviz.has PartialVAFileKNNQuery
+ * 
+ * @param <V> Vector type
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
-public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
+public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
-   * Class logger
+   * Class logger.
    */
   private static final Logging LOG = Logging.getLogger(PartialVAFile.class);
 
   /**
-   * Partial VA files
+   * Partial VA files.
    */
   List<DAFile> daFiles;
 
   /**
-   * Number of partitions
+   * Number of partitions.
    */
   private final int partitions;
 
   /**
-   * Page size
+   * Page size.
    */
   private final int pageSize;
 
   /**
-   * Splitting grid
+   * Splitting grid.
    */
   private double[][] splitPartitions;
 
   /**
-   * Statistics
+   * Statistics.
    */
   protected Statistics stats;
 
@@ -154,7 +157,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
-    final int dimensions = DatabaseUtil.dimensionality(relation);
+    final int dimensions = RelationUtil.dimensionality(relation);
 
     splitPartitions = new double[dimensions][];
     daFiles = new ArrayList<DAFile>(dimensions);
@@ -189,8 +192,8 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    * @param relation Relation with full dimensionality
    * @return Bit set with all bits set.
    */
-  protected static BitSet fakeSubspace(Relation<? extends NumberVector<?, ?>> relation) {
-    int dim = DatabaseUtil.dimensionality(relation);
+  protected static BitSet fakeSubspace(Relation<? extends NumberVector<?>> relation) {
+    int dim = RelationUtil.dimensionality(relation);
     BitSet bits = new BitSet();
     for(int i = 0; i < dim; i++) {
       bits.set(i);
@@ -292,7 +295,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    * @param query Query vector
    * @param epsilon Epsilon radius
    */
-  protected static void calculateSelectivityCoeffs(List<DoubleObjPair<DAFile>> daFiles, NumberVector<?, ?> query, double epsilon) {
+  protected static void calculateSelectivityCoeffs(List<DoubleObjPair<DAFile>> daFiles, NumberVector<?> query, double epsilon) {
     final int dimensions = query.getDimensionality();
     double[] lowerVals = new double[dimensions];
     double[] upperVals = new double[dimensions];
@@ -317,14 +320,14 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   }
 
   /**
-   * Calculate partial vector approximation
+   * Calculate partial vector approximation.
    * 
    * @param id Object ID
    * @param dv Object vector
    * @param daFiles List of approximations to use
    * @return Vector approximation
    */
-  protected static VectorApproximation calculatePartialApproximation(DBID id, NumberVector<?, ?> dv, List<DoubleObjPair<DAFile>> daFiles) {
+  protected static VectorApproximation calculatePartialApproximation(DBID id, NumberVector<?> dv, List<DoubleObjPair<DAFile>> daFiles) {
     int[] approximation = new int[dv.getDimensionality()];
     for(int i = 0; i < daFiles.size(); i++) {
       double val = dv.doubleValue(i + 1);
@@ -351,7 +354,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   }
 
   /**
-   * Class for tracking Partial VA file statistics
+   * Class for tracking Partial VA file statistics.
    * 
    * TODO: refactor into a common statistics API
    * 
@@ -385,7 +388,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     protected double minDistP = 0.0;
 
     /**
-     * The actual approximation
+     * The actual approximation.
      */
     final private VectorApproximation approx;
 
@@ -427,12 +430,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    */
   public class PartialVAFileRangeQuery extends AbstractRefiningIndex<V>.AbstractRangeQuery<DoubleDistance> {
     /**
-     * Lp-Norm p
+     * Lp-Norm p.
      */
     private double p;
 
     /**
-     * Subspace
+     * Subspace.
      */
     private BitSet subspace;
 
@@ -535,12 +538,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    */
   public class PartialVAFileKNNQuery extends AbstractRefiningIndex<V>.AbstractKNNQuery<DoubleDistance> {
     /**
-     * Lp-Norm p
+     * Lp-Norm p.
      */
     private double p;
 
     /**
-     * Subspace
+     * Subspace.
      */
     private BitSet subspace;
 
@@ -745,7 +748,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
   }
 
   /**
-   * Index factory class
+   * Index factory class.
    * 
    * @author Erich Schubert
    * 
@@ -754,7 +757,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?, ?>> implements IndexFactory<V, PartialVAFile<V>> {
+  public static class Factory<V extends NumberVector<?>> implements IndexFactory<V, PartialVAFile<V>> {
     /**
      * Number of partitions to use in each dimension.
      * 
@@ -765,12 +768,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("vafile.partitions", "Number of partitions to use in each dimension.");
 
     /**
-     * Page size
+     * Page size.
      */
     int pagesize = 1;
 
     /**
-     * Number of partitions
+     * Number of partitions.
      */
     int numpart = 2;
 
@@ -797,7 +800,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
     }
 
     /**
-     * Parameterization class
+     * Parameterization class.
      * 
      * @author Erich Schubert
      * 
@@ -805,12 +808,12 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**
-       * Page size
+       * Page size.
        */
       int pagesize = 1;
 
       /**
-       * Number of partitions
+       * Number of partitions.
        */
       int numpart = 2;
 
@@ -829,7 +832,7 @@ public class PartialVAFile<V extends NumberVector<?, ?>> extends AbstractRefinin
 
       @Override
       protected Factory<?> makeInstance() {
-        return new Factory<NumberVector<?, ?>>(pagesize, numpart);
+        return new Factory<NumberVector<?>>(pagesize, numpart);
       }
     }
   }

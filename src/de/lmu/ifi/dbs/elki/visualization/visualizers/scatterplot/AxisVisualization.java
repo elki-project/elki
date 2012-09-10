@@ -28,10 +28,10 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -59,8 +59,7 @@ public class AxisVisualization extends AbstractVisFactory {
   private static final String NAME = "Axes";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public AxisVisualization() {
     super();
@@ -88,7 +87,7 @@ public class AxisVisualization extends AbstractVisFactory {
   }
 
   /**
-   * Instance
+   * Instance.
    * 
    * @author Erich Schubert
    * @author Remigius Wojdanowski
@@ -109,7 +108,7 @@ public class AxisVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
-      int dim = DatabaseUtil.dimensionality(rel);
+      int dim = RelationUtil.dimensionality(rel);
 
       // origin
       double[] orig = proj.fastProjectScaledToRenderSpace(new double[dim]);
@@ -147,7 +146,7 @@ public class AxisVisualization extends AbstractVisFactory {
             // TODO: move axis labeling into drawAxis function.
             double offx = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
             double offy = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
-            Element label = svgp.svgText(ax[0] + offx, ax[1] + offy, DatabaseUtil.getColumnLabel(rel, d + 1));
+            Element label = svgp.svgText(ax[0] + offx, ax[1] + offy, RelationUtil.getColumnLabel(rel, d + 1));
             SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
             SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, righthand ? SVGConstants.SVG_START_VALUE : SVGConstants.SVG_END_VALUE);
             layer.appendChild(label);

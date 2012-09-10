@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @param <V> the type of NumberVector handled by this Result
  */
-public class CorrelationAnalysisSolution<V extends NumberVector<V, ?>> implements TextWriteable, Result, Model {
+public class CorrelationAnalysisSolution<V extends NumberVector<?>> implements TextWriteable, Result, Model {
   /**
    * Stores the solution equations.
    */

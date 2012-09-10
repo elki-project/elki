@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Object type
  */
-public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
+public class GridBasedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
   // TODO: add "grid sampling" option.
 
   /**
@@ -77,8 +78,8 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   /**
    * Constructor.
    * 
-   * @param gridres
-   * @param gridscale
+   * @param gridres Grid resolution
+   * @param gridscale Grid scaling
    */
   public GridBasedReferencePoints(int gridres, double gridscale) {
     super();
@@ -90,9 +91,9 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    V factory = DatabaseUtil.assumeVectorField(database).getFactory();
+    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
 
-    int dim = DatabaseUtil.dimensionality(db);
+    int dim = RelationUtil.dimensionality(db);
 
     // Compute mean from minmax.
     double[] mean = new double[dim];
@@ -137,7 +138,7 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #GRID_ID}.
      */
@@ -151,14 +152,14 @@ public class GridBasedReferencePoints<V extends NumberVector<V, ?>> implements R
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter GRID_PARAM = new IntParameter(GRID_ID, new GreaterEqualConstraint(0), 1);
-      if(config.grab(GRID_PARAM)) {
-        gridres = GRID_PARAM.getValue();
+      IntParameter gridP = new IntParameter(GRID_ID, new GreaterEqualConstraint(0), 1);
+      if(config.grab(gridP)) {
+        gridres = gridP.getValue();
       }
 
-      DoubleParameter GRID_SCALE_PARAM = new DoubleParameter(GRID_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
-      if(config.grab(GRID_SCALE_PARAM)) {
-        gridscale = GRID_SCALE_PARAM.getValue();
+      DoubleParameter gridscaleP = new DoubleParameter(GRID_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
+      if(config.grab(gridscaleP)) {
+        gridscale = gridscaleP.getValue();
       }
     }
 

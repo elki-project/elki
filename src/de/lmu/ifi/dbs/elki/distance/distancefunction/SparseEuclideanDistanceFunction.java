@@ -49,7 +49,7 @@ public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunctio
   }
 
   @Override
-  public double doubleDistance(SparseNumberVector<?, ?> v1, SparseNumberVector<?, ?> v2) {
+  public double doubleDistance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
     // Get the bit masks
     BitSet b1 = v1.getNotNullMask();
     BitSet b2 = v2.getNotNullMask();
@@ -81,7 +81,7 @@ public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunctio
   }
 
   @Override
-  public double doubleNorm(SparseNumberVector<?, ?> v1) {
+  public double doubleNorm(SparseNumberVector<?> v1) {
     double sqrDist = 0;
     // Get the bit masks
     BitSet b1 = v1.getNotNullMask();

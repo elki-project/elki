@@ -33,10 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector class
  * @param <D> Data type
  */
-public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> {
+public interface FeatureVector<D> {
   /**
    * The dimensionality of the vector space where of this FeatureVector of V is
    * an element.
@@ -64,21 +63,38 @@ public interface FeatureVector<V extends FeatureVector<? extends V, D>, D> {
   String toString();
 
   /**
-   * Returns a new FeatureVector of V for the given values.
+   * Factory API for this feature vector.
    * 
-   * @param array the values of the featureVector
-   * @param adapter adapter class
-   * @param <A> Array type
-   * @return a new FeatureVector of V for the given values
+   * @author Erich Schubert
+   *
+   * @param <V> Vector type
+   * @param <D> Data type of vector
    */
-  <A> V newFeatureVector(A array, ArrayAdapter<D, A> adapter);
+  interface Factory<V extends FeatureVector<? extends D>, D> {
+    /**
+     * Returns a new FeatureVector of V for the given values.
+     * 
+     * @param array the values of the featureVector
+     * @param adapter adapter class
+     * @param <A> Array type
+     * @return a new FeatureVector of V for the given values
+     */
+    <A> V newFeatureVector(A array, ArrayAdapter<D, A> adapter);
 
-  /**
-   * Get the default serializer for this type.
-   * 
-   * Note, this may be {@code null} when no serializer is available.
-   * 
-   * @return Serializer
-   */
-  ByteBufferSerializer<V> getDefaultSerializer();
+    /**
+     * Get the default serializer for this type.
+     * 
+     * Note, this may be {@code null} when no serializer is available.
+     * 
+     * @return Serializer
+     */
+    ByteBufferSerializer<V> getDefaultSerializer();
+    
+    /**
+     * Get the objects type restriction.
+     * 
+     * @return Restriction class
+     */
+    Class<? super V> getRestrictionClass();
+  }
 }

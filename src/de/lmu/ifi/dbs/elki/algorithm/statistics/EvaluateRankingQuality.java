@@ -88,7 +88,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
+public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, CollectionResult<DoubleVector>> {
   /**
    * The logger for this class.
    */
@@ -199,7 +199,7 @@ public class EvaluateRankingQuality<V extends NumberVector<V, ?>, D extends Numb
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
     /**
      * Number of bins to use.
      */

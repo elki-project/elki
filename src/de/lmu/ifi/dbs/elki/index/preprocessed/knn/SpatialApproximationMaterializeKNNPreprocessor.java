@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<?, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
+public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   /**
    * Logger to use
    */
@@ -187,20 +187,20 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector<?, ?>, D, KNNResult<D>> {
+  public static class Factory<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory<NumberVector<?>, D, KNNResult<D>> {
     /**
      * Constructor.
      * 
      * @param k k
      * @param distanceFunction distance function
      */
-    public Factory(int k, DistanceFunction<? super NumberVector<?, ?>, D> distanceFunction) {
+    public Factory(int k, DistanceFunction<? super NumberVector<?>, D> distanceFunction) {
       super(k, distanceFunction);
     }
 
     @Override
-    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instantiate(Relation<NumberVector<?, ?>> relation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?, ?>, D, N, E>(relation, distanceFunction, k);
+    public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instantiate(Relation<NumberVector<?>> relation) {
+      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -211,7 +211,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector<?, ?>, D> {
+    public static class Parameterizer<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector<?>, D> {
       @Override
       protected Factory<D, N, E> makeInstance() {
         return new Factory<D, N, E>(k, distanceFunction);

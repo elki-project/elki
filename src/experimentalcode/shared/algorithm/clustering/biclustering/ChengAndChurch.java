@@ -90,7 +90,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 @Title("ChengAndChurch: A biclustering method on row- and column score base")
 @Description("Finding correlated values in a subset of currentRows and a subset of columns")
 @Reference(authors = "Y. Cheng and G. M. Church", title = "Biclustering of expression data", booktitle = "Proceedings of the 8th International Conference on Intelligent Systems for Molecular Biology (ISMB), San Diego, CA, 2000")
-public class ChengAndChurch<V extends NumberVector<V, Double>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
+public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBiclustering<V, BiclusterWithInverted<V>> {
   /**
    * The logger for this class.
    */

@@ -40,11 +40,11 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @param <V> the type of FeatureVector the subspace contains
  */
-public class SubspaceModel<V extends FeatureVector<V, ?>> extends MeanModel<V> implements TextWriteable {
+public class SubspaceModel<V extends FeatureVector<?>> extends MeanModel<V> implements TextWriteable {
   /**
    * The subspace of the cluster.
    */
-  private final Subspace<V> subspace;
+  private final Subspace subspace;
 
   /**
    * Creates a new SubspaceModel for the specified subspace with the given
@@ -53,7 +53,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends MeanModel<V> i
    * @param subspace the subspace of the cluster
    * @param mean the cluster mean
    */
-  public SubspaceModel(Subspace<V> subspace, V mean) {
+  public SubspaceModel(Subspace subspace, V mean) {
     super(mean);
     this.subspace = subspace;
   }
@@ -63,7 +63,7 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends MeanModel<V> i
    * 
    * @return the subspace
    */
-  public Subspace<V> getSubspace() {
+  public Subspace getSubspace() {
     return subspace;
   }
 
@@ -77,9 +77,6 @@ public class SubspaceModel<V extends FeatureVector<V, ?>> extends MeanModel<V> i
     return subspace.getDimensions();
   }
 
-  /**
-   * Implementation of {@link TextWriteable} interface.
-   */
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);

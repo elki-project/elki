@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,16 +23,17 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+
 /**
  * AbstractNumberVector is an abstract implementation of FeatureVector.
  * 
  * @author Arthur Zimek
- * @param <V> the concrete type of this AbstractNumberVector
- * @param <N> the type of number, this AbstractNumberVector consists of (i.e., a
- *        AbstractNumberVector {@code v} of type {@code V} and dimensionality
- *        {@code d} is an element of {@code N}<sup>{@code d}</sup>)
+ * 
+ * @param <N> the type of number stored in this vector
  */
-public abstract class AbstractNumberVector<V extends AbstractNumberVector<? extends V, N>, N extends Number> implements NumberVector<V, N> {
+public abstract class AbstractNumberVector<N extends Number> implements NumberVector<N> {
   /**
    * The String to separate attribute values in a String that represents the
    * values.
@@ -53,20 +52,30 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
    *         AbstractNumberVector are equal to the values of obj in all
    *         dimensions, respectively
    */
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if(this.getClass().isInstance(obj)) {
-      V rv = (V) obj;
+    if (this.getClass().isInstance(obj)) {
+      AbstractNumberVector<?> rv = (AbstractNumberVector<?>) obj;
       boolean equal = (this.getDimensionality() == rv.getDimensionality());
-      for(int i = 1; i <= getDimensionality() && equal; i++) {
+      for (int i = 1; i <= getDimensionality() && equal; i++) {
         equal &= this.getValue(i).equals(rv.getValue(i));
       }
       return equal;
-    }
-    else {
+    } else {
       return false;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    if (this.getDimensionality() == 0) {
+      return 0;
+    }
+    int hash = this.getValue(1).hashCode();
+    for (int i = 2; i <= this.getDimensionality(); i++) {
+      hash = Util.mixHashCodes(hash, this.getValue(i).hashCode());
+    }
+    return hash;
   }
 
   @Override
@@ -99,8 +108,20 @@ public abstract class AbstractNumberVector<V extends AbstractNumberVector<? exte
     return (short) longValue(dimension);
   }
 
-  @Override
-  public V newNumberVector(double[] values) {
-    return newNumberVector(values, ArrayLikeUtil.doubleArrayAdapter());
+  /**
+   * Factory class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has AbstractNumberVector
+   * 
+   * @param <V> Vector type
+   * @param <N> Number type
+   */
+  public abstract static class Factory<V extends AbstractNumberVector<N>, N extends Number> implements NumberVector.Factory<V, N> {
+    @Override
+    public V newNumberVector(double[] values) {
+      return newNumberVector(values, ArrayLikeUtil.doubleArrayAdapter());
+    }
   }
 }

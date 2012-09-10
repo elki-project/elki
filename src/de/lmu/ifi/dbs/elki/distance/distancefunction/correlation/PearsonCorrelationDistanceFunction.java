@@ -72,7 +72,7 @@ public class PearsonCorrelationDistanceFunction extends AbstractVectorDoubleDist
    *         and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     return 1 - MathUtil.pearsonCorrelationCoefficient(v1, v2);
   }
 

@@ -23,9 +23,11 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 
 /**
@@ -35,7 +37,12 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @param <O> Object type processed
  */
-public abstract class AbstractStreamNormalization<O> extends AbstractStreamConversionFilter<O, O> implements Normalization<O> {
+public abstract class AbstractStreamNormalization<O extends NumberVector<?>> extends AbstractStreamConversionFilter<O, O> implements Normalization<O> {
+  /**
+   * Number vector factory.
+   */
+  protected NumberVector.Factory<O, ?> factory;
+
   /**
    * Initializes the option handler and the parameter map.
    */
@@ -45,6 +52,7 @@ public abstract class AbstractStreamNormalization<O> extends AbstractStreamConve
 
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
+    factory = FilterUtil.guessFactory(in);
     return in;
   }
   

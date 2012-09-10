@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
  * 
  * @param <NV> Vector type
  */
-public interface PreferenceVectorIndex<NV extends NumberVector<?, ?>> extends Index {
+public interface PreferenceVectorIndex<NV extends NumberVector<?>> extends Index {
   /**
    * Get the precomputed preference vector for a particular object ID.
    * 
@@ -58,7 +58,7 @@ public interface PreferenceVectorIndex<NV extends NumberVector<?, ?>> extends In
    * @param <V> vector type
    * @param <I> index type
    */
-  public static interface Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> extends IndexFactory<V, I> {
+  public static interface Factory<V extends NumberVector<?>, I extends PreferenceVectorIndex<V>> extends IndexFactory<V, I> {
     /**
      * Instantiate the index for a given database.
      * 

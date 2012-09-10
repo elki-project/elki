@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,6 +23,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+
 /**
  * Adapter to use a feature vector as an array of features.
  * 
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * 
  * @param <N> Number type
  */
-public class NumberVectorAdapter<N extends Number> implements NumberArrayAdapter<N, NumberVector<?, N>> {
+public class NumberVectorAdapter<N extends Number> implements NumberArrayAdapter<N, NumberVector<N>> {
   /**
    * Constructor.
    * 
@@ -45,42 +45,42 @@ public class NumberVectorAdapter<N extends Number> implements NumberArrayAdapter
   }
 
   @Override
-  public int size(NumberVector<?, N> array) {
+  public int size(NumberVector<N> array) {
     return array.getDimensionality();
   }
 
   @Override
-  public N get(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public N get(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.getValue(off + 1);
   }
 
   @Override
-  public double getDouble(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public double getDouble(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.doubleValue(off + 1);
   }
 
   @Override
-  public float getFloat(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public float getFloat(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.floatValue(off + 1);
   }
 
   @Override
-  public int getInteger(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public int getInteger(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.intValue(off + 1);
   }
 
   @Override
-  public short getShort(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public short getShort(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.shortValue(off + 1);
   }
 
   @Override
-  public long getLong(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public long getLong(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.longValue(off + 1);
   }
 
   @Override
-  public byte getByte(NumberVector<?, N> array, int off) throws IndexOutOfBoundsException {
+  public byte getByte(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.byteValue(off + 1);
   }
 }

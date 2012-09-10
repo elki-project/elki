@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  *
  * @param <V> Vector class to use.
  */
-public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> extends AbstractCovarianceMatrixBuilder<V> {
+public class StandardCovarianceMatrixBuilder<V extends NumberVector<?>> extends AbstractCovarianceMatrixBuilder<V> {
   /**
-   * Compute Covariance Matrix for a complete database
+   * Compute Covariance Matrix for a complete database.
    * 
    * @param database the database used
    * @return Covariance Matrix
@@ -52,7 +52,7 @@ public class StandardCovarianceMatrixBuilder<V extends NumberVector<? extends V,
   }
 
   /**
-   * Compute Covariance Matrix for a collection of database IDs
+   * Compute Covariance Matrix for a collection of database IDs.
    * 
    * @param ids a collection of ids
    * @param database the database used

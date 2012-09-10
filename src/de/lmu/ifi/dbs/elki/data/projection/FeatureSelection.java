@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.data.projection;
  */
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.FeatureVector.Factory;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter
  * @param <V> Vector type
  * @param <F> Feature type
  */
-public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Projection<V, V> {
+public class FeatureSelection<V extends FeatureVector<F>, F> implements Projection<V, V> {
   /**
    * Minimum dimensionality required for projection.
    */
@@ -49,7 +50,7 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
   /**
    * Object factory.
    */
-  private V factory;
+  private FeatureVector.Factory<V, F> factory;
 
   /**
    * Output dimensionality.
@@ -67,7 +68,7 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
    * @param dims Dimensions
    * @param factory Object factory
    */
-  public FeatureSelection(int[] dims, V factory) {
+  public FeatureSelection(int[] dims, FeatureVector.Factory<V, F> factory) {
     this.adapter = new SubsetArrayAdapter<F, V>(getAdapter(factory), dims);
     this.factory = factory;
     this.dimensionality = dims.length;
@@ -81,7 +82,7 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
 
   @Override
   public V project(V data) {
-    return data.newFeatureVector(data, adapter);
+    return factory.newFeatureVector(data, adapter);
   }
   
   /**
@@ -93,12 +94,11 @@ public class FeatureSelection<V extends FeatureVector<V, F>, F> implements Proje
    * @return Adapter
    */
   @SuppressWarnings("unchecked")
-  private static <V extends FeatureVector<V, F>, F> ArrayAdapter<F, ? super V> getAdapter(V factory) {
-    if(factory instanceof NumberVector) {
-      ArrayAdapter<?, ?> ret = ArrayLikeUtil.numberVectorAdapter((NumberVector<?, ?>) factory);
-      return (ArrayAdapter<F, ? super V>) ret;
+  private static <V extends FeatureVector<F>, F> ArrayAdapter<F, ? super V> getAdapter(Factory<V, F> factory) {
+    if(factory instanceof NumberVector.Factory) {
+      return (ArrayAdapter<F, ? super V>) ArrayLikeUtil.NUMBERVECTORADAPTER;
     }
-    return ArrayLikeUtil.featureVectorAdapter(factory);
+    return (ArrayAdapter<F, ? super V>) ArrayLikeUtil.FEATUREVECTORADAPTER;
   }
 
   @Override

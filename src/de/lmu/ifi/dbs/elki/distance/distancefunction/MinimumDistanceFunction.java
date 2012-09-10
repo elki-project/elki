@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 // TODO: add spatial?
-public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance. Use this.
    */
@@ -55,7 +55,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim = v1.getDimensionality();
     if(dim != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
@@ -69,7 +69,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
   }
 
   @Override
-  public double doubleNorm(NumberVector<?, ?> v) {
+  public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double min = Double.POSITIVE_INFINITY;
     for(int i = 1; i <= dim; i++) {
@@ -118,7 +118,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+  public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 

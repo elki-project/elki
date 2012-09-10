@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  */
-public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?>, DoubleDistance> implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Parameter for dimensionality.
    */
@@ -74,7 +74,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
    *         distance function
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     if(dim > v1.getDimensionality() || dim > v2.getDimensionality()) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
@@ -108,7 +108,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public DoubleDistance distance(NumberVector<?> o1, NumberVector<?> o2) {
     return new DoubleDistance(doubleDistance(o1, o2));
   }
 
@@ -127,7 +127,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public VectorTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public VectorTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return VectorTypeInformation.get(NumberVector.class, dim, Integer.MAX_VALUE);
   }
 
@@ -137,7 +137,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
+  public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
   }
 

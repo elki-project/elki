@@ -26,27 +26,36 @@ package de.lmu.ifi.dbs.elki.data;
 import gnu.trove.map.TIntDoubleMap;
 
 /**
- * Combines the SparseFeatureVector and NumberVector
+ * Combines the SparseFeatureVector and NumberVector.
  * 
  * @author Erich Schubert
  * 
- * @param <V> Vector type number type
  * @param <N> Number type
  */
-public interface SparseNumberVector<V extends SparseNumberVector<V, N>, N extends Number> extends NumberVector<V, N>, SparseFeatureVector<V, N> {
-  /**
-   * Returns a new NumberVector of N for the given values.
-   * 
-   * @param values the values of the NumberVector
-   * @param maxdim Maximum dimensionality.
-   * @return a new NumberVector of N for the given values
-   */
-  V newNumberVector(TIntDoubleMap values, int maxdim);
-  
+public interface SparseNumberVector<N extends Number> extends NumberVector<N>, SparseFeatureVector<N> {
   /**
    * Update the vector space dimensionality.
    * 
    * @param maxdim New dimensionality
    */
   void setDimensionality(int maxdim);
+
+  /**
+   * Factory for sparse number vectors: make from a dim-value map.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <V> Vector type number type
+   * @param <N> Number type
+   */
+  interface Factory<V extends SparseNumberVector<N>, N extends Number> extends NumberVector.Factory<V, N> {
+    /**
+     * Returns a new NumberVector of N for the given values.
+     * 
+     * @param values the values of the NumberVector
+     * @param maxdim Maximum dimensionality.
+     * @return a new NumberVector of N for the given values
+     */
+    V newNumberVector(TIntDoubleMap values, int maxdim);
+  }
 }

@@ -47,9 +47,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
  * @param <V> Vector type
  */
 // TODO: support categorical features, and multiple relations too
-public class ParallelPlotProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
+public class ParallelPlotProjector<V extends NumberVector<?>> extends AbstractHierarchicalResult implements Projector {
   /**
-   * Relation we project
+   * Relation we project.
    */
   Relation<V> rel;
 

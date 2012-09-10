@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * @param <V> vector type
  * @param <D> distance type
  */
-public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<V, D, KNNResult<D>> {
+public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<V, D, KNNResult<D>> {
   /**
    * Logging class.
    */
@@ -92,7 +92,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D e
    * @param <O> The object type
    * @param <D> The distance type
    */
-  public static class Factory<O extends NumberVector<O, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
+  public static class Factory<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
     /**
      * Constructor.
      * 
@@ -118,7 +118,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<V, ?>, D e
      * @param <O> Object type
      * @param <D> Distance type
      */
-    public static class Parameterizer<O extends NumberVector<O, ?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected KNNJoinMaterializeKNNPreprocessor.Factory<O, D> makeInstance() {
         return new KNNJoinMaterializeKNNPreprocessor.Factory<O, D>(k, distanceFunction);

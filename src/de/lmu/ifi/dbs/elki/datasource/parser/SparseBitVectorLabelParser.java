@@ -121,7 +121,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<BitVector>(BitVector.class, dimensionality, new BitVector(new BitSet(), dimensionality));
+    return new VectorFieldTypeInformation<BitVector>(BitVector.FACTORY, dimensionality);
   }
   
   @Override

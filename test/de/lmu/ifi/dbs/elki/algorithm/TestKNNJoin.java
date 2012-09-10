@@ -90,14 +90,14 @@ public class TestKNNJoin implements JUnit4Test {
     inputparams.failOnErrors();
 
     db.initialize();
-    Relation<NumberVector<?, ?>> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector<?>> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     // verify data set size.
     org.junit.Assert.assertEquals("Database size does not match.", shoulds, relation.size());
 
     // Euclidean
     {
-      DistanceQuery<NumberVector<?, ?>, DoubleDistance> dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
-      KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = QueryUtil.getLinearScanKNNQuery(dq);
+      DistanceQuery<NumberVector<?>, DoubleDistance> dq = db.getDistanceQuery(relation, EuclideanDistanceFunction.STATIC);
+      KNNQuery<NumberVector<?>, DoubleDistance> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -109,8 +109,8 @@ public class TestKNNJoin implements JUnit4Test {
     }
     // Manhattan
     {
-      DistanceQuery<NumberVector<?, ?>, DoubleDistance> dq = db.getDistanceQuery(relation, ManhattanDistanceFunction.STATIC);
-      KNNQuery<NumberVector<?, ?>, DoubleDistance> knnq = QueryUtil.getLinearScanKNNQuery(dq);
+      DistanceQuery<NumberVector<?>, DoubleDistance> dq = db.getDistanceQuery(relation, ManhattanDistanceFunction.STATIC);
+      KNNQuery<NumberVector<?>, DoubleDistance> knnq = QueryUtil.getLinearScanKNNQuery(dq);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -181,7 +181,7 @@ public class TestKNNJoin implements JUnit4Test {
     inputparams.failOnErrors();
 
     db.initialize();
-    Relation<NumberVector<?, ?>> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector<?>> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     // verify data set size.
     org.junit.Assert.assertEquals("Database size does not match.", shoulds, relation.size());
 

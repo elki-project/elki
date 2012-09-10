@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Finding Hierarchies of Subspace Clusters", booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
-public class HiSC<V extends NumberVector<V, ?>> extends OPTICS<V, PreferenceVectorBasedCorrelationDistance> {
+public class HiSC<V extends NumberVector<?>> extends OPTICS<V, PreferenceVectorBasedCorrelationDistance> {
   /**
    * The logger for this class.
    */
@@ -87,7 +87,7 @@ public class HiSC<V extends NumberVector<V, ?>> extends OPTICS<V, PreferenceVect
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     HiSCDistanceFunction<V> distanceFunction;
 
     @Override

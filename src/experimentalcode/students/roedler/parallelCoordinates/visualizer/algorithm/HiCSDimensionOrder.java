@@ -46,7 +46,7 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  * 
  * @author Robert Rödler
  */
-public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVector<?, ?>> implements MenuOwner {
+public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVector<?>> implements MenuOwner {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -230,7 +230,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
    * @param subspaceIndex Subspace indexes
    * @return a set of high contrast subspaces
    */
-  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?, ?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
+  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
     final int dbdim = DatabaseUtil.dimensionality(relation);
 
     TreeSet<HiCSSubspace> subspaceList = new TreeSet<HiCSSubspace>(HiCSSubspace.SORT_BY_SUBSPACE);
@@ -260,7 +260,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
    * @param relation Relation to index
    * @return List of sorted objects
    */
-  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
+  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
     final int dim = DatabaseUtil.dimensionality(relation);
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim + 1);
 
@@ -283,7 +283,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
    * @param subspace
    * @param subspaceIndex Subspace indexes
    */
-  private void calculateContrast(Relation<? extends NumberVector<?, ?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex) {
+  private void calculateContrast(Relation<? extends NumberVector<?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex) {
     final int card = subspace.cardinality();
     final double alpha1 = Math.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);

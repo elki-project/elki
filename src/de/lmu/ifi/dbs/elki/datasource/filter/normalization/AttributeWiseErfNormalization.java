@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * 
  * @apiviz.uses NumberVector
  */
-public class AttributeWiseErfNormalization<O extends NumberVector<O, ?>> extends AbstractNormalization<O> {
+public class AttributeWiseErfNormalization<O extends NumberVector<?>> extends AbstractNormalization<O> {
   /**
    * Constructor.
    */
@@ -57,7 +57,7 @@ public class AttributeWiseErfNormalization<O extends NumberVector<O, ?>> extends
     for(int i = 0; i < val.length; i++) {
       val[i] = NormalDistribution.erf(obj.doubleValue(i + 1));
     }
-    return obj.newNumberVector(val);
+    return factory.newNumberVector(val);
   }
 
   @Override

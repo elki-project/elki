@@ -102,7 +102,7 @@ public class COPVectorVisualization extends AbstractScatterplotVisualization imp
       if(VMath.euclideanLength(ev) < 0.01) {
         continue;
       }
-      final NumberVector<?, ?> vec = rel.get(objId);
+      final NumberVector<?> vec = rel.get(objId);
       if(vec == null) {
         continue;
       }

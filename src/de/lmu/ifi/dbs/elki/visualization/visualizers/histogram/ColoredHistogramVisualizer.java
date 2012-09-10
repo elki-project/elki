@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
@@ -41,7 +42,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -143,7 +143,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
    */
   // FIXME: make non-static, react to database changes!
   // FIXME: cache histogram instead of recomputing it.
-  public class Instance<NV extends NumberVector<NV, ?>> extends AbstractHistogramVisualization {
+  public class Instance<NV extends NumberVector<?>> extends AbstractHistogramVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -270,7 +270,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
 
         // draw axes that are non-trivial
-        final int dimensionality = DatabaseUtil.dimensionality(relation);
+        final int dimensionality = RelationUtil.dimensionality(relation);
         double orig = proj.fastProjectScaledToRender(new Vector(dimensionality));
         for(int d = 0; d < dimensionality; d++) {
           Vector v = new Vector(dimensionality);

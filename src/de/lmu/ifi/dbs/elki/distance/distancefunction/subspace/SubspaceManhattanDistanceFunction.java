@@ -54,7 +54,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
    *         selected dimensions
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
@@ -66,7 +66,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     return sum;
   }
 
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
+  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -118,7 +118,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   @Override
-  public double doubleNorm(NumberVector<?, ?> obj) {
+  public double doubleNorm(NumberVector<?> obj) {
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
       sum += Math.abs(obj.doubleValue(d + 1));

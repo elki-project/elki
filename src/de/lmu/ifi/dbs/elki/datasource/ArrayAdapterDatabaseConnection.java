@@ -51,7 +51,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
   double[][] data;
 
   /**
-   * Object labels
+   * Object labels.
    */
   String[] labels;
 
@@ -114,7 +114,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
     }
     SimpleTypeInformation<DoubleVector> type;
     if(mind == maxd) {
-      type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, mind, DoubleVector.STATIC);
+      type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, mind);
     }
     else {
       type = new SimpleTypeInformation<DoubleVector>(DoubleVector.class);

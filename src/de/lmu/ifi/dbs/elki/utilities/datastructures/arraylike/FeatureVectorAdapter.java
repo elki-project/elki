@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
  * 
  * @param <F> Feature type
  */
-public class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVector<?, F>> {
+public class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVector<F>> {
   /**
    * Constructor.
    * 
@@ -45,12 +45,12 @@ public class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVector<?,
   }
 
   @Override
-  public int size(FeatureVector<?, F> array) {
+  public int size(FeatureVector<F> array) {
     return array.getDimensionality();
   }
 
   @Override
-  public F get(FeatureVector<?, F> array, int off) throws IndexOutOfBoundsException {
+  public F get(FeatureVector<F> array, int off) throws IndexOutOfBoundsException {
     return array.getValue(off);
   }
 }

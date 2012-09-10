@@ -48,13 +48,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.has Instance
  */
-public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, SubspaceDistance> {
+public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, SubspaceDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, SubspaceDistance> {
   /**
    * Constructor
    * 
    * @param indexFactory Index factory
    */
-  public LocalSubspaceDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory) {
+  public LocalSubspaceDistanceFunction(IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>> indexFactory) {
     super(indexFactory);
   }
 
@@ -64,10 +64,10 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
   }
 
   @Override
-  public <V extends NumberVector<?, ?>> Instance<V> instantiate(Relation<V> database) {
+  public <V extends NumberVector<?>> Instance<V> instantiate(Relation<V> database) {
     // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Relation<NumberVector<?, ?>>)database);
+    FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Relation<NumberVector<?>>)database);
     return new Instance<V>(database, indexinst, this);
   }
 
@@ -76,7 +76,7 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance, LocalSubspaceDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance> {
+  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance, LocalSubspaceDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, SubspaceDistance> {
     /**
      * @param database Database
      * @param index Index
@@ -137,7 +137,7 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>>> {
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

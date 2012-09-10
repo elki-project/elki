@@ -117,7 +117,7 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
    *         vectors as an instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int delta = (int) Math.ceil(v2.getDimensionality() * pDelta);
 
     DoubleMinMax extrema1 = VectorUtil.getRangeDouble(v1);
@@ -188,7 +188,7 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
 
   // TODO: relax this to VectorTypeInformation!
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 

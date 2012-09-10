@@ -52,14 +52,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector class to use
  */
-public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends PCARunner<V> {
+public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
   /**
    * Parameter to specify the filter for determination of the strong and weak
    * eigenvectors, must be a subclass of {@link EigenPairFilter}.
-   * <p/>
+   * <p>
    * Default value: {@link PercentageEigenPairFilter}
    * </p>
-   * <p/>
+   * <p>
    * Key: {@code -pca.filter}
    * </p>
    */
@@ -108,10 +108,10 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
   /**
    * Constructor.
    * 
-   * @param covarianceMatrixBuilder
-   * @param eigenPairFilter
-   * @param big
-   * @param small
+   * @param covarianceMatrixBuilder Covariance matrix builder
+   * @param eigenPairFilter Eigen pair filter
+   * @param big Replacement for large eigenvalues
+   * @param small Replacement for small eigenvalues
    */
   public PCAFilteredRunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
     super(covarianceMatrixBuilder);
@@ -121,7 +121,7 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
   }
 
   /**
-   * Run PCA on a collection of database IDs
+   * Run PCA on a collection of database IDs.
    * 
    * @param ids a collection of ids
    * @param database the database used
@@ -133,10 +133,11 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
   }
 
   /**
-   * Run PCA on a QueryResult Collection
+   * Run PCA on a QueryResult Collection.
    * 
    * @param results a collection of QueryResults
    * @param database the database used
+   * @param <D> distance type
    * @return PCA result
    */
   @Override
@@ -145,9 +146,10 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
   }
 
   /**
-   * Process an existing Covariance Matrix
+   * Process an existing Covariance Matrix.
    * 
    * @param covarMatrix the matrix used for performing PCA
+   * @return Filtered result
    */
   @Override
   public PCAFilteredResult processCovarMatrix(Matrix covarMatrix) {
@@ -157,9 +159,10 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
   }
 
   /**
-   * Process an existing eigenvalue decomposition
+   * Process an existing eigenvalue decomposition.
    * 
    * @param evd eigenvalue decomposition to use
+   * @return filtered result
    */
   @Override
   public PCAFilteredResult processEVD(EigenvalueDecomposition evd) {
@@ -184,7 +187,7 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends PCARunner.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector<?>> extends PCARunner.Parameterizer<V> {
     /**
      * Holds the instance of the EigenPairFilter specified by
      * {@link #PCA_EIGENPAIR_FILTER}.
@@ -204,24 +207,24 @@ public class PCAFilteredRunner<V extends NumberVector<? extends V, ?>> extends P
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<EigenPairFilter> EIGENPAIR_FILTER_PARAM = new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-      if(config.grab(EIGENPAIR_FILTER_PARAM)) {
-        eigenPairFilter = EIGENPAIR_FILTER_PARAM.instantiateClass(config);
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
+      if(config.grab(filterP)) {
+        eigenPairFilter = filterP.instantiateClass(config);
       }
 
-      DoubleParameter BIG_PARAM = new DoubleParameter(BIG_ID, new GreaterConstraint(0), 1.0);
-      if(config.grab(BIG_PARAM)) {
-        big = BIG_PARAM.getValue();
+      DoubleParameter bigP = new DoubleParameter(BIG_ID, new GreaterConstraint(0), 1.0);
+      if(config.grab(bigP)) {
+        big = bigP.getValue();
 
       }
 
-      DoubleParameter SMALL_PARAM = new DoubleParameter(SMALL_ID, new GreaterEqualConstraint(0), 0.0);
-      if(config.grab(SMALL_PARAM)) {
-        small = SMALL_PARAM.getValue();
+      DoubleParameter smallP = new DoubleParameter(SMALL_ID, new GreaterEqualConstraint(0), 0.0);
+      if(config.grab(smallP)) {
+        small = smallP.getValue();
       }
 
       // global constraint small <--> big
-      config.checkConstraint(new LessGlobalConstraint<Double>(SMALL_PARAM, BIG_PARAM));
+      config.checkConstraint(new LessGlobalConstraint<Double>(smallP, bigP));
     }
 
     @Override

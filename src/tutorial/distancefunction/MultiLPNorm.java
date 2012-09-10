@@ -72,7 +72,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     assert o1.getDimensionality() == ps.length : "Inappropriate dimensionality!";
     assert o2.getDimensionality() == ps.length : "Inappropriate dimensionality!";
 
@@ -87,8 +87,8 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?, ?>>(NumberVector.class, ps.length);
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, ps.length);
   }
 
   /**

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @apiviz.uses NumberVector
  * @apiviz.has DoubleDistance
  */
-public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?, ?>>, NumberVectorDistanceFunction<DoubleDistance> {
+public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?>, DoubleDistance> implements PrimitiveDoubleDistanceFunction<NumberVector<?>>, NumberVectorDistanceFunction<DoubleDistance> {
   /**
    * Constructor.
    */
@@ -47,12 +47,12 @@ public abstract class AbstractVectorDoubleDistanceFunction extends AbstractPrimi
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
-  public final DoubleDistance distance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public final DoubleDistance distance(NumberVector<?> o1, NumberVector<?> o2) {
     return new DoubleDistance(doubleDistance(o1, o2));
   }
 

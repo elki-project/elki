@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <V> Object type
  */
 // TODO: Erich: use reproducible random
-public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
+public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
   /**
    * Parameter to specify the number of requested reference points.
    * <p>
@@ -76,8 +77,8 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
   /**
    * Constructor.
    * 
-   * @param samplesize
-   * @param scale
+   * @param samplesize Size of desired sample set
+   * @param scale Scaling factor
    */
   public RandomGeneratedReferencePoints(int samplesize, double scale) {
     super();
@@ -89,9 +90,9 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    V factory = DatabaseUtil.assumeVectorField(database).getFactory();
+    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
 
-    int dim = DatabaseUtil.dimensionality(db);
+    int dim = RelationUtil.dimensionality(db);
 
     // Compute mean from minmax.
     double[] mean = new double[dim];
@@ -122,7 +123,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<V, ?>> implem
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #N_ID}.
      */

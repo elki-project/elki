@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
-public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
+public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
   /**
    * Logger to use
    */
@@ -204,7 +204,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @param <N> the type of spatial nodes in the spatial index
    * @param <E> the type of spatial entries in the spatial index
    */
-  public static class Factory<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
+  public static class Factory<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory<O, D, KNNResult<D>> {
     /**
      * Constructor.
      * 
@@ -228,7 +228,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<O extends NumberVector<? super O, ?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
+    public static class Parameterizer<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected Factory<O, D, N, E> makeInstance() {
         return new Factory<O, D, N, E>(k, distanceFunction);

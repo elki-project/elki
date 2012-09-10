@@ -27,7 +27,7 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  * 
  * @author Robert Rödler
  */
-public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVector<?, ?>> implements MenuOwner {
+public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVector<?>> implements MenuOwner {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */

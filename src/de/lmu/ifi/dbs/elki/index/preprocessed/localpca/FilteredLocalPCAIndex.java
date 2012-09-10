@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
  * 
  * @param <NV> Vector type
  */
-public interface FilteredLocalPCAIndex<NV extends NumberVector<?, ?>> extends LocalProjectionIndex<NV, PCAFilteredResult> {
+public interface FilteredLocalPCAIndex<NV extends NumberVector<?>> extends LocalProjectionIndex<NV, PCAFilteredResult> {
   /**
    * Get the precomputed local PCA for a particular object ID.
    * 
@@ -57,7 +57,7 @@ public interface FilteredLocalPCAIndex<NV extends NumberVector<?, ?>> extends Lo
    * @param <NV> Vector type
    * @param <I> Index type produced
    */
-  public static interface Factory<NV extends NumberVector<?, ?>, I extends FilteredLocalPCAIndex<NV>> extends LocalProjectionIndex.Factory<NV, I> {
+  public static interface Factory<NV extends NumberVector<?>, I extends FilteredLocalPCAIndex<NV>> extends LocalProjectionIndex.Factory<NV, I> {
     /**
      * Instantiate the index for a given database.
      * 

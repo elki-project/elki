@@ -97,12 +97,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.has CASHInterval
  * @apiviz.uses ParameterizationFunction
  * @apiviz.has LinearEquationModel
+ * 
+ * @param <V> Vector type
  */
 // todo elke hierarchy (later)
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the Hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", title = "Robust clustering in arbitraily oriented subspaces", booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
-public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -192,7 +194,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
   private ModifiableDBIDs processedIDs;
 
   /**
-   * The entire database
+   * The entire relation.
    */
   private Relation<ParameterizationFunction> fulldatabase;
 
@@ -218,7 +220,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
    * Run CASH on the relation.
    * 
    * @param database Database
-   * @param relation Relation
+   * @param vrel Relation
    * @return Clustering result
    */
   public Clustering<Model> run(Database database, Relation<V> vrel) {
@@ -744,7 +746,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
     DBIDs ids = interval.getIDs();
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
-    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
 
@@ -809,7 +811,7 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
   private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) throws UnableToComplyException {
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
-    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, new DoubleVector(new double[dim]));
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
     MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
     proxy.addRelation(prep);
 
@@ -876,8 +878,8 @@ public class CASH<V extends NumberVector<?, ?>> extends AbstractAlgorithm<Cluste
     }
 
     @Override
-    protected CASH<NumberVector<?, ?>> makeInstance() {
-      return new CASH<NumberVector<?, ?>>(minpts, maxlevel, mindim, jitter, adjust);
+    protected CASH<NumberVector<?>> makeInstance() {
+      return new CASH<NumberVector<?>>(minpts, maxlevel, mindim, jitter, adjust);
     }
   }
 }

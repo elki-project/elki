@@ -45,7 +45,7 @@ public abstract class AbstractStreamConversionFilter<I, O> extends AbstractStrea
    * The column to filter.
    */
   int column = -1;
-
+  
   @Override
   public BundleMeta getMeta() {
     return meta;

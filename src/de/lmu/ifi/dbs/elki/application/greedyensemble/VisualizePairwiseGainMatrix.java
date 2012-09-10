@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
@@ -89,7 +90,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
 public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
-   * Get static logger
+   * Get static logger.
    */
   private static final Logging LOG = Logging.getLogger(VisualizePairwiseGainMatrix.class);
 
@@ -99,7 +100,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   private InputStep inputstep;
 
   /**
-   * Parameterizer for visualizers
+   * Parameterizer for visualizers.
    */
   private VisualizerParameterizer vispar;
 
@@ -119,7 +120,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
-    final Relation<NumberVector<?, ?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    final Relation<NumberVector<?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
@@ -128,8 +129,8 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     }
 
     // Dimensionality and reference vector
-    final int dim = DatabaseUtil.dimensionality(relation);
-    final NumberVector<?, ?> refvec = relation.get(firstid);
+    final int dim = RelationUtil.dimensionality(relation);
+    final NumberVector<?> refvec = relation.get(firstid);
 
     // Build the truth vector
     Set<Integer> pos = new TreeSet<Integer>();
@@ -153,7 +154,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     {
       int a = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), a++) {
-        final NumberVector<?, ?> veca = relation.get(id);
+        final NumberVector<?> veca = relation.get(id);
         // Direct AUC score:
         {
           for(int d = 0; d < dim; d++) {
@@ -170,7 +171,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         DBIDArrayIter id2 = ids.iter();
         id2.seek(a + 1);
         for(int b = a + 1; b < size; b++, id2.advance()) {
-          final NumberVector<?, ?> vecb = relation.get(id2);
+          final NumberVector<?> vecb = relation.get(id2);
           for(int d = 0; d < dim; d++) {
             combined[d].first = veca.doubleValue(d + 1) + vecb.doubleValue(d + 1);
             combined[d].second = d;
@@ -257,10 +258,9 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Show a single visualization.
    * 
-   * @param context
-   * 
-   * @param factory
-   * @param task
+   * @param context Visualization conext
+   * @param factory Visualizer factory
+   * @param task Visualization task
    */
   private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer factory, VisualizationTask task) {
     SVGPlot plot = new SVGPlot();
@@ -283,12 +283,12 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**
-     * Data source
+     * Data source.
      */
     InputStep inputstep;
 
     /**
-     * Parameterizer for visualizers
+     * Parameterizer for visualizers.
      */
     private VisualizerParameterizer vispar;
 

@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class RStarTreeIndex<O extends NumberVector<?, ?>> extends RStarTree implements RangeIndex<O>, KNNIndex<O> {
+public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree implements RangeIndex<O>, KNNIndex<O> {
   /**
    * The appropriate logger for this index.
    */

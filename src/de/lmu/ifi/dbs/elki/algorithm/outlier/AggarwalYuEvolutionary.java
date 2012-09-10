@@ -41,12 +41,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("EAFOD: the evolutionary outlier detection algorithm")
 @Description("Outlier detection for high dimensional data")
 @Reference(authors = "C.C. Aggarwal, P. S. Yu", title = "Outlier detection for high dimensional data", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD 2001), Santa Barbara, CA, 2001", url = "http://dx.doi.org/10.1145/375663.375668")
-public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier<V> {
+public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier<V> {
   /**
    * The logger for this class.
    */
@@ -209,7 +209,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
       this.ranges = ranges;
       this.m = m;
       this.dbsize = relation.size();
-      this.dim = DatabaseUtil.dimensionality(relation);
+      this.dim = RelationUtil.dimensionality(relation);
       if(seed != null) {
         this.random = new Random(seed);
       }
@@ -683,7 +683,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?, ?>> extends Abstra
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractAggarwalYuOutlier.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier.Parameterizer {
     /**
      * Parameter to specify the number of solutions must be an integer greater
      * than 1.

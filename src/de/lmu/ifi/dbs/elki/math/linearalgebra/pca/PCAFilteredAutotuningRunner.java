@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
@@ -43,7 +44,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -58,14 +58,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <V> vector type
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>> extends PCAFilteredRunner<V> {
+public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAFilteredRunner<V> {
   /**
    * Constructor.
    * 
-   * @param covarianceMatrixBuilder
-   * @param eigenPairFilter
-   * @param big
-   * @param small
+   * @param covarianceMatrixBuilder Covariance matrix builder
+   * @param eigenPairFilter Eigen pair filter
+   * @param big Replacement for large values
+   * @param small Replacement for small values
    */
   public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder<V> covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
     super(covarianceMatrixBuilder, eigenPairFilter, big, small);
@@ -88,7 +88,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
   @Override
   public <D extends NumberDistance<D, ?>> PCAFilteredResult processQueryResult(DistanceDBIDResult<D> results, Relation<? extends V> database) {
     assertSortedByDistance(results);
-    final int dim = DatabaseUtil.dimensionality(database);
+    final int dim = RelationUtil.dimensionality(database);
 
     List<Matrix> best = new LinkedList<Matrix>();
     for(int i = 0; i < dim; i++) {
@@ -183,9 +183,9 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
   }
 
   /**
-   * Compute the explained variance for a FilteredEigenPairs
+   * Compute the explained variance for a FilteredEigenPairs.
    * 
-   * @param filteredEigenPairs
+   * @param filteredEigenPairs Filtered eigenpairs
    * @return explained variance by the strong eigenvectors.
    */
   private double computeExplainedVariance(FilteredEigenPairs filteredEigenPairs) {
@@ -203,7 +203,8 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
   /**
    * Ensure that the results are sorted by distance.
    * 
-   * @param results
+   * @param results Results to process
+   * @param <D> distance type
    */
   private <D extends NumberDistance<D, ?>> void assertSortedByDistance(DistanceDBIDResult<D> results) {
     // TODO: sort results instead?
@@ -236,7 +237,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<? extends V, ?>>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends PCAFilteredRunner.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector<?>> extends PCAFilteredRunner.Parameterizer<V> {
     @Override
     protected PCAFilteredAutotuningRunner<V> makeInstance() {
       return new PCAFilteredAutotuningRunner<V>(covarianceMatrixBuilder, eigenPairFilter, big, small);

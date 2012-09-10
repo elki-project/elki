@@ -60,7 +60,7 @@ public class DoubleVectorProjectionFilter extends AbstractFeatureSelectionFilter
 
   @Override
   protected SimpleTypeInformation<? super DoubleVector> convertedType(SimpleTypeInformation<DoubleVector> in) {
-    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, in.getSerializer(), getDimensionality(), DoubleVector.STATIC);
+    return new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, getDimensionality());
   }
 
   /**

@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * 
  * @param <NV> Vector type
  */
-public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extends ProjectionResult> extends LocalProjectionIndex<NV, P> {
+public interface SubspaceProjectionIndex<NV extends NumberVector<?>, P extends ProjectionResult> extends LocalProjectionIndex<NV, P> {
   /**
    * Get the precomputed local subspace for a particular object ID.
    * 
@@ -60,7 +60,7 @@ public interface SubspaceProjectionIndex<NV extends NumberVector<?, ?>, P extend
    * @param <NV> Vector type
    * @param <I> Index type produced
    */
-  public static interface Factory<NV extends NumberVector<?, ?>, I extends SubspaceProjectionIndex<NV, ?>> extends LocalProjectionIndex.Factory<NV, I> {
+  public static interface Factory<NV extends NumberVector<?>, I extends SubspaceProjectionIndex<NV, ?>> extends LocalProjectionIndex.Factory<NV, I> {
     /**
      * Instantiate the index for a given database.
      * 

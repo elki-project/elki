@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.correlation.WeightedPearsonCorrelationDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
@@ -85,7 +86,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", title = "On Evaluation of Outlier Rankings and Outlier Scores", booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
 public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
-   * Get static logger
+   * Get static logger.
    */
   private static final Logging LOG = Logging.getLogger(GreedyEnsembleExperiment.class);
 
@@ -115,7 +116,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Note: the database contains the *result vectors*, not the original data
     // points.
     final Database database = inputstep.getDatabase();
-    final Relation<NumberVector<?, ?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    final Relation<NumberVector<?>> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    final NumberVector.Factory<NumberVector<?>, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
@@ -124,8 +126,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
 
     // Dimensionality and reference vector
-    final int dim = DatabaseUtil.dimensionality(relation);
-    final NumberVector<?, ?> refvec = relation.get(firstid);
+    final int dim = RelationUtil.dimensionality(relation);
+    final NumberVector<?> refvec = relation.get(firstid);
 
     // Build the positive index set for ROC AUC.
     Set<Integer> positive = new TreeSet<Integer>();
@@ -145,7 +147,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
-        final NumberVector<?, ?> vec = relation.get(iditer);
+        final NumberVector<?> vec = relation.get(iditer);
         TiedTopBoundedHeap<DoubleIntPair> heap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
         for(int i = 0; i < dim; i++) {
           heap.add(new DoubleIntPair(vec.doubleValue(i + 1), i));
@@ -169,10 +171,10 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final double[] estimated_weights = new double[dim];
     final double[] estimated_truth = new double[dim];
     updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
-    NumberVector<?, ?> estimated_truth_vec = refvec.newNumberVector(estimated_truth);
+    NumberVector<?> estimated_truth_vec = factory.newNumberVector(estimated_truth);
 
-    PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> wdist = getDistanceFunction(estimated_weights);
-    PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> tdist = wdist;
+    PrimitiveDoubleDistanceFunction<NumberVector<?>> wdist = getDistanceFunction(estimated_weights);
+    PrimitiveDoubleDistanceFunction<NumberVector<?>> tdist = wdist;
 
     // Build the naive ensemble:
     final double[] naiveensemble = new double[dim];
@@ -181,7 +183,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         if(DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
-        final NumberVector<?, ?> vec = relation.get(iditer);
+        final NumberVector<?> vec = relation.get(iditer);
         for(int d = 0; d < dim; d++) {
           naiveensemble[d] += vec.doubleValue(d + 1);
         }
@@ -190,7 +192,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         naiveensemble[d] /= (relation.size() - 1);
       }
     }
-    NumberVector<?, ?> naivevec = refvec.newNumberVector(naiveensemble);
+    NumberVector<?> naivevec = factory.newNumberVector(naiveensemble);
 
     // Compute single AUC scores and estimations.
     // Remember the method most similar to the estimation
@@ -207,7 +209,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           continue;
         }
         // fout.append(labels.get(id));
-        final NumberVector<?, ?> vec = relation.get(iditer);
+        final NumberVector<?> vec = relation.get(iditer);
         double auc = computeROCAUC(vec, positive, dim);
         double estimated = wdist.doubleDistance(vec, estimated_truth_vec);
         double cost = tdist.doubleDistance(vec, refvec);
@@ -237,7 +239,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     enscands.remove(firstid);
     final double[] greedyensemble = new double[dim];
     {
-      final NumberVector<?, ?> vec = relation.get(bestid);
+      final NumberVector<?> vec = relation.get(bestid);
       for(int i = 0; i < dim; i++) {
         greedyensemble[i] = vec.doubleValue(i + 1);
       }
@@ -245,7 +247,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Greedily grow the ensemble
     final double[] testensemble = new double[dim];
     while(enscands.size() > 0) {
-      NumberVector<?, ?> greedyvec = refvec.newNumberVector(greedyensemble);
+      NumberVector<?> greedyvec = factory.newNumberVector(greedyensemble);
 
       // Weighting factors for combining:
       double s1 = ensemble.size() / (ensemble.size() + 1.);
@@ -254,7 +256,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       final int heapsize = enscands.size();
       TopBoundedHeap<DoubleDBIDPair> heap = new TopBoundedHeap<DoubleDBIDPair>(heapsize, Collections.reverseOrder());
       for (DBIDIter iter = enscands.iter(); iter.valid(); iter.advance()) {
-        final NumberVector<?, ?> vec = relation.get(iter);
+        final NumberVector<?> vec = relation.get(iter);
         double diversity = wdist.doubleDistance(vec, greedyvec);
         heap.add(DBIDUtil.newPair(diversity, iter));
       }
@@ -262,11 +264,11 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         DBIDRef bestadd = heap.poll();
         enscands.remove(bestadd);
         // Update ensemble:
-        final NumberVector<?, ?> vec = relation.get(bestadd);
+        final NumberVector<?> vec = relation.get(bestadd);
         for(int i = 0; i < dim; i++) {
           testensemble[i] = greedyensemble[i] * s1 + vec.doubleValue(i + 1) * s2;
         }
-        NumberVector<?, ?> testvec = refvec.newNumberVector(testensemble);
+        NumberVector<?> testvec = factory.newNumberVector(testensemble);
         double oldd = wdist.doubleDistance(estimated_truth_vec, greedyvec);
         double newd = wdist.doubleDistance(estimated_truth_vec, testvec);
         // logger.verbose("Distances: " + oldd + " vs. " + newd);
@@ -295,7 +297,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
             }
             if(refresh) {
               updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
-              estimated_truth_vec = refvec.newNumberVector(estimated_truth);
+              estimated_truth_vec = factory.newNumberVector(estimated_truth);
             }
           }
         }
@@ -311,7 +313,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         greedylbl.append(labels.get(iter));
       }
     }
-    NumberVector<?, ?> greedyvec = refvec.newNumberVector(greedyensemble);
+    NumberVector<?> greedyvec = factory.newNumberVector(greedyensemble);
     LOG.verbose("Estimated outliers remaining: " + union_outliers);
     LOG.verbose("Greedy ensemble: " + greedylbl.toString());
 
@@ -346,7 +348,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           for (DBIDIter iter = random.iter(); iter.valid(); iter.advance()) {
             assert (!DBIDUtil.equal(firstid, iter));
             // logger.verbose("Using: "+labels.get(id));
-            final NumberVector<?, ?> vec = relation.get(iter);
+            final NumberVector<?> vec = relation.get(iter);
             for(int d = 0; d < dim; d++) {
               randomensemble[d] += vec.doubleValue(d + 1);
             }
@@ -355,7 +357,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
             randomensemble[d] /= ensemble.size();
           }
         }
-        NumberVector<?, ?> randomvec = refvec.newNumberVector(randomensemble);
+        NumberVector<?> randomvec = factory.newNumberVector(randomensemble);
         double auc = computeROCAUC(randomvec, positive, dim);
         meanauc.put(auc);
         double cost = tdist.doubleDistance(randomvec, refvec);
@@ -386,13 +388,13 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     }
   }
 
-  private PrimitiveDoubleDistanceFunction<NumberVector<?, ?>> getDistanceFunction(double[] estimated_weights) {
+  private PrimitiveDoubleDistanceFunction<NumberVector<?>> getDistanceFunction(double[] estimated_weights) {
     // return new WeightedSquaredEuclideanDistanceFunction(estimated_weights);
     // return new WeightedLPNormDistanceFunction(1.0, estimated_weights);
     return new WeightedPearsonCorrelationDistanceFunction(estimated_weights);
   }
 
-  private double computeROCAUC(NumberVector<?, ?> vec, Set<Integer> positive, int dim) {
+  private double computeROCAUC(NumberVector<?> vec, Set<Integer> positive, int dim) {
     final DoubleIntPair[] scores = new DoubleIntPair[dim];
     for(int d = 0; d < dim; d++) {
       scores[d] = new DoubleIntPair(vec.doubleValue(d + 1), d);
@@ -401,6 +403,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     return XYCurve.areaUnderCurve(ROC.materializeROC(dim, positive, Arrays.asList(scores).iterator()));
   }
 
+  /**
+   * Compute the gain coefficient.
+   * 
+   * @param score New score
+   * @param ref Reference score
+   * @param optimal Maximum score possible
+   * @return Gain
+   */
   double gain(double score, double ref, double optimal) {
     return 1 - ((optimal - score) / (optimal - ref));
   }
@@ -414,7 +424,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
     /**
-     * Data source
+     * Data source.
      */
     InputStep inputstep;
 

@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
@@ -47,6 +48,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.LinearScanRKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
@@ -57,7 +59,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -132,10 +133,11 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
 
     // insert new objects
     List<DoubleVector> insertions = new ArrayList<DoubleVector>();
-    DoubleVector o = DatabaseUtil.assumeVectorField(rep).getFactory();
+    NumberVector.Factory<DoubleVector, ?> o = RelationUtil.getNumberVectorFactory(rep);
+    int dim = RelationUtil.dimensionality(rep);
     Random random = new Random(seed);
     for(int i = 0; i < updatesize; i++) {
-      DoubleVector obj = VectorUtil.randomVector(o, random);
+      DoubleVector obj = VectorUtil.randomVector(o, dim, random);
       insertions.add(obj);
     }
     System.out.println("Insert " + insertions);

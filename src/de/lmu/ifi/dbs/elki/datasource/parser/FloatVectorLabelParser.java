@@ -69,7 +69,7 @@ public class FloatVectorLabelParser extends NumberVectorLabelParser<FloatVector>
    * @param labelIndices
    */
   public FloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, FloatVector.STATIC);
+    super(colSep, quoteChar, labelIndices, FloatVector.FACTORY);
   }
 
   @Override

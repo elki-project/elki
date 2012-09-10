@@ -40,13 +40,13 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.FilteredLocalPCABasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction;
@@ -56,7 +56,6 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.LocalProjectionIndex.Factory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -92,7 +91,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " + "a clustering algorithm over the partitions.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger P., A. Zimek", title = "Robust, Complete, and Efficient Correlation Clustering", booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
-public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -179,7 +178,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
   @SuppressWarnings("unchecked")
   public Clustering<Model> run(Relation<V> relation) {
     if(LOG.isVerbose()) {
-      LOG.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + DatabaseUtil.dimensionality(relation));
+      LOG.verbose("Running COPAC on db size = " + relation.size() + " with dimensionality = " + RelationUtil.dimensionality(relation));
     }
 
     partitionDistanceQuery = (FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, D>) partitionDistanceFunction.instantiate(relation);
@@ -236,7 +235,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
     // TODO: use an extra finite progress for the partitions?
     for(Entry<Integer, DBIDs> pair : partitionMap.entrySet()) {
       // noise partition
-      if(pair.getKey() == DatabaseUtil.dimensionality(relation)) {
+      if(pair.getKey() == RelationUtil.dimensionality(relation)) {
         // Make a Noise cluster
         result.addCluster(new Cluster<Model>(pair.getValue(), true, ClusterModel.CLUSTER));
       }
@@ -305,7 +304,7 @@ public class COPAC<V extends NumberVector<V, ?>, D extends Distance<D>> extends 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractParameterizer {
     protected LocalProjectionIndex.Factory<V, ?> indexI = null;
 
     protected FilteredLocalPCABasedDistanceFunction<V, ?, D> pdistI = null;

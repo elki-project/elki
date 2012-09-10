@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -42,7 +43,6 @@ import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -143,7 +143,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task) {
       super(task);
-      this.dim = DatabaseUtil.dimensionality(rel);
+      this.dim = RelationUtil.dimensionality(rel);
       incrementalRedraw();
     }
 
@@ -262,7 +262,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
       selection.clear();
       candidates: for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        NumberVector<?, ?> dbTupel = rel.get(iditer);
+        NumberVector<?> dbTupel = rel.get(iditer);
         for(int i = 0; i < dim; i++) {
           if(ranges != null && ranges[i] != null) {
             if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {

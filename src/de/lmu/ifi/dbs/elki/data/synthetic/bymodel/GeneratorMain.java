@@ -68,12 +68,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  */
 public class GeneratorMain {
   /**
-   * List of clusters to generate
+   * List of clusters to generate.
    */
   protected LinkedList<GeneratorInterface> generators = new LinkedList<GeneratorInterface>();
 
   /**
-   * Controls whether points are tested against the model during generation
+   * Controls whether points are tested against the model during generation.
    */
   protected boolean testAgainstModel = true;
 
@@ -89,6 +89,7 @@ public class GeneratorMain {
   /**
    * Main loop to generate data set.
    * 
+   * @return Generated data set
    * @throws UnableToComplyException when model not satisfiable or no clusters
    *         specified.
    */
@@ -106,11 +107,9 @@ public class GeneratorMain {
         }
       }
     }
-    // Vector factory. TODO: make configurable
-    final DoubleVector factory = new DoubleVector(new double[dim]);
     // Prepare result bundle
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, dim, factory);
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
     bundle.appendColumn(type, new ArrayList<Object>());
     bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
     bundle.appendColumn(TypeUtil.MODEL, new ArrayList<Model>());
@@ -168,7 +167,7 @@ public class GeneratorMain {
   }
 
   /**
-   * Return value of the {@link #testAgainstModel} flag
+   * Return value of the {@link #testAgainstModel} flag.
    * 
    * @return value of testAgainstModel
    */
@@ -177,7 +176,7 @@ public class GeneratorMain {
   }
 
   /**
-   * Set the value of the {@link #testAgainstModel} flag
+   * Set the value of the {@link #testAgainstModel} flag.
    * 
    * @param testAgainstModel New value
    */

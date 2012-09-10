@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E> & Index> extends TreeIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E> & Index> extends TreeIndexFactory<O, I> {
   /**
    * Fast-insertion parameter. Optional.
    */
@@ -140,7 +140,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<O, ?>, N e
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O extends NumberVector<O, ?>> extends TreeIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O extends NumberVector<?>> extends TreeIndexFactory.Parameterizer<O> {
     /**
      * Insertion strategy
      */

@@ -215,7 +215,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectDataToRenderSpace(NumberVector<?> data) {
     double[] v = new double[visDims];
     for(int j = 0, o = 0; j < scales.length; j++) {
       if(isDimHidden(j)) {

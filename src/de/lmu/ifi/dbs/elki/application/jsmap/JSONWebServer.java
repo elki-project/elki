@@ -66,27 +66,27 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 public class JSONWebServer implements HttpHandler {
   /**
-   * Our logger
+   * Our logger.
    */
   private static final Logging LOG = Logging.getLogger(JSONWebServer.class);
 
   /**
-   * The base path we serve data from
+   * The base path we serve data from.
    */
   public static final String PATH_JSON = "/json/";
 
   /**
-   * Server instance
+   * Server instance.
    */
   private HttpServer server;
 
   /**
-   * The result tree we serve
+   * The result tree we serve.
    */
   private HierarchicalResult result;
 
   /**
-   * The database we use for obtaining object bundles
+   * The database we use for obtaining object bundles.
    */
   private Database db;
 
@@ -148,7 +148,7 @@ public class JSONWebServer implements HttpHandler {
         // TODO: refactor to JSONFormatters!
         // Format a NumberVector
         if(data instanceof NumberVector) {
-          NumberVector<?, ?> v = (NumberVector<?, ?>) data;
+          NumberVector<?> v = (NumberVector<?>) data;
           re.appendKeyArray(bundle.meta(j));
           for(int i = 0; i < v.getDimensionality(); i++) {
             re.append(v.doubleValue(i + 1));

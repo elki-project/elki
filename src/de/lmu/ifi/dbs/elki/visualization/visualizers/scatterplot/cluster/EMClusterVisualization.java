@@ -125,7 +125,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
    * @return the clustering cast to return a mean model, null otherwise.
    */
   @SuppressWarnings("unchecked")
-  private static <NV extends NumberVector<NV, ?>> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
+  private static <NV extends NumberVector<?>> Clustering<MeanModel<NV>> findMeanModel(Clustering<?> c) {
     final Model firstModel = c.getAllClusters().get(0).getModel();
     if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?> && firstModel instanceof EMModel<?>) {
       return (Clustering<MeanModel<NV>>) c;
@@ -145,7 +145,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
    */
   // TODO: nicer stacking of n-fold hulls
   // TODO: can we find a proper sphere for 3+ dimensions?
-  public class Instance<NV extends NumberVector<NV, ?>> extends AbstractScatterplotVisualization {
+  public class Instance<NV extends NumberVector<?>> extends AbstractScatterplotVisualization {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

@@ -45,11 +45,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.landmark
  */
-public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
+public class DoubleVector extends AbstractNumberVector<Double> {
   /**
    * Static factory instance.
    */
-  public static final DoubleVector STATIC = new DoubleVector(new double[0], true);
+  public static final DoubleVector.Factory FACTORY = new DoubleVector.Factory();
 
   /**
    * Serializer for up to 127 dimensions.
@@ -196,43 +196,70 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
     return featureLine.toString();
   }
 
-  @Override
-  public DoubleVector newNumberVector(double[] values) {
-    return new DoubleVector(values);
-  }
-
-  @Override
-  public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
-    int dim = adapter.size(array);
-    double[] values = new double[dim];
-    for (int i = 0; i < dim; i++) {
-      values[i] = adapter.get(array, i);
+  /**
+   * Factory for Double vectors.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has DoubleVector
+   */
+  public static class Factory extends AbstractNumberVector.Factory<DoubleVector, Double> {
+    @Override
+    public DoubleVector newNumberVector(double[] values) {
+      return new DoubleVector(values);
     }
-    return new DoubleVector(values, true);
-  }
 
-  @Override
-  public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    if (adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
-      return new DoubleVector(((TDoubleList) array).toArray(), true);
+    @Override
+    public <A> DoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+      int dim = adapter.size(array);
+      double[] values = new double[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.get(array, i);
+      }
+      return new DoubleVector(values, true);
     }
-    final int dim = adapter.size(array);
-    double[] values = new double[dim];
-    for (int i = 0; i < dim; i++) {
-      values[i] = adapter.getDouble(array, i);
-    }
-    return new DoubleVector(values, true);
-  }
 
-  @Override
-  public ByteBufferSerializer<DoubleVector> getDefaultSerializer() {
-    return VARIABLE_SERIALIZER;
+    @Override
+    public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      if (adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
+        return new DoubleVector(((TDoubleList) array).toArray(), true);
+      }
+      final int dim = adapter.size(array);
+      double[] values = new double[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.getDouble(array, i);
+      }
+      return new DoubleVector(values, true);
+    }
+
+    @Override
+    public ByteBufferSerializer<DoubleVector> getDefaultSerializer() {
+      return VARIABLE_SERIALIZER;
+    }
+
+    @Override
+    public Class<? super DoubleVector> getRestrictionClass() {
+      return DoubleVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected DoubleVector.Factory makeInstance() {
+        return FACTORY;
+      }
+    }
   }
 
   /**
-   * Serialization class for dense double vectors with up to
-   * 127 dimensions, by using a byte for storing the
-   * dimensionality.
+   * Serialization class for dense double vectors with up to 127 dimensions, by
+   * using a byte for storing the dimensionality.
    * 
    * @author Erich Schubert
    * 
@@ -249,7 +276,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
       }
       return new DoubleVector(values, true);
     }
-  
+
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
@@ -259,7 +286,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
         buffer.putDouble(vec.values[i]);
       }
     }
-  
+
     @Override
     public int getByteSize(DoubleVector vec) {
       assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
@@ -323,7 +350,7 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
       }
       return new DoubleVector(values, true);
     }
-  
+
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
@@ -333,25 +360,11 @@ public class DoubleVector extends AbstractNumberVector<DoubleVector, Double> {
         buffer.putDouble(vec.values[i]);
       }
     }
-  
+
     @Override
     public int getByteSize(DoubleVector vec) {
       assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.getUnsignedVarintSize(vec.values.length) + ByteArrayUtil.SIZE_DOUBLE * vec.values.length;
-    }
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected DoubleVector makeInstance() {
-      return STATIC;
     }
   }
 }

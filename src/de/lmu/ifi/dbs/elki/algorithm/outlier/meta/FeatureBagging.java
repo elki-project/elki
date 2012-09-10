@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -47,7 +48,6 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -88,19 +88,19 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   private static final Logging LOG = Logging.getLogger(FeatureBagging.class);
 
   /**
-   * Number of instances to use
+   * Number of instances to use.
    */
   protected int num = 1;
 
   /**
-   * Cumulative sum or breadth first combinations
+   * Cumulative sum or breadth first combinations.
    */
   protected boolean breadth = false;
 
   /**
-   * Random number generator for subspace choice
+   * Random number generator for subspace choice.
    */
-  private Random RANDOM;
+  private Random rand;
 
   /**
    * The parameters k for LOF.
@@ -113,6 +113,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param k k Parameter for LOF
    * @param num Number of subspaces to use
    * @param breadth Flag for breadth-first merging
+   * @param seed Random generator seed
    */
   public FeatureBagging(int k, int num, boolean breadth, Long seed) {
     super();
@@ -120,10 +121,10 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     this.num = num;
     this.breadth = breadth;
     if(seed != null) {
-      this.RANDOM = new Random(seed);
+      this.rand = new Random(seed);
     }
     else {
-      this.RANDOM = new Random();
+      this.rand = new Random();
     }
   }
 
@@ -133,8 +134,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param relation Relation to use
    * @return Outlier detection result
    */
-  public OutlierResult run(Relation<NumberVector<?, ?>> relation) {
-    final int dbdim = DatabaseUtil.dimensionality(relation);
+  public OutlierResult run(Relation<NumberVector<?>> relation) {
+    final int dbdim = RelationUtil.dimensionality(relation);
     final int mindim = dbdim / 2;
     final int maxdim = dbdim - 1;
 
@@ -144,7 +145,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       for(int i = 0; i < num; i++) {
         BitSet dimset = randomSubspace(dbdim, mindim, maxdim);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
-        LOF<NumberVector<?, ?>, DoubleDistance> lof = new LOF<NumberVector<?, ?>, DoubleDistance>(k, df);
+        LOF<NumberVector<?>, DoubleDistance> lof = new LOF<NumberVector<?>, DoubleDistance>(k, df);
 
         // run LOF and collect the result
         OutlierResult result = lof.run(relation);
@@ -228,7 +229,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   }
 
   /**
-   * Choose a random subspace
+   * Choose a random subspace.
    * 
    * @param alldim Number of total dimensions
    * @param mindim Minimum number to choose
@@ -244,10 +245,10 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         dims[d] = d;
       }
       // Target dimensionality:
-      int subdim = mindim + RANDOM.nextInt(maxdim - mindim);
+      int subdim = mindim + rand.nextInt(maxdim - mindim);
       // Shrink the subspace to the destination size
       for(int d = 0; d < alldim - subdim; d++) {
-        int s = RANDOM.nextInt(alldim - d);
+        int s = rand.nextInt(alldim - d);
         dimset.set(dims[s]);
         dims[s] = dims[alldim - d - 1];
       }
@@ -282,7 +283,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     public static final OptionID NUM_ID = OptionID.getOrCreateOptionID("fbagging.num", "The number of instances to use in the ensemble.");
 
     /**
-     * The flag for using the breadth first approach
+     * The flag for using the breadth first approach.
      * <p>
      * Key: {@code -fbagging.breadth}
      * </p>
@@ -290,7 +291,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     public static final OptionID BREADTH_ID = OptionID.getOrCreateOptionID("fbagging.breadth", "Use the breadth first combinations instead of the cumulative sum approach");
 
     /**
-     * The parameter to specify the random seed
+     * The parameter to specify the random seed.
      * <p>
      * Key: {@code -fbagging.seed}
      * </p>
@@ -298,22 +299,22 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("fbagging.seed", "Specify a particular random seed.");
 
     /**
-     * The neighborhood size to use
+     * The neighborhood size to use.
      */
     protected int k = 2;
 
     /**
-     * Number of instances to use
+     * Number of instances to use.
      */
     protected int num = 1;
 
     /**
-     * Cumulative sum or breadth first combinations
+     * Cumulative sum or breadth first combinations.
      */
     protected boolean breadth = false;
 
     /**
-     * Random generator seed
+     * Random generator seed.
      */
     protected Long seed = null;
 
@@ -324,13 +325,13 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       if(config.grab(pK)) {
         k = pK.getValue();
       }
-      IntParameter NUM_PARAM = new IntParameter(NUM_ID, new GreaterEqualConstraint(1));
-      if(config.grab(NUM_PARAM)) {
-        num = NUM_PARAM.getValue();
+      IntParameter numP = new IntParameter(NUM_ID, new GreaterEqualConstraint(1));
+      if(config.grab(numP)) {
+        num = numP.getValue();
       }
-      Flag BREADTH_FLAG = new Flag(BREADTH_ID);
-      if(config.grab(BREADTH_FLAG)) {
-        breadth = BREADTH_FLAG.getValue();
+      Flag breadthF = new Flag(BREADTH_ID);
+      if(config.grab(breadthF)) {
+        breadth = breadthF.getValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
       if(config.grab(seedP)) {

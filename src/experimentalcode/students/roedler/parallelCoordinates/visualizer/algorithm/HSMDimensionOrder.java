@@ -34,7 +34,7 @@ import experimentalcode.students.roedler.parallelCoordinates.gui.SubMenu;
  * 
  * @author Robert Rödler
  */
-public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVector<?, ?>> implements MenuOwner {
+public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVector<?>> implements MenuOwner {
   /**
    * Generic tags to indicate the type of element. Used in IDs, CSS-Classes etc.
    */
@@ -138,7 +138,7 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         }
 
         for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-          NumberVector<?, ?> obj = relation.get(id);
+          NumberVector<?> obj = relation.get(id);
           double xi = proj.getAxisScale(i - 1).getScaled(obj.doubleValue(i));
           double xj = proj.getAxisScale(j - 1).getScaled(obj.doubleValue(j));
           drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pic);

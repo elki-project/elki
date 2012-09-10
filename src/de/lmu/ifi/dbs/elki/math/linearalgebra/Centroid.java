@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 
 /**
  * Class to compute the centroid of some data.
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
  */
 public class Centroid extends Vector {
   /**
-   * The current weight
+   * The current weight.
    */
   protected double wsum;
 
@@ -57,7 +57,7 @@ public class Centroid extends Vector {
   }
 
   /**
-   * Add a single value with weight 1.0
+   * Add a single value with weight 1.0.
    * 
    * @param val Value
    */
@@ -76,7 +76,7 @@ public class Centroid extends Vector {
    * @param val data
    * @param weight weight
    */
-  public void put(double val[], double weight) {
+  public void put(double[] val, double weight) {
     assert (val.length == elements.length);
     final double nwsum = weight + wsum;
     for(int i = 0; i < elements.length; i++) {
@@ -88,7 +88,7 @@ public class Centroid extends Vector {
   }
 
   /**
-   * Add a single value with weight 1.0
+   * Add a single value with weight 1.0.
    * 
    * @param val Value
    */
@@ -107,11 +107,11 @@ public class Centroid extends Vector {
   }
 
   /**
-   * Add a single value with weight 1.0
+   * Add a single value with weight 1.0.
    * 
    * @param val Value
    */
-  public void put(NumberVector<?, ?> val) {
+  public void put(NumberVector<?> val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
     for(int i = 0; i < elements.length; i++) {
@@ -126,7 +126,7 @@ public class Centroid extends Vector {
    * @param val data
    * @param weight weight
    */
-  public void put(NumberVector<?, ?> val, double weight) {
+  public void put(NumberVector<?> val, double weight) {
     assert (val.getDimensionality() == elements.length);
     final double nwsum = weight + wsum;
     for(int i = 0; i < elements.length; i++) {
@@ -138,18 +138,21 @@ public class Centroid extends Vector {
   }
 
   /**
-   * Get the data as vector
+   * Get the data as vector.
    * 
+   * @param relation Data relation
+   * @param <F> vector type
    * @return the data
    */
-  public <F extends NumberVector<? extends F, ?>> F toVector(Relation<? extends F> relation) {
-    return DatabaseUtil.assumeVectorField(relation).getFactory().newNumberVector(elements);
+  public <F extends NumberVector<?>> F toVector(Relation<? extends F> relation) {
+    return RelationUtil.getNumberVectorFactory(relation).newNumberVector(elements);
   }
 
   /**
    * Static Constructor from an existing matrix columns.
    * 
    * @param mat Matrix to use the columns from.
+   * @return Centroid vector
    */
   public static Centroid make(Matrix mat) {
     Centroid c = new Centroid(mat.getRowDimensionality());
@@ -167,8 +170,8 @@ public class Centroid extends Vector {
    * @param relation Relation to use
    * @return Centroid of relation
    */
-  public static Centroid make(Relation<? extends NumberVector<?, ?>> relation) {
-    Centroid c = new Centroid(DatabaseUtil.dimensionality(relation));
+  public static Centroid make(Relation<? extends NumberVector<?>> relation) {
+    Centroid c = new Centroid(RelationUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
     }
@@ -180,9 +183,10 @@ public class Centroid extends Vector {
    * 
    * @param relation Relation to use
    * @param ids IDs to use
+   * @return Centroid
    */
-  public static Centroid make(Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
-    Centroid c = new Centroid(DatabaseUtil.dimensionality(relation));
+  public static Centroid make(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+    Centroid c = new Centroid(RelationUtil.dimensionality(relation));
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }

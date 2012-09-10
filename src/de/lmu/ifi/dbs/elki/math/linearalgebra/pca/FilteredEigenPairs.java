@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 
 /**
  * Encapsulates weak and strong eigenpairs that have been filtered out
@@ -48,7 +48,7 @@ public class FilteredEigenPairs {
 
   /**
    * Creates a new object that encapsulates weak and strong eigenpairs
-   * that have been filtered out by an eigenpair filter
+   * that have been filtered out by an eigenpair filter.
    *
    * @param weakEigenPairs the weak eigenpairs
    * @param strongEigenPairs the strong eigenpairs

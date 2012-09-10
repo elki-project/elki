@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @param <V> Vector type
  */
-public class BiclusterWithInverted<V extends FeatureVector<V, ?>> extends Bicluster<V> {
+public class BiclusterWithInverted<V extends FeatureVector<?>> extends Bicluster<V> {
   /**
    * The ids of inverted rows.
    */

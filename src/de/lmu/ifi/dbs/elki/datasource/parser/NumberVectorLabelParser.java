@@ -71,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> the type of NumberVector used
  */
-public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends AbstractStreamingParser {
+public class NumberVectorLabelParser<V extends NumberVector<?>> extends AbstractStreamingParser {
   /**
    * Logging class.
    */
@@ -114,7 +114,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
   /**
    * Vector factory class.
    */
-  protected V factory;
+  protected NumberVector.Factory<V, ?> factory;
 
   /**
    * Buffer reader.
@@ -166,7 +166,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * 
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(V factory) {
+  public NumberVectorLabelParser(NumberVector.Factory<V, ?> factory) {
     this(Pattern.compile(DEFAULT_SEPARATOR), QUOTE_CHAR, null, factory);
   }
 
@@ -178,7 +178,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
    */
-  public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, V factory) {
+  public NumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, NumberVector.Factory<V, ?> factory) {
     super(colSep, quoteChar);
     this.labelIndices = labelIndices;
     this.factory = factory;
@@ -352,13 +352,11 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
           }
         }
       }
-      V f = factory.newNumberVector(new double[dimensionality]);
-      return new VectorFieldTypeInformation<V>(cls, f.getDefaultSerializer(), dimensionality, colnames, f);
+      return new VectorFieldTypeInformation<V>(factory, dimensionality, colnames);
     }
     // Variable dimensionality - return non-vector field type
     if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      V f = factory.newNumberVector(new double[0]);
-      return new SimpleTypeInformation<V>(cls, f.getDefaultSerializer());
+      return new SimpleTypeInformation<V>(cls, factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
@@ -375,7 +373,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParser.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParser.Parameterizer {
     /**
      * Keeps the indices of the attributes to be treated as a string label.
      */
@@ -384,7 +382,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
     /**
      * Factory object.
      */
-    protected V factory;
+    protected NumberVector.Factory<V, ?> factory;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -399,7 +397,7 @@ public class NumberVectorLabelParser<V extends NumberVector<V, ?>> extends Abstr
      * @param config Parameterization
      */
     protected void getFactory(Parameterization config) {
-      ObjectParameter<V> factoryP = new ObjectParameter<V>(VECTOR_TYPE_ID, NumberVector.class, DoubleVector.class);
+      ObjectParameter<NumberVector.Factory<V, ?>> factoryP = new ObjectParameter<NumberVector.Factory<V, ?>>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
       if (config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
