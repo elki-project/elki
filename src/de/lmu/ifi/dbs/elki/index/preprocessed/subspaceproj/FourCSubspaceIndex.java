@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  */
 @Title("4C Preprocessor")
 @Description("Computes the local dimensionality and locally weighted matrix of objects of a certain database according to the 4C algorithm.\n" + "The PCA is based on epsilon range queries.")
-public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, PCAFilteredResult> {
+public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, PCAFilteredResult> {
   /**
    * Our logger
    */
@@ -135,7 +135,7 @@ public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance
    * @param <V> Vector type
    * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, FourCSubspaceIndex<V, D>> {
+  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, FourCSubspaceIndex<V, D>> {
     /**
      * The default value for delta.
      */
@@ -171,7 +171,7 @@ public class FourCSubspaceIndex<V extends NumberVector<V, ?>, D extends Distance
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
+    public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
       /**
        * The Filtered PCA Runner
        */

@@ -247,7 +247,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
     private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<?, D, N, E> mtree, E entry, int depth) {
       DBID roid = entry.getRoutingObjectID();
       if(roid != null) {
-        NumberVector<?, ?> ro = rel.get(roid);
+        NumberVector<?> ro = rel.get(roid);
         D rad = entry.getCoveringRadius();
 
         final Element r;

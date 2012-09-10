@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * 
  * @param <NV> Vector type in relation
  */
-public abstract class AbstractParallelVisualization<NV extends NumberVector<?, ?>> extends AbstractVisualization {
+public abstract class AbstractParallelVisualization<NV extends NumberVector<?>> extends AbstractVisualization {
   /**
    * The current projection
    */

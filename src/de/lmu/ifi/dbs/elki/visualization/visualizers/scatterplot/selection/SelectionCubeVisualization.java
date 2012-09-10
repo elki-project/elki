@@ -28,13 +28,13 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -188,7 +188,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
         DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-        int dim = DatabaseUtil.dimensionality(rel);
+        int dim = RelationUtil.dimensionality(rel);
 
         double[] min = new double[dim];
         double[] max = new double[dim];

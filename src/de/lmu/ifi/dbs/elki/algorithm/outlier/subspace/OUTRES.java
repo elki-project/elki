@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
@@ -59,7 +60,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -90,7 +90,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @param <V> vector type
  */
 @Reference(authors = "E. Müller, M. Schiffer, T. Seidl", title = "Adaptive outlierness for subspace outlier ranking", booktitle = "Proc. 19th ACM International Conference on Information and knowledge management")
-public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -329,7 +329,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
     public KernelDensityEstimator(Relation<V> relation) {
       super();
       this.relation = relation;
-      dim = DatabaseUtil.dimensionality(relation);
+      dim = RelationUtil.dimensionality(relation);
       hopttwo = optimalBandwidth(2);
       epsilons = new double[dim + 1];
       Arrays.fill(epsilons, Double.NEGATIVE_INFINITY);
@@ -403,7 +403,7 @@ public class OUTRES<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outl
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Option ID for Epsilon parameter
      */

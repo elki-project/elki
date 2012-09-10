@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilari
  * @author Simon Paradies
  * @param <O> vector type
  */
-public class LinearKernelFunction<O extends NumberVector<?, ?>> extends AbstractPrimitiveSimilarityFunction<O, DoubleDistance> implements PrimitiveDistanceFunction<O, DoubleDistance> {
+public class LinearKernelFunction<O extends NumberVector<?>> extends AbstractPrimitiveSimilarityFunction<O, DoubleDistance> implements PrimitiveDistanceFunction<O, DoubleDistance> {
   /**
    * Provides a linear Kernel function that computes a similarity between the
    * two vectors V1 and V2 defined by V1^T*V2.

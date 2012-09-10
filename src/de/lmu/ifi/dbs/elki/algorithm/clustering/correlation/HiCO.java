@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Mining Hierarchies of Correlation Clusters")
 @Description("Algorithm for detecting hierarchies of correlation clusters.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger, A. Zimek", title = "Mining Hierarchies of Correlation Clusterse", booktitle = "Proc. Int. Conf. on Scientific and Statistical Database Management (SSDBM'06), Vienna, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.35")
-public class HiCO<V extends NumberVector<V, ?>> extends OPTICS<V, PCACorrelationDistance> {
+public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDistance> {
   /**
    * The logger for this class.
    */
@@ -151,7 +151,7 @@ public class HiCO<V extends NumberVector<V, ?>> extends OPTICS<V, PCACorrelation
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     int mu = -1;
     
     PCABasedCorrelationDistanceFunction distance;

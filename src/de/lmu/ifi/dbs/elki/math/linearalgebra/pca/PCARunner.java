@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> Vector type
  */
-public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parameterizable {
+public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
   /**
    * Parameter to specify the class to compute the covariance matrix, must be a
    * subclass of {@link CovarianceMatrixBuilder}.
@@ -85,7 +85,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
   }
 
   /**
-   * Run PCA on the complete database
+   * Run PCA on the complete database.
    * 
    * @param database the database used
    * @return PCA result
@@ -95,7 +95,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
   }
 
   /**
-   * Run PCA on a collection of database IDs
+   * Run PCA on a collection of database IDs.
    * 
    * @param ids a collection of ids
    * @param database the database used
@@ -106,10 +106,11 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
   }
 
   /**
-   * Run PCA on a QueryResult Collection
+   * Run PCA on a QueryResult Collection.
    * 
    * @param results a collection of QueryResults
    * @param database the database used
+   * @param <D> distance type
    * @return PCA result
    */
   public <D extends NumberDistance<D, ?>> PCAResult processQueryResult(DistanceDBIDResult<D> results, Relation<? extends V> database) {
@@ -117,7 +118,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
   }
 
   /**
-   * Process an existing covariance Matrix
+   * Process an existing covariance Matrix.
    * 
    * @param covarMatrix the matrix used for performing pca
    * @return PCA result
@@ -129,7 +130,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
   }
 
   /**
-   * Process an existing eigenvalue decomposition
+   * Process an existing eigenvalue decomposition.
    * 
    * @param evd eigenvalue decomposition to use
    * @return PCA result
@@ -140,7 +141,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
   }
 
   /**
-   * Get covariance matrix builder
+   * Get covariance matrix builder.
    * 
    * @return covariance matrix builder in use
    */
@@ -164,7 +165,7 @@ public class PCARunner<V extends NumberVector<? extends V, ?>> implements Parame
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<? extends V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * The covariance computation class.
      */

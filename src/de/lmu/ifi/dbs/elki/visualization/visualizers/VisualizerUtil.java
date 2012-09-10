@@ -47,6 +47,14 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  */
 public final class VisualizerUtil {
   /**
+   * Fake constructor: do not instantiate.
+   * 
+   */
+  private VisualizerUtil() {
+    // Do not instantiate.
+  }
+
+  /**
    * Find the visualizer context in a result tree.
    * 
    * @param baseResult base result to start searching at.
@@ -54,10 +62,9 @@ public final class VisualizerUtil {
    */
   public static VisualizerContext getContext(HierarchicalResult baseResult) {
     List<VisualizerContext> contexts = ResultUtil.filterResults(baseResult, VisualizerContext.class);
-    if(!contexts.isEmpty()) {
+    if (!contexts.isEmpty()) {
       return contexts.get(0);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -71,10 +78,10 @@ public final class VisualizerUtil {
   public static boolean isVisible(VisualizationTask task) {
     // Currently enabled?
     Boolean enabled = task.getGenerics(VisualizationTask.META_VISIBLE, Boolean.class);
-    if(enabled == null) {
+    if (enabled == null) {
       enabled = task.getGenerics(VisualizationTask.META_VISIBLE_DEFAULT, Boolean.class);
     }
-    if(enabled == null) {
+    if (enabled == null) {
       enabled = true;
     }
     return enabled;
@@ -88,10 +95,9 @@ public final class VisualizerUtil {
    */
   public static void setVisible(VisualizationTask task, boolean visibility) {
     VisualizerContext context = task.getContext();
-    if(context != null) {
+    if (context != null) {
       setVisible(context, task, visibility);
-    }
-    else {
+    } else {
       LoggingUtil.warning("setVisible called without context in task.", new Throwable());
     }
   }
@@ -105,10 +111,10 @@ public final class VisualizerUtil {
    */
   public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
     // Hide other tools
-    if(visibility && VisualizerUtil.isTool(task)) {
+    if (visibility && VisualizerUtil.isTool(task)) {
       final List<VisualizationTask> visualizers = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
-      for(VisualizationTask other : visualizers) {
-        if(other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
+      for (VisualizationTask other : visualizers) {
+        if (other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
           other.put(VisualizationTask.META_VISIBLE, false);
           context.getHierarchy().resultChanged(other);
         }
@@ -155,28 +161,35 @@ public final class VisualizerUtil {
   }
 
   /**
-   * Filter for number vector field representations
+   * Filter for number vector field representations.
    * 
    * @param result Result to filter
    * @return Iterator over suitable representations
    */
   // TODO: move to DatabaseUtil?
-  public static Iterator<Relation<? extends NumberVector<?, ?>>> iterateVectorFieldRepresentations(final Result result) {
+  public static Iterator<Relation<? extends NumberVector<?>>> iterateVectorFieldRepresentations(final Result result) {
     List<Relation<?>> parent = ResultUtil.filterResults(result, Relation.class);
     return new VectorspaceIterator(parent.iterator());
   }
-  
+
   /**
-   * Iterate over vectorspace
+   * Iterate over vectorspace.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  private static class VectorspaceIterator extends AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?, ?>>> {
-    /** Parent iterator */
+  private static class VectorspaceIterator extends AbstractFilteredIterator<Relation<?>, Relation<? extends NumberVector<?>>> {
+    /**
+     * Parent iterator.
+     */
     private Iterator<Relation<?>> parent;
 
+    /**
+     * Constructor.
+     * 
+     * @param parent Parent iterator
+     */
     public VectorspaceIterator(Iterator<Relation<?>> parent) {
       super();
       this.parent = parent;
@@ -189,15 +202,15 @@ public final class VisualizerUtil {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Relation<? extends NumberVector<?, ?>> testFilter(Relation<?> nextobj) {
+    protected Relation<? extends NumberVector<?>> testFilter(Relation<?> nextobj) {
       final SimpleTypeInformation<?> type = nextobj.getDataTypeInformation();
-      if(!NumberVector.class.isAssignableFrom(type.getRestrictionClass())) {
+      if (!NumberVector.class.isAssignableFrom(type.getRestrictionClass())) {
         return null;
       }
-      if(!(type instanceof VectorFieldTypeInformation)) {
+      if (!(type instanceof VectorFieldTypeInformation)) {
         return null;
       }
-      return (Relation<? extends NumberVector<?, ?>>) nextobj;
+      return (Relation<? extends NumberVector<?>>) nextobj;
     }
   };
 

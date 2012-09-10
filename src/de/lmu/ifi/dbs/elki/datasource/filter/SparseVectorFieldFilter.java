@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -33,10 +34,12 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * the maximum dimensionality for each vector.
  * 
  * @author Erich Schubert
+ * 
+ * @param <V> Vector type
  */
-public class SparseVectorFieldFilter<V extends SparseNumberVector<V, ?>> extends AbstractConversionFilter<V, V> {
+public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends AbstractConversionFilter<V, V> {
   /**
-   * Maximum dimension
+   * Maximum dimension.
    */
   int maxdim = -1;
 
@@ -71,7 +74,7 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector<V, ?>> extends
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    V factory = FilterUtil.guessFactory(in);
-    return new VectorFieldTypeInformation<V>(in.getRestrictionClass(), maxdim, factory);
+    NumberVector.Factory<V, ?> factory = FilterUtil.guessFactory(in);
+    return new VectorFieldTypeInformation<V>(factory, maxdim);
   }
 }

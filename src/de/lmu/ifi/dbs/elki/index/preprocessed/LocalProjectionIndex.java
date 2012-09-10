@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * @param <V> Vector type
  * @param <P> Projection result type
  */
-public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends ProjectionResult> extends Index {
+public interface LocalProjectionIndex<V extends NumberVector<?>, P extends ProjectionResult> extends Index {
   /**
    * Get the precomputed local projection for a particular object ID.
    * 
@@ -60,7 +60,7 @@ public interface LocalProjectionIndex<V extends NumberVector<?, ?>, P extends Pr
    * @param <V> Vector type
    * @param <I> Index type
    */
-  public static interface Factory<V extends NumberVector<?, ?>, I extends LocalProjectionIndex<V, ?>> extends IndexFactory<V, I> {
+  public static interface Factory<V extends NumberVector<?>, I extends LocalProjectionIndex<V, ?>> extends IndexFactory<V, I> {
     /**
      * Instantiate the index for a given database.
      * 

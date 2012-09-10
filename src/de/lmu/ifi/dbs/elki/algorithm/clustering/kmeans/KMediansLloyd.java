@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("K-Medians")
 @Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url="http://nips.djvuzone.org/djvu/nips09/0368.djvu")
-public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -78,13 +78,14 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
+   * @param initializer Initialization method
    */
-  public KMediansLloyd(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMediansLloyd(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   /**
-   * Run k-medians
+   * Run k-medians.
    * 
    * @param database Database
    * @param relation relation to use
@@ -95,7 +96,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
       return new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
-    List<? extends NumberVector<?, ?>> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for(int i = 0; i < k; i++) {
@@ -115,7 +116,7 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
       medians = medians(clusters, medians, relation);
     }
     // Wrap result
-    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
@@ -136,11 +137,20 @@ public class KMediansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> 
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?>, D> {
+    /**
+     * k Parameter.
+     */
     protected int k;
 
+    /**
+     * Maximum number of iterations.
+     */
     protected int maxiter;
 
+    /**
+     * Initialization method.
+     */
     protected KMeansInitialization<V> initializer;
 
     @Override

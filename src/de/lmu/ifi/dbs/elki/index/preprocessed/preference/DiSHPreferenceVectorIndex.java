@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
@@ -55,7 +56,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.AprioriResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -74,11 +74,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * database.
  * 
  * @author Elke Achtert
+ * 
+ * @param <V> Vector type
  */
 @Description("Computes the preference vector of objects of a certain database according to the DiSH algorithm.")
-public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
+public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex<V> implements PreferenceVectorIndex<V> {
   /**
-   * Logger to use
+   * Logger to use.
    */
   private static final Logging LOG = Logging.getLogger(DiSHPreferenceVectorIndex.class);
 
@@ -89,17 +91,17 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    */
   public enum Strategy {
     /**
-     * Apriori strategy
+     * Apriori strategy.
      */
     APRIORI,
     /**
-     * Max intersection strategy
+     * Max intersection strategy.
      */
     MAX_INTERSECTION
   }
 
   /**
-   * The epsilon value for each dimension;
+   * The epsilon value for each dimension.
    */
   protected DoubleDistance[] epsilon;
 
@@ -148,7 +150,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
 
     // only one epsilon value specified
-    int dim = DatabaseUtil.dimensionality(relation);
+    int dim = RelationUtil.dimensionality(relation);
     if(epsilon.length == 1 && dim != 1) {
       DoubleDistance eps = epsilon[0];
       epsilon = new DoubleDistance[dim];
@@ -428,7 +430,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
   }
 
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
@@ -437,7 +439,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorIndex.Factory<V, DiSHPreferenceVectorIndex<V>> {
+  public static class Factory<V extends NumberVector<?>> extends AbstractPreferenceVectorIndex.Factory<V, DiSHPreferenceVectorIndex<V>> {
     /**
      * The default value for epsilon.
      */
@@ -483,7 +485,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     /**
      * Default strategy.
      */
-    public static Strategy DEFAULT_STRATEGY = Strategy.MAX_INTERSECTION;
+    public static final Strategy DEFAULT_STRATEGY = Strategy.MAX_INTERSECTION;
 
     /**
      * The strategy for determination of the preference vector, available
@@ -500,7 +502,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
 
     /**
-     * The epsilon value for each dimension;
+     * The epsilon value for each dimension.
      */
     protected DoubleDistance[] epsilon;
 
@@ -534,7 +536,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
     }
 
     /**
-     * Return the minpts value
+     * Return the minpts value.
      * 
      * @return minpts
      */
@@ -549,9 +551,9 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?, ?>> extends Abs
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractParameterizer {
+    public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
       /**
-       * The epsilon value for each dimension;
+       * The epsilon value for each dimension.
        */
       protected DoubleDistance[] epsilon;
 

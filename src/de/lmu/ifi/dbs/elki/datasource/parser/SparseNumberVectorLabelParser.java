@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 // FIXME: Maxdim!
 @Title("Sparse Vector Label Parser")
 @Description("Parser for the following line format:\n" + "A single line provides a single point. Entries are separated by whitespace. " + "The values will be parsed as floats (resulting in a set of SparseFloatVectors). A line is expected in the following format: The first entry of each line is the number of attributes with coordinate value not zero. Subsequent entries are of the form (index, value), where index is the number of the corresponding dimension, and value is the value of the corresponding attribute." + "Any pair of two subsequent substrings not containing whitespace is tried to be read as int and float. If this fails for the first of the pair (interpreted ans index), it will be appended to a label. (Thus, any label must not be parseable as Integer.) If the float component is not parseable, an exception will be thrown. Empty lines and lines beginning with \"#\" will be ignored.")
-public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> extends NumberVectorLabelParser<V> {
+public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> extends NumberVectorLabelParser<V> {
   /**
    * Class logger.
    */
@@ -92,6 +92,11 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
   private int maxdim = -1;
 
   /**
+   * Same as {@link #factory}, but subtype.
+   */
+  private SparseNumberVector.Factory<V, ?> sparsefactory;
+
+  /**
    * Constructor.
    * 
    * @param colSep Column separator
@@ -99,8 +104,9 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
    * @param labelIndices Label indexes
    * @param factory Vector factory
    */
-  public SparseNumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, V factory) {
+  public SparseNumberVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices, SparseNumberVector.Factory<V, ?> factory) {
     super(colSep, quoteChar, labelIndices, factory);
+    this.sparsefactory = factory;
   }
 
   @Override
@@ -140,7 +146,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
     if(values.size() > maxdim) {
       throw new AbortException("Invalid sparse vector seen: " + line);
     }
-    curvec = factory.newNumberVector(values, maxdim);
+    curvec = sparsefactory.newNumberVector(values, maxdim);
     curlbl = labels;
   }
 
@@ -149,7 +155,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
     @SuppressWarnings("unchecked")
     Class<V> cls = (Class<V>) factory.getClass();
     if(dimensionality > 0) {
-      return new VectorFieldTypeInformation<V>(cls, factory.getDefaultSerializer(), dimensionality, factory);
+      return new VectorFieldTypeInformation<V>(factory, dimensionality);
     }
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
       return new SimpleTypeInformation<V>(cls, factory.getDefaultSerializer());
@@ -169,10 +175,10 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends SparseNumberVector<V, ?>> extends NumberVectorLabelParser.Parameterizer<V> {
+  public static class Parameterizer<V extends SparseNumberVector<?>> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<V> factoryP = new ObjectParameter<V>(VECTOR_TYPE_ID, SparseNumberVector.class, SparseFloatVector.class);
+      ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<SparseNumberVector.Factory<V, ?>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
       if(config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -180,7 +186,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<V, ?>> e
 
     @Override
     protected SparseNumberVectorLabelParser<V> makeInstance() {
-      return new SparseNumberVectorLabelParser<V>(colSep, quoteChar, labelIndices, factory);
+      return new SparseNumberVectorLabelParser<V>(colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
     }
   }
 }

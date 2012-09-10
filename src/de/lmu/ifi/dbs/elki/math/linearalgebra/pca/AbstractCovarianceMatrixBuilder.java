@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  *
  * @param <V> Vector class in use
  */
-public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> implements Parameterizable, CovarianceMatrixBuilder<V> {
+public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<?>> implements Parameterizable, CovarianceMatrixBuilder<V> {
   @Override
   public Matrix processDatabase(Relation<? extends V> database) {
     return processIds(database.getDBIDs(), database);
@@ -62,9 +62,7 @@ public abstract class AbstractCovarianceMatrixBuilder<V extends NumberVector<? e
   }
 
   @Override
-  final public <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database) {
+  public final <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database) {
     return processQueryResults(results, database, results.size());
   }
-  
-  // TODO: Allow KNNlist to avoid building the DBID array?
 }

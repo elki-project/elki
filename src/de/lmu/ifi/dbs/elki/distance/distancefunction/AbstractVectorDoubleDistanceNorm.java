@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Erich Schubert
  */
-public abstract class AbstractVectorDoubleDistanceNorm extends AbstractVectorDoubleDistanceFunction implements DoubleNorm<NumberVector<?, ?>> {
+public abstract class AbstractVectorDoubleDistanceNorm extends AbstractVectorDoubleDistanceFunction implements DoubleNorm<NumberVector<?>> {
   @Override
-  public DoubleDistance norm(NumberVector<?, ?> obj) {
+  public DoubleDistance norm(NumberVector<?> obj) {
     return new DoubleDistance(doubleNorm(obj));
   }
 }

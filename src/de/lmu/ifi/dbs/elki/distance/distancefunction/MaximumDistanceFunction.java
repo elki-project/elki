@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class MaximumDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class MaximumDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance.
    */
@@ -51,7 +51,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality();
     if(dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
@@ -65,7 +65,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   }
 
   @Override
-  public double doubleNorm(NumberVector<?, ?> v) {
+  public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double max = 0;
     for(int i = 1; i <= dim; i++) {

@@ -127,7 +127,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
    * @param relation Attribute value relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector<?>> relation) {
     DistanceQuery<N, D> distFunc = getDistanceFunction().instantiate(spatial);
     WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);

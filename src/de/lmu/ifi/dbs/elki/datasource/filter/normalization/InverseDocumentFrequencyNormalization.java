@@ -40,15 +40,17 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * @author Erich Schubert
  * 
  * @apiviz.uses SparseNumberVector
+ * 
+ * @param <V> Vector type
  */
-public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<V, ?>> extends AbstractNormalization<V> {
+public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<?>> extends AbstractNormalization<V> {
   /**
-   * The IDF storage
+   * The IDF storage.
    */
   TIntDoubleMap idf = new TIntDoubleHashMap();
 
   /**
-   * The number of objects in the dataset
+   * The number of objects in the dataset.
    */
   int objcnt = 0;
 
@@ -103,7 +105,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       vals.put(i, (float) (featureVector.doubleValue(i) * idf.get(i)));
     }
-    return featureVector.newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override
@@ -113,7 +115,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       vals.put(i, (float) (featureVector.doubleValue(i) / idf.get(i)));
     }
-    return featureVector.newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 
   @Override

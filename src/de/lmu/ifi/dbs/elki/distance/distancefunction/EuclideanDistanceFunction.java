@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance. Use this!
    */
@@ -56,7 +56,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
    *         value
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality();
     if(dim1 != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
@@ -70,7 +70,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   @Override
-  public double doubleNorm(NumberVector<?, ?> v) {
+  public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double sqrDist = 0;
     for(int i = 1; i <= dim; i++) {
@@ -80,7 +80,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     return Math.sqrt(sqrDist);
   }
 
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
+  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
     final int dim = mbr.getDimensionality();
     if(dim != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
@@ -111,14 +111,14 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     // Some optimizations for simpler cases.
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?, ?>) mbr1, (NumberVector<?, ?>) mbr2);
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       }
       else {
-        return doubleMinDistObject(mbr2, (NumberVector<?, ?>) mbr1);
+        return doubleMinDistObject(mbr2, (NumberVector<?>) mbr1);
       }
     }
     else if(mbr2 instanceof NumberVector) {
-      return doubleMinDistObject(mbr1, (NumberVector<?, ?>) mbr2);
+      return doubleMinDistObject(mbr1, (NumberVector<?>) mbr2);
     }
     final int dim1 = mbr1.getDimensionality();
     if(dim1 != mbr2.getDimensionality()) {

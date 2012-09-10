@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -74,9 +74,9 @@ public class ScatterPlotFactory implements ProjectorFactory {
     for(Relation<?> rel : rels) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        Relation<NumberVector<?, ?>> vrel = (Relation<NumberVector<?, ?>>) rel;
-        final int dim = DatabaseUtil.dimensionality(vrel);
-        ScatterPlotProjector<NumberVector<?, ?>> proj = new ScatterPlotProjector<NumberVector<?, ?>>(vrel, Math.min(maxdim, dim));
+        Relation<NumberVector<?>> vrel = (Relation<NumberVector<?>>) rel;
+        final int dim = RelationUtil.dimensionality(vrel);
+        ScatterPlotProjector<NumberVector<?>> proj = new ScatterPlotProjector<NumberVector<?>>(vrel, Math.min(maxdim, dim));
         baseResult.getHierarchy().add(vrel, proj);
       }
     }
@@ -91,7 +91,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter for the maximum number of dimensions,
+     * Parameter for the maximum number of dimensions.
      * 
      * <p>
      * Code: -vis.maxdim

@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Elke Achtert
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<?, ?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements PrimitiveDoubleDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance> {
+public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extends FeatureVector<?>> extends AbstractPrimitiveDistanceFunction<V, DoubleDistance> implements PrimitiveDoubleDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V, DoubleDistance> {
   /**
    * Dimensions parameter.
    */

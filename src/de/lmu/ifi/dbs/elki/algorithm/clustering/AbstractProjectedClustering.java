@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <R> the result we return
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
-public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector<V, ?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector<?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.

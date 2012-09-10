@@ -29,6 +29,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * 
  * @param <V> Object type
  */
-public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
+public class StarBasedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
   /**
    * Parameter to specify the grid resolution.
    * <p>
@@ -75,8 +76,8 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   /**
    * Constructor.
    * 
-   * @param nocenter
-   * @param scale
+   * @param nocenter Do not include center point
+   * @param scale Scaling factor
    */
   public StarBasedReferencePoints(boolean nocenter, double scale) {
     super();
@@ -87,9 +88,9 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   @Override
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
-    V factory = DatabaseUtil.assumeVectorField(database).getFactory();
+    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
 
-    int dim = DatabaseUtil.dimensionality(db);
+    int dim = RelationUtil.dimensionality(db);
 
     // Compute minimum, maximum and centroid
     double[] centroid = new double[dim];
@@ -144,7 +145,7 @@ public class StarBasedReferencePoints<V extends NumberVector<V, ?>> implements R
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #NOCENTER_ID}.
      */

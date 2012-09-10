@@ -62,7 +62,7 @@ public class RdKNNLeafEntry<D extends NumberDistance<D, ?>> extends SpatialPoint
    * @param values the values of the underlying data object
    * @param knnDistance the knn distance of the underlying data object
    */
-  public RdKNNLeafEntry(DBID id, NumberVector<?, ?> vector, D knnDistance) {
+  public RdKNNLeafEntry(DBID id, NumberVector<?> vector, D knnDistance) {
     super(id, vector);
     this.knnDistance = knnDistance;
   }

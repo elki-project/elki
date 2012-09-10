@@ -52,7 +52,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in scaled space
    */
   @Override
-  public Vector projectDataToScaledSpace(NumberVector<?, ?> data) {
+  public Vector projectDataToScaledSpace(NumberVector<?> data) {
     final int dim = data.getDimensionality();
     Vector vec = new Vector(dim);
     double[] ds = vec.getArrayRef();
@@ -86,7 +86,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in scaled space
    */
   @Override
-  public Vector projectRelativeDataToScaledSpace(NumberVector<?, ?> data) {
+  public Vector projectRelativeDataToScaledSpace(NumberVector<?> data) {
     final int dim = data.getDimensionality();
     Vector vec = new Vector(dim);
     double[] ds = vec.getArrayRef();
@@ -120,7 +120,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in rendering space
    */
   @Override
-  public Vector projectDataToRenderSpace(NumberVector<?, ?> data) {
+  public Vector projectDataToRenderSpace(NumberVector<?> data) {
     return projectScaledToRender(projectDataToScaledSpace(data));
   }
 
@@ -142,7 +142,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in rendering space
    */
   @Override
-  public Vector projectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+  public Vector projectRelativeDataToRenderSpace(NumberVector<?> data) {
     return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
@@ -166,7 +166,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in data space
    */
   @Override
-  public <NV extends NumberVector<NV, ?>> NV projectScaledToDataSpace(Vector v, NV factory) {
+  public <NV extends NumberVector<?>> NV projectScaledToDataSpace(Vector v, NumberVector.Factory<NV, ?> factory) {
     final int dim = v.getDimensionality();
     Vector vec = v.copy();
     double[] ds = vec.getArrayRef();
@@ -185,7 +185,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in data space
    */
   @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRenderToDataSpace(Vector v, NV prototype) {
+  public <NV extends NumberVector<?>> NV projectRenderToDataSpace(Vector v, NumberVector.Factory<NV, ?> prototype) {
     final int dim = v.getDimensionality();
     Vector vec = projectRenderToScaled(v);
     double[] ds = vec.getArrayRef();
@@ -206,7 +206,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in data space
    */
   @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeScaledToDataSpace(Vector v, NV prototype) {
+  public <NV extends NumberVector<?>> NV projectRelativeScaledToDataSpace(Vector v, NumberVector.Factory<NV, ?> prototype) {
     final int dim = v.getDimensionality();
     Vector vec = v.copy();
     double[] ds = vec.getArrayRef();
@@ -225,7 +225,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in data space
    */
   @Override
-  public <NV extends NumberVector<NV, ?>> NV projectRelativeRenderToDataSpace(Vector v, NV prototype) {
+  public <NV extends NumberVector<?>> NV projectRelativeRenderToDataSpace(Vector v, NumberVector.Factory<NV, ?> prototype) {
     final int dim = v.getDimensionality();
     Vector vec = projectRelativeRenderToScaled(v);
     double[] ds = vec.getArrayRef();

@@ -421,11 +421,11 @@ public class ArffParser implements Parser {
           labels[i] = names.get(out + i);
         }
         if(!sparse) {
-          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class, DoubleVector.STATIC.getDefaultSerializer(), dimsize[out], labels, new DoubleVector(new double[dimsize[out]]));
+          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dimsize[out], labels);
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else {
-          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, dimsize[out], labels, new SparseFloatVector(SparseFloatVector.EMPTYMAP, dimsize[out]));
+          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.FACTORY, dimsize[out], labels);
           bundle.appendColumn(type, new ArrayList<SparseFloatVector>());
         }
       }

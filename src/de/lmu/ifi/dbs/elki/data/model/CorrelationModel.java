@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @param <V> Vector type
  */
-public class CorrelationModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable {
+public class CorrelationModel<V extends FeatureVector<?>> extends BaseModel implements TextWriteable {
   /**
    * The computed PCA result of this cluster.
    */

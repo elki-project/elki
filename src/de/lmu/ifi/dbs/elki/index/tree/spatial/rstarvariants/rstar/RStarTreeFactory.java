@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class RStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>> {
+public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>> {
   /**
    * Constructor.
    * 
@@ -83,7 +83,7 @@ public class RStarTreeFactory<O extends NumberVector<O, ?>> extends AbstractRSta
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected RStarTreeFactory<O> makeInstance() {
       return new RStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);

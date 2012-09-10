@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 // TODO: add spatial!
-public class ManhattanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class ManhattanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * The static instance to use.
    */
@@ -52,25 +52,25 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   }
 
   /**
-   * Compute the Manhattan distance
+   * Compute the Manhattan distance.
    * 
    * @param v1 first vector
    * @param v2 second vector
    * @return Manhattan distance value
    */
   @Override
-  public double doubleDistance(NumberVector<?,?> v1, NumberVector<?,?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim = v1.getDimensionality();
-    if(dim != v2.getDimensionality()) {
+    if (dim != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double sum = 0;
-    for(int i = 1; i <= dim; i++) {
+    for (int i = 1; i <= dim; i++) {
       sum += Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
     }
     return sum;
   }
-  
+
   /**
    * Returns the Manhattan norm of the given vector.
    * 
@@ -78,32 +78,30 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
    * @return the Manhattan norm of the given vector
    */
   @Override
-  public double doubleNorm(NumberVector<?,?> v){
+  public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double sum = 0;
-    for(int i = 1; i <= dim; i++) {
+    for (int i = 1; i <= dim; i++) {
       sum += Math.abs(v.doubleValue(i));
     }
     return sum;
   }
 
-  private double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
+  private double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
     final int dim = mbr.getDimensionality();
-    if(dim != v.getDimensionality()) {
+    if (dim != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
     }
 
     double sumDist = 0;
-    for(int d = 1; d <= dim; d++) {
+    for (int d = 1; d <= dim; d++) {
       double value = v.doubleValue(d);
       double r;
-      if(value < mbr.getMin(d)) {
+      if (value < mbr.getMin(d)) {
         r = mbr.getMin(d);
-      }
-      else if(value > mbr.getMax(d)) {
+      } else if (value > mbr.getMax(d)) {
         r = mbr.getMax(d);
-      }
-      else {
+      } else {
         r = value;
       }
 
@@ -116,34 +114,30 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Some optimizations for simpler cases.
-    if(mbr1 instanceof NumberVector) {
-      if(mbr2 instanceof NumberVector) {
-        return doubleDistance((NumberVector<?, ?>) mbr1, (NumberVector<?, ?>) mbr2);
+    if (mbr1 instanceof NumberVector) {
+      if (mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+      } else {
+        return doubleMinDistObject(mbr2, (NumberVector<?>) mbr1);
       }
-      else {
-        return doubleMinDistObject(mbr2, (NumberVector<?, ?>) mbr1);
-      }
-    }
-    else if(mbr2 instanceof NumberVector) {
-      return doubleMinDistObject(mbr1, (NumberVector<?, ?>) mbr2);
+    } else if (mbr2 instanceof NumberVector) {
+      return doubleMinDistObject(mbr1, (NumberVector<?>) mbr2);
     }
     final int dim1 = mbr1.getDimensionality();
-    if(dim1 != mbr2.getDimensionality()) {
+    if (dim1 != mbr2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
 
     double sumDist = 0;
-    for(int d = 1; d <= dim1; d++) {
+    for (int d = 1; d <= dim1; d++) {
       final double m1, m2;
-      if(mbr1.getMax(d) < mbr2.getMin(d)) {
+      if (mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr2.getMin(d);
         m2 = mbr1.getMax(d);
-      }
-      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
+      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
         m1 = mbr1.getMin(d);
         m2 = mbr2.getMax(d);
-      }
-      else { // The mbrs intersect!
+      } else { // The mbrs intersect!
         continue;
       }
       final double manhattanI = m1 - m2;
@@ -164,10 +158,10 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(obj == this) {
+    if (obj == this) {
       return true;
     }
     if (this.getClass().equals(obj.getClass())) {

@@ -85,7 +85,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> Distance type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
-public class RdKNNTree<O extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
   /**
    * The logger for this class.
    */

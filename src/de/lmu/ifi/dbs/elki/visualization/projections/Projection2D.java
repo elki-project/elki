@@ -52,7 +52,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data);
+  public double[] fastProjectDataToRenderSpace(NumberVector<?> data);
 
   /**
    * Project a data vector from data space to scaled space.
@@ -68,7 +68,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in scaled space
    */
-  public double[] fastProjectDataToScaledSpace(NumberVector<?, ?> data);
+  public double[] fastProjectDataToScaledSpace(NumberVector<?> data);
 
   /**
    * Project a vector from scaled space to rendering space.
@@ -93,7 +93,7 @@ public interface Projection2D extends Projection {
    * @param prototype Prototype to create vector from
    * @return vector in data space
    */
-  // public <V extends NumberVector<V, ?>> V fastProjectRenderToDataSpace(double[] data, V prototype);
+  // public <V extends NumberVector<?>> V fastProjectRenderToDataSpace(double[] data, V prototype);
 
   /**
    * Project a vector from rendering space to scaled space.
@@ -117,7 +117,7 @@ public interface Projection2D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data);
+  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?> data);
 
   /**
    * Project a vector from scaled space to rendering space.

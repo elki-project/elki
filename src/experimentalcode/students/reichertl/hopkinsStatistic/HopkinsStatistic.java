@@ -17,6 +17,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -47,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @param <O> Database object type
  * @param <D> Distance type
  */
-public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Result> {
+public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm<V, D, Result> {
   /**
    * The logger for this class.
    */
@@ -170,7 +171,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
       randoms[i] = new Random(random);
     }
 
-    V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(min == null || max == null || min.length == 0 || max.length == 0) {
@@ -237,7 +238,7 @@ public class HopkinsStatistic<V extends NumberVector<V, ?>, D extends NumberDist
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
 
     protected int sampleSize;
     protected List<Integer> dimensions;

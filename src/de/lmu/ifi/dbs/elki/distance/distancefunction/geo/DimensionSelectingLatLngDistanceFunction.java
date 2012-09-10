@@ -64,13 +64,13 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     return MathUtil.latlngDistance(o1.doubleValue(dimlat), o1.doubleValue(dimlng), o2.doubleValue(dimlat), o2.doubleValue(dimlng));
   }
 
   @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?, ?>>(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
+    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
   }
 
   /**

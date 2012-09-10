@@ -54,7 +54,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
    *         selected dimensions
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     if(v1.getDimensionality() != v2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
     }
@@ -68,7 +68,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   @Override
-  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?, ?> v) {
+  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
     }
@@ -124,7 +124,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
   }
 
   @Override
-  public double doubleNorm(NumberVector<?, ?> obj) {
+  public double doubleNorm(NumberVector<?> obj) {
     double sqrDist = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
       final double delta = obj.doubleValue(d + 1);

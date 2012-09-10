@@ -66,7 +66,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectDataToRenderSpace(NumberVector<?> data) {
     double x = (scales[dim1].getScaled(data.doubleValue(dim1 + 1)) - 0.5) * SCALE;
     double y = (scales[dim2].getScaled(data.doubleValue(dim2 + 1)) - 0.5) * -SCALE;
     return new double[] { x, y };
@@ -83,7 +83,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectDataToScaledSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectDataToScaledSpace(NumberVector<?> data) {
     final int dim = data.getDimensionality();
     double[] ds = new double[dim];
     for(int d = 0; d < dim; d++) {
@@ -141,7 +141,7 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?> data) {
     double x = scales[dim1].getRelativeScaled(data.doubleValue(dim1 + 1)) * SCALE;
     double y = scales[dim2].getRelativeScaled(data.doubleValue(dim2 + 1)) * -SCALE;
     return new double[] { x, y };

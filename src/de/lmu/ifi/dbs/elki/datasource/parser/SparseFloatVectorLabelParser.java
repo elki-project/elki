@@ -78,7 +78,7 @@ public class SparseFloatVectorLabelParser extends SparseNumberVectorLabelParser<
    * @param labelIndices Label indexes
    */
   public SparseFloatVectorLabelParser(Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
+    super(colSep, quoteChar, labelIndices, SparseFloatVector.FACTORY);
   }
 
   /**

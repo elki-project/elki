@@ -92,7 +92,7 @@ public class LineVisualization extends AbstractVisFactory {
    * 
    * @author Robert Rödler
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

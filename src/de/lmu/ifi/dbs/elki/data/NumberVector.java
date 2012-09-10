@@ -34,13 +34,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @author Arthur Zimek
  * 
- * @param <V> the type of NumberVector implemented by a subclass
  * @param <N> the type of the attribute values
  * 
  * @apiviz.landmark
  * @apiviz.has Vector
  */
-public interface NumberVector<V extends NumberVector<? extends V, N>, N extends Number> extends FeatureVector<V, N>, SpatialComparable, Parameterizable {
+public interface NumberVector<N extends Number> extends FeatureVector<N>, SpatialComparable, Parameterizable {
   /**
    * Returns the value in the specified dimension as double.
    * 
@@ -130,20 +129,30 @@ public interface NumberVector<V extends NumberVector<? extends V, N>, N extends 
   Vector getColumnVector();
 
   /**
-   * Returns a new NumberVector of N for the given values.
+   * Factory API for this feature vector.
    * 
-   * @param values the values of the NumberVector
-   * @return a new NumberVector of N for the given values
+   * @author Erich Schubert
+   * 
+   * @param <V> Vector type
+   * @param <N> Data type of vector
    */
-  V newNumberVector(double[] values);
+  interface Factory<V extends NumberVector<? extends N>, N extends Number> extends FeatureVector.Factory<V, N> {
+    /**
+     * Returns a new NumberVector of N for the given values.
+     * 
+     * @param values the values of the NumberVector
+     * @return a new NumberVector of N for the given values
+     */
+    V newNumberVector(double[] values);
 
-  /**
-   * Instantiate from any number-array like object.
-   * 
-   * @param <A> Array type
-   * @param array Array
-   * @param adapter Adapter
-   * @return a new NumberVector of N for the given values.
-   */
-  <A> V newNumberVector(A array, NumberArrayAdapter<?, A> adapter);
+    /**
+     * Instantiate from any number-array like object.
+     * 
+     * @param <A> Array type
+     * @param array Array
+     * @param adapter Adapter
+     * @return a new NumberVector of N for the given values.
+     */
+    <A> V newNumberVector(A array, NumberArrayAdapter<?, A> adapter);
+  }
 }

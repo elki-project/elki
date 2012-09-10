@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @param <V> Vector type
  */
-public class EMModel<V extends FeatureVector<V, ?>> extends MeanModel<V> {
+public class EMModel<V extends FeatureVector<?>> extends MeanModel<V> {
   /**
    * Cluster covariance matrix
    */

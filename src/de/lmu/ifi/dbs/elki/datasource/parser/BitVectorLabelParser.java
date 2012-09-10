@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -117,7 +116,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<BitVector>(BitVector.class, dimensionality, new BitVector(new BitSet(), dimensionality));
+    return new VectorFieldTypeInformation<BitVector>(BitVector.FACTORY, dimensionality);
   }
 
   @Override

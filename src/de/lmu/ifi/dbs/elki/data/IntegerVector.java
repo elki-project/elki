@@ -38,11 +38,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> {
+public class IntegerVector extends AbstractNumberVector<Integer> {
   /**
    * Static instance (object factory).
    */
-  public static final IntegerVector STATIC = new IntegerVector(new int[0], true);
+  public static final IntegerVector.Factory STATIC = new IntegerVector.Factory();
 
   /**
    * Serializer for up to 127 dimensions.
@@ -102,8 +102,8 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
-   *         
-   * {@inheritDoc}
+   * 
+   *         {@inheritDoc}
    */
   @Override
   public Integer getValue(int dimension) {
@@ -122,8 +122,8 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
-   *         
-   * {@inheritDoc}
+   * 
+   *         {@inheritDoc}
    */
   @Override
   public double doubleValue(int dimension) {
@@ -142,8 +142,8 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
-   *
-   * {@inheritDoc}
+   * 
+   *         {@inheritDoc}
    */
   @Override
   public long longValue(int dimension) {
@@ -186,29 +186,55 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
     return featureLine.toString();
   }
 
-  @Override
-  public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<Integer, A> adapter) {
-    int dim = adapter.size(array);
-    int[] values = new int[dim];
-    for (int i = 0; i < dim; i++) {
-      values[i] = adapter.get(array, i);
+  /**
+   * Factory for integer vectors.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory extends AbstractNumberVector.Factory<IntegerVector, Integer> {
+    @Override
+    public <A> IntegerVector newFeatureVector(A array, ArrayAdapter<Integer, A> adapter) {
+      int dim = adapter.size(array);
+      int[] values = new int[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.get(array, i);
+      }
+      return new IntegerVector(values, true);
     }
-    return new IntegerVector(values, true);
-  }
 
-  @Override
-  public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    int dim = adapter.size(array);
-    int[] values = new int[dim];
-    for (int i = 0; i < dim; i++) {
-      values[i] = adapter.getInteger(array, i);
+    @Override
+    public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      int dim = adapter.size(array);
+      int[] values = new int[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.getInteger(array, i);
+      }
+      return new IntegerVector(values, true);
     }
-    return new IntegerVector(values, true);
-  }
 
-  @Override
-  public ByteBufferSerializer<IntegerVector> getDefaultSerializer() {
-    return VARIABLE_SERIALIZER;
+    @Override
+    public ByteBufferSerializer<IntegerVector> getDefaultSerializer() {
+      return VARIABLE_SERIALIZER;
+    }
+    
+    @Override
+    public Class<? super IntegerVector> getRestrictionClass() {
+      return IntegerVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected IntegerVector.Factory makeInstance() {
+        return STATIC;
+      }
+    }
   }
 
   /**
@@ -322,20 +348,6 @@ public class IntegerVector extends AbstractNumberVector<IntegerVector, Integer> 
         len += ByteArrayUtil.getSignedVarintSize(vec.values[i]);
       }
       return len;
-    }
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected IntegerVector makeInstance() {
-      return STATIC;
     }
   }
 }

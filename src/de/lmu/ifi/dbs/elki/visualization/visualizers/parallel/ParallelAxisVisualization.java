@@ -32,10 +32,10 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -62,8 +62,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
   private static final String NAME = "Parallel Axes";
 
   /**
-   * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * Constructor.
    */
   public ParallelAxisVisualization() {
     super();
@@ -98,9 +97,9 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
    * @apiviz.uses SVGSimpleLinearAxis
    */
   // TODO: split into interactive / non-interactive parts?
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> {
     /**
-     * Axis label class
+     * Axis label class.
      */
     public static final String AXIS_LABEL = "paxis-label";
 
@@ -138,7 +137,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
           }
           // Get axis label
-          final String label = DatabaseUtil.getColumnLabel(relation, truedim + 1);
+          final String label = RelationUtil.getColumnLabel(relation, truedim + 1);
           // Add axis label
           Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
           SVGUtil.setCSSClass(text, AXIS_LABEL);
@@ -182,7 +181,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
     }
 
     /**
-     * Add an event listener to the Element
+     * Add an event listener to the Element.
      * 
      * @param tag Element to add the listener
      * @param i Tool number for the Element

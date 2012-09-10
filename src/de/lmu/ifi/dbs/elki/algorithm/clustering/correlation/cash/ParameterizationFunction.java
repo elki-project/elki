@@ -76,7 +76,7 @@ public class ParameterizationFunction {
   /**
    * The actual vector
    */
-  private NumberVector<?, ?> vec;
+  private NumberVector<?> vec;
 
   /**
    * Provides a new parameterization function describing all lines in a
@@ -84,7 +84,7 @@ public class ParameterizationFunction {
    * 
    * @param vec Existing vector
    */
-  public ParameterizationFunction(NumberVector<?, ?> vec) {
+  public ParameterizationFunction(NumberVector<?> vec) {
     super();
     this.vec = vec;
     determineGlobalExtremum();

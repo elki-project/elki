@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector to compute the distances in between
  */
 // FIXME: implements SpatialPrimitiveDistanceFunction<V, DoubleDistance>
-public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
+public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> implements FilteredLocalPCABasedDistanceFunction<V, FilteredLocalPCAIndex<V>, DoubleDistance> {
   /**
    * Constructor
    * 
@@ -100,7 +100,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance, LocallyWeightedDistanceFunction<? super V>> implements FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance> {
+  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance, LocallyWeightedDistanceFunction<? super V>> implements FilteredLocalPCABasedDistanceFunction.Instance<V, LocalProjectionIndex<V, ?>, DoubleDistance> {
     /**
      * Constructor.
      * 
@@ -246,7 +246,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?, ?>> exten
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>>> {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Parameterizer<LocalProjectionIndex.Factory<V, FilteredLocalPCAIndex<V>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

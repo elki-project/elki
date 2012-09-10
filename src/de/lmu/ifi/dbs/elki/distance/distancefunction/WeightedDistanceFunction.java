@@ -58,7 +58,7 @@ public class WeightedDistanceFunction extends AbstractVectorDoubleDistanceFuncti
    * @return the Weighted distance between the given two vectors
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     assert (o1.getDimensionality() == o2.getDimensionality()) : "Different dimensionality of FeatureVectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString();
 
     Vector o1_minus_o2 = o1.getColumnVector().minusEquals(o2.getColumnVector());
@@ -66,7 +66,7 @@ public class WeightedDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   }
 
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return VectorFieldTypeInformation.get(NumberVector.class, weightMatrix.getColumnDimensionality());
   }
 }

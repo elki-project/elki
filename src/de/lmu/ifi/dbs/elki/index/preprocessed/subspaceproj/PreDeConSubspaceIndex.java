@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("PreDeCon Preprocessor")
 @Description("Computes the projected dimension of objects of a certain database according to the PreDeCon algorithm.\n" + "The variance analysis is based on epsilon range queries.")
-public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, SubspaceProjectionResult> {
+public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex<V, D, SubspaceProjectionResult> {
   /**
    * The logger for this class.
    */
@@ -172,7 +172,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
   }
 
   /**
-   * Factory
+   * Factory.
    * 
    * @author Erich Schubert
    * 
@@ -182,14 +182,14 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
    * @param <V> Vector type
    * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, PreDeConSubspaceIndex<V, D>> {
+  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory<V, D, PreDeConSubspaceIndex<V, D>> {
     /**
      * The default value for delta.
      */
     public static final double DEFAULT_DELTA = 0.01;
 
     /**
-     * Parameter for Delta
+     * Parameter for Delta.
      */
     public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("predecon.delta", "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = " + DEFAULT_DELTA + ").");
 
@@ -223,7 +223,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<? extends V, ?>, D ext
      * 
      * @apiviz.exclude
      */
-    public static class Parameterizer<V extends NumberVector<? extends V, ?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
+    public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractSubspaceProjectionIndex.Factory.Parameterizer<V, D, Factory<V, D>> {
       /**
        * The threshold for small eigenvalues.
        */

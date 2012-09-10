@@ -74,7 +74,7 @@ public class SquaredPearsonCorrelationDistanceFunction extends AbstractVectorDou
    *         vectors v1 and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final double pcc = MathUtil.pearsonCorrelationCoefficient(v1, v2);
     return 1 - pcc * pcc;
   }

@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Arthur Zimek
  */
-public class CosineDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class CosineDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance
    */
@@ -69,7 +69,7 @@ public class CosineDistanceFunction extends AbstractVectorDoubleDistanceFunction
    * @return the cosine distance for two given feature vectors v1 and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     double d = 1 - VectorUtil.cosAngle(v1, v2);
     if(d < 0) {
       d = 0;
@@ -108,12 +108,12 @@ public class CosineDistanceFunction extends AbstractVectorDoubleDistanceFunction
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
   
   @Override
-  public SimpleTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
 

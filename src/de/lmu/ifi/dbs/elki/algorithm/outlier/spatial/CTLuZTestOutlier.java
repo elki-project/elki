@@ -98,7 +98,7 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
    * @param relation Data relation (1d!)
    * @return Outlier detection result
    */
-  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?, ?>> relation) {
+  public OutlierResult run(Database database, Relation<N> nrel, Relation<? extends NumberVector<?>> relation) {
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(nrel);
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 

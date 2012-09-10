@@ -1,0 +1,7 @@
+de.lmu.ifi.dbs.elki.data.DoubleVector$Factory
+de.lmu.ifi.dbs.elki.data.BitVector$Factory
+de.lmu.ifi.dbs.elki.data.FloatVector$Factory
+de.lmu.ifi.dbs.elki.data.IntegerVector$Factory
+de.lmu.ifi.dbs.elki.data.OneDimensionalDoubleVector$Factory
+de.lmu.ifi.dbs.elki.data.SparseFloatVector$Factory
+de.lmu.ifi.dbs.elki.data.SparseDoubleVector$Factory

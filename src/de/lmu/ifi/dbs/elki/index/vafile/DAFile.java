@@ -49,21 +49,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
 public class DAFile {
   /**
-   * Dimension of this approximation file
+   * Dimension of this approximation file.
    */
   final private int dimension;
 
   /**
-   * Splitting grid
+   * Splitting grid.
    */
   final private double[] splitPositions;
 
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param dimension Dimension of this file
+   * @param partitions Number of partitions
    */
-  public DAFile(Relation<? extends NumberVector<?, ?>> relation, int dimension, int partitions) {
+  public DAFile(Relation<? extends NumberVector<?>> relation, int dimension, int partitions) {
     final int size = relation.size();
     this.dimension = dimension;
     this.splitPositions = new double[partitions + 1];
@@ -85,6 +87,8 @@ public class DAFile {
   }
 
   /**
+   * Return the split positions.
+   * 
    * @return the split positions
    */
   public double[] getSplitPositions() {
@@ -92,6 +96,8 @@ public class DAFile {
   }
 
   /**
+   * Return the dimension we indexed.
+   * 
    * @return the dimension
    */
   public int getDimension() {

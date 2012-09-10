@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
+public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> extends AbstractNormalization<V> {
   /**
    * Class logger.
    */
@@ -144,7 +144,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
       values[d - 1] = normalize(d - 1, featureVector.doubleValue(d));
     }
-    return featureVector.newNumberVector(values);
+    return factory.newNumberVector(values);
   }
 
   @Override
@@ -154,13 +154,20 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
         values[d - 1] = restore(d - 1, featureVector.doubleValue(d));
       }
-      return featureVector.newNumberVector(values);
+      return factory.newNumberVector(values);
     }
     else {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + mean.length);
     }
   }
 
+  /**
+   * Normalize a single dimension.
+   * 
+   * @param d Dimension
+   * @param val Value
+   * @return Normalized value
+   */
   private double normalize(int d, double val) {
     if(mean.length == 1) {
       return (val - mean[0]) / stddev[0];
@@ -170,6 +177,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
     }
   }
 
+  /**
+   * Restore a single dimension.
+   * @param d Dimension
+   * @param val Value
+   * @return Normalized value
+   */
   private double restore(int d, double val) {
     if(mean.length == 1) {
       return (val * stddev[0]) + mean[0];
@@ -225,7 +238,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<V, ?>> ex
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Stores the mean in each dimension.
      */

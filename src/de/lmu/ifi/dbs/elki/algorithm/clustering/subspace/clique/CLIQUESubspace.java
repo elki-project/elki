@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> the type of NumberVector this subspace contains
  */
-public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
+public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
   /**
    * The dense units belonging to this subspace.
    */
@@ -103,14 +103,14 @@ public class CLIQUESubspace<V extends NumberVector<V, ?>> extends Subspace<V> {
    * 
    * @return the clusters in this subspace and the corresponding cluster models
    */
-  public List<Pair<Subspace<V>, ModifiableDBIDs>> determineClusters() {
-    List<Pair<Subspace<V>, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace<V>, ModifiableDBIDs>>();
+  public List<Pair<Subspace, ModifiableDBIDs>> determineClusters() {
+    List<Pair<Subspace, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace, ModifiableDBIDs>>();
 
     for(CLIQUEUnit<V> unit : getDenseUnits()) {
       if(!unit.isAssigned()) {
         ModifiableDBIDs cluster = DBIDUtil.newHashSet();
         CLIQUESubspace<V> model = new CLIQUESubspace<V>(getDimensions());
-        clusters.add(new Pair<Subspace<V>, ModifiableDBIDs>(model, cluster));
+        clusters.add(new Pair<Subspace, ModifiableDBIDs>(model, cluster));
         dfs(unit, cluster, model);
       }
     }

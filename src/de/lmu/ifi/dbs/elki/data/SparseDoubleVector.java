@@ -48,19 +48,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 // TODO: implement ByteArraySerializer<SparseDoubleVector>
-public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector, Double> implements SparseNumberVector<SparseDoubleVector, Double> {
+public class SparseDoubleVector extends AbstractNumberVector<Double> implements SparseNumberVector<Double> {
   /**
-   * Static instance
+   * Static instance.
    */
-  public static final SparseDoubleVector STATIC = new SparseDoubleVector(new int[0], new double[0], -1);
+  public static final SparseDoubleVector.Factory FACTORY = new SparseDoubleVector.Factory();
 
   /**
-   * Indexes of values
+   * Indexes of values.
    */
   private int[] indexes;
 
   /**
-   * Stored values
+   * Stored values.
    */
   private double[] values;
 
@@ -94,7 +94,7 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
    *         zero is bigger than the given dimensionality)
    */
   public SparseDoubleVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
-    if(values.size() > dimensionality) {
+    if (values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
@@ -103,7 +103,7 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
     // Import and sort the indexes
     {
       TIntDoubleIterator iter = values.iterator();
-      for(int i = 0; iter.hasNext(); i++) {
+      for (int i = 0; iter.hasNext(); i++) {
         iter.advance();
         this.indexes[i] = iter.key();
       }
@@ -111,13 +111,13 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
     }
     // Import the values accordingly
     {
-      for(int i = 0; i < values.size(); i++) {
+      for (int i = 0; i < values.size(); i++) {
         this.values[i] = values.get(this.indexes[i]);
       }
     }
     this.dimensionality = dimensionality;
     final int maxdim = getMaxDim();
-    if(maxdim > dimensionality) {
+    if (maxdim > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
   }
@@ -128,10 +128,9 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
    * @return the maximum dimensionality seen
    */
   private int getMaxDim() {
-    if(this.indexes.length == 0) {
+    if (this.indexes.length == 0) {
       return 0;
-    }
-    else {
+    } else {
       return this.indexes[this.indexes.length - 1];
     }
   }
@@ -151,8 +150,8 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
     // Count the number of non-zero entries
     int size = 0;
     {
-      for(int i = 0; i < values.length; i++) {
-        if(values[i] != 0.0f) {
+      for (int i = 0; i < values.length; i++) {
+        if (values[i] != 0.0f) {
           size++;
         }
       }
@@ -163,9 +162,9 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
     // Copy the values
     {
       int pos = 0;
-      for(int i = 0; i < values.length; i++) {
+      for (int i = 0; i < values.length; i++) {
         double value = values[i];
-        if(value != 0.0f) {
+        if (value != 0.0f) {
           this.indexes[pos] = i + 1;
           this.values[pos] = value;
           pos++;
@@ -191,7 +190,7 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
   @Override
   public void setDimensionality(int dimensionality) throws IllegalArgumentException {
     final int maxdim = getMaxDim();
-    if(maxdim > dimensionality) {
+    if (maxdim > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
     this.dimensionality = dimensionality;
@@ -200,10 +199,9 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
   @Override
   public Double getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return values[pos];
-    }
-    else {
+    } else {
       return 0.0;
     }
   }
@@ -211,10 +209,9 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
   @Override
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return values[pos];
-    }
-    else {
+    } else {
       return 0.0;
     }
   }
@@ -222,18 +219,16 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
   @Override
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return (long) values[pos];
-    }
-    else {
+    } else {
       return 0;
     }
   }
 
   @Override
   public Vector getColumnVector() {
-    double[] values = getValues();
-    return new Vector(values);
+    return new Vector(getValues());
   }
 
   /**
@@ -262,7 +257,7 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
     featureLine.append(this.indexes.length);
-    for(int i = 0; i < this.indexes.length; i++) {
+    for (int i = 0; i < this.indexes.length; i++) {
       featureLine.append(ATTRIBUTE_SEPARATOR);
       featureLine.append(this.indexes[i]);
       featureLine.append(ATTRIBUTE_SEPARATOR);
@@ -278,67 +273,79 @@ public class SparseDoubleVector extends AbstractNumberVector<SparseDoubleVector,
    * @return an array consisting of the values of this feature vector
    */
   private double[] getValues() {
-    double[] values = new double[dimensionality];
-    for(int i = 0; i < indexes.length; i++) {
-      values[this.indexes[i]] = this.values[i];
+    double[] vals = new double[dimensionality];
+    for (int i = 0; i < indexes.length; i++) {
+      vals[this.indexes[i]] = this.values[i];
     }
-    return values;
+    return vals;
   }
 
-  @Override
-  public <A> SparseDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
-    int dim = adapter.size(array);
-    double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = adapter.get(array, i);
+  /**
+   * Factory class.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory extends AbstractNumberVector.Factory<SparseDoubleVector, Double> implements SparseNumberVector.Factory<SparseDoubleVector, Double> {
+    @Override
+    public <A> SparseDoubleVector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
+      int dim = adapter.size(array);
+      double[] values = new double[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.get(array, i);
+      }
+      // TODO: inefficient
+      return new SparseDoubleVector(values);
     }
-    // TODO: inefficient
-    return new SparseDoubleVector(values);
-  }
 
-  @Override
-  public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    int dim = adapter.size(array);
-    double[] values = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = adapter.getDouble(array, i);
+    @Override
+    public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      int dim = adapter.size(array);
+      double[] values = new double[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.getDouble(array, i);
+      }
+      // TODO: inefficient
+      return new SparseDoubleVector(values);
     }
-    // TODO: inefficient
-    return new SparseDoubleVector(values);
-  }
 
-  @Override
-  public SparseDoubleVector newNumberVector(TIntDoubleMap values, int maxdim) {
-    return new SparseDoubleVector(values, maxdim);
+    @Override
+    public SparseDoubleVector newNumberVector(TIntDoubleMap values, int maxdim) {
+      return new SparseDoubleVector(values, maxdim);
+    }
+
+    @Override
+    public ByteBufferSerializer<SparseDoubleVector> getDefaultSerializer() {
+      // FIXME: add a serializer
+      return null;
+    }
+    
+    @Override
+    public Class<? super SparseDoubleVector> getRestrictionClass() {
+      return SparseDoubleVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected SparseDoubleVector.Factory makeInstance() {
+        return FACTORY;
+      }
+    }
   }
 
   @Override
   public BitSet getNotNullMask() {
     BitSet b = new BitSet();
-    for(int key : indexes) {
+    for (int key : indexes) {
       b.set(key);
     }
     return b;
-  }
-
-  @Override
-  public ByteBufferSerializer<SparseDoubleVector> getDefaultSerializer() {
-    // FIXME: add a serializer
-    return null;
-  }
-
-  /**
-   * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected SparseDoubleVector makeInstance() {
-      return STATIC;
-    }
   }
 
   /**

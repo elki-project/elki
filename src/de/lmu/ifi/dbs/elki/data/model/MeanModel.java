@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * 
  * @param <V> Vector type
  */
-public class MeanModel<V extends FeatureVector<V, ?>> extends BaseModel implements TextWriteable{
+public class MeanModel<V extends FeatureVector<?>> extends BaseModel implements TextWriteable{
   /**
    * Cluster mean
    */

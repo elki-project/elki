@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.has Instance
  */
-public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, PCACorrelationDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, PCACorrelationDistance> {
+public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, PCACorrelationDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, PCACorrelationDistance> {
   /**
    * Parameter to specify the threshold of a distance between a vector q and a
    * given space that indicates that q adds a new dimension to the space, must
@@ -72,7 +72,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
    * @param indexFactory index factory
    * @param delta Delta parameter
    */
-  public PCABasedCorrelationDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory, double delta) {
+  public PCABasedCorrelationDistanceFunction(IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>> indexFactory, double delta) {
     super(indexFactory);
     this.delta = delta;
   }
@@ -83,11 +83,11 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Relation<T> database) {
+  public <T extends NumberVector<?>> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?, ?>>) database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
     return new Instance<T>(database, indexinst, delta, this);
   }
 
@@ -108,7 +108,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, PCACorrelationDistance, PCABasedCorrelationDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, PCACorrelationDistance> {
+  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, PCACorrelationDistance, PCABasedCorrelationDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, PCACorrelationDistance> {
     /**
      * Delta value
      */
@@ -268,7 +268,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<FilteredLocalPCAIndex.Factory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>>> {
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<FilteredLocalPCAIndex.Factory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>>> {
     protected double delta = 0.0;
 
     @Override

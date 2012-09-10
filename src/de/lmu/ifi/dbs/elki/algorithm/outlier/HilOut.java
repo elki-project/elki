@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -92,7 +93,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("Fast Outlier Detection in High Dimensional Spaces")
 @Description("Algorithm to compute outliers using Hilbert space filling curves")
 @Reference(authors = "F. Angiulli, C. Pizzuti", title = "Fast Outlier Detection in High Dimensional Spaces", booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", url = "http://dx.doi.org/10.1145/375663.375668")
-public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> implements OutlierAlgorithm {
+public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgorithm<O, DoubleDistance, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -171,7 +172,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
 
   public OutlierResult run(Database database, Relation<O> relation) {
     distq = database.getDistanceQuery(relation, getDistanceFunction());
-    d = DatabaseUtil.dimensionality(relation);
+    d = RelationUtil.dimensionality(relation);
     WritableDoubleDataStore hilout_weight = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     // Compute extend of dataset.
@@ -514,7 +515,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       if(h >= 32) { // 32 to 63 bit
         final long scale = Long.MAX_VALUE; // = 63 bits
         for(int i = 0; i < pf.length; i++) {
-          NumberVector<?, ?> obj = relation.get(pf[i].id);
+          NumberVector<?> obj = relation.get(pf[i].id);
           long[] coord = new long[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (long) (getDimForObject(obj, dim) * .5 * scale);
@@ -525,7 +526,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       else if(h >= 16) { // 16-31 bit
         final int scale = ~1 >>> 1;
         for(int i = 0; i < pf.length; i++) {
-          NumberVector<?, ?> obj = relation.get(pf[i].id);
+          NumberVector<?> obj = relation.get(pf[i].id);
           int[] coord = new int[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (int) (getDimForObject(obj, dim) * .5 * scale);
@@ -536,7 +537,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       else if(h >= 8) { // 8-15 bit
         final int scale = ~1 >>> 16;
         for(int i = 0; i < pf.length; i++) {
-          NumberVector<?, ?> obj = relation.get(pf[i].id);
+          NumberVector<?> obj = relation.get(pf[i].id);
           short[] coord = new short[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (short) (getDimForObject(obj, dim) * .5 * scale);
@@ -547,7 +548,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
       else { // 1-7 bit
         final int scale = ~1 >>> 8;
         for(int i = 0; i < pf.length; i++) {
-          NumberVector<?, ?> obj = relation.get(pf[i].id);
+          NumberVector<?> obj = relation.get(pf[i].id);
           byte[] coord = new byte[d];
           for(int dim = 0; dim < d; dim++) {
             coord[dim] = (byte) (getDimForObject(obj, dim) * .5 * scale);
@@ -640,7 +641,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * @param level Level of the corresponding r-region
      */
     private double minDistLevel(DBID id, int level) {
-      final NumberVector<?, ?> obj = relation.get(id);
+      final NumberVector<?> obj = relation.get(id);
       // level 1 is supposed to have r=1 as in the original publication
       // 2 ^ - (level - 1)
       final double r = 1.0 / (1 << (level - 1));
@@ -660,7 +661,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * @param level Level of the corresponding r-region
      */
     private double maxDistLevel(DBID id, int level) {
-      final NumberVector<?, ?> obj = relation.get(id);
+      final NumberVector<?> obj = relation.get(id);
       // level 1 is supposed to have r=1 as in the original publication
       final double r = 1.0 / (1 << (level - 1));
       double dist;
@@ -781,7 +782,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
      * @param dim Dimension
      * @return Projected and shifted position
      */
-    private double getDimForObject(NumberVector<?, ?> obj, int dim) {
+    private double getDimForObject(NumberVector<?> obj, int dim) {
       return (obj.doubleValue(dim + 1) - min[dim]) / diameter + shift;
     }
   }
@@ -897,7 +898,7 @@ public class HilOut<O extends NumberVector<O, ?>> extends AbstractDistanceBasedA
    *
    * @param <O> Vector type
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Parameter to specify how many next neighbors should be used in the
      * computation

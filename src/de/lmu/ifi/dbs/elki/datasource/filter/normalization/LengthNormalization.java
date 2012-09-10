@@ -42,14 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector type
  */
-public class LengthNormalization<V extends NumberVector<V, ?>> extends AbstractStreamNormalization<V> {
+public class LengthNormalization<V extends NumberVector<?>> extends AbstractStreamNormalization<V> {
   /**
-   * Norm to use
+   * Norm to use.
    */
   DoubleNorm<? super V> norm;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param norm Norm to use
    */
@@ -61,7 +61,7 @@ public class LengthNormalization<V extends NumberVector<V, ?>> extends AbstractS
   @Override
   protected V filterSingleObject(V featureVector) {
     final double d = norm.doubleNorm(featureVector);
-    return featureVector.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
+    return factory.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
   }
 
   @Override
@@ -87,14 +87,14 @@ public class LengthNormalization<V extends NumberVector<V, ?>> extends AbstractS
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
-     * Option ID for normalization norm
+     * Option ID for normalization norm.
      */
     public static final OptionID NORM_ID = OptionID.getOrCreateOptionID("normalization.norm", "Norm (length function) to use for computing the vector length.");
 
     /**
-     * Norm to use
+     * Norm to use.
      */
     DoubleNorm<? super V> norm;
 

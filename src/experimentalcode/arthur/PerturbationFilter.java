@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVarianceMinMax;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -57,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @author Arthur Zimek
  */
-public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractConversionFilter<V, V> {
+public class PerturbationFilter<V extends NumberVector<?>> extends AbstractConversionFilter<V, V> {
   /**
    * Class logger
    */
@@ -119,6 +120,8 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
    * Stores the dimensionality from the preprocessing.
    */
   private int dimensionality = 0;
+
+  private NumberVector.Factory<V, ?> factory;
 
   /**
    * Constructor.
@@ -235,11 +238,12 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
       values[d - 1] = featureVector.doubleValue(d) + randomPerAttribute[d - 1].nextGaussian() * scalingreferencevalues[d - 1];
     }
-    return featureVector.newNumberVector(values);
+    return factory.newNumberVector(values);
   }
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    factory = FilterUtil.guessFactory(in);
     return in;
   }
 
@@ -250,7 +254,7 @@ public class PerturbationFilter<V extends NumberVector<V, ?>> extends AbstractCo
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Parameter for minimum.
      */

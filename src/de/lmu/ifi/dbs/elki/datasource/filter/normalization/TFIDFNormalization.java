@@ -39,8 +39,10 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
  * Restore will only undo the IDF part of the normalization!
  * 
  * @author Erich Schubert
+ * 
+ * @param <V> Vector type
  */
-public class TFIDFNormalization<V extends SparseNumberVector<V, ?>> extends InverseDocumentFrequencyNormalization<V> {
+public class TFIDFNormalization<V extends SparseNumberVector<?>> extends InverseDocumentFrequencyNormalization<V> {
   /**
    * Constructor.
    */
@@ -62,6 +64,6 @@ public class TFIDFNormalization<V extends SparseNumberVector<V, ?>> extends Inve
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       vals.put(i, (float) (featureVector.doubleValue(i) / sum * idf.get(i)));
     }
-    return featureVector.newNumberVector(vals, featureVector.getDimensionality());
+    return ((SparseNumberVector.Factory<V, ?>) factory).newNumberVector(vals, featureVector.getDimensionality());
   }
 }

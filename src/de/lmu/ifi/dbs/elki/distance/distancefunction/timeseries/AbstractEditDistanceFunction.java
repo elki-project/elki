@@ -62,7 +62,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
 
   // TODO: relax this to VectorTypeInformation!
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 

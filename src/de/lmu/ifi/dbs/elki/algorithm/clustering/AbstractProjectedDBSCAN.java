@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V extends NumberVector<V, ?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
+public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V extends NumberVector<?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
    * Parameter to specify the distance function to determine the distance
    * between database objects, must extend
@@ -383,7 +383,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractParameterizer {
     protected DistanceFunction<V, D> innerdist;
 
     protected D epsilon;

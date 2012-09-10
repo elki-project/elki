@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -51,7 +52,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("GLS-Backward Search")
 @Reference(authors = "F. Chen and C.-T. Lu and A. P. Boedihardjo", title = "GLS-SOD: A Generalized Local Statistical Approach for Spatial Outlier Detection", booktitle = "Proc. 16th ACM SIGKDD international conference on Knowledge discovery and data mining", url = "http://dx.doi.org/10.1145/1835804.1835939")
-public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
+public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -120,7 +120,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
    * @param relationy Attribute relation
    * @return Algorithm result
    */
-  public OutlierResult run(Relation<V> relationx, Relation<? extends NumberVector<?, ?>> relationy) {
+  public OutlierResult run(Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relationx.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax mm = new DoubleMinMax(0.0, 0.0);
 
@@ -161,9 +161,9 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
    * @param relationy Attribute relation
    * @return Top outlier and associated score
    */
-  private Pair<DBID, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector<?, ?>> relationy) {
-    final int dim = DatabaseUtil.dimensionality(relationx);
-    final int dimy = DatabaseUtil.dimensionality(relationy);
+  private Pair<DBID, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
+    final int dim = RelationUtil.dimensionality(relationx);
+    final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
     KNNQuery<V, D> knnQuery = QueryUtil.getKNNQuery(relationx, getDistanceFunction(), k + 1);
 
@@ -271,7 +271,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?, ?>, D exte
    * @param <V> Input vector type
    * @param <D> Distance type
    */
-  public static class Parameterizer<V extends NumberVector<?, ?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
     /**
      * Holds the alpha value - significance niveau
      */

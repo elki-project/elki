@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
@@ -87,7 +88,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
 @Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
-public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -137,7 +138,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
   }
 
   public OutlierResult run(Database database, Relation<O> relation) {
-    final int dim = DatabaseUtil.dimensionality(relation);
+    final int dim = RelationUtil.dimensionality(relation);
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, LOG) : null;
 
     // Compute extend of dataset.
@@ -332,7 +333,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
     /**
      * Relation indexed.
      */
-    private Relation<? extends NumberVector<?, ?>> relation;
+    private Relation<? extends NumberVector<?>> relation;
 
     /**
      * Constructor.
@@ -343,7 +344,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
      * @param nmin Maximum size for a page to split
      * @param relation Relation to index
      */
-    public ALOCIQuadTree(double[] min, double[] max, double[] shift, int nmin, Relation<? extends NumberVector<?, ?>> relation) {
+    public ALOCIQuadTree(double[] min, double[] max, double[] shift, int nmin, Relation<? extends NumberVector<?>> relation) {
       super();
       assert (min.length <= 32) : "Quadtrees are only supported for up to 32 dimensions";
       this.shift = shift;
@@ -391,11 +392,11 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
       if(dim == 0) {
         DBIDArrayIter iter = ids.iter();
         iter.seek(start);
-        NumberVector<?, ?> first = relation.get(iter);
+        NumberVector<?> first = relation.get(iter);
         iter.advance();
         boolean degenerate = true;
         loop: for(; iter.getOffset() < end; iter.advance()) {
-          NumberVector<?, ?> other = relation.get(iter);
+          NumberVector<?> other = relation.get(iter);
           for(int d = 1; d <= lmin.length; d++) {
             if(Math.abs(first.doubleValue(d) - other.doubleValue(d)) > 1E-15) {
               degenerate = false;
@@ -477,7 +478,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
      * @param level Level (controls scaling/wraping!)
      * @return Shifted position
      */
-    private double getShiftedDim(NumberVector<?, ?> obj, int dim, int level) {
+    private double getShiftedDim(NumberVector<?> obj, int dim, int level) {
       double pos = obj.doubleValue(dim + 1) + shift[dim];
       pos = (pos - min[dim]) / width[dim] * (1 + level);
       return pos - Math.floor(pos);
@@ -491,7 +492,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
      * @param tlevel Target level
      * @return Node
      */
-    public Node findClosestNode(NumberVector<?, ?> vec, int tlevel) {
+    public Node findClosestNode(NumberVector<?> vec, int tlevel) {
       Node cur = root;
       for(int level = 0; level <= tlevel; level++) {
         if(cur.children == null) {
@@ -646,7 +647,7 @@ public class ALOCI<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
     /**
      * Parameter to specify the minimum neighborhood size
      */

@@ -120,7 +120,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

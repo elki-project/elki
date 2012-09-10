@@ -166,7 +166,7 @@ public interface ProjectionParallel extends Projection {
    * @param v Input vector
    * @return Vector with reordering, inversions and scales applied.
    */
-  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> v);
+  public double[] fastProjectDataToRenderSpace(NumberVector<?> v);
 
   /**
    * Project the value of a single axis to its display value

@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Title("4C: Computing Correlation Connected Clusters")
 @Description("4C identifies local subgroups of data objects sharing a uniform correlation. " + "The algorithm is based on a combination of PCA and density-based clustering (DBSCAN).")
 @Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", title = "Computing Clusters of Correlation Connected Objects", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", url = "http://dx.doi.org/10.1145/1007568.1007620")
-public class FourC<V extends NumberVector<V, ?>> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
+public class FourC<V extends NumberVector<?>> extends AbstractProjectedDBSCAN<Clustering<Model>, V> {
   /**
    * The logger for this class.
    */
@@ -102,7 +102,7 @@ public class FourC<V extends NumberVector<V, ?>> extends AbstractProjectedDBSCAN
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractProjectedDBSCAN.Parameterizer<O, DoubleDistance> {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractProjectedDBSCAN.Parameterizer<O, DoubleDistance> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

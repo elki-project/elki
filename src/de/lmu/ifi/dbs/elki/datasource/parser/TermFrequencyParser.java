@@ -83,7 +83,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
    * @param labelIndices
    */
   public TermFrequencyParser(boolean normalize, Pattern colSep, char quoteChar, BitSet labelIndices) {
-    super(colSep, quoteChar, labelIndices, SparseFloatVector.STATIC);
+    super(colSep, quoteChar, labelIndices, SparseFloatVector.FACTORY);
     this.normalize = normalize;
     this.maxdim = 0;
     this.keymap = new HashMap<String, Integer>();
@@ -148,7 +148,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
   @Override
   protected SimpleTypeInformation<SparseFloatVector> getTypeInformation(int dimensionality) {
     if(dimensionality > 0) {
-      return new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class, factory.getDefaultSerializer(), dimensionality, factory);
+      return new VectorFieldTypeInformation<SparseFloatVector>(factory, dimensionality);
     }
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
       return new SimpleTypeInformation<SparseFloatVector>(SparseFloatVector.class, factory.getDefaultSerializer());

@@ -29,11 +29,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
@@ -52,14 +52,14 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
  * 
  * @param <V> Vector type
  */
-public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends AbstractHierarchicalResult implements Projector {
+public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHierarchicalResult implements Projector {
   /**
-   * Relation we project
+   * Relation we project.
    */
   Relation<V> rel;
 
   /**
-   * Database dimensionality
+   * Database dimensionality.
    */
   int dmax;
 
@@ -73,7 +73,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    assert (maxdim <= DatabaseUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
+    assert (maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
   @Override
@@ -95,7 +95,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
         // Label at bottom
         {
           PlotItem it = new PlotItem(.1, 2., 2., .1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(DatabaseUtil.getColumnLabel(rel, 1)));
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1)));
           task.height = .1;
           task.width = 2.;
           task.put(VisualizationTask.META_NODETAIL, true);
@@ -105,7 +105,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
         // Label on left
         {
           PlotItem it = new PlotItem(0, 0, .1, 2, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(DatabaseUtil.getColumnLabel(rel, 2), true));
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 2), true));
           task.height = 2.;
           task.width = .1;
           task.put(VisualizationTask.META_NODETAIL, true);
@@ -126,7 +126,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
           }
         }
         if(dmax >= 3) {
-          AffineTransformation p = AffineProjection.axisProjection(DatabaseUtil.dimensionality(rel), 1, 2);
+          AffineTransformation p = AffineProjection.axisProjection(RelationUtil.dimensionality(rel), 1, 2);
           p.addRotation(0, 2, Math.PI / 180 * -10.);
           p.addRotation(1, 2, Math.PI / 180 * 15.);
           // Wanna try 4d? go ahead:
@@ -140,7 +140,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
         // Labels at bottom
         for(int d1 = 1; d1 < dmax; d1++) {
           PlotItem it = new PlotItem(d1 - 1 + .1, dmax - 1, 1., .1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(DatabaseUtil.getColumnLabel(rel, d1)));
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
           task.height = .1;
           task.width = 1;
           task.put(VisualizationTask.META_NODETAIL, true);
@@ -150,7 +150,7 @@ public class ScatterPlotProjector<V extends NumberVector<?, ?>> extends Abstract
         // Labels on left
         for(int d2 = 2; d2 <= dmax; d2++) {
           PlotItem it = new PlotItem(0, d2 - 2, .1, 1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(DatabaseUtil.getColumnLabel(rel, d2), true));
+          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
           task.height = 1;
           task.width = .1;
           task.put(VisualizationTask.META_NODETAIL, true);

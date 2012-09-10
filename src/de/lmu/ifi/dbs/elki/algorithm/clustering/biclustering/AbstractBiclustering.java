@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairUtil;
  *        columns relate to the attribute values of these objects
  * @param <M> Cluster model type
  */
-public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M extends Bicluster<V>> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends Bicluster<V>> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * Keeps the currently set database.
    */
@@ -116,7 +116,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?, ?>, M exten
     }
     // FIXME: move this into subclasses!
     this.result = new Clustering<M>("Biclustering", "biclustering");
-    colIDs = new int[DatabaseUtil.dimensionality(this.relation)];
+    colIDs = new int[RelationUtil.dimensionality(this.relation)];
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;
     }

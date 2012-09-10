@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -47,7 +48,6 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -150,13 +150,13 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @return Clustering result
    * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
-  public Clustering<Model> run(Database database, Relation<NumberVector<?, ?>> relation) throws UnableToComplyException {
+  public Clustering<Model> run(Database database, Relation<NumberVector<?>> relation) throws UnableToComplyException {
     Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;
     ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());
 
-    final int maxdim = Math.min(maxLMDim, DatabaseUtil.dimensionality(relation));
+    final int maxdim = Math.min(maxLMDim, RelationUtil.dimensionality(relation));
     int cnum = 0;
     while(unclustered.size() > minsize) {
       DBIDs current = unclustered;
@@ -254,7 +254,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @return the overall goodness of the separation. The values origin basis and
    *         threshold are returned indirectly over class variables.
    */
-  private Separation findSeparation(Relation<NumberVector<?, ?>> relation, DBIDs currentids, int dimension) {
+  private Separation findSeparation(Relation<NumberVector<?>> relation, DBIDs currentids, int dimension) {
     Separation separation = new Separation();
     // determine the number of samples needed, to secure that with a specific
     // probability

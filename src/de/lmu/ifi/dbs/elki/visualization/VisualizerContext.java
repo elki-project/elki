@@ -138,7 +138,7 @@ public class VisualizerContext implements DataStoreListener, Result {
       // FIXME: this is a really ugly workaround. :-(
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
-        Relation<? extends NumberVector<?, ?>> vrel = (Relation<? extends NumberVector<?, ?>>) rel;
+        Relation<? extends NumberVector<?>> vrel = (Relation<? extends NumberVector<?>>) rel;
         ResultUtil.getScalesResult(vrel);
       }
     }

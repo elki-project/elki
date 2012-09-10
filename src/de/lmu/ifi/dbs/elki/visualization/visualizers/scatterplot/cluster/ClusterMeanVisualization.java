@@ -164,7 +164,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         double[] mean;
         if(model instanceof MeanModel) {
           @SuppressWarnings("unchecked")
-          MeanModel<? extends NumberVector<?, ?>> mmodel = (MeanModel<? extends NumberVector<?, ?>>) model;
+          MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
           mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
         }
         else if(model instanceof MedoidModel) {

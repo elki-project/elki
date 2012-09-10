@@ -53,13 +53,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -93,7 +93,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("PROCLUS: PROjected CLUStering")
 @Description("Algorithm to find subspace clusters in high dimensional spaces.")
 @Reference(authors = "C. C. Aggarwal, C. Procopiuc, J. L. Wolf, P. S. Yu, J. S. Park", title = "Fast Algorithms for Projected Clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99)", url = "http://dx.doi.org/10.1145/304181.304188")
-public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClustering<Clustering<SubspaceModel<V>>, V> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedClustering<Clustering<SubspaceModel<V>>, V> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -155,8 +155,8 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
       random.setSeed(seed);
     }
 
-    if(DatabaseUtil.dimensionality(relation) < l) {
-      throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + DatabaseUtil.dimensionality(relation) + " < " + l + ")");
+    if(RelationUtil.dimensionality(relation) < l) {
+      throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + RelationUtil.dimensionality(relation) + " < " + l + ")");
     }
 
     // TODO: use a StepProgress!
@@ -238,7 +238,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("ProClus clustering", "proclus-clustering");
     for(PROCLUSCluster c : finalClusters) {
       Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.objectIDs);
-      cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.getDimensions()), c.centroid));
+      cluster.setModel(new SubspaceModel<V>(new Subspace(c.getDimensions()), c.centroid));
       cluster.setName("cluster_" + numClusters++);
 
       result.addCluster(cluster);
@@ -406,7 +406,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
     Map<DBID, DistanceDBIDResult<DoubleDistance>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
-    int dim = DatabaseUtil.dimensionality(database);
+    int dim = RelationUtil.dimensionality(database);
     Map<DBID, double[]> averageDistances = new HashMap<DBID, double[]>();
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
@@ -484,7 +484,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    */
   private List<Pair<V, Set<Integer>>> findDimensions(List<PROCLUSCluster> clusters, Relation<V> database) {
     // compute x_ij = avg distance from points in c_i to c_i.centroid
-    int dim = DatabaseUtil.dimensionality(database);
+    int dim = RelationUtil.dimensionality(database);
     Map<Integer, double[]> averageDistances = new HashMap<Integer, double[]>();
 
     for(int i = 0; i < clusters.size(); i++) {
@@ -830,7 +830,7 @@ public class PROCLUS<V extends NumberVector<V, ?>> extends AbstractProjectedClus
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractProjectedClustering.Parameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractProjectedClustering.Parameterizer {
     protected int m_i = -1;
 
     protected Long seed = null;

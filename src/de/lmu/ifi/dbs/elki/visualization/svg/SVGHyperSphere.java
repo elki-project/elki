@@ -57,7 +57,7 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad) {
+  public static <D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad) {
     final double radius = rad.doubleValue();
     final double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
     final BitSet dims = proj.getVisibleDimensions2D();
@@ -104,7 +104,7 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad) {
+  public static <D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad) {
     final double radius = rad.doubleValue();
     double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
     BitSet dims = proj.getVisibleDimensions2D();
@@ -157,7 +157,7 @@ public class SVGHyperSphere {
    * @param p L_p value
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad, double p) {
+  public static <D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad, double p) {
     final double radius = rad.doubleValue();
     final double[] v_mid = mid.getColumnVector().getArrayRef();
     final BitSet dims = proj.getVisibleDimensions2D();
@@ -277,7 +277,7 @@ public class SVGHyperSphere {
    * @param rad radius
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, D rad) {
+  public static <D extends NumberDistance<?, ?>> Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad) {
     final double radius = rad.doubleValue();
     final double[] v_mid = mid.getColumnVector().getArrayRef();
     final BitSet dims = proj.getVisibleDimensions2D();

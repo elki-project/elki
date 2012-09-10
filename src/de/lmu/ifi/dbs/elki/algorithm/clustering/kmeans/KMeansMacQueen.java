@@ -37,11 +37,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
-public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -81,13 +81,14 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
+   * @param initializer Initialization method
    */
-  public KMeansMacQueen(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansMacQueen(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   /**
-   * Run k-means
+   * Run k-means.
    * 
    * @param database Database
    * @param relation relation to use
@@ -99,7 +100,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
     }
     // Choose initial means
     List<Vector> means = new ArrayList<Vector>(k);
-    for(NumberVector<?, ?> nv : initializer.chooseInitialMeans(relation, k, getDistanceFunction())) {
+    for(NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, getDistanceFunction())) {
       means.add(nv.getColumnVector());
     }
     // Initialize cluster and assign objects
@@ -121,7 +122,7 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
         break;
       }
     }
-    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
@@ -143,11 +144,20 @@ public class KMeansMacQueen<V extends NumberVector<V, ?>, D extends Distance<D>>
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?>, D> {
+    /**
+     * k Parameter.
+     */
     protected int k;
 
+    /**
+     * Maximum number of iterations.
+     */
     protected int maxiter;
 
+    /**
+     * Initialization method.
+     */
     protected KMeansInitialization<V> initializer;
 
     @Override

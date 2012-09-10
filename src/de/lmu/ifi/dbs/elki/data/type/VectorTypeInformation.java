@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @param <V> Vector type
  */
-public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends SimpleTypeInformation<V> {
+public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTypeInformation<V> {
   /**
    * Minimum dimensionality.
    */
@@ -153,7 +153,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
    * @param maxdim Maximum dimensionality
    * @return Type information
    */
-  public static <T extends FeatureVector<?, ?>> VectorTypeInformation<T> get(Class<T> cls, int mindim, int maxdim) {
+  public static <T extends FeatureVector<?>> VectorTypeInformation<T> get(Class<T> cls, int mindim, int maxdim) {
     return new VectorTypeInformation<T>(cls, mindim, maxdim);
   }
 
@@ -165,7 +165,7 @@ public class VectorTypeInformation<V extends FeatureVector<?, ?>> extends Simple
    * @param cls Class restriction
    * @return Type information
    */
-  public static <T extends FeatureVector<?, ?>> VectorTypeInformation<T> get(Class<T> cls) {
+  public static <T extends FeatureVector<?>> VectorTypeInformation<T> get(Class<T> cls) {
     return new VectorTypeInformation<T>(cls);
   }
 

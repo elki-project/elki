@@ -115,7 +115,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
    * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has DBIDSelection oneway - - updates
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DragableArea.DragListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> implements DragableArea.DragListener {
     /**
      * CSS class of the selection rectangle while selecting.
      */

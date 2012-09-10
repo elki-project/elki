@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -64,7 +65,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -101,9 +101,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
 @Reference(authors = "Fabian Keller, Emmanuel Müller, Klemens Böhm", title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", url="http://dx.doi.org/10.1109/ICDE.2012.88")
-public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
-   * The Logger for this class
+   * The Logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(HiCS.class);
 
@@ -113,37 +113,37 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   private static final int MAX_RETRIES = 100;
 
   /**
-   * Monte-Carlo iterations
+   * Monte-Carlo iterations.
    */
   private int m;
 
   /**
-   * Alpha threshold
+   * Alpha threshold.
    */
   private double alpha;
 
   /**
-   * Outlier detection algorithm
+   * Outlier detection algorithm.
    */
   private OutlierAlgorithm outlierAlgorithm;
 
   /**
-   * Statistical test to use
+   * Statistical test to use.
    */
   private GoodnessOfFitTest statTest;
 
   /**
-   * Candidates limit
+   * Candidates limit.
    */
   private int cutoff;
   
   /**
-   * Random generator
+   * Random generator.
    */
   private Random random;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param m value of m
    * @param alpha value of alpha
@@ -163,7 +163,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   }
 
   /**
-   * Perform HiCS on a given database
+   * Perform HiCS on a given database.
    * 
    * @param relation the database
    * @return The aggregated resulting scores that were assigned by the given
@@ -171,7 +171,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
 
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
     Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex);
@@ -233,8 +233,8 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
    * @param relation Relation to index
    * @return List of sorted objects
    */
-  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?, ?>> relation) {
-    final int dim = DatabaseUtil.dimensionality(relation);
+  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation) {
+    final int dim = RelationUtil.dimensionality(relation);
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim + 1);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
@@ -249,14 +249,14 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   }
 
   /**
-   * Identifies high contrast subspaces in a given full-dimensional database
+   * Identifies high contrast subspaces in a given full-dimensional database.
    * 
    * @param relation the relation the HiCS should be evaluated for
    * @param subspaceIndex Subspace indexes
    * @return a set of high contrast subspaces
    */
-  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?, ?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
-    final int dbdim = DatabaseUtil.dimensionality(relation);
+  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
+    final int dbdim = RelationUtil.dimensionality(relation);
 
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Subspace dimensionality", dbdim, LOG) : null;
     if(dprog != null) {
@@ -337,13 +337,13 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   }
 
   /**
-   * Calculates the actual contrast of a given subspace
+   * Calculates the actual contrast of a given subspace.
    * 
-   * @param relation
-   * @param subspace
+   * @param relation Relation to process
+   * @param subspace Subspace
    * @param subspaceIndex Subspace indexes
    */
-  private void calculateContrast(Relation<? extends NumberVector<?, ?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex) {
+  private void calculateContrast(Relation<? extends NumberVector<?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex) {
     final int card = subspace.cardinality();
     final double alpha1 = Math.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
@@ -443,12 +443,12 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
    */
   public static class HiCSSubspace extends BitSet {
     /**
-     * Serial version
+     * Serial version.
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * The HiCS contrast value
+     * The HiCS contrast value.
      */
     protected double contrast;
 
@@ -473,7 +473,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     /**
      * Sort subspaces by their actual subspace.
      */
-    public static Comparator<HiCSSubspace> SORT_BY_CONTRAST_ASC = new Comparator<HiCSSubspace>() {
+    public static final Comparator<HiCSSubspace> SORT_BY_CONTRAST_ASC = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
         if(o1.contrast == o2.contrast) {
@@ -486,7 +486,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     /**
      * Sort subspaces by their actual subspace.
      */
-    public static Comparator<HiCSSubspace> SORT_BY_CONTRAST_DESC = new Comparator<HiCSSubspace>() {
+    public static final Comparator<HiCSSubspace> SORT_BY_CONTRAST_DESC = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
         if(o1.contrast == o2.contrast) {
@@ -499,7 +499,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     /**
      * Sort subspaces by their actual subspace.
      */
-    public static Comparator<HiCSSubspace> SORT_BY_SUBSPACE = new Comparator<HiCSSubspace>() {
+    public static final Comparator<HiCSSubspace> SORT_BY_SUBSPACE = new Comparator<HiCSSubspace>() {
       @Override
       public int compare(HiCSSubspace o1, HiCSSubspace o2) {
         int dim1 = o1.nextSetBit(0);
@@ -520,7 +520,7 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Jan Brusis
    * 
@@ -528,38 +528,38 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
    * 
    * @param <V> vector type
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Parameter that specifies the number of iterations in the Monte-Carlo
-     * process of identifying high contrast subspaces
+     * process of identifying high contrast subspaces.
      */
     public static final OptionID M_ID = OptionID.getOrCreateOptionID("hics.m", "The number of iterations in the Monte-Carlo processing.");
 
     /**
      * Parameter that determines the size of the test statistic during the
-     * Monte-Carlo iteration
+     * Monte-Carlo iteration.
      */
     public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hics.alpha", "The discriminance value that determines the size of the test statistic .");
 
     /**
      * Parameter that specifies which outlier detection algorithm to use on the
-     * resulting set of high contrast subspaces
+     * resulting set of high contrast subspaces.
      */
     public static final OptionID ALGO_ID = OptionID.getOrCreateOptionID("hics.algo", "The Algorithm that performs the actual outlier detection on the resulting set of subspace");
 
     /**
      * Parameter that specifies which statistical test to use in order to
-     * calculate the deviation of two given data samples
+     * calculate the deviation of two given data samples.
      */
     public static final OptionID TEST_ID = OptionID.getOrCreateOptionID("hics.test", "The statistical test that is used to calculate the deviation of two data samples");
 
     /**
-     * Parameter that specifies the candidate_cutoff
+     * Parameter that specifies the candidate_cutoff.
      */
     public static final OptionID LIMIT_ID = OptionID.getOrCreateOptionID("hics.limit", "The threshold that determines how many d-dimensional subspace candidates to retain in each step of the generation");
 
     /**
-     * Parameter that specifies the random seed
+     * Parameter that specifies the random seed.
      */
     public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("hics.seed", "The random seed.");
 
@@ -584,12 +584,12 @@ public class HiCS<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Outlie
     private GoodnessOfFitTest statTest;
 
     /**
-     * Holds the value of {@link #LIMIT_ID}
+     * Holds the value of {@link #LIMIT_ID}.
      */
     private int cutoff = 400;
     
     /**
-     * Random seed (optional)
+     * Random seed (optional).
      */
     private Long seed = null;
 

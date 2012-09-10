@@ -121,7 +121,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
    * @param <E> Tree entry type
    */
   // TODO: listen for tree changes instead of data changes?
-  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector<?>> implements DataStoreListener {
     /**
      * The tree we visualize
      */

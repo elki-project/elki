@@ -27,11 +27,11 @@ import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.PreferenceVectorBasedCorrelationDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @apiviz.has Instance
  */
-public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<NumberVector<?, ?>, DiSHPreferenceVectorIndex<NumberVector<?, ?>>> {
+public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelationDistanceFunction<NumberVector<?>, DiSHPreferenceVectorIndex<NumberVector<?>>> {
   /**
    * Logger for debug.
    */
@@ -51,19 +51,19 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
   /**
    * Constructor.
    * 
-   * @param indexFactory
-   * @param epsilon
+   * @param indexFactory DiSH index factory
+   * @param epsilon Epsilon value
    */
-  public DiSHDistanceFunction(DiSHPreferenceVectorIndex.Factory<NumberVector<?, ?>> indexFactory, double epsilon) {
+  public DiSHDistanceFunction(DiSHPreferenceVectorIndex.Factory<NumberVector<?>> indexFactory, double epsilon) {
     super(indexFactory, epsilon);
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Relation<T> database) {
+  public <T extends NumberVector<?>> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    DiSHPreferenceVectorIndex<T> indexinst = (DiSHPreferenceVectorIndex<T>) indexFactory.instantiate((Relation<NumberVector<?, ?>>) database);
+    DiSHPreferenceVectorIndex<T> indexinst = (DiSHPreferenceVectorIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
     return new Instance<T>(database, indexinst, getEpsilon(), this);
   }
 
@@ -74,7 +74,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
    */
   public int getMinpts() {
     // TODO: get rid of this cast?
-    return ((DiSHPreferenceVectorIndex.Factory<NumberVector<?, ?>>) indexFactory).getMinpts();
+    return ((DiSHPreferenceVectorIndex.Factory<NumberVector<?>>) indexFactory).getMinpts();
   }
 
   /**
@@ -82,7 +82,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, DiSHPreferenceVectorIndex<V>> {
+  public static class Instance<V extends NumberVector<?>> extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Instance<V, DiSHPreferenceVectorIndex<V>> {
     /**
      * Constructor.
      * 
@@ -136,7 +136,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
       BitSet inverseCommonPreferenceVector = (BitSet) commonPreferenceVector.clone();
       inverseCommonPreferenceVector.flip(0, dim);
 
-      return new PreferenceVectorBasedCorrelationDistance(DatabaseUtil.dimensionality(relation), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
+      return new PreferenceVectorBasedCorrelationDistance(RelationUtil.dimensionality(relation), subspaceDim, weightedDistance(v1, v2, inverseCommonPreferenceVector), commonPreferenceVector);
     }
   }
 
@@ -147,11 +147,11 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Parameterizer<DiSHPreferenceVectorIndex.Factory<NumberVector<?, ?>>> {
+  public static class Parameterizer extends AbstractPreferenceVectorBasedCorrelationDistanceFunction.Parameterizer<DiSHPreferenceVectorIndex.Factory<NumberVector<?>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Class<DiSHPreferenceVectorIndex.Factory<NumberVector<?, ?>>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DiSHPreferenceVectorIndex.Factory.class);
+      Class<DiSHPreferenceVectorIndex.Factory<NumberVector<?>>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DiSHPreferenceVectorIndex.Factory.class);
       factory = config.tryInstantiate(cls);
     }
 

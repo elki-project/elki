@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
@@ -84,17 +85,19 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @apiviz.has VAFileRangeQuery
  * @apiviz.has VAFileKNNQuery
  * @apiviz.uses VALPNormDistance
+ * 
+ * @param <V> Vector type
  */
 @Title("An approximation based data structure for similarity search")
 @Reference(authors = "Weber, R. and Blott, S.", title = "An approximation based data structure for similarity search", booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
-public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
+public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
-   * Logging class
+   * Logging class.
    */
-  private static final Logging log = Logging.getLogger(VAFile.class);
+  private static final Logging LOG = Logging.getLogger(VAFile.class);
 
   /**
-   * Approximation index
+   * Approximation index.
    */
   private List<VectorApproximation> vectorApprox;
 
@@ -104,12 +107,12 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
   private int partitions;
 
   /**
-   * Quantile grid we use
+   * Quantile grid we use.
    */
   private double[][] splitPositions;
 
   /**
-   * Page size, for estimating the VA file size
+   * Page size, for estimating the VA file size.
    */
   int pageSize;
 
@@ -153,7 +156,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 
-    final int dimensions = DatabaseUtil.dimensionality(relation);
+    final int dimensions = RelationUtil.dimensionality(relation);
     final int size = relation.size();
     splitPositions = new double[dimensions][partitions + 1];
 
@@ -192,13 +195,13 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
       if(val < splitPositions[d][0]) {
         approximation[d] = 0;
         if(id != null) {
-          log.warning("Vector outside of VAFile grid!");
+          LOG.warning("Vector outside of VAFile grid!");
         }
       } // Value is above data grid
       else if(val > splitPositions[d][lastBorderIndex]) {
         approximation[d] = lastBorderIndex - 1;
         if(id != null) {
-          log.warning("Vector outside of VAFile grid!");
+          LOG.warning("Vector outside of VAFile grid!");
         }
       } // normal case
       else {
@@ -429,9 +432,9 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
         final double dist = refine(va.second, query).doubleValue();
         result.add(dist, va.second);
       }
-      if(log.isDebuggingFinest()) {
-        log.finest("query = (" + query + ")");
-        log.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
+      if(LOG.isDebuggingFinest()) {
+        LOG.finest("query = (" + query + ")");
+        LOG.finest("database: " + vectorApprox.size() + ", candidates: " + candidates.size() + ", results: " + result.size());
       }
 
       return result.toKNNList();
@@ -439,7 +442,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
   }
 
   /**
-   * Index factory class
+   * Index factory class.
    * 
    * @author Erich Schubert
    * 
@@ -448,7 +451,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
    * 
    * @param <V> Vector type
    */
-  public static class Factory<V extends NumberVector<?, ?>> implements IndexFactory<V, VAFile<V>> {
+  public static class Factory<V extends NumberVector<?>> implements IndexFactory<V, VAFile<V>> {
     /**
      * Number of partitions to use in each dimension.
      * 
@@ -459,12 +462,12 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("vafile.partitions", "Number of partitions to use in each dimension.");
 
     /**
-     * Page size
+     * Page size.
      */
     int pagesize = 1;
 
     /**
-     * Number of partitions
+     * Number of partitions.
      */
     int numpart = 2;
 
@@ -491,7 +494,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
     }
 
     /**
-     * Parameterization class
+     * Parameterization class.
      * 
      * @author Erich Schubert
      * 
@@ -499,12 +502,12 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
      */
     public static class Parameterizer extends AbstractParameterizer {
       /**
-       * Page size
+       * Page size.
        */
       int pagesize = 1;
 
       /**
-       * Number of partitions
+       * Number of partitions.
        */
       int numpart = 2;
 
@@ -523,7 +526,7 @@ public class VAFile<V extends NumberVector<?, ?>> extends AbstractRefiningIndex<
 
       @Override
       protected Factory<?> makeInstance() {
-        return new Factory<NumberVector<?, ?>>(pagesize, numpart);
+        return new Factory<NumberVector<?>>(pagesize, numpart);
       }
     }
   }

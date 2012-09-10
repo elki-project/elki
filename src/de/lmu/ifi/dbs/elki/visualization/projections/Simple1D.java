@@ -55,7 +55,7 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   }
 
   @Override
-  public double fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
+  public double fastProjectDataToRenderSpace(NumberVector<?> data) {
     return (scales[dnum].getScaled(data.doubleValue(dnum + 1)) - 0.5) * SCALE;
   }
 
@@ -70,7 +70,7 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   }
 
   @Override
-  public double fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+  public double fastProjectRelativeDataToRenderSpace(NumberVector<?> data) {
     return (data.doubleValue(dnum) - 0.5) * SCALE;
   }
 

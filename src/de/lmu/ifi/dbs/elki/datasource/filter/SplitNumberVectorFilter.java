@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -44,8 +45,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Erich Schubert
  * 
  * @apiviz.uses NumberVector
+ * 
+ * @param <V> Vector type
  */
-public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements ObjectFilter {
+public class SplitNumberVectorFilter<V extends NumberVector<?>> implements ObjectFilter {
   /**
    * Selected dimensions.
    */
@@ -80,10 +83,11 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
       // Should be a vector type after above test.
       @SuppressWarnings("unchecked")
       final VectorFieldTypeInformation<V> vtype = VectorFieldTypeInformation.class.cast(type);
+      Factory<V, ?> factory = FilterUtil.guessFactory(vtype);
 
       // Get the replacement type informations
-      VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), type.getSerializer(), dims.length, vtype.getFactory());
-      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(type.getRestrictionClass(), type.getSerializer(), vtype.dimensionality() - dims.length, vtype.getFactory());
+      VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(factory, dims.length);
+      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(factory, vtype.dimensionality() - dims.length);
       final List<V> col1 = new ArrayList<V>(column.size());
       final List<V> col2 = new ArrayList<V>(column.size());
       bundle.appendColumn(type1, col1);
@@ -110,7 +114,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
           }
         }
       }
-      // Normalization scan
+      // Splitting scan.
       for(int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
         final V obj = (V) column.get(i);
@@ -122,8 +126,8 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
         for(int d = 0; d < odims.length; d++) {
           part2[d] = obj.doubleValue(odims[d]);
         }
-        col1.add(obj.newNumberVector(part1));
-        col2.add(obj.newNumberVector(part2));
+        col1.add(factory.newNumberVector(part1));
+        col2.add(factory.newNumberVector(part2));
       }
     }
     return bundle;
@@ -140,7 +144,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
     for(int i = 1; i < dims.length; i++) {
       m = Math.max(dims[i], m);
     }
-    return new VectorFieldTypeInformation<NumberVector<?, ?>>(NumberVector.class, m, Integer.MAX_VALUE);
+    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, m, Integer.MAX_VALUE);
   }
 
   /**
@@ -150,7 +154,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<V, ?>> implements Ob
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * The parameter listing the split dimensions.
      */

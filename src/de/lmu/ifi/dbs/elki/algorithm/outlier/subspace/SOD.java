@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SharedNearestNeighborSimilarityFunction;
@@ -57,7 +58,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -88,12 +88,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.has SharedNearestNeighborSimilarityFunction
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
+ * @param <D> distance type
  */
 // todo arthur comment
 @Title("SOD: Subspace outlier degree")
 @Description("Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "Outlier Detection in Axis-Parallel Subspaces of High Dimensional Data", booktitle = "Proceedings of the 13th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD), Bangkok, Thailand, 2009", url = "http://dx.doi.org/10.1007/978-3-642-01307-2")
-public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
+public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -220,13 +221,13 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
   }
 
   /**
-   * 
+   * SOD Model class
    * 
    * @author Arthur Zimek
    * @param <V> the type of DatabaseObjects handled by this Result
    */
   // TODO: arthur comment
-  public static class SODModel<V extends NumberVector<V, ?>> implements TextWriteable, Comparable<SODModel<?>> {
+  public static class SODModel<V extends NumberVector<?>> implements TextWriteable, Comparable<SODModel<?>> {
     private double[] centerValues;
 
     private V center;
@@ -250,7 +251,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     public SODModel(Relation<V> relation, DBIDs neighborhood, double alpha, V queryObject) {
       if(neighborhood.size() > 0) {
         // TODO: store database link?
-        centerValues = new double[DatabaseUtil.dimensionality(relation)];
+        centerValues = new double[RelationUtil.dimensionality(relation)];
         variances = new double[centerValues.length];
         for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
           V databaseObject = relation.get(iter);
@@ -282,7 +283,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
             weightVector.set(d, true);
           }
         }
-        center = DatabaseUtil.assumeVectorField(relation).getFactory().newNumberVector(centerValues);
+        center = RelationUtil.getNumberVectorFactory(relation).newNumberVector(centerValues);
         sod = subspaceOutlierDegree(queryObject, center, weightVector);
       }
       else {
@@ -292,12 +293,12 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     }
 
     /**
-     * Compute SOD score
+     * Compute SOD score.
      * 
-     * @param queryObject
-     * @param center
-     * @param weightVector
-     * @return sod value
+     * @param queryObject Query object
+     * @param center Center vector
+     * @param weightVector Weight vector
+     * @return sod score
      */
     private double subspaceOutlierDegree(V queryObject, V center, BitSet weightVector) {
       final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
@@ -350,7 +351,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
     Relation<SODModel<?>> models;
 
     /**
-     * The IDs we are defined for
+     * The IDs we are defined for.
      */
     DBIDs dbids;
 
@@ -434,7 +435,7 @@ public class SOD<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> e
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #KNN_ID}.
      */

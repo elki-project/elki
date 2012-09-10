@@ -36,13 +36,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -120,7 +120,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
         if(testMeanModel(c)) {
           Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           for(ScatterPlotProjector<?> p : ps) {
-            if(DatabaseUtil.dimensionality(p.getRelation()) == 2) {
+            if(RelationUtil.dimensionality(p.getRelation()) == 2) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
               baseResult.getHierarchy().add(p, task);
@@ -198,7 +198,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
             double[] mean;
             if(model instanceof MeanModel) {
               @SuppressWarnings("unchecked")
-              MeanModel<? extends NumberVector<?, ?>> mmodel = (MeanModel<? extends NumberVector<?, ?>>) model;
+              MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
               mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
             }
             else if(model instanceof MedoidModel) {
@@ -231,7 +231,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
             Vector mean;
             if(model instanceof MeanModel) {
               @SuppressWarnings("unchecked")
-              MeanModel<? extends NumberVector<?, ?>> mmodel = (MeanModel<? extends NumberVector<?, ?>>) model;
+              MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
               mean = mmodel.getMean().getColumnVector();
             }
             else if(model instanceof MedoidModel) {

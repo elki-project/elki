@@ -48,7 +48,7 @@ public interface Projection1D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectDataToRenderSpace(NumberVector<?, ?> data);
+  public double fastProjectDataToRenderSpace(NumberVector<?> data);
 
   /**
    * Project a vector from scaled space to rendering space.
@@ -72,7 +72,7 @@ public interface Projection1D extends Projection {
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data);
+  public double fastProjectRelativeDataToRenderSpace(NumberVector<?> data);
 
   /**
    * Project a vector from scaled space to rendering space.

@@ -26,6 +26,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
@@ -56,16 +57,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <V> Vector type
  */
 @Description("Add uniform Jitter to a dataset, while preserving the total vector sum.")
-public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends AbstractStreamConversionFilter<V, V> {
+public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractStreamConversionFilter<V, V> {
   /**
-   * Jitter amount
+   * Jitter amount.
    */
   double jitter;
 
   /**
-   * Random generator
+   * Random generator.
    */
   ExponentialDistribution rnd;
+
+  /**
+   * Vector factory.
+   */
+  Factory<V, ?> factory;
 
   /**
    * Constructor.
@@ -79,7 +85,7 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
     Random random = (seed == null) ? new Random() : new Random(seed);
     rnd = new ExponentialDistribution(1, random);
   }
-
+  
   @Override
   protected V filterSingleObject(V obj) {
     final int dim = obj.getDimensionality();
@@ -102,7 +108,7 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
     for(int i = 0; i < raw.length; i++) {
       raw[i] = raw[i] + (1 - mix) * obj.doubleValue(i + 1);
     }
-    return obj.newNumberVector(raw);
+    return factory.newNumberVector(raw);
   }
 
   @Override
@@ -112,6 +118,8 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
 
   @Override
   protected SimpleTypeInformation<V> convertedType(SimpleTypeInformation<V> in) {
+    // Initialize factory:
+    factory = FilterUtil.guessFactory(in);
     return in;
   }
 
@@ -134,12 +142,12 @@ public class HistogramJitterFilter<V extends NumberVector<V, ?>> extends Abstrac
     public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("jitter.seed", "Jitter random seed.");
 
     /**
-     * Jitter amount
+     * Jitter amount.
      */
     double jitter = 0.1;
 
     /**
-     * Random generator seed
+     * Random generator seed.
      */
     Long seed = null;
 

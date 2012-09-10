@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * 
  * @param <NV> Number vector
  */
-public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?>> extends AbstractPreprocessorIndex<NV, BitSet> implements PreferenceVectorIndex<NV> {
+public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?>> extends AbstractPreprocessorIndex<NV, BitSet> implements PreferenceVectorIndex<NV> {
   /**
    * Constructor.
    * 
@@ -71,7 +71,7 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?, ?
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractPreferenceVectorIndex oneway - - «create»
    */
-  public abstract static class Factory<V extends NumberVector<?, ?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
+  public abstract static class Factory<V extends NumberVector<?>, I extends PreferenceVectorIndex<V>> implements PreferenceVectorIndex.Factory<V, I>, Parameterizable {
     @Override
     public abstract I instantiate(Relation<V> relation);
 

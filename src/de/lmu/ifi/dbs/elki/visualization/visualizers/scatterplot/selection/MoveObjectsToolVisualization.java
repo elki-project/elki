@@ -159,7 +159,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
      */
     // TODO: move to DatabaseUtil?
     private void updateDB(DBIDs dbids, Vector movingVector) {
-      NumberVector<?, ?> nv = null;
+      NumberVector<?> nv = null;
       throw new AbortException("FIXME: INCOMPLETE TRANSITION");
       /*
        * database.accumulateDataStoreEvents();

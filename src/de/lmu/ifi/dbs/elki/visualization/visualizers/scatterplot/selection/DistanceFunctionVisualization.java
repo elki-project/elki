@@ -151,7 +151,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @param angle Opening angle in radians
    * @return path element
    */
-  public static Element drawCosine(SVGPlot svgp, Projection2D proj, NumberVector<?, ?> mid, double angle) {
+  public static Element drawCosine(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double angle) {
     // Project origin
     double[] pointOfOrigin = proj.fastProjectDataToRenderSpace(new double[proj.getInputDimensionality()]);
   
@@ -248,7 +248,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
     /**
      * The selection result we work on
      */
-    private AbstractMaterializeKNNPreprocessor<? extends NumberVector<?, ?>, D, ?> result;
+    private AbstractMaterializeKNNPreprocessor<? extends NumberVector<?>, D, ?> result;
 
     /**
      * Constructor
@@ -306,7 +306,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
               dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), last.getDistance(), p);
             }
             else if(angular) {
-              final NumberVector<?, ?> refvec = rel.get(i);
+              final NumberVector<?> refvec = rel.get(i);
               // Recompute the angle - it could be cosine or arccosine distance
               double maxangle = Math.acos(VectorUtil.cosAngle(refvec, rel.get(last)));
               dist = drawCosine(svgp, proj, refvec, maxangle);

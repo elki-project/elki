@@ -76,7 +76,7 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractVectorDo
    *         and v2
    */
   @Override
-  public double doubleDistance(NumberVector<?, ?> v1, NumberVector<?, ?> v2) {
+  public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     return 1 - MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights);
   }
 

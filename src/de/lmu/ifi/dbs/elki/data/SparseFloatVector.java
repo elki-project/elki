@@ -50,19 +50,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  */
 // TODO: implement ByteArraySerializer<SparseFloatVector>
-public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, Float> implements SparseNumberVector<SparseFloatVector, Float> {
+public class SparseFloatVector extends AbstractNumberVector<Float> implements SparseNumberVector<Float> {
   /**
-   * Static instance
+   * Static instance.
    */
-  public static final SparseFloatVector STATIC = new SparseFloatVector(new int[0], new float[0], -1);
+  public static final SparseFloatVector.Factory FACTORY = new SparseFloatVector.Factory();
 
   /**
-   * Indexes of values
+   * Indexes of values.
    */
   private int[] indexes;
 
   /**
-   * Stored values
+   * Stored values.
    */
   private float[] values;
 
@@ -96,7 +96,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    *         zero is bigger than the given dimensionality)
    */
   public SparseFloatVector(TIntFloatMap values, int dimensionality) throws IllegalArgumentException {
-    if(values.size() > dimensionality) {
+    if (values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
 
@@ -105,7 +105,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     // Import and sort the indexes
     {
       TIntFloatIterator iter = values.iterator();
-      for(int i = 0; iter.hasNext(); i++) {
+      for (int i = 0; iter.hasNext(); i++) {
         this.indexes[i] = iter.key();
         iter.advance();
       }
@@ -113,13 +113,13 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     }
     // Import the values accordingly
     {
-      for(int i = 0; i < values.size(); i++) {
+      for (int i = 0; i < values.size(); i++) {
         this.values[i] = values.get(this.indexes[i]);
       }
     }
     this.dimensionality = dimensionality;
     final int maxdim = getMaxDim();
-    if(maxdim > dimensionality) {
+    if (maxdim > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
   }
@@ -130,10 +130,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @return the maximum dimensionality seen
    */
   private int getMaxDim() {
-    if(this.indexes.length == 0) {
+    if (this.indexes.length == 0) {
       return 0;
-    }
-    else {
+    } else {
       return this.indexes[this.indexes.length - 1];
     }
   }
@@ -153,8 +152,8 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     // Count the number of non-zero entries
     int size = 0;
     {
-      for(int i = 0; i < values.length; i++) {
-        if(values[i] != 0.0f) {
+      for (int i = 0; i < values.length; i++) {
+        if (values[i] != 0.0f) {
           size++;
         }
       }
@@ -165,9 +164,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
     // Copy the values
     {
       int pos = 0;
-      for(int i = 0; i < values.length; i++) {
+      for (int i = 0; i < values.length; i++) {
         float value = values[i];
-        if(value != 0.0f) {
+        if (value != 0.0f) {
           this.indexes[pos] = i + 1;
           this.values[pos] = value;
           pos++;
@@ -193,7 +192,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public void setDimensionality(int dimensionality) throws IllegalArgumentException {
     final int maxdim = getMaxDim();
-    if(maxdim > dimensionality) {
+    if (maxdim > dimensionality) {
       throw new IllegalArgumentException("Given dimensionality " + dimensionality + " is too small w.r.t. the given values (occurring maximum: " + maxdim + ").");
     }
     this.dimensionality = dimensionality;
@@ -202,10 +201,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public Float getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return values[pos];
-    }
-    else {
+    } else {
       return 0.0f;
     }
   }
@@ -213,10 +211,9 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public double doubleValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return values[pos];
-    }
-    else {
+    } else {
       return 0.0;
     }
   }
@@ -224,24 +221,23 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   @Override
   public long longValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return (long) values[pos];
-    }
-    else {
+    } else {
       return 0;
     }
   }
 
   @Override
   public Vector getColumnVector() {
-    double[] values = getValues();
-    return new Vector(values);
+    return new Vector(getValues());
   }
 
   /**
    * <p>
    * Provides a String representation of this SparseFloatVector as suitable for
-   * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}.
+   * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
+   * .
    * </p>
    * 
    * <p>
@@ -263,7 +259,7 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
   public String toString() {
     StringBuilder featureLine = new StringBuilder();
     featureLine.append(this.indexes.length);
-    for(int i = 0; i < this.indexes.length; i++) {
+    for (int i = 0; i < this.indexes.length; i++) {
       featureLine.append(ATTRIBUTE_SEPARATOR);
       featureLine.append(this.indexes[i]);
       featureLine.append(ATTRIBUTE_SEPARATOR);
@@ -279,80 +275,92 @@ public class SparseFloatVector extends AbstractNumberVector<SparseFloatVector, F
    * @return an array consisting of the values of this feature vector
    */
   private double[] getValues() {
-    double[] values = new double[dimensionality];
-    for(int i = 0; i < indexes.length; i++) {
-      values[this.indexes[i]] = this.values[i];
+    double[] vals = new double[dimensionality];
+    for (int i = 0; i < indexes.length; i++) {
+      vals[this.indexes[i]] = this.values[i];
     }
-    return values;
+    return vals;
   }
 
-  @Override
-  public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
-    int dim = adapter.size(array);
-    float[] values = new float[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = adapter.get(array, i);
+  /**
+   * Factory class.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Factory extends AbstractNumberVector.Factory<SparseFloatVector, Float> implements SparseNumberVector.Factory<SparseFloatVector, Float> {
+    @Override
+    public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<Float, A> adapter) {
+      int dim = adapter.size(array);
+      float[] values = new float[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.get(array, i);
+      }
+      // TODO: inefficient
+      return new SparseFloatVector(values);
     }
-    // TODO: inefficient
-    return new SparseFloatVector(values);
-  }
 
-  @Override
-  public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    int dim = adapter.size(array);
-    float[] values = new float[dim];
-    for(int i = 0; i < dim; i++) {
-      values[i] = adapter.getFloat(array, i);
+    @Override
+    public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+      int dim = adapter.size(array);
+      float[] values = new float[dim];
+      for (int i = 0; i < dim; i++) {
+        values[i] = adapter.getFloat(array, i);
+      }
+      // TODO: inefficient
+      return new SparseFloatVector(values);
     }
-    // TODO: inefficient
-    return new SparseFloatVector(values);
-  }
 
-  @Override
-  public SparseFloatVector newNumberVector(TIntDoubleMap dvalues, int maxdim) {
-    int[] indexes = new int[dvalues.size()];
-    float[] values = new float[dvalues.size()];
-    // Import and sort the indexes
-    TIntDoubleIterator iter = dvalues.iterator();
-    for(int i = 0; iter.hasNext(); i++) {
-      iter.advance();
-      indexes[i] = iter.key();
+    @Override
+    public SparseFloatVector newNumberVector(TIntDoubleMap dvalues, int maxdim) {
+      int[] indexes = new int[dvalues.size()];
+      float[] values = new float[dvalues.size()];
+      // Import and sort the indexes
+      TIntDoubleIterator iter = dvalues.iterator();
+      for (int i = 0; iter.hasNext(); i++) {
+        iter.advance();
+        indexes[i] = iter.key();
+      }
+      Arrays.sort(indexes);
+      // Import the values accordingly
+      for (int i = 0; i < dvalues.size(); i++) {
+        values[i] = (float) dvalues.get(indexes[i]);
+      }
+      return new SparseFloatVector(indexes, values, maxdim);
     }
-    Arrays.sort(indexes);
-    // Import the values accordingly
-    for(int i = 0; i < dvalues.size(); i++) {
-      values[i] = (float) dvalues.get(indexes[i]);
+
+    @Override
+    public ByteBufferSerializer<SparseFloatVector> getDefaultSerializer() {
+      // FIXME: add a serializer
+      return null;
     }
-    return new SparseFloatVector(indexes, values, maxdim);
+    
+    @Override
+    public Class<? super SparseFloatVector> getRestrictionClass() {
+      return SparseFloatVector.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected SparseFloatVector.Factory makeInstance() {
+        return FACTORY;
+      }
+    }
   }
 
   @Override
   public BitSet getNotNullMask() {
     BitSet b = new BitSet();
-    for(int key : indexes) {
+    for (int key : indexes) {
       b.set(key);
     }
     return b;
-  }
-  
-  @Override
-  public ByteBufferSerializer<SparseFloatVector> getDefaultSerializer() {
-    // FIXME: add a serializer
-    return null;
-  }
-
-  /**
-   * Parameterization class
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Parameterizer extends AbstractParameterizer {
-    @Override
-    protected SparseFloatVector makeInstance() {
-      return STATIC;
-    }
   }
 
   /**

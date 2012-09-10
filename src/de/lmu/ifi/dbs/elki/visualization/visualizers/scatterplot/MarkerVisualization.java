@@ -145,7 +145,7 @@ public class MarkerVisualization extends AbstractVisFactory {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
-              final NumberVector<?, ?> vec = rel.get(iter);
+              final NumberVector<?> vec = rel.get(iter);
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
             }

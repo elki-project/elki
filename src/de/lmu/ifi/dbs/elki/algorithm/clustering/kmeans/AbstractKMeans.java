@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?, ?>, D, Clustering<MeanModel<V>>> implements KMeans {
+public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?>, D, Clustering<MeanModel<V>>> implements KMeans {
   /**
    * Holds the value of {@link #K_ID}.
    */
@@ -80,7 +80,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public AbstractKMeans(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -96,12 +96,12 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param clusters cluster assignment
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector<?, ?>> means, List<? extends ModifiableDBIDs> clusters) {
+  protected boolean assignToNearestCluster(Relation<V> relation, List<? extends NumberVector<?>> means, List<? extends ModifiableDBIDs> clusters) {
     boolean changed = false;
 
     if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       @SuppressWarnings("unchecked")
-      final PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>>) getDistanceFunction();
+      final PrimitiveDoubleDistanceFunction<? super NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?>>) getDistanceFunction();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         double mindist = Double.POSITIVE_INFINITY;
         V fv = relation.get(iditer);
@@ -128,7 +128,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
       }
     }
     else {
-      final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
+      final PrimitiveDistanceFunction<? super NumberVector<?>, D> df = getDistanceFunction();
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         D mindist = df.getDistanceFactory().infiniteDistance();
         V fv = relation.get(iditer);
@@ -170,7 +170,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?, ?>> means, Relation<V> database) {
+  protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?>> means, Relation<V> database) {
     List<Vector> newMeans = new ArrayList<Vector>(k);
     for(int i = 0; i < k; i++) {
       ModifiableDBIDs list = clusters.get(i);
@@ -201,10 +201,10 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<NumberVector<?, ?>> medians(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?, ?>> medians, Relation<V> database) {
+  protected List<NumberVector<?>> medians(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?>> medians, Relation<V> database) {
     final int dim = medians.get(0).getDimensionality();
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
-    List<NumberVector<?, ?>> newMedians = new ArrayList<NumberVector<?, ?>>(k);
+    List<NumberVector<?>> newMedians = new ArrayList<NumberVector<?>>(k);
     for(int i = 0; i < k; i++) {
       ArrayModifiableDBIDs list = DBIDUtil.newArray(clusters.get(i));
       if(list.size() > 0) {
@@ -217,14 +217,14 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
         newMedians.add(mean);
       }
       else {
-        newMedians.add((NumberVector<?, ?>) medians.get(i));
+        newMedians.add((NumberVector<?>) medians.get(i));
       }
     }
     return newMedians;
   }
 
   /**
-   * Compute an incremental update for the mean
+   * Compute an incremental update for the mean.
    * 
    * @param mean Mean to update
    * @param vec Object vector
@@ -256,7 +256,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
     if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
       // Raw distance function
       @SuppressWarnings("unchecked")
-      final PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?, ?>>) getDistanceFunction();
+      final PrimitiveDoubleDistanceFunction<? super NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<? super NumberVector<?>>) getDistanceFunction();
 
       // Incremental update
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -288,7 +288,7 @@ public abstract class AbstractKMeans<V extends NumberVector<V, ?>, D extends Dis
     }
     else {
       // Raw distance function
-      final PrimitiveDistanceFunction<? super NumberVector<?, ?>, D> df = getDistanceFunction();
+      final PrimitiveDistanceFunction<? super NumberVector<?>, D> df = getDistanceFunction();
 
       // Incremental update
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

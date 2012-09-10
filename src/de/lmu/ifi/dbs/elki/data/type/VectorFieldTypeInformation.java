@@ -33,11 +33,11 @@ import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
  * 
  * @param <V> Vector type
  */
-public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends VectorTypeInformation<V> {
+public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends VectorTypeInformation<V> {
   /**
    * Object factory for producing new instances.
    */
-  private final V factory;
+  private final FeatureVector.Factory<V, ?> factory;
 
   /**
    * Labels.
@@ -46,59 +46,51 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
-   * @param cls Restriction java class
-   * @param serializer Serializer
+   * @param factory Factory class
    * @param dim Dimensionality
    * @param labels Labels
-   * @param factory Factory class
+   * @param serializer Serializer
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim, String[] labels, V factory) {
-    super(cls, serializer, dim, dim);
-    this.labels = labels;
+  public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, String[] labels, ByteBufferSerializer<? super V> serializer) {
+    super(factory.getRestrictionClass(), serializer, dim, dim);
     this.factory = factory;
+    this.labels = labels;
     assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
-   * @param cls Restriction java class
-   * @param serializer Serializer
+   * @param factory Factory class
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
-   * @param factory Factory class
-   */
-  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int mindim, int maxdim, V factory) {
-    super(cls, serializer, mindim, maxdim);
-    this.factory = factory;
-  }
-
-  /**
-   * Constructor with given dimensionality and factory, so usually an instance.
-   * 
-   * @param cls Restriction java class
    * @param serializer Serializer
-   * @param dim Dimensionality
-   * @param factory Factory class
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, ByteBufferSerializer<? super V> serializer, int dim, V factory) {
-    super(cls, serializer, dim, dim);
+  public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int mindim, int maxdim, ByteBufferSerializer<? super V> serializer) {
+    super(factory.getRestrictionClass(), serializer, mindim, maxdim);
     this.factory = factory;
   }
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
-   * @param cls Restriction java class
+   * @param factory Factory class
+   * @param dim Dimensionality
+   * @param serializer Serializer
+   */
+  public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, ByteBufferSerializer<? super V> serializer) {
+    super(factory.getRestrictionClass(), serializer, dim, dim);
+    this.factory = factory;
+  }
+
+  /**
+   * Constructor with given dimensionality and factory, so usually an instance.
+   * @param factory Factory class
    * @param dim Dimensionality
    * @param labels Labels
-   * @param factory Factory class
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, int dim, String[] labels, V factory) {
-    super(cls, dim, dim);
-    this.labels = labels;
+  public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, String[] labels) {
+    super(factory.getRestrictionClass(), factory.getDefaultSerializer(), dim, dim);
     this.factory = factory;
+    this.labels = labels;
     assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
 
@@ -117,12 +109,11 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
    * 
-   * @param cls Restriction java class
-   * @param dim Dimensionality
    * @param factory Factory class
+   * @param dim Dimensionality
    */
-  public VectorFieldTypeInformation(Class<? super V> cls, int dim, V factory) {
-    super(cls, dim, dim);
+  public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim) {
+    super(factory.getRestrictionClass(), factory.getDefaultSerializer(), dim, dim);
     this.factory = factory;
   }
 
@@ -178,7 +169,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * 
    * @return the factory
    */
-  public V getFactory() {
+  public FeatureVector.Factory<V, ?> getFactory() {
     if (factory == null) {
       throw new UnsupportedOperationException("Requesting factory for a type request!");
     }
@@ -193,7 +184,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * @param cls Class restriction
    * @return Type
    */
-  public static <T extends FeatureVector<?, ?>> VectorFieldTypeInformation<T> get(Class<T> cls) {
+  public static <T extends FeatureVector<?>> VectorFieldTypeInformation<T> get(Class<T> cls) {
     return new VectorFieldTypeInformation<T>(cls);
   }
 
@@ -206,7 +197,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?, ?>> extends V
    * @param dim Dimensionality (exact)
    * @return Type
    */
-  public static <T extends FeatureVector<?, ?>> VectorFieldTypeInformation<T> get(Class<T> cls, int dim) {
+  public static <T extends FeatureVector<?>> VectorFieldTypeInformation<T> get(Class<T> cls, int dim) {
     return new VectorFieldTypeInformation<T>(cls, dim);
   }
 

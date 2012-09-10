@@ -56,7 +56,7 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
   /**
    * The representation we visualize
    */
-  final protected Relation<? extends NumberVector<?, ?>> rel;
+  final protected Relation<? extends NumberVector<?>> rel;
 
   /**
    * The DBID sample

@@ -26,23 +26,23 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
- * Lp-Norm distance function for partially computed objects
+ * Lp-Norm distance function for partially computed objects.
  * 
  * @author Erich Schubert
  */
 public class VALPNormDistance {
   /**
-   * Value of 1/p for lP norm
+   * Value of 1/p for lP norm.
    */
   private final double onebyp;
 
   /**
-   * Lookup table for grid cells
+   * Lookup table for grid cells.
    */
   private double[][] lookup;
 
   /**
-   * Approximation of the query vector
+   * Approximation of the query vector.
    */
   private VectorApproximation queryApprox;
 
@@ -52,9 +52,9 @@ public class VALPNormDistance {
    * @param p Value of p
    * @param splitPositions Split positions
    * @param query Query vector
-   * @param queryApprox
+   * @param queryApprox Query approximation
    */
-  public VALPNormDistance(double p, double[][] splitPositions, NumberVector<?, ?> query, VectorApproximation queryApprox) {
+  public VALPNormDistance(double p, double[][] splitPositions, NumberVector<?> query, VectorApproximation queryApprox) {
     super();
     this.onebyp = 1.0 / p;
     this.queryApprox = queryApprox;
@@ -62,7 +62,7 @@ public class VALPNormDistance {
   }
 
   /**
-   * Get the minimum distance contribution of a single dimension
+   * Get the minimum distance contribution of a single dimension.
    * 
    * @param dimension Dimension
    * @param vp Vector position
@@ -82,7 +82,7 @@ public class VALPNormDistance {
   }
 
   /**
-   * Get the minimum distance to approximated vector vec
+   * Get the minimum distance to approximated vector vec.
    * 
    * @param vec Vector approximation
    * @return Minimum distance
@@ -98,7 +98,7 @@ public class VALPNormDistance {
   }
 
   /**
-   * Get the maximum distance contribution of a single dimension
+   * Get the maximum distance contribution of a single dimension.
    * 
    * @param dimension Dimension
    * @param vp Vector position
@@ -149,13 +149,13 @@ public class VALPNormDistance {
   }
 
   /**
-   * Initialize the lookup table
+   * Initialize the lookup table.
    * 
    * @param splitPositions Split positions
    * @param query Query vector
    * @param p p
    */
-  private void initializeLookupTable(double[][] splitPositions, NumberVector<?, ?> query, double p) {
+  private void initializeLookupTable(double[][] splitPositions, NumberVector<?> query, double p) {
     final int dimensions = splitPositions.length;
     final int bordercount = splitPositions[0].length;
     lookup = new double[dimensions][bordercount];

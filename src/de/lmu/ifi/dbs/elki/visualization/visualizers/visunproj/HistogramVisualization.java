@@ -82,7 +82,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   public Visualization makeVisualization(VisualizationTask task) {
     VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
-    HistogramResult<? extends NumberVector<?, ?>> curve = task.getResult();
+    HistogramResult<? extends NumberVector<?>> curve = task.getResult();
     
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
@@ -96,7 +96,7 @@ public class HistogramVisualization extends AbstractVisFactory {
     Integer dim = null;
     DoubleMinMax xminmax = new DoubleMinMax();
     DoubleMinMax yminmax = new DoubleMinMax();
-    for(NumberVector<?, ?> vec : curve) {
+    for(NumberVector<?> vec : curve) {
       xminmax.put(vec.doubleValue(1));
       if(dim == null) {
         dim = vec.getDimensionality();
@@ -127,7 +127,7 @@ public class HistogramVisualization extends AbstractVisFactory {
     }
 
     // draw curves.
-    for(NumberVector<?, ?> vec : curve) {
+    for(NumberVector<?> vec : curve) {
       for(int d = 0; d < dim; d++) {
         path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(1) - binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 2))));
         path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(1) + binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 2))));
@@ -166,8 +166,8 @@ public class HistogramVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    List<HistogramResult<? extends NumberVector<?, ?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
-    for(HistogramResult<? extends NumberVector<?, ?>> histogram : histograms) {
+    List<HistogramResult<? extends NumberVector<?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
+    for(HistogramResult<? extends NumberVector<?>> histogram : histograms) {
       final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this);
       task.width = 2.0;
       task.height = 1.0;

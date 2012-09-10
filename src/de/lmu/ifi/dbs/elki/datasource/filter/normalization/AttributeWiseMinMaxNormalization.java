@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
-public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> extends AbstractNormalization<V> {
+public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends AbstractNormalization<V> {
   /**
    * Parameter for minimum.
    */
@@ -123,7 +123,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
     for(int d = 1; d <= featureVector.getDimensionality(); d++) {
       values[d - 1] = (featureVector.doubleValue(d) - minima[d - 1]) / factor(d);
     }
-    return featureVector.newNumberVector(values);
+    return factory.newNumberVector(values);
   }
 
   @Override
@@ -133,7 +133,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
       for(int d = 1; d <= featureVector.getDimensionality(); d++) {
         values[d - 1] = (featureVector.doubleValue(d) * (factor(d)) + minima[d - 1]);
       }
-      return featureVector.newNumberVector(values);
+      return factory.newNumberVector(values);
     }
     else {
       throw new NonNumericFeaturesException("Attributes cannot be resized: current dimensionality: " + featureVector.getDimensionality() + " former dimensionality: " + maxima.length);
@@ -200,7 +200,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<V, ?>> exte
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Stores the maximum in each dimension.
      */

@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 
 /**
  * Centroid only using a subset of dimensions.
@@ -61,7 +61,7 @@ public class ProjectedCentroid extends Centroid {
   }
 
   /**
-   * Add a single value with weight 1.0
+   * Add a single value with weight 1.0.
    * 
    * @param val Value
    */
@@ -82,7 +82,7 @@ public class ProjectedCentroid extends Centroid {
    * @param weight weight
    */
   @Override
-  public void put(double val[], double weight) {
+  public void put(double[] val, double weight) {
     assert (val.length == elements.length);
     final double nwsum = weight + wsum;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
@@ -94,12 +94,12 @@ public class ProjectedCentroid extends Centroid {
   }
 
   /**
-   * Add a single value with weight 1.0
+   * Add a single value with weight 1.0.
    * 
    * @param val Value
    */
   @Override
-  public void put(NumberVector<?, ?> val) {
+  public void put(NumberVector<?> val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
@@ -115,7 +115,7 @@ public class ProjectedCentroid extends Centroid {
    * @param weight weight
    */
   @Override
-  public void put(NumberVector<?, ?> val, double weight) {
+  public void put(NumberVector<?> val, double weight) {
     assert (val.getDimensionality() == elements.length);
     final double nwsum = weight + wsum;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
@@ -131,10 +131,11 @@ public class ProjectedCentroid extends Centroid {
    * 
    * @param dims Dimensions to use (indexed with 0)
    * @param relation Relation to process
+   * @return Centroid
    */
-  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation) {
-    ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
-    assert (dims.size() <= DatabaseUtil.dimensionality(relation));
+  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?>> relation) {
+    ProjectedCentroid c = new ProjectedCentroid(dims, RelationUtil.dimensionality(relation));
+    assert (dims.size() <= RelationUtil.dimensionality(relation));
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
     }
@@ -147,10 +148,11 @@ public class ProjectedCentroid extends Centroid {
    * @param dims Dimensions to use (indexed with 0)
    * @param relation Relation to process
    * @param ids IDs to process
+   * @return Centroid
    */
-  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?, ?>> relation, DBIDs ids) {
-    ProjectedCentroid c = new ProjectedCentroid(dims, DatabaseUtil.dimensionality(relation));
-    assert (dims.length() <= DatabaseUtil.dimensionality(relation));
+  public static ProjectedCentroid make(BitSet dims, Relation<? extends NumberVector<?>> relation, DBIDs ids) {
+    ProjectedCentroid c = new ProjectedCentroid(dims, RelationUtil.dimensionality(relation));
+    assert (dims.length() <= RelationUtil.dimensionality(relation));
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }

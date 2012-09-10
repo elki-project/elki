@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @apiviz.has Instance
  */
-public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, BitDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>, BitDistance> {
+public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, BitDistance> implements FilteredLocalPCABasedDistanceFunction<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>, BitDistance> {
   /**
    * Parameter to specify the threshold for approximate linear dependency: the
    * strong eigenvectors of q are approximately linear dependent from the strong
@@ -96,7 +96,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * @param delta Delta parameter
    * @param tau Tau parameter
    */
-  public ERiCDistanceFunction(IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>> indexFactory, double delta, double tau) {
+  public ERiCDistanceFunction(IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>> indexFactory, double delta, double tau) {
     super(indexFactory);
     this.delta = delta;
     this.tau = tau;
@@ -108,11 +108,11 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> Instance<T> instantiate(Relation<T> database) {
+  public <T extends NumberVector<?>> Instance<T> instantiate(Relation<T> database) {
     // We can't really avoid these warnings, due to a limitation in Java
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
-    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?, ?>>) database);
+    FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
     return new Instance<T>(database, indexinst, this, delta, tau);
   }
 
@@ -156,7 +156,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * @return the distance between two given DatabaseObjects according to this
    *         distance function
    */
-  public BitDistance distance(NumberVector<?, ?> v1, NumberVector<?, ?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+  public BitDistance distance(NumberVector<?> v1, NumberVector<?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
     if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
@@ -211,7 +211,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * 
    * @author Erich Schubert
    */
-  public static class Instance<V extends NumberVector<?, ?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance> {
+  public static class Instance<V extends NumberVector<?>> extends AbstractIndexBasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance, ERiCDistanceFunction> implements FilteredLocalPCABasedDistanceFunction.Instance<V, FilteredLocalPCAIndex<V>, BitDistance> {
     /**
      * Holds the value of {@link #DELTA_ID}.
      */
@@ -258,7 +258,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<IndexFactory<NumberVector<?, ?>, FilteredLocalPCAIndex<NumberVector<?, ?>>>> {
+  public static class Parameterizer extends AbstractIndexBasedDistanceFunction.Parameterizer<IndexFactory<NumberVector<?>, FilteredLocalPCAIndex<NumberVector<?>>>> {
     double delta = 0.0;
 
     double tau = 0.0;

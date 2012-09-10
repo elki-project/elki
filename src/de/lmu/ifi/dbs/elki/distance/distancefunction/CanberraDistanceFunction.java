@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", title = "Computer programs for hierarchical polythetic classification (similarity analysis).", booktitle = "Computer Journal, Volume 9, Issue 1", url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
-public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?, ?>> {
+public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance. Use this!
    */
@@ -59,7 +59,7 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   }
 
   @Override
-  public double doubleDistance(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     final int dim = o1.getDimensionality();
     double sum = 0.0;
     for(int i = 1; i <= dim; i++) {
@@ -107,7 +107,7 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+  public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }
 

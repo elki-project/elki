@@ -97,7 +97,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
    * 
    * @apiviz.has SelectionResult oneway - - visualizes
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector<?, ?>> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector<?>> implements DataStoreListener {
     /**
      * CSS Class for the range marker
      */

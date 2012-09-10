@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  */
 // TODO: implement SpatialDistanceFunction
-public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector<?, ?>, DoubleDistance> implements DoubleNorm<SparseNumberVector<?, ?>> {
+public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector<?>, DoubleDistance> implements DoubleNorm<SparseNumberVector<?>> {
   /**
    * Keeps the currently set p.
    */
@@ -54,7 +54,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public double doubleDistance(SparseNumberVector<?, ?> v1, SparseNumberVector<?, ?> v2) {
+  public double doubleDistance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
     // Get the bit masks
     BitSet b1 = v1.getNotNullMask();
     BitSet b2 = v2.getNotNullMask();
@@ -86,7 +86,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public double doubleNorm(SparseNumberVector<?, ?> v1) {
+  public double doubleNorm(SparseNumberVector<?> v1) {
     double sqrDist = 0;
     // Get the bit masks
     BitSet b1 = v1.getNotNullMask();
@@ -99,12 +99,12 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public DoubleDistance norm(SparseNumberVector<?, ?> obj) {
+  public DoubleDistance norm(SparseNumberVector<?> obj) {
     return new DoubleDistance(doubleNorm(obj));
   }
 
   @Override
-  public DoubleDistance distance(SparseNumberVector<?, ?> v1, SparseNumberVector<?, ?> v2) {
+  public DoubleDistance distance(SparseNumberVector<?> v1, SparseNumberVector<?> v2) {
     return new DoubleDistance(doubleDistance(v1, v2));
   }
 
@@ -114,7 +114,7 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
   }
 
   @Override
-  public SimpleTypeInformation<? super SparseNumberVector<?, ?>> getInputTypeRestriction() {
+  public SimpleTypeInformation<? super SparseNumberVector<?>> getInputTypeRestriction() {
     return TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH;
   }
 

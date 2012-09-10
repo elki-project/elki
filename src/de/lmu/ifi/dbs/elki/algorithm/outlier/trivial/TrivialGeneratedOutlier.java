@@ -101,7 +101,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
 
   @Override
   public OutlierResult run(Database database) {
-    Relation<NumberVector<?, ?>> vecs = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<NumberVector<?>> vecs = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     Relation<Model> models = database.getRelation(new SimpleTypeInformation<Model>(Model.class));
     // Prefer a true class label
     try {
@@ -122,7 +122,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
    * @param labels Label relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<Model> models, Relation<NumberVector<?, ?>> vecs, Relation<?> labels) {
+  public OutlierResult run(Relation<Model> models, Relation<NumberVector<?>> vecs, Relation<?> labels) {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(models.getDBIDs(), DataStoreFactory.HINT_HOT);
 
     // Adjustment constant

@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <V> Vector type
  */
 @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
-public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends AbstractCovarianceMatrixBuilder<V> {
+public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends AbstractCovarianceMatrixBuilder<V> {
   int iterations = 1000;
 
   Random random = new Random(0);
@@ -116,7 +116,7 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<V, ?>> extends
    * 
    * @param <V> Vector type
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     @Override
     protected RANSACCovarianceMatrixBuilder<V> makeInstance() {
       return new RANSACCovarianceMatrixBuilder<V>();

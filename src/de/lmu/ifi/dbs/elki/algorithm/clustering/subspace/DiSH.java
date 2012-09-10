@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ProxyDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DiSHDistanceFunction;
@@ -60,7 +61,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyReferenceLists;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -101,7 +101,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", title = "Detection and Visualization of Subspace Cluster Hierarchies", booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
-public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -199,7 +199,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @param distFunc Distance function
    */
   private Clustering<SubspaceModel<V>> computeClusters(Relation<V> database, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder, DiSHDistanceFunction.Instance<V> distFunc) {
-    int dimensionality = DatabaseUtil.dimensionality(database);
+    int dimensionality = RelationUtil.dimensionality(database);
     int minpts = dishDistance.getMinpts();
 
     // extract clusters
@@ -323,7 +323,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       StringBuffer msg = new StringBuffer("Step 0");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
-          msg.append("\n").append(FormatUtil.format(DatabaseUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
+          msg.append("\n").append(FormatUtil.format(RelationUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
         }
       }
       LOG.debugFiner(msg.toString());
@@ -371,7 +371,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * @return a sorted list of the clusters
    */
   private List<Cluster<SubspaceModel<V>>> sortClusters(Relation<V> database, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
-    final int db_dim = DatabaseUtil.dimensionality(database);
+    final int db_dim = RelationUtil.dimensionality(database);
     // int num = 1;
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
     for(BitSet pv : clustersMap.keySet()) {
@@ -379,7 +379,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
       for(int i = 0; i < parallelClusters.size(); i++) {
         Pair<BitSet, ArrayModifiableDBIDs> c = parallelClusters.get(i);
         Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
-        cluster.setModel(new SubspaceModel<V>(new Subspace<V>(c.first), Centroid.make(database, c.second).toVector(database)));
+        cluster.setModel(new SubspaceModel<V>(new Subspace(c.first), Centroid.make(database, c.second).toVector(database)));
         cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
         // cluster.setName("Cluster_" + num++);
         String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");
@@ -519,7 +519,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    */
   private void buildHierarchy(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
     StringBuffer msg = new StringBuffer();
-    final int db_dim = DatabaseUtil.dimensionality(database);
+    final int db_dim = RelationUtil.dimensionality(database);
 
     for(int i = 0; i < clusters.size() - 1; i++) {
       Cluster<SubspaceModel<V>> c_i = clusters.get(i);
@@ -602,7 +602,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    */
   private boolean isParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
     V parent_centroid = ProjectedCentroid.make(parent.getModel().getDimensions(), database, parent.getIDs()).toVector(database);
-    int dimensionality = DatabaseUtil.dimensionality(database);
+    int dimensionality = RelationUtil.dimensionality(database);
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();
 
     for(Cluster<SubspaceModel<V>> child : children) {
@@ -633,7 +633,7 @@ public class DiSH<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluste
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     protected double epsilon = 0.0;
 
     protected int mu = 1;

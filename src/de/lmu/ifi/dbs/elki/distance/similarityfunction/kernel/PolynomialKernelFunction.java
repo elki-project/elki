@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Simon Paradies
  */
-public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?, ?>, DoubleDistance> implements PrimitiveSimilarityFunction<NumberVector<?, ?>, DoubleDistance> {
+public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<NumberVector<?>, DoubleDistance> implements PrimitiveSimilarityFunction<NumberVector<?>, DoubleDistance> {
   /**
    * The default degree.
    */
@@ -78,7 +78,7 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
    *         instance of {@link DoubleDistance DoubleDistance}.
    */
   @Override
-  public DoubleDistance similarity(NumberVector<?, ?> o1, NumberVector<?, ?> o2) {
+  public DoubleDistance similarity(NumberVector<?> o1, NumberVector<?> o2) {
     if(o1.getDimensionality() != o2.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
@@ -91,12 +91,12 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   }
 
   @Override
-  public DoubleDistance distance(final NumberVector<?, ?> fv1, final NumberVector<?, ?> fv2) {
+  public DoubleDistance distance(final NumberVector<?> fv1, final NumberVector<?> fv2) {
     return new DoubleDistance(Math.sqrt(similarity(fv1, fv1).doubleValue() + similarity(fv2, fv2).doubleValue() - 2 * similarity(fv1, fv2).doubleValue()));
   }
 
   @Override
-  public VectorFieldTypeInformation<? super NumberVector<?, ?>> getInputTypeRestriction() {
+  public VectorFieldTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
@@ -106,7 +106,7 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   }
 
   @Override
-  public <T extends NumberVector<?, ?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
+  public <T extends NumberVector<?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
     return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
   }
 

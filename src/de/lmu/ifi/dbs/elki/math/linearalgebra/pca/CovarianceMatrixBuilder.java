@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  *
  * @param <V> Vector base type
  */
-public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>> {
+public interface CovarianceMatrixBuilder<V extends NumberVector<?>> {
   /**
-   * Compute Covariance Matrix for a complete database
+   * Compute Covariance Matrix for a complete database.
    * 
    * @param database the database used
    * @return Covariance Matrix
@@ -47,7 +47,7 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>>
   Matrix processDatabase(Relation<? extends V> database);
 
   /**
-   * Compute Covariance Matrix for a collection of database IDs
+   * Compute Covariance Matrix for a collection of database IDs.
    * 
    * @param ids a collection of ids
    * @param database the database used
@@ -56,24 +56,26 @@ public interface CovarianceMatrixBuilder<V extends NumberVector<? extends V, ?>>
   Matrix processIds(DBIDs ids, Relation<? extends V> database);
 
   /**
-   * Compute Covariance Matrix for a QueryResult Collection
+   * Compute Covariance Matrix for a QueryResult Collection.
    * 
    * By default it will just collect the ids and run processIds
    * 
    * @param results a collection of QueryResults
    * @param database the database used
    * @param k the number of entries to process
+   * @param <D> distance type
    * @return Covariance Matrix
    */
   <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database, int k);
 
   /**
-   * Compute Covariance Matrix for a QueryResult Collection
+   * Compute Covariance Matrix for a QueryResult Collection.
    * 
    * By default it will just collect the ids and run processIds
    * 
    * @param results a collection of QueryResults
    * @param database the database used
+   * @param <D> distance type
    * @return Covariance Matrix
    */
   <D extends NumberDistance<D, ?>> Matrix processQueryResults(DistanceDBIDResult<D> results, Relation<? extends V> database);

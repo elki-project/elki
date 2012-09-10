@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DOC: Density-based Optimal projective Clustering")
 @Reference(authors = "Cecilia M. Procopiuc, Michael Jones, Pankaj K. Agarwal, T. M. Murali", title = "A Monte Carlo algorithm for fast projective clustering", booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '02)", url = "http://dx.doi.org/10.1145/564691.564739")
-public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
+public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<SubspaceModel<V>>> implements SubspaceClusteringAlgorithm<SubspaceModel<V>> {
   /**
    * The logger for this class.
    */
@@ -509,7 +509,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(C.size());
     ids.addDBIDs(C);
     Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(ids);
-    cluster.setModel(new SubspaceModel<V>(new Subspace<V>(D), Centroid.make(relation, ids).toVector(relation)));
+    cluster.setModel(new SubspaceModel<V>(new Subspace(D), Centroid.make(relation, ids).toVector(relation)));
     return cluster;
   }
 
@@ -548,7 +548,7 @@ public class DOC<V extends NumberVector<V, ?>> extends AbstractAlgorithm<Cluster
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
 
     protected double alpha;
 

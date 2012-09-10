@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "S. Lloyd", title = "Least squares quantization in PCM", booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
-public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * The logger for this class.
    */
@@ -82,13 +82,14 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
+   * @param initializer Initialization method
    */
-  public KMeansLloyd(PrimitiveDistanceFunction<NumberVector<?, ?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public KMeansLloyd(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   /**
-   * Run k-means
+   * Run k-means.
    * 
    * @param database Database
    * @param relation relation to use
@@ -99,7 +100,7 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
       return new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
-    List<? extends NumberVector<?, ?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
+    List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for(int i = 0; i < k; i++) {
@@ -119,7 +120,7 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
       means = means(clusters, means, relation);
     }
     // Wrap result
-    final V factory = DatabaseUtil.assumeVectorField(relation).getFactory();
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
@@ -140,11 +141,20 @@ public class KMeansLloyd<V extends NumberVector<V, ?>, D extends Distance<D>> ex
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?, ?>, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector<?>, D> {
+    /**
+     * k Parameter.
+     */
     protected int k;
 
+    /**
+     * Number of iterations.
+     */
     protected int maxiter;
 
+    /**
+     * Initialization method.
+     */
     protected KMeansInitialization<V> initializer;
 
     @Override

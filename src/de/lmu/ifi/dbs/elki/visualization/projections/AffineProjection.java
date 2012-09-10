@@ -173,7 +173,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   }
 
   @Override
-  public double[] fastProjectDataToRenderSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectDataToRenderSpace(NumberVector<?> data) {
     return fastProjectScaledToRenderSpace(fastProjectDataToScaledSpace(data));
   }
 
@@ -184,7 +184,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   }
 
   @Override
-  public double[] fastProjectDataToScaledSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectDataToScaledSpace(NumberVector<?> data) {
     // FIXME: implement with less objects?
     return projectDataToScaledSpace(data).getArrayRef();
   }
@@ -221,7 +221,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   }
 
   @Override
-  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?, ?> data) {
+  public double[] fastProjectRelativeDataToRenderSpace(NumberVector<?> data) {
     // FIXME: implement with less objects?
     return fastProjectRelativeScaledToRenderSpace(projectRelativeDataToScaledSpace(data).getArrayRef());
   }

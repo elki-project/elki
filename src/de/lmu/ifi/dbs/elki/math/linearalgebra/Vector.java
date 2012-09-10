@@ -26,10 +26,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Provides a vector object that encapsulates an m x 1 - matrix object.
@@ -38,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * 
  * @apiviz.landmark
  */
-public class Vector implements NumberVector<Vector, Double> {
+public class Vector implements NumberVector<Double> {
   /**
    * Array for internal storage of elements.
    * 
@@ -80,7 +77,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Returns a randomly created vector of length 1.0
+   * Returns a randomly created vector of length 1.0.
    * 
    * @param dimensionality dimensionality
    * @return the dimensionality of the vector
@@ -122,9 +119,6 @@ public class Vector implements NumberVector<Vector, Double> {
     return new Vector(elements.clone());
   }
 
-  /**
-   * Clone the Vector object.
-   */
   @Override
   public Vector clone() {
     return this.copy();
@@ -215,30 +209,30 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * A = A + B
+   * a = a + b.
    * 
-   * @param B another matrix
-   * @return A + B in this Matrix
+   * @param b another vector
+   * @return a + b in this vector
    */
-  public final Vector plusEquals(final Vector B) {
-    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
+  public final Vector plusEquals(final Vector b) {
+    assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
-      elements[i] += B.elements[i];
+      elements[i] += b.elements[i];
     }
     return this;
   }
 
   /**
-   * A = A + s * B
+   * a = a + s * b.
    * 
-   * @param B another matrix
+   * @param b another vector
    * @param s Scalar
-   * @return A + s * B in this Matrix
+   * @return a + s * b in this vector
    */
-  public final Vector plusTimesEquals(final Vector B, final double s) {
-    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
+  public final Vector plusTimesEquals(final Vector b, final double s) {
+    assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
-      elements[i] += s * B.elements[i];
+      elements[i] += s * b.elements[i];
     }
     return this;
   }
@@ -286,30 +280,30 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * A = A - B
+   * a = a - b.
    * 
-   * @param B another matrix
-   * @return A - B in this Matrix
+   * @param b another vector
+   * @return a - b in this vector
    */
-  public final Vector minusEquals(final Vector B) {
-    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
+  public final Vector minusEquals(final Vector b) {
+    assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
-      elements[i] -= B.elements[i];
+      elements[i] -= b.elements[i];
     }
     return this;
   }
 
   /**
-   * A = A - s * B
+   * a = a - s * b.
    * 
-   * @param B another matrix
+   * @param b another vector
    * @param s Scalar
-   * @return A - s * B in this Matrix
+   * @return a - s * b in this vector
    */
-  public final Vector minusTimesEquals(final Vector B, final double s) {
-    assert (this.elements.length == B.elements.length) : ERR_VEC_DIMENSIONS;
+  public final Vector minusTimesEquals(final Vector b, final double s) {
+    assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
     for(int i = 0; i < elements.length; i++) {
-      elements[i] -= s * B.elements[i];
+      elements[i] -= s * b.elements[i];
     }
     return this;
   }
@@ -343,7 +337,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Multiply a matrix by a scalar in place, A = s*A
+   * Multiply a matrix by a scalar in place, A = s*A.
    * 
    * @param s scalar
    * @return replace A by s*A
@@ -356,7 +350,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Linear algebraic matrix multiplication, A * B
+   * Linear algebraic matrix multiplication, A * B.
    * 
    * @param B another matrix
    * @return Matrix product, A * B
@@ -373,7 +367,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Linear algebraic matrix multiplication, A<sup>T</sup> * B
+   * Linear algebraic matrix multiplication, A<sup>T</sup> * B.
    * 
    * @param B another matrix
    * @return Matrix product, A<sup>T</sup> * B
@@ -393,7 +387,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
+   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c.
    * 
    * @param B matrix
    * @param c vector on the right
@@ -414,7 +408,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Linear algebraic matrix multiplication, A<sup>T</sup> * B
+   * Linear algebraic matrix multiplication, A<sup>T</sup> * B.
    * 
    * @param B another vector
    * @return Matrix product, A<sup>T</sup> * B
@@ -429,7 +423,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Linear algebraic matrix multiplication, A * B^T
+   * Linear algebraic matrix multiplication, A * B^T.
    * 
    * @param B another matrix
    * @return Matrix product, A * B^T
@@ -446,7 +440,7 @@ public class Vector implements NumberVector<Vector, Double> {
   }
 
   /**
-   * Linear algebraic matrix multiplication, A * B^T
+   * Linear algebraic matrix multiplication, A * B^T.
    * 
    * @param B another matrix
    * @return Matrix product, A * B^T
@@ -477,6 +471,8 @@ public class Vector implements NumberVector<Vector, Double> {
 
   /**
    * Normalizes this vector to the length of 1.0.
+   * 
+   * @return this vector
    */
   public final Vector normalize() {
     double norm = euclideanLength();
@@ -541,7 +537,7 @@ public class Vector implements NumberVector<Vector, Double> {
 
   /**
    * Returns a string representation of this vector without adding extra
-   * whitespace
+   * whitespace.
    * 
    * @return a string representation of this vector.
    */
@@ -619,37 +615,5 @@ public class Vector implements NumberVector<Vector, Double> {
   @Override
   public Vector getColumnVector() {
     return copy();
-  }
-
-  @Override
-  public Vector newNumberVector(double[] values) {
-    return new Vector(values);
-  }
-
-  @Override
-  public <A> Vector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
-    double[] raw = new double[adapter.size(array)];
-    for(int i = 0; i < raw.length; i++) {
-      raw[i] = adapter.getDouble(array, i);
-    }
-    return new Vector(raw);
-  }
-
-  @Override
-  public <A> Vector newFeatureVector(A array, ArrayAdapter<Double, A> adapter) {
-    if(adapter instanceof NumberArrayAdapter) {
-      return newNumberVector(array, (NumberArrayAdapter<?, A>) adapter);
-    }
-    double[] raw = new double[adapter.size(array)];
-    for(int i = 0; i < raw.length; i++) {
-      raw[i] = adapter.get(array, i);
-    }
-    return new Vector(raw);
-  }
-
-  @Override
-  public ByteBufferSerializer<Vector> getDefaultSerializer() {
-    // FIXME: add a serializer?
-    return null;
   }
 }

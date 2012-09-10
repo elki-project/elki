@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
-public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNResult<D>>> {
+public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNResult<D>>> {
   /**
    * The logger for this class.
    */
@@ -252,7 +252,7 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
   }
 
   /**
-   * Initialize the heaps
+   * Initialize the heaps.
    * 
    * @param distFunction Distance function
    * @param pr Node to initialize for
@@ -370,17 +370,17 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    */
   private class Task implements Comparable<Task> {
     /**
-     * Minimum distance
+     * Minimum distance.
      */
     final D mindist;
 
     /**
-     * First offset
+     * First offset.
      */
     final int i;
 
     /**
-     * Second offset
+     * Second offset.
      */
     final int j;
 
@@ -411,9 +411,9 @@ public class KNNJoin<V extends NumberVector<V, ?>, D extends Distance<D>, N exte
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
+  public static class Parameterizer<V extends NumberVector<?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V, D> {
     /**
-     * K parameter
+     * K parameter.
      */
     protected int k;
 

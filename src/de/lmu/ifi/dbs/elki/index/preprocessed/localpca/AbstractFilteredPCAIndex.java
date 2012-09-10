@@ -61,11 +61,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 // TODO: loosen DoubleDistance restriction.
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
-public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends NV, ?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
+public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
   /**
    * PCA utility object.
    */
-  final protected PCAFilteredRunner<NV> pca;
+  protected final PCAFilteredRunner<NV> pca;
 
   /**
    * Constructor.
@@ -139,14 +139,14 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
   protected abstract DistanceDBIDResult<DoubleDistance> objectsForPCA(DBIDRef id);
 
   /**
-   * Factory class
+   * Factory class.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
-  public abstract static class Factory<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
+  public abstract static class Factory<NV extends NumberVector<?>, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I>, Parameterizable {
     /**
      * Parameter to specify the distance function used for running PCA.
      * 
@@ -192,7 +192,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<? extends
      * 
      * @apiviz.exclude
      */
-    public abstract static class Parameterizer<NV extends NumberVector<NV, ?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
+    public abstract static class Parameterizer<NV extends NumberVector<?>, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**
        * Holds the instance of the distance function specified by
        * {@link #PCA_DISTANCE_ID}.

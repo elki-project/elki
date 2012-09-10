@@ -52,9 +52,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <V> the type of FeatureVector contained in both the original data of
  *        the base parser and the projected data of this ProjectionParser
  */
-public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVector<?, ?>> extends AbstractStreamConversionFilter<V, V> {
+public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVector<?>> extends AbstractStreamConversionFilter<V, V> {
   /**
-   * The selected attributes
+   * The selected attributes.
    */
   protected BitSet selectedAttributes = null;
 
@@ -112,10 +112,10 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
    * @param dim dimensionality
    * @param seed seed for random
    */
-  public AbstractRandomFeatureSelectionFilter(int dim, long seed) {
+  public AbstractRandomFeatureSelectionFilter(int dim, Long seed) {
     super();
     this.k = dim;
-    this.random = new Random(seed);
+    this.random = (seed == null) ? new Random() : new Random(seed);
   }
   
   /**
@@ -137,10 +137,16 @@ public abstract class AbstractRandomFeatureSelectionFilter<V extends FeatureVect
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public abstract static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Number of attributes to select.
+     */
     protected int k = 0;
     
-    protected long seed = System.currentTimeMillis();
+    /**
+     * Random seed.
+     */
+    protected Long seed;
 
     @Override
     protected void makeOptions(Parameterization config) {

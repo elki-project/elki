@@ -28,6 +28,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -46,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @param <V> Vector type
  */
-public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements ReferencePointsHeuristic<V> {
+public class AxisBasedReferencePoints<V extends NumberVector<?>> implements ReferencePointsHeuristic<V> {
   /**
    * Parameter to specify the extra scaling of the space, to allow
    * out-of-data-space reference points.
@@ -64,7 +65,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   /**
    * Constructor.
    * 
-   * @param spacescale
+   * @param spacescale Extra scaling
    */
   public AxisBasedReferencePoints(double spacescale) {
     super();
@@ -75,9 +76,9 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
   public <T extends V> Collection<V> getReferencePoints(Relation<T> db) {
     Relation<V> database = DatabaseUtil.relationUglyVectorCast(db);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(database);
-    V factory = DatabaseUtil.assumeVectorField(database).getFactory();
+    NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
 
-    int dim = DatabaseUtil.dimensionality(db);
+    int dim = RelationUtil.dimensionality(db);
 
     // Compute mean and extend from minmax.
     double[] mean = new double[dim];
@@ -123,7 +124,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<V, ?>> implements R
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector<V, ?>> extends AbstractParameterizer {
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     /**
      * Holds the value of {@link #SPACE_SCALE_ID}.
      */

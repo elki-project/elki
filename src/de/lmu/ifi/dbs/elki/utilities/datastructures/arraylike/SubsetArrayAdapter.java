@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  */
 
 /**
- * Subset array adapter (allows reordering and projection)
+ * Subset array adapter (allows reordering and projection).
  * 
  * @author Erich Schubert
  *
@@ -32,12 +32,12 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  */
 public class SubsetArrayAdapter<T, A> implements ArrayAdapter<T, A> {
   /**
-   * Wrapped adapter
+   * Wrapped adapter.
    */
   ArrayAdapter<T, ? super A> wrapped;
 
   /**
-   * Offsets to return
+   * Offsets to return.
    */
   int[] offs;
   
