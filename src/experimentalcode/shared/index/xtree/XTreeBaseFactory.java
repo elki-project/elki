@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @param <O> object type
  * @param <X> actual tree type
  */
-public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends XNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E> & Index> extends AbstractRStarTreeFactory<O, N, E, X> {
+public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E> & Index> extends AbstractRStarTreeFactory<O, N, E, X> {
   protected double relativeMinFanout;
 
   protected float reinsert_fraction;
@@ -121,7 +121,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<O, ?>, N extends X
    * 
    * @param <O> object type
    */
-  public abstract static class Parameterizer<O extends NumberVector<O, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     protected double relativeMinFanout;
 
     protected float reinsert_fraction;

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
-public class XTreeIndex<O extends NumberVector<?, ?>> extends XTree implements RangeIndex<O>, KNNIndex<O> {
+public class XTreeIndex<O extends NumberVector<?>> extends XTree implements RangeIndex<O>, KNNIndex<O> {
   private static final Logging LOG = Logging.getLogger(XTreeIndex.class);
 
   private Relation<O> relation;
