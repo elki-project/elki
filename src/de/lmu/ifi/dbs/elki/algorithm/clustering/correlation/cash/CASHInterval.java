@@ -141,10 +141,10 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
   /**
    * Removes the specified ids from this interval.
    * 
-   * @param ids the set of ids to be removed
+   * @param ids2 the set of ids to be removed
    */
-  public void removeIDs(DBIDs ids) {
-    this.ids.removeDBIDs(ids);
+  public void removeIDs(DBIDs ids2) {
+    this.ids.removeDBIDs(ids2);
   }
 
   /**
@@ -154,18 +154,6 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
    */
   public int numObjects() {
     return ids.size();
-  }
-
-  /**
-   * Returns true if this interval has already been split in the specified
-   * dimension.
-   * 
-   * @param d the dimension to be tested
-   * @return true if this interval has already been split in the specified
-   *         dimension
-   */
-  public boolean isSplit(int d) {
-    return maxSplitDimension >= d;
   }
 
   /**
@@ -324,16 +312,15 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
       return;
     }
 
-    int dim = getDimensionality();
-    int childLevel = isSplit(dim) ? level + 1 : level;
-
-    int splitDim = isSplit(dim) ? 0 : maxSplitDimension + 1;
-    double splitPoint = getMin(splitDim) + (getMax(splitDim) - getMin(splitDim)) / 2;
+    final boolean issplit = (maxSplitDimension >= (getDimensionality() - 1));
+    final int childLevel = issplit ? level + 1 : level;
+    final int splitDim = issplit ? 0 : maxSplitDimension + 1;
+    final double splitPoint = getMin(splitDim) + (getMax(splitDim) - getMin(splitDim)) / 2;
 
     // left and right child
     for(int i = 0; i < 2; i++) {
-      double[] min = SpatialUtil.getMin(this);
-      double[] max = SpatialUtil.getMax(this);
+      double[] min = SpatialUtil.getMin(this); // clone
+      double[] max = SpatialUtil.getMax(this); // clone
 
       // right child
       if(i == 0) {
