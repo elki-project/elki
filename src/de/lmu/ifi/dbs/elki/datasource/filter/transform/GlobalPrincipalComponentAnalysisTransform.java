@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
-import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Vector type
  */
-public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>> extends AbstractConversionFilter<O, O> {
+public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>> extends AbstractVectorConversionFilter<O, O> {
   /**
    * Class logger.
    */
@@ -89,11 +88,6 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
    * Vector for data set centering.
    */
   double[] mean = null;
-
-  /**
-   * Vector factory.
-   */
-  NumberVector.Factory<O, ?> factory;
 
   /**
    * Constructor.
@@ -176,11 +170,11 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
 
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
+    initializeOutputType(in);
     if(proj.length == dim) {
       return in;
     }
     else {
-      factory = FilterUtil.guessFactory(in);
       return new VectorFieldTypeInformation<O>(factory, proj.length);
     }
   }

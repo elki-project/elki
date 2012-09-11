@@ -26,8 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
-import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 
 /**
@@ -37,12 +36,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * 
  * @param <O> Object type processed
  */
-public abstract class AbstractNormalization<O extends NumberVector<?>> extends AbstractConversionFilter<O, O> implements Normalization<O> {
-  /**
-   * Number vector factory.
-   */
-  protected NumberVector.Factory<O, ?> factory;
-
+public abstract class AbstractNormalization<O extends NumberVector<?>> extends AbstractVectorConversionFilter<O, O> implements Normalization<O> {
   /**
    * Initializes the option handler and the parameter map.
    */
@@ -52,7 +46,7 @@ public abstract class AbstractNormalization<O extends NumberVector<?>> extends A
 
   @Override
   protected SimpleTypeInformation<? super O> convertedType(SimpleTypeInformation<O> in) {
-    factory = FilterUtil.guessFactory(in);
+    initializeOutputType(in);
     return in;
   }
 
@@ -69,8 +63,6 @@ public abstract class AbstractNormalization<O extends NumberVector<?>> extends A
 
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
-    result.append("normalization class: ").append(getClass().getName());
-    return result.toString();
+    return getClass().getName();
   }
 }

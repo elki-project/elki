@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -74,7 +73,7 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends Ab
 
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
-    NumberVector.Factory<V, ?> factory = FilterUtil.guessFactory(in);
+    SparseNumberVector.Factory<V, ?> factory = (SparseNumberVector.Factory<V, ?>) FilterUtil.guessFactory(in);
     return new VectorFieldTypeInformation<V>(factory, maxdim);
   }
 }
