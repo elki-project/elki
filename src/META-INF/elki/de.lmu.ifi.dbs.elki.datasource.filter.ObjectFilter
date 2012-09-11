@@ -8,10 +8,6 @@ de.lmu.ifi.dbs.elki.datasource.filter.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SortByLabelFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter
-de.lmu.ifi.dbs.elki.datasource.filter.DoubleVectorProjectionFilter
-de.lmu.ifi.dbs.elki.datasource.filter.DoubleVectorRandomProjectionFilter
-de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorProjectionFilter
-de.lmu.ifi.dbs.elki.datasource.filter.SparseNumberVectorRandomProjectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SplitNumberVectorFilter
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization
@@ -22,3 +18,5 @@ de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNorm
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.RankTieNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.TFIDFNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.transform.GlobalPrincipalComponentAnalysisTransform
+de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter
+de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorRandomFeatureSelectionFilter

@@ -26,7 +26,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
@@ -57,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * @param <V> Vector type
  */
 @Description("Add uniform Jitter to a dataset, while preserving the total vector sum.")
-public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractStreamConversionFilter<V, V> {
+public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVectorStreamConversionFilter<V, V> {
   /**
    * Jitter amount.
    */
@@ -67,11 +66,6 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractSt
    * Random generator.
    */
   ExponentialDistribution rnd;
-
-  /**
-   * Vector factory.
-   */
-  Factory<V, ?> factory;
 
   /**
    * Constructor.
@@ -118,8 +112,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractSt
 
   @Override
   protected SimpleTypeInformation<V> convertedType(SimpleTypeInformation<V> in) {
-    // Initialize factory:
-    factory = FilterUtil.guessFactory(in);
+    initializeOutputType(in);
     return in;
   }
 

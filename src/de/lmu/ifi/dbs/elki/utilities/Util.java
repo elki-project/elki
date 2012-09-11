@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
@@ -78,7 +78,7 @@ public final class Util {
   public static double[] parseDoubles(String s) {
     List<Double> result = new ArrayList<Double>();
     StringTokenizer tokenizer = new StringTokenizer(s, ",");
-    while(tokenizer.hasMoreTokens()) {
+    while (tokenizer.hasMoreTokens()) {
       String d = tokenizer.nextToken();
       result.add(Double.parseDouble(d));
     }
@@ -97,9 +97,9 @@ public final class Util {
    * @param out the target PrintStream
    */
   public static <O> void print(List<O> list, String separator, PrintStream out) {
-    for(Iterator<O> iter = list.iterator(); iter.hasNext();) {
+    for (Iterator<O> iter = list.iterator(); iter.hasNext();) {
       out.print(iter.next());
-      if(iter.hasNext()) {
+      if (iter.hasNext()) {
         out.print(separator);
       }
     }
@@ -121,14 +121,13 @@ public final class Util {
     assert (cardinality >= 0) : "Cannot set a negative number of bits!";
     assert (cardinality < capacity) : "Cannot set " + cardinality + " of " + capacity + " bits!";
     BitSet bitset = new BitSet(capacity);
-    if(cardinality < capacity >>> 1) {
-      while(bitset.cardinality() < cardinality) {
+    if (cardinality < capacity >>> 1) {
+      while (bitset.cardinality() < cardinality) {
         bitset.set(random.nextInt(capacity));
       }
-    }
-    else {
+    } else {
       bitset.flip(0, capacity);
-      while(bitset.cardinality() > cardinality) {
+      while (bitset.cardinality() > cardinality) {
         bitset.clear(random.nextInt(capacity));
       }
     }
@@ -136,55 +135,36 @@ public final class Util {
   }
 
   /**
-   * Provides a new DoubleVector as a projection on the specified attributes.
+   * Provides a new NumberVector as a projection on the specified attributes.
    * 
-   * If the given DoubleVector has already an ID not <code>null</code>, the same
-   * ID is set in the returned new DoubleVector. Nevertheless, the returned
-   * DoubleVector is not backed by the given DoubleVector, i.e., any changes
-   * affecting <code>v</code> after calling this method will not affect the
-   * newly returned DoubleVector.
-   * 
-   * @param v a DoubleVector to project
+   * @param v a NumberVector to project
    * @param selectedAttributes the attributes selected for projection
-   * @return a new DoubleVector as a projection on the specified attributes
-   * @see DoubleVector#doubleValue(int)
-   */
-  public static DoubleVector project(DoubleVector v, BitSet selectedAttributes) {
-    double[] newAttributes = new double[selectedAttributes.cardinality()];
-    int i = 0;
-    for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-      newAttributes[i] = v.doubleValue(d + 1);
-      i++;
-    }
-    DoubleVector projectedVector = new DoubleVector(newAttributes);
-    return projectedVector;
-  }
-
-  /**
-   * Provides a new SparseFloatVector as a projection on the specified
-   * attributes.
-   * 
-   * If the given SparseFloatVector has already an ID not <code>null</code>, the
-   * same ID is set in the returned new SparseFloatVector. Nevertheless, the
-   * returned SparseFloatVector is not backed by the given SparseFloatVector,
-   * i.e., any changes affecting <code>v</code> after calling this method will
-   * not affect the newly returned SparseFloatVector.
-   * 
-   * @param v a SparseFloatVector to project
-   * @param selectedAttributes the attributes selected for projection
-   * @param factory Object factory
+   * @param factory Vector factory
    * @param <V> Vector type
-   * @return a new SparseFloatVector as a projection on the specified attributes
+   * @return a new NumberVector as a projection on the specified attributes
    */
-  public static <V extends SparseNumberVector<?>> V project(V v, BitSet selectedAttributes, SparseNumberVector.Factory<V, ?> factory) {
-    TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
-    for(int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-      if(v.doubleValue(d + 1) != 0.0) {
-        values.put(d, v.doubleValue(d + 1));
+  public static <V extends NumberVector<?>> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V, ?> factory) {
+    if (factory instanceof SparseNumberVector.Factory) {
+      final SparseNumberVector.Factory<?, ?> sfactory = (SparseNumberVector.Factory<?, ?>) factory;
+      TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
+      for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+        if (v.doubleValue(d + 1) != 0.0) {
+          values.put(d, v.doubleValue(d + 1));
+        }
       }
+      // We can't avoid this cast, because Java doesn't know that V is a SparseNumberVector:
+      @SuppressWarnings("unchecked")
+      V projectedVector = (V) sfactory.newNumberVector(values, selectedAttributes.cardinality());
+      return projectedVector;
+    } else {
+      double[] newAttributes = new double[selectedAttributes.cardinality()];
+      int i = 0;
+      for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+        newAttributes[i] = v.doubleValue(d + 1);
+        i++;
+      }
+      return factory.newNumberVector(newAttributes);
     }
-    V projectedVector = factory.newNumberVector(values, selectedAttributes.cardinality());
-    return projectedVector;
   }
 
   /**
@@ -195,11 +175,11 @@ public final class Util {
    */
   public static int mixHashCodes(int... hash) {
     final long prime = 2654435761L;
-    if(hash.length == 0) {
+    if (hash.length == 0) {
       return 0;
     }
     long result = hash[0];
-    for(int i = 1; i < hash.length; i++) {
+    for (int i = 1; i < hash.length; i++) {
       result = result * prime + hash[i];
     }
     return (int) result;
