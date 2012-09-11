@@ -269,14 +269,14 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private void add2MBR(Integer[] entrySorting, double[] ub, double[] lb, int index) {
     SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
-    for(int d = 1; d <= currMBR.getDimensionality(); d++) {
+    for(int d = 0; d < currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
-      if(max > ub[d - 1]) {
-        ub[d - 1] = max;
+      if(max > ub[d]) {
+        ub[d] = max;
       }
       min = currMBR.getMin(d);
-      if(min < lb[d - 1]) {
-        lb[d - 1] = min;
+      if(min < lb[d]) {
+        lb[d] = min;
       }
     }
   }
@@ -302,11 +302,11 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private void add2MBR(Integer[] entrySorting, List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index) {
     SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
-    for(int d = 1; d <= currMBR.getDimensionality(); d++) {
+    for(int d = 0; d < currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
-      pqUB.get(d - 1).add(new DoubleIntPair(max, index));
+      pqUB.get(d).add(new DoubleIntPair(max, index));
       min = currMBR.getMin(d);
-      pqLB.get(d - 1).add(new DoubleIntPair(min, index));
+      pqLB.get(d).add(new DoubleIntPair(min, index));
     }
   }
 
@@ -358,12 +358,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     @Override
     public int compare(Integer o1, Integer o2) {
       if(lb) {
-        d1 = entries.get(o1).getMin(dimension + 1);
-        d2 = entries.get(o2).getMin(dimension + 1);
+        d1 = entries.get(o1).getMin(dimension);
+        d2 = entries.get(o2).getMin(dimension);
       }
       else {
-        d1 = entries.get(o1).getMax(dimension + 1);
-        d2 = entries.get(o2).getMax(dimension + 1);
+        d1 = entries.get(o1).getMax(dimension);
+        d2 = entries.get(o2).getMax(dimension);
       }
       // ignore NaN case
       return (d1 > d2 ? 1 : (d1 < d2 ? -1 : 0));
@@ -752,19 +752,19 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
     SpatialComparable currMBR = this.entries.get(entries[from]);
 
-    for(int d = 1; d <= min.length; d++) {
-      min[d - 1] = currMBR.getMin(d);
-      max[d - 1] = currMBR.getMax(d);
+    for(int d = 0; d < min.length; d++) {
+      min[d] = currMBR.getMin(d);
+      max[d] = currMBR.getMax(d);
     }
 
     for(int i = from + 1; i < to; i++) {
       currMBR = this.entries.get(entries[i]);
-      for(int d = 1; d <= min.length; d++) {
-        if(min[d - 1] > currMBR.getMin(d)) {
-          min[d - 1] = currMBR.getMin(d);
+      for(int d = 0; d < min.length; d++) {
+        if(min[d] > currMBR.getMin(d)) {
+          min[d] = currMBR.getMin(d);
         }
-        if(max[d - 1] < currMBR.getMax(d)) {
-          max[d - 1] = currMBR.getMax(d);
+        if(max[d] < currMBR.getMax(d)) {
+          max[d] = currMBR.getMax(d);
         }
       }
     }
@@ -782,7 +782,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     final int dimensionality = m1.getDimensionality();
 
     double volume = 1.0, len;
-    for(int d = 1; d <= dimensionality; d++) {
+    for(int d = 0; d < dimensionality; d++) {
       len = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d)) - (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
       if(len <= 0.) {
         return 0.;
@@ -806,10 +806,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     final int dimensionality = m1.getDimensionality();
     double[] min = new double[dimensionality];
     double[] max = new double[dimensionality];
-    for(int d = 1; d <= dimensionality; d++) {
-      min[d - 1] = (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
-      max[d - 1] = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d));
-      if(min[d - 1] > max[d - 1]) {
+    for(int d = 0; d < dimensionality; d++) {
+      min[d] = (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
+      max[d] = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d));
+      if(min[d] > max[d]) {
         return null;
       }
     }
