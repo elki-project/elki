@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -362,7 +363,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       }
 
       // Rebuild heap
-      List<IntegerPriorityObject<CASHInterval>> heapVector = heap.toSortedArrayList();
+      ArrayList<IntegerPriorityObject<CASHInterval>> heapVector = new ArrayList<IntegerPriorityObject<CASHInterval>>(heap);
+      heap.clear();
       for(IntegerPriorityObject<CASHInterval> pair : heapVector) {
         CASHInterval currentInterval = pair.getObject();
         currentInterval.removeIDs(clusterIDs);

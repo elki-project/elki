@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.io.Serializable;
 import java.util.AbstractQueue;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -515,20 +514,6 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       }
       expectedModCount = modCount;
     }
-  }
-
-  /**
-   * Return the heap as a sorted array list, by repeated polling. This will
-   * empty the heap!
-   * 
-   * @return new array list
-   */
-  public ArrayList<E> toSortedArrayList() {
-    ArrayList<E> ret = new ArrayList<E>(size());
-    while(!isEmpty()) {
-      ret.add(poll());
-    }
-    return ret;
   }
 
   /**

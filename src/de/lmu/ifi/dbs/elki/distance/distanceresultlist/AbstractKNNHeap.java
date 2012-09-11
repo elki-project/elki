@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
@@ -58,17 +56,6 @@ abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance
    */
   public AbstractKNNHeap(int k) {
     super(k, COMPARATOR);
-  }
-
-  /**
-   * @deprecated Use {@link #toKNNList()} instead!
-   */
-  @Override
-  @Deprecated
-  public ArrayList<P> toSortedArrayList() {
-    ArrayList<P> list = super.toSortedArrayList();
-    Collections.reverse(list);
-    return list;
   }
 
   /**
