@@ -42,12 +42,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
-   * Latitude dimension
+   * Latitude dimension.
    */
   final int dimlat;
 
   /**
-   * Longitude dimension
+   * Longitude dimension.
    */
   final int dimlng;
 
@@ -92,23 +92,23 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
     public static final OptionID LNGDIM_ID = OptionID.getOrCreateOptionID("distance.longitudedim", "The dimension containing the longitude.");
 
     /**
-     * Latitude dimension
+     * Latitude dimension.
      */
     int dimlat;
 
     /**
-     * Longitude dimension
+     * Longitude dimension.
      */
     int dimlng;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimlatP = new IntParameter(LATDIM_ID, new GreaterEqualConstraint(1));
+      final IntParameter dimlatP = new IntParameter(LATDIM_ID, new GreaterEqualConstraint(0));
       if(config.grab(dimlatP)) {
         dimlat = dimlatP.getValue();
       }
-      final IntParameter dimlngP = new IntParameter(LNGDIM_ID, new GreaterEqualConstraint(1));
+      final IntParameter dimlngP = new IntParameter(LNGDIM_ID, new GreaterEqualConstraint(0));
       if(config.grab(dimlngP)) {
         dimlng = dimlngP.getValue();
       }

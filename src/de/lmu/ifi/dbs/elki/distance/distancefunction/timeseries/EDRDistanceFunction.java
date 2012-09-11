@@ -101,8 +101,8 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
       for(int j = l; j <= r; j++) {
         if(Math.abs(i - j) <= band) {
           // compute squared distance
-          double val1 = v1.doubleValue(i + 1);
-          double val2 = v2.doubleValue(j + 1);
+          double val1 = v1.doubleValue(i);
+          double val2 = v2.doubleValue(j);
           double diff = (val1 - val2);
           final double d = Math.sqrt(diff * diff);
 

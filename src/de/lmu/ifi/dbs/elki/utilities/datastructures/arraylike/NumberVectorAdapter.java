@@ -50,37 +50,38 @@ public class NumberVectorAdapter<N extends Number> implements NumberArrayAdapter
   }
 
   @Override
+  @Deprecated
   public N get(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
     return array.getValue(off + 1);
   }
 
   @Override
   public double getDouble(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
-    return array.doubleValue(off + 1);
+    return array.doubleValue(off);
   }
 
   @Override
   public float getFloat(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
-    return array.floatValue(off + 1);
+    return array.floatValue(off);
   }
 
   @Override
   public int getInteger(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
-    return array.intValue(off + 1);
+    return array.intValue(off);
   }
 
   @Override
   public short getShort(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
-    return array.shortValue(off + 1);
+    return array.shortValue(off);
   }
 
   @Override
   public long getLong(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
-    return array.longValue(off + 1);
+    return array.longValue(off);
   }
 
   @Override
   public byte getByte(NumberVector<N> array, int off) throws IndexOutOfBoundsException {
-    return array.byteValue(off + 1);
+    return array.byteValue(off);
   }
 }

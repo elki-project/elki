@@ -65,9 +65,10 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * @param maxEntries Maximum page size
    * @param c Comparison helper
    * @param ret Output list
+   * @param <T> data type
    */
   protected <T extends SpatialComparable> void strPartition(List<T> objs, int start, int end, int depth, int dims, int maxEntries, Compare<T> c, List<List<T>> ret) {
-    c.dim = depth + 1;
+    c.dim = depth;
     final int p = (int) Math.ceil((end - start) / (double) maxEntries);
     final int s = (int) Math.ceil(Math.pow(p, 1.0 / (dims - depth)));
 
@@ -101,9 +102,9 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    */
   private static class Compare<T extends SpatialComparable> implements Comparator<T> {
     /**
-     * Current dimension
+     * Current dimension.
      */
-    public int dim;
+    int dim;
 
     @Override
     public int compare(T o1, T o2) {

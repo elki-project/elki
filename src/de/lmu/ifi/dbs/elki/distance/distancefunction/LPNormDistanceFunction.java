@@ -79,7 +79,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
     }
 
     double sqrDist = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double delta = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       sqrDist += Math.pow(delta, p);
     }
@@ -90,7 +90,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double sqrDist = 0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double delta = v.doubleValue(i);
       sqrDist += Math.pow(delta, p);
     }
@@ -121,7 +121,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
     }
 
     double sumDist = 0;
-    for(int d = 1; d <= dim1; d++) {
+    for(int d = 0; d < dim1; d++) {
       final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr2.getMin(d);

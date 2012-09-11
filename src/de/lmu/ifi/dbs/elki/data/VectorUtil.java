@@ -69,7 +69,7 @@ public final class VectorUtil {
     DoubleMinMax minmax = new DoubleMinMax();
 
     for(int i = 0; i < vec.getDimensionality(); i++) {
-      minmax.put(vec.doubleValue(i + 1));
+      minmax.put(vec.doubleValue(i));
     }
 
     return minmax;
@@ -154,8 +154,8 @@ public final class VectorUtil {
     final int dim = v1.getDimensionality();
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < dim; k++) {
-      final double r1 = v1.doubleValue(k + 1) - oe[k];
-      final double r2 = v2.doubleValue(k + 1) - oe[k];
+      final double r1 = v1.doubleValue(k) - oe[k];
+      final double r2 = v2.doubleValue(k) - oe[k];
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
@@ -179,8 +179,8 @@ public final class VectorUtil {
     final int dim = v1.getDimensionality();
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < dim; k++) {
-      final double r1 = v1.doubleValue(k + 1) - o.doubleValue(k + 1);
-      final double r2 = v2.doubleValue(k + 1) - o.doubleValue(k + 1);
+      final double r1 = v1.doubleValue(k) - o.doubleValue(k);
+      final double r2 = v2.doubleValue(k) - o.doubleValue(k);
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
@@ -209,18 +209,18 @@ public final class VectorUtil {
     final int dim = Math.min(d1, d2);
     double s = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < dim; k++) {
-      final double r1 = v1.doubleValue(k + 1);
-      final double r2 = v2.doubleValue(k + 1);
+      final double r1 = v1.doubleValue(k);
+      final double r2 = v2.doubleValue(k);
       s += r1 * r2;
       e1 += r1 * r1;
       e2 += r2 * r2;
     }
     for(int k = dim; k < d1; k++) {
-      final double r1 = v1.doubleValue(k + 1);
+      final double r1 = v1.doubleValue(k);
       e1 += r1 * r1;
     }
     for(int k = dim; k < d2; k++) {
-      final double r2 = v2.doubleValue(k + 1);
+      final double r2 = v2.doubleValue(k);
       e2 += r2 * r2;
     }
     return Math.min(Math.sqrt((s / e1) * (s / e2)), 1);
@@ -247,8 +247,8 @@ public final class VectorUtil {
     final int dim = v1.getDimensionality();
     double s1 = 0, s2 = 0, e1 = 0, e2 = 0;
     for(int k = 0; k < dim; k++) {
-      final double min1 = v1.getMin(k + 1), max1 = v1.getMax(k + 1);
-      final double min2 = v2.getMin(k + 1), max2 = v2.getMax(k + 1);
+      final double min1 = v1.getMin(k), max1 = v1.getMax(k);
+      final double min2 = v2.getMin(k), max2 = v2.getMax(k);
       final double p1 = min1 * min2, p2 = min1 * max2;
       final double p3 = max1 * min2, p4 = max1 * max2;
       s1 += Math.max(Math.max(p1, p2), Math.max(p3, p4));
@@ -282,7 +282,7 @@ public final class VectorUtil {
   public static double scalarProduct(NumberVector<?> d1, NumberVector<?> d2) {
     final int dim = d1.getDimensionality();
     double result = 0.0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       result += d1.doubleValue(i) * d2.doubleValue(i);
     }
     return result;
@@ -301,8 +301,8 @@ public final class VectorUtil {
     SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
     Vector medoid = new Vector(dim);
     for (int d = 0; d < dim; d++) {
-      s.setDimension(d + 1);
-      medoid.set(d, relation.get(QuickSelect.median(mids, s)).doubleValue(d + 1));
+      s.setDimension(d);
+      medoid.set(d, relation.get(QuickSelect.median(mids, s)).doubleValue(d));
     }
     return medoid;
   }
@@ -417,8 +417,8 @@ public final class VectorUtil {
       final SparseNumberVector.Factory<?, ?> sfactory = (SparseNumberVector.Factory<?, ?>) factory;
       TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
       for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-        if (v.doubleValue(d + 1) != 0.0) {
-          values.put(d, v.doubleValue(d + 1));
+        if (v.doubleValue(d) != 0.0) {
+          values.put(d, v.doubleValue(d));
         }
       }
       // We can't avoid this cast, because Java doesn't know that V is a SparseNumberVector:
@@ -429,7 +429,7 @@ public final class VectorUtil {
       double[] newAttributes = new double[selectedAttributes.cardinality()];
       int i = 0;
       for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-        newAttributes[i] = v.doubleValue(d + 1);
+        newAttributes[i] = v.doubleValue(d);
         i++;
       }
       return factory.newNumberVector(newAttributes);

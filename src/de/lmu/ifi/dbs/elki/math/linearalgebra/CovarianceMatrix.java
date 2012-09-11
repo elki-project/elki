@@ -183,7 +183,7 @@ public class CovarianceMatrix {
     final double nwsum = wsum + 1.0;
     // Compute new means
     for(int i = 0; i < mean.length; i++) {
-      final double delta = val.doubleValue(i + 1) - mean[i];
+      final double delta = val.doubleValue(i) - mean[i];
       nmea[i] = mean[i] + delta / nwsum;
     }
     // Update covariance matrix
@@ -191,7 +191,7 @@ public class CovarianceMatrix {
       for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
-        double delta = (val.doubleValue(i + 1) - nmea[i]) * (val.doubleValue(j + 1) - mean[j]);
+        double delta = (val.doubleValue(i) - nmea[i]) * (val.doubleValue(j) - mean[j]);
         elements[i][j] = elements[i][j] + delta;
         // Optimize via symmetry
         if(i != j) {
@@ -215,7 +215,7 @@ public class CovarianceMatrix {
     final double nwsum = wsum + weight;
     // Compute new means
     for(int i = 0; i < mean.length; i++) {
-      final double delta = val.doubleValue(i + 1) - mean[i];
+      final double delta = val.doubleValue(i) - mean[i];
       final double rval = delta * weight / nwsum;
       nmea[i] = mean[i] + rval;
     }
@@ -224,7 +224,7 @@ public class CovarianceMatrix {
       for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
-        double delta = (val.doubleValue(i + 1) - nmea[i]) * (val.doubleValue(j + 1) - mean[j]) * weight;
+        double delta = (val.doubleValue(i) - nmea[i]) * (val.doubleValue(j) - mean[j]) * weight;
         elements[i][j] = elements[i][j] + delta;
         // Optimize via symmetry
         if(i != j) {

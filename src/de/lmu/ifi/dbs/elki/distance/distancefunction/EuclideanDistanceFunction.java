@@ -49,12 +49,6 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     super(2.0);
   }
 
-  /**
-   * Provides the Euclidean distance between the given two vectors.
-   * 
-   * @return the Euclidean distance between the given two vectors as raw double
-   *         value
-   */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
     final int dim1 = v1.getDimensionality();
@@ -62,7 +56,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
     double sqrDist = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double delta = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += delta * delta;
     }
@@ -73,7 +67,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double sqrDist = 0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double delta = v.doubleValue(i);
       sqrDist += delta * delta;
     }
@@ -87,7 +81,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     }
 
     double sqrDist = 0;
-    for(int d = 1; d <= dim; d++) {
+    for(int d = 0; d < dim; d++) {
       double value = v.doubleValue(d);
       double r;
       if(value < mbr.getMin(d)) {
@@ -126,7 +120,7 @@ public class EuclideanDistanceFunction extends LPNormDistanceFunction implements
     }
 
     double sqrDist = 0;
-    for(int d = 1; d <= dim1; d++) {
+    for(int d = 0; d < dim1; d++) {
       final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr2.getMin(d);

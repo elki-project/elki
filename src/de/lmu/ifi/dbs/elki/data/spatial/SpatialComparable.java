@@ -42,7 +42,7 @@ public interface SpatialComparable {
    * Returns the minimum coordinate at the specified dimension.
    * 
    * @param dimension the dimension for which the coordinate should be returned,
-   *        where 1 &le; dimension &le; <code>getDimensionality()</code>
+   *        where 0 &le; dimension &lt; <code>getDimensionality()</code>
    * @return the minimum coordinate at the specified dimension
    */
   double getMin(int dimension);
@@ -51,7 +51,7 @@ public interface SpatialComparable {
    * Returns the maximum coordinate at the specified dimension.
    * 
    * @param dimension the dimension for which the coordinate should be returned,
-   *        where 1 &le; dimension &le; <code>getDimensionality()</code>
+   *        where 0 &le; dimension &lt; <code>getDimensionality()</code>
    * @return the maximum coordinate at the specified dimension
    */
   double getMax(int dimension);

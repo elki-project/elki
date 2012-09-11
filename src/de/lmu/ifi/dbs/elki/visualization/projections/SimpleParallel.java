@@ -222,7 +222,7 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
         continue;
       }
       int i = dimOrder[j];
-      v[o] = scales[i].getScaled(data.doubleValue(i + 1));
+      v[o] = scales[i].getScaled(data.doubleValue(i));
       if(!isDimInverted(i)) {
         v[o] = 1 - v[o];
       }

@@ -141,7 +141,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     {
       int i = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
-        final double val = relation.get(id).doubleValue(1);
+        final double val = relation.get(id).doubleValue(0);
         assert (heap.size() == 0);
         int j = 0;
         for(DBIDIter n = ids.iter(); n.valid(); n.advance(), j++) {
@@ -157,7 +157,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
             e = 0;
           }
           else {
-            double diff = Math.abs(val - relation.get(n).doubleValue(1));
+            double diff = Math.abs(val - relation.get(n).doubleValue(0));
             double exp = Math.exp(Math.pow(diff, alpha));
             // Implementation note: not inverting exp worked a lot better.
             // Therefore we diverge from the article here.

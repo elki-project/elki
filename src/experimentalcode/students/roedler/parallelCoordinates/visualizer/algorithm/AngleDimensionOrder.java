@@ -83,18 +83,18 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
     
     double temp;
     
-    for (int i = 1; i < dim; i++){
+    for (int i = 0; i < dim - 1; i++){
     //  if (!proj.isAxisVisible(i - 1)) { 
     //    continue; 
     //  }
       
-      for (int j = i + 1; j <= dim; j++){
+      for (int j = i + 1; j < dim; j++){
     //    if (!proj.isAxisVisible(j - 1)) { continue; }
         
         angles = new int[40];
         
         for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-          double dif = proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(j), j - 1) - proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(i), i - 1);
+          double dif = proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(j), j) - proj.fastProjectDataToRenderSpace(relation.get(id).doubleValue(i), i);
           int div =(int) (dif / 5.);
           
           if (dif > 0.) {
@@ -118,8 +118,8 @@ public class AngleDimensionOrder extends AbstractParallelVisualization<NumberVec
     
         entropy /= Math.log(40);
         
-        angmat.set(i - 1, j - 1, 1 + entropy);
-        angmat.set(j - 1, i - 1, 1 + entropy);
+        angmat.set(i, j, 1 + entropy);
+        angmat.set(j, i, 1 + entropy);
       }
     }
     end = System.nanoTime();

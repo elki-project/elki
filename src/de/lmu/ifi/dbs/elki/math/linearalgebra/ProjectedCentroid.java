@@ -103,7 +103,7 @@ public class ProjectedCentroid extends Centroid {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
-      final double delta = val.doubleValue(i + 1) - elements[i];
+      final double delta = val.doubleValue(i) - elements[i];
       elements[i] += delta / wsum;
     }
   }
@@ -119,7 +119,7 @@ public class ProjectedCentroid extends Centroid {
     assert (val.getDimensionality() == elements.length);
     final double nwsum = weight + wsum;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
-      final double delta = val.doubleValue(i + 1) - elements[i];
+      final double delta = val.doubleValue(i) - elements[i];
       final double rval = delta * weight / nwsum;
       elements[i] += rval;
     }

@@ -62,7 +62,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractVectorDoub
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
     double sqrDist = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double delta = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += delta * delta * weights[i - 1];
     }

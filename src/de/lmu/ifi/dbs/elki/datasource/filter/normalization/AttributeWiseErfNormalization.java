@@ -55,7 +55,7 @@ public class AttributeWiseErfNormalization<O extends NumberVector<?>> extends Ab
   protected O filterSingleObject(O obj) {
     double[] val = new double[obj.getDimensionality()];
     for(int i = 0; i < val.length; i++) {
-      val[i] = NormalDistribution.erf(obj.doubleValue(i + 1));
+      val[i] = NormalDistribution.erf(obj.doubleValue(i));
     }
     return factory.newNumberVector(val);
   }

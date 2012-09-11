@@ -61,7 +61,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      sum += Math.abs(v1.doubleValue(d + 1) - v2.doubleValue(d + 1));
+      sum += Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
     }
     return sum;
   }
@@ -73,13 +73,13 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
 
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      final double value = v.doubleValue(d + 1);
-      final double omin = mbr.getMin(d + 1);
+      final double value = v.doubleValue(d);
+      final double omin = mbr.getMin(d);
       if(value < omin) {
         sum += omin - value;
       }
       else {
-        final double omax = mbr.getMax(d + 1);
+        final double omax = mbr.getMax(d);
         if(value > omax) {
           sum += value - omax;
         }
@@ -98,14 +98,14 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     }
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      final double max1 = mbr1.getMax(d + 1);
-      final double min2 = mbr2.getMin(d + 1);
+      final double max1 = mbr1.getMax(d);
+      final double min2 = mbr2.getMin(d);
       if(max1 < min2) {
         sum += min2 - max1;
       }
       else {
-        final double min1 = mbr1.getMin(d + 1);
-        final double max2 = mbr2.getMax(d + 1);
+        final double min1 = mbr1.getMin(d);
+        final double max2 = mbr2.getMax(d);
         if(min1 > max2) {
           sum += min1 - max2;
         }
@@ -121,7 +121,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
   public double doubleNorm(NumberVector<?> obj) {
     double sum = 0;
     for(int d = dimensions.nextSetBit(0); d >= 0; d = dimensions.nextSetBit(d + 1)) {
-      sum += Math.abs(obj.doubleValue(d + 1));
+      sum += Math.abs(obj.doubleValue(d));
     }
     return sum;
   }

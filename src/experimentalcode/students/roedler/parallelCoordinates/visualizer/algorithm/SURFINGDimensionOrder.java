@@ -84,8 +84,8 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
     }
     start = System.nanoTime();
     
-    for (int i = 1; i < dim; i++){
-      for (int j = i + 1; j <= dim; j++){
+    for (int i = 0; i < dim - 1; i++){
+      for (int j = i + 1; j < dim; j++){
         double[] knns = new double[ids.size()];
         double sum = 0.;
         int knn = 0;
@@ -125,8 +125,8 @@ public class SURFINGDimensionOrder extends AbstractParallelVisualization<NumberV
         else {
           quality = diff / ((double)below * median);
         }
-        surfmat.set(i - 1, j - 1, quality);
-        surfmat.set(j - 1, i - 1, quality);
+        surfmat.set(i, j, quality);
+        surfmat.set(j, i, quality);
       }
     }
     end = System.nanoTime();

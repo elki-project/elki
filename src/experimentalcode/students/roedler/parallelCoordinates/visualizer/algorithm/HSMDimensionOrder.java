@@ -125,12 +125,12 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
     int progress = 0;
     int max = ((dim * dim) - dim) / 2;
 
-    for(int i = 1; i < dim; i++) {
+    for(int i = 0; i < dim - 1; i++) {
       // if (!proj.isAxisVisible(i - 1)) {
       // continue;
       // }
 
-      for(int j = i + 1; j <= dim; j++) {
+      for(int j = i + 1; j < dim; j++) {
         // if (!proj.isAxisVisible(j - 1)) { continue; }
 
         for(int m = 0; m < resolution; m++) {
@@ -149,8 +149,8 @@ public class HSMDimensionOrder extends AbstractParallelVisualization<NumberVecto
         double median = (double) sum / (double) (hough[0].length * hough.length);
         double bigCells = (double) sumMatrix(splitMatrixIntoCells(hough, mode, median));
 
-        hsmmat.set(i - 1, j - 1, 1. - (bigCells / 2500.));
-        hsmmat.set(j - 1, i - 1, 1. - (bigCells / 2500.));
+        hsmmat.set(i, j, 1. - (bigCells / 2500.));
+        hsmmat.set(j, i, 1. - (bigCells / 2500.));
 
         if(logger.isVerbose()) {
           progress++;

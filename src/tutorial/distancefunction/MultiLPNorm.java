@@ -79,7 +79,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
     double sum = 0.0;
     for(int dim = 0; dim < ps.length; dim++) {
       if(ps[dim] > 0) {
-        final double delta = Math.abs(o1.doubleValue(dim + 1) - o2.doubleValue(dim + 1));
+        final double delta = Math.abs(o1.doubleValue(dim) - o2.doubleValue(dim));
         sum += Math.pow(delta, ps[dim]);
       }
     }

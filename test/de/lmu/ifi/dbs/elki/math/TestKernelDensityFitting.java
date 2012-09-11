@@ -93,7 +93,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
     {
       int i = 0;
       for(DBIDIter iditer = rep.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        fulldata[i] = rep.get(iditer).doubleValue(1);
+        fulldata[i] = rep.get(iditer).doubleValue(0);
         i++;
       }
     }

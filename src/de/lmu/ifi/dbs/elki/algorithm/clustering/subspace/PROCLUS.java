@@ -23,15 +23,17 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractProjectedClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -59,6 +61,7 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -202,7 +205,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     Map<DBID, PROCLUSCluster> clusters = null;
     int loops = 0;
     while(loops < 10) {
-      Map<DBID, Set<Integer>> dimensions = findDimensions(m_current, relation, distFunc, rangeQuery);
+      Map<DBID, TIntSet> dimensions = findDimensions(m_current, relation, distFunc, rangeQuery);
       clusters = assignPoints(dimensions, relation);
       double objectiveFunction = evaluateClusters(clusters, dimensions, relation);
 
@@ -230,7 +233,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       LOG.verbose("3. Refinement phase...");
     }
 
-    List<Pair<V, Set<Integer>>> dimensions = findDimensions(new ArrayList<PROCLUSCluster>(clusters.values()), relation);
+    List<Pair<V, TIntSet>> dimensions = findDimensions(new ArrayList<PROCLUSCluster>(clusters.values()), relation);
     List<PROCLUSCluster> finalClusters = finalAssignment(dimensions, relation);
 
     // build result
@@ -401,7 +404,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @return the set of correlated dimensions for each medoid in the specified
    *         medoid set
    */
-  private Map<DBID, Set<Integer>> findDimensions(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
+  private Map<DBID, TIntSet> findDimensions(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
     // get localities
     Map<DBID, DistanceDBIDResult<DoubleDistance>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 
@@ -417,7 +420,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       for(DBIDIter qr = l_i.iter(); qr.valid(); qr.advance()) {
         V o = database.get(qr);
         for(int d = 0; d < dim; d++) {
-          x_i[d] += Math.abs(medoid_i.doubleValue(d + 1) - o.doubleValue(d + 1));
+          x_i[d] += Math.abs(medoid_i.doubleValue(d) - o.doubleValue(d));
         }
       }
       for(int d = 0; d < dim; d++) {
@@ -426,11 +429,11 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       averageDistances.put(m_i, x_i);
     }
 
-    Map<DBID, Set<Integer>> dimensionMap = new HashMap<DBID, Set<Integer>>();
+    Map<DBID, TIntSet> dimensionMap = new HashMap<DBID, TIntSet>();
     List<CTriple<Double, DBID, Integer>> z_ijs = new ArrayList<CTriple<Double, DBID, Integer>>();
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       DBID m_i = DBIDUtil.deref(iter);
-      Set<Integer> dims_i = new HashSet<Integer>();
+      TIntSet dims_i = new TIntHashSet();
       dimensionMap.put(m_i, dims_i);
 
       double[] x_i = averageDistances.get(m_i);
@@ -451,7 +454,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       sigma_i = Math.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
-        z_ijs.add(new CTriple<Double, DBID, Integer>((x_i[j] - y_i) / sigma_i, m_i, j + 1));
+        z_ijs.add(new CTriple<Double, DBID, Integer>((x_i[j] - y_i) / sigma_i, m_i, j));
       }
     }
     Collections.sort(z_ijs);
@@ -459,7 +462,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     int max = Math.max(k * l, 2);
     for(int m = 0; m < max; m++) {
       CTriple<Double, DBID, Integer> z_ij = z_ijs.get(m);
-      Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());
+      TIntSet dims_i = dimensionMap.get(z_ij.getSecond());
       dims_i.add(z_ij.getThird());
 
       if(LOG.isDebugging()) {
@@ -482,7 +485,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @return the set of correlated dimensions for each specified cluster
    *         centroid
    */
-  private List<Pair<V, Set<Integer>>> findDimensions(List<PROCLUSCluster> clusters, Relation<V> database) {
+  private List<Pair<V, TIntSet>> findDimensions(List<PROCLUSCluster> clusters, Relation<V> database) {
     // compute x_ij = avg distance from points in c_i to c_i.centroid
     int dim = RelationUtil.dimensionality(database);
     Map<Integer, double[]> averageDistances = new HashMap<Integer, double[]>();
@@ -493,7 +496,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       for(DBIDIter iter = c_i.objectIDs.iter(); iter.valid(); iter.advance()) {
         V o = database.get(iter);
         for(int d = 0; d < dim; d++) {
-          x_i[d] += Math.abs(c_i.centroid.doubleValue(d + 1) - o.doubleValue(d + 1));
+          x_i[d] += Math.abs(c_i.centroid.doubleValue(d) - o.doubleValue(d));
         }
       }
       for(int d = 0; d < dim; d++) {
@@ -522,19 +525,19 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       sigma_i = Math.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
-        z_ijs.add(new CTriple<Double, Integer, Integer>((x_i[j] - y_i) / sigma_i, i, j + 1));
+        z_ijs.add(new CTriple<Double, Integer, Integer>((x_i[j] - y_i) / sigma_i, i, j));
       }
     }
     Collections.sort(z_ijs);
 
     // mapping cluster index -> dimensions
-    Map<Integer, Set<Integer>> dimensionMap = new HashMap<Integer, Set<Integer>>();
+    Map<Integer, TIntSet> dimensionMap = new HashMap<Integer, TIntSet>();
     int max = Math.max(k * l, 2);
     for(int m = 0; m < max; m++) {
       CTriple<Double, Integer, Integer> z_ij = z_ijs.get(m);
-      Set<Integer> dims_i = dimensionMap.get(z_ij.getSecond());
+      TIntSet dims_i = dimensionMap.get(z_ij.getSecond());
       if(dims_i == null) {
-        dims_i = new HashSet<Integer>();
+        dims_i = new TIntHashSet();
         dimensionMap.put(z_ij.getSecond(), dims_i);
       }
       dims_i.add(z_ij.getThird());
@@ -549,11 +552,11 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     }
 
     // mapping cluster -> dimensions
-    List<Pair<V, Set<Integer>>> result = new ArrayList<Pair<V, Set<Integer>>>();
+    List<Pair<V, TIntSet>> result = new ArrayList<Pair<V, TIntSet>>();
     for(int i : dimensionMap.keySet()) {
-      Set<Integer> dims_i = dimensionMap.get(i);
+      TIntSet dims_i = dimensionMap.get(i);
       PROCLUSCluster c_i = clusters.get(i);
-      result.add(new Pair<V, Set<Integer>>(c_i.centroid, dims_i));
+      result.add(new Pair<V, TIntSet>(c_i.centroid, dims_i));
     }
     return result;
   }
@@ -566,7 +569,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @param database the database containing the objects
    * @return the assignments of the object to the clusters
    */
-  private Map<DBID, PROCLUSCluster> assignPoints(Map<DBID, Set<Integer>> dimensions, Relation<V> database) {
+  private Map<DBID, PROCLUSCluster> assignPoints(Map<DBID, TIntSet> dimensions, Relation<V> database) {
     Map<DBID, ModifiableDBIDs> clusterIDs = new HashMap<DBID, ModifiableDBIDs>();
     for(DBID m_i : dimensions.keySet()) {
       clusterIDs.put(m_i, DBIDUtil.newHashSet());
@@ -593,7 +596,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     for(DBID m_i : dimensions.keySet()) {
       ModifiableDBIDs objectIDs = clusterIDs.get(m_i);
       if(!objectIDs.isEmpty()) {
-        Set<Integer> clusterDimensions = dimensions.get(m_i);
+        TIntSet clusterDimensions = dimensions.get(m_i);
         V centroid = Centroid.make(database, objectIDs).toVector(database);
         clusters.put(m_i, new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
       }
@@ -616,7 +619,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @param database the database containing the objects
    * @return the assignments of the object to the clusters
    */
-  private List<PROCLUSCluster> finalAssignment(List<Pair<V, Set<Integer>>> dimensions, Relation<V> database) {
+  private List<PROCLUSCluster> finalAssignment(List<Pair<V, TIntSet>> dimensions, Relation<V> database) {
     Map<Integer, ModifiableDBIDs> clusterIDs = new HashMap<Integer, ModifiableDBIDs>();
     for(int i = 0; i < dimensions.size(); i++) {
       clusterIDs.put(i, DBIDUtil.newHashSet());
@@ -627,9 +630,9 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       V p = database.get(p_id);
       Pair<DoubleDistance, Integer> minDist = null;
       for(int i = 0; i < dimensions.size(); i++) {
-        Pair<V, Set<Integer>> pair_i = dimensions.get(i);
+        Pair<V, TIntSet> pair_i = dimensions.get(i);
         V c_i = pair_i.first;
-        Set<Integer> dimensions_i = pair_i.second;
+        TIntSet dimensions_i = pair_i.second;
         DoubleDistance currentDist = manhattanSegmentalDistance(p, c_i, dimensions_i);
         if(minDist == null || currentDist.compareTo(minDist.first) < 0) {
           minDist = new Pair<DoubleDistance, Integer>(currentDist, i);
@@ -645,7 +648,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     for(int i = 0; i < dimensions.size(); i++) {
       ModifiableDBIDs objectIDs = clusterIDs.get(i);
       if(!objectIDs.isEmpty()) {
-        Set<Integer> clusterDimensions = dimensions.get(i).second;
+        TIntSet clusterDimensions = dimensions.get(i).second;
         V centroid = Centroid.make(database, objectIDs).toVector(database);
         clusters.add(new PROCLUSCluster(objectIDs, clusterDimensions, centroid));
       }
@@ -670,9 +673,10 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @return the Manhattan segmental distance between o1 and o2 relative to the
    *         specified dimensions
    */
-  private DoubleDistance manhattanSegmentalDistance(V o1, V o2, Set<Integer> dimensions) {
+  private DoubleDistance manhattanSegmentalDistance(V o1, V o2, TIntSet dimensions) {
     double result = 0;
-    for(Integer d : dimensions) {
+    for (TIntIterator iter = dimensions.iterator(); iter.hasNext(); ) {
+      final int d = iter.next();
       result += Math.abs(o1.doubleValue(d) - o2.doubleValue(d));
     }
     result /= dimensions.size();
@@ -687,15 +691,16 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @param database the database holding the objects
    * @return a measure for the cluster quality
    */
-  private double evaluateClusters(Map<DBID, PROCLUSCluster> clusters, Map<DBID, Set<Integer>> dimensions, Relation<V> database) {
+  private double evaluateClusters(Map<DBID, PROCLUSCluster> clusters, Map<DBID, TIntSet> dimensions, Relation<V> database) {
     double result = 0;
     for(DBID m_i : clusters.keySet()) {
       PROCLUSCluster c_i = clusters.get(m_i);
       V centroid_i = c_i.centroid;
 
-      Set<Integer> dims_i = dimensions.get(m_i);
+      TIntSet dims_i = dimensions.get(m_i);
       double w_i = 0;
-      for(Integer j : dims_i) {
+      for (TIntIterator iter = dims_i.iterator(); iter.hasNext(); ) {
+        final int j = iter.next();
         w_i += avgDistance(centroid_i, c_i.objectIDs, database, j);
       }
 
@@ -718,12 +723,12 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    *         specified dimension
    */
   private double avgDistance(V centroid, DBIDs objectIDs, Relation<V> database, int dimension) {
-    double avg = 0;
+    Mean avg = new Mean();
     for(DBIDIter iter = objectIDs.iter(); iter.valid(); iter.advance()) {
       V o = database.get(iter);
-      avg += Math.abs(centroid.doubleValue(dimension) - o.doubleValue(dimension));
+      avg.put(Math.abs(centroid.doubleValue(dimension) - o.doubleValue(dimension)));
     }
-    return avg / objectIDs.size();
+    return avg.getMean();
   }
 
   /**
@@ -769,7 +774,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     /**
      * The correlated dimensions of this cluster.
      */
-    Set<Integer> dimensions;
+    TIntSet dimensions;
 
     /**
      * The centroids of this cluster along each dimension.
@@ -783,7 +788,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
      * @param dimensions the correlated dimensions of this cluster
      * @param centroid the centroid of this cluster
      */
-    public PROCLUSCluster(ModifiableDBIDs objectIDs, Set<Integer> dimensions, V centroid) {
+    public PROCLUSCluster(ModifiableDBIDs objectIDs, TIntSet dimensions, V centroid) {
       this.objectIDs = objectIDs;
       this.dimensions = dimensions;
       this.centroid = centroid;
@@ -794,14 +799,14 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       StringBuffer result = new StringBuffer();
       result.append("Dimensions: [");
       boolean notFirst = false;
-      for(Integer d : dimensions) {
+      for(TIntIterator iter = dimensions.iterator(); iter.hasNext(); ) {
         if(notFirst) {
           result.append(",");
         }
         else {
           notFirst = true;
         }
-        result.append(d);
+        result.append(iter.next());
       }
       result.append("]");
 
@@ -816,8 +821,8 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
      */
     public BitSet getDimensions() {
       BitSet result = new BitSet();
-      for(int d : dimensions) {
-        result.set(d - 1);
+      for(TIntIterator iter = dimensions.iterator(); iter.hasNext(); ) {
+        result.set(iter.next());
       }
       return result;
     }

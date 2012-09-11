@@ -61,7 +61,6 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -212,7 +211,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     int approximation[] = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPartitions.length; d++) {
       double[] split = daFiles.get(d).getSplitPositions();
-      final double val = dv.doubleValue(d + 1);
+      final double val = dv.doubleValue(d);
       final int lastBorderIndex = split.length - 1;
 
       // Value is below data grid
@@ -303,8 +302,9 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     VectorApproximation queryApprox = calculatePartialApproximation(null, query, daFiles);
   
     for(int i = 0; i < dimensions; i++) {
-      lowerVals[i] = query.doubleValue(i + 1) - epsilon;
-      upperVals[i] = query.doubleValue(i + 1) + epsilon;
+      final double val = query.doubleValue(i);
+      lowerVals[i] = val - epsilon;
+      upperVals[i] = val + epsilon;
     }
   
     Vector lowerEpsilon = new Vector(lowerVals);
@@ -330,7 +330,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
   protected static VectorApproximation calculatePartialApproximation(DBID id, NumberVector<?> dv, List<DoubleObjPair<DAFile>> daFiles) {
     int[] approximation = new int[dv.getDimensionality()];
     for(int i = 0; i < daFiles.size(); i++) {
-      double val = dv.doubleValue(i + 1);
+      double val = dv.doubleValue(i);
       double[] borders = daFiles.get(i).second.getSplitPositions();
       assert borders != null : "borders are null";
       int lastBorderIndex = borders.length - 1;

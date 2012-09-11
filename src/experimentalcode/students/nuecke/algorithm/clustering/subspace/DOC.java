@@ -281,8 +281,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         for(int k = 0; k < d; ++k) {
           if(dimensionIsRelevant(k, relation, randomSet)) {
             nD.set(k);
-            min[k] = pV.doubleValue(k + 1) - w;
-            max[k] = pV.doubleValue(k + 1) + w;
+            min[k] = pV.doubleValue(k) - w;
+            max[k] = pV.doubleValue(k) + w;
           }
           else {
             min[k] = Double.NEGATIVE_INFINITY;
@@ -421,8 +421,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     double[] max = new double[d];
     for(int k = 0; k < d; ++k) {
       if(D.get(k)) {
-        min[k] = dV.doubleValue(k + 1) - w;
-        max[k] = dV.doubleValue(k + 1) + w;
+        min[k] = dV.doubleValue(k) - w;
+        max[k] = dV.doubleValue(k) + w;
       }
       else {
         min[k] = Double.NEGATIVE_INFINITY;
@@ -470,8 +470,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     double max = Double.NEGATIVE_INFINITY;
     for(DBIDIter iter = points.iter(); iter.valid(); iter.advance()) {
       V xV = relation.get(iter);
-      min = Math.min(min, xV.doubleValue(dimension + 1));
-      max = Math.max(max, xV.doubleValue(dimension + 1));
+      min = Math.min(min, xV.doubleValue(dimension));
+      max = Math.max(max, xV.doubleValue(dimension));
       if(max - min > w) {
         return false;
       }
@@ -488,7 +488,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return <code>true</code> if the point is inside the cube.
    */
   private boolean isPointInBounds(V v, HyperBoundingBox bounds) {
-    for(int i = 1; i <= v.getDimensionality(); ++i) {
+    for(int i = 0; i < v.getDimensionality(); i++) {
       if(v.doubleValue(i) < bounds.getMin(i) || v.doubleValue(i) > bounds.getMax(i)) {
         return false;
       }

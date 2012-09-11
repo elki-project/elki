@@ -82,7 +82,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
   public V project(V data) {
     double[] dbl = new double[dimensionality];
     for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
-      dbl[j] = data.doubleValue(i + 1);
+      dbl[j] = data.doubleValue(i);
     }
     return factory.newNumberVector(dbl);
   }

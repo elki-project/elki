@@ -63,19 +63,20 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<Double> {
 
   @Override
   public double doubleValue(int dimension) {
-    assert (dimension == 1) : "Non-existant dimension accessed.";
+    assert (dimension == 0) : "Non-existant dimension accessed.";
     return val;
   }
 
   @Override
   public long longValue(int dimension) {
-    assert (dimension == 1) : "Non-existant dimension accessed.";
+    assert (dimension == 0) : "Non-existant dimension accessed.";
     return (long) val;
   }
 
+  @Deprecated
   @Override
   public Double getValue(int dimension) {
-    assert (dimension == 1) : "Incorrect dimension requested for 1-dimensional vector.";
+    assert (dimension == 0) : "Incorrect dimension requested for 1-dimensional vector.";
     return this.val;
   }
 
@@ -97,7 +98,7 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<Double> {
     }
 
     @Override
-    public <A> OneDimensionalDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> OneDimensionalDoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";
       return new OneDimensionalDoubleVector(adapter.getDouble(array, 0));
     }

@@ -496,7 +496,7 @@ public class KNNExplorer<O extends NumberVector<?>, D extends NumberDistance<D, 
       SVGPath path = new SVGPath();
       for(double id = 0; id < dim; id += step) {
         int i = (int) Math.floor(id);
-        path.drawTo(StyleLibrary.SCALE * ratio * (((double) i) / (dim - 1)), StyleLibrary.SCALE * (1.0 - s.getScaled(series.doubleValue(i + 1))));
+        path.drawTo(StyleLibrary.SCALE * ratio * (((double) i) / (dim - 1)), StyleLibrary.SCALE * (1.0 - s.getScaled(series.doubleValue(i))));
       }
       Element p = path.makeElement(plot);
       return p;

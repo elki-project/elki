@@ -203,7 +203,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
     }
 
     @Override
-    public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> IntegerVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       int[] values = new int[dim];
       for (int i = 0; i < dim; i++) {

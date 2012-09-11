@@ -55,7 +55,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
     double dist = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double xi = v1.doubleValue(i);
       final double yi = v2.doubleValue(i);
       final double mi = (xi + yi) / 2;

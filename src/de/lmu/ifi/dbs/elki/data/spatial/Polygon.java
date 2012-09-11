@@ -167,12 +167,12 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
 
   @Override
   public double getMin(int dimension) {
-    return min[dimension - 1];
+    return min[dimension];
   }
 
   @Override
   public double getMax(int dimension) {
-    return max[dimension - 1];
+    return max[dimension];
   }
 
   /**

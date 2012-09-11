@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  */
 public class HyperBoundingBox implements SpatialComparable, Externalizable {
   /**
-   * Serial version
+   * Serial version.
    */
   private static final long serialVersionUID = 1;
 
@@ -86,37 +86,37 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
     this.min = new double[dim];
     this.max = new double[dim];
     for(int i = 0; i < dim; i++) {
-      this.min[i] = other.getMin(i + 1);
-      this.max[i] = other.getMax(i + 1);
+      this.min[i] = other.getMin(i);
+      this.max[i] = other.getMax(i);
     }
   }
 
   /**
    * Returns the coordinate at the specified dimension of the minimum hyper
-   * point
+   * point.
    * 
    * @param dimension the dimension for which the coordinate should be returned,
-   *        where 1 &le; dimension &le; <code>this.getDimensionality()</code>
+   *        where 0 &le; dimension &lt; <code>this.getDimensionality()</code>
    * @return the coordinate at the specified dimension of the minimum hyper
    *         point
    */
   @Override
   public double getMin(int dimension) {
-    return min[dimension - 1];
+    return min[dimension];
   }
 
   /**
    * Returns the coordinate at the specified dimension of the maximum hyper
-   * point
+   * point.
    * 
    * @param dimension the dimension for which the coordinate should be returned,
-   *        where 1 &le; dimension &le; <code>this.getDimensionality()</code>
+   *        where 0 &le; dimension &lt; <code>this.getDimensionality()</code>
    * @return the coordinate at the specified dimension of the maximum hyper
    *         point
    */
   @Override
   public double getMax(int dimension) {
-    return max[dimension - 1];
+    return max[dimension];
   }
 
   /**
@@ -150,18 +150,12 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
     return pre + "[Min(" + FormatUtil.format(min, ",", nf) + "), Max(" + FormatUtil.format(max, ",", nf) + ")]";
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
   @Override
   public boolean equals(Object obj) {
     HyperBoundingBox box = (HyperBoundingBox) obj;
     return Arrays.equals(min, box.min) && Arrays.equals(max, box.max);
   }
 
-  /**
-   * @see Object#hashCode()
-   */
   @Override
   public int hashCode() {
     return 29 * Arrays.hashCode(min) + Arrays.hashCode(max);

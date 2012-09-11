@@ -51,7 +51,7 @@ public class LinearKernelFunction<O extends NumberVector<?>> extends AbstractPri
 
   /**
    * Provides a linear Kernel function that computes a similarity between the
-   * two feature vectors V1 and V2 definded by V1^T*V2
+   * two feature vectors V1 and V2 definded by V1^T*V2.
    * 
    * @param o1 first feature vector
    * @param o2 second feature vector
@@ -64,7 +64,7 @@ public class LinearKernelFunction<O extends NumberVector<?>> extends AbstractPri
       throw new IllegalArgumentException("Different dimensionality of Feature-Vectors" + "\n  first argument: " + o1.toString() + "\n  second argument: " + o2.toString());
     }
     double sim = 0;
-    for(int i = 1; i <= o1.getDimensionality(); i++) {
+    for(int i = 0; i < o1.getDimensionality(); i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
     }
     return new DoubleDistance(sim);

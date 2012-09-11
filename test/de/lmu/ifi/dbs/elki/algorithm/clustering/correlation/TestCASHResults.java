@@ -47,8 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run CASH with fixed parameters and compare the result to a golden standard.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testCASHResults() {
@@ -75,8 +73,6 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
 
   /**
    * Run CASH with fixed parameters and compare the result to a golden standard.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testCASHEmbedded() {

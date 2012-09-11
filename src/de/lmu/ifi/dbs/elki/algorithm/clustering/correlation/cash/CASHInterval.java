@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  */
 public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInterval> {
   /**
-   * Serial version number
+   * Serial version number.
    */
   private static final long serialVersionUID = 1;
 
@@ -148,7 +148,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
   }
 
   /**
-   * Returns the number of objects associated with this interval
+   * Returns the number of objects associated with this interval.
    * 
    * @return the number of objects associated with this interval
    */
@@ -286,9 +286,6 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     }
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
   @Override
   public boolean equals(Object o) {
     if(this == o) {
@@ -305,9 +302,6 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     return super.equals(o);
   }
 
-  /**
-   * Returns the unique id of this interval as hash code.
-   */
   @Override
   public int hashCode() {
     return intervalID.hashCode();
@@ -333,7 +327,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     int dim = getDimensionality();
     int childLevel = isSplit(dim) ? level + 1 : level;
 
-    int splitDim = isSplit(dim) ? 1 : maxSplitDimension + 1;
+    int splitDim = isSplit(dim) ? 0 : maxSplitDimension + 1;
     double splitPoint = getMin(splitDim) + (getMax(splitDim) - getMin(splitDim)) / 2;
 
     // left and right child
@@ -343,11 +337,11 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
 
       // right child
       if(i == 0) {
-        min[splitDim - 1] = splitPoint;
+        min[splitDim] = splitPoint;
       }
       // left child
       else {
-        max[splitDim - 1] = splitPoint;
+        max[splitDim] = splitPoint;
       }
 
       ModifiableDBIDs childIDs = split.determineIDs(getIDs(), new HyperBoundingBox(min, max), d_min, d_max);

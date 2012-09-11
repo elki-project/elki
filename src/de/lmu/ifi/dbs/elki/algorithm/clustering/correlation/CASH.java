@@ -698,9 +698,6 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param dim the dimensionality of the database
    * @param ids an empty set to assign the ids
    * @return a basis of the found subspace
-   * @throws UnableToComplyException if an error according to the database
-   *         occurs
-   * @throws ParameterException if the parameter setting is wrong
    */
   private Matrix runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) {
     // build database for derivator
@@ -719,7 +716,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     Matrix weightMatrix = model.getSimilarityMatrix();
     DoubleVector centroid = new DoubleVector(model.getCentroid());
     DistanceQuery<DoubleVector, DoubleDistance> df = QueryUtil.getDistanceQuery(derivatorDB, new WeightedDistanceFunction(weightMatrix));
-    DoubleDistance eps = df.getDistanceFactory().parseString("0.25");
+    DoubleDistance eps = new DoubleDistance(0.25);
 
     ids.addDBIDs(interval.getIDs());
     // Search for nearby vectors in original database

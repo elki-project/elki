@@ -253,7 +253,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
       }
 
       double sqrDist = 0;
-      for(int i = 1; i <= dv1.getDimensionality(); i++) {
+      for(int i = 0; i < dv1.getDimensionality(); i++) {
         double manhattanI = dv1.doubleValue(i) - dv2.doubleValue(i);
         sqrDist += manhattanI * manhattanI;
       }

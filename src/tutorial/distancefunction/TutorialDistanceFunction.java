@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanc
 public class TutorialDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    double dx = (o1.doubleValue(1) - o2.doubleValue(1));
-    double dy = (o1.doubleValue(2) - o2.doubleValue(2));
+    double dx = (o1.doubleValue(0) - o2.doubleValue(0));
+    double dy = (o1.doubleValue(1) - o2.doubleValue(1));
     return dx * dx + Math.abs(dy);
   }
 

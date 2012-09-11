@@ -137,10 +137,10 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
       b = new double[n];
 
       for(int i = 0; i < v1.getDimensionality(); i++) {
-        a[i] = v1.doubleValue(i + 1);
+        a[i] = v1.doubleValue(i);
       }
       for(int j = 0; j < v2.getDimensionality(); j++) {
-        b[j] = v2.doubleValue(j + 1);
+        b[j] = v2.doubleValue(j);
       }
     }
     else {
@@ -150,10 +150,10 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
       b = new double[n];
 
       for(int i = 0; i < v2.getDimensionality(); i++) {
-        a[i] = v2.doubleValue(i + 1);
+        a[i] = v2.doubleValue(i);
       }
       for(int j = 0; j < v1.getDimensionality(); j++) {
-        b[j] = v1.doubleValue(j + 1);
+        b[j] = v1.doubleValue(j);
       }
     }
 

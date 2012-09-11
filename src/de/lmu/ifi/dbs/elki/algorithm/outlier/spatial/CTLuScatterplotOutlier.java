@@ -104,7 +104,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // regression using the covariance matrix
     CovarianceMatrix covm = new CovarianceMatrix(2);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final double local = relation.get(iditer).doubleValue(1);
+      final double local = relation.get(iditer).doubleValue(0);
       // Compute mean of neighbors
       Mean mean = new Mean();
       DBIDs neighbors = npred.getNeighborDBIDs(iditer);
@@ -112,7 +112,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
         if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        mean.put(relation.get(iter).doubleValue(1));
+        mean.put(relation.get(iter).doubleValue(0));
       }
       final double m;
       if(mean.getCount() > 0) {
@@ -142,7 +142,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     MeanVariance mv = new MeanVariance();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // Compute the error from the linear regression
-      double y_i = relation.get(iditer).doubleValue(1);
+      double y_i = relation.get(iditer).doubleValue(0);
       double e = means.doubleValue(iditer) - (slope * y_i + inter);
       scores.putDouble(iditer, e);
       mv.put(e);

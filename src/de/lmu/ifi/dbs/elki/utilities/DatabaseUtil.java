@@ -95,9 +95,9 @@ public final class DatabaseUtil {
 
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       NumberVector<?> o = database.get(iter);
-      for (int d = 1; d <= centroid.getDimensionality(); d++) {
+      for (int d = 0; d < centroid.getDimensionality(); d++) {
         final double diff = o.doubleValue(d) - centroid.doubleValue(d);
-        variances[d - 1] += diff * diff / size;
+        variances[d ] += diff * diff / size;
       }
     }
     return variances;
@@ -122,7 +122,7 @@ public final class DatabaseUtil {
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final NV o = relation.get(iditer);
       for (int d = 0; d < dim; d++) {
-        final double v = o.doubleValue(d + 1);
+        final double v = o.doubleValue(d);
         mins[d] = Math.min(mins[d], v);
         maxs[d] = Math.max(maxs[d], v);
       }

@@ -97,18 +97,18 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
       for(int j = l; j <= r; j++) {
         if(Math.abs(i - j) <= band) {
           // compute squared distance of feature vectors
-          double val1 = v1.doubleValue(i + 1);
+          double val1 = v1.doubleValue(i);
           double val2 = g;
           double diff = (val1 - val2);
           final double d1 = Math.sqrt(diff * diff);
 
           val1 = g;
-          val2 = v2.doubleValue(j + 1);
+          val2 = v2.doubleValue(j);
           diff = (val1 - val2);
           final double d2 = Math.sqrt(diff * diff);
 
-          val1 = v1.doubleValue(i + 1);
-          val2 = v2.doubleValue(j + 1);
+          val1 = v1.doubleValue(i);
+          val2 = v2.doubleValue(j);
           diff = (val1 - val2);
           final double d12 = Math.sqrt(diff * diff);
 

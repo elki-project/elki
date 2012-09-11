@@ -256,7 +256,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
           V databaseObject = relation.get(iter);
           for(int d = 0; d < centerValues.length; d++) {
-            centerValues[d] += databaseObject.doubleValue(d + 1);
+            centerValues[d] += databaseObject.doubleValue(d);
           }
         }
         for(int d = 0; d < centerValues.length; d++) {
@@ -266,7 +266,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           V databaseObject = relation.get(iter);
           for(int d = 0; d < centerValues.length; d++) {
             // distance
-            double distance = centerValues[d] - databaseObject.doubleValue(d + 1);
+            double distance = centerValues[d] - databaseObject.doubleValue(d);
             // variance
             variances[d] += distance * distance;
           }

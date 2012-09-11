@@ -199,6 +199,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   }
 
   @Override
+  @Deprecated
   public Float getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if (pos >= 0) {
@@ -300,7 +301,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     }
 
     @Override
-    public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> SparseFloatVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
       for (int i = 0; i < dim; i++) {

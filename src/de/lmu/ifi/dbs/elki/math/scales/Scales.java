@@ -67,7 +67,7 @@ public final class Scales {
     for (DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
       O v = db.get(iditer);
       for (int d = 0; d < dim; d++) {
-        minmax[d].put(v.doubleValue(d + 1));
+        minmax[d].put(v.doubleValue(d));
       }
     }
 

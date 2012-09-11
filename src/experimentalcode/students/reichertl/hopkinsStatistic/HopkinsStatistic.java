@@ -179,8 +179,8 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
       min = new double[dim];
       max = new double[dim];
       for(int d = 0; d < dim; d++) {
-        min[d] = minmax.first.doubleValue(d + 1);
-        max[d] = minmax.second.doubleValue(d + 1);
+        min[d] = minmax.first.doubleValue(d);
+        max[d] = minmax.second.doubleValue(d);
       }
     }
     // if only one value for all dimensions set this value for each dimension

@@ -111,11 +111,11 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
         if(DBIDUtil.equal(iditer, iter)) {
           continue;
         }
-        localmean.put(relation.get(iter).doubleValue(1));
+        localmean.put(relation.get(iter).doubleValue(0));
       }
       final double localdiff;
       if(localmean.getCount() > 0) {
-        localdiff = relation.get(iditer).doubleValue(1) - localmean.getMean();
+        localdiff = relation.get(iditer).doubleValue(0) - localmean.getMean();
       }
       else {
         localdiff = 0.0;

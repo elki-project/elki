@@ -114,7 +114,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
    */
   public boolean contains(V vector) {
     for(Interval interval : intervals) {
-      double value = vector.doubleValue(interval.getDimension() + 1);
+      final double value = vector.doubleValue(interval.getDimension());
       if(interval.getMin() > value || value >= interval.getMax()) {
         return false;
       }

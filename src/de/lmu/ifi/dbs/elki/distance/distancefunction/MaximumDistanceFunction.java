@@ -57,7 +57,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double max = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       max = Math.max(d, max);
     }
@@ -68,7 +68,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double max = 0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       max = Math.max(v.doubleValue(i), max);
     }
     return max;
@@ -81,7 +81,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction implements S
       throw new IllegalArgumentException("Different dimensionality of objects.");
     }
     double max = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double d;
       if(mbr1.getMax(i) < mbr2.getMin(i)) {
         d = mbr2.getMin(i) - mbr1.getMin(i);

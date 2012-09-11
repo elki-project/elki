@@ -183,8 +183,8 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       min = new double[d];
       double[] max = new double[d];
       for(int i = 0; i < d; i++) {
-        min[i] = hbbs.first.doubleValue(i + 1);
-        max[i] = hbbs.second.doubleValue(i + 1);
+        min[i] = hbbs.first.doubleValue(i);
+        max[i] = hbbs.second.doubleValue(i);
         diameter = Math.max(diameter, max[i] - min[i]);
       }
       // Enlarge bounding box to have equal lengths.
@@ -783,7 +783,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * @return Projected and shifted position
      */
     private double getDimForObject(NumberVector<?> obj, int dim) {
-      return (obj.doubleValue(dim + 1) - min[dim]) / diameter + shift;
+      return (obj.doubleValue(dim) - min[dim]) / diameter + shift;
     }
   }
 
