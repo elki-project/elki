@@ -70,7 +70,7 @@ public class ZCurveTransformer {
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       NumberVector<?> vector = relation.get(iter);
       for(int dim = 0; dim < dimensionality; ++dim) {
-        double dimValue = vector.doubleValue(dim + 1);
+        double dimValue = vector.doubleValue(dim);
         minValues[dim] = Math.min(minValues[dim], dimValue);
         maxValues[dim] = Math.max(maxValues[dim], dimValue);
       }
@@ -100,7 +100,7 @@ public class ZCurveTransformer {
     for(int dim = 0; dim < dimensionality; ++dim) {
       final double minValue = minValues[dim];
       final double maxValue = maxValues[dim];
-      double dimValue = vector.doubleValue(dim + 1);
+      double dimValue = vector.doubleValue(dim);
 
       dimValue = (dimValue - minValue) / (maxValue - minValue);
       longValueList[dim] = (long) (dimValue * (Long.MAX_VALUE));

@@ -140,20 +140,20 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
   @Override
   protected boolean prepareStart(SimpleTypeInformation<V> in) {
-    if(scalingreference == ScalingReference.MINMAX && minima.length != 0 && maxima.length != 0) {
+    if (scalingreference == ScalingReference.MINMAX && minima.length != 0 && maxima.length != 0) {
       dimensionality = minima.length;
       scalingreferencevalues = new double[dimensionality];
       randomPerAttribute = new Random[dimensionality];
-      for(int d = 0; d < dimensionality; d++) {
+      for (int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = (maxima[d] - minima[d]) * percentage;
-        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+        if (scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
           scalingreferencevalues[d] = percentage;
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
       }
       return false;
     }
-    if(scalingreference == ScalingReference.UNITCUBE) {
+    if (scalingreference == ScalingReference.UNITCUBE) {
       return false;
     }
     return (scalingreferencevalues.length == 0);
@@ -162,11 +162,11 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   @Override
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
-    if(mvs == null) {
+    if (mvs == null) {
       dimensionality = featureVector.getDimensionality();
       mvs = MeanVarianceMinMax.newArray(dimensionality);
     }
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+    for (int d = 1; d <= featureVector.getDimensionality(); d++) {
       mvs[d - 1].put(featureVector.doubleValue(d));
     }
   }
@@ -176,38 +176,37 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     StringBuffer buf = logger.isDebuggingFine() ? new StringBuffer() : null;
     scalingreferencevalues = new double[dimensionality];
     randomPerAttribute = new Random[dimensionality];
-    if(scalingreference == ScalingReference.STDDEV) {
-      if(buf != null) {
+    if (scalingreference == ScalingReference.STDDEV) {
+      if (buf != null) {
         buf.append("Standard deviation per attribute: ");
       }
-      for(int d = 0; d < dimensionality; d++) {
+      for (int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = mvs[d].getSampleStddev() * percentage;
-        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+        if (scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
           scalingreferencevalues[d] = percentage;
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
-        if(buf != null) {
+        if (buf != null) {
           buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d] / percentage);
         }
       }
-    }
-    else if(scalingreference == ScalingReference.MINMAX && minima.length == 0 && maxima.length == 0) {
-      if(buf != null) {
+    } else if (scalingreference == ScalingReference.MINMAX && minima.length == 0 && maxima.length == 0) {
+      if (buf != null) {
         buf.append("extension per attribute: ");
       }
-      for(int d = 0; d < dimensionality; d++) {
+      for (int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = (mvs[d].getMax() - mvs[d].getMin()) * percentage;
-        if(scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
+        if (scalingreferencevalues[d] == 0 || Double.isNaN(scalingreferencevalues[d])) {
           scalingreferencevalues[d] = percentage;
         }
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
-        if(buf != null) {
+        if (buf != null) {
           buf.append(" ").append(d).append(": ").append(scalingreferencevalues[d] / percentage);
         }
       }
     }
     mvs = null;
-    if(buf != null) {
+    if (buf != null) {
       logger.debugFine(buf.toString());
     }
   }
@@ -219,21 +218,21 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    if(scalingreference == ScalingReference.UNITCUBE && dimensionality == 0) {
+    if (scalingreference == ScalingReference.UNITCUBE && dimensionality == 0) {
       dimensionality = featureVector.getDimensionality();
       scalingreferencevalues = new double[dimensionality];
       randomPerAttribute = new Random[dimensionality];
-      for(int d = 0; d < dimensionality; d++) {
+      for (int d = 0; d < dimensionality; d++) {
         scalingreferencevalues[d] = percentage;
         randomPerAttribute[d] = new Random(RANDOM.nextLong());
       }
     }
-    if(scalingreferencevalues.length != featureVector.getDimensionality()) {
+    if (scalingreferencevalues.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
     }
     double[] values = new double[featureVector.getDimensionality()];
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      values[d - 1] = featureVector.doubleValue(d) + randomPerAttribute[d - 1].nextGaussian() * scalingreferencevalues[d - 1];
+    for (int d = 0; d < featureVector.getDimensionality(); d++) {
+      values[d] = featureVector.doubleValue(d) + randomPerAttribute[d].nextGaussian() * scalingreferencevalues[d];
     }
     return factory.newNumberVector(values);
   }
@@ -331,23 +330,23 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<ScalingReference>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
-      if(config.grab(scalingReferenceP)) {
+      if (config.grab(scalingReferenceP)) {
         scalingreference = scalingReferenceP.getValue();
       }
       DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), .01);
-      if(config.grab(percentageP)) {
+      if (config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
+      if (config.grab(seedP)) {
         seed = seedP.getValue();
       }
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
-      if(config.grab(minimaP)) {
+      if (config.grab(minimaP)) {
         minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
       }
       DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
-      if(config.grab(maximaP)) {
+      if (config.grab(maximaP)) {
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 

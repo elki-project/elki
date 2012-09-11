@@ -65,7 +65,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       T v = objs.get(i);
       // Convert into integers
       for(int d = 0; d < dim; d++) {
-        double val = (v.getMin(d + 1) + v.getMax(d + 1)) / 2;
+        double val = (v.getMin(d) + v.getMax(d)) / 2;
         val = Integer.MAX_VALUE * ((val - minmax[2 * d]) / (minmax[2 * d + 1] - minmax[2 * d]));
         buf[d] = (int) val;
       }
@@ -86,19 +86,20 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
    */
   private static class HilbertRef<T extends SpatialComparable> implements Comparable<HilbertRef<T>> {
     /**
-     * The referenced object
+     * The referenced object.
      */
     protected T vec;
 
     /**
-     * Hilbert representation
+     * Hilbert representation.
      */
     protected long[] bits;
 
     /**
      * Constructor.
      * 
-     * @param vec
+     * @param vec Vector
+     * @param bits Bit representation
      */
     protected HilbertRef(T vec, long[] bits) {
       super();
@@ -118,6 +119,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
    * 
    * @param coords Original coordinates
    * @param bitsperdim Number of bits to use.
+   * @param offset offset
    * @return Hilbert address
    */
   public static long[] coordinatesToHilbert(long[] coords, int bitsperdim, int offset) {
@@ -156,6 +158,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
    * 
    * @param coords Original coordinates
    * @param bitsperdim Number of bits to use.
+   * @param offset offset
    * @return Hilbert address
    */
   public static long[] coordinatesToHilbert(int[] coords, int bitsperdim, int offset) {
@@ -194,6 +197,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
    * 
    * @param coords Original coordinates
    * @param bitsperdim Number of bits to use.
+   * @param offset offset
    * @return Hilbert address
    */
   public static long[] coordinatesToHilbert(short[] coords, int bitsperdim, int offset) {
@@ -232,6 +236,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
    * 
    * @param coords Original coordinates
    * @param bitsperdim Number of bits to use.
+   * @param offset offset
    * @return Hilbert address
    */
   public static long[] coordinatesToHilbert(byte[] coords, int bitsperdim, int offset) {

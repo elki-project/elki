@@ -50,12 +50,12 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   public static final double DEFAULT_DEGREE = 2.0;
 
   /**
-   * Degree parameter
+   * Degree parameter.
    */
   public static final OptionID DEGREE_ID = OptionID.getOrCreateOptionID("kernel.degree", "The degree of the polynomial kernel function. Default: " + DEFAULT_DEGREE);
 
   /**
-   * Degree of the polynomial kernel function
+   * Degree of the polynomial kernel function.
    */
   private double degree = 0.0;
 
@@ -84,7 +84,7 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
     }
 
     double sim = 0;
-    for(int i = 1; i <= o1.getDimensionality(); i++) {
+    for(int i = 0; i < o1.getDimensionality(); i++) {
       sim += o1.doubleValue(i) * o2.doubleValue(i);
     }
     return new DoubleDistance(Math.pow(sim, degree));
@@ -118,6 +118,9 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Degree of the polynomial kernel function.
+     */
     protected double degree = 0;
 
     @Override

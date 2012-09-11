@@ -569,47 +569,48 @@ public class Vector implements NumberVector<Double> {
 
   @Override
   public double getMin(int dimension) {
-    return elements[dimension - 1];
+    return elements[dimension];
   }
 
   @Override
   public double getMax(int dimension) {
-    return elements[dimension - 1];
+    return elements[dimension];
   }
 
   @Override
+  @Deprecated
   public Double getValue(int dimension) {
-    return elements[dimension - 1];
+    return elements[dimension];
   }
 
   @Override
   public double doubleValue(int dimension) {
-    return elements[dimension - 1];
+    return elements[dimension];
   }
 
   @Override
   public float floatValue(int dimension) {
-    return (float) elements[dimension - 1];
+    return (float) elements[dimension];
   }
 
   @Override
   public int intValue(int dimension) {
-    return (int) elements[dimension - 1];
+    return (int) elements[dimension];
   }
 
   @Override
   public long longValue(int dimension) {
-    return (long) elements[dimension - 1];
+    return (long) elements[dimension];
   }
 
   @Override
   public short shortValue(int dimension) {
-    return (short) elements[dimension - 1];
+    return (short) elements[dimension];
   }
 
   @Override
   public byte byteValue(int dimension) {
-    return (byte) elements[dimension - 1];
+    return (byte) elements[dimension];
   }
 
   @Override

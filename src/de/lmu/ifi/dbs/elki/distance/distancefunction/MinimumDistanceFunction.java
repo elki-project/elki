@@ -61,7 +61,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
     }
     double min = Double.MAX_VALUE;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double d = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       min = Math.min(d, min);
     }
@@ -72,7 +72,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double min = Double.POSITIVE_INFINITY;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       min = Math.min(v.doubleValue(i), min);
     }
     return min;
@@ -85,7 +85,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
       throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString());
     }
     double min = Double.MAX_VALUE;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double min1 = mbr1.getMin(i);
       final double max1 = mbr1.getMax(i);
       final double min2 = mbr2.getMin(i);

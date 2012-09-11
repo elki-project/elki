@@ -132,7 +132,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Build the positive index set for ROC AUC.
     Set<Integer> positive = new TreeSet<Integer>();
     for(int d = 0; d < dim; d++) {
-      if(refvec.doubleValue(d + 1) > 0) {
+      if(refvec.doubleValue(d) > 0) {
         positive.add(d);
       }
     }
@@ -150,7 +150,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         final NumberVector<?> vec = relation.get(iditer);
         TiedTopBoundedHeap<DoubleIntPair> heap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
         for(int i = 0; i < dim; i++) {
-          heap.add(new DoubleIntPair(vec.doubleValue(i + 1), i));
+          heap.add(new DoubleIntPair(vec.doubleValue(i), i));
         }
         if(heap.size() >= 2 * estimated_outliers) {
           LOG.warning("Too many ties. Expected: " + estimated_outliers + " got: " + heap.size());
@@ -185,7 +185,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         }
         final NumberVector<?> vec = relation.get(iditer);
         for(int d = 0; d < dim; d++) {
-          naiveensemble[d] += vec.doubleValue(d + 1);
+          naiveensemble[d] += vec.doubleValue(d);
         }
       }
       for(int d = 0; d < dim; d++) {
@@ -241,7 +241,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     {
       final NumberVector<?> vec = relation.get(bestid);
       for(int i = 0; i < dim; i++) {
-        greedyensemble[i] = vec.doubleValue(i + 1);
+        greedyensemble[i] = vec.doubleValue(i);
       }
     }
     // Greedily grow the ensemble
@@ -266,7 +266,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         // Update ensemble:
         final NumberVector<?> vec = relation.get(bestadd);
         for(int i = 0; i < dim; i++) {
-          testensemble[i] = greedyensemble[i] * s1 + vec.doubleValue(i + 1) * s2;
+          testensemble[i] = greedyensemble[i] * s1 + vec.doubleValue(i) * s2;
         }
         NumberVector<?> testvec = factory.newNumberVector(testensemble);
         double oldd = wdist.doubleDistance(estimated_truth_vec, greedyvec);
@@ -285,7 +285,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
             // Update target vectors and weights
             TiedTopBoundedHeap<DoubleIntPair> oheap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
             for(int i = 0; i < dim; i++) {
-              oheap.add(new DoubleIntPair(vec.doubleValue(i + 1), i));
+              oheap.add(new DoubleIntPair(vec.doubleValue(i), i));
             }
             for(DoubleIntPair pair : oheap) {
               assert (outliers_seen[pair.second] > 0);
@@ -350,7 +350,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
             // logger.verbose("Using: "+labels.get(id));
             final NumberVector<?> vec = relation.get(iter);
             for(int d = 0; d < dim; d++) {
-              randomensemble[d] += vec.doubleValue(d + 1);
+              randomensemble[d] += vec.doubleValue(d);
             }
           }
           for(int d = 0; d < dim; d++) {
@@ -397,7 +397,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   private double computeROCAUC(NumberVector<?> vec, Set<Integer> positive, int dim) {
     final DoubleIntPair[] scores = new DoubleIntPair[dim];
     for(int d = 0; d < dim; d++) {
-      scores[d] = new DoubleIntPair(vec.doubleValue(d + 1), d);
+      scores[d] = new DoubleIntPair(vec.doubleValue(d), d);
     }
     Arrays.sort(scores, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
     return XYCurve.areaUnderCurve(ROC.materializeROC(dim, positive, Arrays.asList(scores).iterator()));

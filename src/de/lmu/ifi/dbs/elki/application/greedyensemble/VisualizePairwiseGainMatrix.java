@@ -138,7 +138,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     {
       for(int d = 0; d < dim; d++) {
         combined[d] = new DoubleIntPair(0, d);
-        if(refvec.doubleValue(d + 1) > 0) {
+        if(refvec.doubleValue(d) > 0) {
           pos.add(d);
         }
       }
@@ -158,7 +158,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         // Direct AUC score:
         {
           for(int d = 0; d < dim; d++) {
-            combined[d].first = veca.doubleValue(d + 1);
+            combined[d].first = veca.doubleValue(d);
             combined[d].second = d;
           }
           Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
@@ -173,7 +173,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         for(int b = a + 1; b < size; b++, id2.advance()) {
           final NumberVector<?> vecb = relation.get(id2);
           for(int d = 0; d < dim; d++) {
-            combined[d].first = veca.doubleValue(d + 1) + vecb.doubleValue(d + 1);
+            combined[d].first = veca.doubleValue(d) + vecb.doubleValue(d);
             combined[d].second = d;
           }
           Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));

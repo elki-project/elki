@@ -210,9 +210,9 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
       if(list.size() > 0) {
         Vector mean = new Vector(dim);
         for(int d = 0; d < dim; d++) {
-          sorter.setDimension(d + 1);
+          sorter.setDimension(d);
           DBID id = QuickSelect.median(list, sorter);
-          mean.set(d, database.get(id).doubleValue(d + 1));
+          mean.set(d, database.get(id).doubleValue(d));
         }
         newMedians.add(mean);
       }

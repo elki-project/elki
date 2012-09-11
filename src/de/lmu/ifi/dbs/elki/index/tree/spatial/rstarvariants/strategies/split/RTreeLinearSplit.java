@@ -67,7 +67,7 @@ public class RTreeLinearSplit implements SplitStrategy {
       double bestsep = Double.NEGATIVE_INFINITY;
       int w1 = -1, w2 = -1;
       // LPS1: find extreme rectangles
-      for(int d = 1; d <= dim; d++) {
+      for(int d = 0; d < dim; d++) {
         // We need to find two candidates each, in case of el==eh!
         double minlow = Double.POSITIVE_INFINITY;
         double maxlow = Double.NEGATIVE_INFINITY, maxlow2 = Double.NEGATIVE_INFINITY;

@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
@@ -261,11 +262,11 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
    * @return List of sorted objects
    */
   private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
-    final int dim = DatabaseUtil.dimensionality(relation);
-    ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim + 1);
+    final int dim = RelationUtil.dimensionality(relation);
+    ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
     //  ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(relation.getDBIDs());
       ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(ids);
       comp.setDimension(i);
@@ -326,7 +327,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
       {
         int l = 0;
         for(DBIDIter id = conditionalSample.iter(); id.valid(); id.advance()) {
-          sampleValues[l] = relation.get(id).doubleValue(chosen + 1);
+          sampleValues[l] = relation.get(id).doubleValue(chosen);
           l++;
         }
       }
@@ -335,7 +336,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
       {
         int l = 0;
         for(DBIDIter id = subspaceIndex.get(chosen).iter(); id.valid(); id.advance()) {
-          fullValues[l] = relation.get(id).doubleValue(chosen + 1);
+          fullValues[l] = relation.get(id).doubleValue(chosen);
           l++;
         }
       }

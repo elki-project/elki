@@ -149,8 +149,8 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
       min = new double[dim];
       max = new double[dim];
       for(int i = 0; i < dim; i++) {
-        min[i] = hbbs.first.doubleValue(i + 1);
-        max[i] = hbbs.second.doubleValue(i + 1);
+        min[i] = hbbs.first.doubleValue(i);
+        max[i] = hbbs.second.doubleValue(i);
         maxd = Math.max(maxd, max[i] - min[i]);
       }
       // Enlarge bounding box to have equal lengths.
@@ -397,7 +397,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
         boolean degenerate = true;
         loop: for(; iter.getOffset() < end; iter.advance()) {
           NumberVector<?> other = relation.get(iter);
-          for(int d = 1; d <= lmin.length; d++) {
+          for(int d = 0; d < lmin.length; d++) {
             if(Math.abs(first.doubleValue(d) - other.doubleValue(d)) > 1E-15) {
               degenerate = false;
               break loop;
@@ -440,7 +440,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
         // Partially sort data, by dimension dim < mid
         DBIDArrayIter siter = ids.iter(), eiter = ids.iter();
         siter.seek(start);
-        eiter.seek(end);
+        eiter.seek(end - 1);
         while(siter.getOffset() < eiter.getOffset()) {
           if(getShiftedDim(relation.get(siter), dim, level) <= .5) {
             siter.advance();
@@ -479,7 +479,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
      * @return Shifted position
      */
     private double getShiftedDim(NumberVector<?> obj, int dim, int level) {
-      double pos = obj.doubleValue(dim + 1) + shift[dim];
+      double pos = obj.doubleValue(dim) + shift[dim];
       pos = (pos - min[dim]) / width[dim] * (1 + level);
       return pos - Math.floor(pos);
     }

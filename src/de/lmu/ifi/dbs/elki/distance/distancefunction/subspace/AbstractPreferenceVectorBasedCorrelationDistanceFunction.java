@@ -162,8 +162,8 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
       }
 
       double sqrDist = 0;
-      for(int i = 1; i <= v1.getDimensionality(); i++) {
-        if(weightVector.get(i - 1)) {
+      for(int i = 0; i < v1.getDimensionality(); i++) {
+        if(weightVector.get(i)) {
           double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
           sqrDist += manhattanI * manhattanI;
         }

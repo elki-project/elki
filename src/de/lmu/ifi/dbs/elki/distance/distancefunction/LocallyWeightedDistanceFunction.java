@@ -166,16 +166,16 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
       }
 
       double[] r = new double[v.getDimensionality()];
-      for(int d = 1; d <= v.getDimensionality(); d++) {
+      for(int d = 0; d < v.getDimensionality(); d++) { 
         double value = v.doubleValue(d);
         if(value < mbr.getMin(d)) {
-          r[d - 1] = mbr.getMin(d);
+          r[d] = mbr.getMin(d);
         }
         else if(value > mbr.getMax(d)) {
-          r[d - 1] = mbr.getMax(d);
+          r[d] = mbr.getMax(d);
         }
         else {
-          r[d - 1] = value;
+          r[d] = value;
         }
       }
 
@@ -200,7 +200,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
       }
 
       double sqrDist = 0;
-      for(int d = 1; d <= mbr1.getDimensionality(); d++) {
+      for(int d = 0; d < mbr1.getDimensionality(); d++) {
         double m1, m2;
         if(mbr1.getMax(d) < mbr2.getMin(d)) {
           m1 = mbr2.getMin(d);
@@ -228,11 +228,10 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
       }
 
       double sqrDist = 0;
-      for(int d = 1; d <= mbr1.getDimensionality(); d++) {
-        double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
-        double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
-
-        double manhattanI = c1 - c2;
+      for(int d = 0; d < mbr1.getDimensionality(); d++) {
+        final double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
+        final double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
+        final double manhattanI = c1 - c2;
         sqrDist += manhattanI * manhattanI;
       }
       return new DoubleDistance(Math.sqrt(sqrDist));

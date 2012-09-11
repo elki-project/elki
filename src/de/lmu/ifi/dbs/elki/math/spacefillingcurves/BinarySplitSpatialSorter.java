@@ -73,6 +73,7 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
    * @param curdim Current dimension
    * @param dims Number of dimensions
    * @param comp Comparator to use
+   * @param <T> Object type
    */
   private <T extends SpatialComparable> void binarySplitSort(List<T> objs, final int start, final int end, int curdim, final int dims, DimC comp) {
     final int mid = start + ((end - start) >>> 1);
@@ -80,7 +81,7 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
     comp.dim = curdim;
     QuickSelect.quickSelect(objs, comp, start, end, mid);
     // Recurse
-    final int nextdim = (curdim % dims) + 1;
+    final int nextdim = (curdim + 1) % dims;
     if(start < mid - 1) {
       binarySplitSort(objs, start, mid, nextdim, dims, comp);
     }
@@ -100,6 +101,9 @@ public class BinarySplitSpatialSorter extends AbstractSpatialSorter {
    * @apiviz.exclude
    */
   private static class DimC implements Comparator<SpatialComparable> {
+    /**
+     * Dimension.
+     */
     public int dim = -1;
 
     @Override

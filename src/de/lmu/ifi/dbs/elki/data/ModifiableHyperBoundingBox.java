@@ -34,12 +34,12 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  */
 public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   /**
-   * Serial version
+   * Serial version.
    */
   private static final long serialVersionUID = 1;
 
   /**
-   * Constructor
+   * Constructor.
    */
   public ModifiableHyperBoundingBox() {
     super();
@@ -117,7 +117,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   }
 
   /**
-   * Extend the bounding box by some other spatial object
+   * Extend the bounding box by some other spatial object.
    * 
    * @param obj Spatial object to extend with
    * @return true when the MBR changed.
@@ -127,8 +127,8 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
     assert (!LoggingConfiguration.DEBUG || (obj.getDimensionality() == dim));
     boolean extended = false;
     for(int i = 0; i < dim; i++) {
-      final double omin = obj.getMin(i + 1);
-      final double omax = obj.getMax(i + 1);
+      final double omin = obj.getMin(i);
+      final double omax = obj.getMax(i);
       if(omin < min[i]) {
         min[i] = omin;
         extended = true;

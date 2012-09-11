@@ -117,7 +117,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
     for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       V o = database.get(neighbor);
       for(int d = 0; d < dim; d++) {
-        sum[d] += Math.pow(obj.doubleValue(d + 1) - o.doubleValue(d + 1), 2.0);
+        sum[d] += Math.pow(obj.doubleValue(d) - o.doubleValue(d), 2.0);
       }
     }
 

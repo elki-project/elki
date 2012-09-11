@@ -96,7 +96,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     if(se.hasMBR()) {
       final int dim = se.getDimensionality();
       // Test for changes
-      for(int i = 1; i <= dim; i++) {
+      for(int i = 0; i < dim; i++) {
         if(Math.abs(se.getMin(i) - mbr.getMin(i)) > Float.MIN_NORMAL) {
           changed = true;
           break;

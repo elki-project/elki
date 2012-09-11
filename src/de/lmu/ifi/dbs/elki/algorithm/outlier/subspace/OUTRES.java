@@ -269,7 +269,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
         int count = 0;
         for (DBIDIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
           V vector = relation.get(neighbor);
-          data[count] = vector.doubleValue(dim + 1);
+          data[count] = vector.doubleValue(dim);
           count++;
         }
         assert (count == neigh.size());

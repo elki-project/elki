@@ -95,7 +95,7 @@ public class GreeneSplit implements SplitStrategy {
 
       double bestsep = Double.NEGATIVE_INFINITY;
       double bestsep2 = Double.NEGATIVE_INFINITY;
-      for(int d = 1; d <= m1.getDimensionality(); d++) {
+      for(int d = 0; d < m1.getDimensionality(); d++) {
         final double s1 = m1.getMin(d) - m2.getMax(d);
         final double s2 = m2.getMin(d) - m1.getMax(d);
         final double sm = Math.max(s1, s2);

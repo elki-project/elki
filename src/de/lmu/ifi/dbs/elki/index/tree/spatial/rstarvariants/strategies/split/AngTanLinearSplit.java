@@ -82,11 +82,11 @@ public class AngTanLinearSplit implements SplitStrategy {
       }
       for(int i = 0; i < num; i++) {
         E e = getter.get(entries, i);
-        for(int d = 1; d <= dim; d++) {
+        for(int d = 0; d < dim; d++) {
           double low = e.getMin(d) - total.getMin(d);
           double hig = total.getMax(d) - e.getMax(d);
           if(low >= hig) {
-            closer[d - 1].set(i);
+            closer[d].set(i);
           }
         }
       }

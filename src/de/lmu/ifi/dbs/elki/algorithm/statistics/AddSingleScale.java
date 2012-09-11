@@ -93,7 +93,7 @@ public class AddSingleScale implements Algorithm {
       DoubleMinMax mm = new DoubleMinMax();
       for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector<?> vec = rel.get(iditer);
-        for(int d = 1; d <= dim; d++) {
+        for(int d = 0; d < dim; d++) {
           mm.put(vec.doubleValue(d));
         }
       }

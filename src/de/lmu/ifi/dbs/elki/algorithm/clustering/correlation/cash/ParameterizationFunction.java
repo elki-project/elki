@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
@@ -45,15 +46,15 @@ public class ParameterizationFunction {
    */
   public enum ExtremumType {
     /**
-     * Minimum
+     * Minimum.
      */
     MINIMUM,
     /**
-     * Maximum
+     * Maximum.
      */
     MAXIMUM,
     /**
-     * Constant
+     * Constant.
      */
     CONSTANT
   }
@@ -74,7 +75,7 @@ public class ParameterizationFunction {
   private ExtremumType extremumType;
   
   /**
-   * The actual vector
+   * The actual vector.
    */
   private NumberVector<?> vec;
 
@@ -105,7 +106,7 @@ public class ParameterizationFunction {
     double result = 0;
     for(int i = 0; i < d; i++) {
       double alpha_i = i == d - 1 ? 0 : alpha[i];
-      result += vec.doubleValue(i + 1) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
+      result += vec.doubleValue(i) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
     }
     return result;
   }
@@ -187,9 +188,9 @@ public class ParameterizationFunction {
       alpha_extreme_c[i] = centroid[i];
     }
 
-    double intervalLength = interval.getMax(n + 1) - interval.getMin(n + 1);
-    alpha_extreme_l[n] = Math.random() * intervalLength + interval.getMin(n + 1);
-    alpha_extreme_r[n] = Math.random() * intervalLength + interval.getMin(n + 1);
+    double intervalLength = interval.getMax(n) - interval.getMin(n);
+    alpha_extreme_l[n] = Math.random() * intervalLength + interval.getMin(n);
+    alpha_extreme_r[n] = Math.random() * intervalLength + interval.getMin(n);
 
     double f_c = function(alpha_extreme_c);
     double f_l = function(alpha_extreme_l);
@@ -238,8 +239,8 @@ public class ParameterizationFunction {
    */
   private double determineAlphaMin(int n, double[] alpha_min, HyperBoundingBox interval) {
     double alpha_n = extremum_alpha_n(n, alpha_min);
-    double lower = interval.getMin(n + 1);
-    double upper = interval.getMax(n + 1);
+    double lower = interval.getMin(n);
+    double upper = interval.getMax(n);
 
     double[] alpha_extreme = new double[alpha_min.length];
     System.arraycopy(alpha_min, n, alpha_extreme, n, alpha_extreme.length - n);
@@ -301,8 +302,8 @@ public class ParameterizationFunction {
    */
   private double determineAlphaMax(int n, double[] alpha_max, HyperBoundingBox interval) {
     double alpha_n = extremum_alpha_n(n, alpha_max);
-    double lower = interval.getMin(n + 1);
-    double upper = interval.getMax(n + 1);
+    double lower = interval.getMin(n);
+    double upper = interval.getMax(n);
 
     double[] alpha_extreme = new double[alpha_max.length];
     System.arraycopy(alpha_max, n, alpha_extreme, n, alpha_extreme.length - n);
@@ -402,7 +403,7 @@ public class ParameterizationFunction {
       if(d != 0) {
         result.append(" + \n").append(FormatUtil.whitespace(offset));
       }
-      result.append(FormatUtil.format(vec.doubleValue(d + 1)));
+      result.append(FormatUtil.format(vec.doubleValue(d)));
       for(int j = 0; j < d; j++) {
         result.append(" * sin(a_").append(j + 1).append(")");
       }
@@ -488,16 +489,16 @@ public class ParameterizationFunction {
    */
   private double extremum_alpha_n(int n, double[] alpha) {
     // arctan(infinity) = PI/2
-    if(vec.doubleValue(n + 1) == 0) {
-      return 0.5 * Math.PI;
+    if(vec.doubleValue(n) == 0) {
+      return MathUtil.HALFPI;
     }
 
     double tan = 0;
     for(int j = n + 1; j < vec.getDimensionality(); j++) {
       double alpha_j = j == vec.getDimensionality() - 1 ? 0 : alpha[j];
-      tan += vec.doubleValue(j + 1) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
+      tan += vec.doubleValue(j) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
     }
-    tan /= vec.doubleValue(n + 1);
+    tan /= vec.doubleValue(n);
 
     // if (debug) {
     // debugFiner("tan alpha_" + (n + 1) + " = " + tan);

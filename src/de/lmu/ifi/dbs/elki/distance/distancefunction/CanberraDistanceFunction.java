@@ -62,7 +62,7 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     final int dim = o1.getDimensionality();
     double sum = 0.0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       double v1 = o1.doubleValue(i);
       double v2 = o2.doubleValue(i);
       final double div = Math.abs(v1) + Math.abs(v2);
@@ -77,7 +77,7 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = mbr1.getDimensionality();
     double sum = 0.0;
-    for(int d = 1; d <= dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr2.getMin(d);

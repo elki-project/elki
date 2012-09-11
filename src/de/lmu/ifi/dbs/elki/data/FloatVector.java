@@ -135,6 +135,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
     return values.length;
   }
 
+  @Deprecated
   @Override
   public Float getValue(int dimension) {
     try {
@@ -196,7 +197,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
     }
 
     @Override
-    public <A> FloatVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> FloatVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       float[] values = new float[dim];
       for (int i = 0; i < dim; i++) {

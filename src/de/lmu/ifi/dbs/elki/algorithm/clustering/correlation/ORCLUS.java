@@ -510,6 +510,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
      * Creates a new cluster containing the specified object o.
      * 
      * @param o the object belonging to this cluster.
+     * @param id Object id
      * @param factory Factory object / prototype
      */
     ORCLUSCluster(V o, DBIDRef id, NumberVector.Factory<V, ?> factory) {
@@ -519,12 +520,9 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       int dim = o.getDimensionality();
       this.basis = Matrix.unitMatrix(dim);
 
-      // TODO: can we replace this with some kind of clone() statement?
       // initially the centroid is the value array of o
-      double[] values = new double[o.getDimensionality()];
-      for(int d = 1; d <= o.getDimensionality(); d++) {
-        values[d - 1] = o.doubleValue(d);
-      }
+      double[] values = o.getColumnVector().getArrayRef();
+      // FIXME: avoid going through 'values'
       this.centroid = factory.newNumberVector(values);
     }
   }

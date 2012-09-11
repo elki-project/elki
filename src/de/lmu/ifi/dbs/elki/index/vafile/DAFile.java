@@ -51,12 +51,12 @@ public class DAFile {
   /**
    * Dimension of this approximation file.
    */
-  final private int dimension;
+  private final int dimension;
 
   /**
    * Splitting grid.
    */
-  final private double[] splitPositions;
+  private final double[] splitPositions;
 
   /**
    * Constructor.
@@ -73,7 +73,7 @@ public class DAFile {
     double[] tempdata = new double[size];
     int j = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      tempdata[j] = relation.get(iditer).doubleValue(dimension + 1);
+      tempdata[j] = relation.get(iditer).doubleValue(dimension);
       j += 1;
     }
     Arrays.sort(tempdata);

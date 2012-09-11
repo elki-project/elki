@@ -54,7 +54,6 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -164,7 +163,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       double[] tempdata = new double[size];
       int j = 0;
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        tempdata[j] = relation.get(iditer).doubleValue(d + 1);
+        tempdata[j] = relation.get(iditer).doubleValue(d);
         j += 1;
       }
       Arrays.sort(tempdata);
@@ -188,7 +187,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
   public VectorApproximation calculateApproximation(DBID id, V dv) {
     int approximation[] = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPositions.length; d++) {
-      final double val = dv.doubleValue(d + 1);
+      final double val = dv.doubleValue(d);
       final int lastBorderIndex = splitPositions[d].length - 1;
 
       // Value is below data grid

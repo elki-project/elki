@@ -57,7 +57,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
     Vector vec = new Vector(dim);
     double[] ds = vec.getArrayRef();
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getScaled(data.doubleValue(d + 1));
+      ds[d] = scales[d].getScaled(data.doubleValue(d));
     }
     return vec;
   }
@@ -91,7 +91,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
     Vector vec = new Vector(dim);
     double[] ds = vec.getArrayRef();
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getRelativeScaled(data.doubleValue(d + 1));
+      ds[d] = scales[d].getRelativeScaled(data.doubleValue(d));
     }
     return vec;
   }

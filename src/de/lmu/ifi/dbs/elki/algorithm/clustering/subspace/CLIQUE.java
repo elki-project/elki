@@ -367,12 +367,12 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     if(minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors differ in length.");
     }
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      if((featureVector.doubleValue(d)) > maxima[d - 1]) {
-        maxima[d - 1] = (featureVector.doubleValue(d));
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      if((featureVector.doubleValue(d)) > maxima[d]) {
+        maxima[d] = (featureVector.doubleValue(d));
       }
-      if((featureVector.doubleValue(d)) < minima[d - 1]) {
-        minima[d - 1] = (featureVector.doubleValue(d));
+      if((featureVector.doubleValue(d)) < minima[d]) {
+        minima[d] = (featureVector.doubleValue(d));
       }
     }
   }

@@ -238,7 +238,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim + 1);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(relation.getDBIDs());
       comp.setDimension(i);
       amDBIDs.sort(comp);
@@ -393,7 +393,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       {
         int l = 0;
         for (DBIDIter iter = conditionalSample.iter(); iter.valid(); iter.advance()) {
-          sampleValues[l] = relation.get(iter).doubleValue(chosen + 1);
+          sampleValues[l] = relation.get(iter).doubleValue(chosen);
           l++;
         }
       }
@@ -402,7 +402,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       {
         int l = 0;
         for (DBIDIter iter = subspaceIndex.get(chosen).iter(); iter.valid(); iter.advance()) {
-          fullValues[l] = relation.get(iter).doubleValue(chosen + 1);
+          fullValues[l] = relation.get(iter).doubleValue(chosen);
           l++;
         }
       }

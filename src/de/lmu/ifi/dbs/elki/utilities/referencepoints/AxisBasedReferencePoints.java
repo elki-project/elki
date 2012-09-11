@@ -84,8 +84,8 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
     double[] mean = new double[dim];
     double[] delta = new double[dim];
     for(int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.doubleValue(d + 1) + minmax.second.doubleValue(d + 1)) / 2;
-      delta[d] = spacescale * (minmax.second.doubleValue(d + 1) - mean[d]);
+      mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) / 2;
+      delta[d] = spacescale * (minmax.second.doubleValue(d) - mean[d]);
     }
 
     ArrayList<V> result = new ArrayList<V>(2 + dim);

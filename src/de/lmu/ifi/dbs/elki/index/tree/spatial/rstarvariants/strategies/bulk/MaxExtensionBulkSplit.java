@@ -125,17 +125,17 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
 
     // compute min and max value in each dimension
     for(SpatialComparable object : objects) {
-      for(int d = 1; d <= dimension; d++) {
+      for(int d = 0; d < dimension; d++) {
         double min, max;
         min = object.getMin(d);
         max = object.getMax(d);
 
-        if(maxExtension[d - 1] < max) {
-          maxExtension[d - 1] = max;
+        if(maxExtension[d] < max) {
+          maxExtension[d] = max;
         }
 
-        if(minExtension[d - 1] > min) {
-          minExtension[d - 1] = min;
+        if(minExtension[d] > min) {
+          minExtension[d] = min;
         }
       }
     }
@@ -143,8 +143,8 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
     // set split axis to dim with maximal extension
     int splitAxis = -1;
     double max = 0;
-    for(int d = 1; d <= dimension; d++) {
-      double currentExtension = maxExtension[d - 1] - minExtension[d - 1];
+    for(int d = 0; d < dimension; d++) {
+      double currentExtension = maxExtension[d] - minExtension[d];
       if(max < currentExtension) {
         max = currentExtension;
         splitAxis = d;

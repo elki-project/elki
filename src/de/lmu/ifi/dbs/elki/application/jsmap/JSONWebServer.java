@@ -151,7 +151,7 @@ public class JSONWebServer implements HttpHandler {
           NumberVector<?> v = (NumberVector<?>) data;
           re.appendKeyArray(bundle.meta(j));
           for(int i = 0; i < v.getDimensionality(); i++) {
-            re.append(v.doubleValue(i + 1));
+            re.append(v.doubleValue(i));
           }
           re.closeArray();
         }

@@ -63,7 +63,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
       double[] r = MathUtil.randomDoubleArray(dim, random);
       // Rescale
       for(int d = 0; d < dim; d++) {
-        r[d] = minmax.first.doubleValue(d + 1) + (minmax.second.doubleValue(d + 1) - minmax.first.doubleValue(d + 1)) * r[d];
+        r[d] = minmax.first.doubleValue(d) + (minmax.second.doubleValue(d) - minmax.first.doubleValue(d)) * r[d];
       }
       means.add(factory.newNumberVector(r));
     }

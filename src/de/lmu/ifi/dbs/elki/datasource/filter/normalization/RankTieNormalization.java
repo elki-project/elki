@@ -78,7 +78,7 @@ public class RankTieNormalization implements ObjectFilter {
       for(int i = 0; i < sorter.length; i++) {
         sorter[i] = new DoubleIntPair(Double.NaN, -1);
       }
-      for(int d = 1; d <= dim; d++) {
+      for(int d = 0; d < dim; d++) {
         // fill array
         for(int i = 0; i < sorter.length; i++) {
           sorter[i].first = castColumn.get(i).doubleValue(d);
@@ -95,7 +95,7 @@ public class RankTieNormalization implements ObjectFilter {
           }
           final int pos = (sta + end - 1);
           for(int i = sta; i < end; i++) {
-            posvecs[sorter[i].second][d - 1] = pos;
+            posvecs[sorter[i].second][d] = pos;
           }
           sta = end;
         }

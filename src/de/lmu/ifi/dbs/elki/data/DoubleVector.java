@@ -140,9 +140,10 @@ public class DoubleVector extends AbstractNumberVector<Double> {
   }
 
   @Override
+  @Deprecated
   public Double getValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return values[dimension];
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -151,7 +152,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
   @Override
   public double doubleValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return values[dimension];
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -160,7 +161,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
   @Override
   public long longValue(int dimension) {
     try {
-      return (long) values[dimension - 1];
+      return (long) values[dimension];
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -220,7 +221,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
     }
 
     @Override
-    public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       if (adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
         return new DoubleVector(((TDoubleList) array).toArray(), true);
       }

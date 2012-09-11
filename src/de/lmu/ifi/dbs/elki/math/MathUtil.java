@@ -46,6 +46,11 @@ public final class MathUtil {
   public static final double TWOPI = 2 * Math.PI;
 
   /**
+   * Half the value of Pi.
+   */
+  public static final double HALFPI = 0.5 * Math.PI;
+
+  /**
    * Square root of two times Pi.
    */
   public static final double SQRTTWOPI = Math.sqrt(TWOPI);
@@ -109,7 +114,7 @@ public final class MathUtil {
    * Earth radius approximation we are using.
    */
   public static final double EARTH_RADIUS = 6371; // km.
-  
+
   /**
    * Fake constructor for static class.
    */
@@ -231,7 +236,7 @@ public final class MathUtil {
     }
     PearsonCorrelation pc = new PearsonCorrelation();
     for (int i = 0; i < xdim; i++) {
-      pc.put(x.doubleValue(i + 1), y.doubleValue(i + 1), 1.0);
+      pc.put(x.doubleValue(i), y.doubleValue(i), 1.0);
     }
     return pc.getCorrelation();
   }
@@ -258,7 +263,7 @@ public final class MathUtil {
     }
     PearsonCorrelation pc = new PearsonCorrelation();
     for (int i = 0; i < xdim; i++) {
-      pc.put(x.doubleValue(i + 1), y.doubleValue(i + 1), weights[i]);
+      pc.put(x.doubleValue(i), y.doubleValue(i), weights[i]);
     }
     return pc.getCorrelation();
   }
@@ -285,7 +290,7 @@ public final class MathUtil {
     }
     PearsonCorrelation pc = new PearsonCorrelation();
     for (int i = 0; i < xdim; i++) {
-      pc.put(x.doubleValue(i + 1), y.doubleValue(i + 1), weights.doubleValue(i + 1));
+      pc.put(x.doubleValue(i), y.doubleValue(i), weights.doubleValue(i));
     }
     return pc.getCorrelation();
   }

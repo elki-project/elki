@@ -157,7 +157,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
   protected O filterSingleObject(O obj) {
     // Shift by mean and copy
     for(int i = 0; i < dim; i++) {
-      buf[i] = obj.doubleValue(i + 1) - mean[i];
+      buf[i] = obj.doubleValue(i) - mean[i];
     }
     double[] p = VMath.times(proj, buf);
     return factory.newNumberVector(p);

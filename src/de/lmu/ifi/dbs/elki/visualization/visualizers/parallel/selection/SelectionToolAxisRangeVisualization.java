@@ -276,7 +276,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
           NumberVector<?> dbTupel = relation.get(iditer);
           for(int i = 0; i < dim; i++) {
             if(ranges != null && ranges[i] != null) {
-              if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
+              if(dbTupel.doubleValue(i) < ranges[i].first || dbTupel.doubleValue(i) > ranges[i].second) {
                 continue candidates;
               }
             }

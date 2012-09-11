@@ -39,6 +39,9 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * @author Elke Achtert
  */
 public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry {
+  /**
+   * Serial version.
+   */
   private static final long serialVersionUID = 1;
 
   /**
@@ -65,7 +68,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   }
 
   /**
-   * Constructor from number vector
+   * Constructor from number vector.
    *
    * @param id Object id
    * @param vector Number vector
@@ -75,7 +78,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
     int dim = vector.getDimensionality();
     this.values = new double[dim];
     for(int i = 0; i < dim; i++) {
-      values[i] = vector.doubleValue(i + 1);
+      values[i] = vector.doubleValue(i);
     }
   }
 
@@ -84,20 +87,14 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
     return values.length;
   }
 
-  /**
-   * @return the value at the specified dimension
-   */
   @Override
   public double getMin(int dimension) {
-    return values[dimension - 1];
+    return values[dimension];
   }
 
-  /**
-   * @return the value at the specified dimension
-   */
   @Override
   public double getMax(int dimension) {
-    return values[dimension - 1];
+    return values[dimension];
   }
 
   /**

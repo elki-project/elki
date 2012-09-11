@@ -63,7 +63,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
 
     final double p = getP();
     double sqrDist = 0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double delta = Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
       sqrDist += Math.pow(delta, p) * weights[i - 1];
     }
@@ -86,7 +86,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction {
 
     final double p = getP();
     double sumDist = 0;
-    for(int d = 1; d <= dim1; d++) {
+    for(int d = 0; d < dim1; d++) {
       final double m1, m2;
       if(mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr2.getMin(d);

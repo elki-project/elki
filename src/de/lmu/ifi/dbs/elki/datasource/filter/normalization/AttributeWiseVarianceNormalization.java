@@ -108,8 +108,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
       int dimensionality = featureVector.getDimensionality();
       mvs = MeanVariance.newArray(dimensionality);
     }
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      mvs[d - 1].put(featureVector.doubleValue(d));
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      mvs[d].put(featureVector.doubleValue(d));
     }
   }
 
@@ -141,8 +141,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
   @Override
   protected V filterSingleObject(V featureVector) {
     double[] values = new double[featureVector.getDimensionality()];
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      values[d - 1] = normalize(d - 1, featureVector.doubleValue(d));
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      values[d] = normalize(d, featureVector.doubleValue(d));
     }
     return factory.newNumberVector(values);
   }
@@ -151,8 +151,8 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
   public V restore(V featureVector) throws NonNumericFeaturesException {
     if(featureVector.getDimensionality() == mean.length) {
       double[] values = new double[featureVector.getDimensionality()];
-      for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        values[d - 1] = restore(d - 1, featureVector.doubleValue(d));
+      for(int d = 0; d < featureVector.getDimensionality(); d++) {
+        values[d] = restore(d, featureVector.doubleValue(d));
       }
       return factory.newNumberVector(values);
     }

@@ -107,7 +107,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
     int i = 0;
     
     for (int iter=distance_of_points; iter<(int) dist_bn; iter=iter+distance_of_points){
-      double []dest_point = experimentalcode.students.doerre.DestinationPointCalculation.DestinationPointCalculation(p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2), iter);
+      double []dest_point = experimentalcode.students.doerre.DestinationPointCalculation.DestinationPointCalculation(p1.doubleValue(0),p1.doubleValue(1),p2.doubleValue(0),p2.doubleValue(1), iter);
       dest_points[i] = dest_point;
       i++;
     }
@@ -128,7 +128,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
         double lon = x * 360. / width - 180.;
         double lat = y * -180. / height + 90.;
         // ..und übergeben
-        double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(1),p1.doubleValue(2),p2.doubleValue(1),p2.doubleValue(2),lat,lon,0);    
+        double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(0),p1.doubleValue(1),p2.doubleValue(0),p2.doubleValue(1),lat,lon,0);    
         cross_track_distances [x][y] = ctd;
         minmax.put(ctd);
       }

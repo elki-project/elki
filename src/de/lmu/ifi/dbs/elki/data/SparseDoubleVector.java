@@ -197,6 +197,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   }
 
   @Override
+  @Deprecated
   public Double getValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if (pos >= 0) {
@@ -298,7 +299,7 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
     }
 
     @Override
-    public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> SparseDoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       double[] values = new double[dim];
       for (int i = 0; i < dim; i++) {

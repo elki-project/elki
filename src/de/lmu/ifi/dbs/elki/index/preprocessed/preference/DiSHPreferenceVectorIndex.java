@@ -409,7 +409,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(relation, new DimensionSelectingDistanceFunction(d + 1)));
+      rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(relation, new DimensionSelectingDistanceFunction(d)));
     }
     return rangeQueries;
   }

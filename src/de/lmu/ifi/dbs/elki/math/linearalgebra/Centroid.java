@@ -115,7 +115,7 @@ public class Centroid extends Vector {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
     for(int i = 0; i < elements.length; i++) {
-      final double delta = val.doubleValue(i + 1) - elements[i];
+      final double delta = val.doubleValue(i) - elements[i];
       elements[i] += delta / wsum;
     }
   }
@@ -130,7 +130,7 @@ public class Centroid extends Vector {
     assert (val.getDimensionality() == elements.length);
     final double nwsum = weight + wsum;
     for(int i = 0; i < elements.length; i++) {
-      final double delta = val.doubleValue(i + 1) - elements[i];
+      final double delta = val.doubleValue(i) - elements[i];
       final double rval = delta * weight / nwsum;
       elements[i] += rval;
     }

@@ -105,22 +105,25 @@ public class TopologicalSplitter implements SplitStrategy {
     private A entries;
 
     /**
-     * The getter class for the entries
+     * The getter class for the entries.
      */
     private ArrayAdapter<E, A> getter;
 
     /**
-     * List size
+     * List size.
      */
     private int size;
 
     /**
-     * Dimensionality
+     * Dimensionality.
      */
     private int dimensionality;
 
     /**
      * Constructor.
+     * 
+     * @param entries Entires to split
+     * @param getter Array adapter for entries
      */
     public Split(A entries, ArrayAdapter<E, A> getter) {
       this.entries = entries;
@@ -140,7 +143,7 @@ public class TopologicalSplitter implements SplitStrategy {
       double minSurface = Double.MAX_VALUE;
       int splitAxis = -1;
 
-      for(int d = 1; d <= dimensionality; d++) {
+      for(int d = 0; d < dimensionality; d++) {
         double sumOfAllMargins = 0;
         fillAndSort(d);
 
@@ -180,7 +183,7 @@ public class TopologicalSplitter implements SplitStrategy {
     }
 
     /**
-     * Init the arrays we use
+     * Init the arrays we use.
      */
     protected void initMinMaxArrays() {
       maxSorting = new DoubleIntPair[size];
@@ -267,10 +270,22 @@ public class TopologicalSplitter implements SplitStrategy {
       assert (splitPoint < size) : "No split found? Volume outside of double precision?";
     }
 
+    /**
+     * Get an entry.
+     * 
+     * @param off Offset
+     * @return Entry
+     */
     private E get(int off) {
       return getter.get(entries, off);
     }
 
+    /**
+     * Get an entry.
+     * 
+     * @param off Offset
+     * @return Entry
+     */
     private E get(DoubleIntPair pair) {
       return getter.get(entries, pair.second);
     }

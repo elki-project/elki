@@ -40,6 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.has Vector
  */
 public interface NumberVector<N extends Number> extends FeatureVector<N>, SpatialComparable, Parameterizable {
+  @Deprecated
+  @Override
+  N getValue(int dimension);
+  
   /**
    * Returns the value in the specified dimension as double.
    * 
@@ -47,7 +51,7 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * {@code getValue(dim).doubleValue()}, but usually this is much more
    * efficient due to boxing/unboxing cost.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   * @param dimension the desired dimension, where 0 &le; dimension &lt;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
@@ -60,7 +64,7 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * {@code getValue(dim).floatValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   * @param dimension the desired dimension, where 0 &le; dimension &lt;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
@@ -73,7 +77,7 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * {@code getValue(dim).intValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   * @param dimension the desired dimension, where 0 &le; dimension &lt;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
@@ -86,7 +90,7 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * {@code getValue(dim).longValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   * @param dimension the desired dimension, where 0 &le; dimension &lt;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
@@ -99,7 +103,7 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * {@code getValue(dim).shortValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   * @param dimension the desired dimension, where 0 &le; dimension &lt;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
@@ -112,7 +116,7 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * {@code getValue(dim).byteValue()}, but usually this is much more efficient
    * due to boxing/unboxing cost.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
+   * @param dimension the desired dimension, where 0 &le; dimension &lt;
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
@@ -153,6 +157,6 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
      * @param adapter Adapter
      * @return a new NumberVector of N for the given values.
      */
-    <A> V newNumberVector(A array, NumberArrayAdapter<?, A> adapter);
+    <A> V newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter);
   }
 }

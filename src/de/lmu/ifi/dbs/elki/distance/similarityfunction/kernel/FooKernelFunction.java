@@ -84,7 +84,7 @@ public class FooKernelFunction extends AbstractPrimitiveDistanceFunction<NumberV
     }
     double sim = 0.0;
     // iterate over differently powered dimensions
-    for(int degree = 1; degree <= max_degree; degree++) {
+    for(int degree = 0; degree < max_degree; degree++) {
       sim += Math.pow(o1.doubleValue(degree) * o2.doubleValue(degree), degree);
     }
     return new DoubleDistance(sim);

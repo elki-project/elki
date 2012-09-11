@@ -183,8 +183,8 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
         // Fill the data matrix
         {
           V vec = relationx.get(id);
-          double la = vec.doubleValue(1);
-          double lo = vec.doubleValue(2);
+          double la = vec.doubleValue(0);
+          double lo = vec.doubleValue(1);
           X.set(i, 0, 1.0);
           X.set(i, 1, la);
           X.set(i, 2, lo);
@@ -194,8 +194,9 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
         }
 
         {
+          final NumberVector<?> vecy = relationy.get(id);
           for(int d = 0; d < dimy; d++) {
-            double idy = relationy.get(id).doubleValue(d + 1);
+            double idy = vecy.doubleValue(d);
             Y.set(i, d, idy);
           }
         }

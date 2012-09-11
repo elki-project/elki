@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
-   * Static instance
+   * Static instance.
    */
   public static final LngLatDistanceFunction STATIC = new LngLatDistanceFunction();
 
@@ -51,7 +51,7 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    return MathUtil.latlngDistance(o1.doubleValue(2), o1.doubleValue(1), o2.doubleValue(2), o2.doubleValue(1));
+    return MathUtil.latlngDistance(o1.doubleValue(1), o1.doubleValue(0), o2.doubleValue(1), o2.doubleValue(0));
   }
 
   @Override

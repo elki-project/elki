@@ -97,7 +97,7 @@ public class HistogramVisualization extends AbstractVisFactory {
     DoubleMinMax xminmax = new DoubleMinMax();
     DoubleMinMax yminmax = new DoubleMinMax();
     for(NumberVector<?> vec : curve) {
-      xminmax.put(vec.doubleValue(1));
+      xminmax.put(vec.doubleValue(0));
       if(dim == null) {
         dim = vec.getDimensionality();
       }
@@ -106,7 +106,7 @@ public class HistogramVisualization extends AbstractVisFactory {
         assert (dim == vec.getDimensionality());
       }
       for(int i = 1; i < dim; i++) {
-        yminmax.put(vec.doubleValue(i + 1));
+        yminmax.put(vec.doubleValue(i));
       }
     }
     // Minimum should always start at 0 for histograms
@@ -129,8 +129,8 @@ public class HistogramVisualization extends AbstractVisFactory {
     // draw curves.
     for(NumberVector<?> vec : curve) {
       for(int d = 0; d < dim; d++) {
-        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(1) - binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 2))));
-        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(1) + binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 2))));
+        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) - binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
+        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) + binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
       }
     }
 

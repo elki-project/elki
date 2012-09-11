@@ -59,6 +59,7 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
    * @param dim Dimension to sort by
    * @param threshold Threshold value
    * @param desc Inversion flag
+   * @param <T> Object type
    * @return Pivot position
    */
   protected <T extends SpatialComparable> int pivotizeList1D(List<T> objs, int start, int end, int dim, double threshold, boolean desc) {
@@ -102,7 +103,7 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
   }
 
   /**
-   * Compute getMin(dim) + getMax(dim) for the spatial object
+   * Compute getMin(dim) + getMax(dim) for the spatial object.
    * 
    * @param objs Objects
    * @param s index
@@ -120,7 +121,7 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
    * @param objs Objects
    * @return Array of min, max pairs (length = 2 * dim)
    */
-  public static <T extends SpatialComparable> double[] computeMinMax(List<T> objs) {
+  public static double[] computeMinMax(List<? extends SpatialComparable> objs) {
     final int dim = objs.get(0).getDimensionality();
     // Compute min and max for each dimension:
     double[] mm = new double[dim * 2];
@@ -131,8 +132,8 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
       }
       for(SpatialComparable obj : objs) {
         for(int d = 0; d < dim; d++) {
-          mm[2 * d] = Math.min(mm[2 * d], obj.getMin(d + 1));
-          mm[2 * d + 1] = Math.max(mm[2 * d + 1], obj.getMax(d + 1));
+          mm[2 * d] = Math.min(mm[2 * d], obj.getMin(d));
+          mm[2 * d + 1] = Math.max(mm[2 * d + 1], obj.getMax(d));
         }
       }
       for(int d = 0; d < dim; d++) {

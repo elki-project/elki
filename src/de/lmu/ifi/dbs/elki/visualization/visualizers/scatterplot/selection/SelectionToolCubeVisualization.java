@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
- * Tool-Visualization for the tool to select ranges
+ * Tool-Visualization for the tool to select ranges.
  * 
  * @author Heidi Kolb
  * 
@@ -77,7 +77,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
   /**
    * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
    */
   public SelectionToolCubeVisualization() {
     super();
@@ -91,9 +91,9 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-    for(SelectionResult selres : selectionResults) {
+    for (SelectionResult selres : selectionResults) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
+      for (ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
         task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
         task.put(VisualizationTask.META_TOOL, true);
@@ -107,7 +107,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
   }
 
   /**
-   * Instance
+   * Instance.
    * 
    * @author Heidi Kolb
    * 
@@ -122,17 +122,17 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     private static final String CSS_RANGEMARKER = "selectionRangeMarker";
 
     /**
-     * Dimension
+     * Dimension.
      */
     private int dim;
 
     /**
-     * Element for selection rectangle
+     * Element for selection rectangle.
      */
     private Element rtag;
 
     /**
-     * Element for the rectangle to add listeners
+     * Element for the rectangle to add listeners.
      */
     private Element etag;
 
@@ -163,24 +163,25 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     }
 
     /**
-     * Delete the children of the element
+     * Delete the children of the element.
      * 
      * @param container SVG-Element
      */
     private void deleteChildren(Element container) {
-      while(container.hasChildNodes()) {
+      while (container.hasChildNodes()) {
         container.removeChild(container.getLastChild());
       }
     }
 
     /**
      * Set the selected ranges and the mask for the actual dimensions in the
-     * context
+     * context.
      * 
      * @param x1 x-value of the first dimension
      * @param x2 x-value of the second dimension
      * @param y1 y-value of the first dimension
      * @param y2 y-value of the second dimension
+     * @param ranges Ranges to update
      */
     private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
       BitSet actDim = proj.getVisibleDimensions2D();
@@ -194,7 +195,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       double[] nv1 = proj.fastProjectRenderToDataSpace(v1);
       double[] nv2 = proj.fastProjectRenderToDataSpace(v2);
 
-      for(int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
+      for (int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
         ranges[d] = new DoubleDoublePair(Math.min(nv1[d], nv2[d]), Math.max(nv1[d], nv2[d]));
       }
     }
@@ -218,7 +219,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     @Override
     public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
       deleteChildren(rtag);
-      if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
+      if (startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
         updateSelection(proj, startPoint, dragPoint);
       }
       return true;
@@ -232,17 +233,16 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      * @param p2 Second Point of the selected rectangle
      */
     private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
-      if(p1 == null || p2 == null) {
+      if (p1 == null || p2 == null) {
         LOG.warning("no rect selected: p1: " + p1 + " p2: " + p2);
         return;
       }
 
       DBIDSelection selContext = context.getSelection();
       ModifiableDBIDs selection;
-      if(selContext != null) {
+      if (selContext != null) {
         selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
-      }
-      else {
+      } else {
         selection = DBIDUtil.newHashSet();
       }
       DoubleDoublePair[] ranges;
@@ -252,20 +252,19 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       double y1 = Math.max(p1.getY(), p2.getY());
       double y2 = Math.min(p1.getY(), p2.getY());
 
-      if(selContext instanceof RangeSelection) {
+      if (selContext instanceof RangeSelection) {
         ranges = ((RangeSelection) selContext).getRanges();
-      }
-      else {
+      } else {
         ranges = new DoubleDoublePair[dim];
       }
       updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
 
       selection.clear();
-      candidates: for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      candidates: for (DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector<?> dbTupel = rel.get(iditer);
-        for(int i = 0; i < dim; i++) {
-          if(ranges != null && ranges[i] != null) {
-            if(dbTupel.doubleValue(i + 1) < ranges[i].first || dbTupel.doubleValue(i + 1) > ranges[i].second) {
+        for (int i = 0; i < dim; i++) {
+          if (ranges != null && ranges[i] != null) {
+            if (dbTupel.doubleValue(i) < ranges[i].first || dbTupel.doubleValue(i) > ranges[i].second) {
               continue candidates;
             }
           }
@@ -276,13 +275,13 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     }
 
     /**
-     * Adds the required CSS-Classes
+     * Adds the required CSS-Classes.
      * 
      * @param svgp SVG-Plot
      */
     protected void addCSSClasses(SVGPlot svgp) {
       // Class for the range marking
-      if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
+      if (!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
         final StyleLibrary style = context.getStyleLibrary();
         rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));

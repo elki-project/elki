@@ -120,8 +120,8 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
     if(minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors and given Minima/Maxima differ in length.");
     }
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-      values[d - 1] = (featureVector.doubleValue(d) - minima[d - 1]) / factor(d);
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
+      values[d] = (featureVector.doubleValue(d) - minima[d]) / factor(d);
     }
     return factory.newNumberVector(values);
   }
@@ -130,8 +130,8 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
   public V restore(V featureVector) throws NonNumericFeaturesException {
     if(featureVector.getDimensionality() == maxima.length && featureVector.getDimensionality() == minima.length) {
       double[] values = new double[featureVector.getDimensionality()];
-      for(int d = 1; d <= featureVector.getDimensionality(); d++) {
-        values[d - 1] = (featureVector.doubleValue(d) * (factor(d)) + minima[d - 1]);
+      for(int d = 0; d < featureVector.getDimensionality(); d++) {
+        values[d] = (featureVector.doubleValue(d) * (factor(d)) + minima[d]);
       }
       return factory.newNumberVector(values);
     }
@@ -151,7 +151,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
    * @return a factor for normalization in a certain dimension
    */
   private double factor(int dimension) {
-    return maxima[dimension - 1] != minima[dimension - 1] ? maxima[dimension - 1] - minima[dimension - 1] : maxima[dimension - 1] != 0 ? maxima[dimension - 1] : 1;
+    return maxima[dimension] != minima[dimension] ? maxima[dimension] - minima[dimension] : maxima[dimension] != 0 ? maxima[dimension] : 1;
   }
 
   @Override
@@ -161,13 +161,12 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
     int[] row = linearEquationSystem.getRowPermutations();
     int[] col = linearEquationSystem.getColumnPermutations();
 
-    // noinspection ForLoopReplaceableByForEach
     for(int i = 0; i < coeff.length; i++) {
       for(int r = 0; r < coeff.length; r++) {
         double sum = 0.0;
         for(int c = 0; c < coeff[0].length; c++) {
-          sum += minima[c] * coeff[row[r]][col[c]] / factor(c + 1);
-          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / factor(c + 1);
+          sum += minima[c] * coeff[row[r]][col[c]] / factor(c);
+          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / factor(c);
         }
         rhs[row[r]] = rhs[row[r]] + sum;
       }

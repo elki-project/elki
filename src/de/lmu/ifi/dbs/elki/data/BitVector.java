@@ -95,15 +95,6 @@ public class BitVector extends AbstractNumberVector<Bit> {
     return dimensionality;
   }
 
-  /**
-   * Returns the value in the specified dimension.
-   * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
-   *        <code>this.getDimensionality()</code>
-   * @return the value in the specified dimension
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getValue(int)
-   */
   @Override
   public Bit getValue(int dimension) {
     if (dimension < 1 || dimension > dimensionality) {
@@ -112,38 +103,20 @@ public class BitVector extends AbstractNumberVector<Bit> {
     return new Bit(bits.get(dimension - 1));
   }
 
-  /**
-   * Returns the value in the specified dimension as double.
-   * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
-   *        <code>this.getDimensionality()</code>
-   * @return the value in the specified dimension
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#doubleValue(int)
-   */
   @Override
   public double doubleValue(int dimension) {
-    if (dimension < 1 || dimension > dimensionality) {
+    if (dimension < 0 || dimension >= dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
-    return bits.get(dimension - 1) ? 1.0 : 0.0;
+    return bits.get(dimension) ? 1.0 : 0.0;
   }
 
-  /**
-   * Returns the value in the specified dimension as long.
-   * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
-   *        <code>this.getDimensionality()</code>
-   * @return the value in the specified dimension
-   * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#longValue(int)
-   */
   @Override
   public long longValue(int dimension) {
-    if (dimension < 1 || dimension > dimensionality) {
+    if (dimension < 0 || dimension >= dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);
     }
-    return bits.get(dimension - 1) ? 1 : 0;
+    return bits.get(dimension) ? 1 : 0;
   }
 
   /**
@@ -252,7 +225,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
     }
 
     @Override
-    public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> BitVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       int dim = adapter.size(array);
       BitSet bits = new BitSet(dim);
       for (int i = 0; i < dim; i++) {

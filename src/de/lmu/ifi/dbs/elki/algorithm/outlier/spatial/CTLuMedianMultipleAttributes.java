@@ -121,7 +121,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?>> extends 
           // TODO: skip object itself within neighbors?
           O nobj = attributes.get(iter);
           for(int d = 0; d < dim; d++) {
-            data[d][i] = nobj.doubleValue(d + 1);
+            data[d][i] = nobj.doubleValue(d);
           }
           i++;
         }

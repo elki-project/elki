@@ -160,7 +160,7 @@ public class VALPNormDistance {
     final int bordercount = splitPositions[0].length;
     lookup = new double[dimensions][bordercount];
     for(int d = 0; d < dimensions; d++) {
-      final double val = query.doubleValue(d + 1);
+      final double val = query.doubleValue(d);
       for(int i = 0; i < bordercount; i++) {
         lookup[d][i] = Math.pow(splitPositions[d][i] - val, p);
       }

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "Roussopoulos, N. and Leifker, D.", title = "Direct spatial search on pictorial databases using packed R-trees", booktitle = "ACM SIGMOD Record 14-4", url = "http://dx.doi.org/10.1145/971699.318900")
 public class OneDimSortBulkSplit extends AbstractBulkSplit {
   /**
-   * Static instance
+   * Static instance.
    */
   public static final AbstractBulkSplit STATIC = new OneDimSortBulkSplit();
 
@@ -62,8 +62,8 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
     Collections.sort(spatialObjects, new Comparator<SpatialComparable>() {
       @Override
       public int compare(SpatialComparable o1, SpatialComparable o2) {
-        double min1 = (o1.getMax(1) + o1.getMin(1)) / 2;
-        double min2 = (o2.getMax(1) + o2.getMin(1)) / 2;
+        double min1 = (o1.getMax(0) + o1.getMin(0)) / 2;
+        double min2 = (o2.getMax(0) + o2.getMin(0)) / 2;
         return Double.compare(min1, min2);
       }
     });

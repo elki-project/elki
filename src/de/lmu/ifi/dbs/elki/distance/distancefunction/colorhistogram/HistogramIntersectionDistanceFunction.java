@@ -78,7 +78,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
     double dist = 0;
     double norm1 = 0;
     double norm2 = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double val1 = v1.doubleValue(i);
       final double val2 = v2.doubleValue(i);
       dist += Math.min(val1, val2);
@@ -98,7 +98,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
     double dist = 0;
     double norm1 = 0;
     double norm2 = 0;
-    for(int i = 1; i <= dim1; i++) {
+    for(int i = 0; i < dim1; i++) {
       final double min1 = mbr1.getMin(i);
       final double max1 = mbr1.getMax(i);
       final double min2 = mbr2.getMin(i);

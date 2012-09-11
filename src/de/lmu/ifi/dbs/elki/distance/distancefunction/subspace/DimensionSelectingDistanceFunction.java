@@ -75,7 +75,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
    */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    if(dim > v1.getDimensionality() || dim > v2.getDimensionality()) {
+    if(dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n  dimension: " + dim);
     }
 
@@ -85,7 +85,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
 
   @Override
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    if(dim > mbr1.getDimensionality() || dim > mbr2.getDimensionality()) {
+    if(dim >= mbr1.getDimensionality() || dim >= mbr2.getDimensionality() || dim < 0) {
       throw new IllegalArgumentException("Specified dimension to be considered " + "is larger that dimensionality of FeatureVectors:" + "\n  first argument: " + mbr1.toString() + "\n  second argument: " + mbr2.toString() + "\n  dimension: " + dim);
     }
 
@@ -165,7 +165,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimP = new IntParameter(DIM_ID, new GreaterEqualConstraint(1));
+      final IntParameter dimP = new IntParameter(DIM_ID, new GreaterEqualConstraint(0));
       if(config.grab(dimP)) {
         dim = dimP.getValue();
       }

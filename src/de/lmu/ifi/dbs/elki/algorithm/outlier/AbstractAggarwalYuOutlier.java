@@ -121,8 +121,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
     // Project
     for(DBIDIter iter = allids.iter(); iter.valid(); iter.advance()) {
       final V obj = relation.get(iter);
-      for(int d = 1; d <= dim; d++) {
-        dbAxis.get(d - 1).add(DBIDUtil.newPair(obj.doubleValue(d), iter));
+      for(int d = 0; d < dim; d++) {
+        dbAxis.get(d).add(DBIDUtil.newPair(obj.doubleValue(d), iter));
       }
     }
     // Split into cells

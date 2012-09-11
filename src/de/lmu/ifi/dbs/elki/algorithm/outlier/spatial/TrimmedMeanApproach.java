@@ -122,7 +122,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
       double[] values = new double[neighbors.size()];
       // calculate trimmedMean
       for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-        values[num] = relation.get(iter).doubleValue(1);
+        values[num] = relation.get(iter).doubleValue(0);
         num++;
       }
 
@@ -139,10 +139,10 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
         tm = mean.getMean();
       }
       else {
-        tm = relation.get(iditer).doubleValue(1);
+        tm = relation.get(iditer).doubleValue(0);
       }
       // Error: deviation from trimmed mean
-      errors.putDouble(iditer, relation.get(iditer).doubleValue(1) - tm);
+      errors.putDouble(iditer, relation.get(iditer).doubleValue(0) - tm);
 
       if(progress != null) {
         progress.incrementProcessed(LOG);

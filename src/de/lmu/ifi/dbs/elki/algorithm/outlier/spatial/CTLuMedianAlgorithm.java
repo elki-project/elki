@@ -106,7 +106,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
           if(DBIDUtil.equal(iditer, iter)) {
             continue;
           }
-          fi[c] = relation.get(iter).doubleValue(1);
+          fi[c] = relation.get(iter).doubleValue(0);
           c++;
         }
 
@@ -114,10 +114,10 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
           median = QuickSelect.median(fi, 0, c);
         }
         else {
-          median = relation.get(iditer).doubleValue(1);
+          median = relation.get(iditer).doubleValue(0);
         }
       }
-      double h = relation.get(iditer).doubleValue(1) - median;
+      double h = relation.get(iditer).doubleValue(0) - median;
       scores.putDouble(iditer, h);
       mv.put(h);
     }

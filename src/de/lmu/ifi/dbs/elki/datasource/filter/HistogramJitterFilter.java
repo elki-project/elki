@@ -86,7 +86,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     // Compute the total sum.
     double osum = 0;
     for(int i = 0; i < dim; i++) {
-      osum += obj.doubleValue(i + 1);
+      osum += obj.doubleValue(i);
     }
     // Actual maximum jitter amount:
     final double maxjitter = 2 * jitter / dim * osum;
@@ -100,7 +100,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     final double mix = jsum / osum;
     // Combine the two vector
     for(int i = 0; i < raw.length; i++) {
-      raw[i] = raw[i] + (1 - mix) * obj.doubleValue(i + 1);
+      raw[i] = raw[i] + (1 - mix) * obj.doubleValue(i);
     }
     return factory.newNumberVector(raw);
   }
