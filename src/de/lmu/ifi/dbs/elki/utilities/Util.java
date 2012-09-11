@@ -23,20 +23,11 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.hash.TIntDoubleHashMap;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
-import java.util.StringTokenizer;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
  * This class collects various static helper methods.
@@ -52,57 +43,6 @@ public final class Util {
    */
   private Util() {
     // Do not instantiate.
-  }
-
-  /**
-   * Returns a new double array containing the same objects as are contained in
-   * the given array.
-   * 
-   * @param array an array to copy
-   * @return the copied array
-   */
-  public static double[] copy(double[] array) {
-    double[] copy = new double[array.length];
-    System.arraycopy(array, 0, copy, 0, array.length);
-    return copy;
-  }
-
-  /**
-   * Returns a new <code>Double</code> array initialized to the values
-   * represented by the specified <code>String</code> and separated by comma, as
-   * performed by the <code>valueOf</code> method of class <code>Double</code>.
-   * 
-   * @param s the string to be parsed.
-   * @return a new <code>Double</code> array represented by s
-   */
-  public static double[] parseDoubles(String s) {
-    List<Double> result = new ArrayList<Double>();
-    StringTokenizer tokenizer = new StringTokenizer(s, ",");
-    while (tokenizer.hasMoreTokens()) {
-      String d = tokenizer.nextToken();
-      result.add(Double.parseDouble(d));
-    }
-    return ArrayLikeUtil.toPrimitiveDoubleArray(result);
-  }
-
-  /**
-   * Prints the given list to the specified PrintStream. The list entries are
-   * separated by the specified separator. The last entry is not followed by a
-   * separator. Thus, if a newline is used as separator, it might make sense to
-   * print a newline to the PrintStream after calling this method.
-   * 
-   * @param <O> object class
-   * @param list the list to be printed
-   * @param separator the separator to separate entries of the list
-   * @param out the target PrintStream
-   */
-  public static <O> void print(List<O> list, String separator, PrintStream out) {
-    for (Iterator<O> iter = list.iterator(); iter.hasNext();) {
-      out.print(iter.next());
-      if (iter.hasNext()) {
-        out.print(separator);
-      }
-    }
   }
 
   /**
@@ -132,39 +72,6 @@ public final class Util {
       }
     }
     return bitset;
-  }
-
-  /**
-   * Provides a new NumberVector as a projection on the specified attributes.
-   * 
-   * @param v a NumberVector to project
-   * @param selectedAttributes the attributes selected for projection
-   * @param factory Vector factory
-   * @param <V> Vector type
-   * @return a new NumberVector as a projection on the specified attributes
-   */
-  public static <V extends NumberVector<?>> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V, ?> factory) {
-    if (factory instanceof SparseNumberVector.Factory) {
-      final SparseNumberVector.Factory<?, ?> sfactory = (SparseNumberVector.Factory<?, ?>) factory;
-      TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
-      for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-        if (v.doubleValue(d + 1) != 0.0) {
-          values.put(d, v.doubleValue(d + 1));
-        }
-      }
-      // We can't avoid this cast, because Java doesn't know that V is a SparseNumberVector:
-      @SuppressWarnings("unchecked")
-      V projectedVector = (V) sfactory.newNumberVector(values, selectedAttributes.cardinality());
-      return projectedVector;
-    } else {
-      double[] newAttributes = new double[selectedAttributes.cardinality()];
-      int i = 0;
-      for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
-        newAttributes[i] = v.doubleValue(d + 1);
-        i++;
-      }
-      return factory.newNumberVector(newAttributes);
-    }
   }
 
   /**

@@ -28,6 +28,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -81,7 +82,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
 
   @Override
   protected V filterSingleObject(V obj) {
-    return Util.project(obj, selectedAttributes, factory);
+    return VectorUtil.project(obj, selectedAttributes, factory);
   }
 
   @Override
