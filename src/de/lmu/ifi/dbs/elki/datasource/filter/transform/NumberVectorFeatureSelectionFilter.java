@@ -28,11 +28,11 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
@@ -69,7 +69,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
 
   @Override
   protected V filterSingleObject(V obj) {
-    return Util.project(obj, getSelectedAttributes(), factory);
+    return VectorUtil.project(obj, getSelectedAttributes(), factory);
   }
 
   @Override

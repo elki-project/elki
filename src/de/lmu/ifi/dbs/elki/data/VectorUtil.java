@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.hash.TIntDoubleHashMap;
+
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Random;
@@ -398,6 +400,39 @@ public final class VectorUtil {
     @Override
     public int compare(NumberVector<?> o1, NumberVector<?> o2) {
       return Double.compare(o1.doubleValue(d), o2.doubleValue(d));
+    }
+  }
+
+  /**
+   * Provides a new NumberVector as a projection on the specified attributes.
+   * 
+   * @param v a NumberVector to project
+   * @param selectedAttributes the attributes selected for projection
+   * @param factory Vector factory
+   * @param <V> Vector type
+   * @return a new NumberVector as a projection on the specified attributes
+   */
+  public static <V extends NumberVector<?>> V project(V v, BitSet selectedAttributes, NumberVector.Factory<V, ?> factory) {
+    if (factory instanceof SparseNumberVector.Factory) {
+      final SparseNumberVector.Factory<?, ?> sfactory = (SparseNumberVector.Factory<?, ?>) factory;
+      TIntDoubleHashMap values = new TIntDoubleHashMap(selectedAttributes.cardinality(), 1);
+      for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+        if (v.doubleValue(d + 1) != 0.0) {
+          values.put(d, v.doubleValue(d + 1));
+        }
+      }
+      // We can't avoid this cast, because Java doesn't know that V is a SparseNumberVector:
+      @SuppressWarnings("unchecked")
+      V projectedVector = (V) sfactory.newNumberVector(values, selectedAttributes.cardinality());
+      return projectedVector;
+    } else {
+      double[] newAttributes = new double[selectedAttributes.cardinality()];
+      int i = 0;
+      for (int d = selectedAttributes.nextSetBit(0); d >= 0; d = selectedAttributes.nextSetBit(d + 1)) {
+        newAttributes[i] = v.doubleValue(d + 1);
+        i++;
+      }
+      return factory.newNumberVector(newAttributes);
     }
   }
 }
