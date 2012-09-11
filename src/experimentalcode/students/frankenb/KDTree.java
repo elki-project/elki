@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
@@ -37,7 +38,7 @@ public class KDTree<V extends NumberVector<?>> {
       return null;
     }
 
-    final int dimension = (depth % DatabaseUtil.dimensionality(dataSet)) + 1;
+    final int dimension = (depth % RelationUtil.dimensionality(dataSet));
     final double median = DatabaseUtil.exactMedian(dataSet, ids, dimension);
 
     KDTreeNode newNode = new KDTreeNode(parent, dimension, median);
