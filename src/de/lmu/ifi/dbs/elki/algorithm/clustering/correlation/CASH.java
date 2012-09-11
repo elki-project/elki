@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator;
@@ -75,7 +74,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -487,7 +485,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       HyperBoundingBox alphaInterval = new HyperBoundingBox(alphaMin, alphaMax);
       ModifiableDBIDs intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
       if(intervalIDs != null && intervalIDs.size() >= minPts) {
-        CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, 0, 0, d_mins[i], d_maxs[i]);
+        CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, -1, 0, d_mins[i], d_maxs[i]);
         heap.add(new IntegerPriorityObject<CASHInterval>(rootInterval.priority(), rootInterval));
       }
     }
@@ -612,7 +610,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     int dim = interval.getDimensionality();
     while(true) {
       // max level is reached
-      if(interval.getLevel() >= maxLevel && interval.getMaxSplitDimension() == dim) {
+      if(interval.getLevel() >= maxLevel && interval.getMaxSplitDimension() == (dim - 1)) {
         return interval;
       }
 
