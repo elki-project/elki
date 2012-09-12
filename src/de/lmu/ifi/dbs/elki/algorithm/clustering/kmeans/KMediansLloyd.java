@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -66,7 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("K-Medians")
 @Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url="http://nips.djvuzone.org/djvu/nips09/0368.djvu")
-public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, MeanModel<V>> {
   /**
    * The logger for this class.
    */
@@ -173,7 +172,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     }
 
     @Override
-    protected AbstractKMeans<V, D> makeInstance() {
+    protected KMediansLloyd<V, D> makeInstance() {
       return new KMediansLloyd<V, D>(distanceFunction, k, maxiter, initializer);
     }
   }

@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -87,16 +88,27 @@ public class VoronoiVisualization extends AbstractVisFactory {
    * @apiviz.exclude
    */
   public static enum Mode {
-    VORONOI, DELAUNAY, V_AND_D
+    /**
+     * Draw Voronoi cells.
+     */
+    VORONOI,
+    /**
+     * Draw Delaunay triangulation.
+     */
+    DELAUNAY,
+    /**
+     * Draw both Delaunay and Voronoi.
+     */
+    V_AND_D
   }
 
   /**
-   * Settings
+   * Settings.
    */
   private Parameterizer settings;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param settings Drawing mode
    */
@@ -114,13 +126,13 @@ public class VoronoiVisualization extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
+    for (Clustering<?> c : clusterings) {
+      if (c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
-        if(testMeanModel(c)) {
+        if (testMeanModel(c)) {
           Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            if(RelationUtil.dimensionality(p.getRelation()) == 2) {
+          for (ScatterPlotProjector<?> p : ps) {
+            if (RelationUtil.dimensionality(p.getRelation()) == 2) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
               baseResult.getHierarchy().add(p, task);
@@ -140,17 +152,17 @@ public class VoronoiVisualization extends AbstractVisFactory {
    */
   private static boolean testMeanModel(Clustering<?> c) {
     Model firstmodel = c.getAllClusters().get(0).getModel();
-    if(firstmodel instanceof MeanModel<?>) {
+    if (firstmodel instanceof KMeansModel<?>) {
       return true;
     }
-    if(firstmodel instanceof MedoidModel) {
+    if (firstmodel instanceof MedoidModel) {
       return true;
     }
     return false;
   }
 
   /**
-   * Instance
+   * Instance.
    * 
    * @author Robert Rödler
    * @author Erich Schubert
@@ -160,17 +172,17 @@ public class VoronoiVisualization extends AbstractVisFactory {
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**
-     * The result we work on
+     * The result we work on.
      */
     Clustering<Model> clustering;
 
     /**
-     * The Voronoi diagram
+     * The Voronoi diagram.
      */
     Element voronoi;
 
     /**
-     * Constructor
+     * Constructor.
      * 
      * @param task VisualizationTask
      */
@@ -185,60 +197,55 @@ public class VoronoiVisualization extends AbstractVisFactory {
       addCSSClasses(svgp);
       final List<Cluster<Model>> clusters = clustering.getAllClusters();
 
-      if(clusters.size() < 2) {
+      if (clusters.size() < 2) {
         return;
       }
 
       // Collect cluster means
-      if(clusters.size() == 2) {
+      if (clusters.size() == 2) {
         ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
         {
-          for(Cluster<Model> clus : clusters) {
+          for (Cluster<Model> clus : clusters) {
             Model model = clus.getModel();
             double[] mean;
-            if(model instanceof MeanModel) {
+            if (model instanceof MeanModel) {
               @SuppressWarnings("unchecked")
               MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
               mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
-            }
-            else if(model instanceof MedoidModel) {
+            } else if (model instanceof MedoidModel) {
               MedoidModel mmodel = (MedoidModel) model;
               mean = proj.fastProjectDataToRenderSpace(rel.get(mmodel.getMedoid()));
-            }
-            else {
+            } else {
               continue;
             }
             means.add(mean);
           }
         }
-        if(settings.mode == Mode.VORONOI || settings.mode == Mode.V_AND_D) {
+        if (settings.mode == Mode.VORONOI || settings.mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }
-        if(settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
+        if (settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
           Element path = new SVGPath(means.get(0)).drawTo(means.get(1)).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }
-      }
-      else {
+      } else {
         ArrayList<Vector> vmeans = new ArrayList<Vector>(clusters.size());
         ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
         {
-          for(Cluster<Model> clus : clusters) {
+          for (Cluster<Model> clus : clusters) {
             Model model = clus.getModel();
             Vector mean;
-            if(model instanceof MeanModel) {
+            if (model instanceof MeanModel) {
               @SuppressWarnings("unchecked")
               MeanModel<? extends NumberVector<?>> mmodel = (MeanModel<? extends NumberVector<?>>) model;
               mean = mmodel.getMean().getColumnVector();
-            }
-            else if(model instanceof MedoidModel) {
+            } else if (model instanceof MedoidModel) {
               MedoidModel mmodel = (MedoidModel) model;
               mean = rel.get(mmodel.getMedoid()).getColumnVector();
-            }
-            else {
+            } else {
               continue;
             }
             vmeans.add(mean);
@@ -247,12 +254,12 @@ public class VoronoiVisualization extends AbstractVisFactory {
         }
         // Compute Delaunay Triangulation
         ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(vmeans).getDelaunay();
-        if(settings.mode == Mode.VORONOI || settings.mode == Mode.V_AND_D) {
+        if (settings.mode == Mode.VORONOI || settings.mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }
-        if(settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
+        if (settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawDelaunay(proj, delaunay, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
@@ -261,13 +268,13 @@ public class VoronoiVisualization extends AbstractVisFactory {
     }
 
     /**
-     * Adds the required CSS-Classes
+     * Adds the required CSS-Classes.
      * 
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
       // Class for the distance markers
-      if(!svgp.getCSSClassManager().contains(KMEANSBORDER)) {
+      if (!svgp.getCSSClassManager().contains(KMEANSBORDER)) {
         CSSClass cls = new CSSClass(this, KMEANSBORDER);
         cls = new CSSClass(this, KMEANSBORDER);
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
@@ -289,7 +296,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Mode for drawing: Voronoi, Delaunay, both
+     * Mode for drawing: Voronoi, Delaunay, both.
      * 
      * <p>
      * Key: {@code -voronoi.mode}
@@ -297,13 +304,16 @@ public class VoronoiVisualization extends AbstractVisFactory {
      */
     public static final OptionID MODE_ID = OptionID.getOrCreateOptionID("voronoi.mode", "Mode for drawing the voronoi cells (and/or delaunay triangulation)");
 
+    /**
+     * Drawing mode.
+     */
     protected Mode mode;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       EnumParameter<Mode> modeP = new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.VORONOI);
-      if(config.grab(modeP)) {
+      if (config.grab(modeP)) {
         mode = modeP.getValue();
       }
     }
