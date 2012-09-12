@@ -56,7 +56,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
- * 
  */
 public class ClusterParallelMeanVisualization extends AbstractVisFactory {
   /**
@@ -66,7 +65,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
 
   /**
    * Constructor, adhering to
-   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}.
    */
   public ClusterParallelMeanVisualization() {
     super();
@@ -81,13 +80,13 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
+    for (Clustering<?> c : clusterings) {
+      if (c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
         Clustering<MeanModel<? extends NumberVector<?>>> mcls = findMeanModel(c);
-        if(mcls != null) {
+        if (mcls != null) {
           Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-          for(ParallelPlotProjector<?> p : ps) {
+          for (ParallelPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
             task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 1);
             baseResult.getHierarchy().add(c, task);
@@ -106,7 +105,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
    */
   @SuppressWarnings("unchecked")
   private static Clustering<MeanModel<? extends NumberVector<?>>> findMeanModel(Clustering<?> c) {
-    if(c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
+    if (c.getAllClusters().get(0).getModel() instanceof MeanModel<?>) {
       return (Clustering<MeanModel<? extends NumberVector<?>>>) c;
     }
     return null;
@@ -119,7 +118,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
   }
 
   /**
-   * Instance
+   * Instance.
    * 
    * @author Robert Rödler
    * 
@@ -132,7 +131,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     public static final String CLUSTERMEAN = "Clustermean";
 
     /**
-     * The result we visualize
+     * The result we visualize.
      */
     private Clustering<MeanModel<? extends NumberVector<?>>> clustering;
 
@@ -161,17 +160,20 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
       addCSSClasses(svgp);
 
       Iterator<Cluster<MeanModel<? extends NumberVector<?>>>> ci = clustering.getAllClusters().iterator();
-      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
+      for (int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Cluster<MeanModel<? extends NumberVector<?>>> clus = ci.next();
+        if (clus.getModel() == null) {
+          continue;
+        }
         NumberVector<?> mean = clus.getModel().getMean();
-        if(mean == null) {
+        if (mean == null) {
           continue;
         }
 
         double[] pmean = proj.fastProjectDataToRenderSpace(mean);
 
         SVGPath path = new SVGPath();
-        for(int i = 0; i < pmean.length; i++) {
+        for (int i = 0; i < pmean.length; i++) {
           path.drawTo(getVisibleAxisX(i), pmean[i]);
         }
 
@@ -182,25 +184,24 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
     }
 
     /**
-     * Adds the required CSS-Classes
+     * Adds the required CSS-Classes.
      * 
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      if(!svgp.getCSSClassManager().contains(CLUSTERMEAN)) {
+      if (!svgp.getCSSClassManager().contains(CLUSTERMEAN)) {
         ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
         int clusterID = 0;
 
-        for(@SuppressWarnings("unused")
+        for (@SuppressWarnings("unused")
         Cluster<?> cluster : clustering.getAllClusters()) {
           CSSClass cls = new CSSClass(this, CLUSTERMEAN + clusterID);
           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) * 2);
 
           final String color;
-          if(clustering.getAllClusters().size() == 1) {
+          if (clustering.getAllClusters().size() == 1) {
             color = SVGConstants.CSS_BLACK_VALUE;
-          }
-          else {
+          } else {
             color = colors.getColor(clusterID);
           }
 

@@ -84,6 +84,9 @@ public class ProjectedCentroid extends Centroid {
   @Override
   public void put(double[] val, double weight) {
     assert (val.length == elements.length);
+    if (weight == 0) {
+      return; // Skip zero weights.
+    }
     final double nwsum = weight + wsum;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
       final double delta = val[i] - elements[i];
@@ -117,6 +120,9 @@ public class ProjectedCentroid extends Centroid {
   @Override
   public void put(NumberVector<?> val, double weight) {
     assert (val.getDimensionality() == elements.length);
+    if (weight == 0) {
+      return; // Skip zero weights.
+    }
     final double nwsum = weight + wsum;
     for(int i = dims.nextSetBit(0); i >= 0; i = dims.nextSetBit(i + 1)) {
       final double delta = val.doubleValue(i) - elements[i];
