@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Gaussian kernel density estimator.
@@ -51,4 +52,18 @@ public final class GaussianKernelDensityFunction implements KernelDensityFunctio
    * Static instance.
    */
   public static final GaussianKernelDensityFunction KERNEL = new GaussianKernelDensityFunction();
+
+  /**
+   * Parameterization stub.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected GaussianKernelDensityFunction makeInstance() {
+      return KERNEL;
+    }
+  }
 }

@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.math.statistics.EpanechnikovKernelDensityFunction
+de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction
+de.lmu.ifi.dbs.elki.math.statistics.TriangularKernelDensityFunction
+de.lmu.ifi.dbs.elki.math.statistics.UniformKernelDensityFunction
