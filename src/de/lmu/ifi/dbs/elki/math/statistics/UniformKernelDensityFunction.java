@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Uniform / Rectangular kernel density estimator.
@@ -49,4 +50,18 @@ public final class UniformKernelDensityFunction implements KernelDensityFunction
    * Static instance.
    */
   public static final UniformKernelDensityFunction KERNEL = new UniformKernelDensityFunction();
+
+  /**
+   * Parameterization stub.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected UniformKernelDensityFunction makeInstance() {
+      return KERNEL;
+    }
+  }
 }

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Epanechnikov kernel density estimator.
@@ -49,4 +50,18 @@ public final class EpanechnikovKernelDensityFunction implements KernelDensityFun
    * Static instance.
    */
   public static final EpanechnikovKernelDensityFunction KERNEL = new EpanechnikovKernelDensityFunction();
+
+  /**
+   * Parameterization stub.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected EpanechnikovKernelDensityFunction makeInstance() {
+      return KERNEL;
+    }
+  }
 }
