@@ -62,11 +62,11 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 3);
-    AbstractKMeans<DoubleVector, DoubleDistance> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
+    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
-    Clustering<MeanModel<DoubleVector>> result = kmeans.run(db);
+    Clustering<? extends MeanModel<DoubleVector>> result = kmeans.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -85,11 +85,11 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 3);
-    AbstractKMeans<DoubleVector, DoubleDistance> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMacQueen.class, params);
+    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMacQueen.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
-    Clustering<MeanModel<DoubleVector>> result = kmeans.run(db);
+    Clustering<? extends MeanModel<DoubleVector>> result = kmeans.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
@@ -108,11 +108,11 @@ public class TestKMeansResults extends AbstractSimpleAlgorithmTest implements JU
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 3);
-    AbstractKMeans<DoubleVector, DoubleDistance> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
+    AbstractKMeans<DoubleVector, DoubleDistance, ?> kmedians = ClassGenericsUtil.parameterizeOrAbort(KMediansLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMedians on database
-    Clustering<MeanModel<DoubleVector>> result = kmedians.run(db);
+    Clustering<? extends MeanModel<DoubleVector>> result = kmedians.run(db);
     testFMeasure(db, result, 0.998005);
     testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
