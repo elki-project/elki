@@ -82,16 +82,16 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   private static final Logging LOG = Logging.getLogger(CTLuZTestOutlier.class);
 
   /**
-   * Constructor
+   * Constructor.
    * 
-   * @param npredf
+   * @param npredf Neighbor predicate
    */
   public CTLuZTestOutlier(NeighborSetPredicate.Factory<N> npredf) {
     super(npredf);
   }
 
   /**
-   * Main method
+   * Main method.
    * 
    * @param database Database
    * @param nrel Neighborhood relation
@@ -147,11 +147,11 @@ public class CTLuZTestOutlier<N> extends AbstractNeighborhoodOutlier<N> {
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Ahmed Hettab
    * 

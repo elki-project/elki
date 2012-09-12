@@ -85,12 +85,12 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   private static final Logging LOG = Logging.getLogger(TrimmedMeanApproach.class);
 
   /**
-   * the parameter p
+   * the parameter p.
    */
   private double p;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param p Parameter p
    * @param npredf Neighborhood factory.
@@ -101,7 +101,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   }
 
   /**
-   * Run the algorithm
+   * Run the algorithm.
    * 
    * @param database Database
    * @param nrel Neighborhood relation
@@ -201,11 +201,11 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     // Get one dimensional attribute for analysis.
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
   }
 
   /**
-   * Parameterizer
+   * Parameterizer.
    * 
    * @author Ahmed Hettab
    * 
@@ -215,12 +215,12 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
    */
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     /**
-     * Parameter for the percentile value p
+     * Parameter for the percentile value p.
      */
     public static final OptionID P_ID = OptionID.getOrCreateOptionID("tma.p", "the percentile parameter");
 
     /**
-     * Percentile parameter p
+     * Percentile parameter p.
      */
     protected double p = 0.2;
 

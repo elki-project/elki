@@ -86,27 +86,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url = "http://dx.doi.org/10.1145/1869790.1869841")
 public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<N, D, OutlierResult> implements OutlierAlgorithm {
   /**
-   * Logger
+   * Logger.
    */
   private static final Logging LOG = Logging.getLogger(CTLuRandomWalkEC.class);
 
   /**
-   * Parameter alpha: Attribute difference exponent
+   * Parameter alpha: Attribute difference exponent.
    */
   private double alpha;
 
   /**
-   * Parameter c: damping factor
+   * Parameter c: damping factor.
    */
   private double c;
 
   /**
-   * Parameter k
+   * Parameter k.
    */
   private int k;
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param alpha Alpha parameter
@@ -121,7 +121,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
   }
 
   /**
-   * Run the algorithm
+   * Run the algorithm.
    * 
    * @param spatial Spatial neighborhood relation
    * @param relation Attribute value relation
@@ -233,7 +233,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
   }
 
   @Override
@@ -253,32 +253,32 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
    */
   public static class Parameterizer<N, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<N, D> {
     /**
-     * Parameter to specify the number of neighbors
+     * Parameter to specify the number of neighbors.
      */
     public static final OptionID K_ID = OptionID.getOrCreateOptionID("randomwalkec.k", "Number of nearest neighbors to use.");
 
     /**
-     * Parameter to specify alpha
+     * Parameter to specify alpha.
      */
     public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("randomwalkec.alpha", "Scaling exponent for value differences.");
 
     /**
-     * Parameter to specify the c
+     * Parameter to specify the c.
      */
     public static final OptionID C_ID = OptionID.getOrCreateOptionID("randomwalkec.c", "The damping parameter c.");
 
     /**
-     * Parameter alpha: scaling
+     * Parameter alpha: scaling.
      */
     double alpha = 0.5;
 
     /**
-     * Parameter c: damping coefficient
+     * Parameter c: damping coefficient.
      */
     double c = 0.9;
 
     /**
-     * Parameter for kNN
+     * Parameter for kNN.
      */
     int k;
 
@@ -291,7 +291,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     /**
-     * Get the kNN parameter
+     * Get the kNN parameter.
      * 
      * @param config Parameterization
      */
@@ -303,7 +303,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     /**
-     * Get the alpha parameter
+     * Get the alpha parameter.
      * 
      * @param config Parameterization
      */
@@ -315,9 +315,9 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     /**
-     * get the c parameter
+     * get the c parameter.
      * 
-     * @param config
+     * @param config Parameterization
      */
     protected void configC(Parameterization config) {
       final DoubleParameter param = new DoubleParameter(C_ID);

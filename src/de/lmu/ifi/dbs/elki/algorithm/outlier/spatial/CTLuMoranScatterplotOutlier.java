@@ -79,7 +79,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
   private static final Logging LOG = Logging.getLogger(CTLuMoranScatterplotOutlier.class);
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param npredf Neighborhood
    */
@@ -88,7 +88,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
   }
 
   /**
-   * Main method
+   * Main method.
    * 
    * @param nrel Neighborhood relation
    * @param relation Data relation (1d!)
@@ -145,7 +145,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
   }
 
   @Override
@@ -154,7 +154,7 @@ public class CTLuMoranScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Ahmed Hettab
    * 
