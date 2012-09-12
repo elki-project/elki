@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.logging;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -39,7 +40,7 @@ public class ErrorFormatter extends Formatter {
    * 
    * TODO: make configurable via logging.properties
    */
-  public static String[] PRUNE = {//
+  public static final String[] PRUNE = {//
   "de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI", //
   "de.lmu.ifi.dbs.elki.KDDTask", //
   "java.awt.event.", //
@@ -62,15 +63,20 @@ public class ErrorFormatter extends Formatter {
 
   @Override
   public String format(LogRecord record) {
-    if(record instanceof ProgressLogRecord) {
+    if (record instanceof ProgressLogRecord) {
       return record.getMessage();
     }
     String msg = record.getMessage();
-    StringBuffer buf = new StringBuffer(msg);
-    if(!msg.endsWith(OutputStreamLogger.NEWLINE)) {
-      buf.append(OutputStreamLogger.NEWLINE);
+    StringBuffer buf = new StringBuffer();
+    if (msg != null) {
+      buf.append(msg);
+      if (!msg.endsWith(OutputStreamLogger.NEWLINE)) {
+        buf.append(OutputStreamLogger.NEWLINE);
+      }
+    } else {
+      buf.append("null" + OutputStreamLogger.NEWLINE);
     }
-    if(record.getThrown() != null) {
+    if (record.getThrown() != null) {
       appendCauses(buf, record.getThrown());
     }
     return buf.toString();
@@ -86,25 +92,25 @@ public class ErrorFormatter extends Formatter {
     buf.append(thrown.toString()).append(OutputStreamLogger.NEWLINE);
     StackTraceElement[] stack = thrown.getStackTrace();
     int end = stack.length - 1;
-    prune: for(; end >= 0; end--) {
+    prune: for (; end >= 0; end--) {
       String cn = stack[end].getClassName();
-      for(String pat : PRUNE) {
-        if(cn.startsWith(pat)) {
+      for (String pat : PRUNE) {
+        if (cn.startsWith(pat)) {
           continue prune;
         }
       }
       break;
     }
-    if(end <= 0) {
+    if (end <= 0) {
       end = stack.length - 1;
     }
-    for(int i = 0; i <= end; i++) {
+    for (int i = 0; i <= end; i++) {
       buf.append("\tat ").append(stack[i]).append(OutputStreamLogger.NEWLINE);
     }
-    if(end < stack.length - 1) {
+    if (end < stack.length - 1) {
       buf.append("\tat [...]").append(OutputStreamLogger.NEWLINE);
     }
-    if(thrown.getCause() != null) {
+    if (thrown.getCause() != null) {
       buf.append("Caused by: ");
       appendCauses(buf, thrown.getCause());
     }

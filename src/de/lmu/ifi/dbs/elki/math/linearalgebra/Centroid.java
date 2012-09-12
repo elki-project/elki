@@ -64,7 +64,7 @@ public class Centroid extends Vector {
   public void put(double[] val) {
     assert (val.length == elements.length);
     wsum += 1.0;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       final double delta = val[i] - elements[i];
       elements[i] += delta / wsum;
     }
@@ -78,8 +78,11 @@ public class Centroid extends Vector {
    */
   public void put(double[] val, double weight) {
     assert (val.length == elements.length);
+    if (weight == 0) {
+      return; // Skip zero weights.
+    }
     final double nwsum = weight + wsum;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       final double delta = val[i] - elements[i];
       final double rval = delta * weight / nwsum;
       elements[i] += rval;
@@ -114,7 +117,7 @@ public class Centroid extends Vector {
   public void put(NumberVector<?> val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       final double delta = val.doubleValue(i) - elements[i];
       elements[i] += delta / wsum;
     }
@@ -128,8 +131,11 @@ public class Centroid extends Vector {
    */
   public void put(NumberVector<?> val, double weight) {
     assert (val.getDimensionality() == elements.length);
+    if (weight == 0) {
+      return; // Skip zero weights.
+    }
     final double nwsum = weight + wsum;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       final double delta = val.doubleValue(i) - elements[i];
       final double rval = delta * weight / nwsum;
       elements[i] += rval;
@@ -157,7 +163,7 @@ public class Centroid extends Vector {
   public static Centroid make(Matrix mat) {
     Centroid c = new Centroid(mat.getRowDimensionality());
     int n = mat.getColumnDimensionality();
-    for(int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
       // TODO: avoid constructing the vector objects?
       c.put(mat.getCol(i));
     }
@@ -172,7 +178,7 @@ public class Centroid extends Vector {
    */
   public static Centroid make(Relation<? extends NumberVector<?>> relation) {
     Centroid c = new Centroid(RelationUtil.dimensionality(relation));
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       c.put(relation.get(iditer));
     }
     return c;
@@ -187,7 +193,7 @@ public class Centroid extends Vector {
    */
   public static Centroid make(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
     Centroid c = new Centroid(RelationUtil.dimensionality(relation));
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       c.put(relation.get(iter));
     }
     return c;
