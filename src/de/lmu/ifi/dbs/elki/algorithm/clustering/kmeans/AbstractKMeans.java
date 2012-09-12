@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
@@ -55,8 +56,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
  * 
  * @param <V> Vector type
  * @param <D> Distance type
+ * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distance<D>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?>, D, Clustering<MeanModel<V>>> implements KMeans {
+public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distance<D>, M extends MeanModel<V>> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector<?>, D, Clustering<M>> implements KMeans, ClusteringAlgorithm<Clustering<M>> {
   /**
    * Holds the value of {@link #K_ID}.
    */

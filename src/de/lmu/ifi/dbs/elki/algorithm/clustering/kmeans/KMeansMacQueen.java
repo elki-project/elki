@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "J. MacQueen", title = "Some Methods for Classification and Analysis of Multivariate Observations", booktitle = "5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297", url = "http://projecteuclid.org/euclid.bsmsp/1200512992")
-public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, KMeansModel<V>> {
   /**
    * The logger for this class.
    */
@@ -94,9 +93,9 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
    * @param relation relation to use
    * @return Clustering result
    */
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
-      return new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
+      return new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
     List<Vector> means = new ArrayList<Vector>(k);
@@ -123,11 +122,11 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
       }
     }
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
+    Clustering<KMeansModel<V>> result = new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
-      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(means.get(i).getArrayRef()));
-      result.addCluster(new Cluster<MeanModel<V>>(ids, model));
+      KMeansModel<V> model = new KMeansModel<V>(factory.newNumberVector(means.get(i).getArrayRef()));
+      result.addCluster(new Cluster<KMeansModel<V>>(ids, model));
     }
     return result;
   }
@@ -180,7 +179,7 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     }
 
     @Override
-    protected AbstractKMeans<V, D> makeInstance() {
+    protected KMeansMacQueen<V, D> makeInstance() {
       return new KMeansMacQueen<V, D>(distanceFunction, k, maxiter, initializer);
     }
   }

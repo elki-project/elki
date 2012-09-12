@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -70,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("K-Means")
 @Description("Finds a partitioning into k clusters.")
 @Reference(authors = "S. Lloyd", title = "Least squares quantization in PCM", booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
-public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, KMeansModel<V>> {
   /**
    * The logger for this class.
    */
@@ -95,9 +94,9 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
    * @param relation relation to use
    * @return result
    */
-  public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
     if(relation.size() <= 0) {
-      return new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
+      return new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
@@ -121,10 +120,10 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     }
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Clustering", "kmeans-clustering");
+    Clustering<KMeansModel<V>> result = new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
-      result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
+      KMeansModel<V> model = new KMeansModel<V>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
+      result.addCluster(new Cluster<KMeansModel<V>>(clusters.get(i), model));
     }
     return result;
   }
@@ -177,7 +176,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     }
 
     @Override
-    protected AbstractKMeans<V, D> makeInstance() {
+    protected KMeansLloyd<V, D> makeInstance() {
       return new KMeansLloyd<V, D>(distanceFunction, k, maxiter, initializer);
     }
   }
