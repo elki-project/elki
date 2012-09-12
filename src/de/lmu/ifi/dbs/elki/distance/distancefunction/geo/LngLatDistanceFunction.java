@@ -56,7 +56,7 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return VectorFieldTypeInformation.get(NumberVector.class, 2);
+    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 2);
   }
 
   @Override

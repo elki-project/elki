@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -60,14 +61,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * The Difference e = non-spatial-Attribute-Value - Median (Neighborhood) is
  * computed.<br>
  * The Spatial Objects with the highest standardized e value are Spatial
- * Outliers. </p>
+ * Outliers.
  * 
  * @author Ahmed Hettab
  * 
  * @param <N> Neighborhood type
  */
 @Title("Median Algorithm for Spatial Outlier Detection")
-@Reference(authors = "C.-T. Lu and D. Chen and Y. Kou", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proc. 3rd IEEE International Conference on Data Mining", url="http://dx.doi.org/10.1109/ICDM.2003.1250986")
+@Reference(authors = "C.-T. Lu and D. Chen and Y. Kou", title = "Algorithms for Spatial Outlier Detection", booktitle = "Proc. 3rd IEEE International Conference on Data Mining", url = "http://dx.doi.org/10.1109/ICDM.2003.1250986")
 public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   /**
    * The logger for this class.
@@ -75,7 +76,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   private static final Logging LOG = Logging.getLogger(CTLuMedianAlgorithm.class);
 
   /**
-   * Constructor
+   * Constructor.
    * 
    * @param npredf Neighborhood predicate
    */
@@ -84,7 +85,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
   }
 
   /**
-   * Main method
+   * Main method.
    * 
    * @param nrel Neighborhood relation
    * @param relation Data relation (1d!)
@@ -95,25 +96,24 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
 
     MeanVariance mv = new MeanVariance();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       final double median;
       {
         double[] fi = new double[neighbors.size()];
         // calculate and store Median of neighborhood
         int c = 0;
-        for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(iditer, iter)) {
+        for (DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+          if (DBIDUtil.equal(iditer, iter)) {
             continue;
           }
           fi[c] = relation.get(iter).doubleValue(0);
           c++;
         }
 
-        if(c > 0) {
+        if (c > 0) {
           median = QuickSelect.median(fi, 0, c);
-        }
-        else {
+        } else {
           median = relation.get(iditer).doubleValue(0);
         }
       }
@@ -126,7 +126,7 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
     final double mean = mv.getMean();
     final double stddev = mv.getNaiveStddev();
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = Math.abs((scores.doubleValue(iditer) - mean) / stddev);
       minmax.put(score);
       scores.putDouble(iditer, score);
@@ -146,11 +146,11 @@ public class CTLuMedianAlgorithm<N> extends AbstractNeighborhoodOutlier<N> {
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), VectorFieldTypeInformation.get(NumberVector.class, 1));
+    return TypeUtil.array(getNeighborSetPredicateFactory().getInputTypeRestriction(), new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 1));
   }
 
   /**
-   * Parameterization class
+   * Parameterization class.
    * 
    * @author Ahmed Hettab
    * 

@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -128,7 +129,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
 
   @Override
   public VectorTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return VectorTypeInformation.get(NumberVector.class, dim, Integer.MAX_VALUE);
+    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, dim, Integer.MAX_VALUE);
   }
 
   @Override
