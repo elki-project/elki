@@ -43,7 +43,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
    * Maximum dimensionality.
    */
   protected final int maxdim;
-
+  
   /**
    * Constructor for an actual type.
    * 
@@ -141,32 +141,6 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
       throw new UnsupportedOperationException("Requesting dimensionality for a request without defined dimensionality!");
     }
     return maxdim;
-  }
-
-  /**
-   * Pseudo constructor that is often convenient to use when T is not completely
-   * known.
-   * 
-   * @param <T> Type
-   * @param cls Class restriction
-   * @param mindim Minimum dimensionality
-   * @param maxdim Maximum dimensionality
-   * @return Type information
-   */
-  public static <T extends FeatureVector<?>> VectorTypeInformation<T> get(Class<T> cls, int mindim, int maxdim) {
-    return new VectorTypeInformation<T>(cls, mindim, maxdim);
-  }
-
-  /**
-   * Pseudo constructor that is often convenient to use when T is not completely
-   * known.
-   * 
-   * @param <T> Type
-   * @param cls Class restriction
-   * @return Type information
-   */
-  public static <T extends FeatureVector<?>> VectorTypeInformation<T> get(Class<T> cls) {
-    return new VectorTypeInformation<T>(cls);
   }
 
   @Override

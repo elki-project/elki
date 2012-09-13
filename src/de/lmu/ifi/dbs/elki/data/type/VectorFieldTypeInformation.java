@@ -46,6 +46,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
+   * 
    * @param factory Factory class
    * @param dim Dimensionality
    * @param labels Labels
@@ -60,6 +61,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
+   * 
    * @param factory Factory class
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
@@ -72,6 +74,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
+   * 
    * @param factory Factory class
    * @param dim Dimensionality
    * @param serializer Serializer
@@ -83,6 +86,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
+   * 
    * @param factory Factory class
    * @param dim Dimensionality
    * @param labels Labels
@@ -176,31 +180,6 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
     return factory;
   }
 
-  /**
-   * Pseudo constructor that is often convenient to use when T is not completely
-   * known.
-   * 
-   * @param <T> Type
-   * @param cls Class restriction
-   * @return Type
-   */
-  public static <T extends FeatureVector<?>> VectorFieldTypeInformation<T> get(Class<T> cls) {
-    return new VectorFieldTypeInformation<T>(cls);
-  }
-
-  /**
-   * Pseudo constructor that is often convenient to use when T is not completely
-   * known, but the dimensionality is fixed.
-   * 
-   * @param <T> Type
-   * @param cls Class restriction
-   * @param dim Dimensionality (exact)
-   * @return Type
-   */
-  public static <T extends FeatureVector<?>> VectorFieldTypeInformation<T> get(Class<T> cls, int dim) {
-    return new VectorFieldTypeInformation<T>(cls, dim);
-  }
-
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer(getRestrictionClass().getSimpleName());
@@ -228,7 +207,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
     if (labels == null) {
       return null;
     }
-    return labels[col - 1];
+    return labels[col];
   }
 
   /**
