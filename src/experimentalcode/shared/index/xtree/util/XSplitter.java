@@ -226,24 +226,24 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private void removeFromMBR(List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index, ModifiableHyperBoundingBox mbr) {
     boolean change = false;
     DoubleIntPair pqPair;
-    for(int d = 1; d <= mbr.getDimensionality(); d++) {
+    for(int d = 0; d < mbr.getDimensionality(); d++) {
       // remove all relevant upper bound entries belonging to the first set
-      pqPair = pqUB.get(d - 1).peek();
+      pqPair = pqUB.get(d).peek();
       while(pqPair.second <= index) {
         change = true;
-        pqUB.get(d - 1).poll();
-        pqPair = pqUB.get(d - 1).peek();
+        pqUB.get(d).poll();
+        pqPair = pqUB.get(d).peek();
       }
       if(change) { // there probably was a change, as an entry has been removed
         mbr.setMax(d, pqPair.first);
       }
       change = false;
       // remove all relevant lower bound entries belonging to the first set
-      pqPair = pqLB.get(d - 1).peek();
+      pqPair = pqLB.get(d).peek();
       while(pqPair.second <= index) {
         change = true;
-        pqLB.get(d - 1).poll();
-        pqPair = pqLB.get(d - 1).peek();
+        pqLB.get(d).poll();
+        pqPair = pqLB.get(d).peek();
       }
       if(change) { // there probably was a change, as an entry has been removed
         mbr.setMin(d, pqPair.first);
