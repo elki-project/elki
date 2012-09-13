@@ -72,17 +72,17 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * 
  * @apiviz.composedOf SettingsComboboxModel
  * @apiviz.composedOf LoggingStep
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable
- * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.DynamicParameters
+ * @apiviz.owns ParameterTable
+ * @apiviz.owns DynamicParameters
  */
 public class MiniGUI extends JPanel {
   /**
-   * Serial version
+   * Serial version.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Filename for saved settings
+   * Filename for saved settings.
    */
   public static final String SAVED_SETTINGS_FILENAME = "MiniGUI-saved-settings.txt";
 
@@ -92,7 +92,7 @@ public class MiniGUI extends JPanel {
   public static final String NEWLINE = System.getProperty("line.separator");
 
   /**
-   * ELKI logger for the GUI
+   * ELKI logger for the GUI.
    */
   private static final Logging LOG = Logging.getLogger(MiniGUI.class);
 
@@ -102,27 +102,27 @@ public class MiniGUI extends JPanel {
   protected LogPanel outputArea;
 
   /**
-   * The parameter table
+   * The parameter table.
    */
   protected ParameterTable parameterTable;
 
   /**
-   * Parameter storage
+   * Parameter storage.
    */
   protected DynamicParameters parameters;
 
   /**
-   * Settings storage
+   * Settings storage.
    */
   protected SavedSettingsFile store = new SavedSettingsFile(SAVED_SETTINGS_FILENAME);
 
   /**
-   * Combo box for saved settings
+   * Combo box for saved settings.
    */
   protected JComboBox savedCombo;
 
   /**
-   * Model to link the combobox with
+   * Model to link the combobox with.
    */
   protected SettingsComboboxModel savedSettingsModel;
 
@@ -132,7 +132,7 @@ public class MiniGUI extends JPanel {
   protected JButton runButton;
 
   /**
-   * Constructor
+   * Constructor.
    */
   public MiniGUI() {
     super();
@@ -158,7 +158,7 @@ public class MiniGUI extends JPanel {
         public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           ArrayList<String> settings = store.get(key);
-          if(settings != null) {
+          if (settings != null) {
             outputArea.clear();
             outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
             doSetParameters(settings);
@@ -178,8 +178,7 @@ public class MiniGUI extends JPanel {
           store.put(key, parameters.serializeParameters());
           try {
             store.save();
-          }
-          catch(IOException e1) {
+          } catch (IOException e1) {
             LOG.exception(e1);
           }
           savedSettingsModel.update();
@@ -196,8 +195,7 @@ public class MiniGUI extends JPanel {
           store.remove(key);
           try {
             store.save();
-          }
-          catch(IOException e1) {
+          } catch (IOException e1) {
             LOG.exception(e1);
           }
           savedCombo.setSelectedItem("[Saved Settings]");
@@ -278,22 +276,31 @@ public class MiniGUI extends JPanel {
     ArrayList<String> ps = new ArrayList<String>();
     doSetParameters(ps);
 
+    try {
+      Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+          LOG.exception(e);
+        }
+      });
+    } catch (SecurityException e) {
+      LOG.warning("Could not set the Default Uncaught Exception Handler", e);
+    }
+
     // load saved settings (we wanted to have the logger first!)
     try {
       store.load();
       savedSettingsModel.update();
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       // Ignore - probably didn't save any settings yet.
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       LOG.exception(e);
     }
 
   }
 
   /**
-   * Serialize the parameter table and run setParameters()
+   * Serialize the parameter table and run setParameters().
    */
   protected void updateParameterTable() {
     parameterTable.setEnabled(false);
@@ -316,11 +323,10 @@ public class MiniGUI extends JPanel {
     track.tryInstantiate(KDDTask.class);
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
-    if(config.getErrors().size() > 0) {
+    if (config.getErrors().size() > 0) {
       reportErrors(config);
       runButton.setEnabled(false);
-    }
-    else {
+    } else {
       runButton.setEnabled(true);
     }
 
@@ -330,12 +336,11 @@ public class MiniGUI extends JPanel {
     parameterTable.setEnabled(false);
     parameters.updateFromTrackParameters(track);
     // Add remaining parameters
-    if(remainingParameters != null && !remainingParameters.isEmpty()) {
+    if (remainingParameters != null && !remainingParameters.isEmpty()) {
       DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
       try {
         remo.setValue(FormatUtil.format(remainingParameters, " "));
-      }
-      catch(ParameterException e) {
+      } catch (ParameterException e) {
         LOG.exception(e);
       }
       BitSet bits = new BitSet();
@@ -370,15 +375,13 @@ public class MiniGUI extends JPanel {
         KDDTask task = config.tryInstantiate(KDDTask.class);
         try {
           config.logUnusedParameters();
-          if(config.getErrors().size() == 0) {
+          if (config.getErrors().size() == 0) {
             task.run();
-          }
-          else {
+          } else {
             reportErrors(config);
           }
           LOG.debug("Task completed successfully.");
-        }
-        catch(Throwable e) {
+        } catch (Throwable e) {
           LOG.exception("Task failed", e);
         }
         return null;
@@ -401,7 +404,7 @@ public class MiniGUI extends JPanel {
   protected void reportErrors(SerializedParameterization config) {
     StringBuffer buf = new StringBuffer();
     buf.append("Could not run task because of configuration errors:" + NEWLINE + NEWLINE);
-    for(ParameterException e : config.getErrors()) {
+    for (ParameterException e : config.getErrors()) {
       buf.append(e.getMessage() + NEWLINE);
     }
     LOG.warning(buf.toString());
@@ -412,7 +415,7 @@ public class MiniGUI extends JPanel {
    * Create the GUI and show it. For thread safety, this method should be
    * invoked from the event-dispatching thread.
    * 
-   * args Command line arguments
+   * @param args Command line arguments
    */
   protected static void createAndShowGUI(String[] args) {
     // Create and set up the window.
@@ -423,20 +426,18 @@ public class MiniGUI extends JPanel {
       // Class<?> cls =
       // ClassLoader.getSystemClassLoader().loadClass("org.jdesktop.swinghelper.debug.CheckThreadViolationRepaintManager");
       // RepaintManager.setCurrentManager((RepaintManager) cls.newInstance());
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       // ignore
     }
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       // Ignore - icon not found is not fatal.
     }
 
     // Create and set up the content pane.
     MiniGUI newContentPane = new MiniGUI();
-    if(args != null && args.length > 0) {
+    if (args != null && args.length > 0) {
       newContentPane.doSetParameters(Arrays.asList(args));
     }
     newContentPane.setOpaque(true); // content panes must be opaque
@@ -463,7 +464,7 @@ public class MiniGUI extends JPanel {
   }
 
   /**
-   * Class to interface between the saved settings list and a JComboBox
+   * Class to interface between the saved settings list and a JComboBox.
    * 
    * @author Erich Schubert
    * 
@@ -471,22 +472,22 @@ public class MiniGUI extends JPanel {
    */
   class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
     /**
-     * Serial version
+     * Serial version.
      */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Settings storage
+     * Settings storage.
      */
     protected SavedSettingsFile store;
 
     /**
-     * Selected entry
+     * Selected entry.
      */
     protected String selected = null;
 
     /**
-     * Constructor
+     * Constructor.
      * 
      * @param store Store to access
      */
@@ -502,7 +503,7 @@ public class MiniGUI extends JPanel {
 
     @Override
     public void setSelectedItem(Object anItem) {
-      if(anItem instanceof String) {
+      if (anItem instanceof String) {
         selected = (String) anItem;
       }
     }
@@ -518,7 +519,7 @@ public class MiniGUI extends JPanel {
     }
 
     /**
-     * Force an update
+     * Force an update.
      */
     public void update() {
       fireContentsChanged(this, 0, getSize() + 1);
