@@ -97,7 +97,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
       int[] odims = new int[vtype.dimensionality() - dims.length];
       {
         int i = 0;
-        for(int d = 1; d <= vtype.dimensionality(); d++) {
+        for(int d = 0; d < vtype.dimensionality(); d++) {
           boolean found = false;
           for(int j = 0; j < dims.length; j++) {
             if(dims[j] == d) {
@@ -168,7 +168,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(1));
+      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(0));
       if(config.grab(selectedAttributesP)) {
         List<Integer> dimensionList = selectedAttributesP.getValue();
         dims = new int[dimensionList.size()];

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
@@ -39,44 +38,6 @@ public abstract class AbstractNumberVector<N extends Number> implements NumberVe
    * values.
    */
   public static final String ATTRIBUTE_SEPARATOR = " ";
-
-  /**
-   * An Object obj is equal to this AbstractNumberVector if it is an instance of
-   * the same runtime class and is of the identical dimensionality and the
-   * values of this AbstractNumberVector are equal to the values of obj in all
-   * dimensions, respectively.
-   * 
-   * @param obj another Object
-   * @return true if the specified Object is an instance of the same runtime
-   *         class and is of the identical dimensionality and the values of this
-   *         AbstractNumberVector are equal to the values of obj in all
-   *         dimensions, respectively
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this.getClass().isInstance(obj)) {
-      AbstractNumberVector<?> rv = (AbstractNumberVector<?>) obj;
-      boolean equal = (this.getDimensionality() == rv.getDimensionality());
-      for (int i = 1; i <= getDimensionality() && equal; i++) {
-        equal &= this.getValue(i).equals(rv.getValue(i));
-      }
-      return equal;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    if (this.getDimensionality() == 0) {
-      return 0;
-    }
-    int hash = this.getValue(1).hashCode();
-    for (int i = 2; i <= this.getDimensionality(); i++) {
-      hash = Util.mixHashCodes(hash, this.getValue(i).hashCode());
-    }
-    return hash;
-  }
 
   @Override
   public double getMin(int dimension) {
