@@ -103,13 +103,13 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
     if(minima.length != featureVector.getDimensionality()) {
       throw new IllegalArgumentException("FeatureVectors differ in length.");
     }
-    for(int d = 1; d <= featureVector.getDimensionality(); d++) {
+    for(int d = 0; d < featureVector.getDimensionality(); d++) {
       final double val = featureVector.doubleValue(d);
-      if(val > maxima[d - 1]) {
-        maxima[d - 1] = val;
+      if(val > maxima[d]) {
+        maxima[d] = val;
       }
-      if(val < minima[d - 1]) {
-        minima[d - 1] = val;
+      if(val < minima[d]) {
+        minima[d] = val;
       }
     }
   }
