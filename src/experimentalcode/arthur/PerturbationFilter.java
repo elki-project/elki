@@ -166,8 +166,8 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
       dimensionality = featureVector.getDimensionality();
       mvs = MeanVarianceMinMax.newArray(dimensionality);
     }
-    for (int d = 1; d <= featureVector.getDimensionality(); d++) {
-      mvs[d - 1].put(featureVector.doubleValue(d));
+    for (int d = 0; d < featureVector.getDimensionality(); d++) {
+      mvs[d].put(featureVector.doubleValue(d));
     }
   }
 
