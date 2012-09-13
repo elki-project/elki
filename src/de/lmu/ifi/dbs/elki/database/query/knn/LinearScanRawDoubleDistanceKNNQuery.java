@@ -42,15 +42,22 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveDistanceKNNQuery<O, DoubleDistance> {
   /**
+   * Raw distance function.
+   */
+  PrimitiveDoubleDistanceFunction<O> rawdist;
+
+  /**
    * Constructor.
-   * 
+   *
    * @param distanceQuery Distance function to use
    */
+  @SuppressWarnings("unchecked")
   public LinearScanRawDoubleDistanceKNNQuery(PrimitiveDistanceQuery<O, DoubleDistance> distanceQuery) {
     super(distanceQuery);
     if(!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
       throw new UnsupportedOperationException("LinearScanRawDoubleDistance instantiated for non-RawDoubleDistance!");
     }
+    rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
   }
 
   @Override
@@ -60,8 +67,6 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
 
   @Override
   public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
-    @SuppressWarnings("unchecked")
-    final PrimitiveDoubleDistanceFunction<O> rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
     // Optimization for double distances.
     final DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
     // Checking max here has a surprisingly large effect on performance

@@ -33,17 +33,42 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * See also: {@link KNNUtil#newHeap}!
  * 
+ * Experiments have shown that it can be much more performant to track the
+ * knndistance <em>outside</em> of the heap, and do comparisons on the stack:
+ * <blockquote>
+ * 
+ * <pre>
+ * {@code
+ * double knndist = Double.POSITIVE_INFINITY;
+ * DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
+ * for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+ *   double dist = computeDistance(iditer, ...);
+ *   if (dist < knndist) {
+ *     heap.add(dist, iditer);
+ *     if (heap.size() >= k) {
+ *       max = heap.doubleKNNDistance();
+ *     }
+ *   }    
+ * }
+ * }
+ * </pre>
+ * 
+ * </blockquote>
+ * 
+ * The reason probably is that {@code knndist} resides on the stack and can be
+ * better optimized by the hotspot compiler.
+ * 
  * @author Erich Schubert
  */
 public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPair, DoubleDistance> {
   /**
-   * Serial version
+   * Serial version.
    */
   private static final long serialVersionUID = 1L;
 
   /**
    * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
-   * too often)
+   * too often).
    */
   protected double knndistance = Double.POSITIVE_INFINITY;
 
@@ -86,8 +111,11 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @deprecated if you know your distances are double-valued, you should be
    *             using the primitive type.
+   * 
    */
   @Override
   @Deprecated
@@ -104,6 +132,12 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
     return knndistance;
   }
 
+  /**
+   * {@inheritDoc}
+   * 
+   * @deprecated if you know your distances are double-valued, you should be
+   *             using the primitive type.
+   */
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
