@@ -57,7 +57,7 @@ public class SquaredEuclideanDistanceFunction extends AbstractVectorDoubleDistan
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
     double sum = 0;
-    for(int i = 1; i <= dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double val = v.doubleValue(i);
       sum += val * val;
     }

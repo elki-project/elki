@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  */
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -99,19 +98,19 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
     final int size = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
-    ArrayList<Vector<IntIntPair>> Rk;
+    ArrayList<ArrayList<IntIntPair>> Rk;
     // Build a list of all subspaces
     {
       // R1 initial one-dimensional subspaces.
-      Rk = new ArrayList<Vector<IntIntPair>>();
+      Rk = new ArrayList<ArrayList<IntIntPair>>();
       // Set of all dim*phi ranges
       ArrayList<IntIntPair> q = new ArrayList<IntIntPair>();
-      for(int i = 1; i <= dimensionality; i++) {
+      for(int i = 0; i < dimensionality; i++) {
         for(int j = 1; j <= phi; j++) {
           IntIntPair s = new IntIntPair(i, j);
           q.add(s);
           // Add to first Rk
-          Vector<IntIntPair> v = new Vector<IntIntPair>();
+          ArrayList<IntIntPair> v = new ArrayList<IntIntPair>();
           v.add(s);
           Rk.add(v);
         }
@@ -119,10 +118,10 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
 
       // build Ri
       for(int i = 2; i <= k; i++) {
-        ArrayList<Vector<IntIntPair>> Rnew = new ArrayList<Vector<IntIntPair>>();
+        ArrayList<ArrayList<IntIntPair>> Rnew = new ArrayList<ArrayList<IntIntPair>>();
 
         for(int j = 0; j < Rk.size(); j++) {
-          Vector<IntIntPair> c = Rk.get(j);
+          ArrayList<IntIntPair> c = Rk.get(j);
           for(IntIntPair pair : q) {
             boolean invalid = false;
             for(int t = 0; t < c.size(); t++) {
@@ -132,7 +131,7 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
               }
             }
             if(!invalid) {
-              Vector<IntIntPair> neu = new Vector<IntIntPair>(c);
+              ArrayList<IntIntPair> neu = new ArrayList<IntIntPair>(c);
               neu.add(pair);
               Rnew.add(neu);
             }
@@ -144,7 +143,7 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
 
     WritableDoubleDataStore sparsity = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     // calculate the sparsity coefficient
-    for(Vector<IntIntPair> sub : Rk) {
+    for(ArrayList<IntIntPair> sub : Rk) {
       DBIDs ids = computeSubspace(sub, ranges);
       final double sparsityC = sparsity(ids.size(), size, k, phi);
 

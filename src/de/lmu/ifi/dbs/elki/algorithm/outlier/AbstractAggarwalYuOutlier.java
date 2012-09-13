@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -127,8 +126,8 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
     }
     // Split into cells
     final double part = size * 1.0 / phi;
-    for(int d = 1; d <= dim; d++) {
-      ArrayList<DoubleDBIDPair> axis = dbAxis.get(d - 1);
+    for(int d = 0; d < dim; d++) {
+      ArrayList<DoubleDBIDPair> axis = dbAxis.get(d);
       Collections.sort(axis);
       ArrayList<DBIDs> dimranges = new ArrayList<DBIDs>(phi + 1);
       dimranges.add(allids);
@@ -174,11 +173,11 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
    * @param ranges List of DBID ranges
    * @return ids
    */
-  protected DBIDs computeSubspace(Vector<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
+  protected DBIDs computeSubspace(ArrayList<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).first - 1).get(subspace.get(0).second));
     // intersect all selected dimensions
     for(int i = 1; i < subspace.size(); i++) {
-      DBIDs current = ranges.get(subspace.get(i).first - 1).get(subspace.get(i).second);
+      DBIDs current = ranges.get(subspace.get(i).first).get(subspace.get(i).second);
       ids.retainAll(current);
       if(ids.size() == 0) {
         break;
