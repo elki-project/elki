@@ -25,7 +25,7 @@
  * </tr>
  * <tr>
  * <th style="border-right: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs StaticDBIDs}</th>
- * <td>{@link de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs ArrayStaticDBIDs}</td>
+ * <td>{@link de.lmu.ifi.dbs.elki.database.ids.IntegerArrayStaticDBIDs ArrayStaticDBIDs}</td>
  * <td>n/a</td>
  * </tr>
  * </table>

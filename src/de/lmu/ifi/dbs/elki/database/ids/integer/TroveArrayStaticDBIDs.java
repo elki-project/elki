@@ -23,16 +23,15 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import gnu.trove.list.TIntList;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 
 /**
  * Class accessing a trove int array.
  * 
  * @author Erich Schubert
  */
-class TroveArrayStaticDBIDs extends TroveArrayDBIDs implements ArrayStaticDBIDs {
+class TroveArrayStaticDBIDs extends TroveArrayDBIDs implements IntegerArrayStaticDBIDs {
   /**
-   * Actual trove store
+   * Actual trove store.
    */
   private final TIntList store;
 

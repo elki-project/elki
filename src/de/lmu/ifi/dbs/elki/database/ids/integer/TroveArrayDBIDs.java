@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.list.TIntList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * @apiviz.has IntegerDBID
  * @apiviz.has TroveIteratorAdapter
  */
-public abstract class TroveArrayDBIDs implements ArrayDBIDs {
+public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
   /**
    * Get the array store.
    * 
@@ -49,7 +48,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
   protected abstract TIntList getStore();
 
   @Override
-  public DBIDArrayMIter iter() {
+  public IntegerDBIDArrayMIter iter() {
     return new DBIDItr(getStore());
   }
 
@@ -99,7 +98,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements DBIDArrayMIter, IntegerDBIDRef {
+  protected static class DBIDItr implements IntegerDBIDArrayMIter {
     /**
      * Current position.
      */

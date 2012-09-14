@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
  * @apiviz.has IntegerDBID
  * @apiviz.has TroveIteratorAdapter
  */
-class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
+class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBIDs {
   /**
    * The actual store.
    */
@@ -77,7 +77,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
   }
 
   @Override
-  public DBIDMIter iter() {
+  public IntegerDBIDMIter iter() {
     return new DBIDItr(store);
   }
 
@@ -162,9 +162,9 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs {
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr extends THashPrimitiveIterator implements DBIDMIter, IntegerDBIDRef {
+  protected static class DBIDItr extends THashPrimitiveIterator implements IntegerDBIDMIter {
     /**
-     * The has we access
+     * The hash we access.
      */
     private TIntHash hash;
 

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  */
 public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   /**
-   * Empty DBID iterator
+   * Empty DBID iterator.
    */
   public static final EmptyDBIDIterator EMPTY_ITERATOR = new EmptyDBIDIterator();
 
@@ -78,7 +78,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   /**
-   * Iterator for empty DBIDs
+   * Iterator for empty DBIDs-
    * 
    * @author Erich Schubert
    */
