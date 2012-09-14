@@ -87,17 +87,17 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
 
       // Get the replacement type informations
       VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(factory, dims.length);
-      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(factory, vtype.dimensionality() - dims.length);
+      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(factory, vtype.getDimensionality() - dims.length);
       final List<V> col1 = new ArrayList<V>(column.size());
       final List<V> col2 = new ArrayList<V>(column.size());
       bundle.appendColumn(type1, col1);
       bundle.appendColumn(type2, col2);
 
       // Build other dimensions array.
-      int[] odims = new int[vtype.dimensionality() - dims.length];
+      int[] odims = new int[vtype.getDimensionality() - dims.length];
       {
         int i = 0;
-        for(int d = 0; d < vtype.dimensionality(); d++) {
+        for(int d = 0; d < vtype.getDimensionality(); d++) {
           boolean found = false;
           for(int j = 0; j < dims.length; j++) {
             if(dims[j] == d) {

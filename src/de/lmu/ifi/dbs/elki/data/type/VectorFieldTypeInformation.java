@@ -161,7 +161,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
    * 
    * @return dimensionality
    */
-  public int dimensionality() {
+  public int getDimensionality() {
     if (mindim != maxdim) {
       throw new UnsupportedOperationException("Requesting dimensionality for a type request without defined dimensionality!");
     }
