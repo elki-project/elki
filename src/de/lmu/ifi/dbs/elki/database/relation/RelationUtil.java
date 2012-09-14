@@ -78,7 +78,7 @@ public final class RelationUtil {
    */
   public static int dimensionality(Relation<? extends FeatureVector<?>> relation) {
     try {
-      return ((VectorFieldTypeInformation<? extends FeatureVector<?>>) relation.getDataTypeInformation()).dimensionality();
+      return ((VectorFieldTypeInformation<? extends FeatureVector<?>>) relation.getDataTypeInformation()).getDimensionality();
     } catch (Exception e) {
       return -1;
     }

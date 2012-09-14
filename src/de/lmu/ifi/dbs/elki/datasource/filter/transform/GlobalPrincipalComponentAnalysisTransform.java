@@ -104,7 +104,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
     if(!(in instanceof VectorFieldTypeInformation)) {
       throw new AbortException("PCA can only applied to fixed dimensionality vectors");
     }
-    dim = ((VectorFieldTypeInformation<?>) in).dimensionality();
+    dim = ((VectorFieldTypeInformation<?>) in).getDimensionality();
     covmat = new CovarianceMatrix(dim);
     return true;
   }
