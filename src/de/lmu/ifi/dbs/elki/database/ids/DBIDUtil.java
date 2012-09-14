@@ -107,7 +107,7 @@ public final class DBIDUtil {
    * @return DBID
    */
   public static DBID deref(DBIDRef ref) {
-    return DBIDFactory.FACTORY.deref(ref.deref());
+    return DBIDFactory.FACTORY.deref(ref);
   }
 
   /**
@@ -141,7 +141,7 @@ public final class DBIDUtil {
   }
 
   /**
-   * Get a serializer for DBIDs
+   * Get a serializer for DBIDs.
    * 
    * @return DBID serializer
    */
@@ -150,7 +150,7 @@ public final class DBIDUtil {
   }
 
   /**
-   * Get a serializer for DBIDs with static size
+   * Get a serializer for DBIDs with static size.
    * 
    * @return DBID serializer
    */
@@ -159,7 +159,7 @@ public final class DBIDUtil {
   }
 
   /**
-   * Generate a single DBID
+   * Generate a single DBID.
    * 
    * @return A single DBID
    */
@@ -353,7 +353,7 @@ public final class DBIDUtil {
   /**
    * Ensure that the given DBIDs are array-indexable.
    * 
-   * @param ids
+   * @param ids IDs
    * @return Array DBIDs.
    */
   public static ArrayDBIDs ensureArray(DBIDs ids) {
@@ -368,8 +368,8 @@ public final class DBIDUtil {
   /**
    * Ensure that the given DBIDs support fast "contains" operations.
    * 
-   * @param ids
-   * @return Array DBIDs.
+   * @param ids IDs
+   * @return Set DBIDs.
    */
   public static SetDBIDs ensureSet(DBIDs ids) {
     if(ids instanceof SetDBIDs) {
@@ -381,10 +381,10 @@ public final class DBIDUtil {
   }
 
   /**
-   * Ensure modifiable
+   * Ensure modifiable.
    * 
-   * @param ids
-   * @return Array DBIDs.
+   * @param ids IDs
+   * @return Modifiable DBIDs.
    */
   public static ModifiableDBIDs ensureModifiable(DBIDs ids) {
     if(ids instanceof ModifiableDBIDs) {
@@ -425,7 +425,7 @@ public final class DBIDUtil {
   }
 
   /**
-   * Produce a random sample of the given DBIDs
+   * Produce a random sample of the given DBIDs.
    * 
    * @param source Original DBIDs
    * @param k k Parameter
@@ -437,7 +437,7 @@ public final class DBIDUtil {
   }
 
   /**
-   * Produce a random sample of the given DBIDs
+   * Produce a random sample of the given DBIDs.
    * 
    * @param source Original DBIDs
    * @param k k Parameter
