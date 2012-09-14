@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.generic;
+package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 /*
  This file is part of ELKI:
@@ -22,43 +22,13 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 
 /**
- * Make an existing DBIDMIter unmodifiable.
+ * Modifiable integer array iterator.
  * 
  * @author Erich Schubert
  */
-class UnmodifiableDBIDIter implements DBIDIter {
-  /**
-   * Wrapped iterator
-   */
-  private DBIDIter it;
-
-  /**
-   * Constructor.
-   * 
-   * @param it inner iterator
-   */
-  public UnmodifiableDBIDIter(DBIDIter it) {
-    super();
-    this.it = it;
-  }
-
-  @Override
-  public boolean valid() {
-    return it.valid();
-  }
-
-  @Override
-  public void advance() {
-    it.advance();
-  }
-
-  @Override
-  public DBIDRef deref() {
-    return it;
-  }
+public interface IntegerDBIDArrayMIter extends IntegerDBIDArrayIter, IntegerDBIDMIter, DBIDArrayMIter {
+  // Empty
 }

@@ -22,16 +22,13 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 
 /**
- * Combination of {@link ArrayStaticDBIDs} and {@link IntegerDBIDs}.
+ * Modifiable integer array iterator.
  * 
  * @author Erich Schubert
- *
  */
-public interface IntegerArrayStaticDBIDs extends ArrayStaticDBIDs, IntegerDBIDs {
-  @Override
-  IntegerDBIDArrayIter iter();
+public interface IntegerDBIDArrayIter extends IntegerDBIDIter, DBIDArrayIter {
+  // Empty
 }

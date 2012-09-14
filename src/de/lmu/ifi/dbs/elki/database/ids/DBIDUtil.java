@@ -27,6 +27,10 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.TroveArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 
 /**
@@ -127,12 +131,12 @@ public final class DBIDUtil {
    * @return String representation
    */
   public static String toString(DBIDs ids) {
-    if(ids instanceof DBID) {
+    if (ids instanceof DBID) {
       return DBIDFactory.FACTORY.toString((DBID) ids);
     }
     StringBuffer buf = new StringBuffer();
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      if(buf.length() > 0) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      if (buf.length() > 0) {
         buf.append(", ");
       }
       buf.append(DBIDFactory.FACTORY.toString(iter));
@@ -262,12 +266,12 @@ public final class DBIDUtil {
    */
   // TODO: optimize?
   public static ModifiableDBIDs intersection(DBIDs first, DBIDs second) {
-    if(first.size() > second.size()) {
+    if (first.size() > second.size()) {
       return intersection(second, first);
     }
     ModifiableDBIDs inter = newHashSet(first.size());
-    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
-      if(second.contains(it)) {
+    for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
+      if (second.contains(it)) {
         inter.add(it);
       }
     }
@@ -285,7 +289,7 @@ public final class DBIDUtil {
    */
   // TODO: optimize?
   public static void symmetricIntersection(DBIDs first, DBIDs second, HashSetModifiableDBIDs firstonly, HashSetModifiableDBIDs intersection, HashSetModifiableDBIDs secondonly) {
-    if(first.size() > second.size()) {
+    if (first.size() > second.size()) {
       symmetricIntersection(second, first, secondonly, intersection, firstonly);
       return;
     }
@@ -294,12 +298,11 @@ public final class DBIDUtil {
     assert (secondonly.size() == 0) : "OUTPUT set should be empty!";
     // Initialize with second
     secondonly.addDBIDs(second);
-    for(DBIDIter it = first.iter(); it.valid(); it.advance()) {
+    for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
       // Try to remove
-      if(secondonly.remove(it)) {
+      if (secondonly.remove(it)) {
         intersection.add(it);
-      }
-      else {
+      } else {
         firstonly.add(it);
       }
     }
@@ -339,15 +342,19 @@ public final class DBIDUtil {
    * @return Unmodifiable collection
    */
   public static StaticDBIDs makeUnmodifiable(DBIDs existing) {
-    if(existing instanceof StaticDBIDs) {
+    if (existing instanceof StaticDBIDs) {
       return (StaticDBIDs) existing;
     }
-    if(existing instanceof ArrayDBIDs) {
+    if (existing instanceof TroveArrayDBIDs) {
+      return new UnmodifiableIntegerArrayDBIDs((TroveArrayDBIDs) existing);
+    }
+    if (existing instanceof IntegerDBIDs) {
+      return new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);
+    }
+    if (existing instanceof ArrayDBIDs) {
       return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
     }
-    else {
-      return new UnmodifiableDBIDs(existing);
-    }
+    return new UnmodifiableDBIDs(existing);
   }
 
   /**
@@ -357,10 +364,9 @@ public final class DBIDUtil {
    * @return Array DBIDs.
    */
   public static ArrayDBIDs ensureArray(DBIDs ids) {
-    if(ids instanceof ArrayDBIDs) {
+    if (ids instanceof ArrayDBIDs) {
       return (ArrayDBIDs) ids;
-    }
-    else {
+    } else {
       return newArray(ids);
     }
   }
@@ -372,10 +378,9 @@ public final class DBIDUtil {
    * @return Set DBIDs.
    */
   public static SetDBIDs ensureSet(DBIDs ids) {
-    if(ids instanceof SetDBIDs) {
+    if (ids instanceof SetDBIDs) {
       return (SetDBIDs) ids;
-    }
-    else {
+    } else {
       return newHashSet(ids);
     }
   }
@@ -387,14 +392,13 @@ public final class DBIDUtil {
    * @return Modifiable DBIDs.
    */
   public static ModifiableDBIDs ensureModifiable(DBIDs ids) {
-    if(ids instanceof ModifiableDBIDs) {
+    if (ids instanceof ModifiableDBIDs) {
       return (ModifiableDBIDs) ids;
-    }
-    else {
-      if(ids instanceof ArrayDBIDs) {
+    } else {
+      if (ids instanceof ArrayDBIDs) {
         return newArray(ids);
       }
-      if(ids instanceof HashSetDBIDs) {
+      if (ids instanceof HashSetDBIDs) {
         return newHashSet(ids);
       }
       return newArray(ids);
@@ -445,37 +449,35 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
-    if(k <= 0 || k > source.size()) {
+    if (k <= 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
     final Random random;
-    if(seed != null) {
+    if (seed != null) {
       random = new Random(seed);
-    }
-    else {
+    } else {
       random = new Random();
     }
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
-    if(k < source.size() / 2) {
+    if (k < source.size() / 2) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
       DBIDArrayIter iter = aids.iter();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
-      while(sample.size() < k) {
+      while (sample.size() < k) {
         iter.seek(random.nextInt(aids.size()));
         sample.add(iter);
       }
       return sample;
-    }
-    else {
+    } else {
       ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
-      while(sample.size() > k) {
+      while (sample.size() > k) {
         // Element to remove
         int idx = random.nextInt(sample.size());
         // Remove last element
         DBID last = sample.remove(sample.size() - 1);
         // Replace target element:
-        if(idx < sample.size()) {
+        if (idx < sample.size()) {
           sample.set(idx, last);
         }
       }

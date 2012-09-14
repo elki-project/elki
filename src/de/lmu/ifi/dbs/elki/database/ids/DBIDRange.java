@@ -38,5 +38,5 @@ public interface DBIDRange extends ArrayStaticDBIDs {
    * @param dbid ID to compute index for
    * @return index
    */
-  public int getOffset(DBIDRef dbid);
+  int getOffset(DBIDRef dbid);
 }

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.generic;
+package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 /*
  This file is part of ELKI:
@@ -23,33 +23,30 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 
 /**
  * Unmodifiable wrapper for DBIDs.
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ArrayDBIDs
- * @apiviz.has UnmodifiableDBIDArrayIter
+ * @apiviz.uses DBIDs
+ * @apiviz.has UnmodifiableDBIDIter
  */
-public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
+public class UnmodifiableIntegerDBIDs implements StaticDBIDs, IntegerDBIDs {
   /**
    * The DBIDs we wrap.
    */
-  private final ArrayDBIDs inner;
+  private final IntegerDBIDs inner;
 
   /**
    * Constructor.
    * 
    * @param inner Inner DBID collection.
    */
-  public UnmodifiableArrayDBIDs(ArrayDBIDs inner) {
+  public UnmodifiableIntegerDBIDs(IntegerDBIDs inner) {
     super();
     this.inner = inner;
   }
@@ -65,10 +62,10 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   }
 
   @Override
-  public DBIDArrayIter iter() {
-    DBIDArrayIter it = inner.iter();
-    if(it instanceof DBIDMIter) {
-      return new UnmodifiableDBIDArrayIter(it);
+  public IntegerDBIDIter iter() {
+    IntegerDBIDIter it = inner.iter();
+    if (it instanceof DBIDMIter) {
+      return new UnmodifiableDBIDIter(it);
     }
     return it;
   }
@@ -83,33 +80,23 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     return inner.toString();
   }
 
-  @Override
-  public DBID get(int i) {
-    return inner.get(i);
-  }
-
-  @Override
-  public int binarySearch(DBIDRef key) {
-    return inner.binarySearch(key);
-  }
-
   /**
    * Make an existing DBIDMIter unmodifiable.
    * 
    * @author Erich Schubert
    */
-  class UnmodifiableDBIDArrayIter implements DBIDArrayIter {
+  class UnmodifiableDBIDIter implements IntegerDBIDIter {
     /**
      * Wrapped iterator.
      */
-    private DBIDArrayIter it;
+    private IntegerDBIDIter it;
 
     /**
      * Constructor.
      * 
      * @param it inner iterator
      */
-    public UnmodifiableDBIDArrayIter(DBIDArrayIter it) {
+    public UnmodifiableDBIDIter(IntegerDBIDIter it) {
       super();
       this.it = it;
     }
@@ -130,23 +117,8 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     }
 
     @Override
-    public void advance(int count) {
-      it.advance(count);
-    }
-
-    @Override
-    public void retract() {
-      it.retract();
-    }
-
-    @Override
-    public void seek(int off) {
-      it.seek(off);
-    }
-
-    @Override
-    public int getOffset() {
-      return it.getOffset();
+    public int getIntegerID() {
+      return it.getIntegerID();
     }
   }
 }

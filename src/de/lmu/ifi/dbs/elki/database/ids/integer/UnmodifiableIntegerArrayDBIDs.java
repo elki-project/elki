@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.generic;
+package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 /*
  This file is part of ELKI:
@@ -23,10 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
@@ -38,18 +35,18 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * @apiviz.uses ArrayDBIDs
  * @apiviz.has UnmodifiableDBIDArrayIter
  */
-public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
+public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   /**
    * The DBIDs we wrap.
    */
-  private final ArrayDBIDs inner;
+  private final TroveArrayDBIDs inner;
 
   /**
    * Constructor.
    * 
    * @param inner Inner DBID collection.
    */
-  public UnmodifiableArrayDBIDs(ArrayDBIDs inner) {
+  public UnmodifiableIntegerArrayDBIDs(TroveArrayDBIDs inner) {
     super();
     this.inner = inner;
   }
@@ -65,9 +62,9 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   }
 
   @Override
-  public DBIDArrayIter iter() {
-    DBIDArrayIter it = inner.iter();
-    if(it instanceof DBIDMIter) {
+  public IntegerDBIDArrayIter iter() {
+    IntegerDBIDArrayIter it = inner.iter();
+    if (it instanceof DBIDMIter) {
       return new UnmodifiableDBIDArrayIter(it);
     }
     return it;
@@ -98,18 +95,18 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
    * 
    * @author Erich Schubert
    */
-  class UnmodifiableDBIDArrayIter implements DBIDArrayIter {
+  class UnmodifiableDBIDArrayIter implements IntegerDBIDArrayIter {
     /**
-     * Wrapped iterator.
+     * Wrapped iterator
      */
-    private DBIDArrayIter it;
+    private IntegerDBIDArrayIter it;
 
     /**
      * Constructor.
      * 
      * @param it inner iterator
      */
-    public UnmodifiableDBIDArrayIter(DBIDArrayIter it) {
+    public UnmodifiableDBIDArrayIter(IntegerDBIDArrayIter it) {
       super();
       this.it = it;
     }
@@ -147,6 +144,11 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     @Override
     public int getOffset() {
       return it.getOffset();
+    }
+
+    @Override
+    public int getIntegerID() {
+      return it.getIntegerID();
     }
   }
 }
