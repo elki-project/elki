@@ -62,7 +62,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
   /**
    * Keeps the values of the real vector.
    */
-  private int[] values;
+  private final int[] values;
 
   /**
    * Private constructor. NOT for public use.

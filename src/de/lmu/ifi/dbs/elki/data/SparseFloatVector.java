@@ -59,12 +59,12 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
   /**
    * Indexes of values.
    */
-  private int[] indexes;
+  private final int[] indexes;
 
   /**
    * Stored values.
    */
-  private float[] values;
+  private final float[] values;
 
   /**
    * The dimensionality of this feature vector.

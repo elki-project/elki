@@ -53,12 +53,12 @@ public class BitVector extends AbstractNumberVector<Bit> {
   /**
    * Storing the bits.
    */
-  private BitSet bits;
+  private final BitSet bits;
 
   /**
    * Dimensionality of this bit vector.
    */
-  private int dimensionality;
+  private final int dimensionality;
 
   /**
    * Provides a new BitVector corresponding to the specified bits and of the
