@@ -229,8 +229,8 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
 
       double sqrDist = 0;
       for(int d = 0; d < mbr1.getDimensionality(); d++) {
-        final double c1 = (mbr1.getMin(d) + mbr1.getMax(d)) / 2;
-        final double c2 = (mbr2.getMin(d) + mbr2.getMax(d)) / 2;
+        final double c1 = .5 * (mbr1.getMin(d) + mbr1.getMax(d));
+        final double c2 = .5 * (mbr2.getMin(d) + mbr2.getMax(d));
         final double manhattanI = c1 - c2;
         sqrDist += manhattanI * manhattanI;
       }

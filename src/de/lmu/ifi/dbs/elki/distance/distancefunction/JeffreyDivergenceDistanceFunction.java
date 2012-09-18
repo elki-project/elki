@@ -58,7 +58,7 @@ public class JeffreyDivergenceDistanceFunction extends AbstractVectorDoubleDista
     for(int i = 0; i < dim1; i++) {
       final double xi = v1.doubleValue(i);
       final double yi = v2.doubleValue(i);
-      final double mi = (xi + yi) / 2;
+      final double mi = .5 * (xi + yi);
       dist += xi * Math.log(xi / mi);
       dist += yi * Math.log(yi / mi);
     }
