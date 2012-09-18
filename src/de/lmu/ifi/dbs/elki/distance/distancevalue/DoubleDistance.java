@@ -133,7 +133,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException {
-    setValue(in.readDouble());
+    this.value = in.readDouble();
   }
 
   /**
@@ -149,12 +149,12 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
 
   @Override
   public Double getValue() {
-    return this.value;
+    return (Double) this.value;
   }
 
   @Override
   void setValue(Double value) {
-    this.value = value;
+    this.value = (double) value;
   }
 
   @Override

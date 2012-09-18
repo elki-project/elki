@@ -202,7 +202,7 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
    */
   @Override
   public int externalizableSize() {
-    return super.externalizableSize() + 4 + dimensionality * 4;
+    return super.externalizableSize() + 4 + dimensionality << 2;
   }
 
   @Override
