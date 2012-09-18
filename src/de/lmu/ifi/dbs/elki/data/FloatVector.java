@@ -65,7 +65,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
   /**
    * Keeps the values of the float vector.
    */
-  private float[] values;
+  private final float[] values;
 
   /**
    * Private constructor. NOT for public use.

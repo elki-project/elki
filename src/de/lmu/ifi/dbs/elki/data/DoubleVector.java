@@ -69,7 +69,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
   /**
    * Stores the values of the real vector.
    */
-  private double[] values;
+  private final double[] values;
 
   /**
    * Private constructor. NOT for public use.

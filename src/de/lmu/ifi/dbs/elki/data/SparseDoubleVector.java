@@ -57,12 +57,12 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
   /**
    * Indexes of values.
    */
-  private int[] indexes;
+  private final int[] indexes;
 
   /**
    * Stored values.
    */
-  private double[] values;
+  private final double[] values;
 
   /**
    * The dimensionality of this feature vector.
