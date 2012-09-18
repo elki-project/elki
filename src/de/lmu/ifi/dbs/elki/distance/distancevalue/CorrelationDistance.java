@@ -124,7 +124,7 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
     int result;
     long temp;
     result = correlationValue;
-    temp = euclideanValue != +0.0d ? Double.doubleToLongBits(euclideanValue) : 0l;
+    temp = euclideanValue != +0.0d ? Double.doubleToLongBits(euclideanValue) : 0L;
     result = 29 * result + (int) (temp ^ (temp >>> 32));
     return result;
   }

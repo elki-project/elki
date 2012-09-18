@@ -197,7 +197,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public boolean isNullDistance() {
-    return (value == false);
+    return !value;
   }
 
   @Override
