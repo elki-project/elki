@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -121,7 +122,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
 
     int matrixsize = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      int intid = DBIDFactory.FACTORY.asInteger(iditer);
+      int intid = DBIDUtil.asInteger(iditer);
       matrixsize = Math.max(matrixsize, intid + 1);
       if(intid < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
@@ -138,7 +139,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
 
     for(DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
       for(DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
-        if(DBIDFactory.FACTORY.asInteger(id2) >= DBIDFactory.FACTORY.asInteger(id1)) {
+        if(DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
           double d = distanceQuery.distance(id1, id2).doubleValue();
           if(debugExtraCheckSymmetry) {
             double d2 = distanceQuery.distance(id2, id1).doubleValue();
@@ -147,7 +148,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
             }
           }
           try {
-            matrix.getRecordBuffer(DBIDFactory.FACTORY.asInteger(id1), DBIDFactory.FACTORY.asInteger(id2)).putDouble(d);
+            matrix.getRecordBuffer(DBIDUtil.asInteger(id1), DBIDUtil.asInteger(id2)).putDouble(d);
           }
           catch(IOException e) {
             throw new AbortException("Error writing distance record " + DBIDFactory.FACTORY.toString(id1) + "," + DBIDFactory.FACTORY.toString(id2) + " to matrix.", e);

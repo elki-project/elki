@@ -29,8 +29,8 @@ import java.io.IOException;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -126,7 +126,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
 
     int matrixsize = 0;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final int intid = DBIDFactory.FACTORY.asInteger(iditer);
+      final int intid = DBIDUtil.asInteger(iditer);
       matrixsize = Math.max(matrixsize, intid + 1);
       if(intid < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
@@ -143,7 +143,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
 
     for(DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
       for(DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
-        if(DBIDFactory.FACTORY.asInteger(id2) >= DBIDFactory.FACTORY.asInteger(id1)) {
+        if(DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
           float d = distanceQuery.distance(id1, id2).floatValue();
           if(debugExtraCheckSymmetry) {
             float d2 = distanceQuery.distance(id2, id1).floatValue();
@@ -152,7 +152,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
             }
           }
           try {
-            matrix.getRecordBuffer(DBIDFactory.FACTORY.asInteger(id1), DBIDFactory.FACTORY.asInteger(id2)).putFloat(d);
+            matrix.getRecordBuffer(DBIDUtil.asInteger(id1), DBIDUtil.asInteger(id2)).putFloat(d);
           }
           catch(IOException e) {
             throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);
