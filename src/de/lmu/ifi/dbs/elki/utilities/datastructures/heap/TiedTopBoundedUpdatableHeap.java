@@ -42,11 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.MergedIterator;
  */
 public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * List to keep ties in.
    */
   private List<E> ties = new ArrayList<E>();
@@ -81,11 +76,6 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
     ties.clear();
   }
 
-  @Override
-  public boolean contains(Object o) {
-    return ties.contains(o) || super.contains(o);
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Iterator<E> iterator() {
@@ -93,7 +83,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
   }
 
   @Override
-  public boolean offerAt(int pos, E e) {
+  public void offerAt(int pos, E e) {
     if(pos == IN_TIES) {
       for(Iterator<E> i = ties.iterator(); i.hasNext();) {
         E e2 = i.next();
@@ -102,8 +92,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
             i.remove();
             index.remove(e2);
           }
-          // while we did not change, this still was "successful".
-          return true;
+          return;
         }
       }
       throw new AbortException("Heap corrupt - should not be reached");
@@ -117,9 +106,9 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
       final E e2 = ties.remove(ties.size() - 1);
       // index.remove(e2);
       super.offerAt(NO_VALUE, e2);
-      return true;
+      return;
     }
-    return super.offerAt(pos, e);
+    super.offerAt(pos, e);
   }
 
   @Override

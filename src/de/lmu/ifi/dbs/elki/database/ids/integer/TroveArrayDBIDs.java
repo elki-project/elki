@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.list.TIntList;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -69,12 +69,12 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
 
   @Override
   public boolean contains(DBIDRef o) {
-    return getStore().contains(DBIDFactory.FACTORY.asInteger(o));
+    return getStore().contains(DBIDUtil.asInteger(o));
   }
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return getStore().binarySearch(DBIDFactory.FACTORY.asInteger(key));
+    return getStore().binarySearch(DBIDUtil.asInteger(key));
   }
 
   @Override
@@ -85,7 +85,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
       if(buf.length() > 1) {
         buf.append(", ");
       }
-      buf.append(((IntegerDBIDRef) iter).getIntegerID());
+      buf.append(((IntegerDBIDRef) iter).internalGetIndex());
     }
     buf.append("]");
     return buf.toString();
@@ -150,13 +150,8 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
     }
 
     @Override
-    public int getIntegerID() {
+    public int internalGetIndex() {
       return store.get(pos);
-    }
-
-    @Override
-    public DBID deref() {
-      return new IntegerDBID(store.get(pos));
     }
 
     @Override
@@ -181,7 +176,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
 
     @Override
     public String toString() {
-      return Integer.toString(getIntegerID());
+      return Integer.toString(internalGetIndex());
     }
   }
 }

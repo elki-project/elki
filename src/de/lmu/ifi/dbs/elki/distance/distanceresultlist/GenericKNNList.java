@@ -108,13 +108,13 @@ class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
     StringBuffer buf = new StringBuffer();
     buf.append("kNNList[");
     for(DistanceDBIDResultIter<D> iter = this.iter(); iter.valid();) {
-      buf.append(iter.getDistance()).append(":").append(DBIDUtil.toString(iter));
+      buf.append(iter.getDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
       if(iter.valid()) {
-        buf.append(",");
+        buf.append(',');
       }
     }
-    buf.append("]");
+    buf.append(']');
     return buf.toString();
   }
 
@@ -150,7 +150,7 @@ class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
   }
 
   /**
-   * Iterator
+   * Iterator.
    * 
    * @author Erich Schubert
    * 
@@ -158,13 +158,13 @@ class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
    */
   private class Itr implements DistanceDBIDResultIter<D> {
     /**
-     * Cursor position
+     * Cursor position.
      */
     private int pos = 0;
 
     @Override
-    public DBIDRef deref() {
-      return get(pos);
+    public int internalGetIndex() {
+      return get(pos).internalGetIndex();
     }
 
     @Override

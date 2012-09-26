@@ -577,15 +577,13 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      */
     private void updateOUT(int i) {
       if(out.size() < n) {
-        out.offer(pf[i]);
+        out.add(pf[i]);
       }
       else {
         HilFeature head = out.peek();
         if(pf[i].ubound > head.ubound) {
           // replace smallest
-          out.poll();
-          // assert (out.peek().ubound >= head.ubound);
-          out.offer(pf[i]);
+          out.replaceTopElement(pf[i]);
         }
       }
     }
@@ -597,15 +595,13 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      */
     private void updateWLB(int i) {
       if(wlb.size() < n) {
-        wlb.offer(pf[i]);
+        wlb.add(pf[i]);
       }
       else {
         HilFeature head = wlb.peek();
         if(pf[i].lbound > head.lbound) {
           // replace smallest
-          wlb.poll();
-          // assert (wlb.peek().lbound >= head.lbound);
-          wlb.offer(pf[i]);
+          wlb.replaceTopElement(pf[i]);
         }
       }
     }
@@ -867,7 +863,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       // assert (!nn_keys.contains(id));
       if(nn.size() < k) {
         DoubleDistanceDBIDPair entry = DBIDFactory.FACTORY.newDistancePair(dt, id);
-        nn.offer(entry);
+        nn.add(entry);
         nn_keys.add(id);
         sum_nn += dt;
       }
@@ -881,7 +877,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
           // assert (nn.peek().doubleDistance() <= head.doubleDistance());
 
           DoubleDistanceDBIDPair entry = DBIDFactory.FACTORY.newDistancePair(dt, id);
-          nn.offer(entry);
+          nn.add(entry);
           nn_keys.add(id);
           sum_nn += dt;
         }

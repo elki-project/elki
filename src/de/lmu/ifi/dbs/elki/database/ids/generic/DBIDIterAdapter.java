@@ -35,12 +35,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
  */
 public class DBIDIterAdapter implements DBIDMIter {
   /**
-   * Current DBID
+   * Current DBID.
    */
   DBID cur = null;
 
   /**
-   * The real iterator
+   * The real iterator.
    */
   Iterator<DBID> iter;
 
@@ -71,8 +71,8 @@ public class DBIDIterAdapter implements DBIDMIter {
   }
 
   @Override
-  public DBID deref() {
-    return cur;
+  public int internalGetIndex() {
+    return cur.internalGetIndex();
   }
 
   @Override

@@ -79,7 +79,7 @@ public final class DBIDUtil {
    * @return integer value
    */
   public static int asInteger(DBIDRef id) {
-    return DBIDFactory.FACTORY.asInteger(id);
+    return id.internalGetIndex();
   }
 
   /**
@@ -111,7 +111,10 @@ public final class DBIDUtil {
    * @return DBID
    */
   public static DBID deref(DBIDRef ref) {
-    return DBIDFactory.FACTORY.deref(ref);
+    if (ref instanceof DBID) {
+      return (DBID) ref;
+    }
+    return importInteger(ref.internalGetIndex());
   }
 
   /**

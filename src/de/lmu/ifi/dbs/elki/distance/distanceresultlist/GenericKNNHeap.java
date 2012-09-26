@@ -41,13 +41,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  */
 class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBIDPair<D>, D> {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
-   * )
+   * each time).
    */
   protected D knndistance = null;
 
@@ -74,11 +69,33 @@ class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBID
 
   @Override
   public void add(D distance, DBIDRef id) {
-    if(size() < maxsize || knndistance.compareTo(distance) >= 0) {
-      super.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
-      if(size() >= maxsize) {
-        knndistance = peek().getDistance();
-      }
+    if (size() < getK()) {
+      heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
+      heapModified();
+      return;
+    }
+    // size >= maxsize. Insert only when necessary.
+    if (knndistance.compareTo(distance) >= 0) {
+      // Replace worst element.
+      heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
+      heapModified();
+    }
+  }
+
+  @Override
+  public void add(DistanceDBIDPair<D> pair) {
+    if (knndistance.compareTo(pair.getDistance()) >= 0) {
+    heap.add(pair);
+    heapModified();
+    }
+  }
+
+  // @Override
+  protected void heapModified() {
+    // super.heapModified();
+    // Update threshold.
+    if (size() >= getK()) {
+      knndistance = heap.peek().getDistance();
     }
   }
 

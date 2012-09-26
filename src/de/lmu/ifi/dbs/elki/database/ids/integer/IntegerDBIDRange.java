@@ -28,9 +28,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 
 /**
- * Representing a DBID range allocation
+ * Representing a DBID range allocation.
  * 
  * @author Erich Schubert
  * 
@@ -38,12 +39,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 class IntegerDBIDRange implements DBIDRange {
   /**
-   * Start value
+   * Start value.
    */
   protected final int start;
 
   /**
-   * Length value
+   * Length value.
    */
   protected final int len;
 
@@ -71,7 +72,7 @@ class IntegerDBIDRange implements DBIDRange {
 
   @Override
   public DBIDArrayIter iter() {
-    return new DBIDItr();
+    return new DBIDItr(start, len);
   }
 
   /**
@@ -81,8 +82,33 @@ class IntegerDBIDRange implements DBIDRange {
    * 
    * @apiviz.exclude
    */
-  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
+  protected static class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
+    /**
+     * Current position.
+     */
     int pos = 0;
+    
+    /**
+     * Interval length.
+     */
+    final int len;
+
+    /**
+     * Interval start.
+     */
+    final int start;
+    
+    /**
+     * Constructor.
+     *
+     * @param start Interval start
+     * @param len Interval length
+     */
+    DBIDItr(int start, int len) {
+      super();
+      this.start = start;
+      this.len = len;
+    }
 
     @Override
     public boolean valid() {
@@ -115,13 +141,8 @@ class IntegerDBIDRange implements DBIDRange {
     }
 
     @Override
-    public int getIntegerID() {
+    public int internalGetIndex() {
       return start + pos;
-    }
-
-    @Override
-    public DBID deref() {
-      return new IntegerDBID(start + pos);
     }
 
     @Override
@@ -131,13 +152,13 @@ class IntegerDBIDRange implements DBIDRange {
 
     @Override
     public String toString() {
-      return Integer.toString(getIntegerID());
+      return Integer.toString(internalGetIndex());
     }
   }
 
   @Override
   public boolean contains(DBIDRef o) {
-    int oid = DBIDFactory.FACTORY.asInteger(o);
+    int oid = DBIDUtil.asInteger(o);
     if(oid < start) {
       return false;
     }
@@ -158,17 +179,17 @@ class IntegerDBIDRange implements DBIDRange {
   /**
    * For storage array offsets.
    * 
-   * @param dbid
+   * @param dbid ID reference
    * @return array offset
    */
   @Override
   public int getOffset(DBIDRef dbid) {
-    return DBIDFactory.FACTORY.asInteger(dbid) - start;
+    return dbid.internalGetIndex() - start;
   }
 
   @Override
   public int binarySearch(DBIDRef key) {
-    int keyid = DBIDFactory.FACTORY.asInteger(key);
+    int keyid = DBIDUtil.asInteger(key);
     if(keyid < start) {
       return -1;
     }
@@ -182,5 +203,10 @@ class IntegerDBIDRange implements DBIDRange {
   @Override
   public String toString() {
     return "[" + start + " to " + (start + len - 1) + "]";
+  }
+
+  @Override
+  public int mapDBIDToOffset(DBIDRef dbid) {
+    return dbid.internalGetIndex() - start;
   }
 }

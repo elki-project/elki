@@ -130,7 +130,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     final int dbsize = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
-    Collection<Individuum> individuums = (new EvolutionarySearch(relation, ranges, m, seed)).run();
+    Iterable<Individuum> individuums = (new EvolutionarySearch(relation, ranges, m, seed)).run();
 
     WritableDoubleDataStore outlierScore = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     for(Individuum ind : individuums) {
@@ -218,11 +218,13 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       }
     }
 
-    public Collection<Individuum> run() {
+    public Iterable<Individuum> run() {
       ArrayList<Individuum> pop = initialPopulation(m);
       // best Population
       TopBoundedHeap<Individuum> bestSol = new TopBoundedHeap<Individuum>(m, Collections.reverseOrder());
-      bestSol.addAll(pop);
+      for (Individuum ind : pop) {
+        bestSol.add(ind);
+      }
 
       int iterations = 0;
       while(!checkConvergence(pop)) {
@@ -233,10 +235,13 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
         // Mutation with probability 0.25 , 0.25
         pop = mutation(pop, 0.5, 0.5);
         // Avoid duplicates
-        for(Individuum ind : pop) {
-          if(!bestSol.contains(ind)) {
-            bestSol.add(ind);
+        ind: for(Individuum ind : pop) {
+          for (Individuum b : bestSol) {
+            if (b.equals(ind)) {
+              continue ind;
+            }
           }
+          bestSol.add(ind);
         }
         if(LOG.isDebuggingFinest()) {
           StringBuffer buf = new StringBuffer();

@@ -38,34 +38,62 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
  * @param <P> pair type
  * @param <D> distance type
  */
-abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> extends TiedTopBoundedHeap<P> implements KNNHeap<D> {
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-  
+abstract public class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> implements KNNHeap<D> {
   /**
    * Static comparator.
    */
-  private static final Comparator<? super DistanceDBIDPair<?>> COMPARATOR = new Comp();
+  public static final Comparator<? super DistanceDBIDPair<?>> COMPARATOR = new Comp();
+  
+  /**
+   * The actual heap.
+   */
+  protected final TiedTopBoundedHeap<P> heap;
 
   /**
    * Constructor.
    * 
-   * @param k k Parameter
+   * @param k Maximum heap size (unless tied)
    */
   public AbstractKNNHeap(int k) {
-    super(k, COMPARATOR);
+    super();
+    heap = new TiedTopBoundedHeap<P>(k, COMPARATOR);
   }
 
   /**
-   * Get the K parameter ("maxsize" internally).
+   * Add a pair to the heap.
    * 
-   * @return K
+   * @param pair Pair to add.
    */
+  public abstract void add(P pair);
+
   @Override
-  public int getK() {
-    return super.getMaxSize();
+  public final int getK() {
+    return heap.getMaxSize();
+  }
+
+  @Override
+  public int size() {
+    return heap.size();
+  }
+  
+  @Override
+  public P peek() {
+    return heap.peek();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return heap.isEmpty();
+  }
+
+  @Override
+  public void clear() {
+    heap.clear();
+  }
+
+  @Override
+  public P poll() {
+    return heap.poll();
   }
 
   /**

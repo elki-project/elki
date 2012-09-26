@@ -77,7 +77,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   @Deprecated
   public Integer get(DBIDRef id) {
     try {
-      return data[idmap.map(id)];
+      return data[idmap.mapDBIDToOffset(id)];
     }
     catch(ArrayIndexOutOfBoundsException e) {
       return null;
@@ -87,7 +87,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   @Override
   @Deprecated
   public Integer put(DBIDRef id, Integer value) {
-    final int off = idmap.map(id);
+    final int off = idmap.mapDBIDToOffset(id);
     int ret = data[off];
     data[off] = value;
     return ret;
@@ -95,12 +95,12 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   
   @Override
   public int intValue(DBIDRef id) {
-    return data[idmap.map(id)];
+    return data[idmap.mapDBIDToOffset(id)];
   }
 
   @Override
   public int putInt(DBIDRef id, int value) {
-    final int off = idmap.map(id);
+    final int off = idmap.mapDBIDToOffset(id);
     final int ret = data[off];
     data[off] = value;
     return ret;
@@ -108,7 +108,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
 
   @Override
   public int put(DBIDRef id, int value) {
-    final int off = idmap.map(id);
+    final int off = idmap.mapDBIDToOffset(id);
     final int ret = data[off];
     data[off] = value;
     return ret;

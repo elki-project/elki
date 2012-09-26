@@ -23,13 +23,17 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.AbstractKNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 
 /**
  * Optimized linear scan query for {@link PrimitiveDoubleDistanceFunction}s.
@@ -48,37 +52,48 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
 
   /**
    * Constructor.
-   *
+   * 
    * @param distanceQuery Distance function to use
    */
   @SuppressWarnings("unchecked")
   public LinearScanRawDoubleDistanceKNNQuery(PrimitiveDistanceQuery<O, DoubleDistance> distanceQuery) {
     super(distanceQuery);
-    if(!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
+    if (!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
       throw new UnsupportedOperationException("LinearScanRawDoubleDistance instantiated for non-RawDoubleDistance!");
     }
     rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
   }
 
   @Override
-  public DoubleDistanceKNNList getKNNForDBID(DBIDRef id, int k) {
+  public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  public DoubleDistanceKNNList getKNNForObject(O obj, int k) {
+  public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
     // Optimization for double distances.
-    final DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
-    // Checking max here has a surprisingly large effect on performance
-    // Probably due to inlining by the Hotspot VM.
+    // We do NOT use the KNNHeap here. Benchmarking showed this to be faster!
+    // Repeat: DO NOT CHANGE TO USE KNNHEAP WITHOUT BENCHMARKING.
+    final TiedTopBoundedHeap<DoubleDistanceDBIDPair> heap = new TiedTopBoundedHeap<DoubleDistanceDBIDPair>(k, AbstractKNNHeap.COMPARATOR);
     double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
-      if (doubleDistance <= max) {
-        heap.add(doubleDistance, iter);
-        max = heap.doubleKNNDistance();
+      final int size = heap.size();
+      if (size < k) {
+        heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
+        // Update cutoff
+        if (size + 1 >= k) {
+          max = heap.peek().doubleDistance();
+        }
+      } else if (doubleDistance == max) {
+        heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
+      } else if (doubleDistance > max) { // == was handled before!
+        heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
+        max = heap.peek().doubleDistance();
+      } else {
+        continue; // Do not update max!
       }
     }
-    return heap.toKNNList();
+    return new DoubleDistanceKNNList(heap, k);
   }
 }

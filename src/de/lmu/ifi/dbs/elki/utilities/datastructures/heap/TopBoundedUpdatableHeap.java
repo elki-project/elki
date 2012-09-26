@@ -36,12 +36,7 @@ import java.util.Comparator;
  */
 public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * Maximum size
+   * Maximum size.
    */
   protected int maxsize;
 
@@ -67,22 +62,19 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
   }
 
   @Override
-  public boolean offerAt(int pos, E e) {
+  public void offerAt(int pos, E e) {
     // don't add if we hit maxsize and are worse
-    if(pos == NO_VALUE && super.size() >= maxsize) {
-      ensureValid();
-      if(compare(e, queue[0]) < 0) {
-        // while we did not change, this still was "successful".
-        return true;
-      }
-      // pos = index.get(e); // Should not be needed.
+    if (pos != NO_VALUE || super.size() < maxsize) {
+      super.offerAt(pos, e);
+      return;
     }
-    boolean result = super.offerAt(pos, e);
-    // purge unneeded entry(s)
-    while(super.size() > maxsize) {
-      handleOverflow(super.poll());
+    ensureValid();
+    if (compare(e, queue[0]) < 0) {
+      // while we did not change, this still was "successful".
+      return;
     }
-    return result;
+    E prev = super.replaceTopElement(e);
+    handleOverflow(prev);
   }
 
   /**
@@ -93,12 +85,11 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
    * @return True when an update is needed
    */
   protected int compare(Object e, Object object) {
-    if(comparator == null) {
+    if (comparator == null) {
       @SuppressWarnings("unchecked")
       Comparable<Object> c = (Comparable<Object>) e;
       return c.compareTo(queue[0]);
-    }
-    else {
+    } else {
       return comparator.compare(e, queue[0]);
     }
   }
@@ -114,6 +105,8 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
   }
 
   /**
+   * Get the maximum size.
+   * 
    * @return the maximum size
    */
   public int getMaxSize() {

@@ -94,13 +94,13 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
+    public int internalGetIndex() {
       throw new NoSuchElementException();
     }
 
     @Override
     public boolean equals(Object other) {
-      if(other instanceof DBID) {
+      if (other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);

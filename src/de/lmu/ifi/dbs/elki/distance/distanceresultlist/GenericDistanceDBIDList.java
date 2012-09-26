@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  */
 public class GenericDistanceDBIDList<D extends Distance<D>> implements ModifiableDistanceDBIDResult<D> {
   /**
-   * Actual storage
+   * Actual storage.
    */
   final ArrayList<DistanceDBIDPair<D>> storage;
 
@@ -126,13 +126,13 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
    */
   protected class Iter implements DistanceDBIDResultIter<D> {
     /**
-     * Iterator position
+     * Iterator position.
      */
     int pos = 0;
 
     @Override
-    public DBIDRef deref() {
-      return get(pos);
+    public int internalGetIndex() {
+      return get(pos).internalGetIndex();
     }
 
     @Override

@@ -257,7 +257,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       // umsetzen von Pq zu list
       ModifiableDBIDs neighbors = DBIDUtil.newArray(nn.size());
       while(!nn.isEmpty()) {
-        neighbors.add(nn.remove());
+        neighbors.add(nn.poll());
       }
       // getFilter
       double var = getAbofFilter(kernelMatrix, aKey, dists, counter[1], counter[0], neighbors);
@@ -271,7 +271,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
         break;
       }
       // double approx = pq.peek().getFirst();
-      DBIDRef aKey = pq.remove();
+      DBIDRef aKey = pq.poll();
       s.reset();
       for(DBIDIter bKey = relation.iterDBIDs(); bKey.valid(); bKey.advance()) {
         if(DBIDUtil.equal(bKey, aKey)) {
@@ -296,8 +296,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       }
       else {
         if(resqueue.peek().doubleValue() > var) {
-          resqueue.remove();
-          resqueue.add(DBIDUtil.newPair(var, aKey));
+          resqueue.replaceTopElement(DBIDUtil.newPair(var, aKey));
         }
       }
 
@@ -416,8 +415,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       }
       else {
         if(val < nn.peek().doubleValue()) {
-          nn.remove();
-          nn.add(DBIDUtil.newPair(val, bKey));
+          nn.replaceTopElement(DBIDUtil.newPair(val, bKey));
         }
       }
     }
@@ -483,9 +481,9 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       pq.add(DBIDUtil.newPair(s.getSampleVariance(), objKey));
       //
       ModifiableDBIDs expList = DBIDUtil.newArray();
-      expList.add(explain.remove());
+      expList.add(explain.poll());
       while(!explain.isEmpty()) {
-        DBIDRef nextKey = explain.remove();
+        DBIDRef nextKey = explain.poll();
         if(DBIDUtil.equal(nextKey, objKey)) {
           continue;
         }
@@ -512,7 +510,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
         break;
       }
       double factor = pq.peek().doubleValue();
-      DBIDRef key = pq.remove();
+      DBIDRef key = pq.poll();
       buf.append(data.get(key)).append(" ");
       buf.append(count).append(" Factor=").append(factor).append(" ").append(key).append("\n");
       DBIDs expList = explaintab.get(key);

@@ -46,7 +46,7 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs
    * @return hash code
    */
   @Override
-  public int hashCode();
+  int hashCode();
 
   /**
    * In contrast to {@link DBIDRef}, the DBID interface is supposed to have a
@@ -54,23 +54,12 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs
    * 
    * Yet, {@link DBIDUtil#equal} is more type safe and explicit.
    * 
+   * @param obj Other object
    * @return true when the object is the same DBID.
    */
   @Override
-  public boolean equals(Object obj);
-
-  /**
-   * Part of the DBIDRef API, this <em>must</em> return {@code this} for an
-   * actual DBID.
-   * 
-   * @return {@code this}
-   * @deprecated When the object is known to be a DBID, the usage of this method
-   *             is pointless, therefore it is marked as deprecated to cause a
-   *             warning.
-   */
   @Deprecated
-  @Override
-  public DBID deref();
+  boolean equals(Object obj);
 
   /**
    * Compare two DBIDs for ordering.
@@ -81,5 +70,5 @@ public interface DBID extends DBIDRef, Comparable<DBIDRef>, ArrayDBIDs, SetDBIDs
    * @return Comparison result
    */
   @Override
-  public int compareTo(DBIDRef other);
+  int compareTo(DBIDRef other);
 }

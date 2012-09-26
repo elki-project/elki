@@ -75,7 +75,7 @@ public class ArrayRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
     try {
-      return (T) data[idmap.map(id)][index];
+      return (T) data[idmap.mapDBIDToOffset(id)][index];
     }
     catch(ArrayIndexOutOfBoundsException e) {
       return null;
@@ -98,8 +98,8 @@ public class ArrayRecordStore implements WritableRecordStore {
    */
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
-    T ret = (T) data[idmap.map(id)][index];
-    data[idmap.map(id)][index] = value;
+    T ret = (T) data[idmap.mapDBIDToOffset(id)][index];
+    data[idmap.mapDBIDToOffset(id)][index] = value;
     return ret;
   }
 

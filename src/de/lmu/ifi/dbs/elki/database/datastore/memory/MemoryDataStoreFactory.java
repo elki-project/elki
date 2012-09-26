@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
  */
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.RangeIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
@@ -60,7 +59,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
       Object[] data = new Object[range.size()];
-      return new ArrayStore<T>(data, new RangeIDMap(range));
+      return new ArrayStore<T>(data, range);
     }
     else {
       return new MapIntegerDBIDStore<T>(ids.size());
@@ -71,7 +70,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
-      return new ArrayDoubleStore(range.size(), new RangeIDMap(range));
+      return new ArrayDoubleStore(range.size(), range);
     }
     else {
       return new MapIntegerDBIDDoubleStore(ids.size());
@@ -82,7 +81,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def) {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
-      return new ArrayDoubleStore(range.size(), new RangeIDMap(range), def);
+      return new ArrayDoubleStore(range.size(), range, def);
     }
     else {
       return new MapIntegerDBIDDoubleStore(ids.size(), def);
@@ -93,7 +92,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints) {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
-      return new ArrayIntegerStore(range.size(), new RangeIDMap(range));
+      return new ArrayIntegerStore(range.size(), range);
     }
     else {
       return new MapIntegerDBIDIntegerStore(ids.size());
@@ -104,7 +103,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   public WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def) {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
-      return new ArrayIntegerStore(range.size(), new RangeIDMap(range), def);
+      return new ArrayIntegerStore(range.size(), range, def);
     }
     else {
       return new MapIntegerDBIDIntegerStore(ids.size(), def);
@@ -116,7 +115,7 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
       Object[][] data = new Object[range.size()][dataclasses.length];
-      return new ArrayRecordStore(data, new RangeIDMap(range));
+      return new ArrayRecordStore(data, range);
     }
     else {
       return new MapIntegerDBIDRecordStore(ids.size(), dataclasses.length);

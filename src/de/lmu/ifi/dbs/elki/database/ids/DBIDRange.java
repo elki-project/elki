@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,7 +30,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * 
  * @author Erich Schubert
  */
-public interface DBIDRange extends ArrayStaticDBIDs {
+public interface DBIDRange extends ArrayStaticDBIDs, DataStoreIDMap {
   /**
    * Get offset in the array for a particular DBID.
    * 
