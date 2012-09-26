@@ -28,6 +28,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -102,13 +103,8 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
     }
 
     @Override
-    public int getIntegerID() {
+    public int internalGetIndex() {
       return ids[pos];
-    }
-
-    @Override
-    public DBID deref() {
-      return new IntegerDBID(ids[pos]);
     }
 
     @Override
@@ -121,7 +117,7 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
 
     @Override
     public String toString() {
-      return Integer.toString(getIntegerID());
+      return Integer.toString(internalGetIndex());
     }
   }
 
@@ -137,7 +133,7 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
 
   @Override
   public boolean contains(DBIDRef o) {
-    final int oid = DBIDFactory.FACTORY.asInteger(o);
+    final int oid = DBIDUtil.asInteger(o);
     for(int i = 0; i < ids.length; i++) {
       if(ids[i] == oid) {
         return true;
@@ -153,6 +149,6 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return Arrays.binarySearch(ids, DBIDFactory.FACTORY.asInteger(key));
+    return Arrays.binarySearch(ids, DBIDUtil.asInteger(key));
   }
 }

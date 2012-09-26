@@ -288,10 +288,13 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       if(dprog != null) {
         dprog.setProcessed(d, LOG);
       }
-      subspaceList.addAll(dDimensionalList);
       // result now contains all d-dimensional sets of subspaces
 
-      ArrayList<HiCSSubspace> candidateList = new ArrayList<HiCSSubspace>(dDimensionalList);
+      ArrayList<HiCSSubspace> candidateList = new ArrayList<HiCSSubspace>(dDimensionalList.size());
+      for (HiCSSubspace sub : dDimensionalList) {
+        subspaceList.add(sub);
+        candidateList.add(sub);
+      }
       dDimensionalList.clear();
       // candidateList now contains the *m* best d-dimensional sets
       Collections.sort(candidateList, HiCSSubspace.SORT_BY_SUBSPACE);

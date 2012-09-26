@@ -30,9 +30,9 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
@@ -83,7 +83,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      success |= store.add(DBIDFactory.FACTORY.asInteger(iter));
+      success |= store.add(DBIDUtil.asInteger(iter));
     }
     return success;
   }
@@ -92,24 +92,24 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      success |= store.remove(DBIDFactory.FACTORY.asInteger(id));
+      success |= store.remove(DBIDUtil.asInteger(id));
     }
     return success;
   }
 
   @Override
   public boolean add(DBIDRef e) {
-    return store.add(DBIDFactory.FACTORY.asInteger(e));
+    return store.add(DBIDUtil.asInteger(e));
   }
 
   @Override
   public boolean remove(DBIDRef o) {
-    return store.remove(DBIDFactory.FACTORY.asInteger(o));
+    return store.remove(DBIDUtil.asInteger(o));
   }
 
   @Override
   public DBID set(int index, DBID element) {
-    int prev = store.set(index, DBIDFactory.FACTORY.asInteger(element));
+    int prev = store.set(index, DBIDUtil.asInteger(element));
     return new IntegerDBID(prev);
   }
 
@@ -140,7 +140,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
     Arrays.sort(data, comparator);
     // Copy back
     for(int i = 0; i < store.size(); i++) {
-      store.set(i, DBIDFactory.FACTORY.asInteger(data[i]));
+      store.set(i, DBIDUtil.asInteger(data[i]));
     }
   }
 

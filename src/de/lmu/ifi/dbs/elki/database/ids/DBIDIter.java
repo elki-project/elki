@@ -58,16 +58,5 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * @apiviz.landmark
  */
 public interface DBIDIter extends DBIDRef, Iter {
-  /**
-   * Get the referenced {@link DBID}.
-   * 
-   * Efficiency note: this may require materialization of a DBID object - if
-   * possible, use DBIDRef based APIs instead.
-   *
-   * USe {@link DBIDUtil#deref} instead!
-   * 
-   * @return referenced DBID
-   */
-  @Override
-  DBIDRef deref();
+  // Empty - use as DBIDRef or Iter
 }

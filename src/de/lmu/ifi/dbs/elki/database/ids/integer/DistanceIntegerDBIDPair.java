@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -36,12 +35,12 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 class DistanceIntegerDBIDPair<D extends Distance<D>> implements DistanceDBIDPair<D>, IntegerDBIDRef {
   /**
-   * The distance value
+   * The distance value.
    */
   D distance;
 
   /**
-   * The integer DBID
+   * The integer DBID.
    */
   int id;
 
@@ -63,12 +62,7 @@ class DistanceIntegerDBIDPair<D extends Distance<D>> implements DistanceDBIDPair
   }
 
   @Override
-  public DBIDRef deref() {
-    return this;
-  }
-
-  @Override
-  public int getIntegerID() {
+  public int internalGetIndex() {
     return id;
   }
 

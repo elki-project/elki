@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 
 /**
@@ -34,12 +33,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
  */
 class IntegerDoubleDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   /**
-   * The double value
+   * The double value.
    */
   double value;
 
   /**
-   * The DB id
+   * The DB id.
    */
   int id;
   
@@ -56,12 +55,7 @@ class IntegerDoubleDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   }
 
   @Override
-  public DBIDRef deref() {
-    return new IntegerDBID(id);
-  }
-
-  @Override
-  public int getIntegerID() {
+  public int internalGetIndex() {
     return id;
   }
 

@@ -26,8 +26,8 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 
 /**
  * A class to answer representation queries using a map. Basically, it is just a
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
   /**
-   * Storage Map
+   * Storage Map.
    */
   private TIntObjectMap<T> data;
 
@@ -72,15 +72,15 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
 
   @Override
   public T get(DBIDRef id) {
-    return data.get(DBIDFactory.FACTORY.asInteger(id));
+    return data.get(DBIDUtil.asInteger(id));
   }
 
   @Override
   public T put(DBIDRef id, T value) {
     if(value == null) {
-      return data.remove(DBIDFactory.FACTORY.asInteger(id));
+      return data.remove(DBIDUtil.asInteger(id));
     }
-    return data.put(DBIDFactory.FACTORY.asInteger(id), value);
+    return data.put(DBIDUtil.asInteger(id), value);
   }
 
   @Override
@@ -90,7 +90,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
 
   @Override
   public void delete(DBIDRef id) {
-    data.remove(DBIDFactory.FACTORY.asInteger(id));
+    data.remove(DBIDUtil.asInteger(id));
   }
 
   @Override

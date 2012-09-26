@@ -36,12 +36,7 @@ import java.util.Comparator;
  */
 public class TopBoundedHeap<E> extends Heap<E> {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * Maximum size
+   * Maximum size.
    */
   protected int maxsize;
 
@@ -67,31 +62,32 @@ public class TopBoundedHeap<E> extends Heap<E> {
   }
 
   @Override
-  public boolean offer(E e) {
-    // don't add if we hit maxsize and are worse
-    if(super.size() >= maxsize) {
-      ensureValid();
-      if(comparator == null) {
-        @SuppressWarnings("unchecked")
-        Comparable<Object> c = (Comparable<Object>) e;
-        if(c.compareTo(queue[0]) < 0) {
-          // while we did not change, this still was "successful".
-          return true;
-        }
-      }
-      else {
-        if(comparator.compare(e, queue[0]) < 0) {
-          // while we did not change, this still was "successful".
-          return true;
-        }
-      }
+  public void add(E e) {
+    if (super.size() < maxsize) {
+      // Just offer.
+      super.add(e);
+      return;
     }
-    boolean result = super.offer(e);
-    // purge unneeded entry(s)
-    while(super.size() > maxsize) {
-      handleOverflow(super.poll());
+    // Peek at the top element, return if we are worse.
+    ensureValid();
+    final int comp;
+    if (comparator == null) {
+      @SuppressWarnings("unchecked")
+      Comparable<Object> c = (Comparable<Object>) e;
+      comp = c.compareTo(queue[0]);
+    } else {
+      comp = comparator.compare(e, queue[0]);
     }
-    return result;
+    if (comp < 0) {
+      return;
+    }
+    if (comp == 0) {
+      handleOverflow(e);
+    } else {
+      // Otherwise, replace and repair:
+      E prev = super.replaceTopElement(e);
+      handleOverflow(prev);
+    }
   }
 
   /**
@@ -105,6 +101,8 @@ public class TopBoundedHeap<E> extends Heap<E> {
   }
 
   /**
+   * Get the maximum size.
+   * 
    * @return the maximum size
    */
   public int getMaxSize() {

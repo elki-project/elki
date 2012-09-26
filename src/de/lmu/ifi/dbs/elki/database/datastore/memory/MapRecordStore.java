@@ -29,8 +29,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 
 /**
  * A class to answer representation queries using a map and an index within the
@@ -42,12 +42,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 public class MapRecordStore implements WritableRecordStore {
   /**
-   * Record length
+   * Record length.
    */
   private final int rlen;
 
   /**
-   * Storage Map
+   * Storage Map.
    */
   // TODO: Use trove maps?
   private final Map<DBID, Object[]> data;
@@ -80,15 +80,16 @@ public class MapRecordStore implements WritableRecordStore {
   }
 
   /**
-   * Actual getter
+   * Actual getter.
    * 
    * @param id Database ID
    * @param index column index
+   * @param <T> type
    * @return current value
    */
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
-    Object[] d = data.get(DBIDFactory.FACTORY.deref(id));
+    Object[] d = data.get(DBIDUtil.deref(id));
     if(d == null) {
       return null;
     }
@@ -104,19 +105,20 @@ public class MapRecordStore implements WritableRecordStore {
   }
 
   /**
-   * Actual setter
+   * Actual setter.
    * 
    * @param id Database ID
    * @param index column index
    * @param value new value
+   * @param <T> type
    * @return previous value
    */
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
-    Object[] d = data.get(DBIDFactory.FACTORY.deref(id));
+    Object[] d = data.get(DBIDUtil.deref(id));
     if(d == null) {
       d = new Object[rlen];
-      data.put(DBIDFactory.FACTORY.deref(id), d);
+      data.put(DBIDUtil.deref(id), d);
     }
     T ret = (T) d[index];
     d[index] = value;

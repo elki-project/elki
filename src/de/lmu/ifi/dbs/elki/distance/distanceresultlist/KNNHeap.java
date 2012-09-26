@@ -48,21 +48,21 @@ public interface KNNHeap<D extends Distance<D>> {
    * 
    * @return KNNList with the heaps contents.
    */
-  public KNNResult<D> toKNNList();
+  KNNResult<D> toKNNList();
 
   /**
    * Get the K parameter ("maxsize" internally).
    * 
    * @return K
    */
-  public int getK();
+  int getK();
 
   /**
    * Get the distance to the k nearest neighbor, or maxdist otherwise.
    * 
    * @return Maximum distance
    */
-  public D getKNNDistance();
+  D getKNNDistance();
 
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
@@ -72,14 +72,26 @@ public interface KNNHeap<D extends Distance<D>> {
    * @param distance Distance value
    * @param id ID number
    */
-  public void add(D distance, DBIDRef id);
+  void add(D distance, DBIDRef id);
 
   /**
    * Current size of heap.
    * 
    * @return Heap size
    */
-  public int size();
+  int size();
+  
+  /**
+   * Test if the heap is empty.
+   * 
+   * @return true when empty.
+   */
+  boolean isEmpty();
+  
+  /**
+   * Clear the heap.
+   */
+  void clear();
 
   /**
    * Poll the <em>largest</em> element from the heap.
@@ -90,5 +102,12 @@ public interface KNNHeap<D extends Distance<D>> {
    * 
    * @return largest element
    */
-  public DistanceDBIDPair<D> poll();
+  DistanceDBIDPair<D> poll();
+
+  /**
+   * Peek at the <em>largest</em> element in the heap.
+   * 
+   * @return The current largest element.
+   */
+  DistanceDBIDPair<D> peek();
 }

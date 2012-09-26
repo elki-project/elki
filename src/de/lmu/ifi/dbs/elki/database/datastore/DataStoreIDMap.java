@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 public interface DataStoreIDMap {
   /**
-   * Map a DBID to a database id.
+   * Map a DBID to an array offset.
    * 
    * @param dbid DBID
    * @return record id {@code id >= 0}
    */
-  public int map(DBIDRef dbid);
+  int mapDBIDToOffset(DBIDRef dbid);
 }

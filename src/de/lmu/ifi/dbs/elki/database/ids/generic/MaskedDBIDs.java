@@ -41,12 +41,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  */
 public class MaskedDBIDs implements DBIDs {
   /**
-   * Data storage
+   * Data storage.
    */
   protected ArrayDBIDs data;
 
   /**
-   * The bitmask used for masking
+   * The bitmask used for masking.
    */
   protected BitSet bits;
 
@@ -106,7 +106,7 @@ public class MaskedDBIDs implements DBIDs {
   }
 
   /**
-   * Iterator over set bits
+   * Iterator over set bits.
    * 
    * @author Erich Schubert
    * 
@@ -119,12 +119,12 @@ public class MaskedDBIDs implements DBIDs {
     private int pos;
 
     /**
-     * Array iterator, for referencing
+     * Array iterator, for referencing.
      */
     private DBIDArrayIter iter;
 
     /**
-     * Constructor
+     * Constructor.
      */
     protected DBIDItr() {
       this.pos = bits.nextSetBit(0);
@@ -142,14 +142,14 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
+    public int internalGetIndex() {
       iter.seek(pos);
-      return iter;
+      return iter.internalGetIndex();
     }
   }
 
   /**
-   * Iterator over set bits
+   * Iterator over set bits.
    * 
    * @author Erich Schubert
    * 
@@ -162,12 +162,12 @@ public class MaskedDBIDs implements DBIDs {
     private int pos;
 
     /**
-     * Array iterator, for referencing
+     * Array iterator, for referencing.
      */
     private DBIDArrayIter iter;
 
     /**
-     * Constructor
+     * Constructor.
      */
     protected InvDBIDItr() {
       this.pos = bits.nextClearBit(0);
@@ -185,9 +185,9 @@ public class MaskedDBIDs implements DBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
+    public int internalGetIndex() {
       iter.seek(pos);
-      return iter;
+      return iter.internalGetIndex();
     }
   }
 }

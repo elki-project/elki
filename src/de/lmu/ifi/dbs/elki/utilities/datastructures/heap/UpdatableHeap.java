@@ -37,7 +37,7 @@ import java.util.Comparator;
  */
 public class UpdatableHeap<O> extends Heap<O> {
   /**
-   * Constant for "not in heap"
+   * Constant for "not in heap".
    */
   protected static final int NO_VALUE = Integer.MIN_VALUE;
 
@@ -45,11 +45,6 @@ public class UpdatableHeap<O> extends Heap<O> {
    * Constant for "in ties list", for tied heaps.
    */
   protected static final int IN_TIES = -1;
-
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
 
   /**
    * Holds the indices in the heap of each element.
@@ -73,7 +68,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   }
 
   /**
-   * Constructor with comparator
+   * Constructor with comparator.
    * 
    * @param comparator Comparator
    */
@@ -82,7 +77,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   }
 
   /**
-   * Constructor with predefined size and comparator
+   * Constructor with predefined size and comparator.
    * 
    * @param size Size
    * @param comparator Comparator
@@ -98,12 +93,18 @@ public class UpdatableHeap<O> extends Heap<O> {
   }
 
   @Override
-  public boolean offer(O e) {
+  public void add(O e) {
     final int pos = index.get(e);
-    return offerAt(pos, e);
+    offerAt(pos, e);
   }
 
-  protected boolean offerAt(final int pos, O e) {
+  /**
+   * Offer element at the given position.
+   * 
+   * @param pos Position
+   * @param e Element
+   */
+  protected void offerAt(final int pos, O e) {
     if(pos == NO_VALUE) {
       // resize when needed
       if(size + 1 > queue.length) {
@@ -114,9 +115,8 @@ public class UpdatableHeap<O> extends Heap<O> {
       index.put(e, size);
       size += 1;
       // We do NOT YET update the heap. This is done lazily.
-      // We have changed - return true according to {@link Collection#put}
-      modCount++;
-      return true;
+      heapModified();
+      return;
     }
     else {
       assert (pos >= 0) : "Unexpected negative position.";
@@ -126,14 +126,12 @@ public class UpdatableHeap<O> extends Heap<O> {
         @SuppressWarnings("unchecked")
         Comparable<Object> c = (Comparable<Object>) e;
         if(c.compareTo(queue[pos]) >= 0) {
-          // Ignore, but return true according to {@link Collection#put}
-          return true;
+          return;
         }
       }
       else {
         if(comparator.compare(e, queue[pos]) >= 0) {
-          // Ignore, but return true according to {@link Collection#put}
-          return true;
+          return;
         }
       }
       if(pos >= validSize) {
@@ -144,9 +142,8 @@ public class UpdatableHeap<O> extends Heap<O> {
         // ensureValid();
         heapifyUp(pos, e);
       }
-      modCount++;
-      // We have changed - return true according to {@link Collection#put}
-      return true;
+      heapModified();
+      return;
     }
   }
 
@@ -155,7 +152,8 @@ public class UpdatableHeap<O> extends Heap<O> {
     if(pos < 0 || pos >= size) {
       return null;
     }
-    final O ret = castQueueElement(pos);
+    @SuppressWarnings("unchecked")
+    final O ret = (O) queue[pos];
     // Replacement object:
     final Object reinsert = queue[size - 1];
     queue[size - 1] = null;
@@ -188,7 +186,7 @@ public class UpdatableHeap<O> extends Heap<O> {
       queue[pos] = reinsert;
       index.put(reinsert, pos);
     }
-    modCount++;
+    heapModified();
     // Keep index up to date
     index.remove(ret);
     return ret;
@@ -213,6 +211,13 @@ public class UpdatableHeap<O> extends Heap<O> {
   @Override
   public O poll() {
     O node = super.poll();
+    index.remove(node);
+    return node;
+  }
+  
+  @Override
+  public O replaceTopElement(O e) {
+    O node = super.replaceTopElement(e);
     index.remove(node);
     return node;
   }

@@ -59,12 +59,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 public class TrivialDBIDFactory implements DBIDFactory {
   /**
-   * Keep track of the smallest dynamic DBID offset not used
+   * Keep track of the smallest dynamic DBID offset not used.
    */
   AtomicInteger next = new AtomicInteger(1);
 
   /**
-   * Constructor
+   * Constructor.
    */
   public TrivialDBIDFactory() {
     super();
@@ -73,7 +73,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public DBID generateSingleDBID() {
     final int id = next.getAndIncrement();
-    if(id == Integer.MAX_VALUE) {
+    if (id == Integer.MAX_VALUE) {
       throw new AbortException("DBID allocation error - too many objects allocated!");
     }
     DBID ret = new IntegerDBID(id);
@@ -88,7 +88,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public DBIDRange generateStaticDBIDRange(int size) {
     final int start = next.getAndAdd(size);
-    if(start > next.get()) {
+    if (start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
     DBIDRange alloc = new IntegerDBIDRange(start, size);
@@ -106,44 +106,20 @@ public class TrivialDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public int asInteger(DBIDRef id) {
-    if(id instanceof IntegerDBIDRef) {
-      return ((IntegerDBIDRef) id).getIntegerID();
-    }
-    assert (!(id instanceof DBID)) : "Non-Integer DBID found.";
-    final DBIDRef inner = id.deref();
-    assert (inner != id) : "Unresolvable DBIDRef found: " + id;
-    return asInteger(inner);
-  }
-
-  @Override
-  public DBID deref(DBIDRef id) {
-    if(id instanceof DBID) {
-      return (DBID) id;
-    }
-    if (id instanceof IntegerDBIDRef) {
-      return importInteger(((IntegerDBIDRef)id).getIntegerID());
-    }
-    DBIDRef inner = id.deref();
-    assert (inner != id) : "Unresolvable DBID: " + id;
-    return deref(inner);
-  }
-
-  @Override
   public int compare(DBIDRef a, DBIDRef b) {
-    final int inta = asInteger(a);
-    final int intb = asInteger(b);
+    final int inta = a.internalGetIndex();
+    final int intb = b.internalGetIndex();
     return (inta < intb ? -1 : (inta == intb ? 0 : 1));
   }
 
   @Override
   public boolean equal(DBIDRef a, DBIDRef b) {
-    return asInteger(a) == asInteger(b);
+    return a.internalGetIndex() == b.internalGetIndex();
   }
 
   @Override
   public String toString(DBIDRef id) {
-    return Integer.toString(asInteger(id));
+    return Integer.toString(id.internalGetIndex());
   }
 
   @Override
@@ -178,25 +154,25 @@ public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public DBIDPair newPair(DBIDRef first, DBIDRef second) {
-    return new IntegerDBIDPair(asInteger(first), asInteger(second));
+    return new IntegerDBIDPair(first.internalGetIndex(), second.internalGetIndex());
   }
 
   @Override
   public DoubleDBIDPair newPair(double val, DBIDRef id) {
-    return new IntegerDoubleDBIDPair(val, asInteger(id));
+    return new IntegerDoubleDBIDPair(val, id.internalGetIndex());
   }
 
   @Override
   public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id) {
     if (val instanceof DoubleDistance) {
-      return (DistanceDBIDPair<D>) new DoubleDistanceIntegerDBIDPair(((DoubleDistance) val).doubleValue(), asInteger(id));
+      return (DistanceDBIDPair<D>) new DoubleDistanceIntegerDBIDPair(((DoubleDistance) val).doubleValue(), id.internalGetIndex());
     }
-    return new DistanceIntegerDBIDPair<D>(val, asInteger(id));
+    return new DistanceIntegerDBIDPair<D>(val, id.internalGetIndex());
   }
 
   @Override
   public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id) {
-    return new DoubleDistanceIntegerDBIDPair(val, asInteger(id));
+    return new DoubleDistanceIntegerDBIDPair(val, id.internalGetIndex());
   }
 
   @Override

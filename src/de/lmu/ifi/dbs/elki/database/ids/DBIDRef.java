@@ -38,15 +38,13 @@ package de.lmu.ifi.dbs.elki.database.ids;
  */
 public interface DBIDRef {
   /**
-   * Get the referenced {@link DBID}.
+   * Get the internal index.
    * 
-   * Efficiency note: this may require materialization of a DBID object and recursion.
+   * <b>NOT FOR PUBLIC USE - ELKI Optimization engine only</b>
    * 
-   * Use {@link DBIDUtil#deref}!
-   * 
-   * @return referenced DBID
+   * @return Internal index
    */
-  DBIDRef deref();
+  int internalGetIndex();
   
   /**
    * WARNING: Hash codes of this interface <b>might not be stable</b> (e.g. for
@@ -61,7 +59,7 @@ public interface DBIDRef {
    */
   @Override
   @Deprecated
-  public int hashCode();
+  int hashCode();
 
   /**
    * WARNING: calling equality on a reference may be an indicator of incorrect
@@ -75,5 +73,5 @@ public interface DBIDRef {
    */
   @Override
   @Deprecated
-  public boolean equals(Object obj);
+  boolean equals(Object obj);
 }

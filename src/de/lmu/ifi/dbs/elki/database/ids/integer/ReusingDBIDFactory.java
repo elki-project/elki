@@ -29,6 +29,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -46,18 +47,19 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
    * Logging for error messages.
    */
   private static final Logging LOG = Logging.getLogger(ReusingDBIDFactory.class);
-  
+
   /**
    * Bit set to keep track of dynamic DBIDs
    */
   BitSet dynamicUsed = new BitSet();
-  
+
   /**
    * Keep track of the lowest unused dynamic DBID
    */
   int dynamicStart = 0;
 
-  // TODO: add an offset, to save keeping long bit sets of 1s for heavy dynamic use?
+  // TODO: add an offset, to save keeping long bit sets of 1s for heavy dynamic
+  // use?
 
   /**
    * Returned range allocations
@@ -80,11 +82,12 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
 
   @Override
   public synchronized void deallocateSingleDBID(DBID id) {
-    if (asInteger(id) >= 0) {
+    final int intid = DBIDUtil.asInteger(id);
+    if (intid >= 0) {
       LOG.warning("Single DBID returned is from a range allocation!");
       return;
     }
-    final int pos = - asInteger(id) - 1;
+    final int pos = -intid - 1;
     dynamicUsed.clear(pos);
     dynamicStart = Math.min(dynamicStart, pos);
   }
@@ -113,6 +116,6 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   @Override
   public synchronized void deallocateDBIDRange(DBIDRange range) {
     // TODO: catch an eventual cast exception?
-    returnedAllocations.add((IntegerDBIDRange)range);
+    returnedAllocations.add((IntegerDBIDRange) range);
   }
 }

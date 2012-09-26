@@ -1,8 +1,8 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Class storing a double distance a DBID.
@@ -34,14 +33,14 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 class DoubleDistanceIntegerDBIDPair implements DoubleDistanceDBIDPair, IntegerDBIDRef {
   /**
-   * The distance value
+   * The distance value.
    */
-  double distance;
+  final double distance;
 
   /**
-   * The integer DBID
+   * The integer DBID.
    */
-  int id;
+  final int id;
 
   /**
    * Constructor.
@@ -66,12 +65,7 @@ class DoubleDistanceIntegerDBIDPair implements DoubleDistanceDBIDPair, IntegerDB
   }
 
   @Override
-  public DBIDRef deref() {
-    return this;
-  }
-
-  @Override
-  public int getIntegerID() {
+  public int internalGetIndex() {
     return id;
   }
 

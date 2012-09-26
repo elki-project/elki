@@ -125,8 +125,8 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
-      return it;
+    public int internalGetIndex() {
+      return it.internalGetIndex();
     }
 
     @Override

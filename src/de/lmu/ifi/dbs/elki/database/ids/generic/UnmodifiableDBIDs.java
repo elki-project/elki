@@ -41,7 +41,7 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
   /**
    * The DBIDs we wrap.
    */
-  final private DBIDs inner;
+  private final DBIDs inner;
 
   /**
    * Constructor.
@@ -89,7 +89,7 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
    */
   class UnmodifiableDBIDIter implements DBIDIter {
     /**
-     * Wrapped iterator
+     * Wrapped iterator.
      */
     private DBIDIter it;
 
@@ -114,8 +114,8 @@ public class UnmodifiableDBIDs implements StaticDBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
-      return it;
+    public int internalGetIndex() {
+      return it.internalGetIndex();
     }
   }
 }

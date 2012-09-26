@@ -62,11 +62,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPair, DoubleDistance> {
   /**
-   * Serial version.
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
    * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
    * too often).
    */
@@ -101,12 +96,41 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * @param distance Distance value
    * @param id ID number
    */
-  public void add(double distance, DBIDRef id) {
-    if(distance <= knndistance) {
-      super.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
-      if(size() >= maxsize) {
-        knndistance = peek().doubleDistance();
-      }
+  public final void add(final double distance, final DBIDRef id) {
+    if (size() < getK() || knndistance >= distance) {
+      heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
+      heapModified();
+    }
+  }
+
+  /**
+   * Add a distance-id pair to the heap unless the distance is too large.
+   * 
+   * Compared to the super.add() method, this often saves the pair construction.
+   * 
+   * @param distance Distance value
+   * @param id ID number
+   */
+  public final void add(final Double distance, final DBIDRef id) {
+    if (size() < getK() || knndistance >= distance) {
+      heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
+      heapModified();
+    }
+  }
+
+  // @Override
+  protected void heapModified() {
+    // super.heapModified();
+    if (size() >= getK()) {
+      knndistance = heap.peek().doubleDistance();
+    }
+  }
+
+  // @Override
+  public void add(final DoubleDistanceDBIDPair e) {
+    if (size() < getK() || knndistance >= e.doubleDistance()) {
+      heap.add(e);
+      heapModified();
     }
   }
 

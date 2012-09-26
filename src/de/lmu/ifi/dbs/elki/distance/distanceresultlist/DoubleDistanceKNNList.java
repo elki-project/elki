@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
 /**
  * Finalized KNN List.
@@ -92,12 +93,37 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
     assert (heap.size() == 0);
   }
 
+  /**
+   * Constructor, to be called from KNNHeap only. Use {@link KNNHeap#toKNNList}
+   * instead!
+   * 
+   * @param heap Calling heap
+   * @param k Target number of neighbors (before ties)
+   */
+  public DoubleDistanceKNNList(Heap<DoubleDistanceDBIDPair> heap, int k) {
+    super();
+    this.data = new DoubleDistanceDBIDPair[heap.size()];
+    this.k = k;
+    assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
+    // Get sorted data from heap; but in reverse.
+    int i = heap.size();
+    while(heap.size() > 0) {
+      i--;
+      assert (i >= 0);
+      data[i] = heap.poll();
+    }
+    assert (data.length == 0 || data[0] != null);
+    assert (heap.size() == 0);
+  }
+
   @Override
   public int getK() {
     return k;
   }
 
   /**
+   * {@inheritDoc}
+   * 
    * @deprecated use doubleKNNDistance()!
    */
   @Override
@@ -120,13 +146,13 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
     StringBuffer buf = new StringBuffer();
     buf.append("kNNList[");
     for(DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
-      buf.append(iter.doubleDistance()).append(":").append(DBIDUtil.toString(iter));
+      buf.append(iter.doubleDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
       if(iter.valid()) {
-        buf.append(",");
+        buf.append(',');
       }
     }
-    buf.append("]");
+    buf.append(']');
     return buf.toString();
   }
 
@@ -161,7 +187,7 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
   }
 
   /**
-   * Iterator
+   * Iterator.
    * 
    * @author Erich Schubert
    * 
@@ -169,13 +195,13 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
    */
   private class Itr implements DoubleDistanceDBIDResultIter {
     /**
-     * Cursor position
+     * Cursor position.
      */
     private int pos = 0;
 
     @Override
-    public DBIDRef deref() {
-      return get(pos);
+    public int internalGetIndex() {
+      return get(pos).internalGetIndex();
     }
 
     @Override
@@ -189,6 +215,8 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @deprecated use {@link #doubleDistance}!
      */
     @Override

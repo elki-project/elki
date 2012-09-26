@@ -48,8 +48,8 @@ public interface DBIDFactory {
   /**
    * Static DBID factory to use.
    */
-  public static DBIDFactory FACTORY = new TrivialDBIDFactory();
-  
+  DBIDFactory FACTORY = new TrivialDBIDFactory();
+
   /**
    * Import and integer as DBID.
    * 
@@ -58,39 +58,21 @@ public interface DBIDFactory {
    * @param id Integer ID to import
    * @return DBID
    */
-  public DBID importInteger(int id);
+  DBID importInteger(int id);
 
   /**
-   * Export a DBID as int.
-   * 
-   * Note: this may not be possible for some factories!
-   * 
-   * @param id DBID to export
-   * @return integer value
-   */
-  public int asInteger(DBIDRef id);
-  
-  /**
-   * Dereference a DBID reference.
-   * 
-   * @param id Reference
-   * @return Actual DBID
-   */
-  public DBID deref(DBIDRef id);
-
-  /**
-   * Generate a single DBID
+   * Generate a single DBID.
    * 
    * @return A single DBID
    */
-  public DBID generateSingleDBID();
+  DBID generateSingleDBID();
 
   /**
    * Return a single DBID for reuse.
    * 
    * @param id DBID to deallocate
    */
-  public void deallocateSingleDBID(DBID id);
+  void deallocateSingleDBID(DBID id);
 
   /**
    * Generate a static DBID range.
@@ -98,14 +80,14 @@ public interface DBIDFactory {
    * @param size Requested size
    * @return DBID range
    */
-  public DBIDRange generateStaticDBIDRange(int size);
+  DBIDRange generateStaticDBIDRange(int size);
 
   /**
    * Deallocate a static DBID range.
    * 
    * @param range Range to deallocate
    */
-  public void deallocateDBIDRange(DBIDRange range);
+  void deallocateDBIDRange(DBIDRange range);
 
   /**
    * Make a DBID pair from two existing DBIDs.
@@ -115,8 +97,8 @@ public interface DBIDFactory {
    * 
    * @return new pair.
    */
-  public DBIDPair newPair(DBIDRef id1, DBIDRef id2);
-  
+  DBIDPair newPair(DBIDRef id1, DBIDRef id2);
+
   /**
    * Make a double-DBID pair.
    * 
@@ -124,16 +106,17 @@ public interface DBIDFactory {
    * @param id DBID
    * @return New pair
    */
-  public DoubleDBIDPair newPair(double val, DBIDRef id);
-  
+  DoubleDBIDPair newPair(double val, DBIDRef id);
+
   /**
    * Make a new distance-DBID pair.
    * 
    * @param val Distance value
    * @param id Object ID
+   * @param <D> Distance type
    * @return New pair
    */
-  public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id);
+  <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id);
 
   /**
    * Make a new distance-DBID pair.
@@ -142,98 +125,98 @@ public interface DBIDFactory {
    * @param id Object ID
    * @return New pair
    */
-  public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id);
+  DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id);
 
   /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @return New array
    */
-  public ArrayModifiableDBIDs newArray();
-  
+  ArrayModifiableDBIDs newArray();
+
   /**
    * Make a new (modifiable) hash set of DBIDs.
    * 
    * @return New hash set
    */
-  public HashSetModifiableDBIDs newHashSet();
-  
+  HashSetModifiableDBIDs newHashSet();
+
   /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @param size Size hint
    * @return New array
    */
-  public ArrayModifiableDBIDs newArray(int size);
-  
+  ArrayModifiableDBIDs newArray(int size);
+
   /**
    * Make a new (modifiable) hash set of DBIDs.
    * 
    * @param size Size hint
    * @return New hash set
    */
-  public HashSetModifiableDBIDs newHashSet(int size);
-  
+  HashSetModifiableDBIDs newHashSet(int size);
+
   /**
    * Make a new (modifiable) array of DBIDs.
    * 
    * @param existing existing DBIDs to use
    * @return New array
    */
-  public ArrayModifiableDBIDs newArray(DBIDs existing);
-  
+  ArrayModifiableDBIDs newArray(DBIDs existing);
+
   /**
    * Make a new (modifiable) hash set of DBIDs.
    * 
    * @param existing existing DBIDs to use
    * @return New hash set
    */
-  public HashSetModifiableDBIDs newHashSet(DBIDs existing);
-  
+  HashSetModifiableDBIDs newHashSet(DBIDs existing);
+
   /**
-   * Get a serializer for DBIDs
-   * 
-   * @return DBID serializer 
-   */
-  public ByteBufferSerializer<DBID> getDBIDSerializer();
-  
-  /**
-   * Get a serializer for DBIDs with static size
+   * Get a serializer for DBIDs.
    * 
    * @return DBID serializer
    */
-  public FixedSizeByteBufferSerializer<DBID> getDBIDSerializerStatic();
-  
+  ByteBufferSerializer<DBID> getDBIDSerializer();
+
   /**
-   * Get type restriction
+   * Get a serializer for DBIDs with static size.
+   * 
+   * @return DBID serializer
+   */
+  FixedSizeByteBufferSerializer<DBID> getDBIDSerializerStatic();
+
+  /**
+   * Get type restriction.
    * 
    * @return type restriction for DBIDs
    */
-  public Class<? extends DBID> getTypeRestriction();
+  Class<? extends DBID> getTypeRestriction();
 
   /**
-   * Compare two DBIDs, for sorting
+   * Compare two DBIDs, for sorting.
    * 
    * @param a First
    * @param b Second
    * @return Comparison result
    */
-  public int compare(DBIDRef a, DBIDRef b);
+  int compare(DBIDRef a, DBIDRef b);
 
   /**
-   * Compare two DBIDs, for equality testing
+   * Compare two DBIDs, for equality testing.
    * 
    * @param a First
    * @param b Second
    * @return Comparison result
    */
-  public boolean equal(DBIDRef a, DBIDRef b);
+  boolean equal(DBIDRef a, DBIDRef b);
 
   /**
-   * Print a DBID as string
+   * Print a DBID as string.
    * 
    * @param id DBID reference
    * @return Formatted ID
    */
-  public String toString(DBIDRef id);
+  String toString(DBIDRef id);
 }

@@ -72,7 +72,7 @@ public final class DistanceDBIDResultUtil {
 
   public static String toString(DistanceDBIDResult<?> res) {
     StringBuffer buf = new StringBuffer();
-    buf.append("[");
+    buf.append('[');
     DistanceDBIDResultIter<?> iter = res.iter();
     for(; iter.valid(); iter.advance()) {
       if(buf.length() > 1) {
@@ -80,7 +80,7 @@ public final class DistanceDBIDResultUtil {
       }
       buf.append(iter.getDistancePair().toString());
     }
-    buf.append("]");
+    buf.append(']');
     return buf.toString();
   }
 }

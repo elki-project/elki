@@ -97,7 +97,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
    */
   class UnmodifiableDBIDArrayIter implements IntegerDBIDArrayIter {
     /**
-     * Wrapped iterator
+     * Wrapped iterator.
      */
     private IntegerDBIDArrayIter it;
 
@@ -122,11 +122,6 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
-      return it;
-    }
-
-    @Override
     public void advance(int count) {
       it.advance(count);
     }
@@ -147,8 +142,8 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
     }
 
     @Override
-    public int getIntegerID() {
-      return it.getIntegerID();
+    public int internalGetIndex() {
+      return it.internalGetIndex();
     }
   }
 }

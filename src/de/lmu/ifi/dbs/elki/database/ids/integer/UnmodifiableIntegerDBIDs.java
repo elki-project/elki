@@ -112,13 +112,8 @@ public class UnmodifiableIntegerDBIDs implements StaticDBIDs, IntegerDBIDs {
     }
 
     @Override
-    public DBIDRef deref() {
-      return it;
-    }
-
-    @Override
-    public int getIntegerID() {
-      return it.getIntegerID();
+    public int internalGetIndex() {
+      return it.internalGetIndex();
     }
   }
 }

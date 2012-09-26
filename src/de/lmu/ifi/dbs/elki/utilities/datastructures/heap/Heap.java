@@ -23,10 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.Serializable;
-import java.util.AbstractQueue;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -48,39 +45,34 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @param <E> Element type. Should be {@link java.lang.Comparable} or a
  *        {@link java.util.Comparator} needs to be given.
  */
-public class Heap<E> extends AbstractQueue<E> implements Serializable {
+public class Heap<E> implements Iterable<E> {
   /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
-  /**
-   * Heap storage
+   * Heap storage.
    */
   protected transient Object[] queue;
 
   /**
-   * Current number of objects
+   * Current number of objects.
    */
   protected int size = 0;
 
   /**
-   * Indicate up to where the heap is valid
+   * Indicate up to where the heap is valid.
    */
   protected int validSize = 0;
 
   /**
-   * The comparator or {@code null}
+   * The comparator or {@code null}.
    */
   protected final Comparator<Object> comparator;
 
   /**
    * (Structural) modification counter. Used to invalidate iterators.
    */
-  public transient int modCount = 0;
+  private transient int modCount = 0;
 
   /**
-   * Default initial capacity
+   * Default initial capacity.
    */
   private static final int DEFAULT_INITIAL_CAPACITY = 11;
 
@@ -123,16 +115,14 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     this.comparator = (Comparator<Object>) comparator;
   }
 
-  @Override
-  public boolean add(E e) {
-    // Never full - overriding probably slightly faster
-    return offer(e);
-  }
-
-  @Override
-  public boolean offer(E e) {
+  /**
+   * Add an element to the heap.
+   * 
+   * @param e Element to add
+   */
+  public void add(E e) {
     // resize when needed
-    if(size + 1 > queue.length) {
+    if (size + 1 > queue.length) {
       resize(size + 1);
     }
     // final int pos = size;
@@ -140,46 +130,69 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     this.size += 1;
     heapifyUp(size - 1, e);
     validSize += 1;
-    // We have changed - return true according to {@link Collection#put}
-    modCount++;
-    return true;
+    heapModified();
   }
 
-  @Override
+  /**
+   * Combined operation that removes the top element, and inserts a new element
+   * instead.
+   * 
+   * @param e New element to insert
+   * @return Previous top element of the heap
+   */
+  @SuppressWarnings("unchecked")
+  public E replaceTopElement(E e) {
+    ensureValid();
+    E oldroot = (E) queue[0];
+    heapifyDown(0, e);
+    heapModified();
+    return oldroot;
+  }
+
+  /**
+   * Peek at the top element.
+   * 
+   * @return Top element.
+   */
+  @SuppressWarnings("unchecked")
   public E peek() {
-    if(size == 0) {
+    if (size == 0) {
       return null;
     }
     ensureValid();
-    return castQueueElement(0);
+    return (E) queue[0];
   }
 
-  @Override
+  /**
+   * Remove the top element.
+   * 
+   * @return Top element.
+   */
   public E poll() {
     ensureValid();
     return removeAt(0);
   }
 
   /**
-   * Repair the heap
+   * Perform pending heap repair operations in a single bulk operation.
    */
   protected void ensureValid() {
-    if(validSize != size) {
-      if(size > 1) {
+    if (validSize != size) {
+      if (size > 1) {
         // Bottom up heap update.
-        if(comparator != null) {
+        if (comparator != null) {
           // Parent of first invalid
           int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
           int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
           int nextmax = curmin - 1; // End of valid line
           int pos = (size - 2) >>> 1; // Parent of last element
           // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
-          while(pos >= nextmin) {
+          while (pos >= nextmin) {
             // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
-            while(pos >= curmin) {
-              if(!heapifyDownComparator(pos, queue[pos])) {
+            while (pos >= curmin) {
+              if (!heapifyDownComparator(pos, queue[pos])) {
                 final int parent = (pos - 1) >>> 1;
-                if(parent < curmin) {
+                if (parent < curmin) {
                   nextmin = Math.min(nextmin, parent);
                   nextmax = Math.max(nextmax, parent);
                 }
@@ -190,20 +203,19 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
             pos = Math.min(pos, nextmax);
             nextmax = -1;
           }
-        }
-        else {
+        } else {
           // Parent of first invalid
           int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
           int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
           int nextmax = curmin - 1; // End of valid line
           int pos = (size - 2) >>> 1; // Parent of last element
           // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
-          while(pos >= nextmin) {
+          while (pos >= nextmin) {
             // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
-            while(pos >= curmin) {
-              if(!heapifyDownComparable(pos, queue[pos])) {
+            while (pos >= curmin) {
+              if (!heapifyDownComparable(pos, queue[pos])) {
                 final int parent = (pos - 1) >>> 1;
-                if(parent < curmin) {
+                if (parent < curmin) {
                   nextmin = Math.min(nextmin, parent);
                   nextmax = Math.max(nextmax, parent);
                 }
@@ -224,27 +236,28 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * Remove the element at the given position.
    * 
    * @param pos Element position.
+   * @return Element that was at this position.
    */
+  @SuppressWarnings("unchecked")
   protected E removeAt(int pos) {
-    if(pos < 0 || pos >= size) {
+    if (pos < 0 || pos >= size) {
       return null;
     }
-    final E ret = castQueueElement(pos);
+    final E ret = (E) queue[pos];
     // Replacement object:
     final Object reinsert = queue[size - 1];
     queue[size - 1] = null;
     // Keep heap in sync
-    if(validSize == size) {
+    if (validSize == size) {
       size -= 1;
       validSize -= 1;
       heapifyDown(pos, reinsert);
-    }
-    else {
+    } else {
       size -= 1;
       validSize = Math.min(pos >>> 1, validSize);
       queue[pos] = reinsert;
     }
-    modCount++;
+    heapModified();
     return ret;
   }
 
@@ -256,10 +269,9 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    */
   protected void heapifyUp(int pos, E elem) {
     assert (pos < size && pos >= 0);
-    if(comparator != null) {
+    if (comparator != null) {
       heapifyUpComparator(pos, elem);
-    }
-    else {
+    } else {
       heapifyUpComparable(pos, elem);
     }
   }
@@ -273,11 +285,11 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
   @SuppressWarnings("unchecked")
   protected void heapifyUpComparable(int pos, Object elem) {
     final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
-    while(pos > 0) {
+    while (pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
 
-      if(cur.compareTo(par) >= 0) {
+      if (cur.compareTo(par) >= 0) {
         break;
       }
       queue[pos] = par;
@@ -293,11 +305,11 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * @param cur Element to insert
    */
   protected void heapifyUpComparator(int pos, Object cur) {
-    while(pos > 0) {
+    while (pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
 
-      if(comparator.compare(cur, par) >= 0) {
+      if (comparator.compare(cur, par) >= 0) {
         break;
       }
       queue[pos] = par;
@@ -315,10 +327,9 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    */
   protected boolean heapifyDown(int pos, Object reinsert) {
     assert (pos >= 0);
-    if(comparator != null) {
+    if (comparator != null) {
       return heapifyDownComparator(pos, reinsert);
-    }
-    else {
+    } else {
       return heapifyDownComparable(pos, reinsert);
     }
   }
@@ -327,6 +338,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
    * 
    * @param ipos re-insertion position
+   * @param reinsert Object to reinsert
    * @return true when the order was changed
    */
   @SuppressWarnings("unchecked")
@@ -334,21 +346,21 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     Comparable<Object> cur = (Comparable<Object>) reinsert;
     int pos = ipos;
     final int half = size >>> 1;
-    while(pos < half) {
+    while (pos < half) {
       // Get left child (must exist!)
       int cpos = (pos << 1) + 1;
       Object child = queue[cpos];
       // Test right child, if present
       final int rchild = cpos + 1;
-      if(rchild < size) {
+      if (rchild < size) {
         Object right = queue[rchild];
-        if(((Comparable<Object>) child).compareTo(right) > 0) {
+        if (((Comparable<Object>) child).compareTo(right) > 0) {
           cpos = rchild;
           child = right;
         }
       }
 
-      if(cur.compareTo(child) <= 0) {
+      if (cur.compareTo(child) <= 0) {
         break;
       }
       queue[pos] = child;
@@ -362,30 +374,31 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
    * 
    * @param ipos re-insertion position
+   * @param cur Object to reinsert
    * @return true when the order was changed
    */
   protected boolean heapifyDownComparator(final int ipos, Object cur) {
     int pos = ipos;
     final int half = size >>> 1;
-    while(pos < half) {
+    while (pos < half) {
       int min = pos;
       Object best = cur;
 
       final int lchild = (pos << 1) + 1;
       Object left = queue[lchild];
-      if(comparator.compare(best, left) > 0) {
+      if (comparator.compare(best, left) > 0) {
         min = lchild;
         best = left;
       }
       final int rchild = lchild + 1;
-      if(rchild < size) {
+      if (rchild < size) {
         Object right = queue[rchild];
-        if(comparator.compare(best, right) > 0) {
+        if (comparator.compare(best, right) > 0) {
           min = rchild;
           best = right;
         }
       }
-      if(min == pos) {
+      if (min == pos) {
         break;
       }
       queue[pos] = best;
@@ -395,14 +408,22 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     return (pos == ipos);
   }
 
-  @SuppressWarnings("unchecked")
-  protected final E castQueueElement(int n) {
-    return (E) queue[n];
-  }
-
-  @Override
+  /**
+   * Get the heap size.
+   * 
+   * @return Heap size
+   */
   public int size() {
     return this.size;
+  }
+
+  /**
+   * Test for emptiness.
+   * 
+   * @return true when the heap is empty
+   */
+  public boolean isEmpty() {
+    return size == 0;
   }
 
   /**
@@ -414,37 +435,26 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     // Double until 64, then increase by 50% each time.
     int newCapacity = ((queue.length < 64) ? ((queue.length + 1) * 2) : ((queue.length / 2) * 3));
     // overflow?
-    if(newCapacity < 0) {
+    if (newCapacity < 0) {
       throw new OutOfMemoryError();
     }
-    if(requiredSize > newCapacity) {
+    if (requiredSize > newCapacity) {
       newCapacity = requiredSize;
     }
     queue = Arrays.copyOf(queue, newCapacity);
   }
 
-  @Override
+  /**
+   * Clear the heap.
+   */
   public void clear() {
     // clean up references in the array for memory management
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       queue[i] = null;
     }
     this.size = 0;
     this.validSize = -1;
-    modCount++;
-  }
-
-  @Override
-  public boolean contains(Object o) {
-    if(o != null) {
-      // TODO: use order to reduce search space?
-      for(int i = 0; i < size; i++) {
-        if(o.equals(queue[i])) {
-          return true;
-        }
-      }
-    }
-    return false;
+    heapModified();
   }
 
   @Override
@@ -452,19 +462,11 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
     return new Itr();
   }
 
-  @Override
-  public boolean addAll(Collection<? extends E> c) {
-    final int addsize = c.size();
-    if(addsize <= 0) {
-      return false;
-    }
-    if(size + addsize > queue.length) {
-      resize(size + addsize);
-    }
-    for(E elem : c) {
-      add(elem);
-    }
-    return true;
+  /**
+   * Called at the end of each heap modification.
+   */
+  protected void heapModified() {
+    modCount++;
   }
 
   /**
@@ -476,7 +478,7 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    */
   protected final class Itr implements Iterator<E> {
     /**
-     * Cursor position
+     * Cursor position.
      */
     private int cursor = 0;
 
@@ -490,26 +492,26 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
       return cursor < size;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E next() {
-      if(expectedModCount != modCount) {
+      if (expectedModCount != modCount) {
         throw new ConcurrentModificationException();
       }
-      if(cursor < size) {
-        return castQueueElement(cursor++);
+      if (cursor < size) {
+        return (E) queue[cursor++];
       }
       throw new NoSuchElementException();
     }
 
     @Override
     public void remove() {
-      if(expectedModCount != modCount) {
+      if (expectedModCount != modCount) {
         throw new ConcurrentModificationException();
       }
-      if(cursor > 0) {
+      if (cursor > 0) {
         cursor--;
-      }
-      else {
+      } else {
         throw new IllegalStateException();
       }
       expectedModCount = modCount;
@@ -525,20 +527,19 @@ public class Heap<E> extends AbstractQueue<E> implements Serializable {
    */
   protected String checkHeap() {
     ensureValid();
-    if(comparator == null) {
-      for(int i = 1; i < size; i++) {
+    if (comparator == null) {
+      for (int i = 1; i < size; i++) {
         final int parent = (i - 1) >>> 1;
         @SuppressWarnings("unchecked")
         Comparable<Object> po = (Comparable<Object>) queue[parent];
-        if(po.compareTo(queue[i]) > 0) {
+        if (po.compareTo(queue[i]) > 0) {
           return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
         }
       }
-    }
-    else {
-      for(int i = 1; i < size; i++) {
+    } else {
+      for (int i = 1; i < size; i++) {
         final int parent = (i - 1) >>> 1;
-        if(comparator.compare(queue[parent], queue[i]) > 0) {
+        if (comparator.compare(queue[parent], queue[i]) > 0) {
           return "@" + parent + ": " + queue[parent] + " < @" + i + ": " + queue[i];
         }
       }

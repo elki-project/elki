@@ -3,13 +3,13 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import gnu.trove.impl.hash.THashPrimitiveIterator;
 import gnu.trove.impl.hash.TIntHash;
 import gnu.trove.set.hash.TIntHashSet;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /*
  This file is part of ELKI:
@@ -84,8 +84,8 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   @Override
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      success |= store.add(DBIDFactory.FACTORY.asInteger(iter));
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      success |= store.add(DBIDUtil.asInteger(iter));
     }
     return success;
   }
@@ -93,27 +93,27 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      success |= store.remove(DBIDFactory.FACTORY.asInteger(id));
+    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      success |= store.remove(DBIDUtil.asInteger(id));
     }
     return success;
   }
 
   @Override
   public boolean add(DBIDRef e) {
-    return store.add(DBIDFactory.FACTORY.asInteger(e));
+    return store.add(DBIDUtil.asInteger(e));
   }
 
   @Override
   public boolean remove(DBIDRef o) {
-    return store.remove(DBIDFactory.FACTORY.asInteger(o));
+    return store.remove(DBIDUtil.asInteger(o));
   }
 
   @Override
   public boolean retainAll(DBIDs set) {
     boolean modified = false;
     for (DBIDMIter it = iter(); it.valid(); it.advance()) {
-      if(!set.contains(it)) {
+      if (!set.contains(it)) {
         it.remove();
         modified = true;
       }
@@ -138,9 +138,9 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
 
   @Override
   public boolean contains(DBIDRef o) {
-    return store.contains(DBIDFactory.FACTORY.asInteger(o));
+    return store.contains(DBIDUtil.asInteger(o));
   }
-  
+
   @Override
   public String toString() {
     StringBuffer buf = new StringBuffer();
@@ -162,11 +162,11 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr extends THashPrimitiveIterator implements IntegerDBIDMIter {
+  protected static class DBIDItr implements IntegerDBIDMIter {
     /**
-     * The hash we access.
+     * The actual iterator. We don't have multi inheritance.
      */
-    private TIntHash hash;
+    TIntHashItr it;
 
     /**
      * Constructor.
@@ -174,34 +174,77 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
      * @param hash Trove hash
      */
     public DBIDItr(TIntHash hash) {
-      super(hash);
-      this.hash = hash;
-      this._index = nextIndex(); // Find first element
+      super();
+      this.it = new TIntHashItr(hash);
     }
 
     @Override
     public boolean valid() {
-      return _index >= 0;
+      return it.valid();
     }
 
     @Override
     public void advance() {
-      this._index = nextIndex();
+      it.advance();
     }
 
     @Override
-    public int getIntegerID() {
-      return hash._set[_index];
+    public int internalGetIndex() {
+      return it.getInt();
     }
 
-    @Override
-    public DBID deref() {
-      return new IntegerDBID(hash._set[_index]);
-    }
-    
     @Override
     public String toString() {
-      return Integer.toString(getIntegerID());
+      return Integer.toString(internalGetIndex());
+    }
+
+    @Override
+    public void remove() {
+      it.remove();
+    }
+
+    /**
+     * Custom iterator over TIntHash.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    private static class TIntHashItr extends THashPrimitiveIterator implements Iter {
+      /**
+       * The hash we access.
+       */
+      private TIntHash hash;
+
+      /**
+       * Constructor.
+       * 
+       * @param hash Hash to iterate over.
+       */
+      public TIntHashItr(TIntHash hash) {
+        super(hash);
+        this.hash = hash;
+        this._index = nextIndex(); // Find first element
+      }
+
+      /**
+       * Get the current value.
+       * 
+       * @return Current value
+       */
+      public int getInt() {
+        return hash._set[_index];
+      }
+
+      @Override
+      public void advance() {
+        this._index = nextIndex();
+      }
+
+      @Override
+      public boolean valid() {
+        return _index >= 0;
+      }
     }
   }
 }

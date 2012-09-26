@@ -51,7 +51,7 @@ public class TestTiedTopBoundedUpdatableHeap implements JUnit4Test {
         int score = r.nextInt(10000);
         IntegerPriorityObject<Integer> nobj = new IntegerPriorityObject<Integer>(score, id);
         // Update heap
-        heap.offer(nobj);
+        heap.add(nobj);
         // Enabling the followig assertion *hides* certain problems!
         // assertTrue("Heap not valid at i="+i, heap.checkHeap());
         // Update simulation

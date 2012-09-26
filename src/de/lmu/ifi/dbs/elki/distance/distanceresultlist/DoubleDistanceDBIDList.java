@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<DoubleDistance> {
   /**
-   * Actual storage
+   * Actual storage.
    */
   final ArrayList<DoubleDistanceDBIDPair> storage;
   
@@ -147,13 +147,13 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    */
   protected class Iter implements DoubleDistanceDBIDResultIter {
     /**
-     * Iterator position
+     * Iterator position.
      */
     int pos = 0;
 
     @Override
-    public DBIDRef deref() {
-      return get(pos);
+    public int internalGetIndex() {
+      return get(pos).internalGetIndex();
     }
 
     @Override

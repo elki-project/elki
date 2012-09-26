@@ -64,7 +64,7 @@ public class TestHeapPerformance {
     {
       for(int j = 0; j < iterations; j++) {
         Heap<Integer> pq = new Heap<Integer>();
-        testQueue(elements, pq);
+        testHeap(elements, pq);
       }
       for(int j = 0; j < iterations; j++) {
         PriorityQueue<Integer> pq = new PriorityQueue<Integer>(); // 11,
@@ -76,7 +76,7 @@ public class TestHeapPerformance {
     {
       for(int j = 0; j < iterations; j++) {
         Heap<Integer> pq = new Heap<Integer>();
-        testQueue(elements, pq);
+        testHeap(elements, pq);
       }
     }
     long htime = System.nanoTime() - hstart;
@@ -92,6 +92,20 @@ public class TestHeapPerformance {
     System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
     assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.05 * pqtime);
     // 1.05 allows some difference in measuring
+  }
+
+  private void testHeap(final List<Integer> elements, Heap<Integer> pq) {
+    // Insert all
+    for(int i = 0; i < elements.size(); i++) {
+      pq.add(elements.get(i));
+    }
+    // Poll first half.
+    for(int i = 0; i < elements.size() >> 1; i++) {
+      assertEquals((int) pq.poll(), i);
+      // assertEquals((int) pq.poll(), queueSize - 1 - i);
+    }
+    assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
+    pq.clear();
   }
 
   private void testQueue(final List<Integer> elements, Queue<Integer> pq) {

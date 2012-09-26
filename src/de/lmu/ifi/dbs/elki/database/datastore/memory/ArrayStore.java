@@ -38,17 +38,20 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  */
 public class ArrayStore<T> implements WritableDataStore<T> {
   /**
-   * Data array
+   * Data array.
    */
   private Object[] data;
 
   /**
-   * DBID to index map
+   * DBID to index map.
    */
   private DataStoreIDMap idmap;
 
   /**
    * Constructor.
+   * 
+   * @param data Data array
+   * @param idmap DBID to offset mapping
    */
   public ArrayStore(Object[] data, DataStoreIDMap idmap) {
     super();
@@ -60,7 +63,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @Override
   public T get(DBIDRef id) {
     try {
-      return (T) data[idmap.map(id)];
+      return (T) data[idmap.mapDBIDToOffset(id)];
     }
     catch(ArrayIndexOutOfBoundsException e) {
       return null;
@@ -76,7 +79,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @Override
   public T put(DBIDRef id, T value) {
     T ret = get(id);
-    data[idmap.map(id)] = value;
+    data[idmap.mapDBIDToOffset(id)] = value;
     return ret;
   }
 

@@ -27,8 +27,8 @@ import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -77,18 +77,13 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     this.id = id;
   }
 
-  @Override
-  public DBID deref() {
-    return this;
-  }
-
   /**
    * Return the integer value of the object ID.
    * 
    * @return integer id
    */
   @Override
-  public int getIntegerID() {
+  public int internalGetIndex() {
     return this.id;
   }
 
@@ -116,7 +111,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public int compareTo(DBIDRef o) {
-    final int anotherVal = DBIDFactory.FACTORY.asInteger(o);
+    final int anotherVal = DBIDUtil.asInteger(o);
     return (this.id < anotherVal ? -1 : (this.id == anotherVal ? 0 : 1));
   }
 
@@ -135,7 +130,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public boolean contains(DBIDRef o) {
-    return DBIDFactory.FACTORY.asInteger(o) == id;
+    return DBIDUtil.asInteger(o) == id;
   }
 
   @Override
@@ -145,7 +140,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return (id == DBIDFactory.FACTORY.asInteger(key)) ? 0 : -1;
+    return (id == DBIDUtil.asInteger(key)) ? 0 : -1;
   }
 
   /**
@@ -187,13 +182,8 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     }
 
     @Override
-    public int getIntegerID() {
+    public int internalGetIndex() {
       return IntegerDBID.this.id;
-    }
-
-    @Override
-    public DBID deref() {
-      return IntegerDBID.this;
     }
 
     @Override
@@ -217,7 +207,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
     @Override
     public String toString() {
-      return Integer.toString(getIntegerID());
+      return Integer.toString(internalGetIndex());
     }
   }
 

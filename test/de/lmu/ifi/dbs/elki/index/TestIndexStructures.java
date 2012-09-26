@@ -95,8 +95,6 @@ public class TestIndexStructures implements JUnit4Test {
 
   /**
    * Test exact query, also to validate the test is correct.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testExact() {
@@ -106,8 +104,6 @@ public class TestIndexStructures implements JUnit4Test {
 
   /**
    * Test {@link MTree} using a file based database connection.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testMetrical() {
@@ -119,8 +115,6 @@ public class TestIndexStructures implements JUnit4Test {
 
   /**
    * Test {@link RStarTree} using a file based database connection.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testRStarTree() {
@@ -132,8 +126,6 @@ public class TestIndexStructures implements JUnit4Test {
 
   /**
    * Test {@link VAFile} using a file based database connection.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testVAFile() {
@@ -145,8 +137,6 @@ public class TestIndexStructures implements JUnit4Test {
 
   /**
    * Test {@link PartialVAFile} using a file based database connection.
-   * 
-   * @throws ParameterException on errors.
    */
   @Test
   public void testPartialVAFile() {
@@ -159,9 +149,7 @@ public class TestIndexStructures implements JUnit4Test {
   /**
    * Test {@link RStarTree} using a file based database connection. With "fast"
    * mode enabled on an extreme level (since this should only reduce
-   * performance, not accuracy!)
-   * 
-   * @throws ParameterException on errors.
+   * performance, not correctness!)
    */
   @Test
   public void testRStarTreeFast() {
@@ -175,8 +163,6 @@ public class TestIndexStructures implements JUnit4Test {
 
   /**
    * Test {@link XTree} using a file based database connection.
-   * 
-   * @throws ParameterException
    */
   // @Test
   // public void testXTree() {
@@ -193,7 +179,6 @@ public class TestIndexStructures implements JUnit4Test {
    * Actual test routine.
    * 
    * @param inputparams
-   * @throws ParameterException
    */
   void testFileBasedDatabaseConnection(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
     inputparams.addParameter(FileBasedDatabaseConnection.INPUT_ID, dataset);
