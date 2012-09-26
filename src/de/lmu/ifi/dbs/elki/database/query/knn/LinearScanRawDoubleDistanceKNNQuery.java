@@ -87,7 +87,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
         }
       } else if (doubleDistance == max) {
         heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
-      } else if (doubleDistance > max) { // == was handled before!
+      } else if (doubleDistance < max) { // == was handled before!
         heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
         max = heap.peek().doubleDistance();
       } else {
