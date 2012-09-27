@@ -63,7 +63,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   @Override
   @Deprecated
   public Double get(DBIDRef id) {
-    return map.get(DBIDUtil.asInteger(id));
+    return Double.valueOf(map.get(DBIDUtil.asInteger(id)));
   }
 
   @Override
@@ -84,7 +84,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   @Override
   @Deprecated
   public Double put(DBIDRef id, Double value) {
-    return map.put(DBIDUtil.asInteger(id), value);
+    return Double.valueOf(map.put(DBIDUtil.asInteger(id), value.doubleValue()));
   }
 
   @Override

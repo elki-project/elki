@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -78,11 +79,14 @@ class DistanceIntegerDBIDPair<D extends Distance<D>> implements DistanceDBIDPair
 
   @Override
   public boolean equals(Object o) {
-    if(o instanceof DistanceIntegerDBIDPair) {
+    if (this == o) {
+      return true;
+    }
+    if (o instanceof DistanceIntegerDBIDPair) {
       DistanceIntegerDBIDPair<?> p = (DistanceIntegerDBIDPair<?>) o;
       return (this.id == p.id) && distance.equals(p.getDistance());
     }
-    if(o instanceof DoubleDistanceIntegerDBIDPair && distance instanceof DoubleDistance) {
+    if (o instanceof DoubleDistanceIntegerDBIDPair && distance instanceof DoubleDistance) {
       DoubleDistanceIntegerDBIDPair p = (DoubleDistanceIntegerDBIDPair) o;
       return (this.id == p.id) && (((DoubleDistance) this.distance).doubleValue() == p.distance);
     }

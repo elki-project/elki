@@ -304,23 +304,21 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     iter.advance();
     minhotset.add(DBIDUtil.newPair(Double.MAX_VALUE, firstid));
     maxhotset.add(DBIDUtil.newPair(Double.MIN_VALUE, firstid));
-    while(iter.valid()) {
-      DBID id1 = DBIDUtil.deref(iter);
-      iter.advance();
+    for(; iter.valid(); iter.advance()) {
       // generate candidates for min distance.
       ArrayList<DoubleDBIDPair> np = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
       for(DoubleDBIDPair pair : minhotset) {
         // skip the object itself
-        if(DBIDUtil.equal(id1, pair)) {
+        if(DBIDUtil.equal(iter, pair)) {
           continue;
         }
-        double d = distFunc.distance(id1, pair).doubleValue();
-        np.add(DBIDUtil.newPair(d, id1));
+        double d = distFunc.distance(iter, pair).doubleValue();
+        np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        double d = distFunc.distance(id1, iter2).doubleValue();
-        np.add(DBIDUtil.newPair(d, id1));
+        double d = distFunc.distance(iter, iter2).doubleValue();
+        np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
       }
       minhotset.addAll(np);
@@ -330,16 +328,16 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
       ArrayList<DoubleDBIDPair> np2 = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
       for(DoubleDBIDPair pair : minhotset) {
         // skip the object itself
-        if(DBIDUtil.equal(id1, pair)) {
+        if(DBIDUtil.equal(iter, pair)) {
           continue;
         }
-        double d = distFunc.distance(id1, pair).doubleValue();
-        np2.add(DBIDUtil.newPair(d, id1));
+        double d = distFunc.distance(iter, pair).doubleValue();
+        np2.add(DBIDUtil.newPair(d, iter));
         np2.add(DBIDUtil.newPair(d, pair));
       }
       for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
-        double d = distFunc.distance(id1, iter2).doubleValue();
-        np.add(DBIDUtil.newPair(d, id1));
+        double d = distFunc.distance(iter, iter2).doubleValue();
+        np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
       }
       maxhotset.addAll(np2);
@@ -347,10 +345,10 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
 
       // update random set
       if(randomset.size() < randomsize) {
-        randomset.add(id1);
+        randomset.add(iter);
       }
       else if(rnd.nextDouble() < rprob) {
-        randomset.set((int) Math.floor(rnd.nextDouble() * randomsize), id1);
+        randomset.set((int) Math.floor(rnd.nextDouble() * randomsize), iter);
       }
     }
     return new DoubleMinMax(minhotset.first().doubleValue(), maxhotset.first().doubleValue());

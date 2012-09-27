@@ -45,8 +45,9 @@ class DoubleArrayAdapter implements NumberArrayAdapter<Double, double[]> {
   }
 
   @Override
+  @Deprecated
   public Double get(double[] array, int off) throws IndexOutOfBoundsException {
-    return array[off];
+    return Double.valueOf(array[off]);
   }
 
   @Override

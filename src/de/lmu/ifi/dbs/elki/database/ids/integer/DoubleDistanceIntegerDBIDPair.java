@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,6 +22,9 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Class storing a double distance a DBID.
@@ -60,6 +60,7 @@ class DoubleDistanceIntegerDBIDPair implements DoubleDistanceDBIDPair, IntegerDB
   }
 
   @Override
+  @Deprecated
   public DoubleDistance getDistance() {
     return new DoubleDistance(distance);
   }
@@ -71,7 +72,7 @@ class DoubleDistanceIntegerDBIDPair implements DoubleDistanceDBIDPair, IntegerDB
 
   @Override
   public int compareByDistance(DistanceDBIDPair<DoubleDistance> o) {
-    if(o instanceof DoubleDistanceDBIDPair) {
+    if (o instanceof DoubleDistanceDBIDPair) {
       return Double.compare(distance, ((DoubleDistanceDBIDPair) o).doubleDistance());
     }
     return Double.compare(distance, o.getDistance().doubleValue());
@@ -84,13 +85,16 @@ class DoubleDistanceIntegerDBIDPair implements DoubleDistanceDBIDPair, IntegerDB
 
   @Override
   public boolean equals(Object o) {
-    if(o instanceof DoubleDistanceIntegerDBIDPair) {
+    if (this == o) {
+      return true;
+    }
+    if (o instanceof DoubleDistanceIntegerDBIDPair) {
       DoubleDistanceIntegerDBIDPair p = (DoubleDistanceIntegerDBIDPair) o;
       return (this.id == p.id) && (this.distance == p.distance);
     }
-    if(o instanceof DistanceIntegerDBIDPair) {
+    if (o instanceof DistanceIntegerDBIDPair) {
       DistanceIntegerDBIDPair<?> p = (DistanceIntegerDBIDPair<?>) o;
-      if(p.distance instanceof DoubleDistance) {
+      if (p.distance instanceof DoubleDistance) {
         return (this.id == p.id) && (this.distance == ((DoubleDistance) p.distance).doubleValue());
       }
     }

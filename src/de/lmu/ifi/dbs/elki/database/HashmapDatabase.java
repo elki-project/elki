@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -102,7 +104,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     this.addChildResult(idrep);
 
     // Add indexes.
-    if(indexFactories != null) {
+    if (indexFactories != null) {
       this.indexFactories.addAll(indexFactories);
     }
   }
@@ -120,7 +122,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
    */
   @Override
   public void initialize() {
-    if(databaseConnection != null) {
+    if (databaseConnection != null) {
       this.insert(databaseConnection.loadData());
       // Run at most once.
       databaseConnection = null;
@@ -129,7 +131,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
   @Override
   public DBIDs insert(ObjectBundle objpackages) {
-    if(objpackages.dataLength() == 0) {
+    if (objpackages.dataLength() == 0) {
       return DBIDUtil.EMPTYDBIDS;
     }
     // insert into db
@@ -137,29 +139,28 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     Relation<?>[] targets = alignColumns(objpackages);
 
     int idrepnr = -1;
-    for(int i = 0; i < targets.length; i++) {
-      if(targets[i] == idrep) {
+    for (int i = 0; i < targets.length; i++) {
+      if (targets[i] == idrep) {
         idrepnr = i;
         break;
       }
     }
 
-    for(int j = 0; j < objpackages.dataLength(); j++) {
+    for (int j = 0; j < objpackages.dataLength(); j++) {
       // insert object
       final DBID newid;
-      if(idrepnr < 0) {
+      if (idrepnr < 0) {
         newid = DBIDUtil.generateSingleDBID();
-      }
-      else {
+      } else {
         newid = (DBID) objpackages.data(j, idrepnr);
       }
-      if(ids.contains(newid)) {
+      if (ids.contains(newid)) {
         throw new AbortException("Duplicate DBID conflict.");
       }
       ids.add(newid);
-      for(int i = 0; i < targets.length; i++) {
+      for (int i = 0; i < targets.length; i++) {
         // DBIDs were handled above.
-        if(i == idrepnr) {
+        if (i == idrepnr) {
           continue;
         }
         @SuppressWarnings("unchecked")
@@ -170,7 +171,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     }
 
     // Notify indexes of insertions
-    for(Index index : indexes) {
+    for (Index index : indexes) {
       index.insertAll(newids);
     }
 
@@ -191,19 +192,19 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     Relation<?>[] targets = new Relation<?>[pack.metaLength()];
     {
       BitSet used = new BitSet(relations.size());
-      for(int i = 0; i < targets.length; i++) {
+      for (int i = 0; i < targets.length; i++) {
         SimpleTypeInformation<?> meta = pack.meta(i);
         // TODO: aggressively try to match exact metas first?
         // Try to match unused representations only
-        for(int j = used.nextClearBit(0); j >= 0 && j < relations.size(); j = used.nextClearBit(j + 1)) {
+        for (int j = used.nextClearBit(0); j >= 0 && j < relations.size(); j = used.nextClearBit(j + 1)) {
           Relation<?> relation = relations.get(j);
-          if(relation.getDataTypeInformation().isAssignableFromType(meta)) {
+          if (relation.getDataTypeInformation().isAssignableFromType(meta)) {
             targets[i] = relation;
             used.set(j);
             break;
           }
         }
-        if(targets[i] == null) {
+        if (targets[i] == null) {
           targets[i] = addNewRelation(meta);
           used.set(relations.size() - 1);
         }
@@ -225,8 +226,8 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     relations.add(relation);
     getHierarchy().add(this, relation);
     // Try to add indexes where appropriate
-    for(IndexFactory<?, ?> factory : indexFactories) {
-      if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
+    for (IndexFactory<?, ?> factory : indexFactories) {
+      if (factory.getInputTypeRestriction().isAssignableFromType(meta)) {
         @SuppressWarnings("unchecked")
         final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
         @SuppressWarnings("unchecked")
@@ -245,7 +246,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   public MultipleObjectsBundle delete(DBIDs ids) {
     // Prepare bundle to return
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for(Relation<?> relation : relations) {
+    for (Relation<?> relation : relations) {
       ArrayList<Object> data = new ArrayList<Object>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         data.add(relation.get(iter));
@@ -254,10 +255,10 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     }
     // remove from db
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      doDelete(DBIDUtil.deref(iter));
+      doDelete(iter);
     }
     // Remove from indexes
-    for(Index index : indexes) {
+    for (Index index : indexes) {
       index.deleteAll(ids);
     }
     // fire deletion event
@@ -267,29 +268,42 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   /**
+   * Removes the object from the database (by calling {@link #doDelete(DBID)})
+   * and indexes and fires a deletion event.
+   */
+  @Override
+  public SingleObjectBundle delete(DBIDRef id) {
+    // Prepare bundle to return
+    SingleObjectBundle bundle = new SingleObjectBundle();
+    for (Relation<?> relation : relations) {
+      bundle.append(relation.getDataTypeInformation(), relation.get(id));
+    }
+    doDelete(id);
+    // Remove from indexes
+    for (Index index : indexes) {
+      index.delete(id);
+    }
+    // fire deletion event
+    eventManager.fireObjectRemoved(id);
+
+    return bundle;
+  }
+
+  /**
    * Removes the object with the specified id from this database.
    * 
    * @param id id the id of the object to be removed
    */
-  private void doDelete(DBID id) {
+  private void doDelete(DBIDRef id) {
     // Remove id
     ids.remove(id);
     // Remove from all representations.
-    for(Relation<?> relation : relations) {
+    for (Relation<?> relation : relations) {
       // ID has already been removed, and this would loop...
-      if(relation != idrep) {
+      if (relation != idrep) {
         relation.delete(id);
       }
     }
-    restoreID(id);
-  }
-
-  /**
-   * Makes the given id reusable for new insertion operations.
-   * 
-   * @param id the id to become reusable
-   */
-  private void restoreID(final DBID id) {
     DBIDFactory.FACTORY.deallocateSingleDBID(id);
   }
 
@@ -321,12 +335,12 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
       super.makeOptions(config);
       // Get database connection.
       final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
-      if(config.grab(dbcP)) {
+      if (config.grab(dbcP)) {
         databaseConnection = dbcP.instantiateClass(config);
       }
       // Get indexes.
       final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<?, ?>>(INDEX_ID, IndexFactory.class, true);
-      if(config.grab(indexFactoryP)) {
+      if (config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }
     }

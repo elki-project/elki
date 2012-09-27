@@ -23,13 +23,12 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Queue;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
 /**
  * Finalized KNN List.
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
+public class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
   /**
    * The value of k this was materialized for.
    */
@@ -77,7 +76,7 @@ class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
    * @param heap Calling heap
    * @param k K value
    */
-  public GenericKNNList(Queue<D> heap, int k) {
+  public GenericKNNList(Heap<? extends DistanceDBIDPair<D>> heap, int k) {
     super();
     this.data = new Object[heap.size()];
     this.k = k;

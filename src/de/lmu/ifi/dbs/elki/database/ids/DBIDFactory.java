@@ -51,6 +51,14 @@ public interface DBIDFactory {
   DBIDFactory FACTORY = new TrivialDBIDFactory();
 
   /**
+   * Make a new DBID variable.
+   * 
+   * @param val Initial value.
+   * @return Variable
+   */
+  DBIDVar newVar(DBIDRef val);
+
+  /**
    * Import and integer as DBID.
    * 
    * Note: this may not be possible for some factories!
@@ -72,7 +80,7 @@ public interface DBIDFactory {
    * 
    * @param id DBID to deallocate
    */
-  void deallocateSingleDBID(DBID id);
+  void deallocateSingleDBID(DBIDRef id);
 
   /**
    * Generate a static DBID range.

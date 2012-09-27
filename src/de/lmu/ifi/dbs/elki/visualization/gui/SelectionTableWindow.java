@@ -229,7 +229,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     context.setSelection(new DBIDSelection(remain));
     // Now delete them.
     for(DBIDIter iter = todel.iter(); iter.valid(); iter.advance()) {
-      upd.delete(DBIDUtil.deref(iter));
+      upd.delete(iter);
     }
   }
 

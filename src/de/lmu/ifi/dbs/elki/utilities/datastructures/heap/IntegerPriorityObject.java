@@ -79,8 +79,9 @@ public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comp
   }
 
   @Override
+  @Deprecated
   public Integer getFirst() {
-    return priority;
+    return Integer.valueOf(priority);
   }
 
   @Override
@@ -120,8 +121,8 @@ public class IntegerPriorityObject<O> implements PairInterface<Integer, O>, Comp
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(priority).append(":").append(object.toString());
+    StringBuilder buf = new StringBuilder();
+    buf.append(priority).append(':').append(object.toString());
     return buf.toString();
   }
 }

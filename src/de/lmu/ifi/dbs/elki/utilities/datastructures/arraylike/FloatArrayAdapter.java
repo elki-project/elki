@@ -46,8 +46,9 @@ class FloatArrayAdapter implements NumberArrayAdapter<Float, float[]> {
   }
 
   @Override
+  @Deprecated
   public Float get(float[] array, int off) throws IndexOutOfBoundsException {
-    return array[off];
+    return Float.valueOf(array[off]);
   }
 
   @Override

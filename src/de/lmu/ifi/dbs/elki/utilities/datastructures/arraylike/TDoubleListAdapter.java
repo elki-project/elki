@@ -45,8 +45,9 @@ public class TDoubleListAdapter implements NumberArrayAdapter<Double, TDoubleLis
   }
 
   @Override
+  @Deprecated
   public Double get(TDoubleList array, int off) throws IndexOutOfBoundsException {
-    return array.get(off);
+    return Double.valueOf(array.get(off));
   }
 
   @Override

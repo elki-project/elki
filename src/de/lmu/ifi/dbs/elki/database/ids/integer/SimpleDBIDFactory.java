@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
@@ -83,8 +84,8 @@ public class SimpleDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public void deallocateSingleDBID(DBID id) {
-    // ignore.
+  public void deallocateSingleDBID(DBIDRef id) {
+    // ignore for now.
   }
 
   @Override
@@ -122,6 +123,11 @@ public class SimpleDBIDFactory implements DBIDFactory {
   @Override
   public String toString(DBIDRef id) {
     return Integer.toString(id.internalGetIndex());
+  }
+
+  @Override
+  public DBIDVar newVar(DBIDRef val) {
+    return new IntegerDBIDVar(val);
   }
 
   @Override
@@ -164,6 +170,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
     return new IntegerDoubleDBIDPair(val, id.internalGetIndex());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id) {
     if (val instanceof DoubleDistance) {

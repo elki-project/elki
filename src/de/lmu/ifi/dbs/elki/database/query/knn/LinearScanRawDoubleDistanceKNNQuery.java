@@ -26,11 +26,14 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.AbstractKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericKNNList;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
@@ -71,29 +74,70 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
 
   @Override
   public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
+    return getKNNForObjectBenchmarked(obj, k);
+  }
+
+  /**
+   * This is the cleaner, supposedly faster implementation.
+   * 
+   * @param obj Query object
+   * @param k Desired number of neighbors
+   * @return kNN result
+   */
+  KNNResult<DoubleDistance> getKNNForObjectClean(O obj, int k) {
     // Optimization for double distances.
-    // We do NOT use the KNNHeap here. Benchmarking showed this to be faster!
-    // Repeat: DO NOT CHANGE TO USE KNNHEAP WITHOUT BENCHMARKING.
-    final TiedTopBoundedHeap<DoubleDistanceDBIDPair> heap = new TiedTopBoundedHeap<DoubleDistanceDBIDPair>(k, AbstractKNNHeap.COMPARATOR);
-    double max = Double.POSITIVE_INFINITY;
-    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    final TiedTopBoundedHeap<DoubleDistanceDBIDPair> heap = new TiedTopBoundedHeap<DoubleDistanceDBIDPair>(k, DoubleDistanceKNNHeap.COMPARATOR);
+    final DBIDIter iter = relation.iterDBIDs();
+
+    // First k elements don't need checking.
+    double max = 0.;
+    for (int i = 0; i < k && iter.valid(); i++, iter.advance()) {
       final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
-      final int size = heap.size();
-      if (size < k) {
+      heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
+      max = Math.max(max, doubleDistance);
+    }
+    // Remaining elements
+    for (; iter.valid(); iter.advance()) {
+      final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
+      if (doubleDistance <= max) {
         heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
-        // Update cutoff
-        if (size + 1 >= k) {
-          max = heap.peek().doubleDistance();
-        }
-      } else if (doubleDistance == max) {
-        heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
-      } else if (doubleDistance < max) { // == was handled before!
-        heap.add(DBIDFactory.FACTORY.newDistancePair(doubleDistance, iter));
+      }
+      if (doubleDistance < max) {
         max = heap.peek().doubleDistance();
-      } else {
-        continue; // Do not update max!
       }
     }
     return new DoubleDistanceKNNList(heap, k);
+  }
+
+  /**
+   * It does not make sense, but this version is faster in our larger
+   * benchmarks. Apparently, some JIT optimization kicks in better.
+   * 
+   * @param obj Query object
+   * @param k Desired number of neighbors
+   * @return kNN result
+   */
+  KNNResult<DoubleDistance> getKNNForObjectBenchmarked(O obj, int k) {
+    // THIS SHOULD BE SLOWER THAN THE VERSION ABOVE, BUT ISN'T!
+    final TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>> heap = new TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>>(k, AbstractKNNHeap.COMPARATOR);
+    final DBIDIter iter = relation.iterDBIDs();
+    // First k elements don't need checking.
+    double max = 0.;
+    for (int i = 0; i < k && iter.valid(); i++, iter.advance()) {
+      final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
+      heap.add(DBIDFactory.FACTORY.newDistancePair(new DoubleDistance(doubleDistance), iter));
+      max = Math.max(max, doubleDistance);
+    }
+    // Remaining elements
+    for (; iter.valid(); iter.advance()) {
+      final double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
+      if (doubleDistance <= max) {
+        heap.add(DBIDFactory.FACTORY.newDistancePair(new DoubleDistance(doubleDistance), iter));
+      }
+      if (doubleDistance < max) {
+        max = heap.peek().getDistance().doubleValue();
+      }
+    }
+    return new GenericKNNList<DoubleDistance>(heap, k);
   }
 }

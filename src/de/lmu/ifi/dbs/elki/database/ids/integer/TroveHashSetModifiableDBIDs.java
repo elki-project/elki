@@ -143,15 +143,15 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
-    buf.append("[");
+    StringBuilder buf = new StringBuilder();
+    buf.append('[');
     for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
       if (buf.length() > 1) {
         buf.append(", ");
       }
       buf.append(iter.toString());
     }
-    buf.append("]");
+    buf.append(']');
     return buf.toString();
   }
 

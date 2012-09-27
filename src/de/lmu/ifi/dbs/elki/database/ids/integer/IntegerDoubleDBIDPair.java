@@ -70,11 +70,13 @@ class IntegerDoubleDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   }
 
   @Override
+  @Deprecated
   public Double getFirst() {
-    return value;
+    return new Double(value);
   }
 
   @Override
+  @Deprecated
   public DBID getSecond() {
     return new IntegerDBID(id);
   }

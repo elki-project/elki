@@ -212,12 +212,11 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     // "HEAVY" flag for knnReach since it is used more than once
     KNNQuery<O, D> knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, k, DatabaseQuery.HINT_HEAVY_USE, DatabaseQuery.HINT_OPTIMIZED_ONLY, DatabaseQuery.HINT_NO_CACHE);
     // No optimized kNN query - use a preprocessor!
-    if(!(knnReach instanceof PreprocessorKNNQuery)) {
-      if(stepprog != null) {
-        if(neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if (!(knnReach instanceof PreprocessorKNNQuery)) {
+      if (stepprog != null) {
+        if (neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
           stepprog.beginStep(1, "Materializing neighborhoods w.r.t. reference neighborhood distance function.", LOG);
-        }
-        else {
+        } else {
           stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
         }
       }
@@ -229,10 +228,9 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
 
     // knnReach is only used once
     KNNQuery<O, D> knnRefer;
-    if(neighborhoodDistanceFunction == reachabilityDistanceFunction || neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
+    if (neighborhoodDistanceFunction == reachabilityDistanceFunction || neighborhoodDistanceFunction.equals(reachabilityDistanceFunction)) {
       knnRefer = knnReach;
-    }
-    else {
+    } else {
       // do not materialize the first neighborhood, since it is used only once
       knnRefer = QueryUtil.getKNNQuery(relation, neighborhoodDistanceFunction, k);
     }
@@ -254,21 +252,21 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    */
   protected LOFResult<O, D> doRunInTime(DBIDs ids, KNNQuery<O, D> kNNRefer, KNNQuery<O, D> kNNReach, StepProgress stepprog) {
     // Assert we got something
-    if(kNNRefer == null) {
+    if (kNNRefer == null) {
       throw new AbortException("No kNN queries supported by database for reference neighborhood distance function.");
     }
-    if(kNNReach == null) {
+    if (kNNReach == null) {
       throw new AbortException("No kNN queries supported by database for reachability distance function.");
     }
 
     // Compute LRDs
-    if(stepprog != null) {
+    if (stepprog != null) {
       stepprog.beginStep(2, "Computing LRDs.", LOG);
     }
     WritableDoubleDataStore lrds = computeLRDs(ids, kNNReach);
 
     // compute LOF_SCORE of each db object
-    if(stepprog != null) {
+    if (stepprog != null) {
       stepprog.beginStep(3, "Computing LOFs.", LOG);
     }
     Pair<WritableDoubleDataStore, DoubleMinMax> lofsAndMax = computeLOFs(ids, lrds, kNNRefer);
@@ -276,7 +274,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = lofsAndMax.getSecond();
 
-    if(stepprog != null) {
+    if (stepprog != null) {
       stepprog.setCompleted(LOG);
     }
 
@@ -299,24 +297,29 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   protected WritableDoubleDataStore computeLRDs(DBIDs ids, KNNQuery<O, D> knnReach) {
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
       final int size = neighbors.size() - 1; // estimated
       double sum = 0.0;
       int count = 0;
-      if(neighbors instanceof DoubleDistanceKNNList) {
+      if (neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
-        for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            DoubleDistanceKNNList neighborsNeighbors = (DoubleDistanceKNNList) knnReach.getKNNForDBID(neighbor, k);
-            sum += Math.max(neighbor.doubleDistance(), neighborsNeighbors.doubleKNNDistance()) / size;
+        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+            KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
+            final double nkdist;
+            if (neighborsNeighbors instanceof DoubleDistanceKNNList) {
+              nkdist = ((DoubleDistanceKNNList) neighborsNeighbors).doubleKNNDistance();
+            } else {
+              nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
+            }
+            sum += Math.max(neighbor.doubleDistance(), nkdist) / size;
             count++;
           }
         }
-      }
-      else {
-        for(DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+      } else {
+        for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
             sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()) / size;
             count++;
@@ -325,23 +328,21 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       }
       // Avoid division by 0
       final double lrd;
-      if(sum <= 0) {
+      if (sum <= 0) {
         lrd = 0.0;
-      }
-      else if(count == size) {
+      } else if (count == size) {
         lrd = 1 / sum;
-      }
-      else {
+      } else {
         // Correct estimation
         sum *= size / (double) count;
         lrd = 1 / sum;
       }
       lrds.putDouble(iter, lrd);
-      if(lrdsProgress != null) {
+      if (lrdsProgress != null) {
         lrdsProgress.incrementProcessed(LOG);
       }
     }
-    if(lrdsProgress != null) {
+    if (lrdsProgress != null) {
       lrdsProgress.ensureCompleted(LOG);
     }
     return lrds;
@@ -362,42 +363,40 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lrdp = lrds.doubleValue(iter);
       final double lof;
-      if(lrdp > 0) {
+      if (lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
         final int size = neighbors.size() - 1; // estimated
         double sum = 0.0;
         int count = 0;
-        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if(objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
+          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             sum += lrds.doubleValue(neighbor) / size;
             count++;
           }
         }
-        if(count == size) {
+        if (count == size) {
           lof = sum / lrdp;
-        }
-        else {
+        } else {
           // Correct estimation
           sum *= size / (double) count;
           lof = sum / lrdp;
         }
-      }
-      else {
+      } else {
         lof = 1.0;
       }
       lofs.putDouble(iter, lof);
       // update minimum and maximum
       lofminmax.put(lof);
 
-      if(progressLOFs != null) {
+      if (progressLOFs != null) {
         progressLOFs.incrementProcessed(LOG);
       }
     }
-    if(progressLOFs != null) {
+    if (progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
     return new Pair<WritableDoubleDataStore, DoubleMinMax>(lofs, lofminmax);
@@ -406,10 +405,9 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     final TypeInformation type;
-    if(reachabilityDistanceFunction.equals(neighborhoodDistanceFunction)) {
+    if (reachabilityDistanceFunction.equals(neighborhoodDistanceFunction)) {
       type = reachabilityDistanceFunction.getInputTypeRestriction();
-    }
-    else {
+    } else {
       type = new CombinedTypeInformation(neighborhoodDistanceFunction.getInputTypeRestriction(), reachabilityDistanceFunction.getInputTypeRestriction());
     }
     return TypeUtil.array(type);
@@ -588,12 +586,12 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       super.makeOptions(config);
 
       final IntParameter pK = new IntParameter(K_ID, new GreaterConstraint(1));
-      if(config.grab(pK)) {
+      if (config.grab(pK)) {
         k = pK.getValue();
       }
 
       final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
-      if(config.grab(reachDistP)) {
+      if (config.grab(reachDistP)) {
         reachabilityDistanceFunction = reachDistP.instantiateClass(config);
       }
     }

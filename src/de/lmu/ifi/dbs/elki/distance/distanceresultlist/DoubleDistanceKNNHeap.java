@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Comparator;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
@@ -61,6 +63,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @author Erich Schubert
  */
 public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPair, DoubleDistance> {
+  /**
+   * Comparator class.
+   */
+  public static final Comparator<DoubleDistanceDBIDPair> COMPARATOR = new Comp(); 
+  
   /**
    * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
    * too often).
@@ -166,5 +173,19 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
   @Deprecated
   public DoubleDistance getKNNDistance() {
     return new DoubleDistance(knndistance);
+  }
+
+  /**
+   * Comparator to use.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected static class Comp implements Comparator<DoubleDistanceDBIDPair> {
+    @Override
+    public int compare(DoubleDistanceDBIDPair o1, DoubleDistanceDBIDPair o2) {
+      return -Double.compare(o1.doubleDistance(), o2.doubleDistance());
+    }
   }
 }

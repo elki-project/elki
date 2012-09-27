@@ -38,9 +38,9 @@ import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -145,20 +145,18 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
 
     // sort neighbors
     for(Cluster<?> clus : split) {
-      ArrayList<DoubleObjPair<DBID>> cmem = new ArrayList<DoubleObjPair<DBID>>(clus.size());
+      ArrayList<DoubleDBIDPair> cmem = new ArrayList<DoubleDBIDPair>(clus.size());
       Vector av = averages.get(clus);
       Matrix covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        DBID i1 = DBIDUtil.deref(iter);
-        double d = MathUtil.mahalanobisDistance(covm, relation.get(i1).getColumnVector().minusEquals(av));
-        cmem.add(new DoubleObjPair<DBID>(d, i1));
+        double d = MathUtil.mahalanobisDistance(covm, relation.get(iter).getColumnVector().minusEquals(av));
+        cmem.add(DBIDUtil.newPair(d, iter));
       }
       Collections.sort(cmem);
 
       for(int ind = 0; ind < cmem.size(); ind++) {
-        DBID i1 = cmem.get(ind).getSecond();
-        KNNResult<D> knn = knnQuery.getKNNForDBID(i1, relation.size());
+        KNNResult<D> knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         hist.aggregate(((double) ind) / clus.size(), result);
