@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-import java.util.Comparator;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,50 +24,19 @@ import java.util.Comparator;
  */
 
 /**
- * Array-oriented implementation of a modifiable DBID collection.
+ * (Persistent) variable storing a DBID reference.
+ * 
+ * In contrast to the {@link DBIDRef} API, which are read-only references, this
+ * variable can be updated to point to a different DBID, e.g. the current best
+ * candidate.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.has DBIDArrayMIter
  */
-public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
+public interface DBIDVar extends DBIDRef, ArrayDBIDs, SetDBIDs {
   /**
-   * Sort the DBID set.
-   */
-  void sort();
-
-  /**
-   * Sort the DBID set.
+   * Assign a new value for the reference.
    * 
-   * @param comparator Comparator to use
+   * @param ref Reference
    */
-  void sort(Comparator<? super DBID> comparator);
-
-  /**
-   * Remove the i'th entry (starting at 0)
-   * 
-   * @param i Index
-   * @return value removed
-   */
-  public DBID remove(int i);
-
-  /**
-   * Replace the i'th entry (starting at 0)
-   * 
-   * @param i Index
-   * @param newval New value
-   * @return previous value
-   */
-  public DBID set(int i, DBIDRef newval);
-
-  /**
-   * Swap DBIDs add positions a and b.
-   * 
-   * @param a First position
-   * @param b Second position
-   */
-  public void swap(int a, int b);
-
-  @Override
-  public DBIDArrayMIter iter();
+  void set(DBIDRef ref);
 }

@@ -291,7 +291,7 @@ public class DoubleObjMaxHeap<V> implements Serializable {
    */
   protected final void resize(int requiredSize) {
     // Double until 64, then increase by 50% each time.
-    int newCapacity = ((keys.length < 64) ? ((keys.length + 1) * 2) : ((keys.length / 2) * 3));
+    int newCapacity = ((keys.length < 64) ? ((keys.length + 1) << 1) : ((keys.length >> 1) * 3));
     // overflow?
     if(newCapacity < 0) {
       throw new OutOfMemoryError();

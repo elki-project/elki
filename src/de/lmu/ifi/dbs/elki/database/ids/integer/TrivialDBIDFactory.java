@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
@@ -57,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @apiviz.uses TroveArrayModifiableDBIDs oneway - - «create»
  * @apiviz.uses TroveHashSetModifiableDBIDs oneway - - «create»
  */
-public class TrivialDBIDFactory implements DBIDFactory {
+final public class TrivialDBIDFactory implements DBIDFactory {
   /**
    * Keep track of the smallest dynamic DBID offset not used.
    */
@@ -71,7 +72,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public DBID generateSingleDBID() {
+  final public DBID generateSingleDBID() {
     final int id = next.getAndIncrement();
     if (id == Integer.MAX_VALUE) {
       throw new AbortException("DBID allocation error - too many objects allocated!");
@@ -81,12 +82,12 @@ public class TrivialDBIDFactory implements DBIDFactory {
   }
 
   @Override
-  public void deallocateSingleDBID(DBID id) {
-    // ignore.
+  final public void deallocateSingleDBID(DBIDRef id) {
+    // ignore for now
   }
 
   @Override
-  public DBIDRange generateStaticDBIDRange(int size) {
+  final public DBIDRange generateStaticDBIDRange(int size) {
     final int start = next.getAndAdd(size);
     if (start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
@@ -120,6 +121,11 @@ public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public String toString(DBIDRef id) {
     return Integer.toString(id.internalGetIndex());
+  }
+
+  @Override
+  public DBIDVar newVar(DBIDRef val) {
+    return new IntegerDBIDVar(val);
   }
 
   @Override
@@ -162,6 +168,7 @@ public class TrivialDBIDFactory implements DBIDFactory {
     return new IntegerDoubleDBIDPair(val, id.internalGetIndex());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id) {
     if (val instanceof DoubleDistance) {

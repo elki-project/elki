@@ -77,7 +77,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   @Deprecated
   public Double get(DBIDRef id) {
     try {
-      return data[idmap.mapDBIDToOffset(id)];
+      return Double.valueOf(data[idmap.mapDBIDToOffset(id)]);
     }
     catch(ArrayIndexOutOfBoundsException e) {
       return null;
@@ -89,8 +89,8 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   public Double put(DBIDRef id, Double value) {
     final int off = idmap.mapDBIDToOffset(id);
     double ret = data[off];
-    data[off] = value;
-    return ret;
+    data[off] = value.doubleValue();
+    return Double.valueOf(ret);
   }
 
   @Override

@@ -84,9 +84,9 @@ class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBID
 
   @Override
   public void add(DistanceDBIDPair<D> pair) {
-    if (knndistance.compareTo(pair.getDistance()) >= 0) {
-    heap.add(pair);
-    heapModified();
+    if (size() < getK() || knndistance.compareTo(pair.getDistance()) >= 0) {
+      heap.add(pair);
+      heapModified();
     }
   }
 

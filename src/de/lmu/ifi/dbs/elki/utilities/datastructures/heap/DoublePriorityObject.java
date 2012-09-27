@@ -79,8 +79,9 @@ public class DoublePriorityObject<O> implements PairInterface<Double, O>, Compar
   }
 
   @Override
+  @Deprecated
   public Double getFirst() {
-    return priority;
+    return Double.valueOf(priority);
   }
 
   @Override
@@ -120,8 +121,8 @@ public class DoublePriorityObject<O> implements PairInterface<Double, O>, Compar
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(priority).append(":").append(object.toString());
+    StringBuilder buf = new StringBuilder();
+    buf.append(priority).append(':').append(object.toString());
     return buf.toString();
   }
 }

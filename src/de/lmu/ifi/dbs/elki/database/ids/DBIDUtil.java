@@ -137,7 +137,7 @@ public final class DBIDUtil {
     if (ids instanceof DBID) {
       return DBIDFactory.FACTORY.toString((DBID) ids);
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       if (buf.length() > 0) {
         buf.append(", ");
@@ -202,6 +202,17 @@ public final class DBIDUtil {
     DBIDFactory.FACTORY.deallocateDBIDRange(range);
   }
 
+  /**
+   * Make a new DBID variable.
+   * 
+   * @param val Initial value.
+   * @return Variable
+   */
+  public DBIDVar newVar(DBIDRef val) {
+    return DBIDFactory.FACTORY.newVar(val);
+  }
+
+  
   /**
    * Make a new (modifiable) array of DBIDs.
    * 
@@ -440,7 +451,7 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, int seed) {
-    return randomSample(source, k, (long) seed);
+    return randomSample(source, k, new Random(seed));
   }
 
   /**
@@ -452,18 +463,32 @@ public final class DBIDUtil {
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
+    if (seed != null) {
+      return randomSample(source, k, new Random(seed.longValue()));
+    }
+    else {
+      return randomSample(source, k, new Random());
+    }
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs.
+   * 
+   * @param source Original DBIDs
+   * @param k k Parameter
+   * @param seed Random generator seed
+   * @return new DBIDs
+   */
+  public static ModifiableDBIDs randomSample(DBIDs source, int k, Random random) {
     if (k <= 0 || k > source.size()) {
       throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
     }
-    final Random random;
-    if (seed != null) {
-      random = new Random(seed);
-    } else {
+    if (random == null) {
       random = new Random();
     }
     // TODO: better balancing for different sizes
     // Two methods: constructive vs. destructive
-    if (k < source.size() / 2) {
+    if (k < source.size() >> 1) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
       DBIDArrayIter iter = aids.iter();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);

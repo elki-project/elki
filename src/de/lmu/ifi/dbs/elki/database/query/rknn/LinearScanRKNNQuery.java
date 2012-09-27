@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -124,14 +123,13 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
 
     int i = 0;
     for (DBIDIter iter = allIDs.iter(); iter.valid(); iter.advance()) {
-      DBID qid = DBIDUtil.deref(iter);
       KNNResult<D> knn = kNNList.get(i);
       for(DistanceDBIDResultIter<D> n = knn.iter(); n.valid(); n.advance()) {
         int j = 0;
         for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           if(DBIDUtil.equal(n, iter2)) {
             GenericDistanceDBIDList<D> rNN = rNNList.get(j);
-            rNN.add(n.getDistance(), qid);
+            rNN.add(n.getDistance(), iter);
           }
           j++;
         }

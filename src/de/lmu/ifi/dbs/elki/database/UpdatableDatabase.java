@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.database;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
+import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
@@ -52,4 +54,14 @@ public interface UpdatableDatabase extends Database {
    * @throws UnableToComplyException if deletion is not possible
    */
   ObjectBundle delete(DBIDs ids);
+
+  /**
+   * Removes and returns the specified objects with the given ids from the
+   * database.
+   * 
+   * @param id the id of the object to be removed from the database
+   * @return the object that have been removed
+   * @throws UnableToComplyException if deletion is not possible
+   */
+  SingleObjectBundle delete(DBIDRef id);
 }

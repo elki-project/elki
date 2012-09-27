@@ -63,7 +63,7 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   @Override
   @Deprecated
   public Integer get(DBIDRef id) {
-    return map.get(DBIDUtil.asInteger(id));
+    return Integer.valueOf(map.get(DBIDUtil.asInteger(id)));
   }
 
   @Override
@@ -84,7 +84,7 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   @Override
   @Deprecated
   public Integer put(DBIDRef id, Integer value) {
-    return map.put(DBIDUtil.asInteger(id), value);
+    return Integer.valueOf(map.put(DBIDUtil.asInteger(id), value.intValue()));
   }
 
   @Override

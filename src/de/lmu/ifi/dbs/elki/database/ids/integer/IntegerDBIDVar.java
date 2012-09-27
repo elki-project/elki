@@ -23,106 +23,87 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.list.TIntList;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
- * Abstract base class for GNU Trove array based lists.
+ * Variable for storing a single DBID reference.
  * 
+ * TODO: what is the actual memory cost for adding a flag to indicate "null"
+ * values, to allow the variable to be unset? Given 8-byte alignment of Java, it
+ * should come for free!
+ *
  * @author Erich Schubert
- * 
- * @apiviz.has IntegerDBID
- * @apiviz.has TroveIteratorAdapter
  */
-public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
+class IntegerDBIDVar implements DBIDVar {
   /**
-   * Get the array store.
-   * 
-   * @return the store
+   * The actual value.
    */
-  protected abstract TIntList getStore();
+  int id;
 
-  @Override
-  public IntegerDBIDArrayMIter iter() {
-    return new DBIDItr(getStore());
+  /**
+   * Constructor.
+   * 
+   * @param val
+   */
+  protected IntegerDBIDVar(DBIDRef val) {
+    this.id = val.internalGetIndex();
   }
 
   @Override
-  public DBID get(int index) {
-    return new IntegerDBID(getStore().get(index));
+  public int internalGetIndex() {
+    return id;
+  }
+
+  @Override
+  public void set(DBIDRef ref) {
+    id = ref.internalGetIndex();
+  }
+
+  @Override
+  public DBID get(int i) {
+    if (i != 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return new IntegerDBID(i);
+  }
+
+  @Override
+  public DBIDArrayIter iter() {
+    return new DBIDItr();
   }
 
   @Override
   public int size() {
-    return getStore().size();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return getStore().isEmpty();
-  }
-
-  @Override
-  public boolean contains(DBIDRef o) {
-    return getStore().contains(DBIDUtil.asInteger(o));
+    return 1;
   }
 
   @Override
   public int binarySearch(DBIDRef key) {
-    return getStore().binarySearch(DBIDUtil.asInteger(key));
+    final int other = key.internalGetIndex();
+    return (other == id) ? 0 : (other < id) ? -1 : -2;
   }
 
   @Override
-  public String toString() {
-    StringBuilder buf = new StringBuilder();
-    buf.append('[');
-    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if(buf.length() > 1) {
-        buf.append(", ");
-      }
-      buf.append(((IntegerDBIDRef) iter).internalGetIndex());
-    }
-    buf.append(']');
-    return buf.toString();
+  public boolean contains(DBIDRef o) {
+    return id == o.internalGetIndex();
   }
 
   /**
-   * Iterate over a Trove IntList, ELKI/C-style.
+   * Pseudo iterator for DBIDs interface.
    * 
    * @author Erich Schubert
    * 
    * @apiviz.exclude
    */
-  protected static class DBIDItr implements IntegerDBIDArrayMIter {
+  protected class DBIDItr implements DBIDArrayIter, IntegerDBIDRef {
     /**
-     * Current position.
+     * Iterator position: We use an integer so we can support retract().
      */
     int pos = 0;
-
-    /**
-     * The actual store we use.
-     */
-    TIntList store;
-
-    /**
-     * Constructor.
-     * 
-     * @param store The actual trove store
-     */
-    public DBIDItr(TIntList store) {
-      super();
-      this.store = store;
-    }
-
-    @Override
-    public boolean valid() {
-      return pos < store.size();
-    }
 
     @Override
     public void advance() {
@@ -151,25 +132,24 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
 
     @Override
     public int internalGetIndex() {
-      return store.get(pos);
+      return IntegerDBIDVar.this.id;
     }
 
     @Override
-    public void remove() {
-      store.removeAt(pos);
-      pos--;
+    public boolean valid() {
+      return (pos == 0);
     }
-    
+
     @Override
     public int hashCode() {
-      // Since we add a warning to 'equals', we also override hashCode.
+      // Override, because we also are overriding equals.
       return super.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-      if(other instanceof DBID) {
-        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use DBIDUtil.equal(iter, id)!", new Throwable());
+      if (other instanceof DBID) {
+        LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);
     }
@@ -179,4 +159,10 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
       return Integer.toString(internalGetIndex());
     }
   }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
 }

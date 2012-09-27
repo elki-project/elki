@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -292,9 +291,9 @@ public class ROC {
 
     @Override
     public DoubleDBIDPair next() {
-      DBID id = DBIDUtil.deref(this.iter);
+      DoubleDBIDPair pair = DBIDUtil.newPair(scores.get(iter), iter);
       iter.advance();
-      return DBIDUtil.newPair(scores.get(id), id);
+      return pair;
     }
 
     @Override

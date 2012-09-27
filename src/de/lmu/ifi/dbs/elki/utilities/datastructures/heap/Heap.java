@@ -433,7 +433,7 @@ public class Heap<E> implements Iterable<E> {
    */
   protected final void resize(int requiredSize) {
     // Double until 64, then increase by 50% each time.
-    int newCapacity = ((queue.length < 64) ? ((queue.length + 1) * 2) : ((queue.length / 2) * 3));
+    int newCapacity = ((queue.length < 64) ? ((queue.length + 1) << 1) : ((queue.length >> 1) * 3));
     // overflow?
     if (newCapacity < 0) {
       throw new OutOfMemoryError();

@@ -30,7 +30,7 @@ import javax.swing.event.EventListenerList;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
@@ -175,8 +175,8 @@ public class DatabaseEventManager {
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
-  public void fireObjectInserted(DBID insertion) {
-    fireObjectsChanged(insertion, DataStoreEvent.Type.INSERT);
+  public void fireObjectInserted(DBIDRef insertion) {
+    fireObjectChanged(insertion, DataStoreEvent.Type.INSERT);
   }
 
   /**
@@ -211,8 +211,8 @@ public class DatabaseEventManager {
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
-  protected void fireObjectRemoved(DBID deletion) {
-    fireObjectsChanged(deletion, DataStoreEvent.Type.DELETE);
+  protected void fireObjectRemoved(DBIDRef deletion) {
+    fireObjectChanged(deletion, DataStoreEvent.Type.DELETE);
   }
 
   /**
@@ -237,6 +237,35 @@ public class DatabaseEventManager {
       this.dataStoreObjects = DBIDUtil.newHashSet();
     }
     this.dataStoreObjects.addDBIDs(objects);
+    currentDataStoreEventType = type;
+
+    if(!accumulateDataStoreEvents) {
+      flushDataStoreEvents();
+    }
+  }
+
+  /**
+   * Handles a DataStoreEvent with the specified type. If the current event type
+   * is not equal to the specified type, the events accumulated up to now will
+   * be fired first.
+   * 
+   * The new event will be aggregated and fired on demand if
+   * {@link #accumulateDataStoreEvents} is set, otherwise all registered
+   * <code>DataStoreListener</code> will be notified immediately that the
+   * content of the database has been changed.
+   * 
+   * @param object the object that has been changed, i.e. inserted, deleted
+   *        or updated
+   */
+  private void fireObjectChanged(DBIDRef object, DataStoreEvent.Type type) {
+    // flush first
+    if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
+      flushDataStoreEvents();
+    }
+    if (this.dataStoreObjects == null) {
+      this.dataStoreObjects = DBIDUtil.newHashSet();
+    }
+    this.dataStoreObjects.add(object);
     currentDataStoreEventType = type;
 
     if(!accumulateDataStoreEvents) {

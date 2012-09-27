@@ -29,7 +29,7 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -81,8 +81,8 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   }
 
   @Override
-  public synchronized void deallocateSingleDBID(DBID id) {
-    final int intid = DBIDUtil.asInteger(id);
+  public synchronized void deallocateSingleDBID(DBIDRef id) {
+    final int intid = id.internalGetIndex();
     if (intid >= 0) {
       LOG.warning("Single DBID returned is from a range allocation!");
       return;

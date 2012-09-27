@@ -81,8 +81,7 @@ public class DBIDView extends AbstractHierarchicalResult implements Relation<DBI
   @Override
   public void delete(DBIDRef id) {
     if(database instanceof UpdatableDatabase) {
-      // TODO: skip deref!
-      ((UpdatableDatabase) database).delete(DBIDUtil.deref(id));
+      ((UpdatableDatabase) database).delete(id);
     }
     else {
       throw new UnsupportedOperationException("Deletions are not supported.");

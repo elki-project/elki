@@ -108,7 +108,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
-  public DBID set(int index, DBID element) {
+  public DBID set(int index, DBIDRef element) {
     int prev = store.set(index, DBIDUtil.asInteger(element));
     return new IntegerDBID(prev);
   }
