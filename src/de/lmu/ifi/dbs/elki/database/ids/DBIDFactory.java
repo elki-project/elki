@@ -48,7 +48,7 @@ public interface DBIDFactory {
   /**
    * Static DBID factory to use.
    */
-  DBIDFactory FACTORY = new TrivialDBIDFactory();
+  final static DBIDFactory FACTORY = new TrivialDBIDFactory();
 
   /**
    * Make a new DBID variable.
