@@ -31,22 +31,41 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.AbstractCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
  * RANSAC based approach to a more robust covariance matrix computation.
  * 
- * This is an adoption of RANSAC to this problem, not a generic RANSAC
- * implementation!
+ * This is an <b>experimental</b> adoption of RANSAC to this problem, not a
+ * generic RANSAC implementation!
  * 
- * Reference:
+ * While using RANSAC for PCA at first sounds like a good idea, <b>it does not
+ * work very well in high-dimensional spaces</b>. The problem is that PCA has
+ * O(n^2) degrees of freedom, so we need to sample very many objects, then
+ * perform an O(n^3) matrix operation to compute PCA, for each attempt.
+ * 
+ * References:
+ * 
+ * RANSAC for PCA was a side note in:
+ * <p>
+ * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
+ * Outlier Detection in Arbitrarily Oriented Subspaces<br />
+ * in: Proc. IEEE International Conference on Data Mining (ICDM 2012)
+ * </p>
+ * 
+ * The basic RANSAC idea was explained in:
  * <p>
  * Random sample consensus: a paradigm for model fitting with applications to
  * image analysis and automated cartography<br />
@@ -54,53 +73,68 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Communications of the ACM, Vol. 24 Issue 6
  * </p>
  * 
- * TODO: make random seed parameterizable
- * 
- * TODO: make iterations parameteriable OR compute a good estimate. Performance
- * in high dimensionality seems to be an issue!
- * 
  * @author Erich Schubert
  * 
  * @param <V> Vector type
  */
-@Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
 public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends AbstractCovarianceMatrixBuilder<V> {
+  /**
+   * Number of iterations to perform
+   */
   int iterations = 1000;
 
-  Random random = new Random(0);
+  /**
+   * Random seed
+   */
+  Long seed;
 
+  /**
+   * Constructor.
+   * 
+   * @param iterations Number of iterations (attempts) to try
+   * @param seed random seed (may be {@code null})
+   */
+  public RANSACCovarianceMatrixBuilder(int iterations, Long seed) {
+    super();
+    this.iterations = iterations;
+    this.seed = seed;
+  }
+
+  @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
   @Override
   public Matrix processIds(DBIDs ids, Relation<? extends V> relation) {
-    final int dim = DatabaseUtil.dimensionality(relation);
+    final int dim = RelationUtil.dimensionality(relation);
+    Random random = (seed != null) ? new Random(seed) : new Random();
 
     DBIDs best = DBIDUtil.EMPTYDBIDS;
     double tresh = ChiSquaredDistribution.quantile(0.85, dim);
 
-    for(int i = 0; i < iterations; i++) {
+    for (int i = 0; i < iterations; i++) {
       DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random.nextLong());
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
       Vector centroid = cv.getMeanVector();
       Matrix p = cv.destroyToSampleMatrix().inverse();
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+      for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         Vector vec = relation.get(id).getColumnVector().minusEquals(centroid);
         double sqlen = vec.transposeTimesTimes(p, vec);
-        if(sqlen < tresh) {
+        if (sqlen < tresh) {
           support.add(id);
         }
       }
 
-      if(support.size() > best.size()) {
+      if (support.size() > best.size()) {
         best = support;
       }
-      if(support.size() >= ids.size()) {
+      if (support.size() >= ids.size()) {
         break; // Can't get better than this!
       }
     }
     // logger.warning("Consensus size: "+best.size()+" of "+ids.size());
     // Fall back to regular PCA
-    if(best.size() <= dim) {
+    if (best.size() <= dim) {
       return CovarianceMatrix.make(relation, ids).destroyToSampleMatrix();
     }
     // Return estimation based on consensus set.
@@ -117,9 +151,42 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Number of iterations.
+     */
+    public static final OptionID ITER_ID = OptionID.getOrCreateOptionID("ransacpca.iterations", "The number of iterations to perform.");
+
+    /**
+     * Random seed
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ransacpca.seed", "Random seed (optional).");
+
+    /**
+     * Number of iterations to perform
+     */
+    int iterations = 1000;
+
+    /**
+     * Random seed
+     */
+    Long seed = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      IntParameter iterP = new IntParameter(ITER_ID, new GreaterConstraint(0), 1000);
+      if (config.grab(iterP)) {
+        iterations = iterP.getValue();
+      }
+      LongParameter seedP = new LongParameter(SEED_ID, true);
+      if (config.grab(seedP)) {
+        seed = seedP.getValue();
+      }
+    }
+
     @Override
     protected RANSACCovarianceMatrixBuilder<V> makeInstance() {
-      return new RANSACCovarianceMatrixBuilder<V>();
+      return new RANSACCovarianceMatrixBuilder<V>(iterations, seed);
     }
   }
 }
