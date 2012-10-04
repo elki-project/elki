@@ -10,6 +10,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.HiCO
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.HiSC
 de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD
+de.lmu.ifi.dbs.elki.algorithm.outlier.COP
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore
 de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
