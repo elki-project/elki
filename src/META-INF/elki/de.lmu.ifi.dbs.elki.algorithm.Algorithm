@@ -35,6 +35,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD
 de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuEvolutionary
 de.lmu.ifi.dbs.elki.algorithm.outlier.AggarwalYuNaive
 de.lmu.ifi.dbs.elki.algorithm.outlier.ALOCI
+de.lmu.ifi.dbs.elki.algorithm.outlier.COP
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore
 de.lmu.ifi.dbs.elki.algorithm.outlier.EMOutlier
