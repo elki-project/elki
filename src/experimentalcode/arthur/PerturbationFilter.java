@@ -173,7 +173,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
   @Override
   protected void prepareComplete() {
-    StringBuffer buf = logger.isDebuggingFine() ? new StringBuffer() : null;
+    StringBuilder buf = logger.isDebuggingFine() ? new StringBuilder() : null;
     scalingreferencevalues = new double[dimensionality];
     randomPerAttribute = new Random[dimensionality];
     if (scalingreference == ScalingReference.STDDEV) {

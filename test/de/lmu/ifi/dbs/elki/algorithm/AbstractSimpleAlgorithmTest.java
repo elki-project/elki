@@ -179,7 +179,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     Arrays.sort(expected);
     // Report
     // if(logger.isVerbose()) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("Cluster sizes: [");
     for(int i = 0; i < sizes.size(); i++) {
       if(i > 0) {
