@@ -440,7 +440,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     long superNodeOffset = header.getSupernode_offset();
 
     if(getLogger().isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
       getLogger().debugFine(msg.toString());
@@ -516,7 +516,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     super.height = computeHeight();
 
     if(getLogger().isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(getClass());
       msg.append("\n height = ").append(height);
       getLogger().debugFine(msg.toString());
@@ -859,7 +859,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
 
       splitAxis[0] = split.getSplitAxis();
       if(getLogger().isDebugging()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("Split Node ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
         msg.append("      splitAxis ").append(splitAxis[0]).append("\n");
         msg.append("      splitPoint ").append(split.getSplitPoint()).append("\n");
@@ -878,7 +878,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       writeNode(node);
       splitAxis[0] = -1;
       if(getLogger().isDebugging()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("Created Supernode ").append(node.getPageID()).append(" (").append(getClass()).append(")\n");
         msg.append("      new capacity ").append(node.getCapacity()).append("\n");
         msg.append("      minimum overlap: ").append(minOv).append("\n");
@@ -1206,7 +1206,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    */
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     long dirNodes = 0;
     long superNodes = 0;
     long leafNodes = 0;
