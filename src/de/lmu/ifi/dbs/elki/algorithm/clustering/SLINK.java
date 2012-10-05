@@ -525,7 +525,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             clusters.put(key, cluster);
           }
           if(LOG.isDebuggingFine()) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append("Number of clusters at depth ");
             buf.append((curdist != null ? curdist.toString() : "null"));
             buf.append(": ").append(clusters.size()).append(" ");

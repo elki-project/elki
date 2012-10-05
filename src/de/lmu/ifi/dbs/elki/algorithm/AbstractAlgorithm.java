@@ -110,7 +110,7 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
 
     if(runmethod1 != null) {
       try {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for(Class<?> cls : signature1) {
           buf.append(cls.toString()).append(",");
         }
@@ -134,7 +134,7 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
     }
     else if(runmethod2 != null) {
       try {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for(Class<?> cls : signature1) {
           buf.append(cls.toString()).append(",");
         }

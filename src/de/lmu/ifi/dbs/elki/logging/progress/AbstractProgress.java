@@ -109,7 +109,7 @@ public abstract class AbstractProgress implements Progress {
    * @return Buffer the data was serialized to.
    */
   @Override
-  public abstract StringBuffer appendToBuffer(StringBuffer buf);
+  public abstract StringBuilder appendToBuffer(StringBuilder buf);
 
   /**
    * Returns a String representation of the progress suitable as a message for
@@ -119,7 +119,7 @@ public abstract class AbstractProgress implements Progress {
    */
   @Override
   public String toString() {
-    StringBuffer message = new StringBuffer();
+    StringBuilder message = new StringBuilder();
     appendToBuffer(message);
     return message.toString();
   }

@@ -138,7 +138,7 @@ public class MultipleLinearRegression {
    */
   @Override
   public String toString() {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     msg.append("x = ").append(FormatUtil.format(x, 9, 4));
     msg.append("\ny = ").append(FormatUtil.format(y, 9, 4));
     msg.append("\nb = ").append(FormatUtil.format(b, 9, 4));

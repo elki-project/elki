@@ -179,7 +179,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
     for (int i = 0; i < dimensionality; i++) {
       bitArray[i] = new Bit(bits.get(i));
     }
-    StringBuffer representation = new StringBuffer();
+    StringBuilder representation = new StringBuilder();
     for (Bit bit : bitArray) {
       if (representation.length() > 0) {
         representation.append(ATTRIBUTE_SEPARATOR);

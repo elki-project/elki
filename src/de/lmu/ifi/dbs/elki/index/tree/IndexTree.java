@@ -224,7 +224,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
     this.leafMinimum = header.getLeafMinimum();
 
     if(getLogger().isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
       getLogger().debugFine(msg.toString());
@@ -245,7 +245,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
     createEmptyRoot(exampleLeaf);
 
     if(getLogger().isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(getClass()).append("\n");
       msg.append(" file    = ").append(file.getClass()).append("\n");
       msg.append(" maximum number of dir entries = ").append((dirCapacity - 1)).append("\n");

@@ -143,7 +143,7 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
     for(DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(DBIDUtil.toString(iter));

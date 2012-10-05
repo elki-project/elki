@@ -291,7 +291,7 @@ public class LinearEquationSystem {
     int[] coeffDigits = maxIntegerDigits(coeff);
     int rhsDigits = maxIntegerDigits(rhs);
 
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append(prefix).append("\n").append(prefix);
     for(int i = 0; i < coeff.length; i++) {
       for(int j = 0; j < coeff[row[0]].length; j++) {
@@ -356,7 +356,7 @@ public class LinearEquationSystem {
 
     int x0Digits = maxIntegerDigits(x_0);
     int[] uDigits = maxIntegerDigits(u);
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < x_0.length; i++) {
       double value = x_0[i];
       format(nf, buffer, value, x0Digits);
@@ -420,7 +420,7 @@ public class LinearEquationSystem {
       pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
       if(LOG.isDebugging()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("equations ").append(equationsToString(4));
         msg.append("  *** pivot at (").append(pivotRow).append(",").append(pivotCol).append(") = ").append(pivot).append("\n");
         LOG.debugFine(msg.toString());
@@ -547,7 +547,7 @@ public class LinearEquationSystem {
     rhs[row[k]] /= pivot;
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("set pivot element to 1 ").append(equationsToString(4));
       LOG.debugFine(msg.toString());
     }
@@ -574,7 +574,7 @@ public class LinearEquationSystem {
     }// end for k
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("after pivot operation ").append(equationsToString(4));
       LOG.debugFine(msg.toString());
     }
@@ -624,7 +624,7 @@ public class LinearEquationSystem {
       freeIndices.add(i);
     }
 
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     if(LOG.isDebugging()) {
       msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", 4)).append("]");
       msg.append("\nbound Indices ").append(boundIndices);
@@ -746,7 +746,7 @@ public class LinearEquationSystem {
    * @param value the value to append
    * @param maxIntegerDigits the maximum number of integer digits
    */
-  private void format(NumberFormat nf, StringBuffer buffer, double value, int maxIntegerDigits) {
+  private void format(NumberFormat nf, StringBuilder buffer, double value, int maxIntegerDigits) {
     if(value >= 0) {
       buffer.append(" + ");
     }

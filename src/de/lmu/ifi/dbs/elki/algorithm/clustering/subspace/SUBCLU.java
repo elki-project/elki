@@ -187,7 +187,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
       List<Cluster<Model>> clusters = runDBSCAN(relation, null, currentSubspace);
 
       if(LOG.isDebuggingFiner()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("\n").append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
         for(Cluster<Model> cluster : clusters) {
           msg.append("      " + cluster.getIDs() + "\n");
@@ -236,7 +236,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
         }
 
         if(LOG.isDebuggingFine()) {
-          StringBuffer msg = new StringBuffer();
+          StringBuilder msg = new StringBuilder();
           msg.append(clusters.size() + " cluster(s) in subspace " + candidate + ": \n");
           for(Cluster<Model> c : clusters) {
             msg.append("      " + c.getIDs() + "\n");
@@ -343,7 +343,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     // Generate (d+1)-dimensional candidate subspaces
     int d = subspaces.get(0).dimensionality();
 
-    StringBuffer msgFine = new StringBuffer("\n");
+    StringBuilder msgFine = new StringBuilder("\n");
     if(LOG.isDebuggingFiner()) {
       msgFine.append("subspaces ").append(subspaces).append("\n");
     }
@@ -381,7 +381,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
       LOG.debugFiner(msgFine.toString());
     }
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(d + 1).append("-dimensional candidate subspaces: ");
       for(Subspace candidate : candidates) {
         msg.append(candidate.dimensonsToString()).append(" ");

@@ -91,7 +91,7 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
     }
 
     if(LoggingConfiguration.DEBUG) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("b " + FormatUtil.format(b, 4));
       Logger.getLogger(this.getClass().getName()).fine(msg.toString());
     }

@@ -111,7 +111,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
 
   @Override
   public String getDescription() {
-    StringBuffer description = new StringBuffer();
+    StringBuilder description = new StringBuilder();
     if(flagConstraint) {
       description.append("If ").append(flag.getName());
       description.append(" is set, the following constraints for parameter ");

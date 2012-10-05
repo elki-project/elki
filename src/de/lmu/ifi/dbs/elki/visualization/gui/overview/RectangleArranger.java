@@ -419,7 +419,7 @@ public class RectangleArranger<T> {
    * Debug logging
    */
   protected void logSizes() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     final int cols = widths.size();
     final int rows = heights.size();
     {

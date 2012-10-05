@@ -119,7 +119,7 @@ public class CSSClassManager {
    * 
    * @param buf String buffer
    */
-  public void serialize(StringBuffer buf) {
+  public void serialize(StringBuilder buf) {
     for (CSSClass clss : store.values()) {
       clss.appendCSSDefinition(buf);
     }
@@ -193,7 +193,7 @@ public class CSSClassManager {
    * @param style Style element
    */
   public void updateStyleElement(Document document, Element style) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     serialize(buf);
     Text cont = document.createTextNode(buf.toString());
     while (style.hasChildNodes()) {

@@ -62,7 +62,7 @@ public class StepProgress extends FiniteProgress {
   // No constructor with auto logging - call beginStep() first
 
   @Override
-  public StringBuffer appendToBuffer(StringBuffer buf) {
+  public StringBuilder appendToBuffer(StringBuilder buf) {
     buf.append(super.getTask());
     if (isComplete()) {
       buf.append(": complete.");

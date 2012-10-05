@@ -38,7 +38,7 @@ public class TextWriterObjectArray<T> extends TextWriterWriterInterface<T[]> {
    */
   @Override
   public void write(TextWriterStream out, String label, T[] v) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if(label != null) {
       buf.append(label).append("=");
     }

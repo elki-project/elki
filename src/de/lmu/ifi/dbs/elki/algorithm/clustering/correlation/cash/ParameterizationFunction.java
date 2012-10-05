@@ -398,7 +398,7 @@ public class ParameterizationFunction {
    * @return a string representation of the object.
    */
   public String toString(int offset) {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     for(int d = 0; d < vec.getDimensionality(); d++) {
       if(d != 0) {
         result.append(" + \n").append(FormatUtil.whitespace(offset));

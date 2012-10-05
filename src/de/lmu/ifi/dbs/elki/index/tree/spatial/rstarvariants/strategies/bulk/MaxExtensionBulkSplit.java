@@ -74,7 +74,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
     List<N> objects = new ArrayList<N>(spatialObjects);
 
     while(objects.size() > 0) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
 
       // get the split axis and split point
       int splitAxis = chooseMaximalExtendedSplitAxis(objects);

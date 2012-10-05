@@ -145,7 +145,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         candidates[i].set(i);
       }
       while(candidates.length > 0) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         BitSet[] frequentItemsets = frequentItemsets(support, candidates, relation);
         if(LOG.isVerbose()) {
           msg.append("\ncandidates").append(Arrays.asList(candidates));

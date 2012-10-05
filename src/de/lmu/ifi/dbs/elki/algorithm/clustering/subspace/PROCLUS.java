@@ -174,7 +174,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     DBIDs medoids = greedy(distFunc, sampleSet, medoidSize, random);
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("\n");
       msg.append("sampleSize ").append(sampleSize).append("\n");
       msg.append("sampleSet ").append(sampleSet).append("\n");
@@ -193,7 +193,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     ModifiableDBIDs m_current = initialSet(medoids, k, random);
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("\n");
       msg.append("m_c ").append(m_current).append("\n");
       LOG.debugFine(msg.toString());
@@ -466,7 +466,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       dims_i.add(z_ij.getThird());
 
       if(LOG.isDebugging()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("\n");
         msg.append("z_ij ").append(z_ij).append("\n");
         msg.append("D_i ").append(dims_i).append("\n");
@@ -543,7 +543,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       dims_i.add(z_ij.getThird());
 
       if(LOG.isDebugging()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append("\n");
         msg.append("z_ij ").append(z_ij).append("\n");
         msg.append("D_i ").append(dims_i).append("\n");
@@ -603,7 +603,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     }
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("\n");
       msg.append("clusters ").append(clusters).append("\n");
       LOG.debugFine(msg.toString());
@@ -655,7 +655,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     }
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("\n");
       msg.append("clusters ").append(clusters).append("\n");
       LOG.debugFine(msg.toString());
@@ -796,7 +796,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
     @Override
     public String toString() {
-      StringBuffer result = new StringBuffer();
+      StringBuilder result = new StringBuilder();
       result.append("Dimensions: [");
       boolean notFirst = false;
       for(TIntIterator iter = dimensions.iterator(); iter.hasNext(); ) {

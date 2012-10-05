@@ -304,7 +304,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       }
     }
     // Build the improved ensemble:
-    StringBuffer greedylbl = new StringBuffer();
+    StringBuilder greedylbl = new StringBuilder();
     {
       for (DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
         if(greedylbl.length() > 0) {

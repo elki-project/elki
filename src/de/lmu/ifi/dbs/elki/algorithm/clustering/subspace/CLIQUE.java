@@ -313,7 +313,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     }
 
     if(LOG.isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("   minima: ").append(FormatUtil.format(minima, ", ", 2));
       msg.append("\n   maxima: ").append(FormatUtil.format(maxima, ", ", 2));
       msg.append("\n   unit lengths: ").append(FormatUtil.format(unit_lengths, ", ", 2));
@@ -333,7 +333,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
       }
     }
     if(LOG.isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("   unit bounds ").append(FormatUtil.format(new Matrix(unit_bounds), "   "));
       LOG.debugFiner(msg.toString());
     }
@@ -347,7 +347,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     }
 
     if(LOG.isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("   total number of 1-dim units: ").append(units.size());
       LOG.debugFiner(msg.toString());
     }
@@ -414,7 +414,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     }
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("   number of 1-dim dense units: ").append(denseUnits.size());
       msg.append("\n   number of 1-dim dense subspace candidates: ").append(denseSubspaces.size());
       LOG.debugFine(msg.toString());

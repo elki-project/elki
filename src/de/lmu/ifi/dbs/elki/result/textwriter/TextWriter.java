@@ -360,7 +360,7 @@ public class TextWriter {
       mwri.writeObject(out, null, model);
     }
     if(clus.getParents().size() > 0) {
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("Parents:");
       for(Cluster<?> parent : clus.getParents()) {
         buf.append(" ").append(naming.getNameFor(parent));
@@ -368,7 +368,7 @@ public class TextWriter {
       out.commentPrintLn(buf.toString());
     }
     if(clus.getChildren().size() > 0) {
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("Children:");
       for(Cluster<?> child : clus.getChildren()) {
         buf.append(" ").append(naming.getNameFor(child));

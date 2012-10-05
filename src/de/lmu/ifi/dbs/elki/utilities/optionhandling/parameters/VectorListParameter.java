@@ -139,7 +139,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
 
   @Override
   public String getValueAsString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     List<List<Double>> val = getValue();
     Iterator<List<Double>> valiter = val.iterator();
     while(valiter.hasNext()) {

@@ -181,7 +181,7 @@ public class ClusterContingencyTable {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if(contingency != null) {
       for(int i1 = 0; i1 < size1 + 2; i1++) {
         if(i1 >= size1) {

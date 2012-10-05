@@ -149,7 +149,7 @@ public class CLISmartHandler extends Handler {
       Collection<Progress> completed = ptrack.removeCompleted();
       Collection<Progress> progresses = ptrack.getProgresses();
 
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       if(completed.size() > 0) {
         buf.append(OutputStreamLogger.CARRIAGE_RETURN);
         for(Progress prog : completed) {

@@ -284,7 +284,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
    */
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     for(Interval interval : intervals) {
       result.append(interval).append(" ");
     }

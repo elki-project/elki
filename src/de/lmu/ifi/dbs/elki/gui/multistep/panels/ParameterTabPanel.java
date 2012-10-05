@@ -231,7 +231,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * @param config Parameterization
    */
   protected void reportErrors(Parameterization config) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for(ParameterException e : config.getErrors()) {
       if(e instanceof UnspecifiedParameterException) {
         continue;

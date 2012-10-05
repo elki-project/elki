@@ -121,7 +121,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
           subspaceDim++;
           if(LOG.isDebugging()) {
             //Representation<String> rep = database.getObjectLabelQuery();
-            StringBuffer msg = new StringBuffer();
+            StringBuilder msg = new StringBuilder();
             msg.append("d ").append(d);
             //msg.append("\nv1 ").append(rep.get(v1.getID()));
             //msg.append("\nv2 ").append(rep.get(v2.getID()));

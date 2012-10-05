@@ -98,7 +98,7 @@ public class CASHIntervalSplit {
    *         exceeds minPts, null otherwise
    */
   public ModifiableDBIDs determineIDs(DBIDs superSetIDs, HyperBoundingBox interval, double d_min, double d_max) {
-    StringBuffer msg = LOG.isDebugging() ? new StringBuffer() : null;
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     if(msg != null) {
       msg.append("interval ").append(interval);
     }

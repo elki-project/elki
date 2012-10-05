@@ -112,7 +112,7 @@ public class ConvexHull {
    *        should be computed
    */
   private void determineLowerAndUpperHull(double[] x, double[] y) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     // first point is always in lowerHull and upperHull
     lowerHull[0] = 0;
     l = 1;

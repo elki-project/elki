@@ -98,7 +98,7 @@ public class FiniteProgress extends AbstractProgress {
    * @return Buffer the data was serialized to.
    */
   @Override
-  public StringBuffer appendToBuffer(StringBuffer buf) {
+  public StringBuilder appendToBuffer(StringBuilder buf) {
     String processedString = Integer.toString(getProcessed());
     int percentage = (int) (getProcessed() * 100.0 / total);
     buf.append(getTask());

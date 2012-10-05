@@ -43,12 +43,12 @@ public class TextWriterStream {
   /**
    * Buffer for inline data to output.
    */
-  private StringBuffer inline;
+  private StringBuilder inline;
 
   /**
    * Buffer for comment data to output.
    */
-  private StringBuffer comment;
+  private StringBuilder comment;
 
   /**
    * Handlers for various object types.
@@ -96,8 +96,8 @@ public class TextWriterStream {
   public TextWriterStream(PrintStream out, HandlerList<TextWriterWriterInterface<?>> writers) {
     this.outStream = out;
     this.writers = writers;
-    inline = new StringBuffer();
-    comment = new StringBuffer();
+    inline = new StringBuilder();
+    comment = new StringBuilder();
   }
   
   /**

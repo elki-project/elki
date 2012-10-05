@@ -61,7 +61,7 @@ public class IndefiniteProgress extends AbstractProgress {
    * Serialize 'indefinite' progress.
    */
   @Override
-  public StringBuffer appendToBuffer(StringBuffer buf) {
+  public StringBuilder appendToBuffer(StringBuilder buf) {
     buf.append(getTask());
     buf.append(": ");
     buf.append(getProcessed());

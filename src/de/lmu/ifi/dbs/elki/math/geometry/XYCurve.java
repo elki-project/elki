@@ -303,7 +303,7 @@ public class XYCurve implements Result, TextWriteable {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("XYCurve[");
     buf.append(labelx).append(",").append(labely).append(":");
     for(int pos = 0; pos < data.size(); pos += 2) {

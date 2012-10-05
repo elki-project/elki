@@ -176,7 +176,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
 
   @Override
   public String toString() {
-    StringBuffer featureLine = new StringBuffer();
+    StringBuilder featureLine = new StringBuilder();
     for (int i = 0; i < values.length; i++) {
       featureLine.append(values[i]);
       if (i + 1 < values.length) {

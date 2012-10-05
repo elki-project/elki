@@ -66,7 +66,7 @@ public class NoSupportedDataTypeException extends IllegalStateException {
 
   @Override
   public String getMessage() {
-    StringBuffer buf = new StringBuffer(super.getMessage());
+    StringBuilder buf = new StringBuilder(super.getMessage());
     if(types != null) {
       buf.append("\nAvailable types:");
       for(TypeInformation type : types) {

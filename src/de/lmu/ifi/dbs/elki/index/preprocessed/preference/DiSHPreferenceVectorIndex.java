@@ -139,7 +139,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("\n eps ").append(Arrays.asList(epsilon));
       msg.append("\n minpts ").append(minpts);
       msg.append("\n strategy ").append(strategy);
@@ -161,7 +161,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     RangeQuery<V, DoubleDistance>[] rangeQueries = initRangeQueries(relation, dim);
 
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
 
       if(LOG.isDebugging()) {
         msg.append("\nid = ").append(DBIDUtil.toString(it));
@@ -221,7 +221,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * 
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    */
-  private BitSet determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws UnableToComplyException {
+  private BitSet determinePreferenceVector(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) throws UnableToComplyException {
     if(strategy.equals(Strategy.APRIORI)) {
       return determinePreferenceVectorByApriori(relation, neighborIDs, msg);
     }
@@ -244,7 +244,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException
    * 
    */
-  private BitSet determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuffer msg) throws UnableToComplyException {
+  private BitSet determinePreferenceVectorByApriori(Relation<V> relation, ModifiableDBIDs[] neighborIDs, StringBuilder msg) throws UnableToComplyException {
     int dimensionality = neighborIDs.length;
 
     // database for apriori
@@ -307,7 +307,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVectorByMaxIntersection(ModifiableDBIDs[] neighborIDs, StringBuilder msg) {
     int dimensionality = neighborIDs.length;
     BitSet preferenceVector = new BitSet(dimensionality);
 

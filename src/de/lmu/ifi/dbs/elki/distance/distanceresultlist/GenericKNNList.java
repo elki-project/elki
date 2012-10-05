@@ -104,7 +104,7 @@ public class GenericKNNList<D extends Distance<D>> implements KNNResult<D> {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
     for(DistanceDBIDResultIter<D> iter = this.iter(); iter.valid();) {
       buf.append(iter.getDistance()).append(':').append(DBIDUtil.toString(iter));

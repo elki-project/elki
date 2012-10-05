@@ -244,7 +244,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         out.writeStartElement("name");
         out.writeCharacters(score + " " + label);
         out.writeEndElement(); // name
-        StringBuffer buf = makeDescription(otherrel, iter);
+        StringBuilder buf = makeDescription(otherrel, iter);
         out.writeStartElement("description");
         out.writeCData("<div>" + buf.toString() + "</div>");
         out.writeEndElement(); // description
@@ -309,8 +309,8 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
    * @param id Object ID
    * @return Buffer
    */
-  private StringBuffer makeDescription(Collection<Relation<?>> relations, DBIDRef id) {
-    StringBuffer buf = new StringBuffer();
+  private StringBuilder makeDescription(Collection<Relation<?>> relations, DBIDRef id) {
+    StringBuilder buf = new StringBuilder();
     for(Relation<?> rel : relations) {
       Object o = rel.get(id);
       if(o == null) {

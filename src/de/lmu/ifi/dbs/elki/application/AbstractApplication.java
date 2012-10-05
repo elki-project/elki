@@ -196,7 +196,7 @@ public abstract class AbstractApplication implements Parameterizable {
    * @return a usage message explaining all known options
    */
   public static String usage(Collection<Pair<Object, Parameter<?, ?>>> options) {
-    StringBuffer usage = new StringBuffer();
+    StringBuilder usage = new StringBuilder();
     usage.append(INFORMATION);
 
     // Collect options
@@ -235,7 +235,7 @@ public abstract class AbstractApplication implements Parameterizable {
   private static void printDescription(Class<?> descriptionClass) {
     if(descriptionClass != null) {
       LoggingConfiguration.setVerbose(true);
-      STATIC_LOGGER.verbose(OptionUtil.describeParameterizable(new StringBuffer(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
+      STATIC_LOGGER.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
     }
   }
 

@@ -206,7 +206,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = extractClusters(database, distFunc, clusterOrder);
 
     if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer("Step 1: extract clusters");
+      StringBuilder msg = new StringBuilder("Step 1: extract clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
@@ -218,7 +218,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     // check if there are clusters < minpts
     checkClusters(database, distFunc, clustersMap, minpts);
     if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer("Step 2: check clusters");
+      StringBuilder msg = new StringBuilder("Step 2: check clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
@@ -230,7 +230,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     // sort the clusters
     List<Cluster<SubspaceModel<V>>> clusters = sortClusters(database, clustersMap);
     if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer("Step 3: sort clusters");
+      StringBuilder msg = new StringBuilder("Step 3: sort clusters");
       for(Cluster<SubspaceModel<V>> c : clusters) {
         msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspace().getDimensions())).append(" ids ").append(c.size());
       }
@@ -240,7 +240,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     // build the hierarchy
     buildHierarchy(database, distFunc, clusters, dimensionality);
     if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer("Step 4: build hierarchy");
+      StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
       for(Cluster<SubspaceModel<V>> c : clusters) {
         msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getDimensions())).append(" ids ").append(c.size());
         for(Cluster<SubspaceModel<V>> cluster : c.getParents()) {
@@ -320,7 +320,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     if(LOG.isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer("Step 0");
+      StringBuilder msg = new StringBuilder("Step 0");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append("\n").append(FormatUtil.format(RelationUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
@@ -518,7 +518,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param database the database containing the data objects
    */
   private void buildHierarchy(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     final int db_dim = RelationUtil.dimensionality(database);
 
     for(int i = 0; i < clusters.size() - 1; i++) {

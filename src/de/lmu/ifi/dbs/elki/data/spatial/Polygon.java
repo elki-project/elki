@@ -118,7 +118,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
    * 
    * @param buf Buffer to append to
    */
-  public void appendToBuffer(StringBuffer buf) {
+  public void appendToBuffer(StringBuilder buf) {
     Iterator<Vector> iter = points.iterator();
     while(iter.hasNext()) {
       double[] data = iter.next().getArrayRef();
@@ -136,7 +136,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     appendToBuffer(buf);
     return buf.toString();
   }

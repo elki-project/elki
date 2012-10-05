@@ -184,7 +184,7 @@ public class SVGHyperCube {
       for(int j = i + 1; j < r_edges.size(); j++) {
         if(!b.get(i) && !b.get(j)) {
           double[] deltaj = r_edges.get(j);
-          StringBuffer pbuf = new StringBuffer();
+          StringBuilder pbuf = new StringBuilder();
           pbuf.append(SVGUtil.fmt(r_min[0])).append(",");
           pbuf.append(SVGUtil.fmt(r_min[1])).append(" ");
           pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0])).append(",");

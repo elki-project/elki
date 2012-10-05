@@ -345,7 +345,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     }
 
     if(LoggingConfiguration.DEBUG) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("\nchild level ").append(childLevel).append(",  split Dim   ").append(splitDim);
       if(leftChild != null) {
         msg.append("\nleft   ").append(leftChild);

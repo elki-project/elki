@@ -88,7 +88,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
 
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     if(LOG.isDebugging()) {
       msg.append("alpha = ").append(alpha);
       msg.append("\nsortedEigenPairs = ").append(eigenPairs);

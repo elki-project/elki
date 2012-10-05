@@ -144,7 +144,7 @@ public class ListParameterization extends AbstractParameterization {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (Pair<OptionID, Object> pair : parameters) {
       buf.append("-").append(pair.getFirst().toString()).append(" ");
       buf.append(pair.getSecond().toString()).append(" ");

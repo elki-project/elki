@@ -125,7 +125,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
       double[] pat = dashpatterns[styleflav];
       assert (pat.length % 2 == 0);
       if(pat.length > 0) {
-        StringBuffer pattern = new StringBuffer();
+        StringBuilder pattern = new StringBuilder();
         for(int i = 0; i < pat.length; i++) {
           if(i > 0) {
             pattern.append(",");
@@ -144,7 +144,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
       assert (pat.length % 2 == 0);
       // TODO: add dotting.
       if(pat.length > 0) {
-        StringBuffer pattern = new StringBuffer();
+        StringBuilder pattern = new StringBuilder();
         for(int i = 0; i < pat.length; i++) {
           if(i > 0) {
             pattern.append(",");

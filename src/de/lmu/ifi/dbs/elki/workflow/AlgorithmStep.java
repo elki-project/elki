@@ -87,7 +87,7 @@ public class AlgorithmStep implements WorkflowStep {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
     if(LOG.isVerbose() && database.getIndexes().size() > 0) {
-      StringBuffer buf = new StringBuffer();
+      StringBuilder buf = new StringBuilder();
       buf.append("Index statistics before running algorithms:").append(FormatUtil.NEWLINE);
       for(Index idx : database.getIndexes()) {
         PageFileStatistics stat = idx.getPageFileStatistics();
@@ -101,7 +101,7 @@ public class AlgorithmStep implements WorkflowStep {
       long end = System.currentTimeMillis();
       if(LOG.isVerbose()) {
         long elapsedTime = end - start;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(algorithm.getClass().getName()).append(" runtime  : ");
         buf.append(elapsedTime).append(" milliseconds.").append(FormatUtil.NEWLINE);
         for(Index idx : database.getIndexes()) {

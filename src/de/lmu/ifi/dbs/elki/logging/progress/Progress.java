@@ -35,7 +35,7 @@ public interface Progress {
    * @param buf Buffer to serialize to
    * @return Buffer the data was serialized to.
    */
-  StringBuffer appendToBuffer(StringBuffer buf);
+  StringBuilder appendToBuffer(StringBuilder buf);
 
   /**
    * Test whether a progress is complete (and thus doesn't need to be shown anymore)

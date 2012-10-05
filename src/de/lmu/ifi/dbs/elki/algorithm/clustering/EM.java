@@ -197,7 +197,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       invCovMatr.add(m.inverse());
       clusterWeights[i] = 1.0 / k;
       if(LOG.isDebuggingFinest()) {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         msg.append(" model ").append(i).append(":\n");
         msg.append(" mean:    ").append(means.get(i)).append("\n");
         msg.append(" m:\n").append(FormatUtil.format(m, "        ")).append("\n");
