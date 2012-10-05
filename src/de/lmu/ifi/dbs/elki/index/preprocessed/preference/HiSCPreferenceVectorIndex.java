@@ -104,7 +104,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, BitSet.class);
 
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
 
     long start = System.currentTimeMillis();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Preprocessing preference vector", relation.size(), LOG) : null;
@@ -152,7 +152,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
    * @param msg a string buffer for debug messages
    * @return the preference vector
    */
-  private BitSet determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuffer msg) {
+  private BitSet determinePreferenceVector(Relation<V> relation, DBIDRef id, DBIDs neighborIDs, StringBuilder msg) {
     // variances
     double[] variances = DatabaseUtil.variances(relation, relation.get(id), neighborIDs);
 

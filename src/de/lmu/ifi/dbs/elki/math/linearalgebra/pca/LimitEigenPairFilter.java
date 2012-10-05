@@ -98,7 +98,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
 
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     if(LOG.isDebugging()) {
       msg.append("delta = ").append(delta);
     }

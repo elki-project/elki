@@ -402,7 +402,7 @@ public class MiniGUI extends JPanel {
    * @param config Parameterization
    */
   protected void reportErrors(SerializedParameterization config) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("Could not run task because of configuration errors:" + NEWLINE + NEWLINE);
     for (ParameterException e : config.getErrors()) {
       buf.append(e.getMessage() + NEWLINE);

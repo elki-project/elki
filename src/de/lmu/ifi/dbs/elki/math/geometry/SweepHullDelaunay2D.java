@@ -410,7 +410,7 @@ public class SweepHullDelaunay2D {
    * Debug helper
    */
   void debugHull() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for(IntIntPair p : hull) {
       buf.append(p).append(" ");
     }

@@ -75,7 +75,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
 
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     if(LOG.isDebugging()) {
       msg.append("sortedEigenPairs ").append(eigenPairs.toString());
       msg.append("\nn = ").append(n);

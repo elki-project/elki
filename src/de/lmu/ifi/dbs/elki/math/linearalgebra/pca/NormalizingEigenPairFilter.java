@@ -68,7 +68,7 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
       strongEigenPairs.add(eigenPair);
     }
     if(LOG.isDebugging()) {
-      final StringBuffer msg = new StringBuffer();
+      final StringBuilder msg = new StringBuilder();
       msg.append("strong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       LOG.debugFine(msg.toString());

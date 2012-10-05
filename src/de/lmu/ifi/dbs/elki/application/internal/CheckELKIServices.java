@@ -180,7 +180,7 @@ public class CheckELKIServices {
       // TODO: sort by package, then classname
       Collections.sort(sorted);
       if(!update) {
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         message.append("Class ").append(prop).append(" lacks suggestions:").append(FormatUtil.NEWLINE);
         for(String remaining : sorted) {
           message.append("# ").append(remaining).append(FormatUtil.NEWLINE);

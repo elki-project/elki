@@ -87,13 +87,13 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
 
   @Override
   protected SubspaceProjectionResult computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<V> database) {
-    StringBuffer msg = null;
+    StringBuilder msg = null;
 
     int referenceSetSize = neighbors.size();
     V obj = database.get(id);
 
     if(getLogger().isDebugging()) {
-      msg = new StringBuffer();
+      msg = new StringBuilder();
       msg.append("referenceSetSize = ").append(referenceSetSize);
       msg.append("\ndelta = ").append(delta);
     }

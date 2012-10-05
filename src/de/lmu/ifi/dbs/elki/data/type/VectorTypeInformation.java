@@ -145,7 +145,7 @@ public class VectorTypeInformation<V extends FeatureVector<?>> extends SimpleTyp
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer(super.toString());
+    StringBuilder buf = new StringBuilder(super.toString());
     buf.append(",variable");
     if(mindim >= 0) {
       buf.append(",mindim=").append(mindim);

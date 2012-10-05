@@ -397,7 +397,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        (insbes. Distanz 0)
    */
   private void approximateKnnDistances(MkCoPLeafEntry<D> entry, KNNResult<D> knnDistances) {
-    StringBuffer msg = LOG.isDebugging() ? new StringBuffer() : null;
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     if(msg != null) {
       msg.append("\nknnDistances ").append(knnDistances);
     }
@@ -468,7 +468,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     if(err1 > err2 && err1 - err2 > 0.000000001) {
       // if (err1 > err2) {
 
-      StringBuffer warning = new StringBuffer();
+      StringBuilder warning = new StringBuilder();
       int u = convexHull.getNumberOfPointsInUpperHull();
       int[] upperHull = convexHull.getUpperHull();
       warning.append("\nentry ").append(entry.getRoutingObjectID());
@@ -507,7 +507,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   private ApproximationLine approximateLowerHull(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
 
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     int[] lowerHull = convexHull.getLowerHull();
     int l = convexHull.getNumberOfPointsInLowerHull();
     int k_0 = k_max - lowerHull.length + 1;
@@ -559,7 +559,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   }
 
   private ApproximationLine approximateUpperHull(ConvexHull convexHull, double[] log_k, double[] log_kDist) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
@@ -608,7 +608,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   }
 
   private ApproximationLine approximateUpperHull_PAPER(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-    StringBuffer msg = LOG.isDebugging() ? new StringBuffer() : null;
+    StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
@@ -699,7 +699,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
   @SuppressWarnings("unused")
   private ApproximationLine approximateUpperHull_OLD(ConvexHull convexHull, double[] log_k, double sum_log_k, double sum_log_k2, double[] log_kDist, double sum_log_kDist, double sum_log_k_kDist) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
     int k_0 = k_max - upperHull.length + 1;

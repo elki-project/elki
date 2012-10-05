@@ -71,7 +71,7 @@ public final class DistanceDBIDResultUtil {
   };
 
   public static String toString(DistanceDBIDResult<?> res) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append('[');
     DistanceDBIDResultIter<?> iter = res.iter();
     for(; iter.valid(); iter.advance()) {

@@ -130,7 +130,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
     setHeight(2);
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("  root = ").append(getRoot());
       msg.append("\n  numNodes = ").append(numNodes);
       msg.append("\n  height = ").append(getHeight());

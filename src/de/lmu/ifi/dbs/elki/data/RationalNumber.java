@@ -143,7 +143,7 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
       power -= fractionalPart.length();
       denominator = BigInteger.ONE;
       // translate power notation
-      StringBuffer multiplicandString = new StringBuffer("1");
+      StringBuilder multiplicandString = new StringBuilder("1");
       for(int i = 0; i < Math.abs(power); i++) {
         multiplicandString.append('0');
       }

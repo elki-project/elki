@@ -55,7 +55,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
       if(newResult instanceof HierarchicalResult) {
         Hierarchy<Result> hier = ((HierarchicalResult) newResult).getHierarchy();
         if(hier != null) {
-          StringBuffer buf = new StringBuffer();
+          StringBuilder buf = new StringBuilder();
           recursiveLogResult(buf, hier, newResult, 0);
           LOG.verbose(buf.toString());
         }
@@ -70,7 +70,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
    * @param result Current result
    * @param depth Depth
    */
-  private void recursiveLogResult(StringBuffer buf, Hierarchy<Result> hier, Result result, int depth) {
+  private void recursiveLogResult(StringBuilder buf, Hierarchy<Result> hier, Result result, int depth) {
     if(result == null) {
       buf.append("null");
       LOG.warning("null result!");

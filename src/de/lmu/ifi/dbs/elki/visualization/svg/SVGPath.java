@@ -40,7 +40,7 @@ public class SVGPath {
   /**
    * String buffer for building the path.
    */
-  private StringBuffer buf = new StringBuffer();
+  private StringBuilder buf = new StringBuilder();
 
   /**
    * The last action we did, to not add unnecessary commands

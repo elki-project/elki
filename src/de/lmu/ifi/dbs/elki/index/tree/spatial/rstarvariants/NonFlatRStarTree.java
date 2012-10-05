@@ -120,7 +120,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
       initialize(spatialObjects.get(0));
     }
 
-    StringBuffer msg = getLogger().isDebuggingFine() ? new StringBuffer() : null;
+    StringBuilder msg = getLogger().isDebuggingFine() ? new StringBuilder() : null;
 
     // Tiny tree that fits into a single page
     if(spatialObjects.size() <= leafCapacity) {
@@ -228,7 +228,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     // write to file
     writeNode(root);
     if(getLogger().isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("pageNo ").append(root.getPageID());
       getLogger().debugFiner(msg.toString());
     }

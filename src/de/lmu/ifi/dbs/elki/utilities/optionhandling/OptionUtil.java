@@ -58,7 +58,7 @@ public final class OptionUtil {
    * @return the names of the options
    */
   public static <O extends Parameter<?, ?>> String optionsNamesToString(List<O> options) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("[");
     for(int i = 0; i < options.size(); i++) {
       buffer.append(options.get(i).getName());
@@ -79,7 +79,7 @@ public final class OptionUtil {
    * @return the names of the options
    */
   public static <O extends Parameter<?, ?>> String optionsNamesToString(O[] options) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("[");
     for(int i = 0; i < options.length; i++) {
       buffer.append(options[i].getName());
@@ -100,7 +100,7 @@ public final class OptionUtil {
    * @return the names and the values of the parameters
    */
   public static <N extends Parameter<?, ?>> String parameterNamesAndValuesToString(List<N> parameters) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("[");
     for(int i = 0; i < parameters.size(); i++) {
       buffer.append(parameters.get(i).getName());
@@ -123,7 +123,7 @@ public final class OptionUtil {
    * @param indent Indentation string
    * @param options List of options
    */
-  public static void formatForConsole(StringBuffer buf, int width, String indent, Collection<Pair<Object, Parameter<?, ?>>> options) {
+  public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<Pair<Object, Parameter<?, ?>>> options) {
     for(Pair<Object, Parameter<?, ?>> pair : options) {
       String currentOption = pair.getSecond().getName();
       String syntax = pair.getSecond().getSyntax();
@@ -146,7 +146,7 @@ public final class OptionUtil {
    * @param data Data to write.
    * @param indent Indentation
    */
-  public static void println(StringBuffer buf, int width, String data, String indent) {
+  public static void println(StringBuilder buf, int width, String data, String indent) {
     for(String line : FormatUtil.splitAtLastBlank(data, width - indent.length())) {
       buf.append(indent);
       buf.append(line);
@@ -165,7 +165,7 @@ public final class OptionUtil {
    * @param indent Text indent
    * @return Formatted description
    */
-  public static StringBuffer describeParameterizable(StringBuffer buf, Class<?> pcls, int width, String indent) {
+  public static StringBuilder describeParameterizable(StringBuilder buf, Class<?> pcls, int width, String indent) {
     try {
       println(buf, width, "Description for class " + pcls.getName(), "");
 

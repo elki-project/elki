@@ -358,7 +358,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
    */
   @Override
   public String getFullDescription() {
-    StringBuffer description = new StringBuffer();
+    StringBuilder description = new StringBuilder();
     // description.append(getParameterType()).append(" ");
     description.append(shortDescription);
     description.append(FormatUtil.NEWLINE);

@@ -341,7 +341,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   public final void splitTo(AbstractNode<E> newNode, List<E> sorting, int splitPoint) {
     assert (isLeaf() == newNode.isLeaf());
     deleteAllEntries();
-    StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer("\n") : null;
+    StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder("\n") : null;
 
     for(int i = 0; i < splitPoint; i++) {
       addEntry(sorting.get(i));
@@ -373,7 +373,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   public final void splitTo(AbstractNode<E> newNode, List<E> assignmentsToFirst, List<E> assignmentsToSecond) {
     assert (isLeaf() == newNode.isLeaf());
     deleteAllEntries();
-    StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer() : null;
+    StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder() : null;
 
     // assignments to this node
     for(E entry : assignmentsToFirst) {

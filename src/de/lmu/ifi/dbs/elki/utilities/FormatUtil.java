@@ -166,7 +166,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < d.length; i++) {
       if(i > 0) {
         buffer.append(sep).append(d[i]);
@@ -189,7 +189,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep, int digits) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < d.length; i++) {
       if(i < d.length - 1) {
         buffer.append(format(d[i], digits)).append(sep);
@@ -222,7 +222,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep, NumberFormat nf) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < d.length; i++) {
       if(i < d.length - 1) {
         buffer.append(format(d[i], nf)).append(sep);
@@ -263,7 +263,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[][] d) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(double[] array : d) {
       buffer.append(format(array, ", ", 2)).append("\n");
     }
@@ -281,7 +281,7 @@ public final class FormatUtil {
    * @return a String representing the double array d
    */
   public static String format(double[][] d, String sep1, String sep2, int digits) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
 
     for(int i = 0; i < d.length; i++) {
       if(i < d.length - 1) {
@@ -306,7 +306,7 @@ public final class FormatUtil {
    * @return a String representing the Double array f
    */
   public static String format(Double[] f, String sep, int digits) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < f.length; i++) {
       if(i < f.length - 1) {
         buffer.append(format(f[i], digits)).append(sep);
@@ -339,7 +339,7 @@ public final class FormatUtil {
    * @return a String representing the Double array f
    */
   public static String format(Double[] f, String sep, NumberFormat nf) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < f.length; i++) {
       if(i < f.length - 1) {
         buffer.append(format(f[i], nf)).append(sep);
@@ -373,7 +373,7 @@ public final class FormatUtil {
    * @return a String representing the float array f
    */
   public static String format(float[] f, String sep, int digits) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < f.length; i++) {
       if(i < f.length - 1) {
         buffer.append(format(f[i], digits)).append(sep);
@@ -404,7 +404,7 @@ public final class FormatUtil {
    * @return a String representing the int array a
    */
   public static String format(int[] a, String sep) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < a.length; i++) {
       if(i < a.length - 1) {
         buffer.append(a[i]).append(sep);
@@ -435,7 +435,7 @@ public final class FormatUtil {
    * @return a String representing the Integer array a
    */
   public static String format(Integer[] a, String sep) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < a.length; i++) {
       if(i < a.length - 1) {
         buffer.append(a[i]).append(sep);
@@ -464,7 +464,7 @@ public final class FormatUtil {
    * @return a String representing the long array a
    */
   public static String format(long[] a) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < a.length; i++) {
       if(i < a.length - 1) {
         buffer.append(a[i]).append(", ");
@@ -483,7 +483,7 @@ public final class FormatUtil {
    * @return a String representing the byte array a
    */
   public static String format(byte[] a) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < a.length; i++) {
       if(i < a.length - 1) {
         buffer.append(a[i]).append(", ");
@@ -504,7 +504,7 @@ public final class FormatUtil {
    * @return a String representing the boolean array b
    */
   public static String format(boolean[] b, final String sep) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < b.length; i++) {
       if(i < b.length - 1) {
         buffer.append(format(b[i])).append(sep);
@@ -538,7 +538,7 @@ public final class FormatUtil {
    * @return a string representation of the specified bit set.
    */
   public static String format(BitSet bitSet, int dim, String sep) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
 
     for(int d = 0; d < dim; d++) {
       if(d > 0) {
@@ -582,7 +582,7 @@ public final class FormatUtil {
     if(d.size() == 1) {
       return d.iterator().next();
     }
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     boolean first = true;
     for(String str : d) {
       if(!first) {
@@ -611,7 +611,7 @@ public final class FormatUtil {
     format.setGroupingUsed(false);
 
     int width = w + 1;
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     msg.append("\n"); // start on new line.
     for(int i = 0; i < m.getRowDimensionality(); i++) {
       for(int j = 0; j < m.getColumnDimensionality(); j++) {
@@ -647,7 +647,7 @@ public final class FormatUtil {
     format.setGroupingUsed(false);
 
     int width = w + 1;
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     msg.append("\n"); // start on new line.
     for(int i = 0; i < v.getDimensionality(); i++) {
       String s = format.format(v.get(i)); // format the number
@@ -671,7 +671,7 @@ public final class FormatUtil {
    * @return a string representation of this matrix
    */
   public static String format(Matrix m, String pre) {
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
     output.append(pre).append("[\n").append(pre);
     for(int i = 0; i < m.getRowDimensionality(); i++) {
       output.append(" [");
@@ -706,7 +706,7 @@ public final class FormatUtil {
         }
       }
     }
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
     output.append("[\n");
     for(int i = 0; i < m.getRowDimensionality(); i++) {
       output.append(" [");
@@ -765,7 +765,7 @@ public final class FormatUtil {
    * @return a string representation of this matrix
    */
   public static String format(Vector v, String pre) {
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
     output.append(pre).append("[\n").append(pre);
     for(int j = 0; j < v.getDimensionality(); j++) {
       output.append(" ").append(v.get(j));
@@ -801,7 +801,7 @@ public final class FormatUtil {
         }
       }
     }
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
     output.append(pre).append("[\n").append(pre);
     for(int i = 0; i < m.getRowDimensionality(); i++) {
       output.append(" [");
@@ -1007,7 +1007,7 @@ public final class FormatUtil {
    * @return a String representing the string array d
    */
   public static String format(String[] d, String sep) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < d.length; i++) {
       if(i > 0) {
         buffer.append(sep).append(d[i]);

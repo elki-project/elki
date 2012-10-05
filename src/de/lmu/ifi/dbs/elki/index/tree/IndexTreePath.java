@@ -284,7 +284,7 @@ public class IndexTreePath<E extends Entry> {
    */
   @Override
   public String toString() {
-    StringBuffer buffer = new StringBuffer("[");
+    StringBuilder buffer = new StringBuilder("[");
 
     for(int counter = 0, maxCounter = getPathCount(); counter < maxCounter; counter++) {
       if(counter > 0) {

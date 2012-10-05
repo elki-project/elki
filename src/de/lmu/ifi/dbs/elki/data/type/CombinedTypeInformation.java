@@ -67,7 +67,7 @@ public class CombinedTypeInformation implements TypeInformation {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (int i = 0; i < restrictions.length; i++) {
       if (i > 0) {
         buf.append(" AND ");

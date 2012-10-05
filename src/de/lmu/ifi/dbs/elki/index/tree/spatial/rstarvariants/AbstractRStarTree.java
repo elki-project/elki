@@ -329,7 +329,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     this.height = computeHeight();
 
     if(getLogger().isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(getClass());
       msg.append("\n height = ").append(height);
       getLogger().debugFine(msg.toString());
@@ -930,7 +930,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     int dirNodes = 0;
     int leafNodes = 0;
     int objects = 0;

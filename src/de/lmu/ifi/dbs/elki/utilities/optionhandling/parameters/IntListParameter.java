@@ -134,7 +134,7 @@ public class IntListParameter extends ListParameter<Integer> {
   
   @Override
   public String getValueAsString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     List<Integer> val = getValue();
     Iterator<Integer> veciter = val.iterator();
     while(veciter.hasNext()) {

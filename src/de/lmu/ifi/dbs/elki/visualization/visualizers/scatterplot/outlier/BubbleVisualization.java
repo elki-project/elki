@@ -197,7 +197,7 @@ public class BubbleVisualization extends AbstractVisFactory {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
               int color = stylepolicy.getColorForDBID(objId);
-              final StringBuffer style = new StringBuffer();
+              final StringBuilder style = new StringBuilder();
               if(settings.fill) {
                 style.append(SVGConstants.CSS_FILL_PROPERTY).append(":").append(SVGUtil.colorToString(color));
                 style.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY).append(":0.5");

@@ -116,7 +116,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?>> extends AbstractPre
         subspaceDim++;
         if(LOG.isDebugging()) {
           //Representation<String> rep = rep.getObjectLabelQuery();
-          StringBuffer msg = new StringBuffer();
+          StringBuilder msg = new StringBuilder();
           msg.append("\ndist1 ").append(dist1);
           msg.append("\ndist2 ").append(dist2);
           // msg.append("\nv1 ").append(rep.get(v1.getID()));

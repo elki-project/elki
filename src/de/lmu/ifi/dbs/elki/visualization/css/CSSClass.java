@@ -265,7 +265,7 @@ public class CSSClass {
    * 
    * @param buf String buffer to append to.
    */
-  public void appendCSSDefinition(StringBuffer buf) {
+  public void appendCSSDefinition(StringBuilder buf) {
     buf.append("\n.");
     buf.append(name);
     buf.append("{");
@@ -305,7 +305,7 @@ public class CSSClass {
    * @return string rendition of CSS for inline use
    */
   public String inlineCSS() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (Pair<String, String> pair : statements) {
       buf.append(pair.getFirst());
       buf.append(":");

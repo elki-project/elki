@@ -178,7 +178,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
 
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("normalization class: ").append(getClass().getName());
     result.append("\n");
     result.append("normalization minima: ").append(FormatUtil.format(minima));

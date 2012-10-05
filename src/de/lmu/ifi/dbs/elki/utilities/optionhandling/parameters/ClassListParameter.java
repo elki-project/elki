@@ -87,7 +87,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
 
   @Override
   public String getValueAsString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     final String defPackage = restrictionClass.getPackage().getName() + ".";
     for(Class<? extends C> c : getValue()) {
       if(buf.length() > 0) {

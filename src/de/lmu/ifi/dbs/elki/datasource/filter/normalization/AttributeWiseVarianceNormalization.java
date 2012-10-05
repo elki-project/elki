@@ -115,7 +115,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
 
   @Override
   protected void prepareComplete() {
-    StringBuffer buf = LOG.isVerbose() ? new StringBuffer() : null;
+    StringBuilder buf = LOG.isVerbose() ? new StringBuilder() : null;
     final int dimensionality = mvs.length;
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
@@ -221,7 +221,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
 
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("normalization class: ").append(getClass().getName());
     result.append("\n");
     result.append("normalization means: ").append(FormatUtil.format(mean));

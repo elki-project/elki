@@ -182,7 +182,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer(getRestrictionClass().getSimpleName());
+    StringBuilder buf = new StringBuilder(getRestrictionClass().getSimpleName());
     if (mindim == maxdim) {
       buf.append(",dim=").append(mindim);
     } else {

@@ -180,7 +180,7 @@ public class HierarchicalClassLabel extends ClassLabel {
       throw new IllegalArgumentException("Specified level exceeds depth of hierarchy.");
     }
 
-    StringBuffer name = new StringBuffer();
+    StringBuilder name = new StringBuilder();
     for (int i = 0; i < level; i++) {
       name.append(this.getNameAt(i));
       if (i < level - 1) {

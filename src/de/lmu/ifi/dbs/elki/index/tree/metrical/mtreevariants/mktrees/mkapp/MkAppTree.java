@@ -366,7 +366,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return the polynomial approximation of the specified knn-distances.
    */
   private PolynomialApproximation approximateKnnDistances(List<D> knnDistances) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
 
     // count the zero distances (necessary of log-log space is used)
     int k_0 = 0;

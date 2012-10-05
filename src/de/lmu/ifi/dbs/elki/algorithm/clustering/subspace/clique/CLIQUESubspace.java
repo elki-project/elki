@@ -238,7 +238,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    */
   @Override
   public String toString(String pre) {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append(super.toString(pre));
     result.append("\n").append(pre).append("Coverage: ").append(coverage);
     result.append("\n").append(pre).append("Units: " + "\n");

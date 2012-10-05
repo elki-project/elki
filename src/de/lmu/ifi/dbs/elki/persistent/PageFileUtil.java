@@ -39,7 +39,7 @@ public final class PageFileUtil {
    * 
    * @param buffer Buffer to append to
    */
-  public static void appendPageFileStatistics(StringBuffer buffer, PageFileStatistics statistics) {
+  public static void appendPageFileStatistics(StringBuilder buffer, PageFileStatistics statistics) {
     if(statistics != null) {
       buffer.append("Page File Layer: ").append(statistics.getClass()).append("\n");
       buffer.append("Read Operations: ").append(statistics.getReadOperations()).append("\n");

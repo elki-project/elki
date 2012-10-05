@@ -1133,7 +1133,7 @@ public class Matrix {
     if(this.columndimension + columnMatrix.columndimension > this.elements.length) {
       return false;
     }
-    final StringBuffer msg = LoggingConfiguration.DEBUG ? new StringBuffer() : null;
+    final StringBuilder msg = LoggingConfiguration.DEBUG ? new StringBuilder() : null;
 
     final double[][] a = new double[columndimension + 1][elements.length - 1];
     final double[] b = new double[columndimension + 1];

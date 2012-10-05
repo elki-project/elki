@@ -244,7 +244,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
           bestSol.add(ind);
         }
         if(LOG.isDebuggingFinest()) {
-          StringBuffer buf = new StringBuffer();
+          StringBuilder buf = new StringBuilder();
           buf.append("Top solutions:\n");
           for(Individuum ind : bestSol) {
             buf.append(ind.toString()).append("\n");

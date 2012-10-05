@@ -63,7 +63,7 @@ public abstract class AbstractStreamNormalization<O extends NumberVector<?>> ext
 
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("normalization class: ").append(getClass().getName());
     return result.toString();
   }

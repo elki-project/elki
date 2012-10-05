@@ -502,7 +502,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       }
       explaintab.put(DBIDUtil.deref(objKey), expList);
     }
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append("Result: ABOD\n");
     int count = 0;
     while(!pq.isEmpty()) {
@@ -520,7 +520,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     return buf.toString();
   }
 
-  private void generateExplanation(StringBuffer buf, Relation<V> data, DBIDRef key, DBIDs expList) {
+  private void generateExplanation(StringBuilder buf, Relation<V> data, DBIDRef key, DBIDs expList) {
     Vector vect1 = data.get(key).getColumnVector();
     for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
       buf.append("Outlier: ").append(vect1).append("\n");

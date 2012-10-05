@@ -396,7 +396,7 @@ public class JSONWebServer implements HttpHandler {
     }
 
     // Prepare JSON response.
-    StringBuffer response = new StringBuffer();
+    StringBuilder response = new StringBuilder();
     {
       if(callback != null) {
         response.append(callback);

@@ -120,7 +120,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    */
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     int dirNodes = 0;
     int leafNodes = 0;
     int objects = 0;

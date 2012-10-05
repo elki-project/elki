@@ -225,7 +225,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   public Clustering<Model> run(Database database, Relation<V> vrel) {
     this.fulldatabase = preprocess(database, vrel);
     if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("DB size: ").append(fulldatabase.size());
       msg.append("\nmin Dim: ").append(minDim);
       LOG.verbose(msg.toString());
@@ -241,7 +241,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       for(Cluster<Model> c : result.getAllClusters()) {
         if(c.getModel() instanceof LinearEquationModel) {
           LinearEquationModel s = (LinearEquationModel) c.getModel();
@@ -296,7 +296,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     initHeap(heap, relation, dim, noiseIDs);
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
       msg.append("\nXXXX dim ").append(dim);
       msg.append("\nXXXX database.size ").append(relation.size());
@@ -304,7 +304,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       LOG.debugFine(msg.toString());
     }
     else if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("XXXX dim ").append(dim).append(" database.size ").append(relation.size());
       LOG.verbose(msg.toString());
     }
@@ -395,7 +395,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("noise fuer dim ").append(dim).append(": ").append(noiseIDs.size());
 
       for(Cluster<Model> c : res.getAllClusters()) {
@@ -449,7 +449,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     double[] d_maxs = new double[numDIntervals];
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("d_min ").append(d_min);
       msg.append("\nd_max ").append(d_max);
       msg.append("\nnumDIntervals ").append(numDIntervals);
@@ -457,7 +457,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       LOG.debugFine(msg.toString());
     }
     else if(LOG.isVerbose()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("d_min ").append(d_min);
       msg.append("\nd_max ").append(d_max);
       msg.append("\nnumDIntervals ").append(numDIntervals);
@@ -494,7 +494,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     if(LOG.isDebuggingFiner()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append("heap.size ").append(heap.size());
       LOG.debugFiner(msg.toString());
     }

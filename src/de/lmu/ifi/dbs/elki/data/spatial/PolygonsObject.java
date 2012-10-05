@@ -69,7 +69,7 @@ public class PolygonsObject implements SpatialComparable {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     appendToBuffer(buf);
     return buf.toString();
   }
@@ -79,7 +79,7 @@ public class PolygonsObject implements SpatialComparable {
    * 
    * @param buf Buffer to append to
    */
-  public void appendToBuffer(StringBuffer buf) {
+  public void appendToBuffer(StringBuilder buf) {
     Iterator<Polygon> iter = polygons.iterator();
     while(iter.hasNext()) {
       Polygon poly = iter.next();

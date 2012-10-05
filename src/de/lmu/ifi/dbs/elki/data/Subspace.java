@@ -122,7 +122,7 @@ public class Subspace {
    * @return a string representation of this subspace
    */
   public String toString(String pre) {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append(pre).append("Dimensions: [");
     int start = dimensions.nextSetBit(0);
     for(int d = start; d >= 0; d = dimensions.nextSetBit(d + 1)) {
@@ -152,7 +152,7 @@ public class Subspace {
    * @return a string representation of the dimensions of this subspace
    */
   public String dimensonsToString(String sep) {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     result.append("[");
     for(int dim = dimensions.nextSetBit(0); dim >= 0; dim = dimensions.nextSetBit(dim + 1)) {
       if(result.length() == 1) {

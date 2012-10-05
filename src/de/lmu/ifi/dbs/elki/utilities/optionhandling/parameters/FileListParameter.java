@@ -77,7 +77,7 @@ public class FileListParameter extends ListParameter<File> {
 
   @Override
   public String getValueAsString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     List<File> val = getValue();
     Iterator<File> veciter = val.iterator();
     while(veciter.hasNext()) {

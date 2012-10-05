@@ -57,7 +57,7 @@ public class EqualStringConstraint implements ParameterConstraint<String> {
   }
 
   private String constraintStrings() {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append("[");
     for(int i = 0; i < testStrings.length; i++) {
       buffer.append(testStrings[i]);

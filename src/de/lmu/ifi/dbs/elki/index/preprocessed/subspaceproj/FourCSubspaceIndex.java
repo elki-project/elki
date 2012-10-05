@@ -101,7 +101,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
     PCAFilteredResult pcares = pca.processIds(ids, database);
 
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer();
+      StringBuilder msg = new StringBuilder();
       msg.append(id).append(" "); //.append(database.getObjectLabelQuery().get(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       LOG.debugFine(msg.toString());

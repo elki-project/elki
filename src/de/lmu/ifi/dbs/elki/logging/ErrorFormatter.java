@@ -67,7 +67,7 @@ public class ErrorFormatter extends Formatter {
       return record.getMessage();
     }
     String msg = record.getMessage();
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (msg != null) {
       buf.append(msg);
       if (!msg.endsWith(OutputStreamLogger.NEWLINE)) {
@@ -88,7 +88,7 @@ public class ErrorFormatter extends Formatter {
    * @param buf Buffer to append to
    * @param thrown Throwable to format.
    */
-  private void appendCauses(StringBuffer buf, Throwable thrown) {
+  private void appendCauses(StringBuilder buf, Throwable thrown) {
     buf.append(thrown.toString()).append(OutputStreamLogger.NEWLINE);
     StackTraceElement[] stack = thrown.getStackTrace();
     int end = stack.length - 1;

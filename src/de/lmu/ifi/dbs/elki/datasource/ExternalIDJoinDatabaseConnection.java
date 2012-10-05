@@ -122,7 +122,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
         lblcol = lblc; // make static
       }
       if(lblcol == -1) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for(int i = 0; i < cur.metaLength(); i++) {
           if(buf.length() > 0) {
             buf.append(",");
@@ -171,7 +171,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
     for(int i = 0; i < first.dataLength(); i++) {
       for(int d = 0; d < first.metaLength(); d++) {
         if(first.data(i, d) == null) {
-          StringBuffer buf = new StringBuffer();
+          StringBuilder buf = new StringBuilder();
           for(int d2 = 0; d2 < first.metaLength(); d2++) {
             if(buf.length() > 0) {
               buf.append(", ");

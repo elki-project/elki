@@ -138,7 +138,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
     SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality);
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer("Step 2: Extract correlation clusters...");
+      StringBuilder msg = new StringBuilder("Step 2: Extract correlation clusters...");
       for(Integer corrDim : clusterMap.keySet()) {
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
         msg.append("\n\ncorrDim ").append(corrDim);
@@ -166,7 +166,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
     buildHierarchy(clusterMap, query);
     if(LOG.isDebugging()) {
-      StringBuffer msg = new StringBuffer("Step 3: Build hierarchy");
+      StringBuilder msg = new StringBuilder("Step 3: Build hierarchy");
       for(Integer corrDim : clusterMap.keySet()) {
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
         for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
@@ -293,7 +293,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   }
 
   private void buildHierarchy(SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap, DistanceQuery<V, IntegerDistance> query) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
 
     DBSCAN<V, DoubleDistance> dbscan = ClassGenericsUtil.castWithGenericsOrNull(DBSCAN.class, copacAlgorithm.getPartitionAlgorithm(query));
     if(dbscan == null) {
@@ -361,7 +361,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    */
   private boolean isParent(ERiCDistanceFunction distanceFunction, Cluster<CorrelationModel<V>> parent, List<Cluster<CorrelationModel<V>>> children) {
 
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
 
     for(Cluster<CorrelationModel<V>> child : children) {
       if(parent.getModel().getPCAResult().getCorrelationDimension() == child.getModel().getPCAResult().getCorrelationDimension()) {

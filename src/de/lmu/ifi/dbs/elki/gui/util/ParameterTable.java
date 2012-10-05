@@ -149,7 +149,7 @@ public class ParameterTable extends JTable {
       if(value instanceof DynamicParameters.Node) {
         Parameter<?, ?> o = ((DynamicParameters.Node) value).param;
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for(int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
           buf.append(" ");
         }

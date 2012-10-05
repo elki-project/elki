@@ -185,7 +185,7 @@ public class SortedEigenPairs {
    */
   @Override
   public String toString() {
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     for(EigenPair eigenPair : eigenPairs) {
       result.append("\n").append(eigenPair);
     }

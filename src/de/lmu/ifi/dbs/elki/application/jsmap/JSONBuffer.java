@@ -30,14 +30,14 @@ import java.util.Stack;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf StringBuffer
+ * @apiviz.composedOf StringBuilder
  * @apiviz.has JSONBuffer.JSONException
  */
 public class JSONBuffer {
   /**
    * The actual buffer we serialize to
    */
-  final StringBuffer buffer;
+  final StringBuilder buffer;
 
   /**
    * Operations on the stack.
@@ -58,7 +58,7 @@ public class JSONBuffer {
    * 
    * @param buffer Buffer to serialize to
    */
-  public JSONBuffer(StringBuffer buffer) {
+  public JSONBuffer(StringBuilder buffer) {
     this.buffer = buffer;
   }
 
