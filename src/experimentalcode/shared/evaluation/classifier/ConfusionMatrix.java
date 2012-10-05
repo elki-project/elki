@@ -326,7 +326,7 @@ public class ConfusionMatrix {
     nf.setMinimumIntegerDigits(labelLength);
     int cell = Math.max(Integer.toString(max).length(), labelLength + classPrefix.length());
     String separator = " ";
-    StringBuffer representation = new StringBuffer();
+    StringBuilder representation = new StringBuilder();
     for(int i = 1; i <= labels.size(); i++) {
       representation.append(separator);
       String label = classPrefix + nf.format(i);

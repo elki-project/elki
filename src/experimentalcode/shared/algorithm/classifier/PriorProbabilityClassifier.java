@@ -129,7 +129,7 @@ public class PriorProbabilityClassifier<O, L extends ClassLabel> extends Abstrac
 
   @Override
   public String model() {
-    StringBuffer output = new StringBuffer();
+    StringBuilder output = new StringBuilder();
     for(int i = 0; i < distribution.length; i++) {
       output.append(getLabels().get(i));
       output.append(" : ");
