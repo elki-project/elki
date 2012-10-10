@@ -126,7 +126,7 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
       if (config.grab(probP)) {
         prob = probP.getValue().doubleValue();
       }
-      RandomParameter rndP = new RandomParameter(SEED_ID, true);
+      RandomParameter rndP = new RandomParameter(SEED_ID);
       if (config.grab(rndP)) {
         rnd = rndP.getValue();
       }
