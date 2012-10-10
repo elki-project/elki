@@ -225,7 +225,7 @@ public class ArffParser implements Parser {
         }
         nextToken(tokenizer);
         if(tokenizer.ttype == StreamTokenizer.TT_NUMBER) {
-          map.put(dim, tokenizer.nval);
+          map.put(dim, Double.valueOf(tokenizer.nval));
         }
         else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
           map.put(dim, tokenizer.sval);
@@ -246,7 +246,7 @@ public class ArffParser implements Parser {
         }
       }
       assert (s >= 0);
-      if(elkitypes[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[out])) {
         TIntFloatHashMap f = new TIntFloatHashMap(dimsize[out]);
         for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
           iter.advance();
@@ -257,12 +257,12 @@ public class ArffParser implements Parser {
           if(i >= s + dimsize[out]) {
             break;
           }
-          double v = (Double) iter.value();
+          double v = ((Double) iter.value()).doubleValue();
           f.put(i - s + 1, (float) v);
         }
         data[out] = new SparseFloatVector(f, dimsize[out]);
       }
-      else if(elkitypes[out] == TypeUtil.LABELLIST) {
+      else if(TypeUtil.LABELLIST.equals(elkitypes[out])) {
         // Build a label list out of successive labels
         LabelList ll = new LabelList(1);
         for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
@@ -282,7 +282,7 @@ public class ArffParser implements Parser {
         }
         data[out] = ll;
       }
-      else if(elkitypes[out] == TypeUtil.EXTERNALID) {
+      else if(TypeUtil.EXTERNALID.equals(elkitypes[out])) {
         String val = (String) map.get(s);
         if(val != null) {
           data[out] = new ExternalID(val);
@@ -291,7 +291,7 @@ public class ArffParser implements Parser {
           throw new AbortException("External ID column not set in sparse instance." + tokenizer.toString());
         }
       }
-      else if(elkitypes[out] == TypeUtil.CLASSLABEL) {
+      else if(TypeUtil.CLASSLABEL.equals(elkitypes[out])) {
         String val = (String) map.get(s);
         if(val != null) {
           // TODO: support other class label types.
@@ -312,7 +312,7 @@ public class ArffParser implements Parser {
   private Object[] loadDenseInstance(StreamTokenizer tokenizer, int[] dimsize, TypeInformation[] etyp, int outdim) throws IOException {
     Object[] data = new Object[outdim];
     for(int out = 0; out < outdim; out++) {
-      if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.equals(etyp[out])) {
         // For multi-column vectors, read successive columns
         double[] cur = new double[dimsize[out]];
         for(int k = 0; k < dimsize[out]; k++) {
@@ -334,7 +334,7 @@ public class ArffParser implements Parser {
         }
         data[out] = new DoubleVector(cur);
       }
-      else if(etyp[out] == TypeUtil.LABELLIST) {
+      else if(TypeUtil.LABELLIST.equals(etyp[out])) {
         // Build a label list out of successive labels
         LabelList ll = new LabelList(dimsize[out]);
         for(int k = 0; k < dimsize[out]; k++) {
@@ -346,14 +346,14 @@ public class ArffParser implements Parser {
         }
         data[out] = ll;
       }
-      else if(etyp[out] == TypeUtil.EXTERNALID) {
+      else if(TypeUtil.EXTERNALID.equals(etyp[out])) {
         if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
           throw new AbortException("Expected word token, got: " + tokenizer.toString());
         }
         data[out] = new ExternalID(tokenizer.sval);
         nextToken(tokenizer);
       }
-      else if(etyp[out] == TypeUtil.CLASSLABEL) {
+      else if(TypeUtil.CLASSLABEL.equals(etyp[out])) {
         if(tokenizer.ttype != StreamTokenizer.TT_WORD) {
           throw new AbortException("Expected word token, got: " + tokenizer.toString());
         }
@@ -414,7 +414,7 @@ public class ArffParser implements Parser {
           break;
         }
       }
-      if(etyp[out] == TypeUtil.NUMBER_VECTOR_FIELD) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.equals(etyp[out])) {
         String[] labels = new String[dimsize[out]];
         // Collect labels:
         for(int i = 0; i < dimsize[out]; i++) {
@@ -429,17 +429,17 @@ public class ArffParser implements Parser {
           bundle.appendColumn(type, new ArrayList<SparseFloatVector>());
         }
       }
-      else if(etyp[out] == TypeUtil.LABELLIST) {
-        String label = names.get(out);
+      else if(TypeUtil.LABELLIST.equals(etyp[out])) {
+        StringBuilder label = new StringBuilder(names.get(out));
         for(int i = 1; i < dimsize[out]; i++) {
-          label = label + " " + names.get(out + i);
+          label.append(' ').append(names.get(out + i));
         }
-        bundle.appendColumn(new SimpleTypeInformation<LabelList>(LabelList.class, label), new ArrayList<LabelList>());
+        bundle.appendColumn(new SimpleTypeInformation<LabelList>(LabelList.class, label.toString()), new ArrayList<LabelList>());
       }
-      else if(etyp[out] == TypeUtil.EXTERNALID) {
+      else if(TypeUtil.EXTERNALID.equals(etyp[out])) {
         bundle.appendColumn(new SimpleTypeInformation<ExternalID>(ExternalID.class, names.get(out)), new ArrayList<ExternalID>());
       }
-      else if(etyp[out] == TypeUtil.CLASSLABEL) {
+      else if(TypeUtil.CLASSLABEL.equals(etyp[out])) {
         bundle.appendColumn(new SimpleTypeInformation<ClassLabel>(ClassLabel.class, names.get(out)), new ArrayList<ClassLabel>());
       }
       else {
@@ -553,7 +553,7 @@ public class ArffParser implements Parser {
       }
       else if(ARFF_NUMERIC.matcher(types.get(i)).matches()) {
         // Create a number vector field
-        if(next > 0 && etyp[next - 1] == TypeUtil.NUMBER_VECTOR_FIELD) {
+        if(next > 0 && TypeUtil.NUMBER_VECTOR_FIELD.equals(etyp[next - 1])) {
           targ[i] = next - 1;
           dims[next - 1]++;
           continue;
@@ -568,7 +568,7 @@ public class ArffParser implements Parser {
       }
       else {
         // Use LabelList
-        if(next > 0 && etyp[next - 1] == TypeUtil.LABELLIST) {
+        if(next > 0 && TypeUtil.LABELLIST.equals(etyp[next - 1])) {
           targ[i] = next - 1;
           dims[next - 1]++;
           continue;

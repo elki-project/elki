@@ -415,7 +415,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
         labelIndices = new BitSet();
         List<Integer> labelcols = labelIndicesP.getValue();
         for (Integer idx : labelcols) {
-          labelIndices.set(idx);
+          labelIndices.set(idx.intValue());
         }
       }
     }

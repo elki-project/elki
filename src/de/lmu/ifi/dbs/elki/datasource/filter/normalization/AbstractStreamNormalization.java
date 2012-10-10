@@ -51,7 +51,7 @@ public abstract class AbstractStreamNormalization<O extends NumberVector<?>> ext
   }
   
   @Override
-  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException {
+  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) {
     return super.filter(objects);
   }
 

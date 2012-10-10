@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +81,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
       final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(inputParam)) {
         try {
-          inputStream = new FileInputStream(inputParam.getValue());
+          inputStream = new BufferedInputStream(new FileInputStream(inputParam.getValue()));
           inputStream = FileUtil.tryGzipInput(inputStream);
         }
         catch(IOException e) {

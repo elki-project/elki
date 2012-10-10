@@ -23,10 +23,11 @@ package de.lmu.ifi.dbs.elki.datasource;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.impl.Constants;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -72,118 +73,114 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
   @Override
   public MultipleObjectsBundle loadData() {
     List<MultipleObjectsBundle> bundles = new ArrayList<MultipleObjectsBundle>(sources.size());
-    for(DatabaseConnection dbc : sources) {
+    for (DatabaseConnection dbc : sources) {
       bundles.add(dbc.loadData());
     }
 
     MultipleObjectsBundle first = bundles.get(0);
-    Map<String, Integer> labelmap = new HashMap<String, Integer>(first.dataLength());
+    TObjectIntHashMap<String> labelmap = new TObjectIntHashMap<String>(first.dataLength(), Constants.DEFAULT_LOAD_FACTOR, -1);
     // Process first bundle
     {
       // Identify a label column
       final int lblcol;
       {
         int lblc = -1;
-        for(int i = 0; i < first.metaLength(); i++) {
-          if(TypeUtil.GUESSED_LABEL.isAssignableFromType(first.meta(i))) {
+        for (int i = 0; i < first.metaLength(); i++) {
+          if (TypeUtil.GUESSED_LABEL.isAssignableFromType(first.meta(i))) {
             lblc = i;
             break;
           }
         }
         lblcol = lblc; // make static
       }
-      if(lblcol == -1) {
+      if (lblcol == -1) {
         throw new AbortException("No label column found in first source, cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
       }
-      for(int i = 0; i < first.dataLength(); i++) {
+      for (int i = 0; i < first.dataLength(); i++) {
         Object data = first.data(i, lblcol);
-        if(data == null) {
+        if (data == null) {
           LOG.warning("Object without label encountered.");
           continue;
         }
-        if(data instanceof String) {
-          Integer old = labelmap.put((String) data, i);
-          if(old != null) {
+        if (data instanceof String) {
+          int old = labelmap.put((String) data, i);
+          if (old != -1) {
             LOG.warning("Duplicate label encountered: " + data + " in rows " + old + " and " + i);
           }
-        }
-        else if(data instanceof LabelList) {
-          for(String lbl : (LabelList) data) {
-            Integer old = labelmap.put(lbl, i);
-            if(old != null) {
+        } else if (data instanceof LabelList) {
+          for (String lbl : (LabelList) data) {
+            int old = labelmap.put(lbl, i);
+            if (old != -1) {
               LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
             }
           }
-        }
-        else {
+        } else {
           String lbl = data.toString();
-          Integer old = labelmap.put(lbl, i);
-          if(old != null) {
+          int old = labelmap.put(lbl, i);
+          if (old != -1) {
             LOG.warning("Duplicate label encountered: " + lbl + " in rows " + old + " and " + i);
           }
         }
       }
     }
     // Process additional columns
-    for(int c = 1; c < sources.size(); c++) {
+    for (int c = 1; c < sources.size(); c++) {
       MultipleObjectsBundle cur = bundles.get(c);
       final int lblcol;
       {
         int lblc = -1;
-        for(int i = 0; i < cur.metaLength(); i++) {
-          if(TypeUtil.GUESSED_LABEL.isAssignableFromType(cur.meta(i))) {
+        for (int i = 0; i < cur.metaLength(); i++) {
+          if (TypeUtil.GUESSED_LABEL.isAssignableFromType(cur.meta(i))) {
             lblc = i;
             break;
           }
         }
         lblcol = lblc; // make static
       }
-      if(lblcol == -1) {
+      if (lblcol == -1) {
         throw new AbortException("No label column found in source " + (c + 1) + ", cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
       }
       // Destination columns
       List<ArrayList<Object>> dcol = new ArrayList<ArrayList<Object>>(cur.metaLength());
-      for(int i = 0; i < cur.metaLength(); i++) {
+      for (int i = 0; i < cur.metaLength(); i++) {
         // Skip the label columns
-        if(i == lblcol) {
+        if (i == lblcol) {
           dcol.add(null);
           continue;
         }
         ArrayList<Object> newcol = new ArrayList<Object>(first.dataLength());
         // Pre-fill with nulls.
-        for(int j = 0; j < first.dataLength(); j++) {
+        for (int j = 0; j < first.dataLength(); j++) {
           newcol.add(null);
         }
         first.appendColumn(cur.meta(i), newcol);
         dcol.add(newcol);
       }
-      for(int i = 0; i < cur.dataLength(); i++) {
+      for (int i = 0; i < cur.dataLength(); i++) {
         Object data = cur.data(i, lblcol);
-        if(data == null) {
+        if (data == null) {
           LOG.warning("Object without label encountered.");
           continue;
         }
-        Integer row = null;
-        if(data instanceof String) {
+        int row = -1;
+        if (data instanceof String) {
           row = labelmap.get(data);
-        }
-        else if(data instanceof LabelList) {
-          for(String lbl : (LabelList) data) {
+        } else if (data instanceof LabelList) {
+          for (String lbl : (LabelList) data) {
             row = labelmap.get(lbl);
-            if(row != null) {
+            if (row >= 0) {
               break;
             }
           }
-        }
-        else {
+        } else {
           row = labelmap.get(data.toString());
         }
-        if(row == null) {
+        if (row < 0) {
           LOG.warning("Label not found for join: " + data + " in row " + i);
           continue;
         }
-        for(int d = 0; d < cur.metaLength(); d++) {
-          if(d == lblcol) {
+        for (int d = 0; d < cur.metaLength(); d++) {
+          if (d == lblcol) {
             continue;
           }
           List<Object> col = dcol.get(d);
@@ -192,18 +189,17 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
         }
       }
     }
-    for(int i = 0; i < first.dataLength(); i++) {
-      for(int d = 0; d < first.metaLength(); d++) {
-        if(first.data(i, d) == null) {
+    for (int i = 0; i < first.dataLength(); i++) {
+      for (int d = 0; d < first.metaLength(); d++) {
+        if (first.data(i, d) == null) {
           StringBuilder buf = new StringBuilder();
-          for(int d2 = 0; d2 < first.metaLength(); d2++) {
-            if(buf.length() > 0) {
+          for (int d2 = 0; d2 < first.metaLength(); d2++) {
+            if (buf.length() > 0) {
               buf.append(", ");
             }
-            if(first.data(i, d2) == null) {
+            if (first.data(i, d2) == null) {
               buf.append("null");
-            }
-            else {
+            } else {
               buf.append(first.data(i, d2));
             }
           }
@@ -244,7 +240,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
       super.makeOptions(config);
       super.configFilters(config);
       final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class);
-      if(config.grab(sourcesParam)) {
+      if (config.grab(sourcesParam)) {
         sources = sourcesParam.instantiateClasses(config);
       }
     }

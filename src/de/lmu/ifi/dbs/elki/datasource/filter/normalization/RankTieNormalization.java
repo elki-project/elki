@@ -90,7 +90,7 @@ public class RankTieNormalization implements ObjectFilter {
         for(int sta = 0; sta < sorter.length;) {
           // Compute ties
           int end = sta + 1;
-          while(end < sorter.length && sorter[sta].first == sorter[end].first) {
+          while(end < sorter.length && !(sorter[sta].first < sorter[end].first)) {
             end++;
           }
           final int pos = (sta + end - 1);

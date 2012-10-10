@@ -120,11 +120,11 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     for(int i = 1; i < entries.size() - 1; i++) {
       if(labelIndices == null || !labelIndices.get(i)) {
         try {
-          int index = Integer.valueOf(entries.get(i));
+          int index = Integer.parseInt(entries.get(i));
           if(index >= maxdim) {
             maxdim = index + 1;
           }
-          double attribute = Double.valueOf(entries.get(i));
+          double attribute = Double.parseDouble(entries.get(i));
           values.put(index, attribute);
           i++;
         }

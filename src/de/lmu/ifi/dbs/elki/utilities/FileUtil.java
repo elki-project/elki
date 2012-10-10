@@ -122,8 +122,7 @@ public final class FileUtil {
       if (magic[0] == 31 && magic[1] == -117) {
         in = new GZIPInputStream(pb);
       }
-    } else
-    if (in.markSupported()) {
+    } else {
       in.mark(16);
       if (in.read() == 31 && in.read() == -117) {
         in.reset();

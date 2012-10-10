@@ -77,7 +77,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
   public NumberVectorRandomFeatureSelectionFilter(int dim, Long seed) {
     super();
     this.k = dim;
-    this.random = (seed == null) ? new Random() : new Random(seed);
+    this.random = (seed == null) ? new Random() : new Random(seed.longValue());
   }
 
   @Override
@@ -155,9 +155,9 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(1), 1);
+      IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(Integer.valueOf(1)), Integer.valueOf(1));
       if (config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.getValue().intValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
       if (config.grab(seedP)) {

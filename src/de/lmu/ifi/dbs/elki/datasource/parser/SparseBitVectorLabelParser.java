@@ -89,7 +89,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
 
           for(String entry : entries) {
             try {
-              Integer index = Integer.valueOf(entry);
+              int index = Integer.parseInt(entry);
               bitSet.set(index);
               dimensionality = Math.max(dimensionality, index);
             }

@@ -63,7 +63,7 @@ public final class FilterUtil {
         factory = (NumberVector.Factory<V, ?>) f.get(null);
       }
       catch(Exception e) {
-        LoggingUtil.warning("Cannot determine factory for type " + in.getRestrictionClass());
+        LoggingUtil.warning("Cannot determine factory for type " + in.getRestrictionClass(), e);
       }
     }
     return factory;

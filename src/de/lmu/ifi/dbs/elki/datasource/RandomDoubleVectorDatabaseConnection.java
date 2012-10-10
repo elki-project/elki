@@ -85,13 +85,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 
     // Setup random generator
-    final Random rand;
-    if(seed == null) {
-      rand = new Random();
-    }
-    else {
-      rand = new Random(seed);
-    }
+    final Random rand = (seed == null) ? new Random() : new Random(seed.longValue());
 
     // Produce random vectors
     for(int i = 0; i < size; i++) {
@@ -159,11 +153,11 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
       configFilters(config);
       IntParameter dimParam = new IntParameter(DIM_ID);
       if(config.grab(dimParam)) {
-        dim = dimParam.getValue();
+        dim = dimParam.getValue().intValue();
       }
       IntParameter sizeParam = new IntParameter(SIZE_ID);
       if(config.grab(sizeParam)) {
-        size = sizeParam.getValue();
+        size = sizeParam.getValue().intValue();
       }
       LongParameter seedParam = new LongParameter(SEED_ID, true);
       if(config.grab(seedParam)) {

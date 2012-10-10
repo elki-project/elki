@@ -75,13 +75,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector<
     BitSet b = featureVector.getNotNullMask();
     for(int i = b.nextSetBit(0); i >= 0; i = b.nextSetBit(i + 1)) {
       if(featureVector.doubleValue(i) >= 0.0) {
-        Number c = idf.get(i);
-        if(c == null) {
-          idf.put(i, 1);
-        }
-        else {
-          idf.put(i, c.intValue() + 1);
-        }
+        idf.put(i, idf.get(i) + 1);
       }
     }
     objcnt += 1;

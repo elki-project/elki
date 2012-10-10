@@ -65,7 +65,7 @@ public class LengthNormalization<V extends NumberVector<?>> extends AbstractStre
   }
 
   @Override
-  public V restore(V featureVector) throws NonNumericFeaturesException {
+  public V restore(V featureVector) {
     throw new UnsupportedOperationException();
   }
 

@@ -135,7 +135,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
     ExternalID eid = null;
     LabelList labels = null;
-    List<Polygon> polys = new java.util.Vector<Polygon>(1);
+    List<Polygon> polys = new ArrayList<Polygon>(1);
 
     List<Vector> coords = new ArrayList<Vector>();
     while(iter.hasNext()) {
@@ -204,7 +204,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       if(config.grab(colParam)) {
         colSep = colParam.getValue();
       }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), ""+QUOTE_CHAR);
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), String.valueOf(QUOTE_CHAR));
       if(config.grab(quoteParam)) {
         quoteChar = quoteParam.getValue().charAt(0);
       }

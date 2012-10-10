@@ -94,10 +94,10 @@ public class ClassLabelFilter implements ObjectFilter {
     // Find a labellist column
     boolean done = false;
     boolean keeplabelcol = false;
-    for(int i = 0; i < objects.metaLength(); i++) {
+    for (int i = 0; i < objects.metaLength(); i++) {
       SimpleTypeInformation<?> meta = objects.meta(i);
       // Skip non-labellist columns - or if we already had a labellist
-      if(done || meta.getRestrictionClass() != LabelList.class) {
+      if (done || !LabelList.class.equals(meta.getRestrictionClass())) {
         bundle.appendColumn(meta, objects.getColumn(i));
         continue;
       }
@@ -108,29 +108,27 @@ public class ClassLabelFilter implements ObjectFilter {
       List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
 
       // Split the column
-      for(Object obj : objects.getColumn(i)) {
-        if(obj != null) {
+      for (Object obj : objects.getColumn(i)) {
+        if (obj != null) {
           LabelList ll = (LabelList) obj;
           try {
             ClassLabel lbl = classLabelFactory.makeFromString(ll.remove(classLabelIndex));
             clscol.add(lbl);
-          }
-          catch(Exception e) {
-            throw new AbortException("Cannot initialize class labels: "+e.getMessage(), e);
+          } catch (Exception e) {
+            throw new AbortException("Cannot initialize class labels: " + e.getMessage(), e);
           }
           lblcol.add(ll);
-          if(ll.size() > 0) {
+          if (ll.size() > 0) {
             keeplabelcol = true;
           }
-        }
-        else {
+        } else {
           clscol.add(null);
           lblcol.add(null);
         }
       }
       bundle.appendColumn(classLabelFactory.getTypeInformation(), clscol);
       // Only add the label column when it's not empty.
-      if(keeplabelcol) {
+      if (keeplabelcol) {
         bundle.appendColumn(meta, lblcol);
       }
     }
@@ -149,7 +147,7 @@ public class ClassLabelFilter implements ObjectFilter {
      * The index of the label to be used as class label, null if no class label
      * is specified.
      */
-    protected Integer classLabelIndex;
+    protected int classLabelIndex;
 
     /**
      * The class label factory to use.
@@ -160,13 +158,13 @@ public class ClassLabelFilter implements ObjectFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // parameter class label index
-      final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(0));
+      final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID, new GreaterEqualConstraint(Integer.valueOf(0)));
       final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<ClassLabel.Factory<?>>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
 
       config.grab(classLabelIndexParam);
       config.grab(classlabelClassParam);
-      if(classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
-        classLabelIndex = classLabelIndexParam.getValue();
+      if (classLabelIndexParam.isDefined() && classlabelClassParam.isDefined()) {
+        classLabelIndex = classLabelIndexParam.getValue().intValue();
         classLabelFactory = classlabelClassParam.instantiateClass(config);
       }
     }
