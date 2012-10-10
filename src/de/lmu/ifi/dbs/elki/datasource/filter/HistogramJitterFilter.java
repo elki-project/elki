@@ -22,20 +22,19 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Add Jitter, preserving the histogram properties (same sum, nonnegative).
@@ -71,21 +70,20 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
    * Constructor.
    * 
    * @param jitter Relative amount of jitter to add
-   * @param seed Random seed
+   * @param rnd Random generator
    */
-  public HistogramJitterFilter(double jitter, Long seed) {
+  public HistogramJitterFilter(double jitter, RandomFactory rnd) {
     super();
     this.jitter = jitter;
-    Random random = (seed == null) ? new Random() : new Random(seed.longValue());
-    rnd = new ExponentialDistribution(1, random);
+    this.rnd = new ExponentialDistribution(1, rnd.getRandom());
   }
-  
+
   @Override
   protected V filterSingleObject(V obj) {
     final int dim = obj.getDimensionality();
     // Compute the total sum.
     double osum = 0;
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       osum += obj.doubleValue(i);
     }
     // Actual maximum jitter amount:
@@ -93,13 +91,13 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     // Generate jitter vector
     double[] raw = new double[dim];
     double jsum = 0; // Sum of jitter
-    for(int i = 0; i < raw.length; i++) {
+    for (int i = 0; i < raw.length; i++) {
       raw[i] = rnd.nextRandom() * maxjitter;
       jsum += raw[i];
     }
     final double mix = jsum / osum;
     // Combine the two vector
-    for(int i = 0; i < raw.length; i++) {
+    for (int i = 0; i < raw.length; i++) {
       raw[i] = raw[i] + (1 - mix) * obj.doubleValue(i);
     }
     return factory.newNumberVector(raw);
@@ -142,24 +140,24 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     /**
      * Random generator seed.
      */
-    Long seed = null;
+    RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter jitterP = new DoubleParameter(JITTER_ID, new GreaterEqualConstraint(Double.valueOf(0.0)));
-      if(config.grab(jitterP)) {
+      if (config.grab(jitterP)) {
         jitter = jitterP.getValue().doubleValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected HistogramJitterFilter<DoubleVector> makeInstance() {
-      return new HistogramJitterFilter<DoubleVector>(jitter, seed);
+      return new HistogramJitterFilter<DoubleVector>(jitter, rnd);
     }
   }
 }

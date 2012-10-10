@@ -36,13 +36,14 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * RANSAC based approach to a more robust covariance matrix computation.
@@ -84,27 +85,27 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
   int iterations = 1000;
 
   /**
-   * Random seed
+   * Random generator
    */
-  Long seed;
+  RandomFactory rnd;
 
   /**
    * Constructor.
    * 
    * @param iterations Number of iterations (attempts) to try
-   * @param seed random seed (may be {@code null})
+   * @param rnd random generator
    */
-  public RANSACCovarianceMatrixBuilder(int iterations, Long seed) {
+  public RANSACCovarianceMatrixBuilder(int iterations, RandomFactory rnd) {
     super();
     this.iterations = iterations;
-    this.seed = seed;
+    this.rnd = rnd;
   }
 
   @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
   @Override
   public Matrix processIds(DBIDs ids, Relation<? extends V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    Random random = (seed != null) ? new Random(seed) : new Random();
+    Random random = rnd.getRandom();
 
     DBIDs best = DBIDUtil.EMPTYDBIDS;
     double tresh = ChiSquaredDistribution.quantile(0.85, dim);
@@ -166,9 +167,9 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
     int iterations = 1000;
 
     /**
-     * Random seed
+     * Random generator
      */
-    Long seed = null;
+    RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -177,15 +178,15 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
       if (config.grab(iterP)) {
         iterations = iterP.getValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if (config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected RANSACCovarianceMatrixBuilder<V> makeInstance() {
-      return new RANSACCovarianceMatrixBuilder<V>(iterations, seed);
+      return new RANSACCovarianceMatrixBuilder<V>(iterations, rnd);
     }
   }
 }

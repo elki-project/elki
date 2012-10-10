@@ -218,9 +218,9 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
       if (config.grab(samplingP)) {
         sampling = samplingP.getValue();
       }
-      final LongParameter seedP = new LongParameter(SEED_ID, true);
-      if (config.grab(seedP)) {
-        seed = seedP.getValue();
+      final LongParameter rndP = new LongParameter(SEED_ID, true);
+      if (config.grab(rndP)) {
+        seed = rndP.getValue();
       }
     }
 

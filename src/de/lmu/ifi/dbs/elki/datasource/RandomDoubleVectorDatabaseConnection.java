@@ -33,10 +33,11 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Produce a database of random double vectors with each dimension in [0:1].
@@ -60,23 +61,23 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
   protected int size = -1;
 
   /**
-   * Seed to use.
+   * Random generator
    */
-  protected Long seed;
+  protected RandomFactory rnd;
 
   /**
    * Constructor.
    * 
    * @param dim Dimensionality
    * @param size Database size
-   * @param seed Random seed
+   * @param rnd Random generator
    * @param filters Filters to use
    */
-  public RandomDoubleVectorDatabaseConnection(int dim, int size, Long seed, List<ObjectFilter> filters) {
+  public RandomDoubleVectorDatabaseConnection(int dim, int size, RandomFactory rnd, List<ObjectFilter> filters) {
     super(filters);
     this.dim = dim;
     this.size = size;
-    this.seed = seed;
+    this.rnd = rnd;
   }
 
   @Override
@@ -85,7 +86,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     List<DoubleVector> vectors = new ArrayList<DoubleVector>(size);
 
     // Setup random generator
-    final Random rand = (seed == null) ? new Random() : new Random(seed.longValue());
+    final Random rand = rnd.getRandom();
 
     // Produce random vectors
     for(int i = 0; i < size; i++) {
@@ -143,9 +144,9 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
     int size = -1;
 
     /**
-     * Random generator seed.
+     * Random generator.
      */
-    Long seed = null;
+    RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -159,15 +160,15 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
       if(config.grab(sizeParam)) {
         size = sizeParam.getValue().intValue();
       }
-      LongParameter seedParam = new LongParameter(SEED_ID, true);
-      if(config.grab(seedParam)) {
-        seed = seedParam.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected RandomDoubleVectorDatabaseConnection makeInstance() {
-      return new RandomDoubleVectorDatabaseConnection(dim, size, seed, filters);
+      return new RandomDoubleVectorDatabaseConnection(dim, size, rnd, filters);
     }
   }
 }

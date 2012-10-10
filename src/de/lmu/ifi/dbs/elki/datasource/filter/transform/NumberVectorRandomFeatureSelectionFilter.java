@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  */
 
 import java.util.BitSet;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -33,13 +32,14 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Parser to project the ParsingResult obtained by a suitable base parser onto a
@@ -64,20 +64,20 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
   protected int k;
 
   /**
-   * Holds a random object.
+   * Holds a random generator.
    */
-  protected final Random random;
+  protected RandomFactory rnd;
 
   /**
    * Constructor.
    * 
    * @param dim Dimensionality
-   * @param seed Random seed
+   * @param rnd Random generator
    */
-  public NumberVectorRandomFeatureSelectionFilter(int dim, Long seed) {
+  public NumberVectorRandomFeatureSelectionFilter(int dim, RandomFactory rnd) {
     super();
     this.k = dim;
-    this.random = (seed == null) ? new Random() : new Random(seed.longValue());
+    this.rnd = rnd;
   }
 
   @Override
@@ -106,7 +106,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
    */
   void initializeRandomAttributes(SimpleTypeInformation<V> in) {
     int d = ((VectorFieldTypeInformation<V>) in).getDimensionality();
-    selectedAttributes = Util.randomBitSet(k, d, random);
+    selectedAttributes = Util.randomBitSet(k, d, rnd.getRandom());
   }
 
   /**
@@ -148,9 +148,9 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
     protected int k = 0;
 
     /**
-     * Random seed.
+     * Random generator.
      */
-    protected Long seed;
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -159,15 +159,15 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
       if (config.grab(kP)) {
         k = kP.getValue().intValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if (config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected NumberVectorRandomFeatureSelectionFilter<DoubleVector> makeInstance() {
-      return new NumberVectorRandomFeatureSelectionFilter<DoubleVector>(k, seed);
+      return new NumberVectorRandomFeatureSelectionFilter<DoubleVector>(k, rnd);
     }
   }
 }

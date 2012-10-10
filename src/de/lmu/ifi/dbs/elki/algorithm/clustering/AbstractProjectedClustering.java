@@ -50,36 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector<?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
-   * Parameter to specify the number of clusters to find, must be an integer
-   * greater than 0.
-   * <p>
-   * Key: {@code -projectedclustering.k}
-   * </p>
-   */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("projectedclustering.k", "The number of clusters to find.");
-
-  /**
-   * Parameter to specify the multiplier for the initial number of seeds, must
-   * be an integer greater than 0.
-   * <p>
-   * Default value: {@code 30}
-   * </p>
-   * <p>
-   * Key: {@code -projectedclustering.k_i}
-   * </p>
-   */
-  public static final OptionID K_I_ID = OptionID.getOrCreateOptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
-
-  /**
-   * Parameter to specify the dimensionality of the clusters to find, must be an
-   * integer greater than 0.
-   * <p>
-   * Key: {@code -projectedclustering.l}
-   * </p>
-   */
-  public static final OptionID L_ID = OptionID.getOrCreateOptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
-
-  /**
    * Holds the value of {@link #K_ID}.
    */
   protected int k;
@@ -139,6 +109,36 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the number of clusters to find, must be an integer
+     * greater than 0.
+     * <p>
+     * Key: {@code -projectedclustering.k}
+     * </p>
+     */
+    public static final OptionID K_ID = OptionID.getOrCreateOptionID("projectedclustering.k", "The number of clusters to find.");
+
+    /**
+     * Parameter to specify the multiplier for the initial number of seeds, must
+     * be an integer greater than 0.
+     * <p>
+     * Default value: {@code 30}
+     * </p>
+     * <p>
+     * Key: {@code -projectedclustering.k_i}
+     * </p>
+     */
+    public static final OptionID K_I_ID = OptionID.getOrCreateOptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
+
+    /**
+     * Parameter to specify the dimensionality of the clusters to find, must be an
+     * integer greater than 0.
+     * <p>
+     * Key: {@code -projectedclustering.l}
+     * </p>
+     */
+    public static final OptionID L_ID = OptionID.getOrCreateOptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
+
     protected int k;
 
     protected int k_i;

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -46,10 +47,10 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
   /**
    * Constructor.
    * 
-   * @param seed Random seed.
+   * @param rnd Random generator.
    */
-  public RandomlyGeneratedInitialMeans(Long seed) {
-    super(seed);
+  public RandomlyGeneratedInitialMeans(RandomFactory rnd) {
+    super(rnd);
   }
 
   @Override
@@ -58,7 +59,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
     List<V> means = new ArrayList<V>(k);
-    final Random random = (this.seed != null) ? new Random(this.seed) : new Random();
+    final Random random = rnd.getRandom();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
       // Rescale
@@ -80,7 +81,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
     protected RandomlyGeneratedInitialMeans<V> makeInstance() {
-      return new RandomlyGeneratedInitialMeans<V>(seed);
+      return new RandomlyGeneratedInitialMeans<V>(rnd);
     }
   }
 }

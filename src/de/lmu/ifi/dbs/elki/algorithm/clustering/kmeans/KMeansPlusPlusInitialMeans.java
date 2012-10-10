@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -62,10 +63,10 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   /**
    * Constructor.
    * 
-   * @param seed Random seed.
+   * @param rnd Random generator.
    */
-  public KMeansPlusPlusInitialMeans(Long seed) {
-    super(seed);
+  public KMeansPlusPlusInitialMeans(RandomFactory rnd) {
+    super(rnd);
   }
 
   @Override
@@ -81,7 +82,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     // Chose first mean
     List<V> means = new ArrayList<V>(k);
 
-    Random random = (seed != null) ? new Random(seed) : new Random();
+    Random random = rnd.getRandom();
     DBID first = DBIDUtil.deref(DBIDUtil.randomSample(relation.getDBIDs(), 1, random.nextLong()).iter());
     means.add(relation.get(first));
 
@@ -131,7 +132,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     // Chose first mean
     ArrayModifiableDBIDs means = DBIDUtil.newArray(k);
 
-    Random random = (seed != null) ? new Random(seed) : new Random();
+    Random random = rnd.getRandom();
     DBID first = DBIDUtil.deref(DBIDUtil.randomSample(distQ.getRelation().getDBIDs(), 1, random.nextLong()).iter());
     means.add(first);
 
@@ -243,7 +244,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
     protected KMeansPlusPlusInitialMeans<V, D> makeInstance() {
-      return new KMeansPlusPlusInitialMeans<V, D>(seed);
+      return new KMeansPlusPlusInitialMeans<V, D>(rnd);
     }
   }
 }

@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -60,8 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -112,7 +113,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
   /**
    * Random generator
    */
-  private Random random;
+  private RandomFactory rnd;
 
   /**
    * Distance function
@@ -126,19 +127,20 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
    * @param g Number of grids to use
-   * @param seed Random generator seed.
+   * @param rnd Random generator.
    */
-  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g, Long seed) {
+  public ALOCI(NumberVectorDistanceFunction<D> distanceFunction, int nmin, int alpha, int g, RandomFactory rnd) {
     super();
     this.distFunc = distanceFunction;
     this.nmin = nmin;
     this.alpha = alpha;
     this.g = g;
-    this.random = (seed != null) ? new Random(seed) : new Random(0);
+    this.rnd = rnd;
   }
 
   public OutlierResult run(Database database, Relation<O> relation) {
     final int dim = RelationUtil.dimensionality(relation);
+    final Random random = rnd.getRandom();
     FiniteProgress progressPreproc = LOG.isVerbose() ? new FiniteProgress("Build aLOCI quadtress", g, LOG) : null;
 
     // Compute extend of dataset.
@@ -684,9 +686,9 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
     protected int g = 1;
 
     /**
-     * Random generator seed
+     * Random generator
      */
-    protected Long seed = null;
+    protected RandomFactory rnd;
 
     /**
      * The distance function
@@ -712,9 +714,9 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
         this.g = g.getValue();
       }
 
-      final LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        this.seed = seedP.getValue();
+      final RandomParameter rndP = new RandomParameter(SEED_ID);
+      if(config.grab(rndP)) {
+        this.rnd = rndP.getValue();
       }
 
       final IntParameter alphaP = new IntParameter(ALPHA_ID, 4);
@@ -728,7 +730,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
 
     @Override
     protected ALOCI<O, D> makeInstance() {
-      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g, seed);
+      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g, rnd);
     }
   }
 }

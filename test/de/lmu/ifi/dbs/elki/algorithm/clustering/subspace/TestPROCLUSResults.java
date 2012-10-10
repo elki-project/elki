@@ -56,9 +56,9 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
     ListParameterization params = new ListParameterization();
-    params.addParameter(PROCLUS.L_ID, 1);
-    params.addParameter(PROCLUS.K_ID, 4);
-    params.addParameter(PROCLUS.SEED_ID, 2);
+    params.addParameter(PROCLUS.Parameterizer.L_ID, 1);
+    params.addParameter(PROCLUS.Parameterizer.K_ID, 4);
+    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 2);
 
     // setup algorithm
     PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
@@ -83,9 +83,9 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(PROCLUS.L_ID, 2);
-    params.addParameter(PROCLUS.K_ID, 3);
-    params.addParameter(PROCLUS.SEED_ID, 0);
+    params.addParameter(PROCLUS.Parameterizer.L_ID, 2);
+    params.addParameter(PROCLUS.Parameterizer.K_ID, 3);
+    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 0);
     PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
     testParameterizationOk(params);
 

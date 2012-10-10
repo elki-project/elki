@@ -56,9 +56,9 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     Database db = makeSimpleDatabase(UNITTEST + "correlation-hierarchy.csv", 450);
 
     ListParameterization params = new ListParameterization();
-    params.addParameter(ORCLUS.K_ID, 3);
-    params.addParameter(ORCLUS.L_ID, 1);
-    params.addParameter(ORCLUS.SEED_ID, 2);
+    params.addParameter(ORCLUS.Parameterizer.K_ID, 3);
+    params.addParameter(ORCLUS.Parameterizer.L_ID, 1);
+    params.addParameter(ORCLUS.Parameterizer.SEED_ID, 2);
 
     // setup algorithm
     ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
@@ -83,9 +83,9 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ORCLUS.K_ID, 3);
-    params.addParameter(ORCLUS.L_ID, 4);
-    params.addParameter(ORCLUS.SEED_ID, 9);
+    params.addParameter(ORCLUS.Parameterizer.K_ID, 3);
+    params.addParameter(ORCLUS.Parameterizer.L_ID, 4);
+    params.addParameter(ORCLUS.Parameterizer.SEED_ID, 9);
 
     ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
     testParameterizationOk(params);
