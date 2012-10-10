@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -75,8 +76,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Algorithm to compute High Contrast Subspaces for Density-Based Outlier
@@ -140,7 +141,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
   /**
    * Random generator.
    */
-  private Random random;
+  private RandomFactory rnd;
 
   /**
    * Constructor.
@@ -150,16 +151,16 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * @param outlierAlgorithm Inner outlier detection algorithm
    * @param statTest Test to use
    * @param cutoff Candidate limit
-   * @param seed Random seed
+   * @param rnd Random generator
    */
-  public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, GoodnessOfFitTest statTest, int cutoff, Long seed) {
+  public HiCS(int m, double alpha, OutlierAlgorithm outlierAlgorithm, GoodnessOfFitTest statTest, int cutoff, RandomFactory rnd) {
     super();
     this.m = m;
     this.alpha = alpha;
     this.outlierAlgorithm = outlierAlgorithm;
     this.statTest = statTest;
     this.cutoff = cutoff;
-    this.random = (seed != null) ? new Random(seed) : new Random();
+    this.rnd = rnd;
   }
 
   /**
@@ -174,7 +175,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
 
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
-    Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex);
+    Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex, rnd.getRandom());
 
     if(LOG.isVerbose()) {
       LOG.verbose("Number of high-contrast subspaces: " + subspaces.size());
@@ -255,7 +256,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * @param subspaceIndex Subspace indexes
    * @return a set of high contrast subspaces
    */
-  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
+  private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
     final int dbdim = RelationUtil.dimensionality(relation);
 
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Subspace dimensionality", dbdim, LOG) : null;
@@ -272,7 +273,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
         HiCSSubspace ts = new HiCSSubspace();
         ts.set(i);
         ts.set(j);
-        calculateContrast(relation, ts, subspaceIndex);
+        calculateContrast(relation, ts, subspaceIndex, random);
         dDimensionalList.add(ts);
         if(prog != null) {
           prog.incrementProcessed(LOG);
@@ -312,7 +313,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
             continue;
           }
 
-          calculateContrast(relation, joinedSet, subspaceIndex);
+          calculateContrast(relation, joinedSet, subspaceIndex, random);
           dDimensionalList.add(joinedSet);
           if(qprog != null) {
             qprog.incrementProcessed(LOG);
@@ -346,7 +347,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    * @param subspace Subspace
    * @param subspaceIndex Subspace indexes
    */
-  private void calculateContrast(Relation<? extends NumberVector<?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex) {
+  private void calculateContrast(Relation<? extends NumberVector<?>> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
     final int card = subspace.cardinality();
     final double alpha1 = Math.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
@@ -592,9 +593,9 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     private int cutoff = 400;
     
     /**
-     * Random seed (optional).
+     * Random generator.
      */
-    private Long seed = null;
+    private RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -624,15 +625,15 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
         cutoff = cutoffP.getValue();
       }
 
-      final LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      final RandomParameter rndP = new RandomParameter(SEED_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
 }
 
     @Override
     protected HiCS<V> makeInstance() {
-      return new HiCS<V>(m, alpha, outlierAlgorithm, statTest, cutoff, seed);
+      return new HiCS<V>(m, alpha, outlierAlgorithm, statTest, cutoff, rnd);
     }
   }
 }

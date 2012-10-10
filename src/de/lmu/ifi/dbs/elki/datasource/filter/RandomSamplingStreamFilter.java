@@ -26,13 +26,14 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Subsampling stream filter.
@@ -54,12 +55,12 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
    * Constructor.
    * 
    * @param prob Probability
-   * @param seed Random seed
+   * @param rnd Random generator
    */
-  public RandomSamplingStreamFilter(double prob, Long seed) {
+  public RandomSamplingStreamFilter(double prob, RandomFactory rnd) {
     super();
     this.prob = prob;
-    this.random = (seed != null) ? new Random(seed.longValue()) : new Random();
+    this.random = rnd.getRandom();
   }
 
   @Override
@@ -74,15 +75,15 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
 
   @Override
   public Event nextEvent() {
-    while(true) {
+    while (true) {
       Event ev = source.nextEvent();
-      switch(ev){
+      switch(ev) {
       case END_OF_STREAM:
         return ev;
       case META_CHANGED:
         return ev;
       case NEXT_OBJECT:
-        if(random.nextDouble() < prob) {
+        if (random.nextDouble() < prob) {
           return ev;
         }
         continue;
@@ -114,26 +115,26 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     protected double prob;
 
     /**
-     * Random seed
+     * Random generator
      */
-    protected Long seed = null;
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter probP = new DoubleParameter(PROB_ID, new IntervalConstraint(Double.valueOf(0.0), IntervalBoundary.CLOSE, Double.valueOf(1.0), IntervalBoundary.CLOSE));
-      if(config.grab(probP)) {
+      if (config.grab(probP)) {
         prob = probP.getValue().doubleValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID, true);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected RandomSamplingStreamFilter makeInstance() {
-      return new RandomSamplingStreamFilter(prob, seed);
+      return new RandomSamplingStreamFilter(prob, rnd);
     }
   }
 }

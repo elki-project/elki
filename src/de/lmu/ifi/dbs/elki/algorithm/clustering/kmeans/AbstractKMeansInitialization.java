@@ -22,9 +22,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Abstract base class for common k-means initializations.
@@ -35,17 +36,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  */
 public abstract class AbstractKMeansInitialization<V> implements KMeansInitialization<V> {
   /**
-   * Holds the value of {@link KMeans#SEED_ID}.
+   * Random number generator
    */
-  protected Long seed;
+  protected RandomFactory rnd;
 
   /**
    * Constructor.
    * 
-   * @param seed Random seed.
+   * @param rnd Random number generator.
    */
-  public AbstractKMeansInitialization(Long seed) {
-    this.seed = seed;
+  public AbstractKMeansInitialization(RandomFactory rnd) {
+    this.rnd = rnd;
   }
 
   /**
@@ -56,14 +57,17 @@ public abstract class AbstractKMeansInitialization<V> implements KMeansInitializ
    * @apiviz.exclude
    */
   public abstract static class Parameterizer<V> extends AbstractParameterizer {
-    protected Long seed;
+    /**
+     * Random generator
+     */
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      LongParameter seedP = new LongParameter(KMeans.SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(KMeans.SEED_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
   }

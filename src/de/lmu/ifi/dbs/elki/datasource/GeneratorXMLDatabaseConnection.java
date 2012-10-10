@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
 
 /**
@@ -655,9 +655,10 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         sizescale = scalepar.getValue().doubleValue();
       }
       // Random generator
-      final LongParameter seedpar = new LongParameter(RANDOMSEED_ID, true);
-      if(config.grab(seedpar)) {
-        clusterRandom = new Random(seedpar.getValue().longValue());
+      final RandomParameter rndP = new RandomParameter(RANDOMSEED_ID);
+      if(config.grab(rndP)) {
+        // TODO: use RandomFactory in cluster
+        clusterRandom = rndP.getValue().getRandom();
       }
     }
 

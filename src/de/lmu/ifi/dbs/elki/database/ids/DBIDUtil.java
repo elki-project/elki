@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.integer.TroveArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 
 /**
  * DBID Utility functions.
@@ -440,6 +441,18 @@ public final class DBIDUtil {
    */
   public static DoubleDBIDPair newPair(double val, DBIDRef id) {
     return DBIDFactory.FACTORY.newPair(val, id);
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs.
+   * 
+   * @param source Original DBIDs
+   * @param k k Parameter
+   * @param rnd Random generator
+   * @return new DBIDs
+   */
+  public static ModifiableDBIDs randomSample(DBIDs source, int k, RandomFactory rnd) {
+    return randomSample(source, k, rnd.getRandom());
   }
 
   /**

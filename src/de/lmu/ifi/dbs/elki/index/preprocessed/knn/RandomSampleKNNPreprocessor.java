@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -40,12 +38,13 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Class that computed the kNN only on a random sample.
@@ -67,9 +66,9 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
   private final double share;
 
   /**
-   * Random seed
+   * Random generator
    */
-  private final Long seed;
+  private final RandomFactory rnd;
 
   /**
    * Constructor.
@@ -78,12 +77,12 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
    * @param distanceFunction distance function
    * @param k k
    * @param share Relative share
-   * @param seed Random seed (may be null)
+   * @param rnd Random generator
    */
-  public RandomSampleKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, double share, Long seed) {
+  public RandomSampleKNNPreprocessor(Relation<O> relation, DistanceFunction<? super O, D> distanceFunction, int k, double share, RandomFactory rnd) {
     super(relation, distanceFunction, k);
     this.share = share;
-    this.seed = seed;
+    this.rnd = rnd;
   }
 
   @Override
@@ -94,7 +93,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int samplesize = (int) (ids.size() * share);
-    final long iseed = (seed != null) ? seed : (new Random()).nextLong();
+    final long iseed = rnd.getRandom().nextLong();
 
     int i = 0;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -152,9 +151,9 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
     private final double share;
 
     /**
-     * Random seed
+     * Random generator
      */
-    private final Long seed;
+    private final RandomFactory rnd;
 
     /**
      * Constructor.
@@ -162,17 +161,17 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
      * @param k K
      * @param distanceFunction distance function
      * @param share Sample size (relative)
-     * @param seed Random seed
+     * @param rnd Random generator
      */
-    public Factory(int k, DistanceFunction<? super O, D> distanceFunction, double share, Long seed) {
+    public Factory(int k, DistanceFunction<? super O, D> distanceFunction, double share, RandomFactory rnd) {
       super(k, distanceFunction);
       this.share = share;
-      this.seed = seed;
+      this.rnd = rnd;
     }
 
     @Override
     public RandomSampleKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
-      return new RandomSampleKNNPreprocessor<O, D>(relation, distanceFunction, k, share, seed);
+      return new RandomSampleKNNPreprocessor<O, D>(relation, distanceFunction, k, share, rnd);
     }
 
     /**
@@ -211,9 +210,9 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
       private double share = 0.0;
 
       /**
-       * Random seed
+       * Random generator
        */
-      private Long seed = null;
+      private RandomFactory rnd;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -222,15 +221,15 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
         if(config.grab(shareP)) {
           share = shareP.getValue();
         }
-        LongParameter seedP = new LongParameter(SEED_ID, true);
-        if(config.grab(seedP)) {
-          seed = seedP.getValue();
+        RandomParameter rndP = new RandomParameter(SEED_ID);
+        if(config.grab(rndP)) {
+          rnd = rndP.getValue();
         }
       }
 
       @Override
       protected RandomSampleKNNPreprocessor.Factory<O, D> makeInstance() {
-        return new RandomSampleKNNPreprocessor.Factory<O, D>(k, distanceFunction, share, seed);
+        return new RandomSampleKNNPreprocessor.Factory<O, D>(k, distanceFunction, share, rnd);
       }
     }
   }

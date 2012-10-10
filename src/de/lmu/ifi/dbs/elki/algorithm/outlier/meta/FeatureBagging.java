@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -57,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -100,7 +101,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
   /**
    * Random number generator for subspace choice.
    */
-  private Random rand;
+  private RandomFactory rnd;
 
   /**
    * The parameters k for LOF.
@@ -113,19 +114,14 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param k k Parameter for LOF
    * @param num Number of subspaces to use
    * @param breadth Flag for breadth-first merging
-   * @param seed Random generator seed
+   * @param rnd Random generator
    */
-  public FeatureBagging(int k, int num, boolean breadth, Long seed) {
+  public FeatureBagging(int k, int num, boolean breadth, RandomFactory rnd) {
     super();
     this.k = k;
     this.num = num;
     this.breadth = breadth;
-    if(seed != null) {
-      this.rand = new Random(seed);
-    }
-    else {
-      this.rand = new Random();
-    }
+    this.rnd = rnd;
   }
 
   /**
@@ -138,12 +134,13 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     final int dbdim = RelationUtil.dimensionality(relation);
     final int mindim = dbdim / 2;
     final int maxdim = dbdim - 1;
+    final Random rand = rnd.getRandom();
 
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", num, LOG) : null;
       for(int i = 0; i < num; i++) {
-        BitSet dimset = randomSubspace(dbdim, mindim, maxdim);
+        BitSet dimset = randomSubspace(dbdim, mindim, maxdim, rand);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
         LOF<NumberVector<?>, DoubleDistance> lof = new LOF<NumberVector<?>, DoubleDistance>(k, df);
 
@@ -236,7 +233,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    * @param maxdim Maximum number to choose
    * @return Subspace as bits.
    */
-  private BitSet randomSubspace(final int alldim, final int mindim, final int maxdim) {
+  private BitSet randomSubspace(final int alldim, final int mindim, final int maxdim, final Random rand) {
     BitSet dimset = new BitSet();
     {
       // Fill with all dimensions
@@ -314,9 +311,9 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     protected boolean breadth = false;
 
     /**
-     * Random generator seed.
+     * Random generator.
      */
-    protected Long seed = null;
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -333,16 +330,16 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       if(config.grab(breadthF)) {
         breadth = breadthF.getValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected FeatureBagging makeInstance() {
       // Default is to re-use the same distance
-      return new FeatureBagging(k, num, breadth, seed);
+      return new FeatureBagging(k, num, breadth, rnd);
     }
   }
 }

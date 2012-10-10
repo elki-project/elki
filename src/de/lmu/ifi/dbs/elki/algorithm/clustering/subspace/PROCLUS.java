@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -70,7 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.CTriple;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -115,19 +116,14 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
   public static final OptionID M_I_ID = OptionID.getOrCreateOptionID("proclus.mi", "The multiplier for the initial number of medoids.");
 
   /**
-   * Parameter to specify the random generator seed.
-   */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("proclus.seed", "The random number generator seed.");
-
-  /**
    * Holds the value of {@link #M_I_ID}.
    */
   private int m_i;
 
   /**
-   * Holds the value of {@link #SEED_ID}.
+   * Random generator
    */
-  private Long seed;
+  private RandomFactory rnd;
 
   /**
    * Java constructor.
@@ -136,12 +132,12 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @param k_i k_i Parameter
    * @param l l Parameter
    * @param m_i m_i Parameter
-   * @param seed Random generator seed
+   * @param rnd Random generator
    */
-  public PROCLUS(int k, int k_i, int l, int m_i, Long seed) {
+  public PROCLUS(int k, int k_i, int l, int m_i, RandomFactory rnd) {
     super(k, k_i, l);
     this.m_i = m_i;
-    this.seed = seed;
+    this.rnd = rnd;
   }
 
   /**
@@ -153,10 +149,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     DistanceQuery<V, DoubleDistance> distFunc = this.getDistanceQuery(database);
     RangeQuery<V, DoubleDistance> rangeQuery = database.getRangeQuery(distFunc);
-    final Random random = new Random();
-    if(seed != null) {
-      random.setSeed(seed);
-    }
+    final Random random = rnd.getRandom();
 
     if(RelationUtil.dimensionality(relation) < l) {
       throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + RelationUtil.dimensionality(relation) + " < " + l + ")");
@@ -836,9 +829,14 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractProjectedClustering.Parameterizer {
+    /**
+     * Parameter to specify the random generator seed.
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("proclus.seed", "The random number generator seed.");
+
     protected int m_i = -1;
 
-    protected Long seed = null;
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -854,15 +852,15 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
         m_i = m_iP.getValue();
       }
 
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected PROCLUS<V> makeInstance() {
-      return new PROCLUS<V>(k, k_i, l, m_i, seed);
+      return new PROCLUS<V>(k, k_i, l, m_i, rnd);
     }
   }
 }

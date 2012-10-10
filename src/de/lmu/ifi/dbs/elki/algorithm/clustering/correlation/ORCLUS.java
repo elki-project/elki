@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -63,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * ORCLUS provides the ORCLUS algorithm, an algorithm to find clusters in high
@@ -90,31 +91,14 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
   private static final Logging LOG = Logging.getLogger(ORCLUS.class);
 
   /**
-   * Parameter to specify the factor for reducing the number of current clusters
-   * in each iteration, must be an integer greater than 0 and less than 1.
-   * <p>
-   * Default value: {@code 0.5}
-   * </p>
-   * <p>
-   * Key: {@code -orclus.alpha}
-   * </p>
-   */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
-
-  /**
-   * Parameter to specify the random generator seed.
-   */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("orclus.seed", "The random number generator seed.");
-
-  /**
    * Holds the value of {@link #ALPHA_ID}.
    */
   private double alpha;
 
   /**
-   * Holds the value of {@link #SEED_ID}.
+   * Random generator
    */
-  private Long seed;
+  private RandomFactory rnd;
 
   /**
    * The PCA utility object.
@@ -128,13 +112,13 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
    * @param k_i k_i Parameter
    * @param l l Parameter
    * @param alpha Alpha Parameter
-   * @param seed Seed parameter
+   * @param rnd Random generator
    * @param pca PCA runner
    */
-  public ORCLUS(int k, int k_i, int l, double alpha, long seed, PCARunner<V> pca) {
+  public ORCLUS(int k, int k_i, int l, double alpha, RandomFactory rnd, PCARunner<V> pca) {
     super(k, k_i, l);
     this.alpha = alpha;
-    this.seed = seed;
+    this.rnd = rnd;
     this.pca = pca;
   }
 
@@ -150,7 +134,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       // current dimensionality associated with each seed
       int dim_c = RelationUtil.dimensionality(relation);
 
-      if(dim_c < l) {
+      if (dim_c < l) {
         throw new IllegalStateException("Dimensionality of data < parameter l! " + "(" + dim_c + " < " + l + ")");
       }
 
@@ -164,8 +148,8 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
 
       IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Current number of clusters:", LOG) : null;
 
-      while(k_c > k) {
-        if(cprogress != null) {
+      while (k_c > k) {
+        if (cprogress != null) {
           cprogress.setProcessed(clusters.size(), LOG);
         }
 
@@ -173,8 +157,8 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
         assign(relation, distFunc, clusters);
 
         // determine current subspace associated with each cluster
-        for(ORCLUSCluster cluster : clusters) {
-          if(cluster.objectIDs.size() > 0) {
+        for (ORCLUSCluster cluster : clusters) {
+          if (cluster.objectIDs.size() > 0) {
             cluster.basis = findBasis(relation, distFunc, cluster, dim_c);
           }
         }
@@ -187,19 +171,18 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       }
       assign(relation, distFunc, clusters);
 
-      if(cprogress != null) {
+      if (cprogress != null) {
         cprogress.setProcessed(clusters.size());
         cprogress.setCompleted(LOG);
       }
 
       // get the result
       Clustering<Model> r = new Clustering<Model>("ORCLUS clustering", "orclus-clustering");
-      for(ORCLUSCluster c : clusters) {
+      for (ORCLUSCluster c : clusters) {
         r.addCluster(new Cluster<Model>(c.objectIDs, ClusterModel.CLUSTER));
       }
       return r;
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw new IllegalStateException(e);
     }
   }
@@ -212,10 +195,10 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
    * @return the initial seed list
    */
   private List<ORCLUSCluster> initialSeeds(Relation<V> database, int k) {
-    DBIDs randomSample = DBIDUtil.randomSample(database.getDBIDs(), k, seed);
+    DBIDs randomSample = DBIDUtil.randomSample(database.getDBIDs(), k, rnd);
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
     List<ORCLUSCluster> seeds = new ArrayList<ORCLUSCluster>();
-    for(DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = randomSample.iter(); iter.valid(); iter.advance()) {
       seeds.add(new ORCLUSCluster(database.get(iter), iter, factory));
     }
     return seeds;
@@ -233,13 +216,13 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
   private void assign(Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, List<ORCLUSCluster> clusters) {
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
     // clear the current clusters
-    for(ORCLUSCluster cluster : clusters) {
+    for (ORCLUSCluster cluster : clusters) {
       cluster.objectIDs.clear();
     }
 
     // projected centroids of the clusters
     List<V> projectedCentroids = new ArrayList<V>(clusters.size());
-    for(ORCLUSCluster c : clusters) {
+    for (ORCLUSCluster c : clusters) {
       projectedCentroids.add(projection(c, c.centroid, factory));
     }
 
@@ -251,11 +234,11 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       ORCLUSCluster minCluster = null;
 
       // determine projected distance between o and cluster
-      for(int i = 0; i < clusters.size(); i++) {
+      for (int i = 0; i < clusters.size(); i++) {
         ORCLUSCluster c = clusters.get(i);
         V o_proj = projection(c, o, factory);
         DoubleDistance dist = distFunc.distance(o_proj, projectedCentroids.get(i));
-        if(minDist == null || minDist.compareTo(dist) > 0) {
+        if (minDist == null || minDist.compareTo(dist) > 0) {
           minDist = dist;
           minCluster = c;
         }
@@ -266,8 +249,8 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
     }
 
     // recompute the seed in each clusters
-    for(ORCLUSCluster cluster : clusters) {
-      if(cluster.objectIDs.size() > 0) {
+    for (ORCLUSCluster cluster : clusters) {
+      if (cluster.objectIDs.size() > 0) {
         cluster.centroid = Centroid.make(database, cluster.objectIDs).toVector(database);
       }
     }
@@ -287,7 +270,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
     // covariance matrix of cluster
     // Matrix covariance = Util.covarianceMatrix(database, cluster.objectIDs);
     GenericDistanceDBIDList<DoubleDistance> results = new GenericDistanceDBIDList<DoubleDistance>(cluster.objectIDs.size());
-    for(DBIDIter it = cluster.objectIDs.iter(); it.valid(); it.advance()) {
+    for (DBIDIter it = cluster.objectIDs.iter(); it.valid(); it.advance()) {
       DoubleDistance distance = distFunc.distance(cluster.centroid, database.get(it));
       results.add(distance, it);
     }
@@ -320,9 +303,9 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
    */
   private void merge(Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, List<ORCLUSCluster> clusters, int k_new, int d_new, IndefiniteProgress cprogress) {
     ArrayList<ProjectedEnergy> projectedEnergies = new ArrayList<ProjectedEnergy>();
-    for(int i = 0; i < clusters.size(); i++) {
-      for(int j = 0; j < clusters.size(); j++) {
-        if(i >= j) {
+    for (int i = 0; i < clusters.size(); i++) {
+      for (int j = 0; j < clusters.size(); j++) {
+        if (i >= j) {
           continue;
         }
         // projected energy of c_ij in subspace e_ij
@@ -334,8 +317,8 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       }
     }
 
-    while(clusters.size() > k_new) {
-      if(cprogress != null) {
+    while (clusters.size() > k_new) {
+      if (cprogress != null) {
         cprogress.setProcessed(clusters.size(), LOG);
       }
       // find the smallest value of r_ij
@@ -343,12 +326,12 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
 
       // renumber the clusters by replacing cluster c_i with cluster c_ij
       // and discarding cluster c_j
-      for(int c = 0; c < clusters.size(); c++) {
-        if(c == minPE.i) {
+      for (int c = 0; c < clusters.size(); c++) {
+        if (c == minPE.i) {
           clusters.remove(c);
           clusters.add(c, minPE.cluster);
         }
-        if(c == minPE.j) {
+        if (c == minPE.j) {
           clusters.remove(c);
         }
       }
@@ -357,16 +340,15 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       int i = minPE.i;
       int j = minPE.j;
       Iterator<ProjectedEnergy> it = projectedEnergies.iterator();
-      while(it.hasNext()) {
+      while (it.hasNext()) {
         ProjectedEnergy pe = it.next();
-        if(pe.i == i || pe.i == j || pe.j == i || pe.j == j) {
+        if (pe.i == i || pe.i == j || pe.j == i || pe.j == j) {
           it.remove();
-        }
-        else {
-          if(pe.i > j) {
+        } else {
+          if (pe.i > j) {
             pe.i -= 1;
           }
-          if(pe.j > j) {
+          if (pe.j > j) {
             pe.j -= 1;
           }
         }
@@ -374,11 +356,10 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
 
       // ... and recompute them
       ORCLUSCluster c_ij = minPE.cluster;
-      for(int c = 0; c < clusters.size(); c++) {
-        if(c < i) {
+      for (int c = 0; c < clusters.size(); c++) {
+        if (c < i) {
           projectedEnergies.add(projectedEnergy(database, distFunc, clusters.get(c), c_ij, c, i, d_new));
-        }
-        else if(c > i) {
+        } else if (c > i) {
           projectedEnergies.add(projectedEnergy(database, distFunc, clusters.get(c), c_ij, i, c, d_new));
         }
       }
@@ -407,7 +388,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
 
     DoubleDistance sum = getDistanceFunction().getDistanceFactory().nullDistance();
     V c_proj = projection(c_ij, c_ij.centroid, factory);
-    for(DBIDIter iter = c_ij.objectIDs.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = c_ij.objectIDs.iter(); iter.valid(); iter.advance()) {
       V o_proj = projection(c_ij, database.get(iter), factory);
       DoubleDistance dist = distFunc.distance(o_proj, c_proj);
       sum = sum.plus(dist.times(dist));
@@ -435,16 +416,15 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
     // convert into array.
     c.objectIDs = DBIDUtil.newArray(c.objectIDs);
 
-    if(c.objectIDs.size() > 0) {
+    if (c.objectIDs.size() > 0) {
       c.centroid = Centroid.make(relation, c.objectIDs).toVector(relation);
       c.basis = findBasis(relation, distFunc, c, dim);
-    }
-    else {
+    } else {
       NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-      Vector cent = c1.centroid.getColumnVector().plusEquals(c2.centroid.getColumnVector()).timesEquals(0.5); 
+      Vector cent = c1.centroid.getColumnVector().plusEquals(c2.centroid.getColumnVector()).timesEquals(0.5);
       c.centroid = factory.newNumberVector(cent.getArrayRef());
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
-      for(int i = 0; i < dim; i++) {
+      for (int i = 0; i < dim; i++) {
         doubles[i][i] = 1;
       }
       c.basis = new Matrix(doubles);
@@ -569,9 +549,26 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractProjectedClustering.Parameterizer {
+    /**
+     * Parameter to specify the factor for reducing the number of current clusters
+     * in each iteration, must be an integer greater than 0 and less than 1.
+     * <p>
+     * Default value: {@code 0.5}
+     * </p>
+     * <p>
+     * Key: {@code -orclus.alpha}
+     * </p>
+     */
+    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
+
+    /**
+     * Parameter to specify the random generator seed.
+     */
+    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("orclus.seed", "The random number generator seed.");
+
     protected double alpha = -1;
 
-    protected Long seed = null;
+    protected RandomFactory rnd;
 
     protected PCARunner<V> pca = null;
 
@@ -591,21 +588,21 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
 
     protected void configAlpha(Parameterization config) {
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
-      if(config.grab(alphaP)) {
+      if (config.grab(alphaP)) {
         alpha = alphaP.getValue();
       }
     }
 
     protected void configSeed(Parameterization config) {
-      LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected ORCLUS<V> makeInstance() {
-      return new ORCLUS<V>(k, k_i, l, alpha, seed, pca);
+      return new ORCLUS<V>(k, k_i, l, alpha, rnd, pca);
     }
   }
 }

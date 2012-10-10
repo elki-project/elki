@@ -29,10 +29,11 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * A filter to shuffle the dataset.
@@ -56,36 +57,34 @@ public class ShuffleObjectsFilter implements ObjectFilter {
   public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
 
   /**
-   * Seed for randomly shuffling the rows of the database. If not set, a random
-   * seed will be used. Shuffling takes time linearly dependent from the size of
-   * the database.
+   * Random generator.
    */
-  final Long seed;
+  final RandomFactory rnd;
 
   /**
    * Constructor.
    * 
-   * @param seed Seed value, may be {@code null} for a random seed.
+   * @param rnd Random generator
    */
-  public ShuffleObjectsFilter(Long seed) {
+  public ShuffleObjectsFilter(RandomFactory rnd) {
     super();
-    this.seed = seed;
+    this.rnd = rnd;
   }
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       LOG.debug("Shuffling the data set");
     }
-    final Random random = (seed == null) ? new Random() : new Random(seed.longValue());
+    final Random random = rnd.getRandom();
 
     final int size = objects.dataLength();
     final int[] offsets = new int[size];
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       offsets[i] = i;
     }
     // Randomize the offset array
-    for(int i = size; i > 1; i--) {
+    for (int i = size; i > 1; i--) {
       final int j = random.nextInt(i);
       // Swap the elements at positions j and i - 1:
       final int temp = offsets[j];
@@ -94,11 +93,11 @@ public class ShuffleObjectsFilter implements ObjectFilter {
     }
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for(int j = 0; j < objects.metaLength(); j++) {
+    for (int j = 0; j < objects.metaLength(); j++) {
       // Reorder column accordingly
       List<?> in = objects.getColumn(j);
       List<Object> data = new ArrayList<Object>(size);
-      for(int i = 0; i < size; i++) {
+      for (int i = 0; i < size; i++) {
         data.add(in.get(offsets[i]));
       }
       bundle.appendColumn(objects.meta(j), data);
@@ -114,20 +113,20 @@ public class ShuffleObjectsFilter implements ObjectFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    Long seed = null;
+    RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      LongParameter seedParam = new LongParameter(SEED_ID, true);
-      if(config.grab(seedParam)) {
-        seed = seedParam.getValue();
+      RandomParameter rndP = new RandomParameter(SEED_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected Object makeInstance() {
-      return new ShuffleObjectsFilter(seed);
+      return new ShuffleObjectsFilter(rnd);
     }
   }
 }

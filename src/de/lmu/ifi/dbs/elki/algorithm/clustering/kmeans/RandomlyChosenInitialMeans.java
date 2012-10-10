@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 
 /**
  * Initialize K-means by randomly choosing k exsiting elements as cluster
@@ -44,15 +45,15 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
   /**
    * Constructor.
    * 
-   * @param seed Random seed.
+   * @param rnd Random generator.
    */
-  public RandomlyChosenInitialMeans(Long seed) {
-    super(seed);
+  public RandomlyChosenInitialMeans(RandomFactory rnd) {
+    super(rnd);
   }
 
   @Override
   public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
-    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, seed);
+    DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     List<V> means = new ArrayList<V>(k);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       means.add(relation.get(iter));
@@ -62,7 +63,7 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
 
   @Override
   public DBIDs chooseInitialMedoids(int k, DistanceQuery<? super V, ?> distanceFunction) {
-    return DBIDUtil.randomSample(distanceFunction.getRelation().getDBIDs(), k, seed);
+    return DBIDUtil.randomSample(distanceFunction.getRelation().getDBIDs(), k, rnd);
   }
 
   /**
@@ -76,7 +77,7 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
 
     @Override
     protected RandomlyChosenInitialMeans<V> makeInstance() {
-      return new RandomlyChosenInitialMeans<V>(seed);
+      return new RandomlyChosenInitialMeans<V>(rnd);
     }
   }
 }

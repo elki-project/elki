@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -57,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -101,9 +102,9 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
   private int m;
 
   /**
-   * Holds the value of {@link #SEED_ID}.
+   * Random generator.
    */
-  private Long seed;
+  private RandomFactory rnd;
 
   /**
    * Constructor.
@@ -111,12 +112,12 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
    * @param k K
    * @param phi Phi
    * @param m M
-   * @param seed Seed
+   * @param rnd Random generator
    */
-  public AggarwalYuEvolutionary(int k, int phi, int m, Long seed) {
+  public AggarwalYuEvolutionary(int k, int phi, int m, RandomFactory rnd) {
     super(k, phi);
     this.m = m;
-    this.seed = seed;
+    this.rnd = rnd;
   }
 
   /**
@@ -130,7 +131,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     final int dbsize = relation.size();
     ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
 
-    Iterable<Individuum> individuums = (new EvolutionarySearch(relation, ranges, m, seed)).run();
+    Iterable<Individuum> individuums = (new EvolutionarySearch(relation, ranges, m, rnd.getRandom())).run();
 
     WritableDoubleDataStore outlierScore = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     for(Individuum ind : individuums) {
@@ -202,20 +203,15 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      * @param relation Database to use
      * @param ranges DBID ranges to process
      * @param m Population size
-     * @param seed Random generator seed
+     * @param random Random generator
      */
-    public EvolutionarySearch(Relation<V> relation, ArrayList<ArrayList<DBIDs>> ranges, int m, Long seed) {
+    public EvolutionarySearch(Relation<V> relation, ArrayList<ArrayList<DBIDs>> ranges, int m, Random random) {
       super();
       this.ranges = ranges;
       this.m = m;
       this.dbsize = relation.size();
       this.dim = RelationUtil.dimensionality(relation);
-      if(seed != null) {
-        this.random = new Random(seed);
-      }
-      else {
-        this.random = new Random();
-      }
+      this.random = random;
     }
 
     public Iterable<Individuum> run() {
@@ -705,7 +701,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
 
     protected int m = 0;
 
-    protected Long seed = null;
+    protected RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -714,15 +710,15 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       if(config.grab(mP)) {
         m = mP.getValue();
       }
-      final LongParameter seedP = new LongParameter(SEED_ID, true);
-      if(config.grab(seedP)) {
-        seed = seedP.getValue();
+      final RandomParameter rndP = new RandomParameter(SEED_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected AggarwalYuEvolutionary<V> makeInstance() {
-      return new AggarwalYuEvolutionary<V>(k, phi, m, seed);
+      return new AggarwalYuEvolutionary<V>(k, phi, m, rnd);
     }
   }
 }
