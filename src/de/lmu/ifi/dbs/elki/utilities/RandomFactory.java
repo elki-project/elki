@@ -68,7 +68,7 @@ public class RandomFactory {
    * 
    * @param seed Random seed
    */
-  protected RandomFactory(Long seed) {
+  public RandomFactory(Long seed) {
     super();
     this.seed = seed;
   }
