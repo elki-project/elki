@@ -45,20 +45,7 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
    * @param optionID Option ID
    */
   public RandomParameter(OptionID optionID) {
-    super(optionID);
-  }
-
-  /**
-   * Constructor with optional flag.
-   * 
-   * Note: you probably mean to use {@code new RandomParameter(OptionID, null)},
-   * which will use a random seed.
-   * 
-   * @param optionID Option ID
-   * @param optional Flag to indicate the value is optional
-   */
-  public RandomParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
+    super(optionID, RandomFactory.DEFAULT);
   }
 
   /**
@@ -80,7 +67,7 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
    * @param seed Default seed.
    */
   public RandomParameter(OptionID optionID, long seed) {
-    super(optionID);
+    super(optionID, true);
     this.seed = Long.valueOf(seed);
   }
 
@@ -92,26 +79,23 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
   @Override
   public void setValue(Object obj) throws ParameterException {
     // This is a bit hackish. Set both seed and random (via super.setValue())
-    if(obj instanceof RandomFactory) {
+    if (obj instanceof RandomFactory) {
       seed = null;
-    }
-    else if(obj instanceof Long) {
+    } else if (obj instanceof Long) {
       seed = (Long) obj;
       obj = RandomFactory.get(seed);
-    }
-    else if(obj instanceof Number) {
+    } else if (obj instanceof Number) {
       seed = Long.valueOf(((Number) obj).longValue());
       obj = RandomFactory.get(seed);
-    }
-    else {
+    } else if ("global random".equals(obj)) {
+      obj = RandomFactory.DEFAULT;
+    } else {
       try {
         seed = Long.valueOf(obj.toString());
         obj = RandomFactory.get(seed);
-      }
-      catch(NullPointerException e) {
+      } catch (NullPointerException e) {
         throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
-      }
-      catch(NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
       }
     }
@@ -120,22 +104,20 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
 
   @Override
   protected RandomFactory parseValue(Object obj) throws ParameterException {
-    if(obj instanceof RandomFactory) {
+    if (obj instanceof RandomFactory) {
       return (RandomFactory) obj;
     }
-    if(obj instanceof Long) {
+    if (obj instanceof Long) {
       return RandomFactory.get((Long) obj);
     }
-    if(obj instanceof Number) {
+    if (obj instanceof Number) {
       return RandomFactory.get(Long.valueOf(((Number) obj).longValue()));
     }
     try {
       return RandomFactory.get(Long.valueOf(obj.toString()));
-    }
-    catch(NullPointerException e) {
+    } catch (NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
-    }
-    catch(NumberFormatException e) {
+    } catch (NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
     }
   }
@@ -143,7 +125,7 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
   @Override
   public Object getGivenValue() {
     Object r = super.getGivenValue();
-    if (r == null && seed != null) {
+    if (r != null && seed != null) {
       super.givenValue = RandomFactory.get(seed);
       r = super.givenValue;
     }
@@ -153,5 +135,13 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
   @Override
   public String getValueAsString() {
     return (seed != null) ? seed.toString() : "null";
+  }
+
+  @Override
+  public String getDefaultValueAsString() {
+    if (defaultValue == RandomFactory.DEFAULT) {
+      return "global random";
+    }
+    return super.getDefaultValueAsString();
   }
 }
