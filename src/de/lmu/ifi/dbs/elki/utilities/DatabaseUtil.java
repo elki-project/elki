@@ -152,10 +152,10 @@ public final class DatabaseUtil {
     }
     Arrays.sort(vals);
     if (vals.length % 2 == 1) {
-      return vals[((vals.length + 1) / 2) - 1];
+      return vals[((vals.length + 1) >> 1) - 1];
     } else {
-      final double v1 = vals[vals.length / 2];
-      final double v2 = vals[(vals.length / 2) - 1];
+      final double v1 = vals[vals.length >> 1];
+      final double v2 = vals[(vals.length >> 1) - 1];
       return (v1 + v2) / 2.0;
     }
   }
@@ -177,10 +177,10 @@ public final class DatabaseUtil {
     }
     Arrays.sort(vals);
     if (vals.length % 2 == 1) {
-      return vals[((vals.length + 1) / 2) - 1];
+      return vals[((vals.length + 1) >> 1) - 1];
     } else {
-      final double v1 = vals[vals.length / 2];
-      final double v2 = vals[(vals.length / 2) - 1];
+      final double v1 = vals[vals.length >> 1];
+      final double v2 = vals[(vals.length >> 1) - 1];
       return (v1 + v2) / 2.0;
     }
   }
@@ -334,13 +334,13 @@ public final class DatabaseUtil {
       }
     }
     // if we have any candidates left ...
-    if (candidates != null && candidates.size() > 0) {
+    if (candidates.size() > 0) {
       // remove subclasses
       Iterator<Class<?>> ci = candidates.iterator();
       while (ci.hasNext()) {
         Class<?> cand = ci.next();
         for (Class<?> oc : candidates) {
-          if (oc != cand && cand.isAssignableFrom(oc)) {
+          if (!oc.equals(cand) && cand.isAssignableFrom(oc)) {
             ci.remove();
             break;
           }

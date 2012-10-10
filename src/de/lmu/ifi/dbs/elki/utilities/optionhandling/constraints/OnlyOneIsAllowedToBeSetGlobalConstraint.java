@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -57,11 +57,10 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
   /**
    * Checks if only one parameter of a list of parameters is set. If not, a
    * parameter exception is thrown.
-   * 
    */
   @Override
   public void test() throws ParameterException {
-    Vector<String> set = new Vector<String>();
+    ArrayList<String> set = new ArrayList<String>();
     for(Parameter<?, ?> p : parameters) {
       if(p.isDefined()) {
         // FIXME: Retire the use of this constraint for Flags!

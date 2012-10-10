@@ -98,7 +98,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
     // Compute mean from minmax.
     double[] mean = new double[dim];
     for(int d = 0; d < dim; d++) {
-      mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) / 2;
+      mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) * .5;
     }
 
     int gridpoints = Math.max(1, (int) Math.pow(gridres + 1, dim));

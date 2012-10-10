@@ -191,7 +191,7 @@ public final class ClassGenericsUtil {
    *         doesn't fit the constraints.
    * @throws Exception On other errors such as security exceptions
    */
-  public static <C> Method getParameterizationFactoryMethod(Class<C> c, Class<?> ret) throws NoSuchMethodException, Exception {
+  public static <C> Method getParameterizationFactoryMethod(Class<C> c, Class<?> ret) throws NoSuchMethodException {
     Method m = c.getMethod(FACTORY_METHOD_NAME, Parameterization.class);
     if(m == null) {
       throw new NoSuchMethodException("No parameterization method found.");

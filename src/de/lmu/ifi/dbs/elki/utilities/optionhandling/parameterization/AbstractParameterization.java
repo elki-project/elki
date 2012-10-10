@@ -23,7 +23,9 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -44,7 +46,7 @@ public abstract class AbstractParameterization implements Parameterization {
   /**
    * Errors
    */
-  java.util.Vector<ParameterException> errors = new java.util.Vector<ParameterException>();
+  List<ParameterException> errors = new ArrayList<ParameterException>();
 
   /**
    * The logger of the class.
@@ -87,7 +89,7 @@ public abstract class AbstractParameterization implements Parameterization {
   public synchronized void clearErrors() {
     // Do NOT use errors.clear(), since we might have an error report
     // referencing the collection!
-    errors = new java.util.Vector<ParameterException>();
+    errors = new ArrayList<ParameterException>();
   }
 
   /**

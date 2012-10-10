@@ -203,7 +203,7 @@ public class InspectionUtil {
       while(cps.hasMoreElements()) {
         URL u = cps.nextElement();
         // Scan file sources only.
-        if(u.getProtocol() == "file") {
+        if("file".equals(u.getProtocol())) {
           Iterator<String> it = new DirClassIterator(new File(u.getFile()), DEFAULT_IGNORES);
           while(it.hasNext()) {
             String classname = it.next();

@@ -24,7 +24,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  */
 
 import java.util.Collection;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
@@ -57,7 +58,7 @@ public class MergedParameterization implements Parameterization {
   /**
    * Parameters to rewind.
    */
-  final private java.util.Vector<Pair<OptionID, Object>> used;
+  final private List<Pair<OptionID, Object>> used;
 
   /**
    * Constructor.
@@ -68,7 +69,7 @@ public class MergedParameterization implements Parameterization {
     super();
     this.inner = child;
     this.current = new ListParameterization();
-    this.used = new java.util.Vector<Pair<OptionID, Object>>();
+    this.used = new ArrayList<Pair<OptionID, Object>>();
   }
 
   /**
@@ -78,7 +79,7 @@ public class MergedParameterization implements Parameterization {
    * @param current Current parameterization to re-used
    * @param used Used parameters list.
    */
-  private MergedParameterization(Parameterization inner, ListParameterization current, Vector<Pair<OptionID, Object>> used) {
+  private MergedParameterization(Parameterization inner, ListParameterization current, List<Pair<OptionID, Object>> used) {
     super();
     this.inner = inner;
     this.current = current;
@@ -93,7 +94,7 @@ public class MergedParameterization implements Parameterization {
       for(Pair<OptionID, Object> pair : used) {
         current.addParameter(pair.first, pair.second);
       }
-      used.removeAllElements();
+      used.clear();
     }
   }
 

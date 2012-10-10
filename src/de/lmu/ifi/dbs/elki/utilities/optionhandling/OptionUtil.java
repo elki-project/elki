@@ -59,14 +59,14 @@ public final class OptionUtil {
    */
   public static <O extends Parameter<?, ?>> String optionsNamesToString(List<O> options) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("[");
+    buffer.append('[');
     for(int i = 0; i < options.size(); i++) {
       buffer.append(options.get(i).getName());
       if(i != options.size() - 1) {
-        buffer.append(",");
+        buffer.append(',');
       }
     }
-    buffer.append("]");
+    buffer.append(']');
     return buffer.toString();
   }
 
@@ -80,14 +80,14 @@ public final class OptionUtil {
    */
   public static <O extends Parameter<?, ?>> String optionsNamesToString(O[] options) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("[");
+    buffer.append('[');
     for(int i = 0; i < options.length; i++) {
       buffer.append(options[i].getName());
       if(i != options.length - 1) {
-        buffer.append(",");
+        buffer.append(',');
       }
     }
-    buffer.append("]");
+    buffer.append(']');
     return buffer.toString();
   }
 
@@ -101,16 +101,16 @@ public final class OptionUtil {
    */
   public static <N extends Parameter<?, ?>> String parameterNamesAndValuesToString(List<N> parameters) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append("[");
+    buffer.append('[');
     for(int i = 0; i < parameters.size(); i++) {
       buffer.append(parameters.get(i).getName());
-      buffer.append(":");
+      buffer.append(':');
       buffer.append(parameters.get(i).getValueAsString());
       if(i != parameters.size() - 1) {
         buffer.append(", ");
       }
     }
-    buffer.append("]");
+    buffer.append(']');
     return buffer.toString();
   }
 
@@ -131,7 +131,7 @@ public final class OptionUtil {
 
       buf.append(SerializedParameterization.OPTION_PREFIX);
       buf.append(currentOption);
-      buf.append(" ");
+      buf.append(' ');
       buf.append(syntax);
       buf.append(FormatUtil.NEWLINE);
       println(buf, width, longDescription, indent);

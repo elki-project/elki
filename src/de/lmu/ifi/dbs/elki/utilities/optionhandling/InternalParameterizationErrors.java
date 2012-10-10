@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -62,7 +63,7 @@ public class InternalParameterizationErrors extends ParameterException {
    */
   public InternalParameterizationErrors(String message, Exception internalError) {
     super(message);
-    final java.util.Vector<Exception> errors = new java.util.Vector<Exception>(1);
+    final ArrayList<Exception> errors = new ArrayList<Exception>(1);
     errors.add(internalError);
     this.internalErrors = errors;
   }

@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -54,7 +54,7 @@ public class TrackParameters implements Parameterization {
   /**
    * Tracking storage
    */
-  java.util.Vector<Pair<Object, Parameter<?, ?>>> options = new java.util.Vector<Pair<Object, Parameter<?, ?>>>();
+  List<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
 
   /**
    * Tree information: parent links
@@ -85,13 +85,13 @@ public class TrackParameters implements Parameterization {
   /**
    * Internal constructor, for nested tracking.
    * 
-   * @param inner
-   * @param option
-   * @param options
-   * @param parents
-   * @param children
+   * @param inner Inner parameterization
+   * @param option Option
+   * @param options List of options
+   * @param parents Parent map
+   * @param children Child map
    */
-  private TrackParameters(Parameterization inner, Object option, Vector<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
+  private TrackParameters(Parameterization inner, Object option, List<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
     super();
     this.inner = inner.descend(option);
     this.cur = option;
@@ -149,7 +149,7 @@ public class TrackParameters implements Parameterization {
    * @return Parameters given
    */
   public Collection<Pair<OptionID, Object>> getGivenParameters() {
-    java.util.Vector<Pair<OptionID, Object>> ret = new java.util.Vector<Pair<OptionID, Object>>();
+    ArrayList<Pair<OptionID, Object>> ret = new ArrayList<Pair<OptionID, Object>>();
     for(Pair<Object, Parameter<?, ?>> pair : options) {
       if(pair.second.isDefined() && pair.second.getGivenValue() != null) {
         ret.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
@@ -180,7 +180,7 @@ public class TrackParameters implements Parameterization {
     parents.put(opt, cur);
     List<Object> c = children.get(cur);
     if(c == null) {
-      c = new java.util.Vector<Object>();
+      c = new ArrayList<Object>();
       children.put(cur, c);
     }
     if(!c.contains(opt)) {

@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-
-import java.util.List;
 
 /**
  * Represents a Greater-Equal-Than-Number parameter constraint for a list of number values.

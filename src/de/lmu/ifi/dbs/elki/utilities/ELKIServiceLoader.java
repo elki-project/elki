@@ -148,7 +148,7 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
     return classes.iterator();
   }
 
-  private boolean parseLine(String line, ArrayList<Class<?>> classes, URL nextElement) throws IOException {
+  private boolean parseLine(String line, ArrayList<Class<?>> classes, URL nextElement) {
     if(line == null) {
       return false;
     }
@@ -177,7 +177,6 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
       Class<?> cls = cl.loadClass(line);
       // Should not happen. Check anyway.
       if(cls == null) {
-        assert (cls != null);
         return true;
       }
       if(parent.isAssignableFrom(cls)) {

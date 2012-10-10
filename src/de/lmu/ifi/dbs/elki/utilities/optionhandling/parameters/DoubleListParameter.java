@@ -126,7 +126,7 @@ public class DoubleListParameter extends ListParameter<Double> {
 
   @Override
   public String getValueAsString() {
-    return FormatUtil.format(getValue().toArray(new Double[0]), LIST_SEP, FormatUtil.NF);
+    return FormatUtil.format(getValue().toArray(new Double[getValue().size()]), LIST_SEP, FormatUtil.NF);
   }
 
   @SuppressWarnings("unchecked")
