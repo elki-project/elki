@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource.Event;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -220,7 +219,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     boolean stop = false;
     while(!stop) {
-      Event ev = source.nextEvent();
+      BundleStreamSource.Event ev = source.nextEvent();
       switch(ev) {
       case END_OF_STREAM:
         stop = true;

@@ -59,7 +59,7 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
   public RandomSamplingStreamFilter(double prob, Long seed) {
     super();
     this.prob = prob;
-    this.random = (seed != null) ? new Random(seed) : new Random();
+    this.random = (seed != null) ? new Random(seed.longValue()) : new Random();
   }
 
   @Override
@@ -121,9 +121,9 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter probP = new DoubleParameter(PROB_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1.0, IntervalBoundary.CLOSE));
+      DoubleParameter probP = new DoubleParameter(PROB_ID, new IntervalConstraint(Double.valueOf(0.0), IntervalBoundary.CLOSE, Double.valueOf(1.0), IntervalBoundary.CLOSE));
       if(config.grab(probP)) {
-        prob = probP.getValue();
+        prob = probP.getValue().doubleValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
       if(config.grab(seedP)) {

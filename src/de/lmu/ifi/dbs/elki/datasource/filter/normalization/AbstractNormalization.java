@@ -51,7 +51,7 @@ public abstract class AbstractNormalization<O extends NumberVector<?>> extends A
   }
 
   @Override
-  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) throws NonNumericFeaturesException {
+  public MultipleObjectsBundle normalizeObjects(MultipleObjectsBundle objects) {
     return super.filter(objects);
   }
 

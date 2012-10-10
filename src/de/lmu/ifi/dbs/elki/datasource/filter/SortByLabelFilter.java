@@ -62,7 +62,7 @@ public class SortByLabelFilter implements ObjectFilter {
     final int size = objects.dataLength();
     final Integer[] offsets = new Integer[size];
     for(int i = 0; i < size; i++) {
-      offsets[i] = i;
+      offsets[i] = Integer.valueOf(i);
     }
     // Sort by labels - identify a label column
     final int lblcol;
@@ -79,8 +79,8 @@ public class SortByLabelFilter implements ObjectFilter {
     Arrays.sort(offsets, new Comparator<Integer>() {
       @Override
       public int compare(Integer o1, Integer o2) {
-        String l1 = objects.data(o1, lblcol).toString();
-        String l2 = objects.data(o2, lblcol).toString();
+        String l1 = objects.data(o1.intValue(), lblcol).toString();
+        String l2 = objects.data(o2.intValue(), lblcol).toString();
         return l1.compareToIgnoreCase(l2);
       }
     });
@@ -91,7 +91,7 @@ public class SortByLabelFilter implements ObjectFilter {
       List<?> in = objects.getColumn(j);
       List<Object> data = new ArrayList<Object>(size);
       for(int i = 0; i < size; i++) {
-        data.add(in.get(offsets[i]));
+        data.add(in.get(offsets[i].intValue()));
       }
       bundle.appendColumn(objects.meta(j), data);
     }

@@ -24,10 +24,8 @@ package de.lmu.ifi.dbs.elki.datasource;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
 
 /**
@@ -160,7 +158,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
       LOG.verbose("Generating clusters ...");
     }
     if(testAgainstModel != null) {
-      gen.setTestAgainstModel(testAgainstModel);
+      gen.setTestAgainstModel(testAgainstModel.booleanValue());
     }
     try {
       return gen.generate();
@@ -179,7 +177,6 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
    */
   private GeneratorMain loadXMLSpecification() throws UnableToComplyException {
     try {
-      InputStream in = new FileInputStream(specfile);
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
       URL url = ClassLoader.getSystemResource(GENERATOR_SCHEMA_FILE);
@@ -190,15 +187,15 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
           dbf.setIgnoringElementContentWhitespace(true);
         }
         catch(Exception e) {
-          LOG.warning("Could not set up XML Schema validation for speciciation file.");
+          LOG.warning("Could not set up XML Schema validation for speciciation file.", e);
         }
       }
       else {
         LOG.warning("Could not set up XML Schema validation for speciciation file.");
       }
-      Document doc = dbf.newDocumentBuilder().parse(in);
+      Document doc = dbf.newDocumentBuilder().parse(specfile);
       Node root = doc.getDocumentElement();
-      if(root.getNodeName() == "dataset") {
+      if("dataset".equals(root.getNodeName())) {
         GeneratorMain gen = new GeneratorMain();
         processElementDataset(gen, root);
         return gen;
@@ -231,21 +228,21 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   private void processElementDataset(GeneratorMain gen, Node cur) throws UnableToComplyException {
     // *** get parameters
     String seedstr = ((Element) cur).getAttribute("random-seed");
-    if(seedstr != null && seedstr != "") {
-      clusterRandom = new Random((int) (Integer.valueOf(seedstr) * sizescale));
+    if(seedstr != null && seedstr.length() > 0) {
+      clusterRandom = new Random((int) (Integer.parseInt(seedstr) * sizescale));
     }
     String testmod = ((Element) cur).getAttribute("test-model");
-    if(testmod != null && testmod != "") {
-      testAgainstModel = (Integer.valueOf(testmod) != 0);
+    if(testmod != null && testmod.length() > 0) {
+      testAgainstModel = Boolean.valueOf(Integer.parseInt(testmod) != 0);
     }
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
     while(iter.hasNext()) {
       Node child = iter.next();
-      if(child.getNodeName() == "cluster") {
+      if("cluster".equals(child.getNodeName())) {
         processElementCluster(gen, child);
       }
-      else if(child.getNodeName() == "static") {
+      else if("static".equals(child.getNodeName())) {
         processElementStatic(gen, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
@@ -266,21 +263,21 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double overweight = 1.0;
 
     String sizestr = ((Element) cur).getAttribute("size");
-    if(sizestr != null && sizestr != "") {
-      size = (int) (Integer.valueOf(sizestr) * sizescale);
+    if(sizestr != null && sizestr.length() > 0) {
+      size = (int) (Integer.parseInt(sizestr) * sizescale);
     }
 
     String name = ((Element) cur).getAttribute("name");
 
     String dcostr = ((Element) cur).getAttribute("density-correction");
-    if(dcostr != null && dcostr != "") {
+    if(dcostr != null && dcostr.length() > 0) {
       overweight = Double.parseDouble(dcostr);
     }
 
     if(size < 0) {
       throw new UnableToComplyException("No valid cluster size given in specification file.");
     }
-    if(name == null || name == "") {
+    if(name == null || name.length() == 0) {
       throw new UnableToComplyException("No cluster name given in specification file.");
     }
 
@@ -292,22 +289,22 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
     while(iter.hasNext()) {
       Node child = iter.next();
-      if(child.getNodeName() == "uniform") {
+      if("uniform".equals(child.getNodeName())) {
         processElementUniform(cluster, child);
       }
-      else if(child.getNodeName() == "normal") {
+      else if("normal".equals(child.getNodeName())) {
         processElementNormal(cluster, child);
       }
-      else if(child.getNodeName() == "gamma") {
+      else if("gamma".equals(child.getNodeName())) {
         processElementGamma(cluster, child);
       }
-      else if(child.getNodeName() == "rotate") {
+      else if("rotate".equals(child.getNodeName())) {
         processElementRotate(cluster, child);
       }
-      else if(child.getNodeName() == "translate") {
+      else if("translate".equals(child.getNodeName())) {
         processElementTranslate(cluster, child);
       }
-      else if(child.getNodeName() == "clip") {
+      else if("clip".equals(child.getNodeName())) {
         processElementClipping(cluster, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
@@ -330,11 +327,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double max = 1.0;
 
     String minstr = ((Element) cur).getAttribute("min");
-    if(minstr != null && minstr != "") {
+    if(minstr != null && minstr.length() > 0) {
       min = Double.parseDouble(minstr);
     }
     String maxstr = ((Element) cur).getAttribute("max");
-    if(maxstr != null && maxstr != "") {
+    if(maxstr != null && maxstr.length() > 0) {
       max = Double.parseDouble(maxstr);
     }
 
@@ -364,11 +361,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double mean = 0.0;
     double stddev = 1.0;
     String meanstr = ((Element) cur).getAttribute("mean");
-    if(meanstr != null && meanstr != "") {
+    if(meanstr != null && meanstr.length() > 0) {
       mean = Double.parseDouble(meanstr);
     }
     String stddevstr = ((Element) cur).getAttribute("stddev");
-    if(stddevstr != null && stddevstr != "") {
+    if(stddevstr != null && stddevstr.length() > 0) {
       stddev = Double.parseDouble(stddevstr);
     }
 
@@ -398,11 +395,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double k = 1.0;
     double theta = 1.0;
     String kstr = ((Element) cur).getAttribute("k");
-    if(kstr != null && kstr != "") {
+    if(kstr != null && kstr.length() > 0) {
       k = Double.parseDouble(kstr);
     }
     String thetastr = ((Element) cur).getAttribute("theta");
-    if(thetastr != null && thetastr != "") {
+    if(thetastr != null && thetastr.length() > 0) {
       theta = Double.parseDouble(thetastr);
     }
 
@@ -434,15 +431,15 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     double angle = 0.0;
 
     String a1str = ((Element) cur).getAttribute("axis1");
-    if(a1str != null && a1str != "") {
-      axis1 = Integer.valueOf(a1str);
+    if(a1str != null && a1str.length() > 0) {
+      axis1 = Integer.parseInt(a1str);
     }
     String a2str = ((Element) cur).getAttribute("axis2");
-    if(a2str != null && a2str != "") {
-      axis2 = Integer.valueOf(a2str);
+    if(a2str != null && a2str.length() > 0) {
+      axis2 = Integer.parseInt(a2str);
     }
     String anstr = ((Element) cur).getAttribute("angle");
-    if(anstr != null && anstr != "") {
+    if(anstr != null && anstr.length() > 0) {
       angle = Double.parseDouble(anstr);
     }
     if(axis1 <= 0 || axis1 > cluster.getDim()) {
@@ -478,7 +475,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   private void processElementTranslate(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
     Vector offset = null;
     String vstr = ((Element) cur).getAttribute("vector");
-    if(vstr != null && vstr != "") {
+    if(vstr != null && vstr.length() > 0) {
       offset = parseVector(vstr);
     }
     if(offset == null) {
@@ -510,11 +507,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     Vector cmax = null;
 
     String minstr = ((Element) cur).getAttribute("min");
-    if(minstr != null && minstr != "") {
+    if(minstr != null && minstr.length() > 0) {
       cmin = parseVector(minstr);
     }
     String maxstr = ((Element) cur).getAttribute("max");
-    if(maxstr != null && maxstr != "") {
+    if(maxstr != null && maxstr.length() > 0) {
       cmax = parseVector(maxstr);
     }
     if(cmin == null || cmax == null) {
@@ -552,7 +549,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
     while(iter.hasNext()) {
       Node child = iter.next();
-      if(child.getNodeName() == "point") {
+      if("point".equals(child.getNodeName())) {
         processElementPoint(points, child);
       }
       else if(child.getNodeType() == Node.ELEMENT_NODE) {
@@ -578,7 +575,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   private void processElementPoint(List<Vector> points, Node cur) throws UnableToComplyException {
     Vector point = null;
     String vstr = ((Element) cur).getAttribute("vector");
-    if(vstr != null && vstr != "") {
+    if(vstr != null && vstr.length() > 0) {
       point = parseVector(vstr);
     }
     if(point == null) {
@@ -653,14 +650,14 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         specfile = cfgparam.getValue();
       }
       // Cluster size scaling
-      final DoubleParameter scalepar = new DoubleParameter(SIZE_SCALE_ID, 1.0);
+      final DoubleParameter scalepar = new DoubleParameter(SIZE_SCALE_ID, Double.valueOf(1.0));
       if(config.grab(scalepar)) {
-        sizescale = scalepar.getValue();
+        sizescale = scalepar.getValue().doubleValue();
       }
       // Random generator
-      final IntParameter seedpar = new IntParameter(RANDOMSEED_ID, true);
+      final LongParameter seedpar = new LongParameter(RANDOMSEED_ID, true);
       if(config.grab(seedpar)) {
-        clusterRandom = new Random(seedpar.getValue());
+        clusterRandom = new Random(seedpar.getValue().longValue());
       }
     }
 

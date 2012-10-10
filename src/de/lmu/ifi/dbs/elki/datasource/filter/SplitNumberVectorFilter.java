@@ -168,12 +168,12 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(0));
+      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(Integer.valueOf(0)));
       if(config.grab(selectedAttributesP)) {
         List<Integer> dimensionList = selectedAttributesP.getValue();
         dims = new int[dimensionList.size()];
         for(int i = 0; i < dimensionList.size(); i++) {
-          dims[i] = dimensionList.get(i);
+          dims[i] = dimensionList.get(i).intValue();
         }
       }
     }

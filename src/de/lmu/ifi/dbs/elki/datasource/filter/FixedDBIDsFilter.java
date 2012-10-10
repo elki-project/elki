@@ -116,7 +116,7 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
       super.makeOptions(config);
       IntParameter startidParam = new IntParameter(IDSTART_ID);
       if(config.grab(startidParam)) {
-        startid = startidParam.getValue();
+        startid = startidParam.getValue().intValue();
       }
     }
 

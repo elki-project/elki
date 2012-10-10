@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * <em>must have a constructor that either is</em> <blockquote>
  * 
  * <pre>
- * @code
+ * {@code
  * public Class(Parameterizable config) { ... }
  * }
  * </pre>
@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * </blockquote> or <blockquote>
  * 
  * <pre>
- * @code
+ * {@code
  * public Class() { ... }
  * }
  * </pre>
@@ -91,7 +91,8 @@ import de.lmu.ifi.dbs.elki.utilities.InspectionUtilFrequentlyScanned;
  * 
  * @apiviz.exclude
  * @apiviz.excludeSubtypes
- * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter oneway - n
+ * @apiviz.has de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
+ *             oneway - n
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization
  *              .Parameterization oneway
  */

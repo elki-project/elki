@@ -223,9 +223,9 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("normalization class: ").append(getClass().getName());
-    result.append("\n");
+    result.append('\n');
     result.append("normalization means: ").append(FormatUtil.format(mean));
-    result.append("\n");
+    result.append('\n');
     result.append("normalization stddevs: ").append(FormatUtil.format(stddev));
 
     return result.toString();

@@ -104,10 +104,10 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       }
       else {
         try {
-          float attribute = Float.valueOf(entries.get(i));
+          float attribute = Float.parseFloat(entries.get(i));
           Integer curdim = keymap.get(curterm);
           if(curdim == null) {
-            curdim = maxdim + 1;
+            curdim = Integer.valueOf(maxdim + 1);
             keymap.put(curterm, curdim);
             maxdim += 1;
           }
@@ -184,7 +184,7 @@ public class TermFrequencyParser extends NumberVectorLabelParser<SparseFloatVect
       super.makeOptions(config);
       Flag normF = new Flag(NORMALIZE_FLAG);
       if(config.grab(normF)) {
-        normalize = normF.getValue();
+        normalize = normF.getValue().booleanValue();
       }
     }
 

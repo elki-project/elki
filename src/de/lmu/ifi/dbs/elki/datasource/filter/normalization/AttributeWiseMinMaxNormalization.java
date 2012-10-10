@@ -151,7 +151,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
    * @return a factor for normalization in a certain dimension
    */
   private double factor(int dimension) {
-    return maxima[dimension] != minima[dimension] ? maxima[dimension] - minima[dimension] : maxima[dimension] != 0 ? maxima[dimension] : 1;
+    return maxima[dimension] > minima[dimension] ? maxima[dimension] - minima[dimension] : maxima[dimension] > 0 ? maxima[dimension] : 1;
   }
 
   @Override
@@ -180,9 +180,9 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
   public String toString() {
     StringBuilder result = new StringBuilder();
     result.append("normalization class: ").append(getClass().getName());
-    result.append("\n");
+    result.append('\n');
     result.append("normalization minima: ").append(FormatUtil.format(minima));
-    result.append("\n");
+    result.append('\n');
     result.append("normalization maxima: ").append(FormatUtil.format(maxima));
     return result.toString();
   }

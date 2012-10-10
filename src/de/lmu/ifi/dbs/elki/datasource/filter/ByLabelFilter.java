@@ -184,7 +184,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
       }
       final Flag invertedF = new Flag(LABELFILTER_PATTERN_INVERT_ID);
       if(config.grab(invertedF)) {
-        inverted = invertedF.getValue();
+        inverted = invertedF.getValue().booleanValue();
       }
     }
 

@@ -48,8 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 // TODO: use a non-string class for external ids?
 public class ExternalIDFilter implements ObjectFilter {
   /**
-   * Parameter that specifies the index of the label to be used as
-   * external Id, must be an integer equal to or greater than 0.
+   * Parameter that specifies the index of the label to be used as external Id,
+   * must be an integer equal to or greater than 0.
    * <p>
    * Key: {@code -dbc.externalIdIndex}
    * </p>
@@ -77,10 +77,10 @@ public class ExternalIDFilter implements ObjectFilter {
     // Find a labellist column
     boolean done = false;
     boolean keeplabelcol = false;
-    for(int i = 0; i < objects.metaLength(); i++) {
+    for (int i = 0; i < objects.metaLength(); i++) {
       SimpleTypeInformation<?> meta = objects.meta(i);
       // Skip non-labellist columns - or if we already had a labellist
-      if(done || meta.getRestrictionClass() != LabelList.class) {
+      if (done || !LabelList.class.equals(meta.getRestrictionClass())) {
         bundle.appendColumn(meta, objects.getColumn(i));
         continue;
       }
@@ -91,16 +91,15 @@ public class ExternalIDFilter implements ObjectFilter {
       List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
 
       // Split the column
-      for(Object obj : objects.getColumn(i)) {
-        if(obj != null) {
+      for (Object obj : objects.getColumn(i)) {
+        if (obj != null) {
           LabelList ll = (LabelList) obj;
           eidcol.add(new ExternalID(ll.remove(externalIdIndex)));
           lblcol.add(ll);
-          if(ll.size() > 0) {
+          if (ll.size() > 0) {
             keeplabelcol = true;
           }
-        }
-        else {
+        } else {
           eidcol.add(null);
           lblcol.add(null);
         }
@@ -108,7 +107,7 @@ public class ExternalIDFilter implements ObjectFilter {
 
       bundle.appendColumn(TypeUtil.EXTERNALID, eidcol);
       // Only add the label column when it's not empty.
-      if(keeplabelcol) {
+      if (keeplabelcol) {
         bundle.appendColumn(meta, lblcol);
       }
     }
@@ -128,9 +127,9 @@ public class ExternalIDFilter implements ObjectFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID, new GreaterEqualConstraint(0));
-      if(config.grab(externalIdIndexParam)) {
-        externalIdIndex = externalIdIndexParam.getValue();
+      final IntParameter externalIdIndexParam = new IntParameter(EXTERNALID_INDEX_ID, new GreaterEqualConstraint(Integer.valueOf(0)));
+      if (config.grab(externalIdIndexParam)) {
+        externalIdIndex = externalIdIndexParam.getValue().intValue();
       }
     }
 

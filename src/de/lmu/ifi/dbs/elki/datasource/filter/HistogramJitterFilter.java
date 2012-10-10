@@ -76,7 +76,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
   public HistogramJitterFilter(double jitter, Long seed) {
     super();
     this.jitter = jitter;
-    Random random = (seed == null) ? new Random() : new Random(seed);
+    Random random = (seed == null) ? new Random() : new Random(seed.longValue());
     rnd = new ExponentialDistribution(1, random);
   }
   
@@ -147,9 +147,9 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter jitterP = new DoubleParameter(JITTER_ID, new GreaterEqualConstraint(0.0));
+      DoubleParameter jitterP = new DoubleParameter(JITTER_ID, new GreaterEqualConstraint(Double.valueOf(0.0)));
       if(config.grab(jitterP)) {
-        jitter = jitterP.getValue();
+        jitter = jitterP.getValue().doubleValue();
       }
       LongParameter seedP = new LongParameter(SEED_ID, true);
       if(config.grab(seedP)) {

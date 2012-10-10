@@ -99,7 +99,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
     if(startid != null) {
       List<DBID> ids = new ArrayList<DBID>(data.length);
       for(int i = 0; i < data.length; i++) {
-        ids.add(DBIDUtil.importInteger(startid + i));
+        ids.add(DBIDUtil.importInteger(startid.intValue() + i));
       }
       b.appendColumn(TypeUtil.DBID, Arrays.asList(labels));
     }

@@ -29,7 +29,6 @@ import java.nio.channels.WritableByteChannel;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformationSerializer;
-import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource.Event;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -46,7 +45,7 @@ public class BundleWriter {
    * Class logger for the bundle writer.
    */
   private static final Logging LOG = Logging.getLogger(BundleWriter.class);
-  
+
   /**
    * Initial buffer size.
    */
@@ -69,7 +68,7 @@ public class BundleWriter {
 
     ByteBufferSerializer<Object>[] serializers = null;
     loop: while (true) {
-      Event ev = source.nextEvent();
+      BundleStreamSource.Event ev = source.nextEvent();
       switch(ev) {
       case NEXT_OBJECT:
         if (serializers == null) {
@@ -80,17 +79,17 @@ public class BundleWriter {
           buffer = ensureBuffer(size, buffer, output);
           serializers[i].toByteBuffer(buffer, source.data(i));
         }
-        break;
+        break; // switch
       case META_CHANGED:
         if (serializers != null) {
           throw new AbortException("Meta changes are not supported, once the block header has been written.");
         }
-        break;
+        break; // switch
       case END_OF_STREAM:
         break loop;
       default:
-        LOG.warning("Unknown bundle stream event. API inconsistent? "+ev);
-        break;
+        LOG.warning("Unknown bundle stream event. API inconsistent? " + ev);
+        break; // switch
       }
     }
     if (buffer.position() > 0) {
