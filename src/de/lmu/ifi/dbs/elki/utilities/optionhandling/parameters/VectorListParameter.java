@@ -146,7 +146,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
       List<Double> vec = valiter.next();
       Iterator<Double> veciter = vec.iterator();
       while(veciter.hasNext()) {
-        buf.append(Double.toString(veciter.next()));
+        buf.append(veciter.next().toString());
         if (veciter.hasNext()) {
           buf.append(LIST_SEP);
         }
@@ -192,8 +192,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
         ArrayList<Double> vectorCoord = new ArrayList<Double>();
         for(String coordinate : coordinates) {
           try {
-            Double.parseDouble(coordinate);
-            vectorCoord.add(Double.parseDouble(coordinate));
+            vectorCoord.add(Double.valueOf(coordinate));
           }
           catch(NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Coordinates of vector \"" + vector + "\" are not valid!");
@@ -205,23 +204,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     }
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Double values!");
   }
-
-  /**
-   * Returns an array containing the individual vector sizes of this vector list
-   * parameter.
-   * 
-   * @return the individual vector sizes
-   */
-  // unused?
-  /*
-   * public int[] vectorSizes() {
-   * 
-   * int[] sizes = new int[getListSize()];
-   * 
-   * int i = 0; for(List<?> vecs : value) { sizes[i] = vecs.size(); i++; }
-   * 
-   * return sizes; }
-   */
 
   /**
    * Returns a string representation of the parameter's type.

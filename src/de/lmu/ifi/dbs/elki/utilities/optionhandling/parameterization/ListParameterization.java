@@ -90,7 +90,7 @@ public class ListParameterization extends AbstractParameterization {
    * @param flag Flag to add, if set
    */
   public void forwardOption(Flag flag) {
-    if (flag.isDefined() && flag.getValue()) {
+    if (flag.isDefined() && flag.getValue().booleanValue()) {
       addFlag(flag.getOptionID());
     }
   }

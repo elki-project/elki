@@ -68,13 +68,13 @@ public class ExtendedArray<T> implements ArrayAdapter<T, ExtendedArray<T>> {
 
   @Override
   public int size(ExtendedArray<T> array) {
-    assert (array == this);
+    assert (this == array);
     return size;
   }
 
   @Override
   public T get(ExtendedArray<T> array, int off) throws IndexOutOfBoundsException {
-    assert (array == this);
+    assert (this == array);
     if(off == size - 1) {
       return extra;
     }

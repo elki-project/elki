@@ -138,7 +138,7 @@ public class IntListParameter extends ListParameter<Integer> {
     List<Integer> val = getValue();
     Iterator<Integer> veciter = val.iterator();
     while(veciter.hasNext()) {
-      buf.append(Integer.toString(veciter.next()));
+      buf.append(veciter.next().toString());
       if (veciter.hasNext()) {
         buf.append(LIST_SEP);
       }
@@ -167,7 +167,7 @@ public class IntListParameter extends ListParameter<Integer> {
       String[] values = SPLIT.split((String) obj);
       ArrayList<Integer> intValue = new ArrayList<Integer>(values.length);
       for(String val : values) {
-        intValue.add(Integer.parseInt(val));
+        intValue.add(Integer.valueOf(val));
       }
       return intValue;
     }

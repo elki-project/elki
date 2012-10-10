@@ -80,7 +80,7 @@ public class RandomFactory {
    */
   public Random getRandom() {
     if(seed != null) {
-      return new Random(seed);
+      return new Random(Long.valueOf(seed));
     }
     else {
       return new Random();

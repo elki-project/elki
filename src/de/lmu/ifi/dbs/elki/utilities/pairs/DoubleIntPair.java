@@ -127,7 +127,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair>, PairInterface<D
   @Override
   @Deprecated
   public final Double getFirst() {
-    return first;
+    return Double.valueOf(first);
   }
 
   /**
@@ -145,7 +145,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair>, PairInterface<D
   @Override
   @Deprecated
   public final Integer getSecond() {
-    return second;
+    return Integer.valueOf(second);
   }
 
   /**

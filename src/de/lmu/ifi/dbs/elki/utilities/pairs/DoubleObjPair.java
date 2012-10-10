@@ -59,7 +59,7 @@ public class DoubleObjPair<O> implements PairInterface<Double, O>, Comparable<Do
   @Override
   @Deprecated
   public Double getFirst() {
-    return first;
+    return Double.valueOf(first);
   }
 
   @Override

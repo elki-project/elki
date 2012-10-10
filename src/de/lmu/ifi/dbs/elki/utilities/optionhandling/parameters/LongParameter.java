@@ -46,7 +46,7 @@ public class LongParameter extends NumberParameter<Long> {
    * @param defaultValue the default value
    */
   public LongParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, long defaultValue) {
-    super(optionID, constraints, defaultValue);
+    super(optionID, constraints, Long.valueOf(defaultValue));
   }
 
   /**
@@ -81,7 +81,7 @@ public class LongParameter extends NumberParameter<Long> {
    * @param defaultValue the default value
    */
   public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, long defaultValue) {
-    super(optionID, constraint, defaultValue);
+    super(optionID, constraint, Long.valueOf(defaultValue));
   }
 
   /**
@@ -114,7 +114,7 @@ public class LongParameter extends NumberParameter<Long> {
    * @param defaultValue the default value
    */
   public LongParameter(OptionID optionID, long defaultValue) {
-    super(optionID, defaultValue);
+    super(optionID, Long.valueOf(defaultValue));
   }
 
   /**
@@ -138,7 +138,7 @@ public class LongParameter extends NumberParameter<Long> {
   
   @Override
   public String getValueAsString() {
-    return Long.toString(getValue());
+    return getValue().toString();
   }
 
   @Override
@@ -146,11 +146,11 @@ public class LongParameter extends NumberParameter<Long> {
     if(obj instanceof Long) {
       return (Long) obj;
     }
-    if(obj instanceof Integer) {
-      return new Long((Integer) obj);
+    if(obj instanceof Number) {
+      return Long.valueOf(((Number) obj).longValue());
     }
     try {
-      return Long.parseLong(obj.toString());
+      return Long.valueOf(obj.toString());
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");

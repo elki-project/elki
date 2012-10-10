@@ -138,7 +138,7 @@ public class IntParameter extends NumberParameter<Integer> {
 
   @Override
   public String getValueAsString() {
-    return Integer.toString(getValue());
+    return getValue().toString();
   }
 
   @Override
@@ -147,7 +147,7 @@ public class IntParameter extends NumberParameter<Integer> {
       return (Integer) obj;
     }
     try {
-      return Integer.parseInt(obj.toString());
+      return Integer.valueOf(obj.toString());
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
