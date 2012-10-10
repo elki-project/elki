@@ -139,7 +139,7 @@ public class DoubleParameter extends NumberParameter<Double> {
 
   @Override
   public String getValueAsString() {
-    return Double.toString(getValue());
+    return getValue().toString();
   }
 
   @Override
@@ -148,7 +148,7 @@ public class DoubleParameter extends NumberParameter<Double> {
       return (Double) obj;
     }
     try {
-      return Double.parseDouble(obj.toString());
+      return Double.valueOf(obj.toString());
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");

@@ -115,9 +115,6 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
     return result;
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
@@ -139,9 +136,6 @@ public abstract class ConstantObject<D extends ConstantObject<D>> implements Com
     return name.equals(that.getName());
   }
 
-  /**
-   * @see Object#hashCode()
-   */
   @Override
   public int hashCode() {
     return hashCode;

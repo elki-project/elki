@@ -124,7 +124,7 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
   @Override
   @Deprecated
   public final Integer getFirst() {
-    return first;
+    return Integer.valueOf(first);
   }
 
   /**
@@ -142,7 +142,7 @@ public class IntIntPair implements Comparable<IntIntPair>, PairInterface<Integer
   @Override
   @Deprecated
   public final Integer getSecond() {
-    return second;
+    return Integer.valueOf(second);
   }
 
   /**

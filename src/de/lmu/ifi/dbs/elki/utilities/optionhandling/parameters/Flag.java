@@ -58,25 +58,25 @@ public class Flag extends AbstractParameter<Boolean, Boolean> {
   public Flag(OptionID optionID) {
     super(optionID);
     setOptional(true);
-    setDefaultValue(false);
+    setDefaultValue(Boolean.FALSE);
   }
 
   @Override
   protected Boolean parseValue(Object obj) throws ParameterException {
     if(SET.equals(obj)) {
-      return true;
+      return Boolean.TRUE;
     }
     if(NOT_SET.equals(obj)) {
-      return false;
+      return Boolean.FALSE;
     }
     if(obj instanceof Boolean) {
       return (Boolean) obj;
     }
     if(obj != null && SET.equals(obj.toString())) {
-      return true;
+      return Boolean.TRUE;
     }
     if(obj != null && NOT_SET.equals(obj.toString())) {
-      return false;
+      return Boolean.FALSE;
     }
     throw new WrongParameterValueException("Wrong value for flag \"" + getName() + "\". Allowed values:\n" + SET + " or " + NOT_SET);
   }
@@ -91,7 +91,7 @@ public class Flag extends AbstractParameter<Boolean, Boolean> {
 
   @Override
   public String getValueAsString() {
-    return getValue() ? SET : NOT_SET;
+    return getValue().booleanValue() ? SET : NOT_SET;
   }
 
   @Override
@@ -110,7 +110,7 @@ public class Flag extends AbstractParameter<Boolean, Boolean> {
    */
   public void setValue(boolean val) {
     try {
-      super.setValue(val);
+      super.setValue(Boolean.valueOf(val));
     }
     catch(ParameterException e) {
       // We're pretty sure that any Boolean is okay, so this should never be
@@ -125,7 +125,7 @@ public class Flag extends AbstractParameter<Boolean, Boolean> {
    * @return true when defined and true.
    */
   public boolean isTrue() {
-    return isDefined() && getValue();
+    return isDefined() && getValue().booleanValue();
   }
 
   /**
@@ -134,6 +134,6 @@ public class Flag extends AbstractParameter<Boolean, Boolean> {
    * @return true when defined and true.
    */
   public boolean isFalse() {
-    return isDefined() && !getValue();
+    return isDefined() && !getValue().booleanValue();
   }
 }

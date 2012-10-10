@@ -71,7 +71,7 @@ public class GlobalListSizeConstraint implements GlobalParameterConstraint {
       return;
     }
 
-    if(list.getListSize() != length.getValue()) {
+    if(list.getListSize() != length.getValue().intValue()) {
       throw new WrongParameterValueException("Global Parameter Constraint Error." + "\nThe size of the list parameter \"" + list.getName() + "\" must be " + length.getValue() + ", current size is " + list.getListSize() + ". The value is defined by the integer parameter " + length.getName() + ".\n");
     }
   }

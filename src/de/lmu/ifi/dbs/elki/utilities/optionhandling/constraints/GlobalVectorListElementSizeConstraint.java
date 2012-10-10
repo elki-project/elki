@@ -75,7 +75,7 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
     }
 
     for(List<Double> vec : vector.getValue()) {
-      if(vec.size() != size.getValue()) {
+      if(vec.size() != size.getValue().intValue()) {
         throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "The vectors of vector list parameter " + vector.getName() + " have not the required dimension of " + size.getValue() + " given by integer parameter " + size.getName() + ".");
       }
     }

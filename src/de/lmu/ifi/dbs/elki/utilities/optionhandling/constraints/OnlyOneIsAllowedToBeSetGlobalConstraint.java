@@ -65,7 +65,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
       if(p.isDefined()) {
         // FIXME: Retire the use of this constraint for Flags!
         if(p instanceof Flag) {
-          if (((Flag)p).getValue()) {
+          if (((Flag)p).getValue().booleanValue()) {
             set.add(p.getName());
           }
         } else {

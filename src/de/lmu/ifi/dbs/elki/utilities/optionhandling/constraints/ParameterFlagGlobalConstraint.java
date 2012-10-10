@@ -95,7 +95,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
   @Override
   public void test() throws ParameterException {
     // only check constraints of param if flag is set
-    if(flagConstraint == flag.getValue()) {
+    if(flagConstraint == flag.getValue().booleanValue()) {
       if(cons != null) {
         for(ParameterConstraint<? super C> c : cons) {
           c.test(param.getValue());

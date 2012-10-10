@@ -81,7 +81,7 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
    */
   public RandomParameter(OptionID optionID, long seed) {
     super(optionID);
-    this.seed = seed;
+    this.seed = Long.valueOf(seed);
   }
 
   @Override
@@ -99,13 +99,13 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
       seed = (Long) obj;
       obj = RandomFactory.get(seed);
     }
-    else if(obj instanceof Integer) {
-      seed = (long) (Integer) obj;
+    else if(obj instanceof Number) {
+      seed = Long.valueOf(((Number) obj).longValue());
       obj = RandomFactory.get(seed);
     }
     else {
       try {
-        seed = Long.parseLong(obj.toString());
+        seed = Long.valueOf(obj.toString());
         obj = RandomFactory.get(seed);
       }
       catch(NullPointerException e) {
@@ -126,11 +126,11 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
     if(obj instanceof Long) {
       return RandomFactory.get((Long) obj);
     }
-    if(obj instanceof Integer) {
-      return RandomFactory.get((long) (Integer) obj);
+    if(obj instanceof Number) {
+      return RandomFactory.get(Long.valueOf(((Number) obj).longValue()));
     }
     try {
-      return RandomFactory.get(Long.parseLong(obj.toString()));
+      return RandomFactory.get(Long.valueOf(obj.toString()));
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
@@ -152,6 +152,6 @@ public class RandomParameter extends AbstractParameter<RandomFactory, RandomFact
 
   @Override
   public String getValueAsString() {
-    return (seed != null) ? Long.toString(seed) : "null";
+    return (seed != null) ? seed.toString() : "null";
   }
 }
