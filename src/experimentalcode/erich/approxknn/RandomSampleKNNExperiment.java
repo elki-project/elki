@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -156,7 +157,7 @@ public class RandomSampleKNNExperiment {
         final int k = i * step;
         double share = i / (double) iters;
         // Setup preprocessor
-        RandomSampleKNNPreprocessor.Factory<NumberVector<?>, DoubleDistance> ppf = new RandomSampleKNNPreprocessor.Factory<NumberVector<?>, DoubleDistance>(maxk + 1, distanceFunction, share, 1L);
+        RandomSampleKNNPreprocessor.Factory<NumberVector<?>, DoubleDistance> ppf = new RandomSampleKNNPreprocessor.Factory<NumberVector<?>, DoubleDistance>(maxk + 1, distanceFunction, share, new RandomFactory(1L));
         RandomSampleKNNPreprocessor<NumberVector<?>, DoubleDistance> pp = ppf.instantiate(rel);
         database.addIndex(pp);
 
