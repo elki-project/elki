@@ -92,14 +92,14 @@ public class QuickSelect {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final int left = begin + (length - 1) / 2;
+    final int left = begin + ((length - 1) >> 1);
     quickSelect(data, begin, end, left);
     if(length % 2 == 1) {
       return data[left];
     }
     else {
       quickSelect(data, begin, end, left + 1);
-      return data[left] + (data[left + 1] - data[left]) / 2;
+      return data[left] + .5 * (data[left + 1] - data[left]);
     }
   }
 
@@ -167,7 +167,7 @@ public class QuickSelect {
 
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) / 2;
+      final int middle = (start + end) >> 1;
       if(data[start] > data[middle]) {
         swap(data, start, middle);
       }
@@ -290,7 +290,7 @@ public class QuickSelect {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final int left = begin + (length - 1) / 2;
+    final int left = begin + ((length - 1) >> 1);
     quickSelect(data, begin, end, left);
     return data[left];
   }
@@ -355,7 +355,7 @@ public class QuickSelect {
 
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) / 2;
+      final int middle = (start + end) >> 1;
       if(data[start].compareTo(data[middle]) > 0) {
         swap(data, start, middle);
       }
@@ -481,7 +481,7 @@ public class QuickSelect {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final int left = begin + (length - 1) / 2;
+    final int left = begin + ((length - 1) >> 1);
     quickSelect(data, begin, end, left);
     return data.get(left);
   }
@@ -546,7 +546,7 @@ public class QuickSelect {
 
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) / 2;
+      final int middle = (start + end) >> 1;
       if(data.get(start).compareTo(data.get(middle)) > 0) {
         swap(data, start, middle);
       }
@@ -673,7 +673,7 @@ public class QuickSelect {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final int left = begin + (length - 1) / 2;
+    final int left = begin + ((length - 1) >> 1);
     quickSelect(data, comparator, begin, end, left);
     return data.get(left);
   }
@@ -741,7 +741,7 @@ public class QuickSelect {
 
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) / 2;
+      final int middle = (start + end) >> 1;
       if(comparator.compare(data.get(start), data.get(middle)) > 0) {
         swap(data, start, middle);
       }
@@ -853,7 +853,7 @@ public class QuickSelect {
     final int length = end - begin;
     assert (length > 0);
     // Integer division is "floor" since we are non-negative.
-    final int left = begin + (length - 1) / 2;
+    final int left = begin + ((length - 1) >> 1);
     quickSelect(data, comparator, begin, end, left);
     return data.get(left);
   }
@@ -918,7 +918,7 @@ public class QuickSelect {
 
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) / 2;
+      final int middle = (start + end) >> 1;
       if(comparator.compare(data.get(start), data.get(middle)) > 0) {
         data.swap(start, middle);
       }

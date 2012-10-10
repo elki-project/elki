@@ -81,8 +81,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
       final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(inputParam)) {
         try {
-          inputStream = new BufferedInputStream(new FileInputStream(inputParam.getValue()));
-          inputStream = FileUtil.tryGzipInput(inputStream);
+          inputStream = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(inputParam.getValue())));
         }
         catch(IOException e) {
           config.reportError(new WrongParameterValueException(inputParam, inputParam.getValue().getPath(), e));

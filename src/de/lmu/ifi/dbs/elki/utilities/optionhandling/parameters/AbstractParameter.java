@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.security.InvalidParameterException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -109,7 +109,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
     this.shortDescription = optionID.getDescription();
     this.optionalParameter = true;
     this.defaultValue = defaultValue;
-    this.constraints = (constraints != null) ? constraints : new Vector<ParameterConstraint<S>>();
+    this.constraints = (constraints != null) ? constraints : new ArrayList<ParameterConstraint<S>>();
   }
 
   /**
@@ -126,7 +126,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
     this.shortDescription = optionID.getDescription();
     this.optionalParameter = optional;
     this.defaultValue = null;
-    this.constraints = (constraints != null) ? constraints : new Vector<ParameterConstraint<S>>();
+    this.constraints = (constraints != null) ? constraints : new ArrayList<ParameterConstraint<S>>();
   }
 
   /**
@@ -181,7 +181,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
    * @param defaultValue default value.
    */
   public AbstractParameter(OptionID optionID, T defaultValue) {
-    this(optionID, (Vector<ParameterConstraint<S>>) null, defaultValue);
+    this(optionID, (ArrayList<ParameterConstraint<S>>) null, defaultValue);
   }
 
   /**
@@ -191,7 +191,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
    * @param optional optional flag
    */
   public AbstractParameter(OptionID optionID, boolean optional) {
-    this(optionID, (Vector<ParameterConstraint<S>>) null, optional);
+    this(optionID, (ArrayList<ParameterConstraint<S>>) null, optional);
   }
 
   /**
@@ -200,7 +200,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
    * @param optionID the unique id of the option
    */
   public AbstractParameter(OptionID optionID) {
-    this(optionID, (Vector<ParameterConstraint<S>>) null, false);
+    this(optionID, (ArrayList<ParameterConstraint<S>>) null, false);
   }
 
   /**
@@ -211,7 +211,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
    * @return Vector containing the constraint (if not null)
    */
   private static <S> List<ParameterConstraint<S>> makeConstraintsVector(ParameterConstraint<S> constraint) {
-    Vector<ParameterConstraint<S>> constraints = new Vector<ParameterConstraint<S>>((constraint == null) ? 0 : 1);
+    ArrayList<ParameterConstraint<S>> constraints = new ArrayList<ParameterConstraint<S>>((constraint == null) ? 0 : 1);
     if(constraint != null) {
       constraints.add(constraint);
     }
@@ -388,7 +388,7 @@ public abstract class AbstractParameter<S, T extends S> implements Parameter<S, 
         }
         description.append(constraint.getDescription(getName()));
         if(i == constraints.size() - 1) {
-          description.append(".");
+          description.append('.');
         }
       }
       description.append(FormatUtil.NEWLINE);

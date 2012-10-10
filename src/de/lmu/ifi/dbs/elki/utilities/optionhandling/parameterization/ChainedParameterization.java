@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
@@ -43,7 +44,7 @@ public class ChainedParameterization extends AbstractParameterization {
   /**
    * Keep the list of parameterizations.
    */
-  private Vector<Parameterization> chain = new Vector<Parameterization>();
+  private List<Parameterization> chain = new ArrayList<Parameterization>();
   
   /**
    * Error target
@@ -104,7 +105,7 @@ public class ChainedParameterization extends AbstractParameterization {
 
   @Override
   public void reportError(ParameterException e) {
-    if (this.errorTarget == this) {
+    if (this.equals(this.errorTarget)) {
       super.reportError(e);
     } else {
       this.errorTarget.reportError(e);

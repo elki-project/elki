@@ -128,7 +128,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
         mv.put(val);
       }
     }
-    double curMu = mv.getMean() * 2;
+    double curMu = mv.getMean() * 2.;
     if(curMu == 0) {
       curMu = Double.MIN_NORMAL;
     }

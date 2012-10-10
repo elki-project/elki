@@ -23,7 +23,9 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
@@ -43,7 +45,7 @@ public class UnParameterization implements Parameterization {
   /**
    * Errors
    */
-  java.util.Vector<ParameterException> errors = new java.util.Vector<ParameterException>();
+  List<ParameterException> errors = new ArrayList<ParameterException>();
 
   @Override
   public boolean hasUnusedParameters() {
@@ -76,7 +78,7 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?, ?> opt) {
     return false;
   }
 

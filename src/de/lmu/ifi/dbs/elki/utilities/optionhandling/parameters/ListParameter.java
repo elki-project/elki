@@ -177,15 +177,15 @@ public abstract class ListParameter<T> extends AbstractParameter<List<T>, List<T
       return "";
     }
     StringBuilder buffer = new StringBuilder();
-    buffer.append("[");
+    buffer.append('[');
 
     for(int i = 0; i < getValue().size(); i++) {
       buffer.append(getValue().get(i).toString());
       if(i != getValue().size() - 1) {
-        buffer.append(",");
+        buffer.append(',');
       }
     }
-    buffer.append("]");
+    buffer.append(']');
     return buffer.toString();
   }
 }

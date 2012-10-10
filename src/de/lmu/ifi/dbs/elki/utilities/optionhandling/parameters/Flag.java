@@ -94,9 +94,6 @@ public class Flag extends AbstractParameter<Boolean, Boolean> {
     return getValue() ? SET : NOT_SET;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected boolean validate(Boolean obj) throws ParameterException {
     if(obj == null) {

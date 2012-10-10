@@ -43,7 +43,7 @@ public final class DocumentationUtil {
    */
   public static String getTitle(Class<?> c) {
     Title title = c.getAnnotation(Title.class);
-    if(title != null && title.value() != "") {
+    if(title != null && title.value().length() > 0) {
       return title.value();
     }
     return c.getSimpleName();

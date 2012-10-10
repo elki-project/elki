@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -60,8 +60,8 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
   @Override
   public void test() throws ParameterException {
 
-    Vector<String> set = new Vector<String>();
-    Vector<String> notSet = new Vector<String>();
+    ArrayList<String> set = new ArrayList<String>();
+    ArrayList<String> notSet = new ArrayList<String>();
 
     for(Parameter<?, ?> p : parameterList) {
       if(p.isDefined()) {
