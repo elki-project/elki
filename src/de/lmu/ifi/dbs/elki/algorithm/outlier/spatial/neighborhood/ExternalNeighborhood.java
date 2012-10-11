@@ -146,7 +146,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
       // Build a map label/ExternalId -> DBID
       // (i.e. a reverse index!)
       // TODO: move this into the database layer to share?
-      Map<String, DBID> lblmap = new HashMap<String, DBID>(database.size() * 2);
+      Map<String, DBID> lblmap = new HashMap<String, DBID>(database.size() << 1);
       {
         Relation<LabelList> olq = database.getDatabase().getRelation(TypeUtil.LABELLIST);
         Relation<ExternalID> eidq = database.getDatabase().getRelation(TypeUtil.EXTERNALID);

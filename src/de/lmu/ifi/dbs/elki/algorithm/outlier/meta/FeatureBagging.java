@@ -132,7 +132,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    */
   public OutlierResult run(Relation<NumberVector<?>> relation) {
     final int dbdim = RelationUtil.dimensionality(relation);
-    final int mindim = dbdim / 2;
+    final int mindim = dbdim << 1;
     final int maxdim = dbdim - 1;
     final Random rand = rnd.getRandom();
 
