@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -88,8 +89,8 @@ public class Segment implements Comparable<Segment> {
    * @return true when unclustered in at least one dimension.
    */
   public boolean isUnpaired() {
-    for(int id : clusterIds) {
-      if(id == UNCLUSTERED) {
+    for (int id : clusterIds) {
+      if (id == UNCLUSTERED) {
         return true;
       }
     }
@@ -103,8 +104,8 @@ public class Segment implements Comparable<Segment> {
    * @return true when unclustered everywhere
    */
   public boolean isNone() {
-    for(int id : clusterIds) {
-      if(id != UNCLUSTERED) {
+    for (int id : clusterIds) {
+      if (id != UNCLUSTERED) {
         return false;
       }
     }
@@ -118,8 +119,8 @@ public class Segment implements Comparable<Segment> {
    * @return clustering id or -1
    */
   public int getUnpairedClusteringIndex() {
-    for(int index = 0; index < clusterIds.length; index++) {
-      if(clusterIds[index] == UNCLUSTERED) {
+    for (int index = 0; index < clusterIds.length; index++) {
+      if (clusterIds[index] == UNCLUSTERED) {
         return index;
       }
     }
@@ -137,7 +138,10 @@ public class Segment implements Comparable<Segment> {
 
   @Override
   public boolean equals(Object obj) {
-    if(!(Segment.class.isInstance(obj))) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(Segment.class.isInstance(obj))) {
       return false;
     }
     Segment other = (Segment) obj;
@@ -151,16 +155,15 @@ public class Segment implements Comparable<Segment> {
 
   @Override
   public int compareTo(Segment sid) {
-    for(int i = 0; i < clusterIds.length; i++) {
+    for (int i = 0; i < clusterIds.length; i++) {
       final int a = this.clusterIds[i];
       final int b = sid.clusterIds[i];
-      if(a != b) {
-        if(a * b > 0) {
+      if (a != b) {
+        if (a * b > 0) {
           // Regular comparison
           return (a < b) ? -1 : +1;
           // return (a < b) ? +1 : -1;
-        }
-        else {
+        } else {
           // Inverse, to sort negative last
           return (a < b) ? +1 : -1;
         }

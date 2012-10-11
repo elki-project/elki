@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 public class NoAutomaticEvaluation implements Evaluator {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    return;
+    // Noop.
   }
 
   /**

@@ -150,7 +150,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
         for(; id2.valid(); id2.advance()) {
           final double dist = dq.distance(id1, id2).doubleValue();
           if(!Double.isNaN(dist) && !Double.isInfinite(dist) /* && dist > 0.0 */) {
-            if(!skipzero || dist != 0.0) {
+            if(!skipzero || dist > 0.0) {
               minmax.put(dist);
             }
           }

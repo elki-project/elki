@@ -76,7 +76,7 @@ public class SetMatchingPurity {
           // / numobj));
         }
         smPurity += (precisionMax / numobj);
-        smFFirst += (table.contingency[i1][table.size2] / table.contingency[table.size1][table.size2]) * fMax;
+        smFFirst += (table.contingency[i1][table.size2] / (double) table.contingency[table.size1][table.size2]) * fMax;
         // * contingency[i1][size2]/numobj;
       }
     }
@@ -93,7 +93,7 @@ public class SetMatchingPurity {
           // / numobj));
         }
         smInversePurity += (recallMax / numobj);
-        smFSecond += (table.contingency[table.size1][i2] / table.contingency[table.size1][table.size2]) * fMax;
+        smFSecond += (table.contingency[table.size1][i2] / (double) table.contingency[table.size1][table.size2]) * fMax;
         // * contingency[i1][size2]/numobj;
       }
     }

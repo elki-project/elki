@@ -191,9 +191,9 @@ public class ClusterContingencyTable {
           if(i2 >= size2) {
             buf.append("| ");
           }
-          buf.append(contingency[i1][i2]).append(" ");
+          buf.append(contingency[i1][i2]).append(' ');
         }
-        buf.append("\n");
+        buf.append('\n');
       }
     }
     // if(pairconfuse != null) {

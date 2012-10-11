@@ -243,11 +243,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
           StringBuilder buf = new StringBuilder();
           buf.append("Top solutions:\n");
           for(Individuum ind : bestSol) {
-            buf.append(ind.toString()).append("\n");
+            buf.append(ind.toString()).append('\n');
           }
           buf.append("Population:\n");
           for(Individuum ind : pop) {
-            buf.append(ind.toString()).append("\n");
+            buf.append(ind.toString()).append('\n');
           }
           LOG.debugFinest(buf.toString());
         }

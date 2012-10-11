@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
   }
 
   private void loadCache(DistanceParser<DoubleDistance> parser, File matrixfile) throws IOException {
-    InputStream in = FileUtil.tryGzipInput(new FileInputStream(matrixfile));
+    InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
     DistanceParsingResult<DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
   }

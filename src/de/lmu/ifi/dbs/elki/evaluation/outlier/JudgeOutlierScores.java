@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.evaluation.outlier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -121,7 +122,7 @@ public class JudgeOutlierScores implements Evaluator {
    * @throws IllegalStateException
    */
   protected ScoreResult computeScore(DBIDs ids, DBIDs outlierIds, OutlierResult or) throws IllegalStateException {
-    if(scaling instanceof OutlierScalingFunction) {
+    if (scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(or);
     }
@@ -130,16 +131,14 @@ public class JudgeOutlierScores implements Evaluator {
     // If we have useful (finite) min/max, use these for binning.
     double min = scaling.getMin();
     double max = scaling.getMax();
-    if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
+    if (Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
       innerScaling = new IdentityScaling();
       // TODO: does the outlier score give us this guarantee?
       LOG.warning("JudgeOutlierScores expects values between 0.0 and 1.0, but we don't have such a guarantee by the scaling function: min:" + min + " max:" + max);
-    }
-    else {
-      if(min == 0.0 && max == 1.0) {
+    } else {
+      if (min == 0.0 && max == 1.0) {
         innerScaling = new IdentityScaling();
-      }
-      else {
+      } else {
         innerScaling = new LinearScaling(1.0 / (max - min), -min);
       }
     }
@@ -163,7 +162,7 @@ public class JudgeOutlierScores implements Evaluator {
     LOG.verbose("Scores: " + posscore + " " + negscore);
 
     ArrayList<Vector> s = new ArrayList<Vector>(1);
-    s.add(new Vector(new double[] { (posscore + negscore) / 2, posscore, negscore }));
+    s.add(new Vector(new double[] { (posscore + negscore) * .5, posscore, negscore }));
     return new ScoreResult(s);
   }
 
@@ -171,7 +170,7 @@ public class JudgeOutlierScores implements Evaluator {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Database db = ResultUtil.findDatabase(baseResult);
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if(ors == null || ors.size() <= 0) {
+    if (ors == null || ors.size() <= 0) {
       // logger.warning("No results found for "+JudgeOutlierScores.class.getSimpleName());
       return;
     }
@@ -180,7 +179,7 @@ public class JudgeOutlierScores implements Evaluator {
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName);
     ids.removeDBIDs(outlierIds);
 
-    for(OutlierResult or : ors) {
+    for (OutlierResult or : ors) {
       db.getHierarchy().add(or, computeScore(ids, outlierIds, or));
     }
   }
@@ -203,9 +202,9 @@ public class JudgeOutlierScores implements Evaluator {
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -223,12 +222,12 @@ public class JudgeOutlierScores implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if(config.grab(positiveClassNameP)) {
+      if (config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
 
       ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if(config.grab(scalingP)) {
+      if (config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
     }
