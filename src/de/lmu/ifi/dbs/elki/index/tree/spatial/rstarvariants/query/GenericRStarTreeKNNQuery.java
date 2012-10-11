@@ -104,7 +104,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, KNNHeap<D> knnList) {
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>(Math.min(knnList.getK() * 2, 20));
+    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>(Math.min(knnList.getK() << 1, 20));
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
@@ -121,7 +121,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     }
   }
 
-  private D expandNode(O object, KNNHeap<D> knnList, final Heap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final Integer nodeID) {
+  private D expandNode(O object, KNNHeap<D> knnList, final Heap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {
@@ -193,7 +193,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
           if(minDist.compareTo(knn_q_maxDist) <= 0) {
             SpatialEntry entry = distEntry.getEntry();
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID().intValue());
             batchNN(child, knnLists);
             break;
           }

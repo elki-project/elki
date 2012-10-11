@@ -102,7 +102,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, DoubleDistanceKNNHeap knnList) {
-    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>(Math.min(knnList.getK() * 2, 20));
+    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>(Math.min(knnList.getK() << 1, 20));
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
@@ -119,7 +119,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
   }
 
-  private double expandNode(O object, DoubleDistanceKNNHeap knnList, final Heap<DoubleDistanceSearchCandidate> pq, double maxDist, final Integer nodeID) {
+  private double expandNode(O object, DoubleDistanceKNNHeap knnList, final Heap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {
@@ -192,7 +192,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID().intValue());
             batchNN(child, knnLists);
             break;
           }

@@ -62,8 +62,8 @@ public class OneDimSortBulkSplit extends AbstractBulkSplit {
     Collections.sort(spatialObjects, new Comparator<SpatialComparable>() {
       @Override
       public int compare(SpatialComparable o1, SpatialComparable o2) {
-        double min1 = (o1.getMax(0) + o1.getMin(0)) / 2;
-        double min2 = (o2.getMax(0) + o2.getMin(0)) / 2;
+        double min1 = (o1.getMax(0) + o1.getMin(0)) * .5;
+        double min2 = (o2.getMax(0) + o2.getMin(0)) * .5;
         return Double.compare(min1, min2);
       }
     });

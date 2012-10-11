@@ -856,7 +856,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     // node is root
     else {
-      if(hasUnderflow(node) & node.getNumEntries() == 1 && !node.isLeaf()) {
+      if(hasUnderflow(node) && node.getNumEntries() == 1 && !node.isLeaf()) {
         N child = getNode(node.getEntry(0));
         N newRoot;
         if(child.isLeaf()) {
@@ -968,7 +968,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
       result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
       result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
-      result.append(objects).append(" ").append(dim).append("-dim. Punkte im Baum \n");
+      result.append(objects).append(' ').append(dim).append("-dim. Punkte im Baum \n");
       PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     }
     else {

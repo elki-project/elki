@@ -101,7 +101,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
         break;
       }
 
-      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID.intValue());
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
