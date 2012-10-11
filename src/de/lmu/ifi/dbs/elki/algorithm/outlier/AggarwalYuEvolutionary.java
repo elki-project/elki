@@ -355,7 +355,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     private ArrayList<Individuum> rouletteRankSelection(ArrayList<Individuum> population) {
       final int popsize = population.size();
       // Relative weight := popsize - position => sum(1..popsize)
-      int totalweight = popsize * (popsize + 1) / 2;
+      int totalweight = (popsize * (popsize + 1)) >> 1;
       // Survivors
       ArrayList<Individuum> survivors = new ArrayList<Individuum>(popsize);
 

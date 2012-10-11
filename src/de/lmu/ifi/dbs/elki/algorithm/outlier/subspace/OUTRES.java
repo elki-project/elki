@@ -170,7 +170,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
       final double adjustedEps = kernel.adjustedEps(kernel.dim);
       // Query with a larger window, to also get neighbors of neighbors
       // Subspace euclidean is metric!
-      final DoubleDistance range = new DoubleDistance(adjustedEps * 2);
+      final DoubleDistance range = new DoubleDistance(adjustedEps * 2.);
       RangeQuery<V, DoubleDistance> rq = QueryUtil.getRangeQuery(kernel.relation, df, range);
 
       DistanceDBIDResult<DoubleDistance> neighc = rq.getRangeForDBID(id, range);
@@ -281,7 +281,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
 
       // Kolmogorow-Smirnow-Test against uniform distribution:
       for(int j = 1; j < data.length - 2; j++) {
-        double delta = (j / (data.length - 1)) - ((data[j] - min) / norm);
+        double delta = (j / (data.length - 1.)) - ((data[j] - min) / norm);
         if(Math.abs(delta) > crit) {
           return false;
         }
@@ -366,7 +366,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
     protected double optimalBandwidth(int dim) {
       // Pi in the publication is redundant and cancels out!
       double hopt = 8 * GammaDistribution.gamma(dim / 2.0 + 1) * (dim + 4) * Math.pow(2, dim);
-      return hopt * Math.pow(relation.size(), (-1 / (dim + 4)));
+      return hopt * Math.pow(relation.size(), (-1. / (dim + 4)));
     }
 
     /**

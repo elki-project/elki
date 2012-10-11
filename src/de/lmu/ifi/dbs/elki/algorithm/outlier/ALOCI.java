@@ -157,7 +157,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
       }
       // Enlarge bounding box to have equal lengths.
       for(int i = 0; i < dim; i++) {
-        double diff = (maxd - (max[i] - min[i])) / 2;
+        double diff = (maxd - (max[i] - min[i])) * .5;
         min[i] -= diff;
         max[i] += diff;
       }

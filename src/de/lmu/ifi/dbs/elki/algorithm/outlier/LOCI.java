@@ -152,7 +152,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
       // build list of critical distances
-      ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() * 2);
+      ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() << 1);
       {
         for(int i = 0; i < neighbors.size(); i++) {
           DistanceDBIDPair<D> r = neighbors.get(i);

@@ -189,7 +189,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       }
       // Enlarge bounding box to have equal lengths.
       for(int i = 0; i < d; i++) {
-        double diff = (diameter - (max[i] - min[i])) / 2;
+        double diff = (diameter - (max[i] - min[i])) * .5;
         min[i] -= diff;
         max[i] += diff;
       }

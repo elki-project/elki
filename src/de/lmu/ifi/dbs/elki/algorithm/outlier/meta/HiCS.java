@@ -266,7 +266,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
 
     TreeSet<HiCSSubspace> subspaceList = new TreeSet<HiCSSubspace>(HiCSSubspace.SORT_BY_SUBSPACE);
     TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<HiCSSubspace>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Generating two-element subsets", dbdim * (dbdim - 1) / 2, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Generating two-element subsets", (dbdim * (dbdim - 1)) >> 1, LOG) : null;
     // compute two-element sets of subspaces
     for(int i = 0; i < dbdim; i++) {
       for(int j = i + 1; j < dbdim; j++) {
