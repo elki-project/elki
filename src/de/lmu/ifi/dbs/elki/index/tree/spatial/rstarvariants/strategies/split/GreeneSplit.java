@@ -116,7 +116,7 @@ public class GreeneSplit implements SplitStrategy {
     Arrays.sort(data);
     // Object assignment
     final BitSet assignment = new BitSet(num);
-    final int half = (num + 1) / 2;
+    final int half = (num + 1) >> 1;
     // Put the first half into second node
     for(int i = 0; i < half; i++) {
       assignment.set(data[i].second);

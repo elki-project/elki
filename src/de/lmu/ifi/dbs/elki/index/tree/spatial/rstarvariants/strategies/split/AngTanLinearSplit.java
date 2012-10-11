@@ -136,7 +136,7 @@ public class AngTanLinearSplit implements SplitStrategy {
       }
       if(bestset == null) {
         LOG.warning("No Ang-Tan-Split found. Probably all points are the same? Returning random split.");
-        return Util.randomBitSet(num / 2, num, new Random());
+        return Util.randomBitSet(num >> 1, num, new Random());
       }
       return bestset;
     }

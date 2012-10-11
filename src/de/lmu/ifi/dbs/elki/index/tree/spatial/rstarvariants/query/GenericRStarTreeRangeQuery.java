@@ -100,7 +100,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
         break;
       }
 
-      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID.intValue());
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
