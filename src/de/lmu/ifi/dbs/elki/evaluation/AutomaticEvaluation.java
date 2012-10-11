@@ -110,7 +110,7 @@ public class AutomaticEvaluation implements Evaluator {
       // Compute ROC curve
       new OutlierROCCurve(pat).processNewResult(baseResult, newResult);
       // Compute Precision at k
-      new OutlierPrecisionAtKCurve(pat, min * 2).processNewResult(baseResult, newResult);
+      new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(baseResult, newResult);
       // Compute ROC curve
       new OutlierPrecisionRecallCurve(pat).processNewResult(baseResult, newResult);
       // Compute outlier histogram

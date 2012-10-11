@@ -162,7 +162,7 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
     for(int i = 0; i < m; i++) {
       double[] next = new double[n + 1];
       for(int j = Math.max(0, i - delta); j <= Math.min(n - 1, i + delta); j++) {
-        if((b[j] + epsilon) >= a[i] & (b[j] - epsilon) <= a[i]) { // match
+        if((b[j] + epsilon) >= a[i] && (b[j] - epsilon) <= a[i]) { // match
           next[j + 1] = curr[j] + 1;
         }
         else if(curr[j + 1] > next[j]) { // ins

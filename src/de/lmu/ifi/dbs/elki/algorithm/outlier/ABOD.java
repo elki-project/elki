@@ -511,8 +511,8 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       }
       double factor = pq.peek().doubleValue();
       DBIDRef key = pq.poll();
-      buf.append(data.get(key)).append(" ");
-      buf.append(count).append(" Factor=").append(factor).append(" ").append(key).append("\n");
+      buf.append(data.get(key)).append(' ');
+      buf.append(count).append(" Factor=").append(factor).append(' ').append(key).append('\n');
       DBIDs expList = explaintab.get(key);
       generateExplanation(buf, data, key, expList);
       count++;
@@ -523,12 +523,12 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   private void generateExplanation(StringBuilder buf, Relation<V> data, DBIDRef key, DBIDs expList) {
     Vector vect1 = data.get(key).getColumnVector();
     for(DBIDIter iter = expList.iter(); iter.valid(); iter.advance()) {
-      buf.append("Outlier: ").append(vect1).append("\n");
+      buf.append("Outlier: ").append(vect1).append('\n');
       Vector exp = data.get(iter).getColumnVector();
-      buf.append("Most common neighbor: ").append(exp).append("\n");
+      buf.append("Most common neighbor: ").append(exp).append('\n');
       // determine difference Vector
       Vector vals = exp.minus(vect1);
-      buf.append(vals).append("\n");
+      buf.append(vals).append('\n');
     }
   }
 

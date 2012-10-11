@@ -468,9 +468,9 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       StringBuilder buf = new StringBuilder();
       buf.append("[contrast=").append(contrast);
       for(int i = nextSetBit(0); i >= 0; i = nextSetBit(i + 1)) {
-        buf.append(" ").append(i + 1);
+        buf.append(' ').append(i + 1);
       }
-      buf.append("]");
+      buf.append(']');
       return buf.toString();
     }
 

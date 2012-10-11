@@ -114,7 +114,7 @@ public class EvaluateClustering implements Evaluator {
     // Compute the reference clustering
     Clustering<?> refc = null;
     // Try to find an existing reference clustering (globally)
-    if(refc == null) {
+    {
       Collection<Clustering<?>> cs = ResultUtil.filterResults(baseResult, Clustering.class);
       for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {

@@ -96,7 +96,7 @@ public class IndexPurity implements Evaluator {
         }
         mv.put(gini);
       }
-      Collection<DoubleVector> col = new java.util.Vector<DoubleVector>();
+      Collection<DoubleVector> col = new ArrayList<DoubleVector>();
       col.add(new DoubleVector(new double[] { mv.getMean(), mv.getSampleStddev() }));
       database.getHierarchy().add((Result) index, new CollectionResult<DoubleVector>("Gini coefficient of index", "index-gini", col));
     }
