@@ -146,10 +146,10 @@ public class DetailView extends SVGPlot implements ResultListener {
     // TODO: center/arrange visualizations?
     for(Iterator<VisualizationTask> tit = visi.tasks.iterator(); tit.hasNext();) {
       VisualizationTask task = tit.next();
-      if(VisualizerUtil.isVisible(task)) {
+      if(task.visible) {
         try {
           Visualization v = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
-          if (VisualizerUtil.isNoExport(task)) {
+          if (task.noexport) {
             v.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
           }
           layers.add(v);
@@ -278,7 +278,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     if(vis != null) {
       // Ensure visibility is as expected
       boolean isHidden = vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY) == SVGConstants.CSS_HIDDEN_VALUE;
-      if(VisualizerUtil.isVisible(task)) {
+      if(task.visible) {
         if(isHidden) {
           this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
         }
@@ -291,10 +291,10 @@ public class DetailView extends SVGPlot implements ResultListener {
     }
     else {
       // Only materialize when becoming visible
-      if(VisualizerUtil.isVisible(task)) {
+      if(task.visible) {
         // LoggingUtil.warning("Need to recreate a missing layer for " + v);
         vis = task.getFactory().makeVisualization(task.clone(this, context, visi.proj, width, height));
-        if (VisualizerUtil.isNoExport(task)) {
+        if (task.noexport) {
           vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
         }
         layermap.put(task, vis);

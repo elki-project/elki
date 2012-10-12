@@ -162,7 +162,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       ArrayList<VisualizationTask> vis = new ArrayList<VisualizationTask>();
       Collection<VisualizationTask> visualizers = ResultUtil.filterResults(task.getResult(), VisualizationTask.class);
       for(VisualizationTask task : visualizers) {
-        if(VisualizerUtil.isTool(task) && !vis.contains(task)) {
+        if(task.tool && !vis.contains(task)) {
           vis.add(task);
         }
       }
@@ -194,7 +194,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
           container.appendChild(selectRangeText);
         }
 
-        if(VisualizerUtil.isVisible(v)) {
+        if(v.visible) {
           SVGUtil.addCSSClass(toolTags[i], CSS_TOOL_BUTTON_SELECTED);
         }
         else {
@@ -267,7 +267,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
      */
     protected void handleMouseClick(VisualizationTask tool) {
       // TODO: Move this to the selected tool instead?
-      if(VisualizerUtil.isVisible(tool)) {
+      if(tool.visible) {
         context.setSelection(null);
       }
       VisualizerUtil.setVisible(context, tool, true);
@@ -277,7 +277,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
     public void resultAdded(Result child, Result parent) {
       if(child instanceof VisualizationTask) {
         VisualizationTask task = (VisualizationTask) child;
-        if(VisualizerUtil.isTool(task)) {
+        if(task.tool) {
           synchronizedRedraw();
         }
       }
@@ -287,7 +287,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
     public void resultRemoved(Result child, Result parent) {
       if(child instanceof VisualizationTask) {
         VisualizationTask task = (VisualizationTask) child;
-        if(VisualizerUtil.isTool(task)) {
+        if(task.tool) {
           synchronizedRedraw();
         }
       }
@@ -297,7 +297,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
     public void resultChanged(Result current) {
       if(current instanceof VisualizationTask) {
         VisualizationTask task = (VisualizationTask) current;
-        if(VisualizerUtil.isTool(task)) {
+        if(task.tool) {
           synchronizedRedraw();
         }
       }

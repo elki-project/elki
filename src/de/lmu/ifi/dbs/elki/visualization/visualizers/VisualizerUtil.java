@@ -70,16 +70,6 @@ public final class VisualizerUtil {
   }
 
   /**
-   * Utility function to test for Visualizer visibility.
-   * 
-   * @param task Visualization task
-   * @return true when visible
-   */
-  public static boolean isVisible(VisualizationTask task) {
-    return task.visible;
-  }
-
-  /**
    * Utility function to change Visualizer visibility.
    * 
    * @param task Visualization task
@@ -103,10 +93,10 @@ public final class VisualizerUtil {
    */
   public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
     // Hide other tools
-    if (visibility && VisualizerUtil.isTool(task)) {
+    if (visibility && task.tool) {
       final List<VisualizationTask> visualizers = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
       for (VisualizationTask other : visualizers) {
-        if (other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
+        if (other != task && other.tool && other.visible) {
           other.visible = false;
           context.getHierarchy().resultChanged(other);
         }
@@ -114,36 +104,6 @@ public final class VisualizerUtil {
     }
     task.visible = visibility;
     context.getHierarchy().resultChanged(task);
-  }
-
-  /**
-   * Utility function to test for a visualizer being a "tool".
-   * 
-   * @param vis Visualizer to test
-   * @return true for a tool
-   */
-  public static boolean isTool(VisualizationTask vis) {
-    return vis.tool;
-  }
-
-  /**
-   * Utility function to test for a visualizer being "no export".
-   * 
-   * @param vis Visualizer to test
-   * @return true when not to export
-   */
-  public static boolean isNoExport(VisualizationTask vis) {
-    return vis.noexport;
-  }
-
-  /**
-   * Utility function to test for a visualizer having options.
-   * 
-   * @param vis Visualizer to test
-   * @return true when it has options
-   */
-  public static boolean hasOptions(VisualizationTask vis) {
-    return vis.hasoptions;
   }
 
   /**
@@ -199,24 +159,4 @@ public final class VisualizerUtil {
       return (Relation<? extends NumberVector<?>>) nextobj;
     }
   };
-
-  /**
-   * Test whether a thumbnail is enabled for this visualizer.
-   * 
-   * @param vis Visualizer
-   * @return boolean
-   */
-  public static boolean thumbnailEnabled(VisualizationTask vis) {
-    return vis.thumbnail;
-  }
-
-  /**
-   * Test whether a detail plot is available for this task.
-   * 
-   * @param vis Task
-   * @return boolean
-   */
-  public static boolean detailsEnabled(VisualizationTask vis) {
-    return !vis.nodetail;
-  }
 }

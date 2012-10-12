@@ -431,8 +431,8 @@ public class ResultWindow extends JFrame implements ResultListener {
 
       // Currently enabled?
       final String name = v.getLongName();
-      boolean enabled = VisualizerUtil.isVisible(v);
-      boolean istool = VisualizerUtil.isTool(v);
+      boolean enabled = v.visible;
+      boolean istool = v.tool;
       if(!istool) {
         final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
         visItem.addItemListener(new ItemListener() {
