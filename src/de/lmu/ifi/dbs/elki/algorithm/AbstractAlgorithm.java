@@ -110,10 +110,6 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
 
     if(runmethod1 != null) {
       try {
-        StringBuilder buf = new StringBuilder();
-        for(Class<?> cls : signature1) {
-          buf.append(cls.toString()).append(",");
-        }
         return (R) runmethod1.invoke(this, relations1);
       }
       catch(IllegalArgumentException e) {
@@ -134,10 +130,6 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
     }
     else if(runmethod2 != null) {
       try {
-        StringBuilder buf = new StringBuilder();
-        for(Class<?> cls : signature1) {
-          buf.append(cls.toString()).append(",");
-        }
         return (R) runmethod2.invoke(this, relations2);
       }
       catch(IllegalArgumentException e) {

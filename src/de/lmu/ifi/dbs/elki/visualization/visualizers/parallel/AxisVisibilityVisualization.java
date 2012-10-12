@@ -146,7 +146,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
       ypos = getSizeY() + getMarginTop() * .5;
 
       // Background
-      Element back = svgp.svgRect(-controlsize / 2, ypos - controlsize / 2 + buttonsize / 2, getSizeX() + controlsize, controlsize);
+      Element back = svgp.svgRect(-controlsize * .5, ypos - controlsize * .5 + buttonsize * .5, getSizeX() + controlsize, controlsize);
       SVGUtil.addCSSClass(back, SELECTAXISVISIBILITY);
       layer.appendChild(back);
 
@@ -176,15 +176,15 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
      * @param apos Axis position in plot
      */
     protected void makeButtonForVisible(int anum, int apos) {
-      final double xpos = getVisibleAxisX(apos) - buttonsize / 2.;
+      final double xpos = getVisibleAxisX(apos) - buttonsize * .5;
 
       Element border = svgp.svgRect(xpos, ypos, buttonsize, buttonsize);
       SVGUtil.addCSSClass(border, SAV_BORDER);
       layer.appendChild(border);
 
       SVGPath path = new SVGPath();
-      final double qs = controlsize / 2.;
-      final double cs = controlsize / 8.;
+      final double qs = controlsize * .5;
+      final double cs = controlsize * .125;
       path.moveTo(xpos + cs, ypos + cs);
       path.relativeLineTo(qs, qs);
       path.relativeMoveTo(0, -qs);
@@ -223,7 +223,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
       }
       final double step = (rpos - lpos) / (count + 1.0);
       for(int j = 0; j < count; j++) {
-        final double apos = lpos + (j + 1) * step - buttonsize / 2.;
+        final double apos = lpos + (j + 1) * step - buttonsize * .5;
         Element border = svgp.svgRect(apos, ypos, buttonsize, buttonsize);
         SVGUtil.addCSSClass(border, SAV_BORDER);
         layer.appendChild(border);

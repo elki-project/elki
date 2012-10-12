@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -128,7 +128,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @return the AprioriResult learned by this APRIORI
    */
   public AprioriResult run(Database database, Relation<BitVector> relation) {
-    Map<BitSet, Integer> support = new Hashtable<BitSet, Integer>();
+    Map<BitSet, Integer> support = new HashMap<BitSet, Integer>();
     List<BitSet> solution = new ArrayList<BitSet>();
     final int size = relation.size();
     if(size > 0) {

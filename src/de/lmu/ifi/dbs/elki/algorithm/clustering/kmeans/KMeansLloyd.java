@@ -171,7 +171,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
 
       IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
       if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
+        maxiter = maxiterP.intValue();
       }
     }
 

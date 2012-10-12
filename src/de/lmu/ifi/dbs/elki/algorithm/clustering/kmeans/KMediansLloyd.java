@@ -157,7 +157,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
       if(config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.intValue();
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
@@ -167,7 +167,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
 
       IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
       if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
+        maxiter = maxiterP.intValue();
       }
     }
 

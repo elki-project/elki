@@ -121,7 +121,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
     }
     // Add axis labels
     {
-      Element labelx = svgp.svgText(sizex / 2, sizey + margin * .9, curve.getLabelx());
+      Element labelx = svgp.svgText(sizex * .5, sizey + margin * .9, curve.getLabelx());
       SVGUtil.setCSSClass(labelx, CSS_AXIS_LABEL);
       layer.appendChild(labelx);
       Element labely = svgp.svgText(margin * -.8, sizey * .5, curve.getLabely());

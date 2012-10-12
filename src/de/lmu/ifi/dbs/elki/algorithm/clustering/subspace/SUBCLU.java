@@ -188,7 +188,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
       if(LOG.isDebuggingFiner()) {
         StringBuilder msg = new StringBuilder();
-        msg.append("\n").append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
+        msg.append('\n').append(clusters.size()).append(" clusters in subspace ").append(currentSubspace.dimensonsToString()).append(": \n");
         for(Cluster<Model> cluster : clusters) {
           msg.append("      " + cluster.getIDs() + "\n");
         }
@@ -345,7 +345,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
     StringBuilder msgFine = new StringBuilder("\n");
     if(LOG.isDebuggingFiner()) {
-      msgFine.append("subspaces ").append(subspaces).append("\n");
+      msgFine.append("subspaces ").append(subspaces).append('\n');
     }
 
     for(int i = 0; i < subspaces.size(); i++) {
@@ -356,12 +356,12 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
         if(candidate != null) {
           if(LOG.isDebuggingFiner()) {
-            msgFine.append("candidate: ").append(candidate.dimensonsToString()).append("\n");
+            msgFine.append("candidate: ").append(candidate.dimensonsToString()).append('\n');
           }
           // prune irrelevant candidate subspaces
           List<Subspace> lowerSubspaces = lowerSubspaces(candidate);
           if(LOG.isDebuggingFiner()) {
-            msgFine.append("lowerSubspaces: ").append(lowerSubspaces).append("\n");
+            msgFine.append("lowerSubspaces: ").append(lowerSubspaces).append('\n');
           }
           boolean irrelevantCandidate = false;
           for(Subspace s : lowerSubspaces) {
@@ -384,7 +384,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
       StringBuilder msg = new StringBuilder();
       msg.append(d + 1).append("-dimensional candidate subspaces: ");
       for(Subspace candidate : candidates) {
-        msg.append(candidate.dimensonsToString()).append(" ");
+        msg.append(candidate.dimensonsToString()).append(' ');
       }
       LOG.debug(msg.toString());
     }

@@ -159,7 +159,7 @@ public class PrettyMarkers implements MarkerLibrary {
     }
     case 5: {
       // O filled circle
-      Element circ = plot.svgCircle(x, y, size / 2);
+      Element circ = plot.svgCircle(x, y, size * .5);
       SVGUtil.setStyle(circ, SVGConstants.CSS_FILL_PROPERTY + ":" + colorstr);
       parent.appendChild(circ);
       break;

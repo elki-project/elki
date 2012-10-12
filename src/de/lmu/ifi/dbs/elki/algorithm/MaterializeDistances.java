@@ -82,7 +82,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
-    Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) / 2);
+    Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) >> 1);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {

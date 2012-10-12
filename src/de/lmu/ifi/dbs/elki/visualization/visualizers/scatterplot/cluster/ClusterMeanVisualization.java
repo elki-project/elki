@@ -211,7 +211,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
       if(!svgp.getCSSClassManager().contains(CSS_MEAN_CENTER)) {
         CSSClass center = new CSSClass(this, CSS_MEAN_CENTER);
         center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.DEFAULT));
-        center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.AXIS_TICK) / 2);
+        center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.AXIS_TICK) * .5);
         svgp.addCSSClassOrLogError(center);
       }
       if(!svgp.getCSSClassManager().contains(CSS_MEAN)) {

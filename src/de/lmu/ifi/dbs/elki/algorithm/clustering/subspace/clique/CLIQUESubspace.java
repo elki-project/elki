@@ -151,8 +151,8 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    * @param dim the dimension
    * @return the left neighbor of the given unit in the specified dimension
    */
-  public CLIQUEUnit<V> leftNeighbor(CLIQUEUnit<V> unit, Integer dim) {
-    Interval i = unit.getInterval(dim);
+  public CLIQUEUnit<V> leftNeighbor(CLIQUEUnit<V> unit, int dim) {
+    Interval i = unit.getInterval(Integer.valueOf(dim));
 
     for(CLIQUEUnit<V> u : getDenseUnits()) {
       if(u.containsLeftNeighbor(i)) {
@@ -240,8 +240,8 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
   public String toString(String pre) {
     StringBuilder result = new StringBuilder();
     result.append(super.toString(pre));
-    result.append("\n").append(pre).append("Coverage: ").append(coverage);
-    result.append("\n").append(pre).append("Units: " + "\n");
+    result.append('\n').append(pre).append("Coverage: ").append(coverage);
+    result.append('\n').append(pre).append("Units: " + "\n");
     for(CLIQUEUnit<V> denseUnit : getDenseUnits()) {
       result.append(pre).append("   ").append(denseUnit.toString()).append("   ").append(denseUnit.getIds().size()).append(" objects\n");
     }

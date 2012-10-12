@@ -325,7 +325,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
               parent.getChildren().add(child);
               child.getParents().add(parent);
               if(LOG.isDebugging()) {
-                msg.append("\n").append(parent).append(" is parent of ").append(child);
+                msg.append('\n').append(parent).append(" is parent of ").append(child);
               }
             }
             else {
@@ -334,7 +334,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
                 parent.getChildren().add(child);
                 child.getParents().add(parent);
                 if(LOG.isDebugging()) {
-                  msg.append("\n").append(parent).append(" is parent of ").append(child);
+                  msg.append('\n').append(parent).append(" is parent of ").append(child);
                 }
               }
             }

@@ -45,8 +45,8 @@ public class IntParameter extends NumberParameter<Integer> {
    * @param constraints the constraint for this integer parameter
    * @param defaultValue the default value
    */
-  public IntParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, Integer defaultValue) {
-    super(optionID, constraints, defaultValue);
+  public IntParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, int defaultValue) {
+    super(optionID, constraints, Integer.valueOf(defaultValue));
   }
 
   /**
@@ -80,8 +80,8 @@ public class IntParameter extends NumberParameter<Integer> {
    * @param constraint the constraint for this integer parameter
    * @param defaultValue the default value
    */
-  public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, Integer defaultValue) {
-    super(optionID, constraint, defaultValue);
+  public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, int defaultValue) {
+    super(optionID, constraint, Integer.valueOf(defaultValue));
   }
 
   /**
@@ -143,16 +143,14 @@ public class IntParameter extends NumberParameter<Integer> {
 
   @Override
   protected Integer parseValue(Object obj) throws ParameterException {
-    if(obj instanceof Integer) {
+    if (obj instanceof Integer) {
       return (Integer) obj;
     }
     try {
       return Integer.valueOf(obj.toString());
-    }
-    catch(NullPointerException e) {
+    } catch (NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
-    }
-    catch(NumberFormatException e) {
+    } catch (NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
     }
   }
@@ -165,5 +163,14 @@ public class IntParameter extends NumberParameter<Integer> {
   @Override
   public String getSyntax() {
     return "<int>";
+  }
+
+  /**
+   * Get the parameter value as integer
+   * 
+   * @return Parameter value
+   */
+  public int intValue() {
+    return getValue().intValue();
   }
 }

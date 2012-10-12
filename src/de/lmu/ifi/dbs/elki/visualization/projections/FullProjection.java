@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
  * Full vector space projections.

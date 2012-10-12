@@ -268,10 +268,10 @@ public class CSSClass {
   public void appendCSSDefinition(StringBuilder buf) {
     buf.append("\n.");
     buf.append(name);
-    buf.append("{");
+    buf.append('{');
     for (Pair<String, String> pair : statements) {
       buf.append(pair.getFirst());
-      buf.append(":");
+      buf.append(':');
       buf.append(pair.getSecond());
       buf.append(";\n");
     }
@@ -308,9 +308,9 @@ public class CSSClass {
     StringBuilder buf = new StringBuilder();
     for (Pair<String, String> pair : statements) {
       buf.append(pair.getFirst());
-      buf.append(":");
+      buf.append(':');
       buf.append(pair.getSecond());
-      buf.append(";");
+      buf.append(';');
     }
     return buf.toString();
   }

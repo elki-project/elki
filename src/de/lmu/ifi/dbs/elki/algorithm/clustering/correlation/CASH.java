@@ -71,7 +71,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.IntegerPriorityObject;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -789,9 +788,6 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
       return les;
     }
-    catch(UnableToComplyException e) {
-      throw new IllegalStateException("Initialization of the database for the derivator failed: " + e);
-    }
     catch(NonNumericFeaturesException e) {
       throw new IllegalStateException("Error during normalization" + e);
     }
@@ -805,10 +801,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param ids the ids to build the database from
    * @return a database for the derivator consisting of the ids in the specified
    *         interval
-   * @throws UnableToComplyException if initialization of the database is not
-   *         possible
    */
-  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) throws UnableToComplyException {
+  private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) {
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);

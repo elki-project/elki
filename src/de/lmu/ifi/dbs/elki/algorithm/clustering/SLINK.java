@@ -77,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Efficient implementation of the Single-Link Algorithm SLINK of R. Sibson.
+ * Implementation of the efficient Single-Link Algorithm SLINK of R. Sibson.
  * <p>
  * Reference: R. Sibson: SLINK: An optimally efficient algorithm for the
  * single-link cluster method. <br>
@@ -171,7 +171,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     BasicResult result = null;
 
     // Build clusters identified by their target object
-    int minc = minclusters != null ? minclusters : relation.size();
+    int minc = minclusters != null ? minclusters.intValue() : relation.size();
     result = extractClusters(relation.getDBIDs(), pi, lambda, minc);
 
     result.addChildResult(new MaterializedRelation<DBID>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
@@ -200,6 +200,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param newID the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
+   * @param m Data store
    * @param distFunc Distance function to use
    */
   private void step2(DBIDRef newID, DBIDs processedIDs, DistanceQuery<O, D> distFunc, WritableDataStore<D> m) {
@@ -215,6 +216,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param newID the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
+   * @param m Data store
    */
   private void step3(DBIDRef newID, DBIDs processedIDs, WritableDataStore<D> m) {
     // for i = 1..n
@@ -528,10 +530,10 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
             StringBuilder buf = new StringBuilder();
             buf.append("Number of clusters at depth ");
             buf.append((curdist != null ? curdist.toString() : "null"));
-            buf.append(": ").append(clusters.size()).append(" ");
+            buf.append(": ").append(clusters.size()).append(' ');
             buf.append("last-objects:");
             for(DBID id : clusters.keySet()) {
-              buf.append(" ").append(id.toString());
+              buf.append(' ').append(id.toString());
             }
             LOG.debugFine(buf.toString());
           }
@@ -629,7 +631,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       super.makeOptions(config);
       IntParameter minclustersP = new IntParameter(SLINK_MINCLUSTERS_ID, new GreaterEqualConstraint(1), true);
       if(config.grab(minclustersP)) {
-        minclusters = minclustersP.getValue();
+        minclusters = minclustersP.intValue();
       }
     }
 

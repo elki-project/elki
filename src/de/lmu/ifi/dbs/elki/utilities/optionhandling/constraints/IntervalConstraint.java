@@ -110,6 +110,56 @@ public class IntervalConstraint implements ParameterConstraint<Number> {
   }
 
   /**
+   * Creates an IntervalConstraint parameter constraint.
+   * <p/>
+   * That is, the value of the number parameter given has to be greater than (or
+   * equal to, if specified) than the specified low constraint value and less
+   * than (or equal to, if specified) than the specified high constraint value.
+   * 
+   * @param lowConstraintValue the low constraint value (left interval boundary)
+   * @param lowBoundary the interval boundary for the low constraint value (see {@link IntervalBoundary})
+   * @param highConstraintValue the high constraint value (right interval
+   *        boundary)
+   * @param highBoundary the interval boundary for the high constraint value
+   *        (see {@link IntervalBoundary})
+   */
+  public IntervalConstraint(int lowConstraintValue, IntervalBoundary lowBoundary, int highConstraintValue, IntervalBoundary highBoundary) {
+    if(lowConstraintValue >= highConstraintValue) {
+      throw new IllegalArgumentException("Left interval boundary is greater than " + "or equal to right interval boundary!");
+    }
+
+    this.lowConstraintValue = Integer.valueOf(lowConstraintValue);
+    this.lowBoundary = lowBoundary;
+    this.highConstraintValue = Integer.valueOf(highConstraintValue);
+    this.highBoundary = highBoundary;
+  }
+
+  /**
+   * Creates an IntervalConstraint parameter constraint.
+   * <p/>
+   * That is, the value of the number parameter given has to be greater than (or
+   * equal to, if specified) than the specified low constraint value and less
+   * than (or equal to, if specified) than the specified high constraint value.
+   * 
+   * @param lowConstraintValue the low constraint value (left interval boundary)
+   * @param lowBoundary the interval boundary for the low constraint value (see {@link IntervalBoundary})
+   * @param highConstraintValue the high constraint value (right interval
+   *        boundary)
+   * @param highBoundary the interval boundary for the high constraint value
+   *        (see {@link IntervalBoundary})
+   */
+  public IntervalConstraint(double lowConstraintValue, IntervalBoundary lowBoundary, double highConstraintValue, IntervalBoundary highBoundary) {
+    if(lowConstraintValue >= highConstraintValue) {
+      throw new IllegalArgumentException("Left interval boundary is greater than " + "or equal to right interval boundary!");
+    }
+
+    this.lowConstraintValue = Double.valueOf(lowConstraintValue);
+    this.lowBoundary = lowBoundary;
+    this.highConstraintValue = Double.valueOf(highConstraintValue);
+    this.highBoundary = highBoundary;
+  }
+
+  /**
    * Checks if the number value given by the number parameter is greater equal
    * than the constraint value. If not, a parameter exception is thrown.
    * 

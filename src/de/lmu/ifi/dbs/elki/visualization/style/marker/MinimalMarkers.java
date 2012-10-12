@@ -72,7 +72,7 @@ public class MinimalMarkers implements MarkerLibrary {
    */
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
-    Element marker = plot.svgRect(x - size / 2, y - size / 2, size, size);
+    Element marker = plot.svgRect(x - size * .5, y - size * .5, size, size);
     final String col;
     if(stylenr == -1) {
       col = dotcolor;

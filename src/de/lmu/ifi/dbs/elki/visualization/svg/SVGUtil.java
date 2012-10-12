@@ -526,8 +526,8 @@ public final class SVGUtil {
     double swidth = iwidth + lmargin + rmargin;
     double sheight = iheight + tmargin + bmargin;
     double scale = Math.max(swidth / owidth, sheight / oheight);
-    double offx = (scale * owidth - swidth) / 2 + lmargin;
-    double offy = (scale * oheight - sheight) / 2 + tmargin;
+    double offx = (scale * owidth - swidth) * .5 + lmargin;
+    double offy = (scale * oheight - sheight) * .5 + tmargin;
     return "scale(" + fmt(1 / scale) + ") translate(" + fmt(offx) + " " + fmt(offy) + ")";
   }
 

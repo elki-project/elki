@@ -91,7 +91,7 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     final CanvasSize canvas = proj.estimateViewport();
     final double sizex = canvas.getDiffX();
     final double sizey = canvas.getDiffY();
-    String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex / 2) + " " + SVGUtil.fmt(sizey / 2) + ")";
+    String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin) + " translate(" + SVGUtil.fmt(sizex * .5) + " " + SVGUtil.fmt(sizey * .5) + ")";
 
     final Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);

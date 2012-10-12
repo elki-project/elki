@@ -293,7 +293,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
       super.makeOptions(config);
       IntParameter kP = new IntParameter(KMeans.K_ID, new GreaterConstraint(0));
       if(config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.intValue();
       }
 
       ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
@@ -303,7 +303,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
 
       IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, new GreaterEqualConstraint(0), 0);
       if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
+        maxiter = maxiterP.intValue();
       }
     }
 

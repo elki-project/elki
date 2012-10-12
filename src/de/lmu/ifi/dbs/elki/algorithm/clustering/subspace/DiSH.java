@@ -209,7 +209,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       StringBuilder msg = new StringBuilder("Step 1: extract clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
-          msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
+          msg.append('\n').append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
         }
       }
       LOG.verbose(msg.toString());
@@ -221,7 +221,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       StringBuilder msg = new StringBuilder("Step 2: check clusters");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
-          msg.append("\n").append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
+          msg.append('\n').append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
         }
       }
       LOG.verbose(msg.toString());
@@ -232,7 +232,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     if(LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 3: sort clusters");
       for(Cluster<SubspaceModel<V>> c : clusters) {
-        msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getSubspace().getDimensions())).append(" ids ").append(c.size());
+        msg.append('\n').append(FormatUtil.format(dimensionality, c.getModel().getSubspace().getDimensions())).append(" ids ").append(c.size());
       }
       LOG.verbose(msg.toString());
     }
@@ -242,7 +242,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     if(LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
       for(Cluster<SubspaceModel<V>> c : clusters) {
-        msg.append("\n").append(FormatUtil.format(dimensionality, c.getModel().getDimensions())).append(" ids ").append(c.size());
+        msg.append('\n').append(FormatUtil.format(dimensionality, c.getModel().getDimensions())).append(" ids ").append(c.size());
         for(Cluster<SubspaceModel<V>> cluster : c.getParents()) {
           msg.append("\n   parent ").append(cluster);
         }
@@ -323,7 +323,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       StringBuilder msg = new StringBuilder("Step 0");
       for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
         for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
-          msg.append("\n").append(FormatUtil.format(RelationUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
+          msg.append('\n').append(FormatUtil.format(RelationUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
         }
       }
       LOG.debugFiner(msg.toString());
@@ -532,8 +532,8 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
         if(subspaceDim_i < subspaceDim_j) {
           if(LOG.isDebugging()) {
-            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions())).append("]");
-            msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions())).append("]");
+            msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions())).append(']');
+            msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions())).append(']');
           }
 
           // noise level reached
@@ -545,7 +545,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
               if(LOG.isDebugging()) {
                 msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                 msg.append("] is parent of [").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
-                msg.append("]");
+                msg.append(']');
               }
             }
           }
@@ -571,7 +571,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
                     msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                     msg.append("] is parent of [");
                     msg.append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
-                    msg.append("]");
+                    msg.append(']');
                   }
                 }
               }
@@ -648,12 +648,12 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
       DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
       if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
+        epsilon = epsilonP.doubleValue();
       }
 
       IntParameter muP = new IntParameter(MU_ID, new GreaterConstraint(0), 1);
       if(config.grab(muP)) {
-        mu = muP.getValue();
+        mu = muP.intValue();
       }
 
       configDiSHDistance(config, epsilon, mu);

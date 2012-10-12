@@ -78,7 +78,7 @@ public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends
     plotheight = StyleLibrary.SCALE / optics.getOPTICSPlot(context).getRatio();
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), plotwidth, plotheight, margin / 2);
+    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), plotwidth, plotheight, margin * .5);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
   }
 

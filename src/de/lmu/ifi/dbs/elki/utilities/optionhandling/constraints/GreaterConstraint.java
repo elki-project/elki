@@ -28,42 +28,63 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
 
 /**
- * Represents a parameter constraint for testing if the value of the
- * number parameter ({@link NumberParameter})
- * tested is greater than the specified constraint value.
- *
+ * Represents a parameter constraint for testing if the value of the number
+ * parameter ({@link NumberParameter}) tested is greater than the specified
+ * constraint value.
+ * 
  * @author Steffi Wanka
  */
 public class GreaterConstraint extends AbstractNumberConstraint<Number> {
-    /**
-     * Creates a Greater-Than-Number parameter constraint.
-     * <p/>
-     * That is, the value of the number
-     * parameter has to be greater than the given constraint value.
-     *
-     * @param constraintValue the constraint value
-     */
-    public GreaterConstraint(Number constraintValue) {
-        super(constraintValue);
-    }
+  /**
+   * Creates a Greater-Than-Number parameter constraint.
+   * <p/>
+   * That is, the value of the number parameter has to be greater than the given
+   * constraint value.
+   * 
+   * @param constraintValue the constraint value
+   */
+  public GreaterConstraint(Number constraintValue) {
+    super(constraintValue);
+  }
 
-    /**
-     * Checks if the number value given by the number parameter is greater than
-     * the constraint value. If not, a parameter exception is thrown.
-     *
-     */
-    @Override
-    public void test(Number t) throws ParameterException {
-        if (t.doubleValue() <= constraintValue.doubleValue()) {
-            throw new WrongParameterValueException("Parameter Constraint Error:\n"
-                + "The parameter value specified has to be greater than "
-                + constraintValue.toString() +
-                ". (current value: " + t.doubleValue() + ")\n");
-        }
-    }
+  /**
+   * Creates a Greater-Than-Number parameter constraint.
+   * <p/>
+   * That is, the value of the number parameter has to be greater than the given
+   * constraint value.
+   * 
+   * @param constraintValue the constraint value
+   */
+  public GreaterConstraint(int constraintValue) {
+    super(Integer.valueOf(constraintValue));
+  }
 
-    @Override
-    public String getDescription(String parameterName) {
-        return parameterName + " > " + constraintValue;
+  /**
+   * Creates a Greater-Than-Number parameter constraint.
+   * <p/>
+   * That is, the value of the number parameter has to be greater than the given
+   * constraint value.
+   * 
+   * @param constraintValue the constraint value
+   */
+  public GreaterConstraint(double constraintValue) {
+    super(Double.valueOf(constraintValue));
+  }
+
+  /**
+   * Checks if the number value given by the number parameter is greater than
+   * the constraint value. If not, a parameter exception is thrown.
+   * 
+   */
+  @Override
+  public void test(Number t) throws ParameterException {
+    if (t.doubleValue() <= constraintValue.doubleValue()) {
+      throw new WrongParameterValueException("Parameter Constraint Error:\n" + "The parameter value specified has to be greater than " + constraintValue.toString() + ". (current value: " + t.doubleValue() + ")\n");
     }
+  }
+
+  @Override
+  public String getDescription(String parameterName) {
+    return parameterName + " > " + constraintValue;
+  }
 }

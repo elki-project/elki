@@ -159,29 +159,6 @@ public class DoubleParameter extends NumberParameter<Double> {
   }
 
   /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param obj the reference object with which to compare.
-   * @return <code>true</code> if this double parameter has the same value as
-   *         the specified object, <code>false</code> otherwise.
-   */
-  // TODO: comparing the parameters doesn't make sense. REMOVE.
-  /*@Override
-  public boolean equals(Object obj) {
-    if(obj == this) {
-      return true;
-    }
-    if(!(obj instanceof DoubleParameter)) {
-      return false;
-    }
-    DoubleParameter oth = (DoubleParameter) obj;
-    if(this.getValue() == null) {
-      return (oth.getValue() == null);
-    }
-    return this.getValue().equals(oth.getValue());
-  }*/
-
-  /**
    * Returns a string representation of the parameter's type.
    * 
    * @return &quot;&lt;double&gt;&quot;
@@ -189,5 +166,14 @@ public class DoubleParameter extends NumberParameter<Double> {
   @Override
   public String getSyntax() {
     return "<double>";
+  }
+  
+  /**
+   * Get the parameter value as double.
+   * 
+   * @return double value
+   */
+  public double doubleValue() {
+    return getValue().doubleValue();
   }
 }
