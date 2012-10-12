@@ -79,8 +79,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), this);
-        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        task.initDefaultVisibility(false);
+        task.level = VisualizationTask.LEVEL_DATA - 1;
         baseResult.getHierarchy().add(co, task);
         baseResult.getHierarchy().add(p, task);
       }

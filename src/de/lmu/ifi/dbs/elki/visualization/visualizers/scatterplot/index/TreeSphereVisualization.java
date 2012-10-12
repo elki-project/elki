@@ -111,7 +111,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
       for(AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
         if(canVisualize(tree) && tree instanceof Result) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+          task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
           baseResult.getHierarchy().add((Result) tree, task);
           baseResult.getHierarchy().add(p, task);
         }

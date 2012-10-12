@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization;
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
@@ -41,12 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * @apiviz.has VisFactory
  * @apiviz.has Projection oneway - 0:1
  */
-public class VisualizationTask extends AnyMap<String> implements Cloneable, Result, Comparable<VisualizationTask> {
-  /**
-   * Serial number
-   */
-  private static final long serialVersionUID = 1L;
-
+public class VisualizationTask implements Cloneable, Result, Comparable<VisualizationTask> {
   /**
    * Constant for using thumbnail
    */
@@ -60,58 +55,56 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   /**
    * Meta data key: Level for visualizer ordering
    * 
-   * Returns an integer indicating the "temporal position" of this Visualizer.
-   * It is intended to impose an ordering on the execution of Visualizers as a
+   * Returns an integer indicating the "height" of this Visualizer. It is
+   * intended to impose an ordering on the execution of Visualizers as a
    * Visualizer may depend on another Visualizer running earlier. <br>
    * Lower numbers should result in a earlier use of this Visualizer, while
    * higher numbers should result in a later use. If more Visualizers have the
    * same level, no ordering is guaranteed. <br>
    * Note that this value is only a recommendation, as it is totally up to the
    * framework to ignore it.
-   * 
-   * Type: Integer
    */
-  public static final String META_LEVEL = "level";
+  public int level = 0;
 
   /**
-   * Flag to control visibility. Type: Boolean
+   * Flag to control visibility.
    */
-  public static final String META_VISIBLE = "visible";
+  public boolean visible = true;
 
   /**
-   * Flag to signal there is no thumbnail needed. Type: Boolean
+   * Flag to signal there is no thumbnail needed.
    */
-  public static final String META_NOTHUMB = "no-thumbnail";
+  public boolean thumbnail = true;
 
   /**
    * Mark as not having a (sensible) detail view.
    */
-  public static final String META_NODETAIL = "no-detail";
+  public boolean nodetail = false;
 
   /**
-   * Flag to signal the visualizer should not be exported. Type: Boolean
+   * Flag to signal the visualizer should not be exported.
    */
-  public static final String META_NOEXPORT = "no-export";
+  public boolean noexport = false;
 
   /**
-   * Flag to signal the visualizer should not be embed. Type: Boolean
+   * Flag to signal the visualizer should not be embedded.
    */
-  public static final String META_NOEMBED = "no-embed";
+  public boolean noembed = false;
 
   /**
-   * Flag to signal default visibility of a visualizer. Type: Boolean
+   * Flag to signal default visibility of a visualizer.
    */
-  public static final String META_VISIBLE_DEFAULT = "visible-default";
+  public boolean default_visibility = true;
 
   /**
-   * Flag to mark the visualizer as tool. Type: Boolean
+   * Flag to mark the visualizer as tool.
    */
-  public static final String META_TOOL = "tool";
+  public boolean tool = false;
 
   /**
    * Indicate whether this task has options.
    */
-  public static final String META_HAS_OPTIONS = "has-options";
+  public boolean hasoptions = false;
 
   /**
    * Background layer
@@ -182,6 +175,11 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
    * Height
    */
   public double height;
+
+  /**
+   * Thumbnail size
+   */
+  public int thumbsize;
 
   /**
    * Visualization task.
@@ -270,18 +268,23 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
     return height;
   }
 
+  /**
+   * Init the default visibility of a task.
+   * 
+   * @param vis Visibility.
+   */
+  public void initDefaultVisibility(boolean vis) {
+    visible = vis;
+    default_visibility = vis;
+  }
+
   @Override
   public VisualizationTask clone() {
-    VisualizationTask obj = (VisualizationTask) super.clone();
-    obj.name = name;
-    obj.context = context;
-    obj.result = result;
-    obj.proj = proj;
-    obj.factory = factory;
-    obj.svgp = svgp;
-    obj.width = width;
-    obj.height = height;
-    return obj;
+    try {
+      return (VisualizationTask) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new AbortException("Cloneable interface was removed.", e);
+    }
   }
 
   /**
@@ -330,15 +333,13 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   @Override
   public int compareTo(VisualizationTask other) {
     // sort by levels first
-    Integer level1 = this.get(VisualizationTask.META_LEVEL, Integer.class);
-    Integer level2 = other.get(VisualizationTask.META_LEVEL, Integer.class);
-    if(level1 != null && level2 != null && level1 != level2) {
-      return level1 - level2;
+    if (this.level != other.level) {
+      return this.level - other.level;
     }
     // sort by name otherwise.
     String name1 = this.getShortName();
     String name2 = other.getShortName();
-    if(name1 != null && name2 != null && name1 != name2) {
+    if (name1 != null && name2 != null && name1 != name2) {
       return name1.compareTo(name2);
     }
     return 0;
@@ -348,10 +349,10 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
-    if(result != null) {
+    if (result != null) {
       buf.append("Result: ").append(result.getLongName()).append(' ');
     }
-    if(proj != null) {
+    if (proj != null) {
       buf.append("Proj: ").append(proj.toString()).append(' ');
     }
     buf.append(super.toString());

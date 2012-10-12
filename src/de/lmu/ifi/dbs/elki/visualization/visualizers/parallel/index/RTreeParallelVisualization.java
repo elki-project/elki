@@ -102,7 +102,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
         Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
         for(ParallelPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 2);
+          task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
           baseResult.getHierarchy().add((Result) tree, task);
           baseResult.getHierarchy().add(p, task);
         }

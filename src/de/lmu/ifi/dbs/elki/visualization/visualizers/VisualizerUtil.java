@@ -76,15 +76,7 @@ public final class VisualizerUtil {
    * @return true when visible
    */
   public static boolean isVisible(VisualizationTask task) {
-    // Currently enabled?
-    Boolean enabled = task.getGenerics(VisualizationTask.META_VISIBLE, Boolean.class);
-    if (enabled == null) {
-      enabled = task.getGenerics(VisualizationTask.META_VISIBLE_DEFAULT, Boolean.class);
-    }
-    if (enabled == null) {
-      enabled = true;
-    }
-    return enabled;
+    return task.visible;
   }
 
   /**
@@ -115,12 +107,12 @@ public final class VisualizerUtil {
       final List<VisualizationTask> visualizers = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
       for (VisualizationTask other : visualizers) {
         if (other != task && VisualizerUtil.isTool(other) && VisualizerUtil.isVisible(other)) {
-          other.put(VisualizationTask.META_VISIBLE, false);
+          other.visible = false;
           context.getHierarchy().resultChanged(other);
         }
       }
     }
-    task.put(VisualizationTask.META_VISIBLE, visibility);
+    task.visible = visibility;
     context.getHierarchy().resultChanged(task);
   }
 
@@ -131,9 +123,7 @@ public final class VisualizerUtil {
    * @return true for a tool
    */
   public static boolean isTool(VisualizationTask vis) {
-    // Currently enabled?
-    Boolean tool = vis.getGenerics(VisualizationTask.META_TOOL, Boolean.class);
-    return (tool != null) && tool;
+    return vis.tool;
   }
 
   /**
@@ -143,9 +133,7 @@ public final class VisualizerUtil {
    * @return true when not to export
    */
   public static boolean isNoExport(VisualizationTask vis) {
-    // Currently enabled?
-    Boolean noexport = vis.getGenerics(VisualizationTask.META_NOEXPORT, Boolean.class);
-    return (noexport != null) && noexport;
+    return vis.noexport;
   }
 
   /**
@@ -155,9 +143,7 @@ public final class VisualizerUtil {
    * @return true when it has options
    */
   public static boolean hasOptions(VisualizationTask vis) {
-    // Currently enabled?
-    Boolean hasoptions = vis.getGenerics(VisualizationTask.META_HAS_OPTIONS, Boolean.class);
-    return (hasoptions != null) && hasoptions;
+    return vis.hasoptions;
   }
 
   /**
@@ -221,8 +207,7 @@ public final class VisualizerUtil {
    * @return boolean
    */
   public static boolean thumbnailEnabled(VisualizationTask vis) {
-    Boolean nothumb = vis.getGenerics(VisualizationTask.META_NOTHUMB, Boolean.class);
-    return (nothumb == null) || !nothumb;
+    return vis.thumbnail;
   }
 
   /**
@@ -232,7 +217,6 @@ public final class VisualizerUtil {
    * @return boolean
    */
   public static boolean detailsEnabled(VisualizationTask vis) {
-    Boolean nodetail = vis.getGenerics(VisualizationTask.META_NODETAIL, Boolean.class);
-    return (nodetail == null) || !nodetail;
+    return !vis.nodetail;
   }
 }

@@ -465,8 +465,7 @@ public class ResultWindow extends JFrame implements ResultListener {
         });
         item = visItem;
       }
-      boolean hasoptions = VisualizerUtil.hasOptions(v);
-      if(hasoptions) {
+      if(v.hasoptions) {
         final JMenu menu = new JMenu(name);
         menu.add(item);
         // TODO: build a menu for the visualizer!

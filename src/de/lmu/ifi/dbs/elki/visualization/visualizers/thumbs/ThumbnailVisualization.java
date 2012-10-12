@@ -91,7 +91,8 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   protected int tresolution;
 
   /**
-   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION}, {@link #ON_STYLE}, {@link #NO_PROJECTION}
+   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
+   * {@link #ON_STYLE}, {@link #NO_PROJECTION}
    */
   private int mask;
 
@@ -110,14 +111,13 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, int mask) {
     super(task);
     this.visFactory = visFactory;
-    Integer tres = task.getGenerics(VisualizationTask.THUMBNAIL_RESOLUTION, Integer.class);
-    this.tresolution = tres;
+    this.tresolution = task.thumbsize;
     this.layer = task.getPlot().svgElement(SVGConstants.SVG_G_TAG);
     this.thumbid = -1;
     this.thumb = null;
     this.mask = mask;
     // Listen for database events only when needed.
-    if((mask & ON_DATA) == ON_DATA) {
+    if ((mask & ON_DATA) == ON_DATA) {
       context.addDataStoreListener(this);
     }
     // Listen for result changes, including the one we monitor
@@ -126,7 +126,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void destroy() {
-    if(pendingThumbnail != null) {
+    if (pendingThumbnail != null) {
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
     // TODO: remove image from registry?
@@ -136,7 +136,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public Element getLayer() {
-    if(thumbid < 0) {
+    if (thumbid < 0) {
       synchronizedRedraw();
     }
     return layer;
@@ -150,15 +150,14 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   @Override
   protected void incrementalRedraw() {
     final Element oldcontainer;
-    if(layer.hasChildNodes()) {
+    if (layer.hasChildNodes()) {
       oldcontainer = layer;
       layer = (Element) layer.cloneNode(false);
-    }
-    else {
+    } else {
       oldcontainer = null;
     }
     redraw();
-    if(oldcontainer != null && oldcontainer.getParentNode() != null) {
+    if (oldcontainer != null && oldcontainer.getParentNode() != null) {
       oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
     }
   }
@@ -168,14 +167,13 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    */
   @Override
   protected void redraw() {
-    if(thumbid < 0) {
+    if (thumbid < 0) {
       // LoggingUtil.warning("Generating new thumbnail " + this);
       layer.appendChild(SVGUtil.svgWaitIcon(task.getPlot().getDocument(), 0, 0, task.getWidth(), task.getHeight()));
-      if(pendingThumbnail == null) {
+      if (pendingThumbnail == null) {
         pendingThumbnail = ThumbnailThread.QUEUE(this);
       }
-    }
-    else {
+    } else {
       // LoggingUtil.warning("Injecting Thumbnail " + this);
       Element i = task.getPlot().svgElement(SVGConstants.SVG_IMAGE_TAG);
       SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
@@ -196,7 +194,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
       // Work on a clone
       VisualizationTask clone = task.clone(plot, context);
-      clone.put(VisualizationTask.THUMBNAIL, false);
+      clone.thumbnail = false;
       Visualization vis = visFactory.makeVisualization(clone);
 
       plot.getRoot().appendChild(vis.getLayer());
@@ -208,13 +206,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       // The visualization will not be used anymore.
       vis.destroy();
       synchronizedRedraw();
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       final Logging logger = Logging.getLogger(task.getFactory().getClass());
-      if(logger != null && logger.isDebugging()) {
+      if (logger != null && logger.isDebugging()) {
         logger.exception("Thumbnail failed.", e);
-      }
-      else {
+      } else {
         LoggingUtil.warning("Thumbnail for " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
       }
       // TODO: hide the failed image?
@@ -231,11 +227,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void resultChanged(Result current) {
-    if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+    if ((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
       refreshThumbnail();
       return;
     }
-    if((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
+    if ((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
       refreshThumbnail();
       return;
     }

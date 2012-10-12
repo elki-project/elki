@@ -83,7 +83,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
       Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
       for(ParallelPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        task.level = VisualizationTask.LEVEL_DATA - 1;
         baseResult.getHierarchy().add(selres, task);
         baseResult.getHierarchy().add(p, task);
       }

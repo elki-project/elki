@@ -73,7 +73,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        task.level = VisualizationTask.LEVEL_DATA;
         baseResult.getHierarchy().add(rp, task);
         baseResult.getHierarchy().add(p, task);
       }

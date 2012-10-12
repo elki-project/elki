@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualizer, displaying the key for a clustering.
- * 
+ *
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
@@ -79,8 +79,8 @@ public class KeyVisualization extends AbstractVisFactory {
         final double div = Math.max(2. + rows, cols * maxwidth);
         task.width = cols * maxwidth / div;
         task.height = (2. + rows) / div;
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
-        task.put(VisualizationTask.META_NODETAIL, true);
+        task.level = VisualizationTask.LEVEL_STATIC;
+        task.nodetail = true;
         baseResult.getHierarchy().add(c, task);
       }
     }

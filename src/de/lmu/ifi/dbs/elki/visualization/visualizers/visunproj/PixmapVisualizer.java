@@ -70,7 +70,7 @@ public class PixmapVisualizer extends AbstractVisFactory {
       final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
       task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
       task.height = 1.0;
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      task.level = VisualizationTask.LEVEL_STATIC;
       baseResult.getHierarchy().add(pr, task);
     }
   }

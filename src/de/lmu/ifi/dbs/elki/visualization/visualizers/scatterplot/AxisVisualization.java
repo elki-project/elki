@@ -75,7 +75,7 @@ public class AxisVisualization extends AbstractVisFactory {
     Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
+      task.level = VisualizationTask.LEVEL_BACKGROUND;
       baseResult.getHierarchy().add(p, task);
     }
   }

@@ -106,8 +106,8 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
-        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        task.level = VisualizationTask.LEVEL_DATA - 1;
+        task.initDefaultVisibility(false);
         baseResult.getHierarchy().add(c, task);
         baseResult.getHierarchy().add(p, task);
       }

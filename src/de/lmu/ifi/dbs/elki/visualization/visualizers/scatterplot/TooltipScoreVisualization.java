@@ -100,8 +100,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
-        task.put(VisualizationTask.META_TOOL, true);
-        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        task.tool = true;
+        task.initDefaultVisibility(false);
         baseResult.getHierarchy().add(o.getScores(), task);
         baseResult.getHierarchy().add(p, task);
       }
@@ -123,8 +123,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          task.tool = true;
+          task.initDefaultVisibility(false);
           baseResult.getHierarchy().add(r, task);
           baseResult.getHierarchy().add(p, task);
         }

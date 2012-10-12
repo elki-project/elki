@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,11 +25,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
-import de.lmu.ifi.dbs.elki.math.statistics.tests.WelchTTest;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
@@ -110,7 +109,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
   }
 
   private void arrange(int par) {
-    int dim = DatabaseUtil.dimensionality(relation);
+    int dim = RelationUtil.dimensionality(relation);
     Matrix hicsmat = new Matrix(dim, dim, 0.);
     long start, end;
     
@@ -232,7 +231,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
    * @return a set of high contrast subspaces
    */
   private Set<HiCSSubspace> calculateSubspaces(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex) {
-    final int dbdim = DatabaseUtil.dimensionality(relation);
+    final int dbdim = RelationUtil.dimensionality(relation);
 
     TreeSet<HiCSSubspace> subspaceList = new TreeSet<HiCSSubspace>(HiCSSubspace.SORT_BY_SUBSPACE);
     TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<HiCSSubspace>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
@@ -247,7 +246,9 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
         dDimensionalList.add(ts);
       }
     }
-    subspaceList.addAll(dDimensionalList);
+    for (Iterator<HiCSSubspace> iter = dDimensionalList.iterator(); iter.hasNext();) {
+      subspaceList.add(iter.next());
+    }
  
     return subspaceList;
   }
@@ -500,7 +501,7 @@ public class HiCSDimensionOrder extends AbstractParallelVisualization<NumberVect
           Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
           for(ParallelPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
+            task.level = VisualizationTask.LEVEL_DATA + 3;
             baseResult.getHierarchy().add(c, task);
             baseResult.getHierarchy().add(p, task);
           }

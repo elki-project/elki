@@ -85,7 +85,7 @@ public class MarkerVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        task.level = VisualizationTask.LEVEL_DATA;
         baseResult.getHierarchy().add(c, task);
         baseResult.getHierarchy().add(p, task);
       }

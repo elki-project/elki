@@ -70,11 +70,6 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   private static final String NAME = "OPTICS Cluster Ranges";
 
   /**
-   * Optics clustering we visualize
-   */
-  public static final String CLUSTERING = "OPTICSClustering";
-
-  /**
    * Constructor, adhering to
    * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable}
    */
@@ -88,9 +83,8 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
     for(OPTICSProjector<?> p : ops) {
       final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
       if(ocl != null) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-        task.put(CLUSTERING, ocl);
+        final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
+        task.level = VisualizationTask.LEVEL_DATA;
         baseResult.getHierarchy().add(p, task);
       }
     }
@@ -163,7 +157,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task) {
       super(task);
-      this.clus = task.getGenerics(CLUSTERING, Clustering.class);
+      this.clus = task.getResult();
       context.addResultListener(this);
       incrementalRedraw();
     }

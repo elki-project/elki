@@ -98,8 +98,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          task.tool = true;
+          task.initDefaultVisibility(false);
           baseResult.getHierarchy().add(rep, task);
           baseResult.getHierarchy().add(p, task);
         }
@@ -108,8 +108,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          task.tool = true;
+          task.initDefaultVisibility(false);
           baseResult.getHierarchy().add(rep, task);
           baseResult.getHierarchy().add(p, task);
         }
@@ -118,8 +118,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          task.tool = true;
+          task.initDefaultVisibility(false);
           baseResult.getHierarchy().add(rep, task);
           baseResult.getHierarchy().add(p, task);
         }
@@ -128,8 +128,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), this);
-          task.put(VisualizationTask.META_TOOL, true);
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          task.tool = true;
+          task.initDefaultVisibility(false);
           baseResult.getHierarchy().add(rep, task);
           baseResult.getHierarchy().add(p, task);
         }

@@ -96,7 +96,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 2);
+        task.level = VisualizationTask.LEVEL_DATA - 2;
         baseResult.getHierarchy().add(selres, task);
         baseResult.getHierarchy().add(p, task);
       }

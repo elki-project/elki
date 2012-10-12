@@ -95,11 +95,11 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for (ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-        task.put(VisualizationTask.META_TOOL, true);
-        task.put(VisualizationTask.META_NOTHUMB, true);
-        task.put(VisualizationTask.META_NOEXPORT, true);
-        task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+        task.level = VisualizationTask.LEVEL_INTERACTIVE;
+        task.tool = true;
+        task.thumbnail = false;
+        task.noexport = true;
+        task.initDefaultVisibility(false);
         baseResult.getHierarchy().add(selres, task);
         baseResult.getHierarchy().add(p, task);
       }

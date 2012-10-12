@@ -95,7 +95,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
     Collection<OPTICSProjector<?>> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
     for(OPTICSProjector<?> p : ops) {
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
       baseResult.getHierarchy().add(p, task);
     }
   }
