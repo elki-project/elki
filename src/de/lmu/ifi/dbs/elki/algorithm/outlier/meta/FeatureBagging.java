@@ -132,14 +132,14 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    */
   public OutlierResult run(Relation<NumberVector<?>> relation) {
     final int dbdim = RelationUtil.dimensionality(relation);
-    final int mindim = dbdim << 1;
+    final int mindim = dbdim >> 1;
     final int maxdim = dbdim - 1;
     final Random rand = rnd.getRandom();
 
     ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", num, LOG) : null;
-      for(int i = 0; i < num; i++) {
+      for (int i = 0; i < num; i++) {
         BitSet dimset = randomSubspace(dbdim, mindim, maxdim, rand);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
         LOF<NumberVector<?>, DoubleDistance> lof = new LOF<NumberVector<?>, DoubleDistance>(k, df);
@@ -147,18 +147,18 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         // run LOF and collect the result
         OutlierResult result = lof.run(relation);
         results.add(result);
-        if(prog != null) {
+        if (prog != null) {
           prog.incrementProcessed(LOG);
         }
       }
-      if(prog != null) {
+      if (prog != null) {
         prog.ensureCompleted(LOG);
       }
     }
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     DoubleMinMax minmax = new DoubleMinMax();
-    if(breadth) {
+    if (breadth) {
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", relation.size(), LOG) : null;
       Pair<DBIDIter, Relation<Double>>[] IDVectorOntoScoreVector = Pair.newPairArray(results.size());
 
@@ -166,45 +166,43 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       // We need to initialize them now be able to iterate them "in parallel".
       {
         int i = 0;
-        for(OutlierResult r : results) {
+        for (OutlierResult r : results) {
           IDVectorOntoScoreVector[i] = new Pair<DBIDIter, Relation<Double>>(r.getOrdering().iter(relation.getDBIDs()).iter(), r.getScores());
           i++;
         }
       }
 
       // Iterating over the *lines* of the AS_t(i)-matrix.
-      for(int i = 0; i < relation.size(); i++) {
+      for (int i = 0; i < relation.size(); i++) {
         // Iterating over the elements of a line (breadth-first).
-        for(Pair<DBIDIter, Relation<Double>> pair : IDVectorOntoScoreVector) {
+        for (Pair<DBIDIter, Relation<Double>> pair : IDVectorOntoScoreVector) {
           DBIDIter iter = pair.first;
           // Always true if every algorithm returns a complete result (one score
           // for every DBID).
-          if(iter.valid()) {
+          if (iter.valid()) {
             double score = pair.second.get(iter);
-            if(Double.isNaN(scores.doubleValue(iter))) {
+            if (Double.isNaN(scores.doubleValue(iter))) {
               scores.putDouble(iter, score);
               minmax.put(score);
             }
             iter.advance();
-          }
-          else {
+          } else {
             LOG.warning("Incomplete result: Iterator does not contain |DB| DBIDs");
           }
         }
         // Progress does not take the initial mapping into account.
-        if(cprog != null) {
+        if (cprog != null) {
           cprog.incrementProcessed(LOG);
         }
       }
-      if(cprog != null) {
+      if (cprog != null) {
         cprog.ensureCompleted(LOG);
       }
-    }
-    else {
+    } else {
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", relation.size(), LOG) : null;
-      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
         double sum = 0.0;
-        for(OutlierResult r : results) {
+        for (OutlierResult r : results) {
           final Double s = r.getScores().get(iter);
           if (s != null && !Double.isNaN(s)) {
             sum += s;
@@ -212,11 +210,11 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
         }
         scores.putDouble(iter, sum);
         minmax.put(sum);
-        if(cprog != null) {
+        if (cprog != null) {
           cprog.incrementProcessed(LOG);
         }
       }
-      if(cprog != null) {
+      if (cprog != null) {
         cprog.ensureCompleted(LOG);
       }
     }
@@ -235,20 +233,18 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
    */
   private BitSet randomSubspace(final int alldim, final int mindim, final int maxdim, final Random rand) {
     BitSet dimset = new BitSet();
-    {
-      // Fill with all dimensions
-      int[] dims = new int[alldim];
-      for(int d = 0; d < alldim; d++) {
-        dims[d] = d;
-      }
-      // Target dimensionality:
-      int subdim = mindim + rand.nextInt(maxdim - mindim);
-      // Shrink the subspace to the destination size
-      for(int d = 0; d < alldim - subdim; d++) {
-        int s = rand.nextInt(alldim - d);
-        dimset.set(dims[s]);
-        dims[s] = dims[alldim - d - 1];
-      }
+    // Fill with all dimensions
+    int[] dims = new int[alldim];
+    for (int d = 0; d < alldim; d++) {
+      dims[d] = d;
+    }
+    // Target dimensionality:
+    int subdim = mindim + rand.nextInt(maxdim - mindim);
+    // Shrink the subspace to the destination size
+    for (int d = 0; d < alldim - subdim; d++) {
+      int s = rand.nextInt(alldim - d);
+      dimset.set(dims[s]);
+      dims[s] = dims[alldim - d - 1];
     }
     return dimset;
   }
@@ -319,19 +315,19 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter pK = new IntParameter(LOF.K_ID, new GreaterConstraint(1));
-      if(config.grab(pK)) {
+      if (config.grab(pK)) {
         k = pK.getValue();
       }
       IntParameter numP = new IntParameter(NUM_ID, new GreaterEqualConstraint(1));
-      if(config.grab(numP)) {
+      if (config.grab(numP)) {
         num = numP.getValue();
       }
       Flag breadthF = new Flag(BREADTH_ID);
-      if(config.grab(breadthF)) {
+      if (config.grab(breadthF)) {
         breadth = breadthF.getValue();
       }
       RandomParameter rndP = new RandomParameter(SEED_ID);
-      if(config.grab(rndP)) {
+      if (config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }
