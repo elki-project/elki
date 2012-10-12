@@ -193,7 +193,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
       final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
       task.width = 1.0;
       task.height = 1.0;
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      task.level = VisualizationTask.LEVEL_STATIC;
       baseResult.getHierarchy().add(curve, task);
     }
   }

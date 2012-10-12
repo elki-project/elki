@@ -78,7 +78,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
     Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
     for(ParallelPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND);
+      task.level = VisualizationTask.LEVEL_BACKGROUND;
       baseResult.getHierarchy().add(p, task);
     }
   }
@@ -137,7 +137,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
           }
           // Get axis label
-          final String label = RelationUtil.getColumnLabel(relation, truedim + 1);
+          final String label = RelationUtil.getColumnLabel(relation, truedim);
           // Add axis label
           Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
           SVGUtil.setCSSClass(text, AXIS_LABEL);

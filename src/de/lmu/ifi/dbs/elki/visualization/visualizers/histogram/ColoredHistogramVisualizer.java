@@ -119,7 +119,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       for(HistogramProjector<?> p : ps) {
         // register self
         final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        task.level = VisualizationTask.LEVEL_DATA;
         baseResult.getHierarchy().add(c, task);
         baseResult.getHierarchy().add(p, task);
       }

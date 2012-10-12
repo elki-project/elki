@@ -85,10 +85,10 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
     Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-      task.put(VisualizationTask.META_NOTHUMB, true);
-      task.put(VisualizationTask.META_NOEXPORT, true);
-      task.put(VisualizationTask.META_NOEMBED, true);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.thumbnail = false;
+      task.noexport = true;
+      task.noembed = true;
       baseResult.getHierarchy().add(p, task);
     }
   }

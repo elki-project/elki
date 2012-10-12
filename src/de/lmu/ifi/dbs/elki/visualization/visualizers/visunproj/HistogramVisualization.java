@@ -169,7 +169,7 @@ public class HistogramVisualization extends AbstractVisFactory {
       final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this);
       task.width = 2.0;
       task.height = 1.0;
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      task.level = VisualizationTask.LEVEL_STATIC;
       baseResult.getHierarchy().add(histogram, task);
     }
   }

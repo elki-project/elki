@@ -122,9 +122,9 @@ public class BubbleVisualization extends AbstractVisFactory {
       }
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+        task.level = VisualizationTask.LEVEL_DATA;
         if(!vis) {
-          task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+          task.initDefaultVisibility(false);
         }
         baseResult.getHierarchy().add(o, task);
         baseResult.getHierarchy().add(p, task);

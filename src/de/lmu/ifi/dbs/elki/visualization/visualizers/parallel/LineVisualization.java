@@ -82,7 +82,7 @@ public class LineVisualization extends AbstractVisFactory {
     Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
     for(ParallelPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+      task.level = VisualizationTask.LEVEL_DATA;
       baseResult.getHierarchy().add(p, task);
     }
   }

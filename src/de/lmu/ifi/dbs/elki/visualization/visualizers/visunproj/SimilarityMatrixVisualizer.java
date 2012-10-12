@@ -74,7 +74,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
       final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
       task.width = 1.0;
       task.height = 1.0;
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_STATIC);
+      task.level = VisualizationTask.LEVEL_STATIC;
       baseResult.getHierarchy().add(pr, task);
     }
   }

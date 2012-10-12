@@ -83,7 +83,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 1);
+        task.level = VisualizationTask.LEVEL_DATA - 1;
         baseResult.getHierarchy().add(selres, task);
         baseResult.getHierarchy().add(p, task);
       }

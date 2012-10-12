@@ -341,8 +341,8 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     }
     else {
       VisualizationTask thumbtask = task.clone(this, context, it.proj, it.w, it.h);
-      thumbtask.put(VisualizationTask.THUMBNAIL, true);
-      thumbtask.put(VisualizationTask.THUMBNAIL_RESOLUTION, thumbsize);
+      thumbtask.thumbnail = true;
+      thumbtask.thumbsize = thumbsize;
       final Visualization vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
       if(vis.getLayer() == null) {
         LoggingUtil.warning("Visualization returned empty layer: " + vis);
@@ -428,8 +428,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
       return false;
     }
     if(single) {
-      Boolean nothumb = task.getGenerics(VisualizationTask.META_NOEMBED, Boolean.class);
-      return (nothumb == null) || !nothumb;
+      return !task.noembed;
     }
     else {
       return VisualizerUtil.thumbnailEnabled(task);

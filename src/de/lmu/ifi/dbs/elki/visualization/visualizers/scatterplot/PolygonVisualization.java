@@ -86,7 +86,7 @@ public class PolygonVisualization extends AbstractVisFactory {
         for(ScatterPlotProjector<?> p : ps) {
           if(RelationUtil.dimensionality(p.getRelation()) == 2) {
             final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA - 10);
+            task.level = VisualizationTask.LEVEL_DATA - 10;
             baseResult.getHierarchy().add(rel, task);
             baseResult.getHierarchy().add(p, task);
           }

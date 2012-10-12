@@ -71,7 +71,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
     for(OPTICSProjector<?> p : ops) {
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
+      task.level = VisualizationTask.LEVEL_DATA;
       baseResult.getHierarchy().add(p, task);
     }
   }

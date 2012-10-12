@@ -102,7 +102,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
-          task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_BACKGROUND + 1);
+          task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
           baseResult.getHierarchy().add((Result) tree, task);
           baseResult.getHierarchy().add(p, task);
         }

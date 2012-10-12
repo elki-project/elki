@@ -98,7 +98,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
           final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1)));
           task.height = .1;
           task.width = 2.;
-          task.put(VisualizationTask.META_NODETAIL, true);
+          task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -108,7 +108,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
           final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 2), true));
           task.height = 2.;
           task.width = .1;
-          task.put(VisualizationTask.META_NODETAIL, true);
+          task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -143,7 +143,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
           final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
           task.height = .1;
           task.width = 1;
-          task.put(VisualizationTask.META_NODETAIL, true);
+          task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -153,7 +153,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
           final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
           task.height = 1;
           task.width = .1;
-          task.put(VisualizationTask.META_NODETAIL, true);
+          task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
         }

@@ -76,9 +76,9 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
     Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(result, ParallelPlotProjector.class);
     for(ParallelPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
-      task.put(VisualizationTask.META_NOEXPORT, true);
-      task.put(VisualizationTask.META_NOTHUMB, true);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.noexport = true;
+      task.thumbnail = false;
       baseResult.getHierarchy().add(p, task);
     }
   }

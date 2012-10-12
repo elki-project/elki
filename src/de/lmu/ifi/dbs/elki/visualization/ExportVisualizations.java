@@ -48,14 +48,13 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Class that automatically generates all visualizations and exports them into
  * SVG files.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.composedOf VisualizerParameterizer
  */
 // TODO: make more parameterizable, wrt. what to skip
@@ -130,44 +129,44 @@ public class ExportVisualizations implements ResultHandler {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    if(output.isFile()) {
+    if (output.isFile()) {
       throw new AbortException("Output folder cannot be an existing file.");
     }
-    if(!output.exists()) {
-      if(!output.mkdirs()) {
+    if (!output.exists()) {
+      if (!output.mkdirs()) {
         throw new AbortException("Could not create output directory.");
       }
     }
-    if(this.baseResult != baseResult) {
+    if (this.baseResult != baseResult) {
       this.baseResult = baseResult;
       context = null;
       counter = 0;
       LOG.verbose("Note: Reusing visualization exporter for more than one result is untested.");
     }
-    if(context == null) {
+    if (context == null) {
       context = manager.newContext(baseResult);
     }
 
     // Projected visualizations
     ArrayList<Projector> projectors = ResultUtil.filterResults(baseResult, Projector.class);
-    for(Projector proj : projectors) {
+    for (Projector proj : projectors) {
       // TODO: allow selecting individual projections only.
       Collection<PlotItem> items = proj.arrange();
-      for(PlotItem item : items) {
+      for (PlotItem item : items) {
         processItem(item);
       }
     }
     ResultHierarchy hier = baseResult.getHierarchy();
     ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(baseResult, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
+    for (VisualizationTask task : tasks) {
       boolean isprojected = false;
-      for(Result parent : hier.getParents(task)) {
-        if(parent instanceof Projector) {
+      for (Result parent : hier.getParents(task)) {
+        if (parent instanceof Projector) {
           isprojected = true;
           break;
         }
       }
-      if(isprojected) {
+      if (isprojected) {
         continue;
       }
       PlotItem pi = new PlotItem(ratio, 1.0, null);
@@ -180,11 +179,11 @@ public class ExportVisualizations implements ResultHandler {
     final double height = 1;
     final double width = ratio * height;
     // Descend into subitems
-    for(Iterator<PlotItem> iter = item.subitems.iterator(); iter.hasNext();) {
+    for (Iterator<PlotItem> iter = item.subitems.iterator(); iter.hasNext();) {
       PlotItem subitem = iter.next();
       processItem(subitem);
     }
-    if(item.taskSize() <= 0) {
+    if (item.taskSize() <= 0) {
       return;
     }
     item.sort();
@@ -195,44 +194,29 @@ public class ExportVisualizations implements ResultHandler {
     svgp.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
     ArrayList<Visualization> layers = new ArrayList<Visualization>();
-    for(Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
+    for (Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
       VisualizationTask task = iter.next();
-      {
-        Boolean dis = task.getGenerics(VisualizationTask.META_NODETAIL, Boolean.class);
-        if(dis != null && dis == true) {
-          continue;
-        }
-      }
-      {
-        Boolean dis = task.getGenerics(VisualizationTask.META_NOEXPORT, Boolean.class);
-        if(dis != null && dis == true) {
-          continue;
-        }
-      }
-      if(!VisualizerUtil.isVisible(task)) {
+      if (task.nodetail || task.noexport || !task.visible) {
         continue;
       }
       try {
         Visualization v = task.getFactory().makeVisualization(task.clone(svgp, context, item.proj, width, height));
         layers.add(v);
-      }
-      catch(Exception e) {
-        if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
+      } catch (Exception e) {
+        if (Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
           LoggingUtil.exception("Visualization failed.", e);
-        }
-        else {
+        } else {
           LoggingUtil.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
         }
       }
     }
-    if(layers.size() <= 0) {
+    if (layers.size() <= 0) {
       return;
     }
-    for(Visualization layer : layers) {
-      if(layer.getLayer() != null) {
+    for (Visualization layer : layers) {
+      if (layer.getLayer() != null) {
         svgp.getRoot().appendChild(layer.getLayer());
-      }
-      else {
+      } else {
         LoggingUtil.warning("NULL layer seen.");
       }
     }
@@ -242,11 +226,10 @@ public class ExportVisualizations implements ResultHandler {
     File outname = new File(output, "plot-" + counter + ".svg");
     try {
       svgp.saveAsSVG(outname);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LOG.warning("Export of visualization failed.", e);
     }
-    for(Visualization layer : layers) {
+    for (Visualization layer : layers) {
       layer.destroy();
     }
     counter++;
@@ -279,12 +262,12 @@ public class ExportVisualizations implements ResultHandler {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileParameter outputP = new FileParameter(FOLDER_ID, FileType.OUTPUT_FILE);
-      if(config.grab(outputP)) {
+      if (config.grab(outputP)) {
         output = outputP.getValue();
       }
 
       DoubleParameter ratioP = new DoubleParameter(RATIO_ID, new GreaterConstraint(0.0), 1.33);
-      if(config.grab(ratioP)) {
+      if (config.grab(ratioP)) {
         ratio = ratioP.getValue();
       }
 

@@ -98,7 +98,7 @@ public class HistogramProjector<V extends NumberVector<?>> extends AbstractHiera
         final VisualizationTask task = new VisualizationTask("", null, null, lbl);
         task.height = lheight;
         task.width = 1;
-        task.put(VisualizationTask.META_NODETAIL, true); 
+        task.nodetail = true;
         it.tasks.add(task);
         master.subitems.add(it);
       }

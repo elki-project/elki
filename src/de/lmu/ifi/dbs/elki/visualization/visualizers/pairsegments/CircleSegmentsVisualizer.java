@@ -130,7 +130,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       final VisualizationTask task = new VisualizationTask(NAME, policy, null, this);
       task.width = 2.0;
       task.height = 2.0;
-      task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_INTERACTIVE);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
       baseResult.getHierarchy().add(segmentResult, task);
     }
   }

@@ -92,18 +92,18 @@ public class COPVectorVisualization extends AbstractScatterplotVisualization imp
   @Override
   public void redraw() {
     setupCSS(svgp);
-    for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
+    for (DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
       Vector evec = result.get(objId);
-      if(evec == null) {
+      if (evec == null) {
         continue;
       }
       double[] ev = proj.fastProjectRelativeDataToRenderSpace(evec);
       // TODO: avoid hard-coded plot threshold
-      if(VMath.euclideanLength(ev) < 0.01) {
+      if (VMath.euclideanLength(ev) < 0.01) {
         continue;
       }
       final NumberVector<?> vec = rel.get(objId);
-      if(vec == null) {
+      if (vec == null) {
         continue;
       }
       double[] v = proj.fastProjectDataToRenderSpace(vec);
@@ -115,7 +115,7 @@ public class COPVectorVisualization extends AbstractScatterplotVisualization imp
 
   @Override
   public void resultChanged(Result current) {
-    if(sample == current) {
+    if (sample == current) {
       synchronizedRedraw();
     }
   }
@@ -161,20 +161,20 @@ public class COPVectorVisualization extends AbstractScatterplotVisualization imp
     @Override
     public void processNewResult(HierarchicalResult baseResult, Result result) {
       List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-      for(OutlierResult o : ors) {
+      for (OutlierResult o : ors) {
         List<Relation<?>> rels = ResultUtil.filterResults(o, Relation.class);
-        for(Relation<?> rel : rels) {
+        for (Relation<?> rel : rels) {
           // TODO: use a constant.
-          if(!rel.getShortName().equals("cop-errorvec")) {
+          if (!rel.getShortName().equals("cop-errorvec")) {
             continue;
           }
           List<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
           boolean vis = true;
-          for(ScatterPlotProjector<?> p : ps) {
+          for (ScatterPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
-            task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA);
-            if(!vis) {
-              task.put(VisualizationTask.META_VISIBLE_DEFAULT, false);
+            task.level = VisualizationTask.LEVEL_DATA;
+            if (!vis) {
+              task.initDefaultVisibility(false);
             }
             baseResult.getHierarchy().add(o, task);
             baseResult.getHierarchy().add(p, task);

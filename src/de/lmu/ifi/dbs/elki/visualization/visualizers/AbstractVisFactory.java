@@ -49,8 +49,7 @@ public abstract class AbstractVisFactory implements VisFactory {
   @Override
   public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
     // Is this a thumbnail request?
-    Boolean isthumb = task.get(VisualizationTask.THUMBNAIL, Boolean.class);
-    if (isthumb != null && isthumb.booleanValue() && allowThumbnails(task)) {
+    if (task.thumbnail && allowThumbnails(task)) {
       return new ThumbnailVisualization(this, task, thumbmask);
     }
     return makeVisualization(task);

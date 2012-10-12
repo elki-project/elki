@@ -134,7 +134,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
           for (ScatterPlotProjector<?> p : ps) {
             if (RelationUtil.dimensionality(p.getRelation()) == 2) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-              task.put(VisualizationTask.META_LEVEL, VisualizationTask.LEVEL_DATA + 3);
+              task.level = VisualizationTask.LEVEL_DATA + 3;
               baseResult.getHierarchy().add(p, task);
               baseResult.getHierarchy().add(c, task);
             }
