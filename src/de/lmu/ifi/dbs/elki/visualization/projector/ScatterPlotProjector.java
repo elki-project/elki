@@ -115,7 +115,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
       }
       else {
         final double sizeh = Math.ceil((dmax - 1) / 2.0);
-        master = new PlotItem(sizeh * 2 + .1, dmax - 1 + .1, null);
+        master = new PlotItem(sizeh * 2. + .1, dmax - 1 + .1, null);
 
         for(int d1 = 1; d1 < dmax; d1++) {
           for(int d2 = d1 + 1; d2 <= dmax; d2++) {

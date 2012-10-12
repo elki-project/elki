@@ -100,7 +100,7 @@ public class SolidLineStyleLibrary implements LineStyleLibrary {
     }
     cls.setStatement(CSSConstants.CSS_STROKE_WIDTH_PROPERTY, SVGUtil.fmt(width));
     if(interpolated) {
-      cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, "" + SVGUtil.fmt(width / StyleLibrary.SCALE * 2) + "," + SVGUtil.fmt(width / StyleLibrary.SCALE * 2));
+      cls.setStatement(CSSConstants.CSS_STROKE_DASHARRAY_PROPERTY, "" + SVGUtil.fmt(width / StyleLibrary.SCALE * 2.) + "," + SVGUtil.fmt(width / StyleLibrary.SCALE * 2.));
     }
   }
 }

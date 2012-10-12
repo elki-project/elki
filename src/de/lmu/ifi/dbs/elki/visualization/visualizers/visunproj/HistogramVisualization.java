@@ -83,7 +83,7 @@ public class HistogramVisualization extends AbstractVisFactory {
     VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
     HistogramResult<? extends NumberVector<?>> curve = task.getResult();
-    
+
     double scale = StyleLibrary.SCALE;
     final double sizex = scale;
     final double sizey = scale * task.getHeight() / task.getWidth();
@@ -91,21 +91,20 @@ public class HistogramVisualization extends AbstractVisFactory {
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
-    
+
     // find maximum, determine step size
     Integer dim = null;
     DoubleMinMax xminmax = new DoubleMinMax();
     DoubleMinMax yminmax = new DoubleMinMax();
-    for(NumberVector<?> vec : curve) {
+    for (NumberVector<?> vec : curve) {
       xminmax.put(vec.doubleValue(0));
-      if(dim == null) {
+      if (dim == null) {
         dim = vec.getDimensionality();
-      }
-      else {
+      } else {
         // TODO: test and throw always
         assert (dim == vec.getDimensionality());
       }
-      for(int i = 1; i < dim; i++) {
+      for (int i = 1; i < dim; i++) {
         yminmax.put(vec.doubleValue(i));
       }
     }
@@ -118,38 +117,37 @@ public class HistogramVisualization extends AbstractVisFactory {
     double range = xminmax.getMax() - xminmax.getMin();
     double binwidth = range / (size - 1);
 
-    LinearScale xscale = new LinearScale(xminmax.getMin() - binwidth / 2, xminmax.getMax() + binwidth / 2);
+    LinearScale xscale = new LinearScale(xminmax.getMin() - binwidth * .5, xminmax.getMax() + binwidth * .5);
     LinearScale yscale = new LinearScale(yminmax.getMin(), yminmax.getMax());
 
     SVGPath[] path = new SVGPath[dim];
-    for(int i = 0; i < dim; i++) {
-      path[i] = new SVGPath(sizex * xscale.getScaled(xminmax.getMin() - binwidth / 2), sizey);
+    for (int i = 0; i < dim; i++) {
+      path[i] = new SVGPath(sizex * xscale.getScaled(xminmax.getMin() - binwidth * .5), sizey);
     }
 
     // draw curves.
-    for(NumberVector<?> vec : curve) {
-      for(int d = 0; d < dim; d++) {
-        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) - binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
-        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) + binwidth / 2)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
+    for (NumberVector<?> vec : curve) {
+      for (int d = 0; d < dim; d++) {
+        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) - binwidth * .5)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
+        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) + binwidth * .5)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
       }
     }
 
     // close all histograms
-    for(int i = 0; i < dim; i++) {
-      path[i].lineTo(sizex * xscale.getScaled(xminmax.getMax() + binwidth / 2), sizey);
+    for (int i = 0; i < dim; i++) {
+      path[i].lineTo(sizex * xscale.getScaled(xminmax.getMax() + binwidth * .5), sizey);
     }
 
     // add axes
     try {
       SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
       SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
-    }
-    catch(CSSNamingConflict e) {
+    } catch (CSSNamingConflict e) {
       LoggingUtil.exception(e);
     }
     // Setup line styles and insert lines.
     ColorLibrary cl = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       CSSClass csscls = new CSSClass(this, SERIESID + "_" + d);
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       csscls.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, cl.getColor(d));
@@ -167,7 +165,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     List<HistogramResult<? extends NumberVector<?>>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
-    for(HistogramResult<? extends NumberVector<?>> histogram : histograms) {
+    for (HistogramResult<? extends NumberVector<?>> histogram : histograms) {
       final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this);
       task.width = 2.0;
       task.height = 1.0;

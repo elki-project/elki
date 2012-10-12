@@ -128,7 +128,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
         StringBuilder pattern = new StringBuilder();
         for(int i = 0; i < pat.length; i++) {
           if(i > 0) {
-            pattern.append(",");
+            pattern.append(',');
           }
           pattern.append(SVGUtil.fmt(pat[i] * width * 30));
           // pattern.append("%");
@@ -147,7 +147,7 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
         StringBuilder pattern = new StringBuilder();
         for(int i = 0; i < pat.length; i++) {
           if(i > 0) {
-            pattern.append(",");
+            pattern.append(',');
           }
           pattern.append(SVGUtil.fmt(pat[i] * width));
           // pattern.append("%");

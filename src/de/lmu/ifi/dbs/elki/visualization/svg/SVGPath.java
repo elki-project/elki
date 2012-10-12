@@ -794,7 +794,7 @@ public class SVGPath {
     }
     for(double d : ds) {
       buf.append(SVGUtil.FMT.format(d));
-      buf.append(" ");
+      buf.append(' ');
     }
   }
 

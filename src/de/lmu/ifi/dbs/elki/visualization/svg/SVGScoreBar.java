@@ -111,7 +111,7 @@ public class SVGScoreBar {
     Element bar = svgp.svgRect(x, y, width, height);
     bar.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#a0a0a0");
     bar.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
-    bar.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "" + height * 0.01);
+    bar.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, String.valueOf(height * 0.01));
     barchart.appendChild(bar);
 
     if(fill >= 0 && fill <= size + 1) {
@@ -119,7 +119,7 @@ public class SVGScoreBar {
       Element chart = svgp.svgRect(x + 0.02 * height, y + 0.02 * height, fpos, height - 0.04 * height);
       chart.setAttribute(SVGConstants.SVG_FILL_ATTRIBUTE, "#d4e4f1");
       chart.setAttribute(SVGConstants.SVG_STROKE_ATTRIBUTE, "#a0a0a0");
-      chart.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "" + height * 0.01);
+      chart.setAttribute(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, String.valueOf(height * 0.01));
       barchart.appendChild(chart);
     }
 

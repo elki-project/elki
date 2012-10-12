@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.TIntObjectMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -174,7 +176,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     }
     SortedMap<Integer, List<CLIQUESubspace<V>>> dimensionToDenseSubspaces = new TreeMap<Integer, List<CLIQUESubspace<V>>>();
     List<CLIQUESubspace<V>> denseSubspaces = findOneDimensionalDenseSubspaces(relation);
-    dimensionToDenseSubspaces.put(0, denseSubspaces);
+    dimensionToDenseSubspaces.put(Integer.valueOf(0), denseSubspaces);
     if(LOG.isVerbose()) {
       LOG.verbose("    1-dimensional dense subspaces: " + denseSubspaces.size());
     }
@@ -187,7 +189,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     int dimensionality = RelationUtil.dimensionality(relation);
     for(int k = 2; k <= dimensionality && !denseSubspaces.isEmpty(); k++) {
       denseSubspaces = findDenseSubspaces(relation, denseSubspaces);
-      dimensionToDenseSubspaces.put(k - 1, denseSubspaces);
+      dimensionToDenseSubspaces.put(Integer.valueOf(k - 1), denseSubspaces);
       if(LOG.isVerbose()) {
         LOG.verbose("    " + k + "-dimensional dense subspaces: " + denseSubspaces.size());
       }
@@ -404,10 +406,10 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
         denseUnits.add(unit);
         // add the dense unit to its subspace
         int dim = unit.getIntervals().iterator().next().getDimension();
-        CLIQUESubspace<V> subspace_d = denseSubspaces.get(dim);
+        CLIQUESubspace<V> subspace_d = denseSubspaces.get(Integer.valueOf(dim));
         if(subspace_d == null) {
           subspace_d = new CLIQUESubspace<V>(dim);
-          denseSubspaces.put(dim, subspace_d);
+          denseSubspaces.put(Integer.valueOf(dim), subspace_d);
         }
         subspace_d.addDenseUnit(unit);
       }
@@ -595,17 +597,17 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
       super.makeOptions(config);
       IntParameter xsiP = new IntParameter(XSI_ID, new GreaterConstraint(0));
       if(config.grab(xsiP)) {
-        xsi = xsiP.getValue();
+        xsi = xsiP.intValue();
       }
 
       DoubleParameter tauP = new DoubleParameter(TAU_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
       if(config.grab(tauP)) {
-        tau = tauP.getValue();
+        tau = tauP.doubleValue();
       }
 
       Flag pruneF = new Flag(PRUNE_ID);
       if(config.grab(pruneF)) {
-        prune = pruneF.getValue();
+        prune = pruneF.isTrue();
       }
     }
 

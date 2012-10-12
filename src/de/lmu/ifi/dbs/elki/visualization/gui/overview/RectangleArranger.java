@@ -430,7 +430,7 @@ public class RectangleArranger<T> {
         }
         buf.append(widths.get(x));
       }
-      buf.append("\n");
+      buf.append('\n');
     }
     {
       buf.append("Heights: ");
@@ -440,7 +440,7 @@ public class RectangleArranger<T> {
         }
         buf.append(heights.get(y));
       }
-      buf.append("\n");
+      buf.append('\n');
     }
     {
       for(int y = 0; y < rows; y++) {
@@ -450,7 +450,7 @@ public class RectangleArranger<T> {
         buf.append("|\n");
       }
       for(int x = 0; x < cols; x++) {
-        buf.append("-");
+        buf.append('-');
       }
       buf.append("+\n");
     }

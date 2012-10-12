@@ -185,13 +185,13 @@ public class SVGHyperCube {
         if(!b.get(i) && !b.get(j)) {
           double[] deltaj = r_edges.get(j);
           StringBuilder pbuf = new StringBuilder();
-          pbuf.append(SVGUtil.fmt(r_min[0])).append(",");
-          pbuf.append(SVGUtil.fmt(r_min[1])).append(" ");
-          pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0])).append(",");
-          pbuf.append(SVGUtil.fmt(r_min[1] + deltai[1])).append(" ");
-          pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0] + deltaj[0])).append(",");
-          pbuf.append(SVGUtil.fmt(r_min[1] + deltai[1] + deltaj[1])).append(" ");
-          pbuf.append(SVGUtil.fmt(r_min[0] + deltaj[0])).append(",");
+          pbuf.append(SVGUtil.fmt(r_min[0])).append(',');
+          pbuf.append(SVGUtil.fmt(r_min[1])).append(' ');
+          pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0])).append(',');
+          pbuf.append(SVGUtil.fmt(r_min[1] + deltai[1])).append(' ');
+          pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0] + deltaj[0])).append(',');
+          pbuf.append(SVGUtil.fmt(r_min[1] + deltai[1] + deltaj[1])).append(' ');
+          pbuf.append(SVGUtil.fmt(r_min[0] + deltaj[0])).append(',');
           pbuf.append(SVGUtil.fmt(r_min[1] + deltaj[1]));
           
           Element poly = plot.svgElement(SVGConstants.SVG_POLYGON_TAG);

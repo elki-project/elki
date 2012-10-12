@@ -135,7 +135,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     // TODO: make it configurable to keep this list; this is mostly useful for
     // visualization
     List<SteepArea> salist = new ArrayList<SteepArea>();
-    List<SteepDownArea> sdaset = new java.util.Vector<SteepDownArea>();
+    List<SteepDownArea> sdaset = new ArrayList<SteepDownArea>();
     ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
@@ -658,7 +658,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
       DoubleParameter xiP = new DoubleParameter(XI_ID);
       xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
       if(config.grab(xiP)) {
-        xi = xiP.getValue();
+        xi = xiP.doubleValue();
       }
 
       ClassParameter<OPTICSTypeAlgorithm<D>> opticsP = new ClassParameter<OPTICSTypeAlgorithm<D>>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);

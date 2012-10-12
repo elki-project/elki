@@ -168,11 +168,11 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("\n");
-      msg.append("sampleSize ").append(sampleSize).append("\n");
-      msg.append("sampleSet ").append(sampleSet).append("\n");
-      msg.append("medoidSize ").append(medoidSize).append("\n");
-      msg.append("m ").append(medoids).append("\n");
+      msg.append('\n');
+      msg.append("sampleSize ").append(sampleSize).append('\n');
+      msg.append("sampleSet ").append(sampleSet).append('\n');
+      msg.append("medoidSize ").append(medoidSize).append('\n');
+      msg.append("m ").append(medoids).append('\n');
       LOG.debugFine(msg.toString());
     }
 
@@ -187,8 +187,8 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("\n");
-      msg.append("m_c ").append(m_current).append("\n");
+      msg.append('\n');
+      msg.append("m_c ").append(m_current).append('\n');
       LOG.debugFine(msg.toString());
     }
 
@@ -460,9 +460,9 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
       if(LOG.isDebugging()) {
         StringBuilder msg = new StringBuilder();
-        msg.append("\n");
-        msg.append("z_ij ").append(z_ij).append("\n");
-        msg.append("D_i ").append(dims_i).append("\n");
+        msg.append('\n');
+        msg.append("z_ij ").append(z_ij).append('\n');
+        msg.append("D_i ").append(dims_i).append('\n');
         LOG.debugFiner(msg.toString());
       }
     }
@@ -537,9 +537,9 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
       if(LOG.isDebugging()) {
         StringBuilder msg = new StringBuilder();
-        msg.append("\n");
-        msg.append("z_ij ").append(z_ij).append("\n");
-        msg.append("D_i ").append(dims_i).append("\n");
+        msg.append('\n');
+        msg.append("z_ij ").append(z_ij).append('\n');
+        msg.append("D_i ").append(dims_i).append('\n');
         LOG.debugFiner(msg.toString());
       }
     }
@@ -597,8 +597,8 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("\n");
-      msg.append("clusters ").append(clusters).append("\n");
+      msg.append('\n');
+      msg.append("clusters ").append(clusters).append('\n');
       LOG.debugFine(msg.toString());
     }
     return clusters;
@@ -649,8 +649,8 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("\n");
-      msg.append("clusters ").append(clusters).append("\n");
+      msg.append('\n');
+      msg.append("clusters ").append(clusters).append('\n');
       LOG.debugFine(msg.toString());
     }
     return clusters;
@@ -794,14 +794,14 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       boolean notFirst = false;
       for(TIntIterator iter = dimensions.iterator(); iter.hasNext(); ) {
         if(notFirst) {
-          result.append(",");
+          result.append(',');
         }
         else {
           notFirst = true;
         }
         result.append(iter.next());
       }
-      result.append("]");
+      result.append(']');
 
       result.append("\nCentroid: ").append(centroid);
       return result.toString();

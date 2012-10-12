@@ -72,7 +72,7 @@ public class CircleMarkers implements MarkerLibrary {
    */
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int stylenr, double size) {
-    Element marker = plot.svgCircle(x, y, size / 2);
+    Element marker = plot.svgCircle(x, y, size * .5);
     final String col;
     if(stylenr == -1) {
       col = dotcolor;

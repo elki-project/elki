@@ -147,7 +147,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
     }
 
     // Build priority queue
-    final int sqsize = ps_candidates.size() * (ps_candidates.size() - 1) / 2;
+    final int sqsize = ps_candidates.size() * (ps_candidates.size() - 1) >> 1;
     if (LOG.isDebuggingFine()) {
       LOG.debugFine("Number of leaves: " + ps_candidates.size() + " so " + sqsize + " MBR computations.");
     }

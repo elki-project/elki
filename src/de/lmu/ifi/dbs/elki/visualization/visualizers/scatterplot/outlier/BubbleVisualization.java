@@ -199,12 +199,12 @@ public class BubbleVisualization extends AbstractVisFactory {
               int color = stylepolicy.getColorForDBID(objId);
               final StringBuilder style = new StringBuilder();
               if(settings.fill) {
-                style.append(SVGConstants.CSS_FILL_PROPERTY).append(":").append(SVGUtil.colorToString(color));
+                style.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGUtil.colorToString(color));
                 style.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY).append(":0.5");
               }
               else {
-                style.append(SVGConstants.CSS_STROKE_VALUE).append(":").append(SVGUtil.colorToString(color));
-                style.append(SVGConstants.CSS_FILL_PROPERTY).append(":").append(SVGConstants.CSS_NONE_VALUE);
+                style.append(SVGConstants.CSS_STROKE_VALUE).append(':').append(SVGUtil.colorToString(color));
+                style.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGConstants.CSS_NONE_VALUE);
               }
               SVGUtil.setAtt(circle, SVGConstants.SVG_STYLE_ATTRIBUTE, style.toString());
               layer.appendChild(circle);

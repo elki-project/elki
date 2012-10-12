@@ -315,7 +315,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     final boolean issplit = (maxSplitDimension >= (getDimensionality() - 1));
     final int childLevel = issplit ? level + 1 : level;
     final int splitDim = issplit ? 0 : maxSplitDimension + 1;
-    final double splitPoint = getMin(splitDim) + (getMax(splitDim) - getMin(splitDim)) / 2;
+    final double splitPoint = getMin(splitDim) + (getMax(splitDim) - getMin(splitDim)) * .5;
 
     // left and right child
     for(int i = 0; i < 2; i++) {

@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -148,9 +147,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @param database The database to operate on
    * @param relation Relation
    * @return Clustering result
-   * @throws de.lmu.ifi.dbs.elki.utilities.UnableToComplyException
    */
-  public Clustering<Model> run(Database database, Relation<NumberVector<?>> relation) throws UnableToComplyException {
+  public Clustering<Model> run(Database database, Relation<NumberVector<?>> relation) {
     Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;

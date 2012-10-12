@@ -192,7 +192,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         if(color == null) {
           color = Color.BLACK;
         }
-        color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256), (int) (color.getBlue() * 0.8));
+        color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256.), (int) (color.getBlue() * 0.8));
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
         cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);
@@ -203,7 +203,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         if(color == null) {
           color = Color.BLACK;
         }
-        color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
+        color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256.), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
         cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);

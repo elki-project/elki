@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.HashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 import java.util.Iterator;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -56,7 +56,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
    * Provides a mapping of particular dimensions to the intervals of which this
    * unit is build.
    */
-  private Map<Integer, Interval> dimensionToInterval;
+  private TIntObjectHashMap<Interval> dimensionToInterval;
 
   /**
    * The ids of the feature vectors this unit contains.
@@ -77,7 +77,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
   public CLIQUEUnit(SortedSet<Interval> intervals, ModifiableDBIDs ids) {
     this.intervals = intervals;
 
-    dimensionToInterval = new HashMap<Integer, Interval>();
+    dimensionToInterval = new TIntObjectHashMap<Interval>();
     for(Interval interval : intervals) {
       dimensionToInterval.put(interval.getDimension(), interval);
     }
@@ -96,7 +96,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
     intervals = new TreeSet<Interval>();
     intervals.add(interval);
 
-    dimensionToInterval = new HashMap<Integer, Interval>();
+    dimensionToInterval = new TIntObjectHashMap<Interval>();
     dimensionToInterval.put(interval.getDimension(), interval);
 
     ids = DBIDUtil.newHashSet();
@@ -286,7 +286,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
   public String toString() {
     StringBuilder result = new StringBuilder();
     for(Interval interval : intervals) {
-      result.append(interval).append(" ");
+      result.append(interval).append(' ');
     }
 
     return result.toString();

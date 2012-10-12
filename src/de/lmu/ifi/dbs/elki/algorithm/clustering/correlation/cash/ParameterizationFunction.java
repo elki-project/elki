@@ -405,10 +405,10 @@ public class ParameterizationFunction {
       }
       result.append(FormatUtil.format(vec.doubleValue(d)));
       for(int j = 0; j < d; j++) {
-        result.append(" * sin(a_").append(j + 1).append(")");
+        result.append(" * sin(a_").append(j + 1).append(')');
       }
       if(d != vec.getDimensionality() - 1) {
-        result.append(" * cos(a_").append(d + 1).append(")");
+        result.append(" * cos(a_").append(d + 1).append(')');
       }
     }
     return result.toString();

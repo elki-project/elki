@@ -292,8 +292,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       // Visualizing
       if(!settings.curves) {
         for(DoubleObjPair<double[]> bin : histogram) {
-          double lpos = xscale.getScaled(bin.first - binwidth / 2);
-          double rpos = xscale.getScaled(bin.first + binwidth / 2);
+          double lpos = xscale.getScaled(bin.first - binwidth * .5);
+          double rpos = xscale.getScaled(bin.first + binwidth * .5);
           double stack = 0.0;
           final int start = numc > 0 ? 1 : 0;
           for(int key = start; key < cols; key++) {
@@ -318,8 +318,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
         // draw histogram lines
         for(DoubleObjPair<double[]> bin : histogram) {
-          left = xscale.getScaled(bin.first - binwidth / 2);
-          right = xscale.getScaled(bin.first + binwidth / 2);
+          left = xscale.getScaled(bin.first - binwidth * .5);
+          right = xscale.getScaled(bin.first + binwidth * .5);
           for(int i = 0; i < cols; i++) {
             double val = yscale.getScaled(bin.getSecond()[i]);
             if(lasty[i] != val) {

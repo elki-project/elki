@@ -174,7 +174,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       double height = 0.06 * scale;
       double miny = viewport.getMinY();
       double maxy = viewport.getMaxY();
-      double y = (miny + maxy) / 2 - (vis.size() * height * 1.4) / 2;
+      double y = (miny + maxy - vis.size() * height * 1.4) * .5;
       if(y < miny) {
         LOG.warning("Too many Tools");
       }

@@ -104,12 +104,12 @@ public class LabelVisualization extends AbstractVisFactory {
 
     Element layer;
     if(!rotated) {
-      layer = svgp.svgText(task.getWidth() / 2, task.getHeight() / 2 + .35 * fontsize, this.label);
+      layer = svgp.svgText(task.getWidth() * .5, task.getHeight() * .5 + .35 * fontsize, this.label);
       SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
     }
     else {
-      layer = svgp.svgText(- task.getHeight() / 2, task.getWidth() / 2 + .35 * fontsize, this.label);
+      layer = svgp.svgText(- task.getHeight() * .5, task.getWidth() * .5 + .35 * fontsize, this.label);
       SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90)");

@@ -199,11 +199,11 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       if(LOG.isDebuggingFinest()) {
         StringBuilder msg = new StringBuilder();
         msg.append(" model ").append(i).append(":\n");
-        msg.append(" mean:    ").append(means.get(i)).append("\n");
-        msg.append(" m:\n").append(FormatUtil.format(m, "        ")).append("\n");
-        msg.append(" m.det(): ").append(m.det()).append("\n");
-        msg.append(" cluster weight: ").append(clusterWeights[i]).append("\n");
-        msg.append(" normDistFact:   ").append(normDistrFactor[i]).append("\n");
+        msg.append(" mean:    ").append(means.get(i)).append('\n');
+        msg.append(" m:\n").append(FormatUtil.format(m, "        ")).append('\n');
+        msg.append(" m.det(): ").append(m.det()).append('\n');
+        msg.append(" cluster weight: ").append(clusterWeights[i]).append('\n');
+        msg.append(" normDistFact:   ").append(normDistrFactor[i]).append('\n');
         LOG.debugFine(msg.toString());
       }
     }

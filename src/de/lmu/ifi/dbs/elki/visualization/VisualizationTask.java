@@ -347,12 +347,12 @@ public class VisualizationTask extends AnyMap<String> implements Cloneable, Resu
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append("VisTask: ").append(factory.getClass().getName()).append(" ");
+    buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
     if(result != null) {
-      buf.append("Result: ").append(result.getLongName()).append(" ");
+      buf.append("Result: ").append(result.getLongName()).append(' ');
     }
     if(proj != null) {
-      buf.append("Proj: ").append(proj.toString()).append(" ");
+      buf.append("Proj: ").append(proj.toString()).append(' ');
     }
     buf.append(super.toString());
     return buf.toString();

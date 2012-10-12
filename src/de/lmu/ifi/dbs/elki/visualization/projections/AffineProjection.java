@@ -109,7 +109,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   @Override
   public CanvasSize estimateViewport() {
-    if(viewport == null) {
+    if (viewport == null) {
       final int dim = proj.getDimensionality();
       DoubleMinMax minmaxx = new DoubleMinMax();
       DoubleMinMax minmaxy = new DoubleMinMax();
@@ -121,14 +121,14 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
       minmaxy.put(orig.get(1));
       // Diagonal point
       Vector diag = new Vector(dim);
-      for(int d2 = 0; d2 < dim; d2++) {
+      for (int d2 = 0; d2 < dim; d2++) {
         diag.set(d2, 1);
       }
       diag = projectScaledToRender(diag);
       minmaxx.put(diag.get(0));
       minmaxy.put(diag.get(1));
       // Axis end points
-      for(int d = 0; d < dim; d++) {
+      for (int d = 0; d < dim; d++) {
         Vector v = new Vector(dim);
         v.set(d, 1);
         Vector ax = projectScaledToRender(v);
@@ -154,7 +154,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     AffineTransformation proj = AffineTransformation.reorderAxesTransformation(dim, new int[] { ax1, ax2 });
     // Assuming that the data was normalized on [0:1], center it:
     double[] trans = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       trans[i] = -.5;
     }
     proj.addTranslation(new Vector(trans));
@@ -201,7 +201,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     final double[] cols = matrix[vr.length];
     assert (colx.length == coly.length && colx.length == cols.length && cols.length == vr.length + 1);
 
-    for(int k = 0; k < vr.length; k++) {
+    for (int k = 0; k < vr.length; k++) {
       x += colx[k] * vr[k];
       y += coly[k] * vr[k];
       s += cols[k] * vr[k];
@@ -210,7 +210,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     x += colx[vr.length];
     y += coly[vr.length];
     s += cols[vr.length];
-    assert (s != 0.0);
+    assert (s > 0.0 || s < 0.0);
     return new double[] { x / s, y / s };
   }
 
@@ -236,7 +236,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     final double[] coly = matrix[1];
     assert (colx.length == coly.length);
 
-    for(int k = 0; k < vr.length; k++) {
+    for (int k = 0; k < vr.length; k++) {
       x += colx[k] * vr[k];
       y += coly[k] * vr[k];
     }
@@ -246,7 +246,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   @Override
   public double[] fastProjectRenderToDataSpace(double[] data) {
     double[] ret = fastProjectRenderToScaledSpace(data);
-    for(int d = 0; d < scales.length; d++) {
+    for (int d = 0; d < scales.length; d++) {
       ret[d] = scales[d].getUnscaled(ret[d]);
     }
     return ret;
@@ -254,11 +254,11 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   @Override
   public double[] fastProjectRenderToScaledSpace(double[] v) {
-    if(v.length == scales.length) {
+    if (v.length == scales.length) {
       return projectRenderToScaled(new Vector(v)).getArrayRef();
     }
     double[] c = Arrays.copyOf(v, scales.length);
-    for(int d = v.length; d < scales.length; d++) {
+    for (int d = v.length; d < scales.length; d++) {
       c[d] = 0.5;
     }
     return projectRenderToScaled(new Vector(c)).getArrayRef();
@@ -269,13 +269,13 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     final int dim = proj.getDimensionality();
     BitSet actDim = new BitSet(dim);
     Vector vScale = new Vector(dim);
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       vScale.setZero();
       vScale.set(d, 1);
       double[] vRender = fastProjectScaledToRenderSpace(vScale.getArrayRef());
 
       // TODO: Can't we do this by inspecting the projection matrix directly?
-      if(vRender[0] != 0.0 || vRender[1] != 0) {
+      if (vRender[0] > 0.0 || vRender[0] < 0.0 || vRender[1] != 0) {
         actDim.set(d);
       }
     }

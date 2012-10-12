@@ -140,7 +140,7 @@ public class AxisReorderVisualization extends AbstractVisFactory {
       final double ypos = getSizeY() + getMarginTop() * .5 + controlsize;
       final double spacing = 0.9 * controlsize;
 
-      Element back = svgp.svgRect(-controlsize / 2, ypos, getSizeX() + controlsize, controlsize);
+      Element back = svgp.svgRect(-controlsize * .5, ypos, getSizeX() + controlsize, controlsize);
       SVGUtil.addCSSClass(back, SELECTDIMENSIONORDER);
       layer.appendChild(back);
 
@@ -149,28 +149,28 @@ public class AxisReorderVisualization extends AbstractVisFactory {
         for(int i = 0; i < dim; i++) {
           final double xpos = getVisibleAxisX(i);
           if(i > 0) {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.LEFT, xpos - spacing, ypos + controlsize / 2, arrowsize);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.LEFT, xpos - spacing, ypos + controlsize * .5, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(xpos - spacing - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
+            Element button = svgp.svgRect(xpos - spacing - buttonsize * .5, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.LEFT);
             layer.appendChild(button);
           }
           {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, xpos, ypos + controlsize / 2, arrowsize);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, xpos, ypos + controlsize * .5, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(xpos - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
+            Element button = svgp.svgRect(xpos - buttonsize * .5, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.DOWN);
             layer.appendChild(button);
           }
           if(i < dim - 1) {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.RIGHT, xpos + spacing, ypos + controlsize / 2, arrowsize);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.RIGHT, xpos + spacing, ypos + controlsize * .5, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(xpos + spacing - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
+            Element button = svgp.svgRect(xpos + spacing - buttonsize * .5, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.RIGHT);
             layer.appendChild(button);
@@ -180,19 +180,19 @@ public class AxisReorderVisualization extends AbstractVisFactory {
       else {
         for(int i = 0; i < dim; i++) {
           {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, getVisibleAxisX(i), ypos + controlsize / 2, arrowsize);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.DOWN, getVisibleAxisX(i), ypos + controlsize * .5, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(getVisibleAxisX(i) - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
+            Element button = svgp.svgRect(getVisibleAxisX(i) - buttonsize * .5, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.DOWN);
             layer.appendChild(button);
           }
           if(i > 0.) {
-            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.UP, getVisibleAxisX(i - .5), ypos + controlsize / 2, arrowsize);
+            Element arrow = SVGArrow.makeArrow(svgp, SVGArrow.UP, getVisibleAxisX(i - .5), ypos + controlsize * .5, arrowsize);
             SVGUtil.addCSSClass(arrow, SDO_ARROW);
             layer.appendChild(arrow);
-            Element button = svgp.svgRect(getVisibleAxisX(i - .5) - buttonsize / 2, ypos + padding, buttonsize, buttonsize);
+            Element button = svgp.svgRect(getVisibleAxisX(i - .5) - buttonsize * .5, ypos + padding, buttonsize, buttonsize);
             SVGUtil.addCSSClass(button, SDO_BUTTON);
             addEventListener(button, i, SVGArrow.UP);
             layer.appendChild(button);
