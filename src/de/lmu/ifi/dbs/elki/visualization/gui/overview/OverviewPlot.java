@@ -90,7 +90,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Action listeners for this plot.
    */
-  private java.util.Vector<ActionListener> actionListeners = new java.util.Vector<ActionListener>();
+  private ArrayList<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
   /**
    * Single view mode

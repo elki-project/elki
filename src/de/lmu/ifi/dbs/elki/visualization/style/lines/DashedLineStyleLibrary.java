@@ -107,14 +107,14 @@ public class DashedLineStyleLibrary implements LineStyleLibrary {
     boolean interpolated = false;
     // process flavoring flags
     for(Object flag : flags) {
-      if(flag == LineStyleLibrary.FLAG_STRONG) {
+      if(LineStyleLibrary.FLAG_STRONG.equals(flag)) {
         width = width * 1.5;
       }
-      else if(flag == LineStyleLibrary.FLAG_WEAK) {
+      else if(LineStyleLibrary.FLAG_WEAK.equals(flag)) {
         cls.setStatement(CSSConstants.CSS_STROKE_OPACITY_PROPERTY, ".50");
         width = width * 0.75;
       }
-      else if(flag == LineStyleLibrary.FLAG_INTERPOLATED) {
+      else if(LineStyleLibrary.FLAG_INTERPOLATED.equals(flag)) {
         interpolated = true;
       }
     }

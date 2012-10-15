@@ -168,7 +168,7 @@ public class ResultVisualizer implements ResultHandler {
       }
       Flag singleF = new Flag(SINGLE_ID);
       if (config.grab(singleF)) {
-        single = singleF.getValue();
+        single = singleF.isTrue();
       }
       manager = config.tryInstantiate(VisualizerParameterizer.class);
     }

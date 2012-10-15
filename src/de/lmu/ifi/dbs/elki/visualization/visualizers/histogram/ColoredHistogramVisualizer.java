@@ -277,7 +277,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
           v.set(d, 1);
           // projected endpoint of axis
           double ax = proj.fastProjectScaledToRender(v);
-          if(ax != orig) {
+          if(ax < orig || ax > orig) {
             final double left = (orig / Projection.SCALE + 0.5) * xsize;
             final double right = (ax / Projection.SCALE + 0.5) * xsize;
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
@@ -322,7 +322,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
           right = xscale.getScaled(bin.first + binwidth * .5);
           for(int i = 0; i < cols; i++) {
             double val = yscale.getScaled(bin.getSecond()[i]);
-            if(lasty[i] != val) {
+            if(lasty[i] > val || lasty[i] < val) {
               paths[i].lineTo(xsize * left, ysize * (1 - lasty[i]));
               paths[i].lineTo(xsize * left, ysize * (1 - val));
               paths[i].lineTo(xsize * right, ysize * (1 - val));
@@ -422,11 +422,11 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       super.makeOptions(config);
       Flag STYLE_CURVES_FLAG = new Flag(STYLE_CURVES_ID);
       if(config.grab(STYLE_CURVES_FLAG)) {
-        curves = STYLE_CURVES_FLAG.getValue();
+        curves = STYLE_CURVES_FLAG.isTrue();
       }
       IntParameter HISTOGRAM_BINS_PARAM = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), DEFAULT_BINS);
       if(config.grab(HISTOGRAM_BINS_PARAM)) {
-        bins = HISTOGRAM_BINS_PARAM.getValue();
+        bins = HISTOGRAM_BINS_PARAM.intValue();
       }
     }
 

@@ -44,7 +44,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param cons a list of parameter constraints for this double parameter
    * @param defaultValue the default value for this double parameter
    */
-  public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons, Double defaultValue) {
+  public DoubleParameter(OptionID optionID, List<ParameterConstraint<Number>> cons, double defaultValue) {
     super(optionID, cons, defaultValue);
   }
 
@@ -81,7 +81,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param constraint the constraint of this parameter
    * @param defaultValue the default value for this parameter
    */
-  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint, Double defaultValue) {
+  public DoubleParameter(OptionID optionID, ParameterConstraint<Number> constraint, double defaultValue) {
     super(optionID, constraint, defaultValue);
   }
 
@@ -114,7 +114,7 @@ public class DoubleParameter extends NumberParameter<Double> {
    * @param optionID the unique optionID
    * @param defaultValue the default value for this double parameter
    */
-  public DoubleParameter(OptionID optionID, Double defaultValue) {
+  public DoubleParameter(OptionID optionID, double defaultValue) {
     super(optionID, defaultValue);
   }
 

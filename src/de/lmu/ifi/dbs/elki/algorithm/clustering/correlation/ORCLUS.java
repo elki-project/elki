@@ -589,7 +589,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
     protected void configAlpha(Parameterization config) {
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
       if (config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
     }
 

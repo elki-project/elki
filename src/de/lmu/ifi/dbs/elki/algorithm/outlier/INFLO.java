@@ -240,12 +240,12 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       super.makeOptions(config);
       final DoubleParameter mP = new DoubleParameter(M_ID, new GreaterConstraint(0.0), 1.0);
       if(config.grab(mP)) {
-        m = mP.getValue();
+        m = mP.doubleValue();
       }
 
       final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
       if(config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.intValue();
       }
     }
 

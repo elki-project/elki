@@ -130,24 +130,20 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
     InputStream stream = null;
     try {
       stream = FileUtil.openSystemFile(filename);
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       try {
         stream = FileUtil.openSystemFile(filename + DEFAULT_PROPERTIES_EXTENSION);
-      }
-      catch(FileNotFoundException e2) {
+      } catch (FileNotFoundException e2) {
         try {
           stream = FileUtil.openSystemFile(DEFAULT_PROPERTIES_PATH + filename + DEFAULT_PROPERTIES_EXTENSION);
-        }
-        catch(FileNotFoundException e3) {
+        } catch (FileNotFoundException e3) {
           throw new AbortException("Could not find style scheme file '" + filename + "' for scheme '" + name + "'!");
         }
       }
     }
     try {
       properties.load(stream);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       throw new AbortException("Error loading properties file " + filename + ".\n", e);
     }
   }
@@ -171,7 +167,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    * @return Resulting value
    */
   private <T> T getCached(String prefix, String postfix, Class<T> cls) {
-    return cache.get(prefix + "." + postfix, cls);
+    return cache.get(prefix + '.' + postfix, cls);
   }
 
   /**
@@ -183,7 +179,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    * @param data Data
    */
   private <T> void setCached(String prefix, String postfix, T data) {
-    cache.put(prefix + "." + postfix, data);
+    cache.put(prefix + '.' + postfix, data);
   }
 
   /**
@@ -195,26 +191,26 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    */
   protected String getPropertyValue(String prefix, String postfix) {
     String ret = properties.getProperty(prefix + "." + postfix);
-    if(ret != null) {
+    if (ret != null) {
       // logger.debugFine("Found property: "+prefix + "." +
       // postfix+" for "+prefix);
       return ret;
     }
     int pos = prefix.length();
-    while(pos > 0) {
-      pos = prefix.lastIndexOf(".", pos - 1);
-      if(pos <= 0) {
+    while (pos > 0) {
+      pos = prefix.lastIndexOf('.', pos - 1);
+      if (pos <= 0) {
         break;
       }
-      ret = properties.getProperty(prefix.substring(0, pos) + "." + postfix);
-      if(ret != null) {
+      ret = properties.getProperty(prefix.substring(0, pos) + '.' + postfix);
+      if (ret != null) {
         // logger.debugFine("Found property: "+prefix.substring(0, pos) + "." +
         // postfix+" for "+prefix);
         return ret;
       }
     }
     ret = properties.getProperty(postfix);
-    if(ret != null) {
+    if (ret != null) {
       // logger.debugFine("Found property: "+postfix+" for "+prefix);
       return ret;
     }
@@ -239,7 +235,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   @Override
   public ColorLibrary getColorSet(String key) {
     ColorLibrary cl = getCached(key, COLORSET, ColorLibrary.class);
-    if(cl == null) {
+    if (cl == null) {
       String[] colors = getPropertyValue(key, COLORSET).split(LIST_SEPARATOR);
       cl = new ListBasedColorLibrary(colors, "Default");
       setCached(key, COLORSET, cl);
@@ -250,29 +246,27 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   @Override
   public double getLineWidth(String key) {
     Double lw = getCached(key, LINE_WIDTH, Double.class);
-    if(lw == null) {
+    if (lw == null) {
       try {
-        lw = Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE;
-      }
-      catch(NullPointerException e) {
-        throw new AbortException("Missing/invalid value in style library: " + key + "." + LINE_WIDTH);
+        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, LINE_WIDTH)) * SCALE);
+      } catch (NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + '.' + LINE_WIDTH);
       }
     }
-    return lw;
+    return lw.doubleValue();
   }
 
   @Override
   public double getTextSize(String key) {
     Double lw = getCached(key, TEXT_SIZE, Double.class);
-    if(lw == null) {
+    if (lw == null) {
       try {
-        lw = Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE;
-      }
-      catch(NullPointerException e) {
-        throw new AbortException("Missing/invalid value in style library: " + key + "." + TEXT_SIZE);
+        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, TEXT_SIZE)) * SCALE);
+      } catch (NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + '.' + TEXT_SIZE);
       }
     }
-    return lw;
+    return lw.doubleValue();
   }
 
   @Override
@@ -283,46 +277,42 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   @Override
   public double getSize(String key) {
     Double lw = getCached(key, GENERIC_SIZE, Double.class);
-    if(lw == null) {
+    if (lw == null) {
       try {
-        lw = Double.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE;
-      }
-      catch(NullPointerException e) {
-        throw new AbortException("Missing/invalid value in style library: " + key + "." + GENERIC_SIZE);
+        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, GENERIC_SIZE)) * SCALE);
+      } catch (NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + '.' + GENERIC_SIZE);
       }
     }
-    return lw;
+    return lw.doubleValue();
   }
 
   @Override
   public double getOpacity(String key) {
     Double lw = getCached(key, OPACITY, Double.class);
-    if(lw == null) {
+    if (lw == null) {
       try {
-        lw = Double.parseDouble(getPropertyValue(key, OPACITY));
-      }
-      catch(NullPointerException e) {
-        throw new AbortException("Missing/invalid value in style library: " + key + "." + OPACITY);
+        lw = Double.valueOf(Double.parseDouble(getPropertyValue(key, OPACITY)));
+      } catch (NullPointerException e) {
+        throw new AbortException("Missing/invalid value in style library: " + key + '.' + OPACITY);
       }
     }
-    return lw;
+    return lw.doubleValue();
   }
 
   @Override
   public LineStyleLibrary lines() {
-    if(linelib == null) {
+    if (linelib == null) {
       String libname = properties.getProperty(PROP_LINES_LIBRARY, SolidLineStyleLibrary.class.getName());
       try {
         Class<?> cls;
         try {
           cls = Class.forName(libname);
-        }
-        catch(ClassNotFoundException e) {
-          cls = Class.forName(LineStyleLibrary.class.getPackage().getName() + "." + libname);
+        } catch (ClassNotFoundException e) {
+          cls = Class.forName(LineStyleLibrary.class.getPackage().getName() + '.' + libname);
         }
         linelib = (LineStyleLibrary) cls.getConstructor(StyleLibrary.class).newInstance(this);
-      }
-      catch(Exception e) {
+      } catch (Exception e) {
         LOG.exception(e);
         linelib = new SolidLineStyleLibrary(this);
       }
@@ -332,19 +322,17 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
 
   @Override
   public MarkerLibrary markers() {
-    if(markerlib == null) {
+    if (markerlib == null) {
       String libname = properties.getProperty(PROP_MARKER_LIBRARY, PrettyMarkers.class.getName());
       try {
         Class<?> cls;
         try {
           cls = Class.forName(libname);
-        }
-        catch(ClassNotFoundException e) {
-          cls = Class.forName(MarkerLibrary.class.getPackage().getName() + "." + libname);
+        } catch (ClassNotFoundException e) {
+          cls = Class.forName(MarkerLibrary.class.getPackage().getName() + '.' + libname);
         }
         markerlib = (MarkerLibrary) cls.getConstructor(StyleLibrary.class).newInstance(this);
-      }
-      catch(Exception e) {
+      } catch (Exception e) {
         LOG.exception(e);
         markerlib = new PrettyMarkers(this);
       }

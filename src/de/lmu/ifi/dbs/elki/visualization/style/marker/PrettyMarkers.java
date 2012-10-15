@@ -192,7 +192,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param size Size
    */
   protected void plotGray(SVGPlot plot, Element parent, double x, double y, double size) {
-    Element marker = plot.svgCircle(x, y, size / 2);
+    Element marker = plot.svgCircle(x, y, size * .5);
     SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + greycolor);
     parent.appendChild(marker);
   }
@@ -207,7 +207,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * @param size Size
    */
   protected void plotUncolored(SVGPlot plot, Element parent, double x, double y, double size) {
-    Element marker = plot.svgCircle(x, y, size / 2);
+    Element marker = plot.svgCircle(x, y, size * .5);
     SVGUtil.setStyle(marker, SVGConstants.CSS_FILL_PROPERTY + ":" + dotcolor);
     parent.appendChild(marker);
   }

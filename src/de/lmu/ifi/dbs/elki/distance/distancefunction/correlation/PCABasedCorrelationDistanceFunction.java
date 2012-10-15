@@ -278,7 +278,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
       final DoubleParameter param = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.25);
       if(config.grab(param)) {
-        delta = param.getValue();
+        delta = param.doubleValue();
       }
     }
 

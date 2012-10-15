@@ -288,12 +288,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
         super.makeOptions(config);
         final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
         if(config.grab(alphaP)) {
-          alpha = alphaP.getValue();
+          alpha = alphaP.doubleValue();
         }
 
         final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
         if(config.grab(kP)) {
-          k = kP.getValue();
+          k = kP.intValue();
         }
       }
 

@@ -92,7 +92,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
       super.makeOptions(config);
       final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
       if(config.grab(bandSizeP)) {
-        bandSize = bandSizeP.getValue();
+        bandSize = bandSizeP.doubleValue();
       }
     }
   }

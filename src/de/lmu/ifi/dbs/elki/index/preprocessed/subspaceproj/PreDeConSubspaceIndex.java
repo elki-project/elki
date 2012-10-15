@@ -234,7 +234,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
         super.makeOptions(config);
         DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN), DEFAULT_DELTA);
         if(config.grab(deltaP)) {
-          delta = deltaP.getValue();
+          delta = deltaP.doubleValue();
         }
       }
 

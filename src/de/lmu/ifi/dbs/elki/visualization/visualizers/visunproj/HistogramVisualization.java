@@ -93,18 +93,18 @@ public class HistogramVisualization extends AbstractVisFactory {
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // find maximum, determine step size
-    Integer dim = null;
+    int dim = -1;
     DoubleMinMax xminmax = new DoubleMinMax();
     DoubleMinMax yminmax = new DoubleMinMax();
     for (NumberVector<?> vec : curve) {
       xminmax.put(vec.doubleValue(0));
-      if (dim == null) {
+      if (dim < 0) {
         dim = vec.getDimensionality();
       } else {
         // TODO: test and throw always
         assert (dim == vec.getDimensionality());
       }
-      for (int i = 1; i < dim; i++) {
+      for (int i = 0; i <= dim; i++) {
         yminmax.put(vec.doubleValue(i));
       }
     }

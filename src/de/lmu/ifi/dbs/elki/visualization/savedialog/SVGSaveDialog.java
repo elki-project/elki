@@ -73,11 +73,10 @@ public class SVGSaveDialog {
 
   static {
     // FOP installed?
-    if(SVGPlot.hasFOPInstalled()) {
+    if (SVGPlot.hasFOPInstalled()) {
       formats = new String[] { "svg", "png", "jpeg", "jpg", "pdf", "ps", "eps" };
       visibleformats = new String[] { automagic_format, "svg", "png", "jpeg", "pdf", "ps", "eps" };
-    }
-    else {
+    } else {
       formats = new String[] { "svg", "png", "jpeg", "jpg" };
       visibleformats = new String[] { automagic_format, "svg", "png", "jpeg" };
     }
@@ -103,70 +102,54 @@ public class SVGSaveDialog {
 
     ret = fc.showSaveDialog(null);
     fc.setDialogTitle("Saving... Please wait.");
-    if(ret == JFileChooser.APPROVE_OPTION) {
+    if (ret == JFileChooser.APPROVE_OPTION) {
       File file = fc.getSelectedFile();
       String format = optionsPanel.getSelectedFormat();
-      if(format == null || format == automagic_format) {
+      if (format == null || automagic_format.equals(format)) {
         format = guessFormat(file.getName());
       }
       try {
-        if(format == null) {
+        if (format == null) {
           showError(fc, "Error saving image.", "File format not recognized.");
-        }
-        else if(format.equals("jpeg") || format.equals("jpg")) {
+        } else if ("jpeg".equals(format) || "jpg".equals(format)) {
           quality = optionsPanel.getJPEGQuality();
           plot.saveAsJPEG(file, width, height, quality);
-        }
-        else if(format.equals("png")) {
+        } else if ("png".equals(format)) {
           plot.saveAsPNG(file, width, height);
-        }
-        else if(format.equals("ps")) {
+        } else if ("ps".equals(format)) {
           plot.saveAsPS(file);
-        }
-        else if(format.equals("eps")) {
+        } else if ("eps".equals(format)) {
           plot.saveAsEPS(file);
-        }
-        else if(format.equals("pdf")) {
+        } else if ("pdf".equals(format)) {
           plot.saveAsPDF(file);
-        }
-        else if(format.equals("svg")) {
+        } else if ("svg".equals(format)) {
           plot.saveAsSVG(file);
-        }
-        else {
+        } else {
           showError(fc, "Error saving image.", "Unsupported format: " + format);
         }
-      }
-      catch(java.lang.IncompatibleClassChangeError e) {
+      } catch (java.lang.IncompatibleClassChangeError e) {
         showError(fc, "Error saving image.", "It seems that your Java version is incompatible with this version of Batik and Jpeg writing. Sorry.");
-      }
-      catch(ClassNotFoundException e) {
+      } catch (ClassNotFoundException e) {
         showError(fc, "Error saving image.", "A class was not found when saving this image. Maybe installing Apache FOP will help (for PDF, PS and EPS output).\n" + e.toString());
-      }
-      catch(IOException e) {
+      } catch (IOException e) {
+        LOG.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      } catch (TranscoderException e) {
+        LOG.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      } catch (TransformerFactoryConfigurationError e) {
+        LOG.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      } catch (TransformerException e) {
+        LOG.exception(e);
+        showError(fc, "Error saving image.", e.toString());
+      } catch (Exception e) {
         LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
-      catch(TranscoderException e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(TransformerFactoryConfigurationError e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(TransformerException e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(Exception e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-    }
-    else if(ret == JFileChooser.ERROR_OPTION) {
+    } else if (ret == JFileChooser.ERROR_OPTION) {
       showError(fc, "Error in file dialog.", "Unknown Error.");
-    }
-    else if(ret == JFileChooser.CANCEL_OPTION) {
+    } else if (ret == JFileChooser.CANCEL_OPTION) {
       // do nothing - except return result
     }
     return ret;
@@ -180,8 +163,8 @@ public class SVGSaveDialog {
    */
   public static String guessFormat(String name) {
     String ext = FileUtil.getFilenameExtension(name);
-    for(String format : formats) {
-      if(format.equals(ext)) {
+    for (String format : formats) {
+      if (format.equals(ext)) {
         return ext;
       }
     }

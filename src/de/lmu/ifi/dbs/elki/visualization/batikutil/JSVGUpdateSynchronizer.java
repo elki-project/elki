@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  */
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.batik.bridge.UpdateManager;
@@ -50,7 +51,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
    * The UpdateRunner we are put into
    */
-  private List<WeakReference<UpdateRunner>> updaterunner = new java.util.Vector<WeakReference<UpdateRunner>>();
+  private List<WeakReference<UpdateRunner>> updaterunner = new ArrayList<WeakReference<UpdateRunner>>();
 
   /**
    * Adapter to track component changes

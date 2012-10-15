@@ -236,7 +236,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
       super.makeOptions(config);
       Flag fillF = new Flag(FILL_ID);
       if(config.grab(fillF)) {
-        fill = fillF.getValue();
+        fill = fillF.isTrue();
       }
     }
 

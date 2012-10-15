@@ -270,12 +270,12 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
 
       final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.1);
       if(config.grab(deltaP)) {
-        delta = deltaP.getValue();
+        delta = deltaP.doubleValue();
       }
 
       final DoubleParameter tauP = new DoubleParameter(TAU_ID, new GreaterEqualConstraint(0), 0.1);
       if(config.grab(tauP)) {
-        tau = tauP.getValue();
+        tau = tauP.doubleValue();
       }
     }
 

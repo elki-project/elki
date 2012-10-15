@@ -602,12 +602,12 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       super.makeOptions(config);
       final IntParameter mP = new IntParameter(M_ID, new GreaterConstraint(1), 50);
       if(config.grab(mP)) {
-        m = mP.getValue();
+        m = mP.intValue();
       }
 
       final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 0.1);
       if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
 
       final ObjectParameter<OutlierAlgorithm> algoP = new ObjectParameter<OutlierAlgorithm>(ALGO_ID, OutlierAlgorithm.class, LOF.class);
@@ -622,7 +622,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
 
       final IntParameter cutoffP = new IntParameter(LIMIT_ID, new GreaterConstraint(1), 100);
       if(config.grab(cutoffP)) {
-        cutoff = cutoffP.getValue();
+        cutoff = cutoffP.intValue();
       }
 
       final RandomParameter rndP = new RandomParameter(SEED_ID);

@@ -96,7 +96,7 @@ public class HiSC<V extends NumberVector<?>> extends OPTICS<V, PreferenceVectorB
       DoubleParameter alphaP = new DoubleParameter(HiSCPreferenceVectorIndex.Factory.ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), HiSCPreferenceVectorIndex.Factory.DEFAULT_ALPHA);
       double alpha = 0.0;
       if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
 
       // Configure HiSC distance function

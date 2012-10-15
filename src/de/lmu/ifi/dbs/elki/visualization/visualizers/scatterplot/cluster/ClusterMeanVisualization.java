@@ -281,7 +281,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
       super.makeOptions(config);
       Flag starsF = new Flag(STARS_ID);
       if(config.grab(starsF)) {
-        stars = starsF.getValue();
+        stars = starsF.isTrue();
       }
     }
 
