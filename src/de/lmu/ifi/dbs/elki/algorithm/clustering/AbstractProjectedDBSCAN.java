@@ -410,7 +410,8 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     }
 
     protected void configMinPts(Parameterization config) {
-      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      IntParameter minptsP = new IntParameter(MINPTS_ID);
+      minptsP.addConstraint(new GreaterConstraint(0));
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
       }
@@ -433,7 +434,8 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     }
 
     protected void configLambda(Parameterization config) {
-      IntParameter lambdaP = new IntParameter(LAMBDA_ID, new GreaterConstraint(0));
+      IntParameter lambdaP = new IntParameter(LAMBDA_ID);
+      lambdaP.addConstraint(new GreaterConstraint(0));
       if(config.grab(lambdaP)) {
         lambda = lambdaP.getValue();
       }

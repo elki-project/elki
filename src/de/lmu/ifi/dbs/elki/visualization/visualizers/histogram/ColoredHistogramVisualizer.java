@@ -420,13 +420,14 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      Flag STYLE_CURVES_FLAG = new Flag(STYLE_CURVES_ID);
-      if(config.grab(STYLE_CURVES_FLAG)) {
-        curves = STYLE_CURVES_FLAG.isTrue();
+      Flag curvesF = new Flag(STYLE_CURVES_ID);
+      if(config.grab(curvesF)) {
+        curves = curvesF.isTrue();
       }
-      IntParameter HISTOGRAM_BINS_PARAM = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), DEFAULT_BINS);
-      if(config.grab(HISTOGRAM_BINS_PARAM)) {
-        bins = HISTOGRAM_BINS_PARAM.intValue();
+      IntParameter binsP = new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS);
+      binsP.addConstraint(new GreaterEqualConstraint(2));
+      if(config.grab(binsP)) {
+        bins = binsP.intValue();
       }
     }
 

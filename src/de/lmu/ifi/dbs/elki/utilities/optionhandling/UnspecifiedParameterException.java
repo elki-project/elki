@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Exception when a required parameter was not given.
+ * 
  * @author Erich Schubert
  */
 public class UnspecifiedParameterException extends WrongParameterValueException {
@@ -37,23 +38,26 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
 
   /**
    * Constructor with missing Parameter
+   * 
    * @param parameter Missing parameter
    */
-  public UnspecifiedParameterException(Parameter<?, ?> parameter) {
+  public UnspecifiedParameterException(Parameter<?> parameter) {
     super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription());
   }
 
   /**
    * Constructor with missing Parameter and cause
+   * 
    * @param parameter Missing parameter
    * @param cause Cause
    */
-  public UnspecifiedParameterException(Parameter<?, ?> parameter, Throwable cause) {
+  public UnspecifiedParameterException(Parameter<?> parameter, Throwable cause) {
     super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription(), cause);
   }
 
   /**
    * Constructor with error message.
+   * 
    * @param message Message
    */
   public UnspecifiedParameterException(String message) {

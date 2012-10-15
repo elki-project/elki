@@ -95,14 +95,14 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
   @Override
   protected PCAFilteredResult computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<V> database) {
     ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
-    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+    for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       ids.add(neighbor);
     }
     PCAFilteredResult pcares = pca.processIds(ids, database);
 
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
-      msg.append(id).append(" "); //.append(database.getObjectLabelQuery().get(id));
+      msg.append(id).append(" "); // .append(database.getObjectLabelQuery().get(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       LOG.debugFine(msg.toString());
     }
@@ -183,18 +183,19 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
         // flag absolute
         boolean absolute = false;
         Flag absoluteF = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
-        if(config.grab(absoluteF)) {
+        if (config.grab(absoluteF)) {
           absolute = absoluteF.isTrue();
         }
 
         // Parameter delta
         double delta = 0.0;
-        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, new GreaterEqualConstraint(0), DEFAULT_DELTA);
-        if(config.grab(deltaP)) {
+        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA);
+        deltaP.addConstraint(new GreaterEqualConstraint(0));
+        if (config.grab(deltaP)) {
           delta = deltaP.doubleValue();
         }
         // Absolute flag doesn't have a sensible default value for delta.
-        if(absolute && deltaP.tookDefaultValue()) {
+        if (absolute && deltaP.tookDefaultValue()) {
           config.reportError(new WrongParameterValueException("Illegal parameter setting: " + "Flag " + absoluteF.getName() + " is set, " + "but no value for " + deltaP.getName() + " is specified."));
         }
 
@@ -220,7 +221,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
         // eigen pair filter
         pcaParameters.addParameter(PCAFilteredRunner.PCA_EIGENPAIR_FILTER, LimitEigenPairFilter.class.getName());
         // abs
-        if(absolute) {
+        if (absolute) {
           pcaParameters.addFlag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         }
         // delta
@@ -231,18 +232,18 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
         pcaParameters.addParameter(PCAFilteredRunner.SMALL_ID, 1);
         Class<PCAFilteredRunner<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
         pca = pcaParameters.tryInstantiate(cls);
-        for(ParameterException e : pcaParameters.getErrors()) {
+        for (ParameterException e : pcaParameters.getErrors()) {
           LoggingUtil.warning("Error in internal parameterization: " + e.getMessage());
         }
 
-        final ArrayList<ParameterConstraint<Number>> deltaCons = new ArrayList<ParameterConstraint<Number>>();
+        final ArrayList<ParameterConstraint<? super Double>> deltaCons = new ArrayList<ParameterConstraint<? super Double>>();
         // TODO: this constraint is already set in the parameter itself, since
         // it
         // also applies to the relative case, right? -- erich
         // deltaCons.add(new GreaterEqualConstraint(0));
         deltaCons.add(new LessEqualConstraint(1));
 
-        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(deltaP, deltaCons, absoluteF, false);
+        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Double>(deltaP, deltaCons, absoluteF, false);
         config.checkConstraint(gpc);
       }
 

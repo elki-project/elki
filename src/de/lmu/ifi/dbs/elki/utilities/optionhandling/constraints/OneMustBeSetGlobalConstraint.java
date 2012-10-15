@@ -41,7 +41,7 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
   /**
    * List of parameters to be checked.
    */
-  private List<Parameter<?,?>> parameters;
+  private List<Parameter<?>> parameters;
 
   /**
    * Creates a One-Must-Be-Set global parameter constraint. That is, at least
@@ -49,7 +49,7 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    * 
    * @param params list of parameters
    */
-  public OneMustBeSetGlobalConstraint(List<Parameter<?,?>> params) {
+  public OneMustBeSetGlobalConstraint(List<Parameter<?>> params) {
     parameters = params;
   }
 
@@ -60,8 +60,8 @@ public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
    */
   @Override
   public void test() throws ParameterException {
-    for(Parameter<?, ?> p : parameters) {
-      if(p.isDefined()) {
+    for (Parameter<?> p : parameters) {
+      if (p.isDefined()) {
         return;
       }
     }

@@ -99,7 +99,7 @@ public class MergedParameterization implements Parameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
     try {
       if(current.setValueForOption(opt)) {
         used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
@@ -140,7 +140,7 @@ public class MergedParameterization implements Parameterization {
   }
 
   @Override
-  public boolean grab(Parameter<?, ?> opt) {
+  public boolean grab(Parameter<?> opt) {
     try {
       if (setValueForOption(opt)) {
         return true;

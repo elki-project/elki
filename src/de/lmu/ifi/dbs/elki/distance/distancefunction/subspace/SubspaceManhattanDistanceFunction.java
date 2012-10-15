@@ -66,6 +66,7 @@ public class SubspaceManhattanDistanceFunction extends SubspaceLPNormDistanceFun
     return sum;
   }
 
+  @Override
   protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
     if(mbr.getDimensionality() != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());

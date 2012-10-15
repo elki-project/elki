@@ -33,7 +33,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -89,7 +90,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuilder msg = new StringBuilder();
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       msg.append("alpha = ").append(alpha);
       msg.append("\nsortedEigenPairs = ").append(eigenPairs);
     }
@@ -100,34 +101,32 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
 
     // determine sum of eigenvalues
     double totalSum = 0;
-    for(int i = 0; i < eigenPairs.size(); i++) {
+    for (int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       totalSum += eigenPair.getEigenvalue();
     }
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       msg.append("\ntotalSum = ").append(totalSum);
     }
 
     // determine strong and weak eigenpairs
     double currSum = 0;
     boolean found = false;
-    for(int i = 0; i < eigenPairs.size(); i++) {
+    for (int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       currSum += eigenPair.getEigenvalue();
-      if(currSum / totalSum >= alpha) {
-        if(!found) {
+      if (currSum / totalSum >= alpha) {
+        if (!found) {
           found = true;
           strongEigenPairs.add(eigenPair);
-        }
-        else {
+        } else {
           weakEigenPairs.add(eigenPair);
         }
-      }
-      else {
+      } else {
         strongEigenPairs.add(eigenPair);
       }
     }
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       LOG.debugFine(msg.toString());
@@ -153,8 +152,10 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
-      if(config.grab(alphaP)) {
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA);
+      alphaP.addConstraint(new GreaterConstraint(0.0));
+      alphaP.addConstraint(new LessConstraint(1.0));
+      if (config.grab(alphaP)) {
         alpha = alphaP.getValue();
       }
     }

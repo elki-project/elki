@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -131,7 +132,7 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
 
   /**
    * Constructor.
-   *
+   * 
    * @param distanceFunction Distance function
    * @param mu Mu parameter
    */
@@ -146,26 +147,29 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
     int mu = -1;
-    
+
     PCABasedCorrelationDistanceFunction distance;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter muP = new IntParameter(MU_ID, new GreaterConstraint(0));
+      IntParameter muP = new IntParameter(MU_ID);
+      muP.addConstraint(new GreaterConstraint(0));
       if (config.grab(muP)) {
         mu = muP.getValue();
       }
 
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      kP.setOptional(true);
       final int k;
       if (config.grab(kP)) {
         k = kP.getValue();
@@ -173,13 +177,16 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
         k = mu;
       }
 
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), DEFAULT_DELTA);
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, DEFAULT_DELTA);
+      deltaP.addConstraint(new GreaterEqualConstraint(0));
       double delta = DEFAULT_DELTA;
       if (config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }
 
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, DEFAULT_ALPHA);
+      alphaP.addConstraint(new GreaterConstraint(0.0));
+      alphaP.addConstraint(new LessConstraint(1.0));
       double alpha = DEFAULT_ALPHA;
       if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();

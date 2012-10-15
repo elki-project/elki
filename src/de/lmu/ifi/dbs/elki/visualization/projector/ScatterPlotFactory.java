@@ -107,7 +107,8 @@ public class ScatterPlotFactory implements ProjectorFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter maxdimP = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), MAX_DIMENSIONS_DEFAULT);
+      IntParameter maxdimP = new IntParameter(MAXDIM_ID, MAX_DIMENSIONS_DEFAULT);
+      maxdimP.addConstraint(new GreaterEqualConstraint(1));
       if(config.grab(maxdimP)) {
         maxdim = maxdimP.intValue();
       }

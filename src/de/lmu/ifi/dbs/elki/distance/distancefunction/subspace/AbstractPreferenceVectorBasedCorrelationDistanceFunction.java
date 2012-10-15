@@ -92,15 +92,16 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
+    if (!this.getClass().equals(obj.getClass())) {
       return false;
     }
     AbstractPreferenceVectorBasedCorrelationDistanceFunction<?, ?> other = (AbstractPreferenceVectorBasedCorrelationDistanceFunction<?, ?>) obj;
     return (this.indexFactory.equals(other.indexFactory)) && this.epsilon == other.epsilon;
   }
+
   /**
    * Instance to compute the distances on an actual database.
    * 
@@ -157,13 +158,13 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
      *         to the given preference vector
      */
     public double weightedDistance(V v1, V v2, BitSet weightVector) {
-      if(v1.getDimensionality() != v2.getDimensionality()) {
+      if (v1.getDimensionality() != v2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
       }
 
       double sqrDist = 0;
-      for(int i = 0; i < v1.getDimensionality(); i++) {
-        if(weightVector.get(i)) {
+      for (int i = 0; i < v1.getDimensionality(); i++) {
+        if (weightVector.get(i)) {
           double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
           sqrDist += manhattanI * manhattanI;
         }
@@ -220,8 +221,9 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     }
 
     protected void configEpsilon(Parameterization config) {
-      final DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
-      if(config.grab(epsilonP)) {
+      final DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001);
+      epsilonP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
     }

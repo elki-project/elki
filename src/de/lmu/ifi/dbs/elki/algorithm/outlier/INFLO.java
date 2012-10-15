@@ -1,26 +1,27 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -140,7 +141,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // density
     WritableDoubleDataStore density = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // init knns and rnns
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       knns.put(iditer, DBIDUtil.newArray());
       rnns.put(iditer, DBIDUtil.newArray());
     }
@@ -148,10 +149,10 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // TODO: use kNN preprocessor?
     KNNQuery<O, D> knnQuery = database.getKNNQuery(distFunc, k, DatabaseQuery.HINT_HEAVY_USE);
 
-    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       // if not visited count=0
       int count = rnns.get(id).size();
-      if(!processedIDs.contains(id)) {
+      if (!processedIDs.contains(id)) {
         // TODO: use exactly k neighbors?
         KNNResult<D> list = knnQuery.getKNNForDBID(id, k);
         knns.get(id).addDBIDs(list);
@@ -161,7 +162,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       }
       ModifiableDBIDs s = knns.get(id);
       for (DBIDIter q = knns.get(id).iter(); q.valid(); q.advance()) {
-        if(!processedIDs.contains(q)) {
+        if (!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors?
           KNNResult<D> listQ = knnQuery.getKNNForDBID(q, k);
           knns.get(q).addDBIDs(listQ);
@@ -169,13 +170,13 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
           processedIDs.add(q);
         }
 
-        if(knns.get(q).contains(id)) {
+        if (knns.get(q).contains(id)) {
           rnns.get(q).add(id);
           rnns.get(id).add(q);
           count++;
         }
       }
-      if(count >= s.size() * m) {
+      if (count >= s.size() * m) {
         pruned.add(id);
       }
     }
@@ -184,8 +185,8 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     // IF Object is pruned INFLO=1.0
     DoubleMinMax inflominmax = new DoubleMinMax();
     WritableDoubleDataStore inflos = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-      if(!pruned.contains(id)) {
+    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+      if (!pruned.contains(id)) {
         ModifiableDBIDs knn = knns.get(id);
         ModifiableDBIDs rnn = rnns.get(id);
 
@@ -201,7 +202,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
         inflominmax.put(den);
 
       }
-      if(pruned.contains(id)) {
+      if (pruned.contains(id)) {
         inflos.putDouble(id, 1.0);
         inflominmax.put(1.0);
       }
@@ -225,9 +226,9 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
 
   /**
    * Parameterization class.
-   *
+   * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
@@ -238,13 +239,15 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter mP = new DoubleParameter(M_ID, new GreaterConstraint(0.0), 1.0);
-      if(config.grab(mP)) {
+      final DoubleParameter mP = new DoubleParameter(M_ID, 1.0);
+      mP.addConstraint(new GreaterConstraint(0.0));
+      if (config.grab(mP)) {
         m = mP.doubleValue();
       }
 
-      final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
-      if(config.grab(kP)) {
+      final IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(1));
+      if (config.grab(kP)) {
         k = kP.intValue();
       }
     }

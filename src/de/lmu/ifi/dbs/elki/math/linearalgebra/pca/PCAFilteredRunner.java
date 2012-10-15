@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -208,18 +207,20 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
-      if(config.grab(filterP)) {
+      if (config.grab(filterP)) {
         eigenPairFilter = filterP.instantiateClass(config);
       }
 
-      DoubleParameter bigP = new DoubleParameter(BIG_ID, new GreaterConstraint(0), 1.0);
-      if(config.grab(bigP)) {
+      DoubleParameter bigP = new DoubleParameter(BIG_ID, 1.0);
+      bigP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(bigP)) {
         big = bigP.getValue();
 
       }
 
-      DoubleParameter smallP = new DoubleParameter(SMALL_ID, new GreaterEqualConstraint(0), 0.0);
-      if(config.grab(smallP)) {
+      DoubleParameter smallP = new DoubleParameter(SMALL_ID, 0.0);
+      smallP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(smallP)) {
         small = smallP.getValue();
       }
 

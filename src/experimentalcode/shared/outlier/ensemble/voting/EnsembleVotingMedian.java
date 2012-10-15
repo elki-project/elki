@@ -45,7 +45,7 @@ public class EnsembleVotingMedian implements EnsembleVoting {
   /**
    * Quantile parameter
    */
-  private final DoubleParameter QUANTILE_PARAM = new DoubleParameter(QUANTILE_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
+  private final DoubleParameter QUANTILE_PARAM = new DoubleParameter(QUANTILE_ID, 0.5, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.CLOSE));
 
   /**
    * Quantile to use

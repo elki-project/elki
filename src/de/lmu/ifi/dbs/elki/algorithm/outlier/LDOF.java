@@ -195,7 +195,8 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+      final IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(1));
       if(config.grab(kP)) {
         k = kP.getValue();
       }

@@ -97,23 +97,23 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
 
     // Compute mean from minmax.
     double[] mean = new double[dim];
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) * .5;
     }
 
     int gridpoints = Math.max(1, (int) Math.pow(gridres + 1, dim));
     ArrayList<V> result = new ArrayList<V>(gridpoints);
     double[] delta = new double[dim];
-    if(gridres > 0) {
+    if (gridres > 0) {
       double halfgrid = gridres / 2.0;
-      for(int d = 0; d < dim; d++) {
+      for (int d = 0; d < dim; d++) {
         delta[d] = (minmax.second.doubleValue(d) - minmax.first.doubleValue(d)) / gridres;
       }
 
       double[] vec = new double[dim];
-      for(int i = 0; i < gridpoints; i++) {
+      for (int i = 0; i < gridpoints; i++) {
         int acc = i;
-        for(int d = 0; d < dim; d++) {
+        for (int d = 0; d < dim; d++) {
           int coord = acc % (gridres + 1);
           acc = acc / (gridres + 1);
           vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
@@ -122,8 +122,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
         // logger.debug("New reference point: " + FormatUtil.format(vec));
         result.add(newp);
       }
-    }
-    else {
+    } else {
       result.add(factory.newNumberVector(mean));
       // logger.debug("New reference point: " + FormatUtil.format(mean));
     }
@@ -152,13 +151,15 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter gridP = new IntParameter(GRID_ID, new GreaterEqualConstraint(0), 1);
-      if(config.grab(gridP)) {
+      IntParameter gridP = new IntParameter(GRID_ID, 1);
+      gridP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(gridP)) {
         gridres = gridP.getValue();
       }
 
-      DoubleParameter gridscaleP = new DoubleParameter(GRID_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
-      if(config.grab(gridscaleP)) {
+      DoubleParameter gridscaleP = new DoubleParameter(GRID_SCALE_ID, 1.0);
+      gridscaleP.addConstraint(new GreaterEqualConstraint(0.0));
+      if (config.grab(gridscaleP)) {
         gridscale = gridscaleP.getValue();
       }
     }

@@ -190,7 +190,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return generated title
    */
   public static String getTitle(Database db, Result result) {
-    List<Pair<Object, Parameter<?, ?>>> settings = new ArrayList<Pair<Object, Parameter<?, ?>>>();
+    List<Pair<Object, Parameter<?>>> settings = new ArrayList<Pair<Object, Parameter<?>>>();
     for (SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
@@ -198,7 +198,7 @@ public class VisualizerParameterizer implements Parameterizable {
     String distance = null;
     String dataset = null;
 
-    for (Pair<Object, Parameter<?, ?>> setting : settings) {
+    for (Pair<Object, Parameter<?>> setting : settings) {
       if (setting.second.equals(OptionID.ALGORITHM)) {
         algorithm = setting.second.getValue().toString();
       }
@@ -264,7 +264,8 @@ public class VisualizerParameterizer implements Parameterizable {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplingP = new IntParameter(SAMPLING_ID, new GreaterEqualConstraint(-1), 10000);
+      IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000);
+      samplingP.addConstraint(new GreaterEqualConstraint(-1));
       if (config.grab(samplingP)) {
         samplesize = samplingP.intValue();
       }

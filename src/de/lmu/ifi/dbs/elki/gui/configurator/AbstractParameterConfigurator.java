@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * 
  * @param <T> parameter type
  */
-public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> implements ParameterConfigurator {
+public abstract class AbstractParameterConfigurator<T extends Parameter<?>> implements ParameterConfigurator {
   /**
    * The parameter to configure
    */
@@ -109,7 +109,7 @@ public abstract class AbstractParameterConfigurator<T extends Parameter<?, ?>> i
   }
 
   @Override
-  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
+  public void addParameter(Object owner, Parameter<?> param, TrackParameters track) {
     LoggingUtil.warning(this.getClass() + " does not support sub-parameters!");
   }
 

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @author Erich Schubert
  */
-public class RandomParameter extends AbstractParameter<RandomFactory, RandomFactory> {
+public class RandomParameter extends AbstractParameter<RandomFactory> {
   /**
    * Seed value, if used
    */

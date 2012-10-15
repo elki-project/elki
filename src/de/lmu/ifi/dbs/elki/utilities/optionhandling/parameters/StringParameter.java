@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -37,42 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class StringParameter extends AbstractParameter<String, String> {
-  /**
-   * Constructs a string parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param defaultValue the default value of the parameter
-   */
-  public StringParameter(OptionID optionID, List<ParameterConstraint<String>> constraint, String defaultValue) {
-    super(optionID, constraint, defaultValue);
-  }
-
-  /**
-   * Constructs a string parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraints parameter constraint
-   * @param optional Flag to signal an optional parameter.
-   */
-  public StringParameter(OptionID optionID, List<ParameterConstraint<String>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-  }
-
-  /**
-   * Constructs a string parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraints parameter constraint
-   */
-  public StringParameter(OptionID optionID, List<ParameterConstraint<String>> constraints) {
-    super(optionID, constraints);
-  }
-
+public class StringParameter extends AbstractParameter<String> {
   /**
    * Constructs a string parameter with the given optionID, constraints and
    * default value.
@@ -82,7 +45,8 @@ public class StringParameter extends AbstractParameter<String, String> {
    * @param defaultValue the default value of the parameter
    */
   public StringParameter(OptionID optionID, ParameterConstraint<String> constraint, String defaultValue) {
-    super(optionID, constraint, defaultValue);
+    super(optionID, defaultValue);
+    addConstraint(constraint);
   }
 
   /**
@@ -94,7 +58,8 @@ public class StringParameter extends AbstractParameter<String, String> {
    * @param optional Flag to signal an optional parameter.
    */
   public StringParameter(OptionID optionID, ParameterConstraint<String> constraint, boolean optional) {
-    super(optionID, constraint, optional);
+    super(optionID, optional);
+    addConstraint(constraint);
   }
 
   /**
@@ -105,7 +70,8 @@ public class StringParameter extends AbstractParameter<String, String> {
    * @param constraint parameter constraint
    */
   public StringParameter(OptionID optionID, ParameterConstraint<String> constraint) {
-    super(optionID, constraint);
+    super(optionID);
+    addConstraint(constraint);
   }
 
   /**

@@ -121,7 +121,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
     final DistanceQuery<V, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V, D> knnQuery = database.getKNNQuery(distQuery, relation.size());
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
@@ -130,7 +130,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
     // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, Vector> averages = new HashMap<Cluster<?>, Vector>(split.size());
     HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(split.size());
-    for(Cluster<?> clus : split) {
+    for (Cluster<?> clus : split) {
       CovarianceMatrix covmat = CovarianceMatrix.make(relation, clus.getIDs());
       averages.put(clus, covmat.getMeanVector());
       covmats.put(clus, covmat.destroyToNaiveMatrix());
@@ -138,42 +138,42 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
 
     AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Processing points...");
     }
     FiniteProgress rocloop = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
 
     // sort neighbors
-    for(Cluster<?> clus : split) {
+    for (Cluster<?> clus : split) {
       ArrayList<DoubleDBIDPair> cmem = new ArrayList<DoubleDBIDPair>(clus.size());
       Vector av = averages.get(clus);
       Matrix covm = covmats.get(clus);
 
-      for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
+      for (DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
         double d = MathUtil.mahalanobisDistance(covm, relation.get(iter).getColumnVector().minusEquals(av));
         cmem.add(DBIDUtil.newPair(d, iter));
       }
       Collections.sort(cmem);
 
-      for(int ind = 0; ind < cmem.size(); ind++) {
+      for (int ind = 0; ind < cmem.size(); ind++) {
         KNNResult<D> knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         hist.aggregate(((double) ind) / clus.size(), result);
 
-        if(rocloop != null) {
+        if (rocloop != null) {
           rocloop.incrementProcessed(LOG);
         }
       }
     }
-    if(rocloop != null) {
+    if (rocloop != null) {
       rocloop.ensureCompleted(LOG);
     }
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
-    for(DoubleObjPair<MeanVariance> pair : hist) {
+    for (DoubleObjPair<MeanVariance> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.first, pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getSampleVariance() });
       res.add(row);
     }
@@ -206,8 +206,9 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
-      if(config.grab(param)) {
+      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 20);
+      param.addConstraint(new GreaterEqualConstraint(2));
+      if (config.grab(param)) {
         numbins = param.getValue();
       }
     }

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
@@ -38,7 +37,7 @@ public class EmptyParameterization extends AbstractParameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) {
+  public boolean setValueForOption(Parameter<?> opt) {
     // Always return false, we don't have extra parameters,
     // This will cause {@link AbstractParameterization} to use the default values
     return false;

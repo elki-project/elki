@@ -570,7 +570,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+        final IntParameter minptsP = new IntParameter(MINPTS_ID);
+        minptsP.addConstraint(new GreaterConstraint(0));
         if(config.grab(minptsP)) {
           minpts = minptsP.getValue();
         }

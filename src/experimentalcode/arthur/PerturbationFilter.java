@@ -37,7 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.AllOrNoneMustBeSetGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualSizeGlobalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -61,7 +62,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   /**
    * Class logger
    */
-  private static final Logging logger = Logging.getLogger(PerturbationFilter.class);
+  private static final Logging LOG = Logging.getLogger(PerturbationFilter.class);
 
   /**
    * Scaling reference options.
@@ -173,7 +174,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
   @Override
   protected void prepareComplete() {
-    StringBuilder buf = logger.isDebuggingFine() ? new StringBuilder() : null;
+    StringBuilder buf = LOG.isDebuggingFine() ? new StringBuilder() : null;
     scalingreferencevalues = new double[dimensionality];
     randomPerAttribute = new Random[dimensionality];
     if (scalingreference == ScalingReference.STDDEV) {
@@ -207,7 +208,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     }
     mvs = null;
     if (buf != null) {
-      logger.debugFine(buf.toString());
+      LOG.debugFine(buf.toString());
     }
   }
 
@@ -333,24 +334,29 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
       if (config.grab(scalingReferenceP)) {
         scalingreference = scalingReferenceP.getValue();
       }
-      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), .01);
+      DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01);
+      percentageP.addConstraint(new GreaterConstraint(0));
+      percentageP.addConstraint(new LessEqualConstraint(1));
       if (config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }
-      LongParameter seedP = new LongParameter(SEED_ID, true);
+      LongParameter seedP = new LongParameter(SEED_ID);
+      seedP.setOptional(true);
       if (config.grab(seedP)) {
         seed = seedP.getValue();
       }
-      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID, true);
+      DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID);
+      minimaP.setOptional(true);
       if (config.grab(minimaP)) {
         minima = ArrayLikeUtil.toPrimitiveDoubleArray(minimaP.getValue());
       }
-      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID, true);
+      DoubleListParameter maximaP = new DoubleListParameter(MAXIMA_ID);
+      maximaP.setOptional(true);
       if (config.grab(maximaP)) {
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
-      ArrayList<Parameter<?, ?>> globalSetMinAndMax = new ArrayList<Parameter<?, ?>>();
+      ArrayList<Parameter<?>> globalSetMinAndMax = new ArrayList<Parameter<?>>();
       globalSetMinAndMax.add(minimaP);
       globalSetMinAndMax.add(maximaP);
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(globalSetMinAndMax));

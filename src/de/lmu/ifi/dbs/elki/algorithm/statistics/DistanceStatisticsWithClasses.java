@@ -75,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * set.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  */
@@ -160,35 +160,33 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     MeanVariance modif = new MeanVariance();
     // Histogram
     final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
-    if(stepprog != null) {
+    if (stepprog != null) {
       stepprog.beginStep(1, "Prepare histogram.", LOG);
     }
-    if(exact) {
+    if (exact) {
       gminmax = exactMinMax(relation, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
-    }
-    else if(sampling) {
+    } else if (sampling) {
       gminmax = sampleMinMax(relation, distFunc);
       histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
-    }
-    else {
+    } else {
       histogram = FlexiHistogram.LongSumLongSumHistogram(numbin);
     }
 
-    if(stepprog != null) {
+    if (stepprog != null) {
       stepprog.beginStep(2, "Build histogram.", LOG);
     }
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), LOG) : null;
     // iterate per cluster
     final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
     final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
-    for(Cluster<?> c1 : split) {
-      for(DBIDIter id1 = c1.getIDs().iter(); id1.valid(); id1.advance()) {
+    for (Cluster<?> c1 : split) {
+      for (DBIDIter id1 = c1.getIDs().iter(); id1.valid(); id1.advance()) {
         // in-cluster distances
         DoubleMinMax iminmax = new DoubleMinMax();
-        for(DBIDIter iter2 = c1.getIDs().iter(); iter2.valid(); iter2.advance()) {
+        for (DBIDIter iter2 = c1.getIDs().iter(); iter2.valid(); iter2.advance()) {
           // skip the point itself.
-          if(DBIDUtil.equal(id1, iter2)) {
+          if (DBIDUtil.equal(id1, iter2)) {
             continue;
           }
           double d = distFunc.distance(id1, iter2).doubleValue();
@@ -207,13 +205,13 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
 
         // other-cluster distances
         DoubleMinMax ominmax = new DoubleMinMax();
-        for(Cluster<?> c2 : split) {
-          if(c2 == c1) {
+        for (Cluster<?> c2 : split) {
+          if (c2 == c1) {
             continue;
           }
-          for(DBIDIter iter2 = c2.getIDs().iter(); iter2.valid(); iter2.advance()) {
+          for (DBIDIter iter2 = c2.getIDs().iter(); iter2.valid(); iter2.advance()) {
             // skip the point itself (shouldn't happen though)
-            if(DBIDUtil.equal(id1, iter2)) {
+            if (DBIDUtil.equal(id1, iter2)) {
               continue;
             }
             double d = distFunc.distance(id1, iter2).doubleValue();
@@ -230,33 +228,33 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         // min/max
         gominmax.put(ominmax.getMin());
         gominmax.put(ominmax.getMax());
-        if(progress != null) {
+        if (progress != null) {
           progress.incrementProcessed(LOG);
         }
       }
     }
-    if(progress != null) {
+    if (progress != null) {
       progress.ensureCompleted(LOG);
     }
     // Update values (only needed for sampling case).
     gminmax.setFirst(Math.min(giminmax.getMin(), gominmax.getMin()));
     gminmax.setSecond(Math.max(giminmax.getMax(), gominmax.getMax()));
 
-    if(stepprog != null) {
+    if (stepprog != null) {
       stepprog.setCompleted(LOG);
     }
 
     // count the number of samples we have in the data
     long inum = 0;
     long onum = 0;
-    for(DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
+    for (DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
       inum += ppair.getSecond().getFirst();
       onum += ppair.getSecond().getSecond();
     }
     long bnum = inum + onum;
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for(DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
+    for (DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
       final double icof = (inum == 0) ? 0 : ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize();
       final double icaf = ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize();
       final double ocof = (onum == 0) ? 0 : ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize();
@@ -297,26 +295,26 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     ArrayModifiableDBIDs randomset = DBIDUtil.newArray(randomsize);
 
     DBIDIter iter = relation.iterDBIDs();
-    if(!iter.valid()) {
+    if (!iter.valid()) {
       throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
     }
     DBID firstid = DBIDUtil.deref(iter);
     iter.advance();
     minhotset.add(DBIDUtil.newPair(Double.MAX_VALUE, firstid));
     maxhotset.add(DBIDUtil.newPair(Double.MIN_VALUE, firstid));
-    for(; iter.valid(); iter.advance()) {
+    for (; iter.valid(); iter.advance()) {
       // generate candidates for min distance.
       ArrayList<DoubleDBIDPair> np = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
-      for(DoubleDBIDPair pair : minhotset) {
+      for (DoubleDBIDPair pair : minhotset) {
         // skip the object itself
-        if(DBIDUtil.equal(iter, pair)) {
+        if (DBIDUtil.equal(iter, pair)) {
           continue;
         }
         double d = distFunc.distance(iter, pair).doubleValue();
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, pair));
       }
-      for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
+      for (DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
         double d = distFunc.distance(iter, iter2).doubleValue();
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
@@ -326,16 +324,16 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
 
       // generate candidates for max distance.
       ArrayList<DoubleDBIDPair> np2 = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
-      for(DoubleDBIDPair pair : minhotset) {
+      for (DoubleDBIDPair pair : minhotset) {
         // skip the object itself
-        if(DBIDUtil.equal(iter, pair)) {
+        if (DBIDUtil.equal(iter, pair)) {
           continue;
         }
         double d = distFunc.distance(iter, pair).doubleValue();
         np2.add(DBIDUtil.newPair(d, iter));
         np2.add(DBIDUtil.newPair(d, pair));
       }
-      for(DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
+      for (DBIDIter iter2 = randomset.iter(); iter2.valid(); iter2.advance()) {
         double d = distFunc.distance(iter, iter2).doubleValue();
         np.add(DBIDUtil.newPair(d, iter));
         np.add(DBIDUtil.newPair(d, iter2));
@@ -344,10 +342,9 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
       shrinkHeap(maxhotset, k);
 
       // update random set
-      if(randomset.size() < randomsize) {
+      if (randomset.size() < randomsize) {
         randomset.add(iter);
-      }
-      else if(rnd.nextDouble() < rprob) {
+      } else if (rnd.nextDouble() < rprob) {
         randomset.set((int) Math.floor(rnd.nextDouble() * randomsize), iter);
       }
     }
@@ -364,10 +361,10 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   private DoubleMinMax exactMinMax(Relation<O> relation, DistanceQuery<O, D> distFunc) {
     DoubleMinMax minmax = new DoubleMinMax();
     // find exact minimum and maximum first.
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for (DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
         // skip the point itself.
-        if(DBIDUtil.equal(iditer, iditer2)) {
+        if (DBIDUtil.equal(iditer, iditer2)) {
           continue;
         }
         double d = distFunc.distance(iditer, iditer2).doubleValue();
@@ -387,12 +384,11 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     // drop duplicates
     ModifiableDBIDs seenids = DBIDUtil.newHashSet(2 * k);
     int cnt = 0;
-    for(Iterator<DoubleDBIDPair> i = hotset.iterator(); i.hasNext();) {
+    for (Iterator<DoubleDBIDPair> i = hotset.iterator(); i.hasNext();) {
       DoubleDBIDPair p = i.next();
-      if(cnt > k || seenids.contains(p)) {
+      if (cnt > k || seenids.contains(p)) {
         i.remove();
-      }
-      else {
+      } else {
         seenids.add(p);
         cnt++;
       }
@@ -435,22 +431,23 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter numbinP = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 20);
-      if(config.grab(numbinP)) {
+      final IntParameter numbinP = new IntParameter(HISTOGRAM_BINS_ID, 20);
+      numbinP.addConstraint(new GreaterEqualConstraint(2));
+      if (config.grab(numbinP)) {
         numbin = numbinP.getValue();
       }
 
       final Flag exactF = new Flag(EXACT_ID);
-      if(config.grab(exactF)) {
+      if (config.grab(exactF)) {
         exact = exactF.getValue();
       }
 
       final Flag samplingF = new Flag(SAMPLING_ID);
-      if(config.grab(samplingF)) {
+      if (config.grab(samplingF)) {
         sampling = samplingF.getValue();
       }
 
-      ArrayList<Parameter<?, ?>> exclusive = new ArrayList<Parameter<?, ?>>();
+      ArrayList<Parameter<?>> exclusive = new ArrayList<Parameter<?>>();
       exclusive.add(exactF);
       exclusive.add(samplingF);
       config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));

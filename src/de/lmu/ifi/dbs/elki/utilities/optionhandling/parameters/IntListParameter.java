@@ -43,75 +43,36 @@ public class IntListParameter extends ListParameter<Integer> {
    * Constructs an integer list parameter
    * 
    * @param optionID the unique id of this parameter
-   * @param constraints the constraints of this parameter, may be null
-   * @param defaultValue the default value
-   */
-  public IntListParameter(OptionID optionID, List<ParameterConstraint<List<Integer>>> constraints, List<Integer> defaultValue) {
-    super(optionID, constraints, defaultValue);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraints the constraints of this parameter, may be null
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public IntListParameter(OptionID optionID, List<ParameterConstraint<List<Integer>>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraints the constraints of this parameter, may be null
-   */
-  /*public IntListParameter(OptionID optionID, List<ParameterConstraint<List<Integer>>> constraints) {
-    super(optionID, constraints);
-  } */
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
    * @param constraint the constraint of this parameter, may be null
    * @param defaultValue the default value
    */
-  public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint, List<Integer> defaultValue) {
-    super(optionID, constraint, defaultValue);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint, boolean optional) {
-    super(optionID, constraint, optional);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
-   */
-  public IntListParameter(OptionID optionID, ParameterConstraint<List<Integer>> constraint) {
-    super(optionID, constraint);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param defaultValue the default value
-   */
-  /*public IntListParameter(OptionID optionID, List<Integer> defaultValue) {
+  public IntListParameter(OptionID optionID, ParameterConstraint<? super List<? super Integer>> constraint, List<Integer> defaultValue) {
     super(optionID, defaultValue);
-  }*/
+    addConstraint(constraint);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID the unique id of this parameter
+   * @param constraint the constraint of this parameter, may be null
+   * @param optional specifies if this parameter is an optional parameter
+   */
+  public IntListParameter(OptionID optionID, ParameterConstraint<? super List<? super Integer>> constraint, boolean optional) {
+    super(optionID, optional);
+    addConstraint(constraint);
+  }
+
+  /**
+   * Constructs an integer list parameter
+   * 
+   * @param optionID the unique id of this parameter
+   * @param constraint the constraint of this parameter, may be null
+   */
+  public IntListParameter(OptionID optionID, ParameterConstraint<? super List<? super Integer>> constraint) {
+    super(optionID);
+    addConstraint(constraint);
+  }
 
   /**
    * Constructs an integer list parameter

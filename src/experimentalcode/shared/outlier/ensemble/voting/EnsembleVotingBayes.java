@@ -43,7 +43,7 @@ public class EnsembleVotingBayes implements EnsembleVoting {
   /**
    * Minimum vote to cast.
    */
-  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 0.5, IntervalConstraint.IntervalBoundary.OPEN), 0.05);
+  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, 0.05, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 0.5, IntervalConstraint.IntervalBoundary.OPEN));
 
   /**
    * Minimum vote to cast

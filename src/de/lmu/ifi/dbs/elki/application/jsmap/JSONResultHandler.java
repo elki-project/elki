@@ -28,7 +28,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -90,7 +91,9 @@ public class JSONResultHandler implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter portP = new IntParameter(PORT_ID, new IntervalConstraint(1, IntervalConstraint.IntervalBoundary.CLOSE, 65535, IntervalConstraint.IntervalBoundary.CLOSE), port);
+      IntParameter portP = new IntParameter(PORT_ID, port);
+      portP.addConstraint(new GreaterEqualConstraint(1));
+      portP.addConstraint(new LessEqualConstraint(65535));
       if(config.grab(portP)) {
         this.port = portP.getValue();
       }

@@ -118,7 +118,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
    * @return result
    */
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
+    if (relation.size() <= 0) {
       return new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
     }
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, getDistanceFunction());
@@ -126,7 +126,7 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, distQ));
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
     Mean[] mdists = Mean.newArray(k);
@@ -137,41 +137,41 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
 
     // Swap phase
     boolean changed = true;
-    while(changed) {
+    while (changed) {
       changed = false;
       // Try to swap the medoid with a better cluster member:
       int i = 0;
       for (DBIDIter miter = medoids.iter(); miter.valid(); miter.advance(), i++) {
         DBID best = null;
         Mean bestm = mdists[i];
-        for(DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
-          if(DBIDUtil.equal(miter, iter)) {
+        for (DBIDIter iter = clusters.get(i).iter(); iter.valid(); iter.advance()) {
+          if (DBIDUtil.equal(miter, iter)) {
             continue;
           }
           Mean mdist = new Mean();
-          for(DBIDIter iter2 = clusters.get(i).iter(); iter2.valid(); iter2.advance()) {
+          for (DBIDIter iter2 = clusters.get(i).iter(); iter2.valid(); iter2.advance()) {
             mdist.put(distQ.distance(iter, iter2).doubleValue());
           }
-          if(mdist.getMean() < bestm.getMean()) {
+          if (mdist.getMean() < bestm.getMean()) {
             best = DBIDUtil.deref(iter);
             bestm = mdist;
           }
         }
-        if(best != null && !DBIDUtil.equal(miter, best)) {
+        if (best != null && !DBIDUtil.equal(miter, best)) {
           changed = true;
           medoids.set(i, best);
           mdists[i] = bestm;
         }
       }
       // Reassign
-      if(changed) {
+      if (changed) {
         assignToNearestCluster(medoids, mdists, clusters, distQ);
       }
     }
 
     // Wrap result
     Clustering<MedoidModel> result = new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
+    for (int i = 0; i < clusters.size(); i++) {
       MedoidModel model = new MedoidModel(medoids.get(i));
       result.addCluster(new Cluster<MedoidModel>(clusters.get(i), model));
     }
@@ -192,27 +192,27 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     boolean changed = false;
 
     double[] dists = new double[k];
-    for(DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = distQ.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
       int minIndex = 0;
       double mindist = Double.POSITIVE_INFINITY;
       {
         int i = 0;
-        for(DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
+        for (DBIDIter miter = means.iter(); miter.valid(); miter.advance(), i++) {
           dists[i] = distQ.distance(iditer, miter).doubleValue();
-          if(dists[i] < mindist) {
+          if (dists[i] < mindist) {
             minIndex = i;
             mindist = dists[i];
           }
         }
       }
-      if(clusters.get(minIndex).add(iditer)) {
+      if (clusters.get(minIndex).add(iditer)) {
         changed = true;
         mdist[minIndex].put(mindist);
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for (int i = 0; i < k; i++) {
-          if(i != minIndex) {
-            if(clusters.get(i).remove(iditer)) {
+          if (i != minIndex) {
+            if (clusters.get(i).remove(iditer)) {
               mdist[minIndex].put(dists[i], -1);
               break;
             }
@@ -250,18 +250,20 @@ public class KMedoidsEM<V, D extends NumberDistance<D, ?>> extends AbstractDista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(KMeans.K_ID, new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      IntParameter kP = new IntParameter(KMeans.K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
         k = kP.intValue();
       }
 
       ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
-      if(config.grab(initialP)) {
+      if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, new GreaterEqualConstraint(0), 0);
-      if(config.grab(maxiterP)) {
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0);
+      maxiterP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }
     }

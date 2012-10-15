@@ -90,7 +90,8 @@ public class HistogramFactory implements ProjectorFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter maxdimP = new IntParameter(ScatterPlotFactory.Parameterizer.MAXDIM_ID, new GreaterEqualConstraint(1), ScatterPlotFactory.MAX_DIMENSIONS_DEFAULT);
+      IntParameter maxdimP = new IntParameter(ScatterPlotFactory.Parameterizer.MAXDIM_ID, ScatterPlotFactory.MAX_DIMENSIONS_DEFAULT);
+      maxdimP.addConstraint(new GreaterEqualConstraint(1));
       if(config.grab(maxdimP)) {
         maxdim = maxdimP.intValue();
       }

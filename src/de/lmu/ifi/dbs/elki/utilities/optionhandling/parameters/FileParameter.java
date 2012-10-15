@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Erich Schubert
  */
 // TODO: turn FileType into a Constraint?
-public class FileParameter extends AbstractParameter<File, File> {
+public class FileParameter extends AbstractParameter<File> {
   /**
    * Available file types: {@link #INPUT_FILE} denotes an input file,
    * {@link #OUTPUT_FILE} denotes an output file.

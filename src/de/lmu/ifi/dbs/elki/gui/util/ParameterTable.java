@@ -147,7 +147,7 @@ public class ParameterTable extends JTable {
         return;
       }
       if(value instanceof DynamicParameters.Node) {
-        Parameter<?, ?> o = ((DynamicParameters.Node) value).param;
+        Parameter<?> o = ((DynamicParameters.Node) value).param;
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuilder buf = new StringBuilder();
         for(int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
@@ -230,7 +230,7 @@ public class ParameterTable extends JTable {
         comboBox.setSelectedIndex(0);
       }
       if(row < parameters.size()) {
-        Parameter<?, ?> option = parameters.getNode(row).param;
+        Parameter<?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
         if(option instanceof ClassParameter<?>) {
           ClassParameter<?> cp = (ClassParameter<?>) option;
@@ -347,7 +347,7 @@ public class ParameterTable extends JTable {
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       if(row < parameters.size()) {
-        Parameter<?, ?> option = parameters.getNode(row).param;
+        Parameter<?> option = parameters.getNode(row).param;
         if(option instanceof FileParameter) {
           FileParameter fp = (FileParameter) option;
           File f = null;
@@ -519,7 +519,7 @@ public class ParameterTable extends JTable {
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
       combo.removeAllItems();
       if(row < parameters.size()) {
-        Parameter<?, ?> option = parameters.getNode(row).param;
+        Parameter<?> option = parameters.getNode(row).param;
         // We can do dropdown choices for class parameters
         if(option instanceof ClassListParameter<?>) {
           ClassListParameter<?> cp = (ClassListParameter<?>) option;
@@ -620,7 +620,7 @@ public class ParameterTable extends JTable {
         }
       }
       if(row < parameters.size()) {
-        Parameter<?, ?> option = parameters.getNode(row).param;
+        Parameter<?> option = parameters.getNode(row).param;
         if(option instanceof Flag) {
           activeEditor = dropdownEditor;
           return dropdownEditor.getTableCellEditorComponent(table, value, isSelected, row, column);

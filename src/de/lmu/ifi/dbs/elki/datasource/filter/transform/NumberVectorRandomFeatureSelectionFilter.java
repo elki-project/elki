@@ -155,7 +155,8 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, new GreaterEqualConstraint(Integer.valueOf(1)), Integer.valueOf(1));
+      IntParameter kP = new IntParameter(NUMBER_SELECTED_ATTRIBUTES_ID, 1);
+      kP.addConstraint(new GreaterEqualConstraint(1));
       if (config.grab(kP)) {
         k = kP.getValue().intValue();
       }

@@ -166,7 +166,8 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimP = new IntParameter(DIM_ID, new GreaterEqualConstraint(0));
+      final IntParameter dimP = new IntParameter(DIM_ID);
+      dimP.addConstraint(new GreaterEqualConstraint(0));
       if(config.grab(dimP)) {
         dim = dimP.getValue();
       }

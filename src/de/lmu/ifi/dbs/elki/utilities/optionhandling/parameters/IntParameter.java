@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -42,46 +40,14 @@ public class IntParameter extends NumberParameter<Integer> {
    * constraint, and default value.
    * 
    * @param optionID optionID the unique id of the option
-   * @param constraints the constraint for this integer parameter
    * @param defaultValue the default value
-   */
-  public IntParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, int defaultValue) {
-    super(optionID, constraints, Integer.valueOf(defaultValue));
-  }
-
-  /**
-   * Constructs an integer parameter with the given optionID, parameter
-   * constraint, and optional flag.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param constraints the constraint for this integer parameter
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public IntParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-  }
-
-  /**
-   * Constructs an integer parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID optionID the unique id of the option
-   * @param constraints the constraint for this integer parameter
-   */
-  public IntParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints) {
-    super(optionID, constraints);
-  }
-
-  /**
-   * Constructs an integer parameter with the given optionID, parameter
-   * constraint, and default value.
-   * 
-   * @param optionID optionID the unique id of the option
    * @param constraint the constraint for this integer parameter
-   * @param defaultValue the default value
+   * @deprecated Use {@link #addConstraint} instead.
    */
-  public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, int defaultValue) {
-    super(optionID, constraint, Integer.valueOf(defaultValue));
+  @Deprecated
+  public IntParameter(OptionID optionID, int defaultValue, ParameterConstraint<Number> constraint) {
+    super(optionID, Integer.valueOf(defaultValue));
+    addConstraint(constraint);
   }
 
   /**
@@ -91,9 +57,12 @@ public class IntParameter extends NumberParameter<Integer> {
    * @param optionID optionID the unique id of the option
    * @param constraint the constraint for this integer parameter
    * @param optional specifies if this parameter is an optional parameter
+   * @deprecated Use {@link #addConstraint} instead.
    */
+  @Deprecated
   public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
-    super(optionID, constraint, optional);
+    super(optionID, optional);
+    addConstraint(constraint);
   }
 
   /**
@@ -102,9 +71,12 @@ public class IntParameter extends NumberParameter<Integer> {
    * 
    * @param optionID optionID the unique id of the option
    * @param constraint the constraint for this integer parameter
+   * @deprecated Use {@link #addConstraint} instead.
    */
+  @Deprecated
   public IntParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
-    super(optionID, constraint);
+    super(optionID);
+    addConstraint(constraint);
   }
 
   /**
@@ -113,8 +85,8 @@ public class IntParameter extends NumberParameter<Integer> {
    * @param optionID optionID the unique id of the option
    * @param defaultValue the default value
    */
-  public IntParameter(OptionID optionID, Integer defaultValue) {
-    super(optionID, defaultValue);
+  public IntParameter(OptionID optionID, int defaultValue) {
+    super(optionID, Integer.valueOf(defaultValue));
   }
 
   /**
@@ -122,7 +94,9 @@ public class IntParameter extends NumberParameter<Integer> {
    * 
    * @param optionID optionID the unique id of the option
    * @param optional specifies if this parameter is an optional parameter
+   * @deprecated Use {@link #setOptional} instead.
    */
+  @Deprecated
   public IntParameter(OptionID optionID, boolean optional) {
     super(optionID, optional);
   }

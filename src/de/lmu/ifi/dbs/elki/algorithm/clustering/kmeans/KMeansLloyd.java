@@ -95,24 +95,24 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
    * @return result
    */
   public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
+    if (relation.size() <= 0) {
       return new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
 
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(LOG.isVerbose()) {
+    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+      if (LOG.isVerbose()) {
         LOG.verbose("K-Means iteration " + (iteration + 1));
       }
       boolean changed = assignToNearestCluster(relation, means, clusters);
       // Stop if no cluster assignment changed.
-      if(!changed) {
+      if (!changed) {
         break;
       }
       // Recompute means.
@@ -121,7 +121,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
+    for (int i = 0; i < clusters.size(); i++) {
       KMeansModel<V> model = new KMeansModel<V>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
       result.addCluster(new Cluster<KMeansModel<V>>(clusters.get(i), model));
     }
@@ -159,18 +159,20 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
         k = kP.getValue();
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
-      if(config.grab(initialP)) {
+      if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
-      if(config.grab(maxiterP)) {
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
+      maxiterP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }
     }

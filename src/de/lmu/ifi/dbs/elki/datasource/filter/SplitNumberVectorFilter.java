@@ -66,17 +66,17 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
 
   @Override
   public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
-    if(objects.dataLength() == 0) {
+    if (objects.dataLength() == 0) {
       return objects;
     }
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
 
-    for(int r = 0; r < objects.metaLength(); r++) {
+    for (int r = 0; r < objects.metaLength(); r++) {
       @SuppressWarnings("unchecked")
       SimpleTypeInformation<Object> type = (SimpleTypeInformation<Object>) objects.meta(r);
       @SuppressWarnings("unchecked")
       final List<Object> column = (List<Object>) objects.getColumn(r);
-      if(!getInputTypeRestriction().isAssignableFromType(type)) {
+      if (!getInputTypeRestriction().isAssignableFromType(type)) {
         bundle.appendColumn(type, column);
         continue;
       }
@@ -97,16 +97,16 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
       int[] odims = new int[vtype.getDimensionality() - dims.length];
       {
         int i = 0;
-        for(int d = 0; d < vtype.getDimensionality(); d++) {
+        for (int d = 0; d < vtype.getDimensionality(); d++) {
           boolean found = false;
-          for(int j = 0; j < dims.length; j++) {
-            if(dims[j] == d) {
+          for (int j = 0; j < dims.length; j++) {
+            if (dims[j] == d) {
               found = true;
               break;
             }
           }
-          if(!found) {
-            if(i >= odims.length) {
+          if (!found) {
+            if (i >= odims.length) {
               throw new AbortException("Dimensionalities not proper!");
             }
             odims[i] = d;
@@ -115,15 +115,15 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
         }
       }
       // Splitting scan.
-      for(int i = 0; i < objects.dataLength(); i++) {
+      for (int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
         final V obj = (V) column.get(i);
         double[] part1 = new double[dims.length];
         double[] part2 = new double[obj.getDimensionality() - dims.length];
-        for(int d = 0; d < dims.length; d++) {
+        for (int d = 0; d < dims.length; d++) {
           part1[d] = obj.doubleValue(dims[d]);
         }
-        for(int d = 0; d < odims.length; d++) {
+        for (int d = 0; d < odims.length; d++) {
           part2[d] = obj.doubleValue(odims[d]);
         }
         col1.add(factory.newNumberVector(part1));
@@ -141,7 +141,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
   private TypeInformation getInputTypeRestriction() {
     // Find maximum dimension requested
     int m = dims[0];
-    for(int i = 1; i < dims.length; i++) {
+    for (int i = 1; i < dims.length; i++) {
       m = Math.max(dims[i], m);
     }
     return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, m, Integer.MAX_VALUE);
@@ -168,11 +168,12 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID, new ListGreaterEqualConstraint<Integer>(Integer.valueOf(0)));
-      if(config.grab(selectedAttributesP)) {
+      IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
+      selectedAttributesP.addConstraint(new ListGreaterEqualConstraint(Integer.valueOf(0)));
+      if (config.grab(selectedAttributesP)) {
         List<Integer> dimensionList = selectedAttributesP.getValue();
         dims = new int[dimensionList.size()];
-        for(int i = 0; i < dimensionList.size(); i++) {
+        for (int i = 0; i < dimensionList.size(); i++) {
           dims[i] = dimensionList.get(i).intValue();
         }
       }

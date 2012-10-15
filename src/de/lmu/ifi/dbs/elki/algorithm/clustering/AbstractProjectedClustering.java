@@ -131,8 +131,8 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
     public static final OptionID K_I_ID = OptionID.getOrCreateOptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
 
     /**
-     * Parameter to specify the dimensionality of the clusters to find, must be an
-     * integer greater than 0.
+     * Parameter to specify the dimensionality of the clusters to find, must be
+     * an integer greater than 0.
      * <p>
      * Key: {@code -projectedclustering.l}
      * </p>
@@ -151,8 +151,9 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      * @param config Parameterization
      */
     protected void configK(Parameterization config) {
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
         k = kP.getValue();
       }
     }
@@ -163,8 +164,9 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      * @param config Parameterization
      */
     protected void configKI(Parameterization config) {
-      IntParameter k_iP = new IntParameter(K_I_ID, new GreaterConstraint(0), 30);
-      if(config.grab(k_iP)) {
+      IntParameter k_iP = new IntParameter(K_I_ID, 30);
+      k_iP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(k_iP)) {
         k_i = k_iP.getValue();
       }
     }
@@ -175,8 +177,9 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      * @param config Parameterization
      */
     protected void configL(Parameterization config) {
-      IntParameter lP = new IntParameter(L_ID, new GreaterConstraint(0));
-      if(config.grab(lP)) {
+      IntParameter lP = new IntParameter(L_ID);
+      lP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(lP)) {
         l = lP.getValue();
       }
     }

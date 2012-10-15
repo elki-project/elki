@@ -96,14 +96,14 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
     double[] centroid = new double[dim];
     double[] min = new double[dim];
     double[] max = new double[dim];
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       centroid[d] = 0;
       min[d] = Double.MAX_VALUE;
       max[d] = -Double.MAX_VALUE;
     }
-    for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
       V obj = database.get(iditer);
-      for(int d = 0; d < dim; d++) {
+      for (int d = 0; d < dim; d++) {
         double val = obj.doubleValue(d + 1);
         centroid[d] += val;
         min[d] = Math.min(min[d], val);
@@ -111,21 +111,21 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
       }
     }
     // finish centroid, scale min, max
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       centroid[d] = centroid[d] / database.size();
       min[d] = (min[d] - centroid[d]) * scale + centroid[d];
       max[d] = (max[d] - centroid[d]) * scale + centroid[d];
     }
 
     ArrayList<V> result = new ArrayList<V>(2 * dim + 1);
-    if(!nocenter) {
+    if (!nocenter) {
       result.add(factory.newNumberVector(centroid));
     }
     // Plus axis end points through centroid
     double[] vec = new double[dim];
-    for(int i = 0; i < dim; i++) {
-      for(int d = 0; d < dim; d++) {
-        if(d != i) {
+    for (int i = 0; i < dim; i++) {
+      for (int d = 0; d < dim; d++) {
+        if (d != i) {
           vec[d] = centroid[d];
         }
       }
@@ -160,12 +160,13 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag nocenterF = new Flag(NOCENTER_ID);
-      if(config.grab(nocenterF)) {
+      if (config.grab(nocenterF)) {
         nocenter = nocenterF.getValue();
       }
 
-      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
-      if(config.grab(scaleP)) {
+      DoubleParameter scaleP = new DoubleParameter(SCALE_ID, 1.0);
+      scaleP.addConstraint(new GreaterEqualConstraint(0.0));
+      if (config.grab(scaleP)) {
         scale = scaleP.getValue();
       }
     }

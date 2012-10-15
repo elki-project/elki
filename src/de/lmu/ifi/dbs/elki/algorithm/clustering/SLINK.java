@@ -629,7 +629,9 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter minclustersP = new IntParameter(SLINK_MINCLUSTERS_ID, new GreaterEqualConstraint(1), true);
+      IntParameter minclustersP = new IntParameter(SLINK_MINCLUSTERS_ID);
+      minclustersP.addConstraint(new GreaterEqualConstraint(1));
+      minclustersP.setOptional(true);
       if(config.grab(minclustersP)) {
         minclusters = minclustersP.intValue();
       }

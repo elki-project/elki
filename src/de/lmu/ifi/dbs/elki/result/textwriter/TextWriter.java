@@ -174,7 +174,7 @@ public class TextWriter {
     if(sr != null) {
       for(SettingsResult settings : sr) {
         Object last = null;
-        for(Pair<Object, Parameter<?, ?>> setting : settings.getSettings()) {
+        for(Pair<Object, Parameter<?>> setting : settings.getSettings()) {
           if(setting.first != last && setting.first != null) {
             if(last != null) {
               out.commentPrintLn("");

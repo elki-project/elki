@@ -62,8 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -342,7 +341,8 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(5));
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(5));
       if (config.grab(kP)) {
         k = kP.intValue();
       }
@@ -350,7 +350,9 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       if (config.grab(distP)) {
         dist = distP.getValue();
       }
-      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, new IntervalConstraint(0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN), 0.001);
+      DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.001);
+      expectP.addConstraint(new GreaterConstraint(0));
+      expectP.addConstraint(new LessConstraint(1.0));
       if (config.grab(expectP)) {
         expect = expectP.doubleValue();
       }

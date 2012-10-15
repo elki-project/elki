@@ -47,9 +47,9 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -210,15 +210,20 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID, new GreaterEqualConstraint(2));
+      final IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterEqualConstraint(2));
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.CLOSE), true);
+      final DoubleParameter samplingP = new DoubleParameter(SAMPLING_ID);
+      samplingP.addConstraint(new GreaterConstraint(0.0));
+      samplingP.addConstraint(new LessEqualConstraint(1.0));
+      samplingP.setOptional(true);
       if (config.grab(samplingP)) {
         sampling = samplingP.getValue();
       }
-      final LongParameter rndP = new LongParameter(SEED_ID, true);
+      final LongParameter rndP = new LongParameter(SEED_ID);
+      rndP.setOptional(true);
       if (config.grab(rndP)) {
         seed = rndP.getValue();
       }

@@ -45,7 +45,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
   /**
    * List of number parameters to be checked.
    */
-  private List<? extends AbstractParameter<?, ?>> parameters;
+  private List<? extends AbstractParameter<?>> parameters;
 
   /**
    * Constructs a Not-Equal-Value global parameter constraint. That is, the
@@ -54,7 +54,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
    * 
    * @param parameters list of number parameters to be tested
    */
-  public NoDuplicateValueGlobalConstraint(List<? extends AbstractParameter<?, ?>> parameters) {
+  public NoDuplicateValueGlobalConstraint(List<? extends AbstractParameter<?>> parameters) {
     this.parameters = parameters;
   }
 
@@ -65,7 +65,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
    * 
    * @param parameters list of number parameters to be tested
    */
-  public NoDuplicateValueGlobalConstraint(AbstractParameter<?, ?>... parameters) {
+  public NoDuplicateValueGlobalConstraint(AbstractParameter<?>... parameters) {
     this.parameters = Arrays.asList(parameters);
   }
 
@@ -78,7 +78,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
   public void test() throws ParameterException {
     Set<Object> numbers = new HashSet<Object>();
 
-    for(Parameter<?, ?> param : parameters) {
+    for(Parameter<?> param : parameters) {
       if(param.isDefined()) {
         if(!numbers.add(param.getValue())) {
           throw new WrongParameterValueException("Global Parameter Constraint Error:\n" + "Parameters " + OptionUtil.optionsNamesToString(parameters) + " must have different values. Current values: " + OptionUtil.parameterNamesAndValuesToString(parameters) + ".\n");

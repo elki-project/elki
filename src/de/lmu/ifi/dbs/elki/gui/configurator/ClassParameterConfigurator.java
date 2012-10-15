@@ -99,7 +99,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
   }
 
   @Override
-  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
+  public void addParameter(Object owner, Parameter<?> param, TrackParameters track) {
     child.addParameter(owner, param, track);
   }
 

@@ -89,7 +89,8 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter k_maxP = new IntParameter(K_MAX_ID, new GreaterConstraint(0));
+      IntParameter k_maxP = new IntParameter(K_MAX_ID);
+      k_maxP.addConstraint(new GreaterConstraint(0));
 
       if (config.grab(k_maxP)) {
         k_max = k_maxP.getValue();

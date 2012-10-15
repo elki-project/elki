@@ -263,9 +263,10 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
       }
 
       protected void configMinPts(Parameterization config) {
-        IntParameter minptsP = new IntParameter(AbstractProjectedDBSCAN.MINPTS_ID, new GreaterConstraint(0));
+        IntParameter minptsP = new IntParameter(AbstractProjectedDBSCAN.MINPTS_ID);
+        minptsP.addConstraint(new GreaterConstraint(0));
         if(config.grab(minptsP)) {
-          minpts = minptsP.getValue();
+          minpts = minptsP.intValue();
         }
       }
     }

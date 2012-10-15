@@ -61,7 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -550,8 +551,9 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractProjectedClustering.Parameterizer {
     /**
-     * Parameter to specify the factor for reducing the number of current clusters
-     * in each iteration, must be an integer greater than 0 and less than 1.
+     * Parameter to specify the factor for reducing the number of current
+     * clusters in each iteration, must be an integer greater than 0 and less
+     * than 1.
      * <p>
      * Default value: {@code 0.5}
      * </p>
@@ -587,7 +589,9 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
     }
 
     protected void configAlpha(Parameterization config) {
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE), 0.5);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
+      alphaP.addConstraint(new GreaterConstraint(0));
+      alphaP.addConstraint(new LessEqualConstraint(1));
       if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

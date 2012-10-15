@@ -310,7 +310,8 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
         outputAccuracy = outputAccuracyP.getValue();
       }
       
-      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID, true);
+      IntParameter sampleSizeP = new IntParameter(SAMPLE_SIZE_ID);
+      sampleSizeP.setOptional(true);
       sampleSizeP.addConstraint(new GreaterConstraint(0));
       if(config.grab(sampleSizeP)) {
         sampleSize = sampleSizeP.getValue();

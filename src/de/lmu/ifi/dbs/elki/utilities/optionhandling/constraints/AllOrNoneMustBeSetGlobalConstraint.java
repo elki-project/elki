@@ -41,7 +41,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
   /**
    * List of parameters to be checked
    */
-  private List<Parameter<?, ?>> parameterList;
+  private List<Parameter<?>> parameterList;
 
   /**
    * Constructs a global parameter constraint for testing if either all elements
@@ -49,7 +49,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
    * 
    * @param parameters list of parameters to be checked
    */
-  public AllOrNoneMustBeSetGlobalConstraint(List<Parameter<?, ?>> parameters) {
+  public AllOrNoneMustBeSetGlobalConstraint(List<Parameter<?>> parameters) {
     this.parameterList = parameters;
   }
 
@@ -63,7 +63,7 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
     ArrayList<String> set = new ArrayList<String>();
     ArrayList<String> notSet = new ArrayList<String>();
 
-    for(Parameter<?, ?> p : parameterList) {
+    for(Parameter<?> p : parameterList) {
       if(p.isDefined()) {
         set.add(p.getName());
       }

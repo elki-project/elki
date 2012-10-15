@@ -213,7 +213,8 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       if(config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
-      IntParameter maxkP = new IntParameter(MAX_K_ID, true);
+      IntParameter maxkP = new IntParameter(MAX_K_ID);
+      maxkP.setOptional(true);
       if(config.grab(maxkP)) {
         maxk = maxkP.getValue();
       }

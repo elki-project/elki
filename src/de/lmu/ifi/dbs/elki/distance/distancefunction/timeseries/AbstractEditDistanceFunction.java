@@ -29,8 +29,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -68,7 +68,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
     if (!this.getClass().equals(obj.getClass())) {
@@ -76,7 +76,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
     }
     return this.bandSize == ((AbstractEditDistanceFunction) obj).bandSize;
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -90,8 +90,10 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
-      if(config.grab(bandSizeP)) {
+      final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID, 0.1);
+      bandSizeP.addConstraint(new GreaterEqualConstraint(0));
+      bandSizeP.addConstraint(new LessEqualConstraint(1));
+      if (config.grab(bandSizeP)) {
         bandSize = bandSizeP.doubleValue();
       }
     }

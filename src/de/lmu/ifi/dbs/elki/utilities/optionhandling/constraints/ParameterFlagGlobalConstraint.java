@@ -43,14 +43,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @apiviz.uses 
  *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter
  * 
- * @param <C> Constraint type
  * @param <S> Parameter type
  */
-public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalParameterConstraint {
+public class ParameterFlagGlobalConstraint<S> implements GlobalParameterConstraint {
   /**
    * Parameter possibly to be checked.
    */
-  private Parameter<S, C> param;
+  private Parameter<S> param;
 
   /**
    * Flag the checking of the parameter constraints is dependent on.
@@ -65,7 +64,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
   /**
    * List of parameter constraints.
    */
-  private List<ParameterConstraint<S>> cons;
+  private List<ParameterConstraint<? super S>> cons;
 
   /**
    * Constructs a global parameter constraint specifying that the testing of the
@@ -79,7 +78,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
    * @param flagConstraint indicates at which status of the flag the parameter
    *        is to be checked
    */
-  public ParameterFlagGlobalConstraint(Parameter<S, C> p, List<ParameterConstraint<S>> c, Flag f, boolean flagConstraint) {
+  public ParameterFlagGlobalConstraint(Parameter<S> p, List<ParameterConstraint<? super S>> c, Flag f, boolean flagConstraint) {
     param = p;
     flag = f;
     this.flagConstraint = flagConstraint;
@@ -97,7 +96,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
     // only check constraints of param if flag is set
     if(flagConstraint == flag.getValue().booleanValue()) {
       if(cons != null) {
-        for(ParameterConstraint<? super C> c : cons) {
+        for(ParameterConstraint<? super S> c : cons) {
           c.test(param.getValue());
         }
       }
@@ -118,7 +117,7 @@ public class ParameterFlagGlobalConstraint<S, C extends S> implements GlobalPara
       description.append(param.getName()).append(" have to be fullfilled: ");
       if(cons != null) {
         for(int i = 0; i < cons.size(); i++) {
-          ParameterConstraint<? super C> c = cons.get(i);
+          ParameterConstraint<? super S> c = cons.get(i);
           if(i > 0) {
             description.append(", ");
           }

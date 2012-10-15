@@ -212,9 +212,10 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
       if(config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.intValue();
       }
       ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<PCAFilteredRunner<V>>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
       if(config.grab(pcaP)) {

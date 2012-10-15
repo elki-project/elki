@@ -50,7 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapLi
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -656,7 +657,8 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter xiP = new DoubleParameter(XI_ID);
-      xiP.addConstraint(new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
+      xiP.addConstraint(new GreaterEqualConstraint(0.0));
+      xiP.addConstraint(new LessConstraint(1.0));
       if(config.grab(xiP)) {
         xi = xiP.doubleValue();
       }

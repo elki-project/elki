@@ -820,11 +820,13 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        IntParameter pagesizeP = new IntParameter(TreeIndexFactory.PAGE_SIZE_ID, new GreaterConstraint(0), 1024);
+        IntParameter pagesizeP = new IntParameter(TreeIndexFactory.PAGE_SIZE_ID, 1024);
+        pagesizeP.addConstraint(new GreaterConstraint(0));
         if(config.grab(pagesizeP)) {
           pagesize = pagesizeP.getValue();
         }
-        IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID, new GreaterConstraint(2));
+        IntParameter partitionsP = new IntParameter(Factory.PARTITIONS_ID);
+        partitionsP.addConstraint(new GreaterConstraint(2));
         if(config.grab(partitionsP)) {
           numpart = partitionsP.getValue();
         }

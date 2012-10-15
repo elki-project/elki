@@ -57,7 +57,7 @@ public final class OptionUtil {
    * @param options the list of options
    * @return the names of the options
    */
-  public static <O extends Parameter<?, ?>> String optionsNamesToString(List<O> options) {
+  public static <O extends Parameter<?>> String optionsNamesToString(List<O> options) {
     StringBuilder buffer = new StringBuilder();
     buffer.append('[');
     for(int i = 0; i < options.size(); i++) {
@@ -78,7 +78,7 @@ public final class OptionUtil {
    * @param options the list of options
    * @return the names of the options
    */
-  public static <O extends Parameter<?, ?>> String optionsNamesToString(O[] options) {
+  public static <O extends Parameter<?>> String optionsNamesToString(O[] options) {
     StringBuilder buffer = new StringBuilder();
     buffer.append('[');
     for(int i = 0; i < options.length; i++) {
@@ -99,7 +99,7 @@ public final class OptionUtil {
    * @param parameters the list of number parameters
    * @return the names and the values of the parameters
    */
-  public static <N extends Parameter<?, ?>> String parameterNamesAndValuesToString(List<N> parameters) {
+  public static <N extends Parameter<?>> String parameterNamesAndValuesToString(List<N> parameters) {
     StringBuilder buffer = new StringBuilder();
     buffer.append('[');
     for(int i = 0; i < parameters.size(); i++) {
@@ -123,8 +123,8 @@ public final class OptionUtil {
    * @param indent Indentation string
    * @param options List of options
    */
-  public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<Pair<Object, Parameter<?, ?>>> options) {
-    for(Pair<Object, Parameter<?, ?>> pair : options) {
+  public static void formatForConsole(StringBuilder buf, int width, String indent, Collection<Pair<Object, Parameter<?>>> options) {
+    for(Pair<Object, Parameter<?>> pair : options) {
       String currentOption = pair.getSecond().getName();
       String syntax = pair.getSecond().getSyntax();
       String longDescription = pair.getSecond().getFullDescription();
@@ -196,7 +196,7 @@ public final class OptionUtil {
       TrackParameters track = new TrackParameters(config);
       @SuppressWarnings("unused")
       Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
-      Collection<Pair<Object, Parameter<?, ?>>> options = track.getAllParameters();
+      Collection<Pair<Object, Parameter<?>>> options = track.getAllParameters();
       if(options.size() > 0) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }

@@ -165,14 +165,15 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(1));
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(1));
       if(config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.intValue();
       }
 
       Flag binaryF = new Flag(BINARY_ID);
       if(config.grab(binaryF)) {
-        binary = binaryF.getValue();
+        binary = binaryF.isTrue();
       }
     }
 

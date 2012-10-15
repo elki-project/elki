@@ -72,7 +72,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Subspace Outlier Degree. Outlier detection method for axis-parallel subspaces.
+ * Subspace Outlier Degree. Outlier detection method for axis-parallel
+ * subspaces.
  * 
  * Reference:
  * <p>
@@ -158,8 +159,8 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Assigning Subspace Outlier Degree", relation.size(), LOG) : null;
     WritableDataStore<SODModel<?>> sod_models = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, SODModel.class);
     DoubleMinMax minmax = new DoubleMinMax();
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      if(progress != null) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      if (progress != null) {
         progress.incrementProcessed(LOG);
       }
       DBIDs knnList = getNearestNeighbors(relation, snnInstance, iter);
@@ -167,7 +168,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       sod_models.put(iter, model);
       minmax.put(model.getSod());
     }
-    if(progress != null) {
+    if (progress != null) {
       progress.ensureCompleted(LOG);
     }
     // combine results.
@@ -194,17 +195,17 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBIDRef queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
     Heap<DoubleDBIDPair> nearestNeighbors = new TiedTopBoundedHeap<DoubleDBIDPair>(knn);
-    for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
-      if(!DBIDUtil.equal(iter, queryObject)) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+      if (!DBIDUtil.equal(iter, queryObject)) {
         double sim = simQ.similarity(queryObject, iter).doubleValue();
-        if(sim > 0) {
+        if (sim > 0) {
           nearestNeighbors.add(DBIDUtil.newPair(sim, iter));
         }
       }
     }
     // Collect DBIDs
     ArrayModifiableDBIDs dbids = DBIDUtil.newArray(nearestNeighbors.size());
-    while(nearestNeighbors.size() > 0) {
+    while (nearestNeighbors.size() > 0) {
       dbids.add(nearestNeighbors.poll());
     }
     return dbids;
@@ -249,22 +250,22 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * @param queryObject Query object
      */
     public SODModel(Relation<V> relation, DBIDs neighborhood, double alpha, V queryObject) {
-      if(neighborhood.size() > 0) {
+      if (neighborhood.size() > 0) {
         // TODO: store database link?
         centerValues = new double[RelationUtil.dimensionality(relation)];
         variances = new double[centerValues.length];
-        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+        for (DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
           V databaseObject = relation.get(iter);
-          for(int d = 0; d < centerValues.length; d++) {
+          for (int d = 0; d < centerValues.length; d++) {
             centerValues[d] += databaseObject.doubleValue(d);
           }
         }
-        for(int d = 0; d < centerValues.length; d++) {
+        for (int d = 0; d < centerValues.length; d++) {
           centerValues[d] /= neighborhood.size();
         }
-        for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
+        for (DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
           V databaseObject = relation.get(iter);
-          for(int d = 0; d < centerValues.length; d++) {
+          for (int d = 0; d < centerValues.length; d++) {
             // distance
             double distance = centerValues[d] - databaseObject.doubleValue(d);
             // variance
@@ -272,21 +273,20 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           }
         }
         expectationOfVariance = 0;
-        for(int d = 0; d < variances.length; d++) {
+        for (int d = 0; d < variances.length; d++) {
           variances[d] /= neighborhood.size();
           expectationOfVariance += variances[d];
         }
         expectationOfVariance /= variances.length;
         weightVector = new BitSet(variances.length);
-        for(int d = 0; d < variances.length; d++) {
-          if(variances[d] < alpha * expectationOfVariance) {
+        for (int d = 0; d < variances.length; d++) {
+          if (variances[d] < alpha * expectationOfVariance) {
             weightVector.set(d, true);
           }
         }
         center = RelationUtil.getNumberVectorFactory(relation).newNumberVector(centerValues);
         sod = subspaceOutlierDegree(queryObject, center, weightVector);
-      }
-      else {
+      } else {
         center = queryObject;
         sod = 0.0;
       }
@@ -303,7 +303,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     private double subspaceOutlierDegree(V queryObject, V center, BitSet weightVector) {
       final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
       final int card = weightVector.cardinality();
-      if(card == 0) {
+      if (card == 0) {
         return 0;
       }
       double distance = df.distance(queryObject, center).doubleValue();
@@ -455,17 +455,19 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<SimilarityFunction<V, D>> simP = new ObjectParameter<SimilarityFunction<V, D>>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
-      if(config.grab(simP)) {
+      if (config.grab(simP)) {
         similarityFunction = simP.instantiateClass(config);
       }
 
-      final IntParameter knnP = new IntParameter(KNN_ID, new GreaterConstraint(0));
-      if(config.grab(knnP)) {
+      final IntParameter knnP = new IntParameter(KNN_ID);
+      knnP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(knnP)) {
         knn = knnP.getValue();
       }
 
-      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 1.1);
-      if(config.grab(alphaP)) {
+      final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.1);
+      alphaP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
     }

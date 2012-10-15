@@ -124,9 +124,9 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntListParameter param = new IntListParameter(BINSPERPLANE_ID, false);
-      param.addConstraint(new ListSizeConstraint<Integer>(3));
-      param.addConstraint(new ListGreaterEqualConstraint<Integer>(1));
+      final IntListParameter param = new IntListParameter(BINSPERPLANE_ID);
+      param.addConstraint(new ListSizeConstraint(3));
+      param.addConstraint(new ListGreaterEqualConstraint(1));
 
       if(config.grab(param)) {
         List<Integer> quant = param.getValue();

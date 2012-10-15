@@ -227,7 +227,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter partitionsP = new IntParameter(PARTITIONS_ID, new GreaterConstraint(1));
+        final IntParameter partitionsP = new IntParameter(PARTITIONS_ID);
+        partitionsP.addConstraint(new GreaterConstraint(1));
         if(config.grab(partitionsP)) {
           partitions = partitionsP.getValue();
         }

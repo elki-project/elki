@@ -42,7 +42,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
   /**
    * List of parameters to be checked.
    */
-  private List<Parameter<?, ?>> parameters;
+  private List<Parameter<?>> parameters;
 
   /**
    * Constructs a global parameter constraint for testing if only one parameter
@@ -50,7 +50,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
    * 
    * @param params list of parameters to be checked
    */
-  public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Parameter<?, ?>> params) {
+  public OnlyOneIsAllowedToBeSetGlobalConstraint(List<Parameter<?>> params) {
     parameters = params;
   }
 
@@ -61,7 +61,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
   @Override
   public void test() throws ParameterException {
     ArrayList<String> set = new ArrayList<String>();
-    for(Parameter<?, ?> p : parameters) {
+    for(Parameter<?> p : parameters) {
       if(p.isDefined()) {
         // FIXME: Retire the use of this constraint for Flags!
         if(p instanceof Flag) {

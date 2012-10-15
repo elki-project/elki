@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <D> distance value type
  */
 @Title("K-Medians")
-@Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url="http://nips.djvuzone.org/djvu/nips09/0368.djvu")
+@Reference(title = "Clustering via Concave Minimization", authors = "P. S. Bradley, O. L. Mangasarian, W. N. Street", booktitle = "Advances in neural information processing systems", url = "http://nips.djvuzone.org/djvu/nips09/0368.djvu")
 public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> extends AbstractKMeans<V, D, MeanModel<V>> {
   /**
    * The logger for this class.
@@ -91,24 +91,24 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
    * @return result
    */
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
+    if (relation.size() <= 0) {
       return new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
     List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
 
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(LOG.isVerbose()) {
+    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+      if (LOG.isVerbose()) {
         LOG.verbose("K-Medians iteration " + (iteration + 1));
       }
       boolean changed = assignToNearestCluster(relation, medians, clusters);
       // Stop if no cluster assignment changed.
-      if(!changed) {
+      if (!changed) {
         break;
       }
       // Recompute medians.
@@ -117,7 +117,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
+    for (int i = 0; i < clusters.size(); i++) {
       MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
       result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
     }
@@ -155,18 +155,20 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
         k = kP.intValue();
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
-      if(config.grab(initialP)) {
+      if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
-      if(config.grab(maxiterP)) {
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
+      maxiterP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(maxiterP)) {
         maxiter = maxiterP.intValue();
       }
     }

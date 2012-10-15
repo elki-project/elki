@@ -438,7 +438,8 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(K_ID, new GreaterConstraint(1));
+      final IntParameter pK = new IntParameter(K_ID);
+      pK.addConstraint(new GreaterConstraint(1));
       if(config.grab(pK)) {
         k = pK.getValue();
       }

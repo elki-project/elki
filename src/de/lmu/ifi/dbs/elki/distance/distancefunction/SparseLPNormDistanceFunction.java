@@ -139,7 +139,8 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter pP = new DoubleParameter(LPNormDistanceFunction.P_ID, new GreaterConstraint(0));
+      DoubleParameter pP = new DoubleParameter(LPNormDistanceFunction.P_ID);
+      pP.addConstraint(new GreaterConstraint(0));
       if(config.grab(pP)) {
         p = pP.getValue();
       }

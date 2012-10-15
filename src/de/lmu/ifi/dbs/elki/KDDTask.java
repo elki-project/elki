@@ -58,7 +58,7 @@ public class KDDTask implements Parameterizable {
   /**
    * The settings used, for settings reporting.
    */
-  private Collection<Pair<Object, Parameter<?, ?>>> settings;
+  private Collection<Pair<Object, Parameter<?>>> settings;
 
   /**
    * The data input step
@@ -94,7 +94,7 @@ public class KDDTask implements Parameterizable {
    * @param outputStep
    * @param settings
    */
-  public KDDTask(InputStep inputStep, AlgorithmStep algorithmStep, EvaluationStep evaluationStep, OutputStep outputStep, Collection<Pair<Object, Parameter<?, ?>>> settings) {
+  public KDDTask(InputStep inputStep, AlgorithmStep algorithmStep, EvaluationStep evaluationStep, OutputStep outputStep, Collection<Pair<Object, Parameter<?>>> settings) {
     super();
     this.inputStep = inputStep;
     this.algorithmStep = algorithmStep;
@@ -147,7 +147,7 @@ public class KDDTask implements Parameterizable {
 
     EvaluationStep evaluationStep = null;
 
-    Collection<Pair<Object, Parameter<?, ?>>> settings = null;
+    Collection<Pair<Object, Parameter<?>>> settings = null;
 
     OutputStep outputStep = null;
 

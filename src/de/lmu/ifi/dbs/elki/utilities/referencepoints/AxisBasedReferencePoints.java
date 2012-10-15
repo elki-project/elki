@@ -83,7 +83,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
     // Compute mean and extend from minmax.
     double[] mean = new double[dim];
     double[] delta = new double[dim];
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       mean[d] = (minmax.first.doubleValue(d) + minmax.second.doubleValue(d)) * .5;
       delta[d] = spacescale * (minmax.second.doubleValue(d) - mean[d]);
     }
@@ -92,22 +92,21 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
 
     double[] vec = new double[dim];
     // Use min and max
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       vec[d] = mean[d] - delta[d];
     }
     result.add(factory.newNumberVector(vec));
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       vec[d] = mean[d] + delta[d];
     }
     result.add(factory.newNumberVector(vec));
 
     // Plus axis end points:
-    for(int i = 0; i < dim; i++) {
-      for(int d = 0; d < dim; d++) {
-        if(d != i) {
+    for (int i = 0; i < dim; i++) {
+      for (int d = 0; d < dim; d++) {
+        if (d != i) {
           vec[d] = mean[d] - delta[d];
-        }
-        else {
+        } else {
           vec[d] = mean[d] + delta[d];
         }
       }
@@ -133,8 +132,9 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, new GreaterEqualConstraint(0.0), 1.0);
-      if(config.grab(spacescaleP)) {
+      DoubleParameter spacescaleP = new DoubleParameter(SPACE_SCALE_ID, 1.0);
+      spacescaleP.addConstraint(new GreaterEqualConstraint(0.0));
+      if (config.grab(spacescaleP)) {
         spacescale = spacescaleP.getValue();
       }
     }

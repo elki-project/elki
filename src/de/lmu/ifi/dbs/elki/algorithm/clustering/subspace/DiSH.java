@@ -169,12 +169,12 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    */
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
     // Instantiate DiSH distance (and thus run the preprocessor)
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("*** Run DiSH preprocessor.");
     }
     DiSHDistanceFunction.Instance<V> dishDistanceQuery = dishDistance.instantiate(relation);
     // Configure and run OPTICS.
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("*** Run OPTICS algorithm.");
     }
     ListParameterization opticsconfig = new ListParameterization(opticsAlgorithmParameters);
@@ -185,7 +185,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     optics = opticsconfig.tryInstantiate(cls);
     ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> opticsResult = optics.run(database, relation);
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("*** Compute Clusters.");
     }
     return computeClusters(relation, opticsResult, dishDistanceQuery);
@@ -205,10 +205,10 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     // extract clusters
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = extractClusters(database, distFunc, clusterOrder);
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 1: extract clusters");
-      for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
-        for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
+      for (List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
+        for (Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append('\n').append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
         }
       }
@@ -217,10 +217,10 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     // check if there are clusters < minpts
     checkClusters(database, distFunc, clustersMap, minpts);
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 2: check clusters");
-      for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
-        for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
+      for (List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
+        for (Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append('\n').append(FormatUtil.format(dimensionality, c.first)).append(" ids ").append(c.second.size());
         }
       }
@@ -229,9 +229,9 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     // sort the clusters
     List<Cluster<SubspaceModel<V>>> clusters = sortClusters(database, clustersMap);
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 3: sort clusters");
-      for(Cluster<SubspaceModel<V>> c : clusters) {
+      for (Cluster<SubspaceModel<V>> c : clusters) {
         msg.append('\n').append(FormatUtil.format(dimensionality, c.getModel().getSubspace().getDimensions())).append(" ids ").append(c.size());
       }
       LOG.verbose(msg.toString());
@@ -239,14 +239,14 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     // build the hierarchy
     buildHierarchy(database, distFunc, clusters, dimensionality);
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
-      for(Cluster<SubspaceModel<V>> c : clusters) {
+      for (Cluster<SubspaceModel<V>> c : clusters) {
         msg.append('\n').append(FormatUtil.format(dimensionality, c.getModel().getDimensions())).append(" ids ").append(c.size());
-        for(Cluster<SubspaceModel<V>> cluster : c.getParents()) {
+        for (Cluster<SubspaceModel<V>> cluster : c.getParents()) {
           msg.append("\n   parent ").append(cluster);
         }
-        for(Cluster<SubspaceModel<V>> cluster : c.getChildren()) {
+        for (Cluster<SubspaceModel<V>> cluster : c.getChildren()) {
           msg.append("\n   child ").append(cluster);
         }
       }
@@ -255,8 +255,8 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     // build result
     Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("DiSH clustering", "dish-clustering");
-    for(Cluster<SubspaceModel<V>> c : clusters) {
-      if(c.getParents() == null || c.getParents().isEmpty()) {
+    for (Cluster<SubspaceModel<V>> c : clusters) {
+      if (c.getParents() == null || c.getParents().isEmpty()) {
         result.addCluster(c);
       }
     }
@@ -277,7 +277,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
     Map<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>>();
     Map<DBID, Pair<BitSet, ArrayModifiableDBIDs>> entryToClusterMap = new HashMap<DBID, Pair<BitSet, ArrayModifiableDBIDs>>();
-    for(Iterator<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> it = clusterOrder.iterator(); it.hasNext();) {
+    for (Iterator<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> it = clusterOrder.iterator(); it.hasNext();) {
       ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> entry = it.next();
       entryMap.put(entry.getID(), entry);
 
@@ -286,43 +286,43 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
       // get the list of (parallel) clusters for the preference vector
       List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(preferenceVector);
-      if(parallelClusters == null) {
+      if (parallelClusters == null) {
         parallelClusters = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
         clustersMap.put(preferenceVector, parallelClusters);
       }
 
       // look for the proper cluster
       Pair<BitSet, ArrayModifiableDBIDs> cluster = null;
-      for(Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
+      for (Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
         V c_centroid = ProjectedCentroid.make(c.first, database, c.second).toVector(database);
         PreferenceVectorBasedCorrelationDistance dist = distFunc.correlationDistance(object, c_centroid, preferenceVector, preferenceVector);
-        if(dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
+        if (dist.getCorrelationValue() == entry.getReachability().getCorrelationValue()) {
           double d = distFunc.weightedDistance(object, c_centroid, dist.getCommonPreferenceVector());
-          if(d <= 2 * epsilon) {
+          if (d <= 2 * epsilon) {
             cluster = c;
             break;
           }
         }
       }
-      if(cluster == null) {
+      if (cluster == null) {
         cluster = new Pair<BitSet, ArrayModifiableDBIDs>(preferenceVector, DBIDUtil.newArray());
         parallelClusters.add(cluster);
       }
       cluster.second.add(entry.getID());
       entryToClusterMap.put(entry.getID(), cluster);
 
-      if(progress != null) {
+      if (progress != null) {
         progress.setProcessed(++processed, LOG);
       }
     }
-    if(progress != null) {
+    if (progress != null) {
       progress.ensureCompleted(LOG);
     }
 
-    if(LOG.isDebuggingFiner()) {
+    if (LOG.isDebuggingFiner()) {
       StringBuilder msg = new StringBuilder("Step 0");
-      for(List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
-        for(Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
+      for (List<Pair<BitSet, ArrayModifiableDBIDs>> clusterList : clustersMap.values()) {
+        for (Pair<BitSet, ArrayModifiableDBIDs> c : clusterList) {
           msg.append('\n').append(FormatUtil.format(RelationUtil.dimensionality(database), c.first)).append(" ids ").append(c.second.size());
         }
       }
@@ -330,24 +330,24 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     // add the predecessor to the cluster
-    for(BitSet pv : clustersMap.keySet()) {
+    for (BitSet pv : clustersMap.keySet()) {
       List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
-      for(Pair<BitSet, ArrayModifiableDBIDs> cluster : parallelClusters) {
-        if(cluster.second.isEmpty()) {
+      for (Pair<BitSet, ArrayModifiableDBIDs> cluster : parallelClusters) {
+        if (cluster.second.isEmpty()) {
           continue;
         }
         DBID firstID = cluster.second.get(0);
         ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> entry = entryMap.get(firstID);
         DBID predecessorID = entry.getPredecessorID();
-        if(predecessorID == null) {
+        if (predecessorID == null) {
           continue;
         }
         ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> predecessor = entryMap.get(predecessorID);
         // parallel cluster
-        if(predecessor.getReachability().getCommonPreferenceVector().equals(entry.getReachability().getCommonPreferenceVector())) {
+        if (predecessor.getReachability().getCommonPreferenceVector().equals(entry.getReachability().getCommonPreferenceVector())) {
           continue;
         }
-        if(predecessor.getReachability().compareTo(entry.getReachability()) < 0) {
+        if (predecessor.getReachability().compareTo(entry.getReachability()) < 0) {
           continue;
         }
 
@@ -374,19 +374,18 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     final int db_dim = RelationUtil.dimensionality(database);
     // int num = 1;
     List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
-    for(BitSet pv : clustersMap.keySet()) {
+    for (BitSet pv : clustersMap.keySet()) {
       List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
-      for(int i = 0; i < parallelClusters.size(); i++) {
+      for (int i = 0; i < parallelClusters.size(); i++) {
         Pair<BitSet, ArrayModifiableDBIDs> c = parallelClusters.get(i);
         Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
         cluster.setModel(new SubspaceModel<V>(new Subspace(c.first), Centroid.make(database, c.second).toVector(database)));
         cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
         // cluster.setName("Cluster_" + num++);
         String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");
-        if(parallelClusters.size() > 1) {
+        if (parallelClusters.size() > 1) {
           cluster.setName("Cluster_" + subspace + "_" + i);
-        }
-        else {
+        } else {
           cluster.setName("Cluster_" + subspace);
         }
         clusters.add(cluster);
@@ -419,11 +418,11 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     List<Pair<BitSet, ArrayModifiableDBIDs>> notAssigned = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
     Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> newClustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
     Pair<BitSet, ArrayModifiableDBIDs> noise = new Pair<BitSet, ArrayModifiableDBIDs>(new BitSet(), DBIDUtil.newArray());
-    for(BitSet pv : clustersMap.keySet()) {
+    for (BitSet pv : clustersMap.keySet()) {
       // noise
-      if(pv.cardinality() == 0) {
+      if (pv.cardinality() == 0) {
         List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
-        for(Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
+        for (Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
           noise.second.addDBIDs(c.second);
         }
       }
@@ -431,11 +430,10 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       else {
         List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
         List<Pair<BitSet, ArrayModifiableDBIDs>> newParallelClusters = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>(parallelClusters.size());
-        for(Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
-          if(!pv.equals(new BitSet()) && c.second.size() < minpts) {
+        for (Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
+          if (!pv.equals(new BitSet()) && c.second.size() < minpts) {
             notAssigned.add(c);
-          }
-          else {
+          } else {
             newParallelClusters.add(c);
           }
         }
@@ -446,15 +444,14 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     clustersMap.clear();
     clustersMap.putAll(newClustersMap);
 
-    for(Pair<BitSet, ArrayModifiableDBIDs> c : notAssigned) {
-      if(c.second.isEmpty()) {
+    for (Pair<BitSet, ArrayModifiableDBIDs> c : notAssigned) {
+      if (c.second.isEmpty()) {
         continue;
       }
       Pair<BitSet, ArrayModifiableDBIDs> parent = findParent(database, distFunc, c, clustersMap);
-      if(parent != null) {
+      if (parent != null) {
         parent.second.addDBIDs(c.second);
-      }
-      else {
+      } else {
         noise.second.addDBIDs(c.second);
       }
     }
@@ -481,23 +478,23 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     BitSet childPV = child.first;
     int childCardinality = childPV.cardinality();
-    for(BitSet parentPV : clustersMap.keySet()) {
+    for (BitSet parentPV : clustersMap.keySet()) {
       int parentCardinality = parentPV.cardinality();
-      if(parentCardinality >= childCardinality) {
+      if (parentCardinality >= childCardinality) {
         continue;
       }
-      if(resultCardinality != -1 && parentCardinality <= resultCardinality) {
+      if (resultCardinality != -1 && parentCardinality <= resultCardinality) {
         continue;
       }
 
       BitSet pv = (BitSet) childPV.clone();
       pv.and(parentPV);
-      if(pv.equals(parentPV)) {
+      if (pv.equals(parentPV)) {
         List<Pair<BitSet, ArrayModifiableDBIDs>> parentList = clustersMap.get(parentPV);
-        for(Pair<BitSet, ArrayModifiableDBIDs> parent : parentList) {
+        for (Pair<BitSet, ArrayModifiableDBIDs> parent : parentList) {
           V parent_centroid = ProjectedCentroid.make(parentPV, database, parent.second).toVector(database);
           double d = distFunc.weightedDistance(child_centroid, parent_centroid, parentPV);
-          if(d <= 2 * epsilon) {
+          if (d <= 2 * epsilon) {
             result = parent;
             resultCardinality = parentCardinality;
             break;
@@ -521,61 +518,59 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     StringBuilder msg = new StringBuilder();
     final int db_dim = RelationUtil.dimensionality(database);
 
-    for(int i = 0; i < clusters.size() - 1; i++) {
+    for (int i = 0; i < clusters.size() - 1; i++) {
       Cluster<SubspaceModel<V>> c_i = clusters.get(i);
       int subspaceDim_i = dimensionality - c_i.getModel().getSubspace().dimensionality();
       V ci_centroid = ProjectedCentroid.make(c_i.getModel().getDimensions(), database, c_i.getIDs()).toVector(database);
 
-      for(int j = i + 1; j < clusters.size(); j++) {
+      for (int j = i + 1; j < clusters.size(); j++) {
         Cluster<SubspaceModel<V>> c_j = clusters.get(j);
         int subspaceDim_j = dimensionality - c_j.getModel().getSubspace().dimensionality();
 
-        if(subspaceDim_i < subspaceDim_j) {
-          if(LOG.isDebugging()) {
+        if (subspaceDim_i < subspaceDim_j) {
+          if (LOG.isDebugging()) {
             msg.append("\n l_i=").append(subspaceDim_i).append(" pv_i=[").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions())).append(']');
             msg.append("\n l_j=").append(subspaceDim_j).append(" pv_j=[").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions())).append(']');
           }
 
           // noise level reached
-          if(c_j.getModel().getSubspace().dimensionality() == 0) {
+          if (c_j.getModel().getSubspace().dimensionality() == 0) {
             // no parents exists -> parent is noise
-            if(c_i.getParents().isEmpty()) {
+            if (c_i.getParents().isEmpty()) {
               c_j.getChildren().add(c_i);
               c_i.getParents().add(c_j);
-              if(LOG.isDebugging()) {
+              if (LOG.isDebugging()) {
                 msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                 msg.append("] is parent of [").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
                 msg.append(']');
               }
             }
-          }
-          else {
+          } else {
             V cj_centroid = ProjectedCentroid.make(c_j.getModel().getDimensions(), database, c_j.getIDs()).toVector(database);
             PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(ci_centroid, cj_centroid, c_i.getModel().getSubspace().getDimensions(), c_j.getModel().getSubspace().getDimensions());
             double d = distFunc.weightedDistance(ci_centroid, cj_centroid, distance.getCommonPreferenceVector());
-            if(LOG.isDebugging()) {
+            if (LOG.isDebugging()) {
               msg.append("\n dist = ").append(distance.getCorrelationValue());
             }
 
-            if(distance.getCorrelationValue() == subspaceDim_j) {
-              if(LOG.isDebugging()) {
+            if (distance.getCorrelationValue() == subspaceDim_j) {
+              if (LOG.isDebugging()) {
                 msg.append("\n d = ").append(d);
               }
-              if(d <= 2 * epsilon) {
+              if (d <= 2 * epsilon) {
                 // no parent exists or c_j is not a parent of the already
                 // existing parents
-                if(c_i.getParents().isEmpty() || !isParent(database, distFunc, c_j, c_i.getParents())) {
+                if (c_i.getParents().isEmpty() || !isParent(database, distFunc, c_j, c_i.getParents())) {
                   c_j.getChildren().add(c_i);
                   c_i.getParents().add(c_j);
-                  if(LOG.isDebugging()) {
+                  if (LOG.isDebugging()) {
                     msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                     msg.append("] is parent of [");
                     msg.append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
                     msg.append(']');
                   }
                 }
-              }
-              else {
+              } else {
                 throw new RuntimeException("Should never happen: d = " + d);
               }
             }
@@ -583,7 +578,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         }
       }
     }
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       LOG.debug(msg.toString());
     }
   }
@@ -605,10 +600,10 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     int dimensionality = RelationUtil.dimensionality(database);
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();
 
-    for(Cluster<SubspaceModel<V>> child : children) {
+    for (Cluster<SubspaceModel<V>> child : children) {
       V child_centroid = ProjectedCentroid.make(child.getModel().getDimensions(), database, child.getIDs()).toVector(database);
       PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(parent_centroid, child_centroid, parent.getModel().getSubspace().getDimensions(), child.getModel().getSubspace().getDimensions());
-      if(distance.getCorrelationValue() == subspaceDim_parent) {
+      if (distance.getCorrelationValue() == subspaceDim_parent) {
         return true;
       }
     }
@@ -646,13 +641,15 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
-      if(config.grab(epsilonP)) {
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, 0.001);
+      epsilonP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
 
-      IntParameter muP = new IntParameter(MU_ID, new GreaterConstraint(0), 1);
-      if(config.grab(muP)) {
+      IntParameter muP = new IntParameter(MU_ID, 1);
+      muP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(muP)) {
         mu = muP.intValue();
       }
 

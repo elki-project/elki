@@ -54,7 +54,7 @@ public class TrackParameters implements Parameterization {
   /**
    * Tracking storage
    */
-  List<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
+  List<Pair<Object, Parameter<?>>> options = new ArrayList<Pair<Object, Parameter<?>>>();
 
   /**
    * Tree information: parent links
@@ -91,7 +91,7 @@ public class TrackParameters implements Parameterization {
    * @param parents Parent map
    * @param children Child map
    */
-  private TrackParameters(Parameterization inner, Object option, List<Pair<Object, Parameter<?, ?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
+  private TrackParameters(Parameterization inner, Object option, List<Pair<Object, Parameter<?>>> options, Map<Object, Object> parents, Map<Object, List<Object>> children) {
     super();
     this.inner = inner.descend(option);
     this.cur = option;
@@ -111,9 +111,9 @@ public class TrackParameters implements Parameterization {
   }
 
   @Override
-  public boolean grab(Parameter<?, ?> opt) {
+  public boolean grab(Parameter<?> opt) {
     registerChild(opt);
-    options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
+    options.add(new Pair<Object, Parameter<?>>(cur, opt));
     return inner.grab(opt);
   }
 
@@ -128,9 +128,9 @@ public class TrackParameters implements Parameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
     registerChild(opt);
-    options.add(new Pair<Object, Parameter<?, ?>>(cur, opt));
+    options.add(new Pair<Object, Parameter<?>>(cur, opt));
     return inner.setValueForOption(opt);
   }
 
@@ -139,7 +139,7 @@ public class TrackParameters implements Parameterization {
    * 
    * @return Parameters seen
    */
-  public Collection<Pair<Object, Parameter<?, ?>>> getAllParameters() {
+  public Collection<Pair<Object, Parameter<?>>> getAllParameters() {
     return options;
   }
 
@@ -150,7 +150,7 @@ public class TrackParameters implements Parameterization {
    */
   public Collection<Pair<OptionID, Object>> getGivenParameters() {
     ArrayList<Pair<OptionID, Object>> ret = new ArrayList<Pair<OptionID, Object>>();
-    for(Pair<Object, Parameter<?, ?>> pair : options) {
+    for(Pair<Object, Parameter<?>> pair : options) {
       if(pair.second.isDefined() && pair.second.getGivenValue() != null) {
         ret.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
       }

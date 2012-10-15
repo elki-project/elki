@@ -150,9 +150,10 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplesizeP = new IntParameter(N_ID, new GreaterConstraint(0));
+      IntParameter samplesizeP = new IntParameter(N_ID);
+      samplesizeP.addConstraint(new GreaterConstraint(0));
       if(config.grab(samplesizeP)) {
-        samplesize = samplesizeP.getValue();
+        samplesize = samplesizeP.intValue();
       }
     }
 

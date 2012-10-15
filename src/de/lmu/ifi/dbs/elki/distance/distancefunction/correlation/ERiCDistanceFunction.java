@@ -129,14 +129,14 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
   private boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
     Matrix m1_czech = pca1.dissimilarityMatrix();
     Matrix v2_strong = pca2.adapatedStrongEigenvectors();
-    for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
+    for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
       Vector v2_i = v2_strong.getCol(i);
       // check, if distance of v2_i to the space of pca_1 > delta
       // (i.e., if v2_i spans up a new dimension)
       double dist = Math.sqrt(v2_i.transposeTimes(v2_i) - v2_i.transposeTimesTimes(m1_czech, v2_i));
 
       // if so, return false
-      if(dist > delta) {
+      if (dist > delta) {
         return false;
       }
     }
@@ -157,36 +157,34 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    *         distance function
    */
   public BitDistance distance(NumberVector<?> v1, NumberVector<?> v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
-    if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
+    if (pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
       throw new IllegalStateException("pca1.getCorrelationDimension() < pca2.getCorrelationDimension(): " + pca1.getCorrelationDimension() + " < " + pca2.getCorrelationDimension());
     }
 
     boolean approximatelyLinearDependent;
-    if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
+    if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2) && approximatelyLinearDependent(pca2, pca1);
-    }
-    else {
+    } else {
       approximatelyLinearDependent = approximatelyLinearDependent(pca1, pca2);
     }
 
-    if(!approximatelyLinearDependent) {
+    if (!approximatelyLinearDependent) {
       return new BitDistance(true);
     }
 
     else {
       double affineDistance;
 
-      if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
+      if (pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
         WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         WeightedDistanceFunction df2 = new WeightedDistanceFunction(pca2.similarityMatrix());
         affineDistance = Math.max(df1.distance(v1, v2).doubleValue(), df2.distance(v1, v2).doubleValue());
-      }
-      else {
+      } else {
         WeightedDistanceFunction df1 = new WeightedDistanceFunction(pca1.similarityMatrix());
         affineDistance = df1.distance(v1, v2).doubleValue();
       }
 
-      if(affineDistance > tau) {
+      if (affineDistance > tau) {
         return new BitDistance(true);
       }
 
@@ -196,7 +194,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
     if (!this.getClass().equals(obj.getClass())) {
@@ -268,13 +266,15 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
       super.makeOptions(config);
       configIndexFactory(config, FilteredLocalPCAIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
 
-      final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.1);
-      if(config.grab(deltaP)) {
+      final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.1);
+      deltaP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }
 
-      final DoubleParameter tauP = new DoubleParameter(TAU_ID, new GreaterEqualConstraint(0), 0.1);
-      if(config.grab(tauP)) {
+      final DoubleParameter tauP = new DoubleParameter(TAU_ID, 0.1);
+      tauP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(tauP)) {
         tau = tauP.doubleValue();
       }
     }

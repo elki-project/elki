@@ -239,12 +239,14 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter minP = new DoubleParameter(MIN_ID, true);
+      DoubleParameter minP = new DoubleParameter(MIN_ID);
+      minP.setOptional(true);
       if(config.grab(minP)) {
         min = minP.getValue();
       }
 
-      DoubleParameter maxP = new DoubleParameter(MAX_ID, true);
+      DoubleParameter maxP = new DoubleParameter(MAX_ID);
+      maxP.setOptional(true);
       if(config.grab(maxP)) {
         max = maxP.getValue();
       }
@@ -260,7 +262,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
       }
 
       // Use-Mean and Minimum value must not be set at the same time!
-      ArrayList<Parameter<?, ?>> minmean = new ArrayList<Parameter<?, ?>>();
+      ArrayList<Parameter<?>> minmean = new ArrayList<Parameter<?>>();
       minmean.add(minP);
       minmean.add(meanF);
       GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);

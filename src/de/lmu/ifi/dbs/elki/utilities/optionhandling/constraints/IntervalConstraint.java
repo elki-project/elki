@@ -37,7 +37,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter
+ * 
+ * @deprecated Use two constraints instead.
  */
+@Deprecated
 public class IntervalConstraint implements ParameterConstraint<Number> {
   /**
    * Available interval boundary types types:

@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -42,69 +40,14 @@ public class LongParameter extends NumberParameter<Long> {
    * and default value.
    * 
    * @param optionID the unique OptionID for this parameter
-   * @param constraints the parameter constraints for this long parameter
-   * @param defaultValue the default value
-   */
-  public LongParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, long defaultValue) {
-    super(optionID, constraints, Long.valueOf(defaultValue));
-  }
-
-  /**
-   * Constructs a long parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID the unique OptionID for this parameter
-   * @param constraints the parameter constraints for this long parameter
-   * @param optional optional flag
-   */
-  public LongParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-  }
-
-  /**
-   * Constructs a long parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID the unique OptionID for this parameter
-   * @param constraints the parameter constraints for this long parameter
-   */
-  public LongParameter(OptionID optionID, List<ParameterConstraint<Number>> constraints) {
-    super(optionID, constraints);
-  }
-
-  /**
-   * Constructs a long parameter with the given optionID, parameter constraint
-   * and default value.
-   * 
-   * @param optionID the unique OptionID for this parameter
    * @param constraint the parameter constraint for this long parameter
    * @param defaultValue the default value
+   * @deprecated Use {@link #addConstraint} instead!
    */
+  @Deprecated
   public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, long defaultValue) {
-    super(optionID, constraint, Long.valueOf(defaultValue));
-  }
-
-  /**
-   * Constructs a long parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID the unique OptionID for this parameter
-   * @param constraint the parameter constraint for this long parameter
-   * @param optional optional flag
-   */
-  public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint, boolean optional) {
-    super(optionID, constraint, optional);
-  }
-
-  /**
-   * Constructs a long parameter with the given optionID, and parameter
-   * constraint.
-   * 
-   * @param optionID the unique OptionID for this parameter
-   * @param constraint the parameter constraint for this long parameter
-   */
-  public LongParameter(OptionID optionID, ParameterConstraint<Number> constraint) {
-    super(optionID, constraint);
+    super(optionID, Long.valueOf(defaultValue));
+    addConstraint(constraint);
   }
 
   /**
@@ -115,16 +58,6 @@ public class LongParameter extends NumberParameter<Long> {
    */
   public LongParameter(OptionID optionID, long defaultValue) {
     super(optionID, Long.valueOf(defaultValue));
-  }
-
-  /**
-   * Constructs a long parameter with the given optionID.
-   * 
-   * @param optionID the unique OptionID for this parameter
-   * @param optional optional flag
-   */
-  public LongParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
   }
 
   /**
