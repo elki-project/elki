@@ -143,12 +143,12 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
       super.makeOptions(config);
       outputFile = getParameterOutputFile(config);
 
-      IntParameter kP = new IntParameter(K_ID, false);
+      IntParameter kP = new IntParameter(K_ID);
       if(config.grab(kP)) {
         this.k = kP.getValue();
       }
 
-      IntParameter kFactorP = new IntParameter(K_FACTOR_ID, false);
+      IntParameter kFactorP = new IntParameter(K_FACTOR_ID);
       if(config.grab(kFactorP)) {
         this.kFactor = kFactorP.getValue();
       }

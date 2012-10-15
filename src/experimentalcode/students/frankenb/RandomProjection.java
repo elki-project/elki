@@ -25,7 +25,7 @@ public class RandomProjection<V extends NumberVector<?>> {
   /**
    * Logger
    */
-  private static final Logging logger = Logging.getLogger(RandomProjection.class);
+  private static final Logging LOG = Logging.getLogger(RandomProjection.class);
 
   public static final OptionID SPARSITY_ID = OptionID.getOrCreateOptionID("sparsity", "frequency of zeros in the projection matrix");
 
@@ -33,7 +33,7 @@ public class RandomProjection<V extends NumberVector<?>> {
 
   public static final OptionID NEW_DIMENSIONALITY_ID = OptionID.getOrCreateOptionID("newdimensionality", "amount of dimensions to project down to");
 
-  private final IntParameter NEW_DIMENSIONALITY_PARAM = new IntParameter(NEW_DIMENSIONALITY_ID, false);
+  private final IntParameter NEW_DIMENSIONALITY_PARAM = new IntParameter(NEW_DIMENSIONALITY_ID);
 
   private int sparsity;
 
@@ -90,8 +90,8 @@ public class RandomProjection<V extends NumberVector<?>> {
       projectedDataSet.set(iditer, result);
     }
 
-    if(logger.isDebugging()) {
-      logger.debug("Projection Matrix:\n" + projectionMatrix.toString());
+    if(LOG.isDebugging()) {
+      LOG.debug("Projection Matrix:\n" + projectionMatrix.toString());
     }
 
     return projectedDataSet;
