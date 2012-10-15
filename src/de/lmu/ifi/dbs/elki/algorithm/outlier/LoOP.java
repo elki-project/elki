@@ -403,7 +403,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       super.makeOptions(config);
       final IntParameter kcompP = new IntParameter(KCOMP_ID, new GreaterConstraint(1));
       if(config.grab(kcompP)) {
-        kcomp = kcompP.getValue();
+        kcomp = kcompP.intValue();
       }
 
       final ObjectParameter<DistanceFunction<O, D>> compDistP = new ObjectParameter<DistanceFunction<O, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
@@ -413,7 +413,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
 
       final IntParameter kreachP = new IntParameter(KREACH_ID, new GreaterConstraint(1), true);
       if(config.grab(kreachP)) {
-        kreach = kreachP.getValue();
+        kreach = kreachP.intValue();
       }
       else {
         kreach = kcomp;
@@ -427,7 +427,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       // TODO: make default 1.0?
       final DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, new GreaterConstraint(0.0), 2.0);
       if(config.grab(lambdaP)) {
-        lambda = lambdaP.getValue();
+        lambda = lambdaP.doubleValue();
       }
     }
 

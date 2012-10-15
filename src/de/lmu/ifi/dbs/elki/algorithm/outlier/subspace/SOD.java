@@ -466,7 +466,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
       final DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new GreaterConstraint(0), 1.1);
       if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
     }
 

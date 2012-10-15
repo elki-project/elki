@@ -256,7 +256,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       super.makeOptions(config);
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, Double.POSITIVE_INFINITY);
       if(config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
     }
 

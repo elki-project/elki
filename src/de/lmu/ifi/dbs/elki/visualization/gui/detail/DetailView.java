@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Manages a detail view.
@@ -277,7 +276,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     Visualization vis = layermap.get(task);
     if(vis != null) {
       // Ensure visibility is as expected
-      boolean isHidden = vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY) == SVGConstants.CSS_HIDDEN_VALUE;
+      boolean isHidden = SVGConstants.CSS_HIDDEN_VALUE.equals(vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
       if(task.visible) {
         if(isHidden) {
           this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));

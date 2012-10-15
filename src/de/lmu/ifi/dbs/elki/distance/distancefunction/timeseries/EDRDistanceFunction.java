@@ -162,7 +162,7 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
       super.makeOptions(config);
       final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 1.0);
       if(config.grab(deltaP)) {
-        delta = deltaP.getValue();
+        delta = deltaP.doubleValue();
       }
     }
 

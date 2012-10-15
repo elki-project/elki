@@ -344,7 +344,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(5));
       if (config.grab(kP)) {
-        k = kP.getValue();
+        k = kP.intValue();
       }
       EnumParameter<DistanceDist> distP = new EnumParameter<DistanceDist>(DIST_ID, DistanceDist.class, DistanceDist.GAMMA);
       if (config.grab(distP)) {
@@ -352,7 +352,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       }
       DoubleParameter expectP = new DoubleParameter(EXPECT_ID, new IntervalConstraint(0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN), 0.001);
       if (config.grab(expectP)) {
-        expect = expectP.getValue();
+        expect = expectP.doubleValue();
       }
       ObjectParameter<PCARunner<V>> pcaP = new ObjectParameter<PCARunner<V>>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
       if (config.grab(pcaP)) {

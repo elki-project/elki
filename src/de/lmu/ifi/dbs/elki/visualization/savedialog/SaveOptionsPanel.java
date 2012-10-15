@@ -206,8 +206,8 @@ public class SaveOptionsPanel extends JPanel {
       resetSizeButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-          modelWidth.setValue(width);
-          modelHeight.setValue(height);
+          modelWidth.setValue(Integer.valueOf(width));
+          modelHeight.setValue(Integer.valueOf(height));
           aspectRatioLock.setSelected(true);
         }
       });
@@ -312,8 +312,7 @@ public class SaveOptionsPanel extends JPanel {
    * @return Quality value for JPEG.
    */
   public double getJPEGQuality() {
-    Double qual = 0.7;
-    qual = modelQuality.getNumber().doubleValue();
+    double qual =modelQuality.getNumber().doubleValue();
     if(qual > 1.0) {
       qual = 1.0;
     }

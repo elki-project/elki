@@ -237,7 +237,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
       IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
 
       if(config.grab(DIGITS_PARAM)) {
-        int digits = DIGITS_PARAM.getValue();
+        int digits = DIGITS_PARAM.intValue();
         nf = NumberFormat.getInstance(Locale.ROOT);
         nf.setGroupingUsed(false);
         nf.setMaximumFractionDigits(digits);

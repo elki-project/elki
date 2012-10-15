@@ -251,7 +251,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
       super.makeOptions(config);
       Flag nofillF = new Flag(NOFILL_ID);
       if(config.grab(nofillF)) {
-        nofill = nofillF.getValue();
+        nofill = nofillF.isTrue();
       }
     }
 

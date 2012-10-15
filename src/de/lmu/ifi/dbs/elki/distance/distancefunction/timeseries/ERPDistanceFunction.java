@@ -171,7 +171,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
       super.makeOptions(config);
       final DoubleParameter gP = new DoubleParameter(G_ID, new GreaterEqualConstraint(0), 0.0);
       if(config.grab(gP)) {
-        g = gP.getValue();
+        g = gP.doubleValue();
       }
     }
 

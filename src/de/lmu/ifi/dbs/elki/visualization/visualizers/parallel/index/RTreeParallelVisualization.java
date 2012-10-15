@@ -246,9 +246,9 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag fillF = new Flag(TreeMBRVisualization.Parameterizer.FILL_ID);
-      fillF.setDefaultValue(true);
+      fillF.setDefaultValue(Boolean.TRUE);
       if(config.grab(fillF)) {
-        fill = fillF.getValue();
+        fill = fillF.isTrue();
       }
     }
 

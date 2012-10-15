@@ -79,7 +79,7 @@ public final class SVGUtil {
    * SVG color names conversion.
    */
   final private static TObjectIntHashMap<String> SVG_COLOR_NAMES;
-  
+
   /**
    * Key not found value. Not a reasonable color, fully transparent!
    */
@@ -329,13 +329,13 @@ public final class SVGUtil {
    */
   public static void addCSSClass(Element e, String cssclass) {
     String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-    if(oldval == null || oldval.length() == 0) {
+    if (oldval == null || oldval.length() == 0) {
       setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
       return;
     }
     String[] classes = oldval.split(" ");
-    for(String c : classes) {
-      if(c.equals(cssclass)) {
+    for (String c : classes) {
+      if (c.equals(cssclass)) {
         return;
       }
     }
@@ -350,22 +350,36 @@ public final class SVGUtil {
    */
   public static void removeCSSClass(Element e, String cssclass) {
     String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-    if(oldval == null) {
+    if (oldval == null) {
       return;
     }
     String[] classes = oldval.split(" ");
-    String joined = "";
-    for(String c : classes) {
-      if(!c.equals(cssclass)) {
-        if(joined.length() > 0) {
-          joined = joined + " " + c;
+    if (classes.length == 1) {
+      if (cssclass.equals(classes[0])) {
+        e.removeAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
+      }
+    } else if (classes.length == 2) {
+      if (cssclass.equals(classes[0])) {
+        if (cssclass.equals(classes[1])) {
+          e.removeAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
+        } else {
+          e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, classes[1]);
         }
-        else {
-          joined = c;
+      } else if (cssclass.equals(classes[1])) {
+        e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, classes[0]);
+      }
+    } else {
+      StringBuilder joined = new StringBuilder();
+      for (String c : classes) {
+        if (!c.equals(cssclass)) {
+          if (joined.length() > 0) {
+            joined.append(' ');
+          }
+          joined.append(c);
         }
       }
+      e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, joined.toString());
     }
-    SVGUtil.setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, joined);
   }
 
   /**
@@ -376,7 +390,7 @@ public final class SVGUtil {
    */
   public static Element makeStyleElement(Document document) {
     Element style = SVGUtil.svgElement(document, SVGConstants.SVG_STYLE_TAG);
-    SVGUtil.setAtt(style, SVGConstants.SVG_TYPE_ATTRIBUTE, SVGConstants.CSS_MIME_TYPE);
+    style.setAttribute(SVGConstants.SVG_TYPE_ATTRIBUTE, SVGConstants.CSS_MIME_TYPE);
     return style;
   }
 
@@ -479,7 +493,7 @@ public final class SVGUtil {
    */
   public static Color stringToColor(String str) {
     int icol = SVG_COLOR_NAMES.get(str.toLowerCase());
-    if(icol != NO_VALUE) {
+    if (icol != NO_VALUE) {
       return new Color(icol, false);
     }
     return colorLookupStylesheet.stringToColor(str);
@@ -494,7 +508,7 @@ public final class SVGUtil {
    * @return Color string
    */
   public static String colorToString(Color col) {
-    return String.format("#%02x%02x%02x", col.getRed(), col.getGreen(), col.getBlue());
+    return colorToString(col.getRGB());
   }
 
   /**
@@ -506,7 +520,12 @@ public final class SVGUtil {
    * @return Color string
    */
   public static String colorToString(int col) {
-    return String.format("#%02x%02x%02x", (col >>> 16) & 0xFF, (col >>> 8) & 0xFF, col & 0xFF);
+    char[] buf = new char[] { '#', '0', '0', '0', '0', '0', '0' };
+    for (int i = 7; i > 0; i--) {
+      buf[i] += (col & 0xF);
+      col >>= 4;
+    }
+    return new String(buf);
   }
 
   /**
@@ -578,8 +597,7 @@ public final class SVGUtil {
       cPt.setX(gnme.getClientX());
       cPt.setY(gnme.getClientY());
       return cPt.matrixTransform(imat);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LoggingUtil.warning("Error getting coordinates from SVG event.", e);
       return null;
     }
@@ -592,7 +610,7 @@ public final class SVGUtil {
    */
   public static void removeLastChild(Element tag) {
     final Node last = tag.getLastChild();
-    if(last != null) {
+    if (last != null) {
       tag.removeChild(last);
     }
   }
@@ -603,8 +621,8 @@ public final class SVGUtil {
    * @param elem Element to remove
    */
   public static void removeFromParent(Element elem) {
-    if(elem != null) {
-      if(elem.getParentNode() != null) {
+    if (elem != null) {
+      if (elem.getParentNode() != null) {
         elem.getParentNode().removeChild(elem);
       }
     }
@@ -625,25 +643,25 @@ public final class SVGUtil {
   public static Element svgCircleSegment(SVGPlot svgp, double centerx, double centery, double angleStart, double angleDelta, double innerRadius, double outerRadius) {
     double sin1st = Math.sin(angleStart);
     double cos1st = Math.cos(angleStart);
-  
+
     double sin2nd = Math.sin(angleStart + angleDelta);
     double cos2nd = Math.cos(angleStart + angleDelta);
-  
+
     double inner1stx = centerx + (innerRadius * sin1st);
     double inner1sty = centery - (innerRadius * cos1st);
     double outer1stx = centerx + (outerRadius * sin1st);
     double outer1sty = centery - (outerRadius * cos1st);
-  
+
     double inner2ndx = centerx + (innerRadius * sin2nd);
     double inner2ndy = centery - (innerRadius * cos2nd);
     double outer2ndx = centerx + (outerRadius * sin2nd);
     double outer2ndy = centery - (outerRadius * cos2nd);
-  
+
     double largeArc = 0;
-    if(angleDelta >= Math.PI) {
+    if (angleDelta >= Math.PI) {
       largeArc = 1;
     }
-  
+
     SVGPath path = new SVGPath(inner1stx, inner1sty);
     path.lineTo(outer1stx, outer1sty);
     path.ellipticalArc(outerRadius, outerRadius, 0, largeArc, 1, outer2ndx, outer2ndy);
@@ -651,7 +669,7 @@ public final class SVGUtil {
     if (innerRadius > 0) {
       path.ellipticalArc(innerRadius, innerRadius, 0, largeArc, 0, inner1stx, inner1sty);
     }
-  
+
     return path.makeElement(svgp);
   }
 }

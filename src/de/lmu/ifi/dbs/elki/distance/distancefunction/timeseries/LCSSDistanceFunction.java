@@ -220,12 +220,12 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
       super.makeOptions(config);
       final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
       if(config.grab(pDeltaP)) {
-        pDelta = pDeltaP.getValue();
+        pDelta = pDeltaP.doubleValue();
       }
 
       final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.05);
       if(config.grab(pEpsilonP)) {
-        pEpsilon = pEpsilonP.getValue();
+        pEpsilon = pEpsilonP.doubleValue();
       }
     }
 

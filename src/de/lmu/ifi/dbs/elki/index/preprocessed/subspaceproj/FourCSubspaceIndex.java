@@ -184,14 +184,14 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
         boolean absolute = false;
         Flag absoluteF = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
         if(config.grab(absoluteF)) {
-          absolute = absoluteF.getValue();
+          absolute = absoluteF.isTrue();
         }
 
         // Parameter delta
         double delta = 0.0;
         DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, new GreaterEqualConstraint(0), DEFAULT_DELTA);
         if(config.grab(deltaP)) {
-          delta = deltaP.getValue();
+          delta = deltaP.doubleValue();
         }
         // Absolute flag doesn't have a sensible default value for delta.
         if(absolute && deltaP.tookDefaultValue()) {

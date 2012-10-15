@@ -222,7 +222,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
     protected void configEpsilon(Parameterization config) {
       final DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID, new GreaterEqualConstraint(0), 0.001);
       if(config.grab(epsilonP)) {
-        epsilon = epsilonP.getValue();
+        epsilon = epsilonP.doubleValue();
       }
     }
   }

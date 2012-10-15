@@ -176,13 +176,13 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), DEFAULT_DELTA);
       double delta = DEFAULT_DELTA;
       if (config.grab(deltaP)) {
-        delta = deltaP.getValue();
+        delta = deltaP.doubleValue();
       }
 
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.OPEN), DEFAULT_ALPHA);
       double alpha = DEFAULT_ALPHA;
       if (config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
 
       // Configure Distance function

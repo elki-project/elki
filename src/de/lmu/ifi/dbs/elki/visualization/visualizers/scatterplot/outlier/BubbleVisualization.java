@@ -175,7 +175,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         setupCSS(svgp, colors);
         // draw data
         for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
-          final Double radius = getScaledForId(objId);
+          final double radius = getScaledForId(objId);
           if(radius > 0.01 && !Double.isInfinite(radius)) {
             final NumberVector<?> vec = rel.get(objId);
             if(vec != null) {
@@ -190,7 +190,7 @@ public class BubbleVisualization extends AbstractVisFactory {
       else {
         // draw data
         for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
-          final Double radius = getScaledForId(objId);
+          final double radius = getScaledForId(objId);
           if(radius > 0.01 && !Double.isInfinite(radius)) {
             final NumberVector<?> vec = rel.get(objId);
             if(vec != null) {
@@ -314,7 +314,7 @@ public class BubbleVisualization extends AbstractVisFactory {
       super.makeOptions(config);
       Flag fillF = new Flag(FILL_ID);
       if(config.grab(fillF)) {
-        fill = fillF.getValue();
+        fill = fillF.isTrue();
       }
 
       ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);

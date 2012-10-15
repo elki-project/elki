@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  */
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -331,7 +332,7 @@ public class SVGPlot {
    * @throws TransformerException Transformation error
    */
   public void saveAsSVG(File file) throws IOException, TransformerFactoryConfigurationError, TransformerException {
-    OutputStream out = new FileOutputStream(file);
+    OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
     // TODO embed linked images.
     javax.xml.transform.Result result = new StreamResult(out);
     SVGDocument doc = cloneDocument();
@@ -356,7 +357,7 @@ public class SVGPlot {
     transcoder.addTranscodingHint(XMLAbstractTranscoder.KEY_XML_PARSER_VALIDATING, Boolean.FALSE);
     SVGDocument doc = cloneDocument();
     TranscoderInput input = new TranscoderInput(doc);
-    OutputStream out = new FileOutputStream(file);
+    OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
     TranscoderOutput output = new TranscoderOutput(out);
     transcoder.transcode(input, output);
     out.flush();

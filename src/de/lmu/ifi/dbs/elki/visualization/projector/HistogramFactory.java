@@ -92,7 +92,7 @@ public class HistogramFactory implements ProjectorFactory {
       super.makeOptions(config);
       IntParameter maxdimP = new IntParameter(ScatterPlotFactory.Parameterizer.MAXDIM_ID, new GreaterEqualConstraint(1), ScatterPlotFactory.MAX_DIMENSIONS_DEFAULT);
       if(config.grab(maxdimP)) {
-        maxdim = maxdimP.getValue();
+        maxdim = maxdimP.intValue();
       }
     }
 

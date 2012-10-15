@@ -30,12 +30,11 @@ import org.w3c.dom.events.EventListener;
 
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
-
 /**
  * Do a hover effect using a CSS class.
  * 
  * @author Erich Schubert
- *
+ * 
  */
 public class CSSHoverClass implements EventListener {
   /**
@@ -47,7 +46,7 @@ public class CSSHoverClass implements EventListener {
    * Class to set when out
    */
   private String outclass;
-  
+
   /**
    * Consider a click as 'out'?
    */
@@ -55,6 +54,7 @@ public class CSSHoverClass implements EventListener {
 
   /**
    * Constructor
+   * 
    * @param overclass class to set when over
    * @param outclass class to set when out
    * @param clickisout consider a click to be an 'out' event
@@ -82,7 +82,7 @@ public class CSSHoverClass implements EventListener {
   @Override
   public void handleEvent(Event evt) {
     Element e = (Element) evt.getTarget();
-    if (evt.getType() == SVGConstants.SVG_EVENT_MOUSEOVER) {
+    if (SVGConstants.SVG_EVENT_MOUSEOVER.equals(evt.getType())) {
       if (overclass != null) {
         SVGUtil.addCSSClass(e, overclass);
       }
@@ -90,7 +90,7 @@ public class CSSHoverClass implements EventListener {
         SVGUtil.removeCSSClass(e, outclass);
       }
     }
-    if (evt.getType() == SVGConstants.SVG_EVENT_MOUSEOUT) {
+    if (SVGConstants.SVG_EVENT_MOUSEOUT.equals(evt.getType())) {
       if (overclass != null) {
         SVGUtil.removeCSSClass(e, overclass);
       }
@@ -98,7 +98,7 @@ public class CSSHoverClass implements EventListener {
         SVGUtil.addCSSClass(e, outclass);
       }
     }
-    if (clickisout && evt.getType() == SVGConstants.SVG_EVENT_CLICK) {
+    if (clickisout && SVGConstants.SVG_EVENT_CLICK.equals(evt.getType())) {
       if (overclass != null) {
         SVGUtil.removeCSSClass(e, overclass);
       }

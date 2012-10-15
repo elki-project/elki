@@ -106,10 +106,10 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
+    for (ScatterPlotProjector<?> p : ps) {
       Collection<AbstractMTree<?, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
-      for(AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
-        if(canVisualize(tree) && tree instanceof Result) {
+      for (AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
+        if (canVisualize(tree) && tree instanceof Result) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
           task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
           baseResult.getHierarchy().add((Result) tree, task);
@@ -130,15 +130,14 @@ public class TreeSphereVisualization extends AbstractVisFactory {
    * @param tree Tree to visualize
    * @return p value
    */
-  public static Double getLPNormP(AbstractMTree<?, ?, ?, ?> tree) {
+  public static double getLPNormP(AbstractMTree<?, ?, ?, ?> tree) {
     // Note: we deliberately lose generics here, so the compilers complain
-    // less
-    // on the next typecheck and cast!
+    // less on the next typecheck and cast!
     DistanceFunction<?, ?> distanceFunction = tree.getDistanceQuery().getDistanceFunction();
-    if(LPNormDistanceFunction.class.isInstance(distanceFunction)) {
+    if (LPNormDistanceFunction.class.isInstance(distanceFunction)) {
       return ((LPNormDistanceFunction) distanceFunction).getP();
     }
-    return null;
+    return 0;
   }
 
   /**
@@ -148,8 +147,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
    * @return whether the tree is visualizable
    */
   public static boolean canVisualize(AbstractMTree<?, ?, ?, ?> tree) {
-    Double p = getLPNormP(tree);
-    return (p != null);
+    return getLPNormP(tree) > 0;
   }
 
   /**
@@ -197,31 +195,28 @@ public class TreeSphereVisualization extends AbstractVisFactory {
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
       p = getLPNormP(tree);
-      if(tree != null) {
-        if(ManhattanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
+      if (tree != null) {
+        if (ManhattanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
           dist = Modus.MANHATTAN;
-        }
-        else if(EuclideanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
+        } else if (EuclideanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
           dist = Modus.EUCLIDEAN;
-        }
-        else {
+        } else {
           dist = Modus.LPCROSS;
         }
         E root = tree.getRootEntry();
         final int mtheight = tree.getHeight();
-        for(int i = 0; i < mtheight; i++) {
+        for (int i = 0; i < mtheight; i++) {
           CSSClass cls = new CSSClass(this, INDEX + i);
           // Relative depth of this level. 1.0 = toplevel
           final double relDepth = 1. - (((double) i) / mtheight);
-          if(settings.fill) {
+          if (settings.fill) {
             cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
             cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
             cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
             cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
             cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
             cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          }
-          else {
+          } else {
             cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
             cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
             cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
@@ -246,15 +241,14 @@ public class TreeSphereVisualization extends AbstractVisFactory {
      */
     private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<?, D, N, E> mtree, E entry, int depth) {
       DBID roid = entry.getRoutingObjectID();
-      if(roid != null) {
+      if (roid != null) {
         NumberVector<?> ro = rel.get(roid);
         D rad = entry.getCoveringRadius();
 
         final Element r;
-        if(dist == Modus.MANHATTAN) {
+        if (dist == Modus.MANHATTAN) {
           r = SVGHyperSphere.drawManhattan(svgp, proj, ro, rad);
-        }
-        else if(dist == Modus.EUCLIDEAN) {
+        } else if (dist == Modus.EUCLIDEAN) {
           r = SVGHyperSphere.drawEuclidean(svgp, proj, ro, rad);
         }
         // TODO: add visualizer for infinity norm?
@@ -266,11 +260,11 @@ public class TreeSphereVisualization extends AbstractVisFactory {
         layer.appendChild(r);
       }
 
-      if(!entry.isLeafEntry()) {
+      if (!entry.isLeafEntry()) {
         N node = mtree.getNode(entry);
-        for(int i = 0; i < node.getNumEntries(); i++) {
+        for (int i = 0; i < node.getNumEntries(); i++) {
           E child = node.getEntry(i);
-          if(!child.isLeafEntry()) {
+          if (!child.isLeafEntry()) {
             visualizeMTreeEntry(svgp, layer, proj, mtree, child, depth + 1);
           }
         }
@@ -298,8 +292,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag fillF = new Flag(TreeMBRVisualization.Parameterizer.FILL_ID);
-      if(config.grab(fillF)) {
-        fill = fillF.getValue();
+      if (config.grab(fillF)) {
+        fill = fillF.isTrue();
       }
     }
 
