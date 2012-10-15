@@ -1,26 +1,27 @@
 package experimentalcode.shared.index.xtree.util;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private List<ET> entries = null;
 
   /** Selected maximum overlap strategy. */
-  private int maxOverlapStrategy = XTreeBase.VOLUME_OVERLAP;
+  private XTreeBase.Overlap maxOverlapStrategy = XTreeBase.Overlap.VOLUME_OVERLAP;
 
   /** The tree calling this splitter. */
   private T tree;
@@ -146,7 +147,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     Arrays.fill(pqUBFirst, Double.NEGATIVE_INFINITY);
     // maintain the second entries' upper bounds
     List<Heap<DoubleIntPair>> pqUBSecond = new ArrayList<Heap<DoubleIntPair>>(dim);
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       // Descending heap
       pqUBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries, Collections.reverseOrder()));
     }
@@ -155,12 +156,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     Arrays.fill(pqLBFirst, Double.POSITIVE_INFINITY);
     // maintain the second entries' minimum lower bounds
     List<Heap<DoubleIntPair>> pqLBSecond = new ArrayList<Heap<DoubleIntPair>>(dim);
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       // Ascending heap
       pqLBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries));
     }
     // initialize bounds for first entry collection
-    for(int index = 0; index < minEntries; index++) {
+    for (int index = 0; index < minEntries; index++) {
       add2MBR(entrySorting, pqUBFirst, pqLBFirst, index);
     }
     HyperBoundingBox mbr1 = new HyperBoundingBox(pqLBFirst, pqUBFirst);
@@ -173,19 +174,19 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
     assert entrySorting.length - maxEntries == minEntries;
     // initialize min/max entries of the second collections' tail
-    for(int index = maxEntries; index < entrySorting.length; index++) {
+    for (int index = maxEntries; index < entrySorting.length; index++) {
       add2MBR(entrySorting, maxSecond, minSecond, index);
     }
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       // with index entrySorting.length => never to be removed
       pqLBSecond.get(i).add(new DoubleIntPair(minSecond[i], entrySorting.length));
       pqUBSecond.get(i).add(new DoubleIntPair(maxSecond[i], entrySorting.length));
     }
     // add the entries to be removed later on
-    for(int index = minEntries; index < maxEntries; index++) {
+    for (int index = minEntries; index < maxEntries; index++) {
       add2MBR(entrySorting, pqUBSecond, pqLBSecond, index);
     }
-    for(int i = 0; i < minSecond.length; i++) {
+    for (int i = 0; i < minSecond.length; i++) {
       minSecond[i] = pqLBSecond.get(i).peek().first;
       maxSecond[i] = pqUBSecond.get(i).peek().first;
     }
@@ -193,7 +194,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     double surfaceSum = SpatialUtil.perimeter(mbr1) + SpatialUtil.perimeter(mbr2);
 
     // generate the other distributions and file the surface sums
-    for(int limit = minEntries; limit < maxEntries; limit++) {
+    for (int limit = minEntries; limit < maxEntries; limit++) {
       // extend first MBR by entry at position entrySorting[limit]:
       add2MBR(entrySorting, pqUBFirst, pqLBFirst, limit);
       // shrink entry at position entrySorting[limit] from second MBR:
@@ -226,26 +227,26 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private void removeFromMBR(List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index, ModifiableHyperBoundingBox mbr) {
     boolean change = false;
     DoubleIntPair pqPair;
-    for(int d = 0; d < mbr.getDimensionality(); d++) {
+    for (int d = 0; d < mbr.getDimensionality(); d++) {
       // remove all relevant upper bound entries belonging to the first set
       pqPair = pqUB.get(d).peek();
-      while(pqPair.second <= index) {
+      while (pqPair.second <= index) {
         change = true;
         pqUB.get(d).poll();
         pqPair = pqUB.get(d).peek();
       }
-      if(change) { // there probably was a change, as an entry has been removed
+      if (change) { // there probably was a change, as an entry has been removed
         mbr.setMax(d, pqPair.first);
       }
       change = false;
       // remove all relevant lower bound entries belonging to the first set
       pqPair = pqLB.get(d).peek();
-      while(pqPair.second <= index) {
+      while (pqPair.second <= index) {
         change = true;
         pqLB.get(d).poll();
         pqPair = pqLB.get(d).peek();
       }
-      if(change) { // there probably was a change, as an entry has been removed
+      if (change) { // there probably was a change, as an entry has been removed
         mbr.setMin(d, pqPair.first);
       }
       change = false;
@@ -269,13 +270,13 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private void add2MBR(Integer[] entrySorting, double[] ub, double[] lb, int index) {
     SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
-    for(int d = 0; d < currMBR.getDimensionality(); d++) {
+    for (int d = 0; d < currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
-      if(max > ub[d]) {
+      if (max > ub[d]) {
         ub[d] = max;
       }
       min = currMBR.getMin(d);
-      if(min < lb[d]) {
+      if (min < lb[d]) {
         lb[d] = min;
       }
     }
@@ -302,7 +303,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private void add2MBR(Integer[] entrySorting, List<Heap<DoubleIntPair>> pqUB, List<Heap<DoubleIntPair>> pqLB, int index) {
     SpatialComparable currMBR = this.entries.get(entrySorting[index]);
     double min, max;
-    for(int d = 0; d < currMBR.getDimensionality(); d++) {
+    for (int d = 0; d < currMBR.getDimensionality(); d++) {
       max = currMBR.getMax(d);
       pqUB.get(d).add(new DoubleIntPair(max, index));
       min = currMBR.getMin(d);
@@ -357,11 +358,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
      */
     @Override
     public int compare(Integer o1, Integer o2) {
-      if(lb) {
+      if (lb) {
         d1 = entries.get(o1).getMin(dimension);
         d2 = entries.get(o2).getMin(dimension);
-      }
-      else {
+      } else {
         d1 = entries.get(o1).getMax(dimension);
         d2 = entries.get(o2).getMax(dimension);
       }
@@ -389,11 +389,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   private Collection<Integer> getCommonSplitDimensions(Collection<ET> entries) {
     Collection<SplitHistory> splitHistories = new ArrayList<SplitHistory>(entries.size());
-    for(ET entry : entries) {
-      if(entry instanceof XDirectoryEntry) {
+    for (ET entry : entries) {
+      if (entry instanceof XDirectoryEntry) {
         splitHistories.add(((XDirectoryEntry) entry).getSplitHistory());
-      }
-      else {
+      } else {
         throw new RuntimeException("Wrong entry type to derive split dimension from: " + entry.getClass().getName());
       }
     }
@@ -420,7 +419,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   private int chooseSplitAxis(Iterable<Integer> dimensionIterable, int minEntries, int maxEntries) {
     // assert that there ARE dimensions to be tested
-    if(!dimensionIterable.iterator().hasNext()) {
+    if (!dimensionIterable.iterator().hasNext()) {
       return -1;
     }
 
@@ -432,32 +431,32 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     int optAxis = -1;
 
     Integer[] entriesByLB = new Integer[entries.size()];
-    for(int i = 0; i < entriesByLB.length; i++) {
+    for (int i = 0; i < entriesByLB.length; i++) {
       entriesByLB[i] = i;
     }
     Integer[] entriesByUB = Arrays.copyOf(entriesByLB, entries.size());
 
     Integer[] entriesByLBRev = null, entriesByUBRev = null;
-    if(maxEntries <= entries.size() / 2) {
+    if (maxEntries <= entries.size() / 2) {
       System.out.println("THIS HAPPENS!!");
       // initialize backwards direction
       entriesByLBRev = new Integer[entries.size()];
       entriesByUBRev = new Integer[entries.size()];
     }
 
-    for(Integer d : dimensionIterable) {
+    for (Integer d : dimensionIterable) {
       sortEntriesForDimension(d, entriesByLB, entriesByUB);
       double surfaceSum = generateDistributionsAndSurfaceSums(minEntries, maxEntries, entriesByLB, entriesByUB);
-      if(maxEntries <= entries.size() / 2) { // add opposite ranges
+      if (maxEntries <= entries.size() / 2) { // add opposite ranges
         System.out.println("THIS HAPPENS intern");
-        for(int j = 0; j < entriesByUB.length; j++) {
+        for (int j = 0; j < entriesByUB.length; j++) {
           // reverse sorting
           entriesByUBRev[entries.size() - 1 - j] = entriesByUB[j];
           entriesByLBRev[entries.size() - 1 - j] = entriesByLB[j];
         }
         surfaceSum += generateDistributionsAndSurfaceSums(minEntries, maxEntries, entriesByLBRev, entriesByUBRev);
       }
-      if(surfaceSum < optSurfaceSum) {
+      if (surfaceSum < optSurfaceSum) {
         optSurfaceSum = surfaceSum;
         optAxis = d;
       }
@@ -478,9 +477,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *        this is either the minimum directory capacity or, if a topological
    *        split has already failed, the tree's minimum fan-out parameter.
    * @param maxEntries The maximum number of entries to be tested
-   * @param revert if <code>maxEntrie &lt; {@link #entries}.size()</code> and <code>revert</code>
-   *        is <code>true</code>, the upper range of the sorting is tested, i.e.
-   *        not <code>{minEntries, ..., maxEntries}</code> but
+   * @param revert if <code>maxEntrie &lt; {@link #entries}.size()</code> and
+   *        <code>revert</code> is <code>true</code>, the upper range of the
+   *        sorting is tested, i.e. not
+   *        <code>{minEntries, ..., maxEntries}</code> but
    * 
    *        <code>{{@link #entries}.size() - maxEntries + 1, ..., {@link #entries}.size() - minEntries + 1}</code>
    * @return The distribution with the minimal intersection volume or
@@ -488,7 +488,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *         is larger than the allowed <code>maxOverlap</code> ratio
    */
   private SplitSorting chooseMinimumOverlapSplit(int splitAxis, int minEntries, int maxEntries, boolean revert) {
-    if(splitAxis != -1) {
+    if (splitAxis != -1) {
       double optXVolume = Double.POSITIVE_INFINITY;
       double optVolume = Double.POSITIVE_INFINITY;
       SplitSorting optDistribution = null;
@@ -496,51 +496,49 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
       // generate sortings for the mbr's extrema
       Integer[] entrySorting = new Integer[entries.size()];
-      for(int i = 0; i < entrySorting.length; i++) {
+      for (int i = 0; i < entrySorting.length; i++) {
         entrySorting[i] = i;
       }
       Integer[] lbSorting = Arrays.copyOf(entrySorting, entrySorting.length);
       Integer[] ubSorting = Arrays.copyOf(entrySorting, entrySorting.length);
       sortEntriesForDimension(splitAxis, entrySorting, entrySorting);
-      if(revert && maxEntries < entries.size() / 2) {
+      if (revert && maxEntries < entries.size() / 2) {
         // test reverted sortings
         int[][] reverted = new int[2][entries.size()]; // temp array
-        for(int i = 0; i < lbSorting.length; i++) {
+        for (int i = 0; i < lbSorting.length; i++) {
           reverted[0][reverted[0].length - 1 - i] = lbSorting[i];
           reverted[1][reverted[1].length - 1 - i] = ubSorting[i];
         }
-        for(int i = 0; i < lbSorting.length; i++) {
+        for (int i = 0; i < lbSorting.length; i++) {
           lbSorting[i] = reverted[0][i];
           ubSorting[i] = reverted[1][i];
         }
       }
-      for(int i = 0; i < 2; i++) { // test lower and upper bound sortings
-        if(i == 0) { // lower-bound sorting
+      for (int i = 0; i < 2; i++) { // test lower and upper bound sortings
+        if (i == 0) { // lower-bound sorting
           entrySorting = lbSorting;
-        }
-        else {
+        } else {
           // upper-bound sorting
           entrySorting = ubSorting;
         }
-        for(int limit = minEntries; limit <= maxEntries; limit++) {
+        for (int limit = minEntries; limit <= maxEntries; limit++) {
           HyperBoundingBox mbr1 = mbr(entrySorting, 0, limit);
           HyperBoundingBox mbr2 = mbr(entrySorting, limit, entrySorting.length);
           double xVolume = getIntersectionVolume(mbr1, mbr2);
-          if(xVolume < optXVolume) {
+          if (xVolume < optXVolume) {
             optXVolume = xVolume;
             optDistribution = generateSplitSorting(entrySorting, limit);
             optMBRs = new HyperBoundingBox[] { mbr1, mbr2 };
             optVolume = Double.NaN;
-          }
-          else if(xVolume == optXVolume) {
+          } else if (xVolume == optXVolume) {
             double vol = SpatialUtil.volume(mbr1);
             vol += SpatialUtil.volume(mbr2);
-            if(Double.isNaN(optVolume)) {
+            if (Double.isNaN(optVolume)) {
               // calculate when necessary
               optVolume = SpatialUtil.volume(optMBRs[0]);
               optVolume += SpatialUtil.volume(optMBRs[1]);
             }
-            if(vol < optVolume) {
+            if (vol < optVolume) {
               optXVolume = xVolume;
               optVolume = vol;
               optDistribution = generateSplitSorting(entrySorting, limit);
@@ -548,34 +546,34 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
           }
         }
       }
-      if(!entries.get(0).isLeafEntry() && tree.get_max_overlap() < 1) {
+      if (!entries.get(0).isLeafEntry() && tree.get_max_overlap() < 1) {
         // test overlap
-        if(maxOverlapStrategy == XTreeBase.DATA_OVERLAP) {
+        switch(maxOverlapStrategy) {
+        case DATA_OVERLAP:
           pastOverlap = getRatioOfDataInIntersectionVolume(generateDistribution(optDistribution), optMBRs);
-          if(tree.get_max_overlap() < pastOverlap) {
+          if (tree.get_max_overlap() < pastOverlap) {
             logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best data overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
             return null;
           }
-        }
-        else { // strategy == VOLUME_OVERLAP
-          if(Double.isNaN(optVolume)) {
+          break;
+        case VOLUME_OVERLAP:
+          if (Double.isNaN(optVolume)) {
             optVolume = SpatialUtil.volume(optMBRs[0]);
             optVolume += SpatialUtil.volume(optMBRs[1]);
           }
           pastOverlap = optXVolume / optVolume;
-          if(tree.get_max_overlap() < pastOverlap) {
+          if (tree.get_max_overlap() < pastOverlap) {
             logger.finest(String.format(Locale.ENGLISH, "No %s split found%s; best volume overlap was %.3f", (minEntries == tree.get_min_fanout() ? "minimum overlap" : "topological"), (maxEntries < entries.size() / 2 ? " in " + (revert ? "second" : "first") + " range" : ""), pastOverlap));
             return null;
           }
+          break;
         }
-      }
-      else {
+      } else {
         pastOverlap = Double.NaN; // overlap is not computed
       }
 
       return optDistribution;
-    }
-    else {
+    } else {
       pastOverlap = Double.MAX_VALUE;
       return null;
     }
@@ -598,10 +596,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     distibution[0] = new ArrayList<ET>();
     distibution[1] = new ArrayList<ET>();
     List<ET> sorted_entries = sorting.getSortedEntries();
-    for(int i = 0; i < sorting.getSplitPoint(); i++) {
+    for (int i = 0; i < sorting.getSplitPoint(); i++) {
       distibution[0].add(sorted_entries.get(i));
     }
-    for(int i = sorting.getSplitPoint(); i < entries.size(); i++) {
+    for (int i = sorting.getSplitPoint(); i < entries.size(); i++) {
       distibution[1].add(sorted_entries.get(i));
     }
     return distibution;
@@ -620,7 +618,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   private SplitSorting generateSplitSorting(Integer[] entrySorting, int limit) {
     List<ET> sorting = new ArrayList<ET>();
-    for(int i = 0; i < entries.size(); i++) {
+    for (int i = 0; i < entries.size(); i++) {
       sorting.add(entries.get(entrySorting[i]));
     }
     return new SplitSorting(sorting, limit, splitAxis);
@@ -643,29 +641,28 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return distribution resulting from the minimum overlap split
    */
   public SplitSorting minimumOverlapSplit() {
-    if(entries.get(0).isLeafEntry()) {
+    if (entries.get(0).isLeafEntry()) {
       throw new IllegalArgumentException("The minimum overlap split will only be performed on directory nodes");
     }
-    if(entries.size() < 2) {
+    if (entries.size() < 2) {
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
     int maxEntries = tree.getDirCapacity() - 1;
     int minFanout = tree.get_min_fanout();
-    if(entries.size() < maxEntries) {
+    if (entries.size() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + entries.size() + "<=" + maxEntries);
     }
     assert !entries.get(0).isLeafEntry();
 
-    if((minFanout < tree.getDirMinimum())) {
+    if ((minFanout < tree.getDirMinimum())) {
       Iterable<Integer> dimensionListing;
-      if(entries.get(0) instanceof XDirectoryEntry) {
+      if (entries.get(0) instanceof XDirectoryEntry) {
         // filter common split dimensions
         dimensionListing = getCommonSplitDimensions(entries);
-        if(!dimensionListing.iterator().hasNext()) { // no common dimensions
+        if (!dimensionListing.iterator().hasNext()) { // no common dimensions
           return null;
         }
-      }
-      else {
+      } else {
         // test all dimensions
         dimensionListing = new Range(0, entries.get(0).getDimensionality());
       }
@@ -673,33 +670,31 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
       maxEntries = maxEntries + 1 - minFanout; // = maximum left-hand size
       chooseSplitAxis(dimensionListing, minFanout, maxEntries);
       // find the best split point
-      if(formerSplitAxis == this.splitAxis && tree.getDirMinimum() > minFanout) {
+      if (formerSplitAxis == this.splitAxis && tree.getDirMinimum() > minFanout) {
         // remember: this follows an unsuccessful topological split
         // avoid duplicate computations of {minEntries, ..., maxEntries}
         double minOverlap = pastOverlap;
         // test {minFanout, ..., minEntries - 1}
         SplitSorting ret1 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, false);
-        if(ret1 != null && pastOverlap < minOverlap) {
+        if (ret1 != null && pastOverlap < minOverlap) {
           minOverlap = pastOverlap; // this is a valid choice
         }
         // test {maxEntries - minEntries + 2, ..., maxEntries - minFanout + 1}
         SplitSorting ret2 = chooseMinimumOverlapSplit(this.splitAxis, minFanout, tree.getDirMinimum() - 1, true);
-        if(ret2 == null) {
+        if (ret2 == null) {
           // accept first range regardless of whether or not there is one
           pastOverlap = minOverlap;
           return ret1;
         }
-        if(pastOverlap < minOverlap) { // the second range is better
+        if (pastOverlap < minOverlap) { // the second range is better
           return ret2;
         }
         pastOverlap = minOverlap; // the first range is better
         return ret1;
-      }
-      else {
+      } else {
         return chooseMinimumOverlapSplit(this.splitAxis, minFanout, maxEntries, false);
       }
-    }
-    else { // minFanout not set for allowing underflowing nodes
+    } else { // minFanout not set for allowing underflowing nodes
       return null;
     }
   }
@@ -722,12 +717,12 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *         allowed <code>maxOverlap</code> ratio of #tree
    */
   public SplitSorting topologicalSplit() {
-    if(entries.size() < 2) {
+    if (entries.size() < 2) {
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
     int minEntries = (entries.get(0).isLeafEntry() ? tree.getLeafMinimum() : tree.getDirMinimum());
     int maxEntries = (entries.get(0).isLeafEntry() ? tree.getLeafCapacity() - 1 : tree.getDirCapacity() - 1);
-    if(entries.size() < maxEntries) {
+    if (entries.size() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + entries.size() + "<=" + maxEntries);
     }
 
@@ -752,18 +747,18 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
 
     SpatialComparable currMBR = this.entries.get(entries[from]);
 
-    for(int d = 0; d < min.length; d++) {
+    for (int d = 0; d < min.length; d++) {
       min[d] = currMBR.getMin(d);
       max[d] = currMBR.getMax(d);
     }
 
-    for(int i = from + 1; i < to; i++) {
+    for (int i = from + 1; i < to; i++) {
       currMBR = this.entries.get(entries[i]);
-      for(int d = 0; d < min.length; d++) {
-        if(min[d] > currMBR.getMin(d)) {
+      for (int d = 0; d < min.length; d++) {
+        if (min[d] > currMBR.getMin(d)) {
           min[d] = currMBR.getMin(d);
         }
-        if(max[d] < currMBR.getMax(d)) {
+        if (max[d] < currMBR.getMax(d)) {
           max[d] = currMBR.getMax(d);
         }
       }
@@ -782,9 +777,9 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     final int dimensionality = m1.getDimensionality();
 
     double volume = 1.0, len;
-    for(int d = 0; d < dimensionality; d++) {
+    for (int d = 0; d < dimensionality; d++) {
       len = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d)) - (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
-      if(len <= 0.) {
+      if (len <= 0.) {
         return 0.;
       }
       volume *= len;
@@ -806,10 +801,10 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     final int dimensionality = m1.getDimensionality();
     double[] min = new double[dimensionality];
     double[] max = new double[dimensionality];
-    for(int d = 0; d < dimensionality; d++) {
+    for (int d = 0; d < dimensionality; d++) {
       min[d] = (m1.getMin(d) > m2.getMin(d) ? m1.getMin(d) : m2.getMin(d));
       max[d] = (m1.getMax(d) < m2.getMax(d) ? m1.getMax(d) : m2.getMax(d));
-      if(min[d] > max[d]) {
+      if (min[d] > max[d]) {
         return null;
       }
     }
@@ -827,7 +822,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    */
   public double getRatioOfDataInIntersectionVolume(List<ET>[] split, HyperBoundingBox[] mbrs) {
     final HyperBoundingBox xMBR = getIntersection(mbrs[0], mbrs[1]);
-    if(xMBR == null) {
+    if (xMBR == null) {
       return 0.;
     }
     // Total number of entries, intersecting entries
@@ -852,15 +847,14 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    *         number of data objects intersecting <code>mbr</code>
    */
   private <ET2 extends SpatialEntry> int[] countXingDataEntries(final Collection<ET2> entries, final HyperBoundingBox mbr, int[] numOf) {
-    for(ET2 entry : entries) {
-      if(entry.isLeafEntry()) {
+    for (ET2 entry : entries) {
+      if (entry.isLeafEntry()) {
         numOf[0]++;
-        if(SpatialUtil.intersects(mbr, entry)) {
+        if (SpatialUtil.intersects(mbr, entry)) {
           numOf[1]++;
         }
-      }
-      else {
-        N node = tree.getNode(((DirectoryEntry)entry).getPageID());
+      } else {
+        N node = tree.getNode(((DirectoryEntry) entry).getPageID());
         countXingDataEntries(node.getChildren(), mbr, numOf);
       }
     }

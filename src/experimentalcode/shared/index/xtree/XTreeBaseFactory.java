@@ -1,26 +1,27 @@
 package experimentalcode.shared.index.xtree;
+
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2012
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2012
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.index.Index;
@@ -30,13 +31,13 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFac
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.EqualStringConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
  * Factory class for XTree.
@@ -53,7 +54,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
 
   protected float max_overlap;
 
-  protected int overlap_type;
+  protected XTreeBase.Overlap overlap_type;
 
   /**
    * Constructor.
@@ -69,7 +70,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
    * @param max_overlap
    * @param overlap_type
    */
-  public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+  public XTreeBaseFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
     super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, null, null, relativeMinEntries);
     this.relativeMinFanout = relativeMinFanout;
     this.reinsert_fraction = reinsert_fraction;
@@ -128,37 +129,34 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
 
     protected float max_overlap;
 
-    protected int overlap_type;
+    protected XTreeBase.Overlap overlap_type;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Bulk loads are not supported yet:
       // super.configBulkLoad(config);
-      final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.3);
-      if(config.grab(MIN_FANOUT_PARAMETER)) {
+      final DoubleParameter MIN_FANOUT_PARAMETER = new DoubleParameter(MIN_FANOUT_ID, 0.3);
+      MIN_FANOUT_PARAMETER.addConstraint(new GreaterEqualConstraint(0));
+      MIN_FANOUT_PARAMETER.addConstraint(new LessEqualConstraint(1));
+      if (config.grab(MIN_FANOUT_PARAMETER)) {
         relativeMinFanout = MIN_FANOUT_PARAMETER.getValue();
       }
-      final DoubleParameter REINSERT_PARAMETER = new DoubleParameter(REINSERT_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.OPEN), 0.3);
-      if(config.grab(REINSERT_PARAMETER)) {
+      final DoubleParameter REINSERT_PARAMETER = new DoubleParameter(REINSERT_ID, 0.3);
+      REINSERT_PARAMETER.addConstraint(new GreaterEqualConstraint(0));
+      REINSERT_PARAMETER.addConstraint(new LessConstraint(1));
+      if (config.grab(REINSERT_PARAMETER)) {
         reinsert_fraction = REINSERT_PARAMETER.getValue().floatValue();
       }
-      final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, new IntervalConstraint(0, IntervalBoundary.OPEN, 1, IntervalBoundary.CLOSE), 0.2);
-      if(config.grab(MAX_OVERLAP_PARAMETER)) {
+      final DoubleParameter MAX_OVERLAP_PARAMETER = new DoubleParameter(MAX_OVERLAP_ID, 0.2);
+      MAX_OVERLAP_PARAMETER.addConstraint(new GreaterConstraint(0));
+      MAX_OVERLAP_PARAMETER.addConstraint(new LessEqualConstraint(1));
+      if (config.grab(MAX_OVERLAP_PARAMETER)) {
         max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
       }
-      final StringParameter OVERLAP_TYPE_PARAMETER = new StringParameter(OVERLAP_TYPE_ID, new EqualStringConstraint(new String[] { "DataOverlap", "VolumeOverlap" }), "VolumeOverlap");
-      if(config.grab(OVERLAP_TYPE_PARAMETER)) {
-        String mOType = OVERLAP_TYPE_PARAMETER.getValue();
-        if(mOType.equals("DataOverlap")) {
-          overlap_type = XTreeBase.DATA_OVERLAP;
-        }
-        else if(mOType.equals("VolumeOverlap")) {
-          overlap_type = XTreeBase.VOLUME_OVERLAP;
-        }
-        else {
-          config.reportError(new WrongParameterValueException("Wrong input parameter for overlap type '" + mOType + "'"));
-        }
+      final EnumParameter<XTreeBase.Overlap> OVERLAP_TYPE_PARAMETER = new EnumParameter<XTreeBase.Overlap>(OVERLAP_TYPE_ID, XTreeBase.Overlap.class, XTreeBase.Overlap.VOLUME_OVERLAP);
+      if (config.grab(OVERLAP_TYPE_PARAMETER)) {
+        overlap_type = OVERLAP_TYPE_PARAMETER.getValue();
       }
     }
   }

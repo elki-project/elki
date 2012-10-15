@@ -26,7 +26,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 public class XTreeFactory<O extends NumberVector<?>> extends XTreeBaseFactory<O, XTreeNode, SpatialEntry, XTreeIndex<O>> {
-  public XTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, int overlap_type) {
+  public XTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
     super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
   }
 
@@ -54,7 +53,7 @@ public class XTreeFactory<O extends NumberVector<?>> extends XTreeBaseFactory<O,
   
   public static class Parameterizer<O extends NumberVector<?>> extends XTreeBaseFactory.Parameterizer<O> {
     @Override
-    protected AbstractRStarTreeFactory<O, ?, ?, ?> makeInstance() {
+    protected XTreeFactory<O> makeInstance() {
       return new XTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
     }
   }
