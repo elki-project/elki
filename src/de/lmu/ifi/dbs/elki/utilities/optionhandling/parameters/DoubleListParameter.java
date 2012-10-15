@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying a list of double values.
@@ -39,44 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Erich Schubert
  */
 public class DoubleListParameter extends ListParameter<Double> {
-  /**
-   * Constructs a list parameter with the given optionID.
-   * 
-   * @param optionID Option ID
-   * @param constraint Constraint
-   * @param defaultValue Default value
-   */
-  @Deprecated
-  public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, List<Double> defaultValue) {
-    super(optionID, defaultValue);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a list parameter with the given optionID.
-   * 
-   * @param optionID Option ID
-   * @param constraint Constraint
-   * @param optional Optional flag
-   */
-  @Deprecated
-  public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, boolean optional) {
-    super(optionID, optional);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a list parameter with the given optionID.
-   * 
-   * @param optionID Option ID
-   * @param constraint Constraint
-   */
-  @Deprecated
-  public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint) {
-    super(optionID);
-    addConstraint(constraint);
-  }
-
   /**
    * Constructs a list parameter with the given optionID and optional flag.
    * 

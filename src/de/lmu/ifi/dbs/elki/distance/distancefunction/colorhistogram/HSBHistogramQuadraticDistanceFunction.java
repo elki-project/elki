@@ -31,7 +31,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
@@ -131,7 +132,7 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
       super.makeOptions(config);
       IntListParameter param = new IntListParameter(BPP_ID);
       param.addConstraint(new ListSizeConstraint(3));
-      param.addConstraint(new ListGreaterEqualConstraint(1));
+      param.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(1)));
       if(config.grab(param)) {
         List<Integer> quant = param.getValue();
         assert (quant.size() == 3);

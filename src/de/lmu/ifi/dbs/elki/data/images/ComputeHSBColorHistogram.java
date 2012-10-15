@@ -29,7 +29,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
@@ -126,7 +127,7 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
       super.makeOptions(config);
       final IntListParameter param = new IntListParameter(BINSPERPLANE_ID);
       param.addConstraint(new ListSizeConstraint(3));
-      param.addConstraint(new ListGreaterEqualConstraint(1));
+      param.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(1)));
 
       if(config.grab(param)) {
         List<Integer> quant = param.getValue();

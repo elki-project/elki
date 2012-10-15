@@ -162,7 +162,8 @@ public class ResultVisualizer implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      StringParameter titleP = new StringParameter(WINDOW_TITLE_ID, true);
+      StringParameter titleP = new StringParameter(WINDOW_TITLE_ID);
+      titleP.setOptional(true);
       if(config.grab(titleP)) {
         title = titleP.getValue();
       }

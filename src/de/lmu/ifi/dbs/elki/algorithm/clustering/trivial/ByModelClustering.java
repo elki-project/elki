@@ -149,7 +149,8 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter noisepatP = new PatternParameter(NOISE_ID, true);
+      PatternParameter noisepatP = new PatternParameter(NOISE_ID);
+      noisepatP.setOptional(true);
       if(config.grab(noisepatP)) {
         noisepat = noisepatP.getValue();
       }

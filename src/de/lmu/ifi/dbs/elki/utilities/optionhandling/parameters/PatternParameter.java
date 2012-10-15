@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying a pattern.
@@ -39,57 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Erich Schubert
  */
 public class PatternParameter extends AbstractParameter<Pattern> {
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param defaultValue the default value of the parameter
-   */
-  public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, Pattern defaultValue) {
-    super(optionID, defaultValue);
-    addConstraint(constraint);
-}
-
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param defaultValue the default value of the parameter
-   */
-  public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, String defaultValue) {
-    super(optionID, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param optional Flag to signal an optional parameter.
-   */
-  public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, boolean optional) {
-    super(optionID, optional);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   */
-  public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint) {
-    super(optionID);
-    addConstraint(constraint);
-  }
-
   /**
    * Constructs a pattern parameter with the given optionID, and default value.
    * 
@@ -108,16 +56,6 @@ public class PatternParameter extends AbstractParameter<Pattern> {
    */
   public PatternParameter(OptionID optionID, String defaultValue) {
     super(optionID, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
-  }
-
-  /**
-   * Constructs a pattern parameter with the given optionID.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param optional Flag to signal an optional parameter.
-   */
-  public PatternParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
   }
 
   /**
