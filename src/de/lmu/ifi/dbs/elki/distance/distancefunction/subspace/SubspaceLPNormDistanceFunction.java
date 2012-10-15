@@ -199,7 +199,8 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
     @Override
     protected void makeOptions(Parameterization config) {
-      final DoubleParameter paramP = new DoubleParameter(LPNormDistanceFunction.P_ID, new GreaterConstraint(0));
+      final DoubleParameter paramP = new DoubleParameter(LPNormDistanceFunction.P_ID);
+      paramP.addConstraint(new GreaterConstraint(0));
       if(config.grab(paramP)) {
         p = paramP.getValue();
       }

@@ -432,18 +432,21 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         distf = distP.instantiateClass(config);
       }
       // k parameters
-      IntParameter stepkP = new IntParameter(STEPK_ID, new GreaterConstraint(0));
+      IntParameter stepkP = new IntParameter(STEPK_ID);
+      stepkP.addConstraint(new GreaterConstraint(0));
       if(config.grab(stepkP)) {
         stepk = stepkP.getValue();
       }
-      IntParameter startkP = new IntParameter(STARTK_ID, true);
+      IntParameter startkP = new IntParameter(STARTK_ID);
+      startkP.setOptional(true);
       if(config.grab(startkP)) {
         startk = startkP.getValue();
       }
       else {
         startk = stepk;
       }
-      IntParameter maxkP = new IntParameter(MAXK_ID, new GreaterConstraint(0));
+      IntParameter maxkP = new IntParameter(MAXK_ID);
+      maxkP.addConstraint(new GreaterConstraint(0));
       if(config.grab(maxkP)) {
         maxk = maxkP.getValue();
       }

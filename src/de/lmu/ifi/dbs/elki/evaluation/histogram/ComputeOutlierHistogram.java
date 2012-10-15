@@ -260,7 +260,8 @@ public class ComputeOutlierHistogram implements Evaluator {
         positiveClassName = positiveClassNameP.getValue();
       }
 
-      IntParameter binsP = new IntParameter(BINS_ID, new GreaterConstraint(1), 50);
+      IntParameter binsP = new IntParameter(BINS_ID, 50);
+      binsP.addConstraint(new GreaterConstraint(1));
       if(config.grab(binsP)) {
         bins = binsP.getValue();
       }

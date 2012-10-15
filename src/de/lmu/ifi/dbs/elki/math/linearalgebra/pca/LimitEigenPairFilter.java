@@ -99,27 +99,26 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     StringBuilder msg = new StringBuilder();
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       msg.append("delta = ").append(delta);
     }
 
     // determine limit
     double limit;
-    if(absolute) {
+    if (absolute) {
       limit = delta;
-    }
-    else {
+    } else {
       double max = Double.NEGATIVE_INFINITY;
-      for(int i = 0; i < eigenPairs.size(); i++) {
+      for (int i = 0; i < eigenPairs.size(); i++) {
         EigenPair eigenPair = eigenPairs.getEigenPair(i);
         double eigenValue = Math.abs(eigenPair.getEigenvalue());
-        if(max < eigenValue) {
+        if (max < eigenValue) {
           max = eigenValue;
         }
       }
       limit = max * delta;
     }
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       msg.append("\nlimit = ").append(limit);
     }
 
@@ -128,17 +127,16 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
 
     // determine strong and weak eigenpairs
-    for(int i = 0; i < eigenPairs.size(); i++) {
+    for (int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       double eigenValue = Math.abs(eigenPair.getEigenvalue());
-      if(eigenValue >= limit) {
+      if (eigenValue >= limit) {
         strongEigenPairs.add(eigenPair);
-      }
-      else {
+      } else {
         weakEigenPairs.add(eigenPair);
       }
     }
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
       msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
       LOG.debugFine(msg.toString());
@@ -169,15 +167,16 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag absoluteF = new Flag(EIGENPAIR_FILTER_ABSOLUTE);
-      if(config.grab(absoluteF)) {
+      if (config.grab(absoluteF)) {
         absolute = absoluteF.getValue();
       }
 
-      DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, new GreaterEqualConstraint(0), DEFAULT_DELTA);
-      if(config.grab(deltaP)) {
+      DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA);
+      deltaP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(deltaP)) {
         delta = deltaP.getValue();
         // TODO: make this a global constraint?
-        if(absolute && deltaP.tookDefaultValue()) {
+        if (absolute && deltaP.tookDefaultValue()) {
           config.reportError(new WrongParameterValueException("Illegal parameter setting: " + "Flag " + absoluteF.getName() + " is set, " + "but no value for " + deltaP.getName() + " is specified."));
         }
       }
@@ -186,16 +185,16 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       // delta must be >= 0 and <= 1 if it's a relative value
       // Since relative or absolute is dependent on the absolute flag this is a
       // global constraint!
-      List<ParameterConstraint<Number>> cons = new Vector<ParameterConstraint<Number>>();
+      List<ParameterConstraint<? super Double>> cons = new Vector<ParameterConstraint<? super Double>>();
       // TODO: Keep the constraint here - applies to non-conditional case as
       // well,
       // and is set above.
-      ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0);
+      ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0.);
       cons.add(aboveNull);
-      ParameterConstraint<Number> underOne = new LessEqualConstraint(1);
+      ParameterConstraint<Number> underOne = new LessEqualConstraint(1.);
       cons.add(underOne);
 
-      GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Number, Double>(deltaP, cons, absoluteF, false);
+      GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Double>(deltaP, cons, absoluteF, false);
       config.checkConstraint(gpc);
     }
 

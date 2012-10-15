@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -39,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * 
  * @param <D> Distance type 
  */
-public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<D, D> {
+public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<D> {
   /**
    * Distance type
    */
@@ -47,90 +45,6 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
   
   /**
    * Constructs a double parameter with the given optionID, parameter
-   * constraints, and default value.
-   * 
-   * @param optionID the unique optionID
-   * @param dist distance factory
-   * @param cons a list of parameter constraints for this double parameter
-   * @param defaultValue the default value for this double parameter
-   */
-  public DistanceParameter(OptionID optionID, D dist, List<ParameterConstraint<D>> cons, D defaultValue) {
-    super(optionID, cons, defaultValue);
-    this.dist = dist;
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, parameter
-   * constraints, and default value.
-   * 
-   * @param optionID the unique optionID
-   * @param dist distance factory
-   * @param cons a list of parameter constraints for this double parameter
-   * @param defaultValue the default value for this double parameter
-   */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, List<ParameterConstraint<D>> cons, D defaultValue) {
-    super(optionID, cons, defaultValue);
-    this.dist = (dist != null) ? dist.getDistanceFactory() : null;
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, parameter
-   * constraints, and optional flag.
-   * 
-   * @param optionID the unique optionID
-   * @param dist distance factory
-   * @param cons a list of parameter constraints for this double parameter
-   * @param optional specifies whether this parameter is an optional parameter
-   */
-  public DistanceParameter(OptionID optionID, D dist, List<ParameterConstraint<D>> cons, boolean optional) {
-    this(optionID, dist, cons);
-    setOptional(optional);
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, parameter
-   * constraints, and optional flag.
-   * 
-   * @param optionID the unique optionID
-   * @param dist distance factory
-   * @param cons a list of parameter constraints for this double parameter
-   * @param optional specifies whether this parameter is an optional parameter
-   */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, List<ParameterConstraint<D>> cons, boolean optional) {
-    this(optionID, dist, cons);
-    setOptional(optional);
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, and parameter
-   * constraints.
-   * 
-   * @param optionID the unique optionID
-   * @param dist distance factory
-   * @param constraints a list of parameter constraints for this double
-   *        parameter
-   */
-  public DistanceParameter(OptionID optionID, D dist, List<ParameterConstraint<D>> constraints) {
-    super(optionID, constraints);
-    this.dist = dist;
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, and parameter
-   * constraints.
-   * 
-   * @param optionID the unique optionID
-   * @param dist distance factory
-   * @param constraints a list of parameter constraints for this double
-   *        parameter
-   */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, List<ParameterConstraint<D>> constraints) {
-    super(optionID, constraints);
-    this.dist = (dist != null) ? dist.getDistanceFactory() : null;
-  }
-
-  /**
-   * Constructs a double parameter with the given optionID, parameter
    * constraint, and default value.
    * 
    * @param optionID the unique id of this parameter
@@ -138,8 +52,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param constraint the constraint of this parameter
    * @param defaultValue the default value for this parameter
    */
-  public DistanceParameter(OptionID optionID, D dist, ParameterConstraint<D> constraint, D defaultValue) {
-    super(optionID, constraint, defaultValue);
+  public DistanceParameter(OptionID optionID, D dist, ParameterConstraint<? super D> constraint, D defaultValue) {
+    super(optionID, defaultValue);
+    addConstraint(constraint);
     this.dist = dist;
   }
 
@@ -152,8 +67,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param constraint the constraint of this parameter
    * @param defaultValue the default value for this parameter
    */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<D> constraint, D defaultValue) {
-    super(optionID, constraint, defaultValue);
+  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<? super D> constraint, D defaultValue) {
+    super(optionID, defaultValue);
+    addConstraint(constraint);
     this.dist = (dist != null) ? dist.getDistanceFactory() : null;
   }
 
@@ -166,8 +82,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param constraint the constraint of this parameter
    * @param optional specifies whether this parameter is an optional parameter
    */
-  public DistanceParameter(OptionID optionID, D dist, ParameterConstraint<D> constraint, boolean optional) {
-    super(optionID, constraint, optional);
+  public DistanceParameter(OptionID optionID, D dist, ParameterConstraint<? super D> constraint, boolean optional) {
+    super(optionID, optional);
+    addConstraint(constraint);
     this.dist = dist;
   }
 
@@ -180,8 +97,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param constraint the constraint of this parameter
    * @param optional specifies whether this parameter is an optional parameter
    */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<D> constraint, boolean optional) {
-    super(optionID, constraint, optional);
+  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<? super D> constraint, boolean optional) {
+    super(optionID, optional);
+    addConstraint(constraint);
     this.dist = (dist != null) ? dist.getDistanceFactory() : null;
   }
 
@@ -193,8 +111,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param dist distance factory
    * @param constraint the constraint of this parameter
    */
-  public DistanceParameter(OptionID optionID, D dist, ParameterConstraint<D> constraint) {
-    super(optionID, constraint);
+  public DistanceParameter(OptionID optionID, D dist, ParameterConstraint<? super D> constraint) {
+    super(optionID);
+    addConstraint(constraint);
     this.dist = dist;
   }
 
@@ -206,8 +125,9 @@ public class DistanceParameter<D extends Distance<D>> extends AbstractParameter<
    * @param dist distance factory
    * @param constraint the constraint of this parameter
    */
-  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<D> constraint) {
-    super(optionID, constraint);
+  public DistanceParameter(OptionID optionID, DistanceFunction<?, D> dist, ParameterConstraint<? super D> constraint) {
+    super(optionID);
+    addConstraint(constraint);
     this.dist = (dist != null) ? dist.getDistanceFactory() : null;
   }
 

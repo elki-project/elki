@@ -68,7 +68,7 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  public boolean grab(Parameter<?, ?> opt) {
+  public boolean grab(Parameter<?> opt) {
     return false;
   }
 
@@ -78,7 +78,7 @@ public class UnParameterization implements Parameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) {
+  public boolean setValueForOption(Parameter<?> opt) {
     return false;
   }
 

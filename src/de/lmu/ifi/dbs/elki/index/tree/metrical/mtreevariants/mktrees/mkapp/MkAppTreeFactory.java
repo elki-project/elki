@@ -131,19 +131,21 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter K_PARAM = new IntParameter(K_ID, new GreaterConstraint(0));
-      if(config.grab(K_PARAM)) {
-        k_max = K_PARAM.getValue();
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(kP)) {
+        k_max = kP.getValue();
       }
 
-      IntParameter P_PARAM = new IntParameter(P_ID, new GreaterConstraint(0));
-      if(config.grab(P_PARAM)) {
-        p = P_PARAM.getValue();
+      IntParameter pP = new IntParameter(P_ID);
+      pP.addConstraint(new GreaterConstraint(0));
+      if(config.grab(pP)) {
+        p = pP.getValue();
       }
 
-      Flag NOLOG_FLAG = new Flag(NOLOG_ID);
-      if(config.grab(NOLOG_FLAG)) {
-        log = !NOLOG_FLAG.getValue();
+      Flag nologF = new Flag(NOLOG_ID);
+      if(config.grab(nologF)) {
+        log = !nologF.getValue();
       }
     }
 

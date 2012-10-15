@@ -126,13 +126,12 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
   // FIXME: make this single-shot when filename is set!
   protected <N extends ExternalizablePage> PageFile<N> makePageFile(Class<N> cls) {
     final PageFile<N> inner;
-    if(fileName == null) {
+    if (fileName == null) {
       inner = new MemoryPageFile<N>(pageSize);
-    }
-    else {
+    } else {
       inner = new PersistentPageFile<N>(pageSize, fileName, cls);
     }
-    if(cacheSize >= Integer.MAX_VALUE) {
+    if (cacheSize >= Integer.MAX_VALUE) {
       return inner;
     }
     return new LRUCache<N>(cacheSize, inner);
@@ -158,22 +157,24 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter FILE_PARAM = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
-      if(config.grab(FILE_PARAM)) {
-        fileName = FILE_PARAM.getValue().getPath();
-      }
-      else {
+      FileParameter fileNameP = new FileParameter(FILE_ID, FileParameter.FileType.OUTPUT_FILE, true);
+      if (config.grab(fileNameP)) {
+        fileName = fileNameP.getValue().getPath();
+      } else {
         fileName = null;
       }
 
-      final IntParameter PAGE_SIZE_PARAM = new IntParameter(PAGE_SIZE_ID, new GreaterConstraint(0), 4000);
-      if(config.grab(PAGE_SIZE_PARAM)) {
-        pageSize = PAGE_SIZE_PARAM.getValue();
+      final IntParameter pageSizeP = new IntParameter(PAGE_SIZE_ID, 4000);
+      pageSizeP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(pageSizeP)) {
+        pageSize = pageSizeP.getValue();
       }
 
-      LongParameter CACHE_SIZE_PARAM = new LongParameter(CACHE_SIZE_ID, new GreaterEqualConstraint(0), Integer.MAX_VALUE);
-      if(config.grab(CACHE_SIZE_PARAM)) {
-        cacheSize = CACHE_SIZE_PARAM.getValue();
+      // FIXME: long, but limited to int values?!?
+      LongParameter cacheSizeP = new LongParameter(CACHE_SIZE_ID, Integer.MAX_VALUE);
+      cacheSizeP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(cacheSizeP)) {
+        cacheSize = cacheSizeP.getValue();
       }
     }
 

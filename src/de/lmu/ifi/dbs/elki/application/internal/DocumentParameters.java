@@ -118,8 +118,8 @@ public class DocumentParameters {
     File byclsname = new File(args[0]);
     File byoptname = new File(args[1]);
 
-    HashMapList<Class<?>, Parameter<?, ?>> byclass = new HashMapList<Class<?>, Parameter<?, ?>>();
-    HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>>();
+    HashMapList<Class<?>, Parameter<?>> byclass = new HashMapList<Class<?>, Parameter<?>>();
+    HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?>, Class<?>>>();
     try {
       buildParameterIndex(byclass, byopt);
     }
@@ -175,8 +175,8 @@ public class DocumentParameters {
     }
   }
 
-  private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?, ?>> byclass, HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
-    final ArrayList<Pair<Object, Parameter<?, ?>>> options = new ArrayList<Pair<Object, Parameter<?, ?>>>();
+  private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?>> byclass, HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
+    final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<Pair<Object, Parameter<?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       // Doesn't have a proper name?
@@ -225,7 +225,7 @@ public class DocumentParameters {
               throw new RuntimeException(e);
             }
           }
-          for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
+          for(Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
             if(pair.first == null) {
               pair.first = cls;
             }
@@ -262,7 +262,7 @@ public class DocumentParameters {
     }
 
     LOG.debug("Documenting " + options.size() + " parameter instances.");
-    for(Pair<Object, Parameter<?, ?>> pp : options) {
+    for(Pair<Object, Parameter<?>> pp : options) {
       if(pp.first == null || pp.second == null) {
         LOG.debugFiner("Null: " + pp.first + " " + pp.second);
         continue;
@@ -274,14 +274,14 @@ public class DocumentParameters {
       else {
         c = pp.first.getClass();
       }
-      Parameter<?, ?> o = pp.second;
+      Parameter<?> o = pp.second;
 
       // just collect unique occurrences
       {
-        List<Parameter<?, ?>> byc = byclass.get(c);
+        List<Parameter<?>> byc = byclass.get(c);
         boolean inlist = false;
         if(byc != null) {
-          for(Parameter<?, ?> par : byc) {
+          for(Parameter<?> par : byc) {
             if(par.getOptionID() == o.getOptionID()) {
               inlist = true;
               break;
@@ -293,10 +293,10 @@ public class DocumentParameters {
         }
       }
       {
-        List<Pair<Parameter<?, ?>, Class<?>>> byo = byopt.get(o.getOptionID());
+        List<Pair<Parameter<?>, Class<?>>> byo = byopt.get(o.getOptionID());
         boolean inlist = false;
         if(byo != null) {
-          for(Pair<Parameter<?, ?>, Class<?>> pair : byo) {
+          for(Pair<Parameter<?>, Class<?>> pair : byo) {
             if(pair.second.equals(c)) {
               inlist = true;
               break;
@@ -304,7 +304,7 @@ public class DocumentParameters {
           }
         }
         if(!inlist) {
-          byopt.add(o.getOptionID(), new Pair<Parameter<?, ?>, Class<?>>(o, c));
+          byopt.add(o.getOptionID(), new Pair<Parameter<?>, Class<?>>(o, c));
         }
       }
     }
@@ -333,7 +333,7 @@ public class DocumentParameters {
     return null;
   }
 
-  private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?, ?>> byclass) {
+  private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?>> byclass) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -415,7 +415,7 @@ public class DocumentParameters {
       // nested definition list for options
       Element classdl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
       classdd.appendChild(classdl);
-      for(Parameter<?, ?> opt : byclass.get(cls)) {
+      for(Parameter<?> opt : byclass.get(cls)) {
         // DT definition term: option name, in TT for typewriter optics
         Element elemdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
         {
@@ -447,7 +447,7 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static Document makeByOptOverview(HashMapList<OptionID, Pair<Parameter<?, ?>, Class<?>>> byopt) {
+  private static Document makeByOptOverview(HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -507,7 +507,7 @@ public class DocumentParameters {
     Collections.sort(opts, new SortByOption());
 
     for(OptionID oid : opts) {
-      final Parameter<?, ?> firstopt = byopt.get(oid).get(0).getFirst();
+      final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
       Element optdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -535,7 +535,7 @@ public class DocumentParameters {
       if(firstopt instanceof ClassParameter<?>) {
         // Find superclass heuristically
         superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
-        for (Pair<Parameter<?, ?>, Class<?>> clinst : byopt.get(oid)) {
+        for (Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
           ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
           if (!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
             superclass = cls.getRestrictionClass();
@@ -558,7 +558,7 @@ public class DocumentParameters {
         optdd.appendChild(p);
       }
       optdd.appendChild(classesul);
-      for(Pair<Parameter<?, ?>, Class<?>> clinst : byopt.get(oid)) {
+      for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
         // DT definition term: option name, in TT for typewriter optics
         Element classli = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
 
@@ -581,7 +581,7 @@ public class DocumentParameters {
             appendNoClassRestriction(htmldoc, classli);
           }
         }
-        Parameter<?, ?> param = clinst.getFirst();
+        Parameter<?> param = clinst.getFirst();
         if(param.getDefaultValue() != null) {
           if(!param.getDefaultValue().equals(firstopt.getDefaultValue())) {
             appendDefaultValueIfSet(htmldoc, param, classli);
@@ -599,7 +599,7 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static void appendDefaultClassLink(Document htmldoc, Parameter<?, ?> opt, Element p) {
+  private static void appendDefaultClassLink(Document htmldoc, Parameter<?> opt, Element p) {
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
     defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getDefaultValue().getCanonicalName()));
     defa.setTextContent(((ClassParameter<?>) opt).getDefaultValue().getCanonicalName());
@@ -666,7 +666,7 @@ public class DocumentParameters {
    * @param par Parameter
    * @param optdd HTML Element
    */
-  private static void appendDefaultValueIfSet(Document htmldoc, Parameter<?, ?> par, Element optdd) {
+  private static void appendDefaultValueIfSet(Document htmldoc, Parameter<?> par, Element optdd) {
     if(par.hasDefaultValue()) {
       Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
       p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));

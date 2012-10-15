@@ -538,11 +538,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter maxLMDimP = new IntParameter(MAXDIM_ID, new GreaterEqualConstraint(1), true);
+      IntParameter maxLMDimP = new IntParameter(MAXDIM_ID);
+      maxLMDimP.addConstraint(new GreaterEqualConstraint(1));
+      maxLMDimP.setOptional(true);
       if(config.grab(maxLMDimP)) {
         maxdim = maxLMDimP.getValue();
       }
-      IntParameter minsizeP = new IntParameter(MINSIZE_ID, new GreaterEqualConstraint(1));
+      IntParameter minsizeP = new IntParameter(MINSIZE_ID);
+      minsizeP.addConstraint(new GreaterEqualConstraint(1));
       if(config.grab(minsizeP)) {
         minsize = minsizeP.getValue();
       }

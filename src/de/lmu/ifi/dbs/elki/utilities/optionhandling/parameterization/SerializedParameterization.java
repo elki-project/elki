@@ -108,7 +108,7 @@ public class SerializedParameterization extends AbstractParameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException {
+  public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
     Iterator<String> piter = parameters.iterator();
     while(piter.hasNext()) {
       String cur = piter.next();

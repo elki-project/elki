@@ -43,10 +43,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 // FIXME: update on focus loss?
 // FIXME: restrictions for number input?
-public class TextParameterConfigurator extends AbstractSingleParameterConfigurator<Parameter<?, ?>> implements ActionListener {
+public class TextParameterConfigurator extends AbstractSingleParameterConfigurator<Parameter<?>> implements ActionListener {
   final JTextField value;
 
-  public TextParameterConfigurator(Parameter<?, ?> param, JComponent parent) {
+  public TextParameterConfigurator(Parameter<?> param, JComponent parent) {
     super(param, parent);
 
     // Input field

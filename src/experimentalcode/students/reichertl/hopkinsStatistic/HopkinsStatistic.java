@@ -274,8 +274,9 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
         sampleSize = sample.getValue();
       }
 
-
-      LongParameter seedP = new LongParameter(SEED_ID, true);
+      // FIXME: use RandomParameter instead.
+      final LongParameter seedP = new LongParameter(SEED_ID);
+      seedP.setOptional(true);
       if(config.grab(seedP)) {
         seed = seedP.getValue();
       }
@@ -288,7 +289,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
-      ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
+      ArrayList<Parameter<?>> global_1 = new ArrayList<Parameter<?>>();
       global_1.add(minimaP);
       global_1.add(maximaP);
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));

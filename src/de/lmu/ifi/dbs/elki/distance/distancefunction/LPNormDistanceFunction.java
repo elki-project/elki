@@ -187,7 +187,8 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter paramP = new DoubleParameter(P_ID, new GreaterConstraint(0));
+      final DoubleParameter paramP = new DoubleParameter(P_ID);
+      paramP.addConstraint(new GreaterConstraint(0));
       if(config.grab(paramP)) {
         p = paramP.getValue();
       }

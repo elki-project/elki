@@ -43,7 +43,7 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
   /**
    * Minimum vote to cast.
    */
-  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN), 0.05);
+  private final DoubleParameter MIN_PARAM = new DoubleParameter(MIN_ID, 0.05, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.CLOSE, 1.0, IntervalConstraint.IntervalBoundary.OPEN));
 
   /**
    * Option ID for the minimum and maximum vote
@@ -53,7 +53,7 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
   /**
    * Minimum vote to cast.
    */
-  private final DoubleParameter MAX_PARAM = new DoubleParameter(MAX_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.CLOSE), 0.95);
+  private final DoubleParameter MAX_PARAM = new DoubleParameter(MAX_ID, 0.95, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 1.0, IntervalConstraint.IntervalBoundary.CLOSE));
 
   /**
    * Minimum vote to cast

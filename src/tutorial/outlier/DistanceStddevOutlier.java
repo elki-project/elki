@@ -133,7 +133,8 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
     protected void makeOptions(Parameterization config) {
       // The super class has the distance function parameter!
       super.makeOptions(config);
-      IntParameter kParam = new IntParameter(K_ID, new GreaterConstraint(1));
+      IntParameter kParam = new IntParameter(K_ID);
+      kParam.addConstraint(new GreaterConstraint(1));
       if(config.grab(kParam)) {
         k = kParam.getValue();
       }

@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -130,45 +130,42 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
     double[] a, b;
 
     // put shorter vector first
-    if(v1.getDimensionality() < v2.getDimensionality()) {
+    if (v1.getDimensionality() < v2.getDimensionality()) {
       m = v1.getDimensionality();
       n = v2.getDimensionality();
       a = new double[m];
       b = new double[n];
 
-      for(int i = 0; i < v1.getDimensionality(); i++) {
+      for (int i = 0; i < v1.getDimensionality(); i++) {
         a[i] = v1.doubleValue(i);
       }
-      for(int j = 0; j < v2.getDimensionality(); j++) {
+      for (int j = 0; j < v2.getDimensionality(); j++) {
         b[j] = v2.doubleValue(j);
       }
-    }
-    else {
+    } else {
       m = v2.getDimensionality();
       n = v1.getDimensionality();
       a = new double[m];
       b = new double[n];
 
-      for(int i = 0; i < v2.getDimensionality(); i++) {
+      for (int i = 0; i < v2.getDimensionality(); i++) {
         a[i] = v2.doubleValue(i);
       }
-      for(int j = 0; j < v1.getDimensionality(); j++) {
+      for (int j = 0; j < v1.getDimensionality(); j++) {
         b[j] = v1.doubleValue(j);
       }
     }
 
     double[] curr = new double[n + 1];
 
-    for(int i = 0; i < m; i++) {
+    for (int i = 0; i < m; i++) {
       double[] next = new double[n + 1];
-      for(int j = Math.max(0, i - delta); j <= Math.min(n - 1, i + delta); j++) {
-        if((b[j] + epsilon) >= a[i] && (b[j] - epsilon) <= a[i]) { // match
+      for (int j = Math.max(0, i - delta); j <= Math.min(n - 1, i + delta); j++) {
+        if ((b[j] + epsilon) >= a[i] && (b[j] - epsilon) <= a[i]) { // match
           next[j + 1] = curr[j] + 1;
-        }
-        else if(curr[j + 1] > next[j]) { // ins
+        } else if (curr[j + 1] > next[j]) { // ins
           next[j + 1] = curr[j + 1];
-        }
-        else { // del
+        } else { // del
           next[j + 1] = next[j];
         }
       }
@@ -177,8 +174,8 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
 
     // search for maximum in the last line
     double maxEntry = -1;
-    for(int i = 1; i < n + 1; i++) {
-      if(curr[i] > maxEntry) {
+    for (int i = 1; i < n + 1; i++) {
+      if (curr[i] > maxEntry) {
         maxEntry = curr[i];
       }
     }
@@ -194,7 +191,7 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
     if (!this.getClass().equals(obj.getClass())) {
@@ -202,7 +199,7 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
     }
     return (this.pDelta == ((LCSSDistanceFunction) obj).pDelta) && (this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -218,13 +215,17 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.1);
-      if(config.grab(pDeltaP)) {
+      final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, 0.1);
+      pDeltaP.addConstraint(new GreaterEqualConstraint(0));
+      pDeltaP.addConstraint(new LessEqualConstraint(1));
+      if (config.grab(pDeltaP)) {
         pDelta = pDeltaP.doubleValue();
       }
 
-      final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, new IntervalConstraint(0, IntervalBoundary.CLOSE, 1, IntervalBoundary.CLOSE), 0.05);
-      if(config.grab(pEpsilonP)) {
+      final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, 0.05);
+      pEpsilonP.addConstraint(new GreaterEqualConstraint(0));
+      pEpsilonP.addConstraint(new LessEqualConstraint(1));
+      if (config.grab(pEpsilonP)) {
         pEpsilon = pEpsilonP.doubleValue();
       }
     }

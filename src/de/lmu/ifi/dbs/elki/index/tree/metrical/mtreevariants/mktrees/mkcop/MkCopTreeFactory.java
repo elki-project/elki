@@ -93,9 +93,10 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter k_maxP = new IntParameter(K_ID, new GreaterConstraint(0));
+      IntParameter k_maxP = new IntParameter(K_ID);
+      k_maxP.addConstraint(new GreaterConstraint(0));
       if (config.grab(k_maxP)) {
-        k_max = k_maxP.getValue();
+        k_max = k_maxP.intValue();
       }
     }
 

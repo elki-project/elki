@@ -93,21 +93,21 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     // find the last eigenvector that is considered 'strong' by the weak rule
     // applied to the remaining vectors only
     double eigenValueSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
-    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
+    for (int i = eigenPairs.size() - 2; i >= 0; i--) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       eigenValueSum += eigenPair.getEigenvalue();
       double needEigenvalue = eigenValueSum / (eigenPairs.size() - i) * ralpha;
-      if(eigenPair.getEigenvalue() >= needEigenvalue) {
+      if (eigenPair.getEigenvalue() >= needEigenvalue) {
         contrastAtMax = i;
         break;
       }
     }
 
-    for(int i = 0; i <= contrastAtMax /* && i < eigenPairs.size() */; i++) {
+    for (int i = 0; i <= contrastAtMax /* && i < eigenPairs.size() */; i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       strongEigenPairs.add(eigenPair);
     }
-    for(int i = contrastAtMax + 1; i < eigenPairs.size(); i++) {
+    for (int i = contrastAtMax + 1; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       weakEigenPairs.add(eigenPair);
     }
@@ -128,8 +128,9 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, new GreaterEqualConstraint(0.0), DEFAULT_RALPHA);
-      if(config.grab(ralphaP)) {
+      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA);
+      ralphaP.addConstraint(new GreaterEqualConstraint(0.0));
+      if (config.grab(ralphaP)) {
         ralpha = ralphaP.getValue();
       }
     }

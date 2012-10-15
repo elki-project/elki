@@ -27,7 +27,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDista
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -92,12 +93,14 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter reinsertAmountP = new DoubleParameter(REINSERT_AMOUNT_ID, new IntervalConstraint(0.0, IntervalConstraint.IntervalBoundary.OPEN, 0.5, IntervalConstraint.IntervalBoundary.OPEN), 0.3);
-      if(config.grab(reinsertAmountP)) {
+      DoubleParameter reinsertAmountP = new DoubleParameter(REINSERT_AMOUNT_ID, 0.3);
+      reinsertAmountP.addConstraint(new GreaterConstraint(0.0));
+      reinsertAmountP.addConstraint(new LessConstraint(0.5));
+      if (config.grab(reinsertAmountP)) {
         reinsertAmount = reinsertAmountP.getValue();
       }
       ObjectParameter<SpatialPrimitiveDoubleDistanceFunction<?>> distanceP = new ObjectParameter<SpatialPrimitiveDoubleDistanceFunction<?>>(REINSERT_DISTANCE_ID, SpatialPrimitiveDoubleDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
-      if(config.grab(distanceP)) {
+      if (config.grab(distanceP)) {
         distanceFunction = distanceP.instantiateClass(config);
       }
     }

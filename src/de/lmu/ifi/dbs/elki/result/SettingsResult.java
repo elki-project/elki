@@ -34,27 +34,28 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Erich Schubert
  */
-public class SettingsResult  extends BasicResult {
+public class SettingsResult extends BasicResult {
   /**
    * Settings storage.
    */
-  Collection<Pair<Object, Parameter<?,?>>> settings;
-  
+  Collection<Pair<Object, Parameter<?>>> settings;
+
   /**
    * Constructor.
    * 
    * @param settings Settings to store
    */
-  public SettingsResult(Collection<Pair<Object, Parameter<?,?>>> settings) {
+  public SettingsResult(Collection<Pair<Object, Parameter<?>>> settings) {
     super("Settings", "settings");
     this.settings = settings;
   }
-  
+
   /**
    * Get the settings
+   * 
    * @return the settings
    */
-  public Collection<Pair<Object, Parameter<?,?>>> getSettings() {
+  public Collection<Pair<Object, Parameter<?>>> getSettings() {
     return settings;
   }
 }

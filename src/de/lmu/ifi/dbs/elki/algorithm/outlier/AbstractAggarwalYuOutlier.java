@@ -241,11 +241,13 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID, new GreaterEqualConstraint(2));
+      final IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterEqualConstraint(2));
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      final IntParameter phiP = new IntParameter(PHI_ID, new GreaterEqualConstraint(2));
+      final IntParameter phiP = new IntParameter(PHI_ID);
+      phiP.addConstraint(new GreaterEqualConstraint(2));
       if(config.grab(phiP)) {
         phi = phiP.getValue();
       }

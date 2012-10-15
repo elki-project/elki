@@ -296,7 +296,8 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
      * @param config Parameterization
      */
     protected void configK(Parameterization config) {
-      final IntParameter param = new IntParameter(K_ID, new GreaterEqualConstraint(1));
+      final IntParameter param = new IntParameter(K_ID);
+      param.addConstraint(new GreaterEqualConstraint(1));
       if(config.grab(param)) {
         k = param.getValue();
       }

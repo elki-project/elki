@@ -120,7 +120,7 @@ public abstract class AbstractParameterization implements Parameterization {
   }
 
   @Override
-  public final boolean grab(Parameter<?, ?> opt) {
+  public final boolean grab(Parameter<?> opt) {
     if(opt.isDefined()) {
       LOG.warning("Option " + opt.getName() + " is already set!");
     }
@@ -149,7 +149,7 @@ public abstract class AbstractParameterization implements Parameterization {
    * @throws ParameterException on assignment errors.
    */
   @Override
-  public abstract boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException;
+  public abstract boolean setValueForOption(Parameter<?> opt) throws ParameterException;
 
   /** Upon destruction, report any errors that weren't handled yet.
    *  

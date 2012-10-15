@@ -30,7 +30,7 @@ import javax.swing.JLabel;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
-public abstract class AbstractSingleParameterConfigurator<T extends Parameter<?, ?>> extends AbstractParameterConfigurator<T> {
+public abstract class AbstractSingleParameterConfigurator<T extends Parameter<?>> extends AbstractParameterConfigurator<T> {
   final JLabel label;
 
   public AbstractSingleParameterConfigurator(T param, JComponent parent) {

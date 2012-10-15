@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedDistanceFunction;
@@ -34,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -131,10 +129,9 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final List<ParameterConstraint<List<Integer>>> bppConstraints = new ArrayList<ParameterConstraint<List<Integer>>>(2);
-      bppConstraints.add(new ListSizeConstraint<Integer>(3));
-      bppConstraints.add(new ListGreaterEqualConstraint<Integer>(1));
-      IntListParameter param = new IntListParameter(BPP_ID, bppConstraints, false);
+      IntListParameter param = new IntListParameter(BPP_ID);
+      param.addConstraint(new ListSizeConstraint(3));
+      param.addConstraint(new ListGreaterEqualConstraint(1));
       if(config.grab(param)) {
         List<Integer> quant = param.getValue();
         assert (quant.size() == 3);

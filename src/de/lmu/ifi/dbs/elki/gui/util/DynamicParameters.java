@@ -87,7 +87,7 @@ public class DynamicParameters {
    * @apiviz.exclude
    */
   public class Node {
-    protected Parameter<?, ?> param;
+    protected Parameter<?> param;
 
     protected String value;
 
@@ -103,7 +103,7 @@ public class DynamicParameters {
      * @param flags Flags
      * @param depth Depth (for tree representation)
      */
-    public Node(Parameter<?, ?> param, String value, BitSet flags, int depth) {
+    public Node(Parameter<?> param, String value, BitSet flags, int depth) {
       super();
       this.param = param;
       this.value = value;
@@ -141,8 +141,8 @@ public class DynamicParameters {
    */
   public synchronized void updateFromTrackParameters(TrackParameters track) {
     parameters.clear();
-    for(Pair<Object, Parameter<?, ?>> p : track.getAllParameters()) {
-      Parameter<?, ?> option = p.getSecond();
+    for(Pair<Object, Parameter<?>> p : track.getAllParameters()) {
+      Parameter<?> option = p.getSecond();
       String value = null;
       if(option.isDefined()) {
         if(option.tookDefaultValue()) {
@@ -206,7 +206,7 @@ public class DynamicParameters {
    * @param bits Bits
    * @param depth Depth
    */
-  public synchronized void addParameter(Parameter<?, ?> option, String value, BitSet bits, int depth) {
+  public synchronized void addParameter(Parameter<?> option, String value, BitSet bits, int depth) {
     Node t = new Node(option, value, bits, depth);
     parameters.add(t);
   }

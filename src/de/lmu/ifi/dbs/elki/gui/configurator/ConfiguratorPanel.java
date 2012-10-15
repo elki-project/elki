@@ -85,7 +85,7 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
    * @param param Parameter to add
    * @param track Parameter tracking object
    */
-  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track) {
+  public void addParameter(Object owner, Parameter<?> param, TrackParameters track) {
     this.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
     ParameterConfigurator cfg = null;
     {
@@ -109,7 +109,7 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
     }
   }
 
-  private ParameterConfigurator makeConfigurator(Parameter<?, ?> param) {
+  private ParameterConfigurator makeConfigurator(Parameter<?> param) {
     if(param instanceof Flag) {
       return new FlagParameterConfigurator((Flag) param, this);
     }

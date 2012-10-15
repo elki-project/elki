@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -39,54 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class PatternParameter extends AbstractParameter<Pattern, Pattern> {
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param defaultValue the default value of the parameter
-   */
-  public PatternParameter(OptionID optionID, List<ParameterConstraint<Pattern>> constraint, Pattern defaultValue) {
-    super(optionID, constraint, defaultValue);
-  }
-
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
-   * @param defaultValue the default value of the parameter
-   */
-  public PatternParameter(OptionID optionID, List<ParameterConstraint<Pattern>> constraint, String defaultValue) {
-    super(optionID, constraint, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
-  }
-
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraints parameter constraint
-   * @param optional Flag to signal an optional parameter.
-   */
-  public PatternParameter(OptionID optionID, List<ParameterConstraint<Pattern>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-  }
-
-  /**
-   * Constructs a pattern parameter with the given optionID, constraints and
-   * default value.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param constraints parameter constraint
-   */
-  public PatternParameter(OptionID optionID, List<ParameterConstraint<Pattern>> constraints) {
-    super(optionID, constraints);
-  }
-
+public class PatternParameter extends AbstractParameter<Pattern> {
   /**
    * Constructs a pattern parameter with the given optionID, constraints and
    * default value.
@@ -96,8 +48,9 @@ public class PatternParameter extends AbstractParameter<Pattern, Pattern> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, Pattern defaultValue) {
-    super(optionID, constraint, defaultValue);
-  }
+    super(optionID, defaultValue);
+    addConstraint(constraint);
+}
 
   /**
    * Constructs a pattern parameter with the given optionID, constraints and
@@ -108,7 +61,8 @@ public class PatternParameter extends AbstractParameter<Pattern, Pattern> {
    * @param defaultValue the default value of the parameter
    */
   public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, String defaultValue) {
-    super(optionID, constraint, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
+    super(optionID, Pattern.compile(defaultValue, Pattern.CASE_INSENSITIVE));
+    addConstraint(constraint);
   }
 
   /**
@@ -120,7 +74,8 @@ public class PatternParameter extends AbstractParameter<Pattern, Pattern> {
    * @param optional Flag to signal an optional parameter.
    */
   public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint, boolean optional) {
-    super(optionID, constraint, optional);
+    super(optionID, optional);
+    addConstraint(constraint);
   }
 
   /**
@@ -131,7 +86,8 @@ public class PatternParameter extends AbstractParameter<Pattern, Pattern> {
    * @param constraint parameter constraint
    */
   public PatternParameter(OptionID optionID, ParameterConstraint<Pattern> constraint) {
-    super(optionID, constraint);
+    super(optionID);
+    addConstraint(constraint);
   }
 
   /**

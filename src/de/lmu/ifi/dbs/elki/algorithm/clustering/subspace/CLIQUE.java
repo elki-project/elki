@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.TIntObjectMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -595,12 +593,15 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter xsiP = new IntParameter(XSI_ID, new GreaterConstraint(0));
+      IntParameter xsiP = new IntParameter(XSI_ID);
+      xsiP.addConstraint(new GreaterConstraint(0));
       if(config.grab(xsiP)) {
         xsi = xsiP.intValue();
       }
 
-      DoubleParameter tauP = new DoubleParameter(TAU_ID, new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.OPEN));
+      DoubleParameter tauP = new DoubleParameter(TAU_ID);
+      tauP.addConstraint(new GreaterConstraint(0));
+      tauP.addConstraint(new LessConstraint(1));
       if(config.grab(tauP)) {
         tau = tauP.doubleValue();
       }

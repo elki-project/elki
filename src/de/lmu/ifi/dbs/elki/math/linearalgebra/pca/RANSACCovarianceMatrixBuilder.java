@@ -174,7 +174,8 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter iterP = new IntParameter(ITER_ID, new GreaterConstraint(0), 1000);
+      IntParameter iterP = new IntParameter(ITER_ID, 1000);
+      iterP.addConstraint(new GreaterConstraint(0));
       if (config.grab(iterP)) {
         iterations = iterP.getValue();
       }

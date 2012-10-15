@@ -28,8 +28,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public interface Parameter<S, T extends S> {
-
+/**
+ * Interface for the parameter of a class.
+ * 
+ * A parameter is defined as an option having a specific value.
+ * 
+ * See the {@link de.lmu.ifi.dbs.elki.utilities.optionhandling} package for
+ * documentation!
+ * 
+ * @author Steffi Wanka
+ * @author Erich Schubert
+ * 
+ * @apiviz.composedOf OptionID
+ * @apiviz.uses ParameterConstraint
+ * 
+ * @param <T> the type of a possible value (i.e., the type of the option)
+ */
+public interface Parameter<T> {
   /**
    * Sets the default value of this parameter.
    * 
@@ -164,8 +179,10 @@ public interface Parameter<S, T extends S> {
   /**
    * Returns the value of the option.
    * 
-   * You should use either {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab}
-   * or {@link #isDefined} to test if getValue() will return a well-defined value.
+   * You should use either
+   * {@link de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization#grab}
+   * or {@link #isDefined} to test if getValue() will return a well-defined
+   * value.
    * 
    * @return the option's value.
    */
@@ -216,6 +233,5 @@ public interface Parameter<S, T extends S> {
    * 
    * @param constraint Constraint to add.
    */
-  public abstract void addConstraint(ParameterConstraint<S> constraint);
-
+  public abstract void addConstraint(ParameterConstraint<? super T> constraint);
 }

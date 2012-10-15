@@ -104,11 +104,13 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter dimlatP = new IntParameter(LATDIM_ID, new GreaterEqualConstraint(0));
+      final IntParameter dimlatP = new IntParameter(LATDIM_ID);
+      dimlatP.addConstraint(new GreaterEqualConstraint(0));
       if(config.grab(dimlatP)) {
         dimlat = dimlatP.getValue();
       }
-      final IntParameter dimlngP = new IntParameter(LNGDIM_ID, new GreaterEqualConstraint(0));
+      final IntParameter dimlngP = new IntParameter(LNGDIM_ID);
+      dimlngP.addConstraint(new GreaterEqualConstraint(0));
       if(config.grab(dimlngP)) {
         dimlng = dimlngP.getValue();
       }

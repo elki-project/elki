@@ -86,10 +86,10 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
+    if (!this.getClass().equals(obj.getClass())) {
       return false;
     }
     return this.dimensions.equals(((AbstractDimensionsSelectingDoubleDistanceFunction<?>) obj).dimensions);
@@ -109,9 +109,11 @@ public abstract class AbstractDimensionsSelectingDoubleDistanceFunction<V extend
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       dimensions = new BitSet();
-      final IntListParameter dimsP = new IntListParameter(DIMS_ID, new ListGreaterEqualConstraint<Integer>(0), true);
-      if(config.grab(dimsP)) {
-        for(int d : dimsP.getValue()) {
+      final IntListParameter dimsP = new IntListParameter(DIMS_ID);
+      dimsP.addConstraint(new ListGreaterEqualConstraint(0));
+      dimsP.setOptional(true);
+      if (config.grab(dimsP)) {
+        for (int d : dimsP.getValue()) {
           dimensions.set(d);
         }
       }

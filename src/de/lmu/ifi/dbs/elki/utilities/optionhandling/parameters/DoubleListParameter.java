@@ -43,45 +43,13 @@ public class DoubleListParameter extends ListParameter<Double> {
    * Constructs a list parameter with the given optionID.
    * 
    * @param optionID Option ID
-   * @param constraints Constraints
-   * @param defaultValue Default value
-   */
-  public DoubleListParameter(OptionID optionID, List<ParameterConstraint<List<Double>>> constraints, List<Double> defaultValue) {
-    super(optionID, constraints, defaultValue);
-  }
-
-  /**
-   * Constructs a list parameter with the given optionID.
-   * 
-   * @param optionID Option ID
-   * @param constraints Constraints
-   * @param optional Optional flag
-   */
-  public DoubleListParameter(OptionID optionID, List<ParameterConstraint<List<Double>>> constraints, boolean optional) {
-    super(optionID, constraints, optional);
-  }
-
-  /**
-   * Constructs a list parameter with the given optionID.
-   * 
-   * @param optionID Option ID
-   * @param constraints Constraints
-   */
-  /*
-   * public DoubleListParameter(OptionID optionID,
-   * List<ParameterConstraint<List<Double>>> constraints) { super(optionID,
-   * constraints); }
-   */
-
-  /**
-   * Constructs a list parameter with the given optionID.
-   * 
-   * @param optionID Option ID
    * @param constraint Constraint
    * @param defaultValue Default value
    */
+  @Deprecated
   public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, List<Double> defaultValue) {
-    super(optionID, constraint, defaultValue);
+    super(optionID, defaultValue);
+    addConstraint(constraint);
   }
 
   /**
@@ -91,8 +59,10 @@ public class DoubleListParameter extends ListParameter<Double> {
    * @param constraint Constraint
    * @param optional Optional flag
    */
+  @Deprecated
   public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint, boolean optional) {
-    super(optionID, constraint, optional);
+    super(optionID, optional);
+    addConstraint(constraint);
   }
 
   /**
@@ -101,8 +71,10 @@ public class DoubleListParameter extends ListParameter<Double> {
    * @param optionID Option ID
    * @param constraint Constraint
    */
+  @Deprecated
   public DoubleListParameter(OptionID optionID, ParameterConstraint<List<Double>> constraint) {
-    super(optionID, constraint);
+    super(optionID);
+    addConstraint(constraint);
   }
 
   /**

@@ -74,7 +74,7 @@ public class SettingsVisualization extends AbstractVisFactory {
     VisualizerContext context = task.getContext();
     SVGPlot svgp = task.getPlot();
 
-    Collection<Pair<Object, Parameter<?, ?>>> settings = sr.getSettings();
+    Collection<Pair<Object, Parameter<?>>> settings = sr.getSettings();
 
     Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
@@ -82,7 +82,7 @@ public class SettingsVisualization extends AbstractVisFactory {
 
     int i = 0;
     Object last = null;
-    for(Pair<Object, Parameter<?, ?>> setting : settings) {
+    for(Pair<Object, Parameter<?>> setting : settings) {
       if(setting.first != last && setting.first != null) {
         String name;
         try {

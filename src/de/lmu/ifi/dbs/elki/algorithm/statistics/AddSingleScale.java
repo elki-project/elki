@@ -139,7 +139,9 @@ public class AddSingleScale implements Algorithm {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleListParameter minmaxP = new DoubleListParameter(MINMAX_ID, new ListSizeConstraint<Double>(2), true);
+      DoubleListParameter minmaxP = new DoubleListParameter(MINMAX_ID);
+      minmaxP.setOptional(true);
+      minmaxP.addConstraint(new ListSizeConstraint(2));
       if(config.grab(minmaxP)) {
         minmax = ArrayLikeUtil.toPrimitiveDoubleArray(minmaxP.getValue());
       }

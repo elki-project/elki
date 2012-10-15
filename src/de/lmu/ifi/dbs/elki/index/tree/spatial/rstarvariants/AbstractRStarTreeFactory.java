@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -170,19 +170,21 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<InsertionStrategy> insertionStrategyP = new ObjectParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
-      if(config.grab(insertionStrategyP)) {
+      if (config.grab(insertionStrategyP)) {
         insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
       ObjectParameter<SplitStrategy> splitStrategyP = new ObjectParameter<SplitStrategy>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
-      if(config.grab(splitStrategyP)) {
+      if (config.grab(splitStrategyP)) {
         nodeSplitter = splitStrategyP.instantiateClass(config);
       }
-      DoubleParameter minimumFillP = new DoubleParameter(MINIMUM_FILL_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 0.5, IntervalBoundary.OPEN), 0.4);
+      DoubleParameter minimumFillP = new DoubleParameter(MINIMUM_FILL_ID, 0.4);
+      minimumFillP.addConstraint(new GreaterConstraint(0.0));
+      minimumFillP.addConstraint(new LessConstraint(0.5));
       if (config.grab(minimumFillP)) {
         minimumFill = minimumFillP.getValue();
       }
       ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<OverflowTreatment>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
-      if(config.grab(overflowP)) {
+      if (config.grab(overflowP)) {
         overflowTreatment = overflowP.instantiateClass(config);
       }
       configBulkLoad(config);
@@ -195,7 +197,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
      */
     protected void configBulkLoad(Parameterization config) {
       ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<BulkSplit>(BULK_SPLIT_ID, BulkSplit.class, true);
-      if(config.grab(bulkSplitP)) {
+      if (config.grab(bulkSplitP)) {
         bulkSplitter = bulkSplitP.instantiateClass(config);
       }
     }

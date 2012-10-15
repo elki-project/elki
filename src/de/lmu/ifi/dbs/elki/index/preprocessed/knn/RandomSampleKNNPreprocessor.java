@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -217,7 +217,9 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter shareP = new DoubleParameter(SHARE_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN));
+        DoubleParameter shareP = new DoubleParameter(SHARE_ID);
+        shareP.addConstraint(new GreaterConstraint(0.0));
+        shareP.addConstraint(new LessConstraint(1.0));
         if(config.grab(shareP)) {
           share = shareP.getValue();
         }

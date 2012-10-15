@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 public interface ParameterConfigurator {
-  public void addParameter(Object owner, Parameter<?, ?> param, TrackParameters track);
+  public void addParameter(Object owner, Parameter<?> param, TrackParameters track);
 
   public void addChangeListener(ChangeListener listener);
 

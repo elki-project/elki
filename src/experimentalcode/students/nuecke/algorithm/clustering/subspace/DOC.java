@@ -565,27 +565,26 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       super.makeOptions(config);
 
       {
-        Vector<ParameterConstraint<Number>> constraints = new Vector<ParameterConstraint<Number>>();
-        constraints.add(new GreaterEqualConstraint(0));
-        constraints.add(new LessEqualConstraint(1));
-        DoubleParameter param = new DoubleParameter(ALPHA_ID, constraints, 0.2);
+        DoubleParameter param = new DoubleParameter(ALPHA_ID, 0.2);
+        param.addConstraint(new GreaterEqualConstraint(0));
+        param.addConstraint(new LessEqualConstraint(1));
         if(config.grab(param)) {
           alpha = param.getValue();
         }
       }
 
       {
-        Vector<ParameterConstraint<Number>> constraints = new Vector<ParameterConstraint<Number>>();
-        constraints.add(new GreaterConstraint(0));
-        constraints.add(new LessConstraint(1));
-        DoubleParameter param = new DoubleParameter(BETA_ID, constraints, 0.8);
+        DoubleParameter param = new DoubleParameter(BETA_ID, 0.8);
+        param.addConstraint(new GreaterConstraint(0));
+        param.addConstraint(new LessConstraint(1));
         if(config.grab(param)) {
           beta = param.getValue();
         }
       }
 
       {
-        DoubleParameter param = new DoubleParameter(W_ID, new GreaterEqualConstraint(0), 0.05);
+        DoubleParameter param = new DoubleParameter(W_ID, 0.05);
+        param.addConstraint(new GreaterEqualConstraint(0));
         if(config.grab(param)) {
           w = param.getValue();
         }
@@ -599,7 +598,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       }
 
       if(heuristics) {
-        IntParameter param = new IntParameter(D_ZERO_ID, new GreaterConstraint(0), 5);
+        IntParameter param = new IntParameter(D_ZERO_ID, 5);
+        param.addConstraint(new GreaterConstraint(0));
         if(config.grab(param)) {
           d_zero = param.getValue();
         }

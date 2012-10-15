@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -92,20 +92,20 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
     int referenceSetSize = neighbors.size();
     V obj = database.get(id);
 
-    if(getLogger().isDebugging()) {
+    if (getLogger().isDebugging()) {
       msg = new StringBuilder();
       msg.append("referenceSetSize = ").append(referenceSetSize);
       msg.append("\ndelta = ").append(delta);
     }
 
-    if(referenceSetSize == 0) {
+    if (referenceSetSize == 0) {
       throw new RuntimeException("Reference Set Size = 0. This should never happen!");
     }
 
     // prepare similarity matrix
     int dim = obj.getDimensionality();
     Matrix simMatrix = new Matrix(dim, dim, 0);
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       simMatrix.set(i, i, 1);
     }
 
@@ -114,36 +114,35 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
 
     // start variance analysis
     double[] sum = new double[dim];
-    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+    for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       V o = database.get(neighbor);
-      for(int d = 0; d < dim; d++) {
+      for (int d = 0; d < dim; d++) {
         sum[d] += Math.pow(obj.doubleValue(d) - o.doubleValue(d), 2.0);
       }
     }
 
-    for(int d = 0; d < dim; d++) {
-      if(Math.sqrt(sum[d]) / referenceSetSize <= delta) {
-        if(msg != null) {
+    for (int d = 0; d < dim; d++) {
+      if (Math.sqrt(sum[d]) / referenceSetSize <= delta) {
+        if (msg != null) {
           msg.append("\nsum[").append(d).append("]= ").append(sum[d]);
           msg.append("\n  Math.sqrt(sum[d]) / referenceSetSize)= ").append(Math.sqrt(sum[d]) / referenceSetSize);
         }
         // projDim++;
         simMatrix.set(d, d, kappa);
-      }
-      else {
+      } else {
         // bug in paper?
         projDim++;
       }
     }
 
-    if(projDim == 0) {
-      if(msg != null) {
+    if (projDim == 0) {
+      if (msg != null) {
         // msg.append("\nprojDim == 0!");
       }
       projDim = dim;
     }
 
-    if(msg != null) {
+    if (msg != null) {
       msg.append("\nprojDim ");
       // .append(database.getObjectLabelQuery().get(id));
       msg.append(": ").append(projDim);
@@ -232,8 +231,10 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, new IntervalConstraint(0.0, IntervalBoundary.OPEN, 1.0, IntervalBoundary.OPEN), DEFAULT_DELTA);
-        if(config.grab(deltaP)) {
+        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, DEFAULT_DELTA);
+        deltaP.addConstraint(new GreaterConstraint(0.0));
+        deltaP.addConstraint(new LessConstraint(1.0));
+        if (config.grab(deltaP)) {
           delta = deltaP.doubleValue();
         }
       }

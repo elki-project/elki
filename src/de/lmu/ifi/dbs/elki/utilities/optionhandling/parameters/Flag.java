@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class Flag extends AbstractParameter<Boolean, Boolean> {
+public class Flag extends AbstractParameter<Boolean> {
   /**
    * Constant indicating that the flag is set.
    */

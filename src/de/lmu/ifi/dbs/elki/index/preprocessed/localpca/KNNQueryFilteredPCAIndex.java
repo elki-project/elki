@@ -166,7 +166,9 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0), true);
+        final IntParameter kP = new IntParameter(K_ID);
+        kP.addConstraint(new GreaterConstraint(0));
+        kP.setOptional(true);
         if(config.grab(kP)) {
           k = kP.getValue();
         }

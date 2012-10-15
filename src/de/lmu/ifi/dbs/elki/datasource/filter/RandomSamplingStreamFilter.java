@@ -29,8 +29,8 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint.IntervalBoundary;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -122,7 +122,9 @@ public class RandomSamplingStreamFilter extends AbstractStreamFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter probP = new DoubleParameter(PROB_ID, new IntervalConstraint(Double.valueOf(0.0), IntervalBoundary.CLOSE, Double.valueOf(1.0), IntervalBoundary.CLOSE));
+      DoubleParameter probP = new DoubleParameter(PROB_ID);
+      probP.addConstraint(new GreaterEqualConstraint(0.0));
+      probP.addConstraint(new LessEqualConstraint(1.0));
       if (config.grab(probP)) {
         prob = probP.getValue().doubleValue();
       }

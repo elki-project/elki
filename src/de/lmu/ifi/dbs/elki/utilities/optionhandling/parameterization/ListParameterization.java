@@ -100,14 +100,14 @@ public class ListParameterization extends AbstractParameterization {
    * 
    * @param param Parameter to add
    */
-  public void forwardOption(Parameter<?, ?> param) {
+  public void forwardOption(Parameter<?> param) {
     if (param.isDefined()) {
       addParameter(param.getOptionID(), param.getValue());
     }
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?, ?> opt) throws ParameterException { 
+  public boolean setValueForOption(Parameter<?> opt) throws ParameterException { 
     Iterator<Pair<OptionID, Object>> iter = parameters.iterator();
     while(iter.hasNext()) {
       Pair<OptionID, Object> pair = iter.next();

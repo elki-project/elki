@@ -303,7 +303,8 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
         epsilon = epsilonP.getValue();
       }
 
-      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      IntParameter minptsP = new IntParameter(MINPTS_ID);
+      minptsP.addConstraint(new GreaterConstraint(0));
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
       }

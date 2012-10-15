@@ -195,7 +195,7 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param options Options to show in usage.
    * @return a usage message explaining all known options
    */
-  public static String usage(Collection<Pair<Object, Parameter<?, ?>>> options) {
+  public static String usage(Collection<Pair<Object, Parameter<?>>> options) {
     StringBuilder usage = new StringBuilder();
     usage.append(INFORMATION);
 

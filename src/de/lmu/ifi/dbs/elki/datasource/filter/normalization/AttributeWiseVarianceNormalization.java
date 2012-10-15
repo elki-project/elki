@@ -268,7 +268,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
         }
       }
 
-      ArrayList<Parameter<?, ?>> global_1 = new ArrayList<Parameter<?, ?>>();
+      ArrayList<Parameter<?>> global_1 = new ArrayList<Parameter<?>>();
       global_1.add(meanP);
       global_1.add(stddevP);
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));

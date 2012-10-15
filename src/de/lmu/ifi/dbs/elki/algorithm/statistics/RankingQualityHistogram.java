@@ -110,7 +110,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     final DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Preprocessing clusters...");
     }
     // Cluster by labels
@@ -118,33 +118,33 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
 
     AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(numbins, 0.0, 1.0);
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Processing points...");
     }
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
 
     MeanVariance mv = new MeanVariance();
     // sort neighbors
-    for(Cluster<?> clus : split) {
-      for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
+    for (Cluster<?> clus : split) {
+      for (DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
         KNNResult<D> knn = knnQuery.getKNNForDBID(iter, relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         mv.put(result);
         hist.aggregate(result, 1. / relation.size());
 
-        if(progress != null) {
+        if (progress != null) {
           progress.incrementProcessed(LOG);
         }
       }
     }
-    if(progress != null) {
+    if (progress != null) {
       progress.ensureCompleted(LOG);
     }
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
-    for(DoubleObjPair<Double> pair : hist) {
+    for (DoubleObjPair<Double> pair : hist) {
       DoubleVector row = new DoubleVector(new double[] { pair.first, pair.getSecond() });
       res.add(row);
     }
@@ -157,7 +157,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
-  
+
   @Override
   protected Logging getLogger() {
     return LOG;
@@ -179,8 +179,9 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, new GreaterEqualConstraint(2), 100);
-      if(config.grab(param)) {
+      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 100);
+      param.addConstraint(new GreaterEqualConstraint(2));
+      if (config.grab(param)) {
         numbins = param.getValue();
       }
     }

@@ -37,10 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * @author Steffi Wanka
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter
- * 
- * @param <T> Parameter type
  */
-public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
+public class ListSizeConstraint implements ParameterConstraint<List<?>> {
   /**
    * The list size constraint.
    */
@@ -63,7 +61,7 @@ public class ListSizeConstraint<T> implements ParameterConstraint<List<T>> {
    *         equal to the list size constraint specified.
    */
   @Override
-  public void test(List<T> t) throws ParameterException {
+  public void test(List<?> t) throws ParameterException {
     if(t.size() != sizeConstraint) {
       throw new WrongParameterValueException("Parameter Constraint Error.\n" + "List parameter has not the required size. (Requested size: " + +sizeConstraint + ", current size: " + t.size() + ").\n");
     }

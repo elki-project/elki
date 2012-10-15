@@ -94,17 +94,17 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
    * @return Clustering result
    */
   public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
-    if(relation.size() <= 0) {
+    if (relation.size() <= 0) {
       return new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
     List<Vector> means = new ArrayList<Vector>(k);
-    for(NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, getDistanceFunction())) {
+    for (NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, getDistanceFunction())) {
       means.add(nv.getColumnVector());
     }
     // Initialize cluster and assign objects
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
-    for(int i = 0; i < k; i++) {
+    for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
     assignToNearestCluster(relation, means, clusters);
@@ -112,18 +112,18 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     means = means(clusters, means, relation);
 
     // Refine result
-    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
-      if(LOG.isVerbose()) {
+    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+      if (LOG.isVerbose()) {
         LOG.verbose("K-Means iteration " + (iteration + 1));
       }
       boolean changed = macQueenIterate(relation, means, clusters);
-      if(!changed) {
+      if (!changed) {
         break;
       }
     }
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<KMeansModel<V>> result = new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
+    for (int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
       KMeansModel<V> model = new KMeansModel<V>(factory.newNumberVector(means.get(i).getArrayRef()));
       result.addCluster(new Cluster<KMeansModel<V>>(ids, model));
@@ -162,18 +162,20 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID, new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(kP)) {
         k = kP.getValue();
       }
 
       ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
-      if(config.grab(initialP)) {
+      if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
 
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, new GreaterEqualConstraint(0), 0);
-      if(config.grab(maxiterP)) {
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
+      maxiterP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }
     }

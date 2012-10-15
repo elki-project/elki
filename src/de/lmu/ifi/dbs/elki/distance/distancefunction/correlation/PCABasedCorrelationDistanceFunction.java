@@ -93,10 +93,10 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
+    if (!this.getClass().equals(obj.getClass())) {
       return false;
     }
     PCABasedCorrelationDistanceFunction other = (PCABasedCorrelationDistanceFunction) obj;
@@ -166,7 +166,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
       // for all strong eigenvectors of rv2
       Matrix m1_czech = pca1.dissimilarityMatrix();
-      for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
+      for (int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
         Vector v2_i = v2_strong.getCol(i);
         // check, if distance of v2_i to the space of rv1 > delta
         // (i.e., if v2_i spans up a new dimension)
@@ -174,7 +174,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
         // if so, insert v2_i into v1 and adjust v1
         // and compute m1_czech new, increase lambda1
-        if(lambda1 < dimensionality && dist > delta) {
+        if (lambda1 < dimensionality && dist > delta) {
           adjust(v1, e1_czech, v2_i, lambda1++);
           m1_czech = v1.times(e1_czech).timesTranspose(v1);
         }
@@ -182,7 +182,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
       // for all strong eigenvectors of rv1
       Matrix m2_czech = pca2.dissimilarityMatrix();
-      for(int i = 0; i < v1_strong.getColumnDimensionality(); i++) {
+      for (int i = 0; i < v1_strong.getColumnDimensionality(); i++) {
         Vector v1_i = v1_strong.getCol(i);
         // check, if distance of v1_i to the space of rv2 > delta
         // (i.e., if v1_i spans up a new dimension)
@@ -190,7 +190,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
 
         // if so, insert v1_i into v2 and adjust v2
         // and compute m2_czech new , increase lambda2
-        if(lambda2 < dimensionality && dist > delta) {
+        if (lambda2 < dimensionality && dist > delta) {
           adjust(v2, e2_czech, v1_i, lambda2++);
           m2_czech = v2.times(e2_czech).timesTranspose(v2);
         }
@@ -231,7 +231,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
       // normalize v
       Vector v_i = vector.copy();
       Vector sum = new Vector(dim);
-      for(int k = 0; k < corrDim; k++) {
+      for (int k = 0; k < corrDim; k++) {
         Vector v_k = v.getCol(k);
         sum.plusTimesEquals(v_k, v_i.transposeTimes(v_k));
       }
@@ -248,12 +248,12 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
      * @return the Euclidean distance between the given two vectors
      */
     private double euclideanDistance(V dv1, V dv2) {
-      if(dv1.getDimensionality() != dv2.getDimensionality()) {
+      if (dv1.getDimensionality() != dv2.getDimensionality()) {
         throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  first argument: " + dv1.toString() + "\n  second argument: " + dv2.toString());
       }
 
       double sqrDist = 0;
-      for(int i = 0; i < dv1.getDimensionality(); i++) {
+      for (int i = 0; i < dv1.getDimensionality(); i++) {
         double manhattanI = dv1.doubleValue(i) - dv2.doubleValue(i);
         sqrDist += manhattanI * manhattanI;
       }
@@ -276,8 +276,9 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
       super.makeOptions(config);
       configIndexFactory(config, FilteredLocalPCAIndex.Factory.class, KNNQueryFilteredPCAIndex.Factory.class);
 
-      final DoubleParameter param = new DoubleParameter(DELTA_ID, new GreaterEqualConstraint(0), 0.25);
-      if(config.grab(param)) {
+      final DoubleParameter param = new DoubleParameter(DELTA_ID, 0.25);
+      param.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(param)) {
         delta = param.doubleValue();
       }
     }

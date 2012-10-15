@@ -84,7 +84,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
     double[] ev = eigenPairs.eigenValues();
     // calc the eigenvalue sum.
     double eigenValueSum = 0.0;
-    for(int i = 0; i < ev.length; i++) {
+    for (int i = 0; i < ev.length; i++) {
       eigenValueSum += ev[i];
     }
     // Minimum value
@@ -92,13 +92,13 @@ public class DropEigenPairFilter implements EigenPairFilter {
     // Now find the maximum contrast, scanning backwards.
     double prev_sum = ev[ev.length - 1];
     double prev_rel = 1.0;
-    for(int i = 2; i <= ev.length; i++) {
+    for (int i = 2; i <= ev.length; i++) {
       double curr_sum = prev_sum + ev[ev.length - i];
       double curr_rel = ev[ev.length - i] / curr_sum * i;
       // not too weak?
-      if(ev[ev.length - i] >= weakEigenvalue) {
+      if (ev[ev.length - i] >= weakEigenvalue) {
         double contrast = curr_rel - prev_rel;
-        if(contrast > maxContrast) {
+        if (contrast > maxContrast) {
           maxContrast = contrast;
           contrastMaximum = ev.length - i;
         }
@@ -107,11 +107,11 @@ public class DropEigenPairFilter implements EigenPairFilter {
       prev_rel = curr_rel;
     }
 
-    for(int i = 0; i <= contrastMaximum; i++) {
+    for (int i = 0; i <= contrastMaximum; i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       strongEigenPairs.add(eigenPair);
     }
-    for(int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
+    for (int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       weakEigenPairs.add(eigenPair);
     }
@@ -132,8 +132,9 @@ public class DropEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, new GreaterEqualConstraint(0.0), DEFAULT_WALPHA);
-      if(config.grab(walphaP)) {
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
+      walphaP.addConstraint(new GreaterEqualConstraint(0.0));
+      if (config.grab(walphaP)) {
         walpha = walphaP.getValue();
       }
     }

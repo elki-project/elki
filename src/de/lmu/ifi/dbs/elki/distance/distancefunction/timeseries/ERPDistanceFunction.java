@@ -78,7 +78,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
     // bandsize is the maximum allowed distance to the diagonal
     final int band = (int) Math.ceil(v2.getDimensionality() * bandSize);
 
-    for(int i = 0; i < v1.getDimensionality(); i++) {
+    for (int i = 0; i < v1.getDimensionality(); i++) {
       // Swap current and prev arrays. We'll just overwrite the new curr.
       {
         double[] temp = prev;
@@ -86,16 +86,16 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
         curr = temp;
       }
       int l = i - (band + 1);
-      if(l < 0) {
+      if (l < 0) {
         l = 0;
       }
       int r = i + (band + 1);
-      if(r > (v2.getDimensionality() - 1)) {
+      if (r > (v2.getDimensionality() - 1)) {
         r = (v2.getDimensionality() - 1);
       }
 
-      for(int j = l; j <= r; j++) {
-        if(Math.abs(i - j) <= band) {
+      for (int j = l; j <= r; j++) {
+        if (Math.abs(i - j) <= band) {
           // compute squared distance of feature vectors
           double val1 = v1.doubleValue(i);
           double val2 = g;
@@ -118,28 +118,24 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
 
           final double cost;
 
-          if((i + j) != 0) {
-            if((i == 0) || ((j != 0) && (((prev[j - 1] + dist12) > (curr[j - 1] + dist2)) && ((curr[j - 1] + dist2) < (prev[j] + dist1))))) {
+          if ((i + j) != 0) {
+            if ((i == 0) || ((j != 0) && (((prev[j - 1] + dist12) > (curr[j - 1] + dist2)) && ((curr[j - 1] + dist2) < (prev[j] + dist1))))) {
               // del
               cost = curr[j - 1] + dist2;
-            }
-            else if((j == 0) || ((i != 0) && (((prev[j - 1] + dist12) > (prev[j] + dist1)) && ((prev[j] + dist1) < (curr[j - 1] + dist2))))) {
+            } else if ((j == 0) || ((i != 0) && (((prev[j - 1] + dist12) > (prev[j] + dist1)) && ((prev[j] + dist1) < (curr[j - 1] + dist2))))) {
               // ins
               cost = prev[j] + dist1;
-            }
-            else {
+            } else {
               // match
               cost = prev[j - 1] + dist12;
             }
-          }
-          else {
+          } else {
             cost = 0;
           }
 
           curr[j] = cost;
           // steps[i][j] = step;
-        }
-        else {
+        } else {
           curr[j] = Double.POSITIVE_INFINITY; // outside band
         }
       }
@@ -150,12 +146,12 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(!super.equals(obj)) {
+    if (!super.equals(obj)) {
       return false;
     }
     return this.g == ((ERPDistanceFunction) obj).g;
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -169,8 +165,9 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter gP = new DoubleParameter(G_ID, new GreaterEqualConstraint(0), 0.0);
-      if(config.grab(gP)) {
+      final DoubleParameter gP = new DoubleParameter(G_ID, 0.0);
+      gP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(gP)) {
         g = gP.doubleValue();
       }
     }

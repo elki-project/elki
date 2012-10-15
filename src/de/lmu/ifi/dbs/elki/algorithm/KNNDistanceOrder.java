@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.IntervalConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -170,7 +170,8 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
       }
 
       DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, 1.0);
-      percentageP.addConstraint(new IntervalConstraint(0, IntervalConstraint.IntervalBoundary.OPEN, 1, IntervalConstraint.IntervalBoundary.CLOSE));
+      percentageP.addConstraint(new GreaterConstraint(0));
+      percentageP.addConstraint(new LessEqualConstraint(1));
       if(config.grab(percentageP)) {
         percentage = percentageP.getValue();
       }

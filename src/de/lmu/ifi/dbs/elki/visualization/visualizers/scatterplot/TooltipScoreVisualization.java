@@ -234,10 +234,11 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter DIGITS_PARAM = new IntParameter(DIGITS_ID, new GreaterEqualConstraint(0), 4);
+      IntParameter digitsP = new IntParameter(DIGITS_ID, 4);
+      digitsP.addConstraint(new GreaterEqualConstraint(0));
 
-      if(config.grab(DIGITS_PARAM)) {
-        int digits = DIGITS_PARAM.intValue();
+      if(config.grab(digitsP)) {
+        int digits = digitsP.intValue();
         nf = NumberFormat.getInstance(Locale.ROOT);
         nf.setGroupingUsed(false);
         nf.setMaximumFractionDigits(digits);

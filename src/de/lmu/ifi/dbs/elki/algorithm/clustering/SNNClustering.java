@@ -327,7 +327,8 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
         epsilon = epsilonP.getValue();
       }
 
-      IntParameter minptsP = new IntParameter(MINPTS_ID, new GreaterConstraint(0));
+      IntParameter minptsP = new IntParameter(MINPTS_ID);
+      minptsP.addConstraint(new GreaterConstraint(0));
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
       }

@@ -202,7 +202,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       parameterTable.setEnabled(false);
 
       parameterTable.clear();
-      for(Pair<Object, Parameter<?, ?>> pair : track.getAllParameters()) {
+      for(Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
         parameterTable.addParameter(pair.first, pair.getSecond(), track);
       }
       // parameters.updateFromTrackParameters(track);
