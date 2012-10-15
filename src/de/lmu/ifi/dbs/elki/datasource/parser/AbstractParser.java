@@ -214,7 +214,8 @@ public abstract class AbstractParser {
       if(config.grab(colParam)) {
         colSep = colParam.getValue();
       }
-      StringParameter quoteParam = new StringParameter(QUOTE_ID, new StringLengthConstraint(1, 1), String.valueOf(QUOTE_CHAR));
+      StringParameter quoteParam = new StringParameter(QUOTE_ID, String.valueOf(QUOTE_CHAR));
+      quoteParam.addConstraint(new StringLengthConstraint(1, 1));
       if(config.grab(quoteParam)) {
         quoteChar = quoteParam.getValue().charAt(0);
       }

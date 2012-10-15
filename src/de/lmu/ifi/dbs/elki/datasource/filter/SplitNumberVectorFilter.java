@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -169,7 +170,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(new ListGreaterEqualConstraint(Integer.valueOf(0)));
+      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
       if (config.grab(selectedAttributesP)) {
         List<Integer> dimensionList = selectedAttributesP.getValue();
         dims = new int[dimensionList.size()];

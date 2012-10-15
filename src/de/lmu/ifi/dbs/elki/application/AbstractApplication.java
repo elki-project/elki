@@ -65,7 +65,7 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * We need a static logger in this class, for code used in "main" methods.
    */
-  protected static Logging STATIC_LOGGER = Logging.getLogger(AbstractApplication.class);
+  private static final Logging LOG = Logging.getLogger(AbstractApplication.class);
 
   /**
    * The newline string according to system.
@@ -75,7 +75,7 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.5.0~beta1 (2012, April)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th"+NEWLINE+"International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
+  public static final String INFORMATION = "ELKI Version 0.5.0~beta1 (2012, April)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th" + NEWLINE + "International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
 
   /**
    * Parameter that specifies the name of the output file.
@@ -104,7 +104,7 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param verbose Verbose flag.
    */
   public AbstractApplication(boolean verbose) {
-    if(verbose) {
+    if (verbose) {
       // Note: do not unset verbose if not --verbose - someone else might
       // have set it intentionally. So don't setVerbose(verbose)!
       LoggingConfiguration.setVerbose(true);
@@ -131,32 +131,32 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param args the arguments to run this application with
    */
   public static void runCLIApplication(Class<?> cls, String[] args) {
-    final Flag HELP_FLAG = new Flag(OptionID.HELP);
-    final Flag HELP_LONG_FLAG = new Flag(OptionID.HELP_LONG);
-    final ClassParameter<Object> DESCRIPTION_PARAM = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
-    final StringParameter DEBUG_PARAM = new StringParameter(OptionID.DEBUG, true);
+    final Flag helpF = new Flag(OptionID.HELP);
+    final Flag helpLongF = new Flag(OptionID.HELP_LONG);
+    final ClassParameter<Object> descriptionP = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
+    final StringParameter debugP = new StringParameter(OptionID.DEBUG);
+    debugP.setOptional(true);
 
     SerializedParameterization params = new SerializedParameterization(args);
     try {
-      params.grab(HELP_FLAG);
-      params.grab(HELP_LONG_FLAG);
-      params.grab(DESCRIPTION_PARAM);
-      params.grab(DEBUG_PARAM);
-      if(DESCRIPTION_PARAM.isDefined()) {
+      params.grab(helpF);
+      params.grab(helpLongF);
+      params.grab(descriptionP);
+      params.grab(debugP);
+      if (descriptionP.isDefined()) {
         params.clearErrors();
-        printDescription(DESCRIPTION_PARAM.getValue());
+        printDescription(descriptionP.getValue());
         return;
       }
       // Fail silently on errors.
-      if(params.getErrors().size() > 0) {
+      if (params.getErrors().size() > 0) {
         params.logAndClearReportedErrors();
         return;
       }
-      if(DEBUG_PARAM.isDefined()) {
-        LoggingUtil.parseDebugParameter(DEBUG_PARAM);
+      if (debugP.isDefined()) {
+        LoggingUtil.parseDebugParameter(debugP);
       }
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       printErrorMessage(e);
       return;
     }
@@ -164,27 +164,24 @@ public abstract class AbstractApplication implements Parameterizable {
       TrackParameters config = new TrackParameters(params);
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
-      if((HELP_FLAG.isDefined() && HELP_FLAG.getValue()) || (HELP_LONG_FLAG.isDefined() && HELP_LONG_FLAG.getValue())) {
+      if ((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
         LoggingConfiguration.setVerbose(true);
-        STATIC_LOGGER.verbose(usage(config.getAllParameters()));
-      }
-      else {
+        LOG.verbose(usage(config.getAllParameters()));
+      } else {
         params.logUnusedParameters();
-        if(params.getErrors().size() > 0) {
+        if (params.getErrors().size() > 0) {
           LoggingConfiguration.setVerbose(true);
-          STATIC_LOGGER.verbose("The following configuration errors prevented execution:\n");
-          for(ParameterException e : params.getErrors()) {
-            STATIC_LOGGER.verbose(e.getMessage());
+          LOG.verbose("The following configuration errors prevented execution:\n");
+          for (ParameterException e : params.getErrors()) {
+            LOG.verbose(e.getMessage());
           }
-          STATIC_LOGGER.verbose("\n");
-          STATIC_LOGGER.verbose("Stopping execution because of configuration errors.");
-        }
-        else {
+          LOG.verbose("\n");
+          LOG.verbose("Stopping execution because of configuration errors.");
+        } else {
           task.run();
         }
       }
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       printErrorMessage(e);
     }
   }
@@ -213,19 +210,16 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param e Error Exception.
    */
   protected static void printErrorMessage(Exception e) {
-    if(e instanceof AbortException) {
+    if (e instanceof AbortException) {
       // ensure we actually show the message:
       LoggingConfiguration.setVerbose(true);
-      STATIC_LOGGER.verbose(e.getMessage());
-    }
-    else if(e instanceof UnspecifiedParameterException) {
-      STATIC_LOGGER.error(e.getMessage());
-    }
-    else if(e instanceof ParameterException) {
-      STATIC_LOGGER.error(e.getMessage());
-    }
-    else {
-      STATIC_LOGGER.exception(e);
+      LOG.verbose(e.getMessage());
+    } else if (e instanceof UnspecifiedParameterException) {
+      LOG.error(e.getMessage());
+    } else if (e instanceof ParameterException) {
+      LOG.error(e.getMessage());
+    } else {
+      LOG.exception(e);
     }
   }
 
@@ -233,9 +227,9 @@ public abstract class AbstractApplication implements Parameterizable {
    * Print the description for the given parameter
    */
   private static void printDescription(Class<?> descriptionClass) {
-    if(descriptionClass != null) {
+    if (descriptionClass != null) {
       LoggingConfiguration.setVerbose(true);
-      STATIC_LOGGER.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
+      LOG.verbose(OptionUtil.describeParameterizable(new StringBuilder(), descriptionClass, FormatUtil.getConsoleWidth(), "    ").toString());
     }
   }
 
@@ -275,7 +269,7 @@ public abstract class AbstractApplication implements Parameterizable {
      */
     protected void configVerbose(Parameterization config) {
       final Flag verboseF = new Flag(OptionID.VERBOSE_FLAG);
-      if(config.grab(verboseF)) {
+      if (config.grab(verboseF)) {
         verbose = verboseF.getValue();
       }
     }
@@ -300,7 +294,7 @@ public abstract class AbstractApplication implements Parameterizable {
     protected File getParameterOutputFile(Parameterization config, String description) {
       final FileParameter outputP = new FileParameter(OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
       outputP.setShortDescription(description);
-      if(config.grab(outputP)) {
+      if (config.grab(outputP)) {
         return outputP.getValue();
       }
       return null;
@@ -326,7 +320,7 @@ public abstract class AbstractApplication implements Parameterizable {
     protected File getParameterInputFile(Parameterization config, String description) {
       final FileParameter inputP = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       inputP.setShortDescription(description);
-      if(config.grab(inputP)) {
+      if (config.grab(inputP)) {
         return inputP.getValue();
       }
       return null;

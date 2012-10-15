@@ -43,7 +43,10 @@ public class StringParameter extends AbstractParameter<String> {
    * @param optionID the unique id of the parameter
    * @param constraint parameter constraint
    * @param defaultValue the default value of the parameter
+   * 
+   * @deprecated Use {@link #addConstraint} instead!
    */
+  @Deprecated
   public StringParameter(OptionID optionID, ParameterConstraint<String> constraint, String defaultValue) {
     super(optionID, defaultValue);
     addConstraint(constraint);
@@ -55,20 +58,10 @@ public class StringParameter extends AbstractParameter<String> {
    * 
    * @param optionID the unique id of the parameter
    * @param constraint parameter constraint
-   * @param optional Flag to signal an optional parameter.
-   */
-  public StringParameter(OptionID optionID, ParameterConstraint<String> constraint, boolean optional) {
-    super(optionID, optional);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs a string parameter with the given optionID, constraints and
-   * default value.
    * 
-   * @param optionID the unique id of the parameter
-   * @param constraint parameter constraint
+   * @deprecated Use {@link #addConstraint} instead!
    */
+  @Deprecated
   public StringParameter(OptionID optionID, ParameterConstraint<String> constraint) {
     super(optionID);
     addConstraint(constraint);
@@ -82,16 +75,6 @@ public class StringParameter extends AbstractParameter<String> {
    */
   public StringParameter(OptionID optionID, String defaultValue) {
     super(optionID, defaultValue);
-  }
-
-  /**
-   * Constructs a string parameter with the given optionID.
-   * 
-   * @param optionID the unique id of the parameter
-   * @param optional Flag to signal an optional parameter.
-   */
-  public StringParameter(OptionID optionID, boolean optional) {
-    super(optionID, optional);
   }
 
   /**

@@ -35,7 +35,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListGreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
@@ -138,7 +139,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
      * Key: <code>-projectionfilter.selectedattributes</code>
      * </p>
      */
-    public static final OptionID SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("projectionfilter.selectedattributes", "a comma separated array of integer values d_i, where 1 <= d_i <= the " + "dimensionality of the feature space " + "specifying the dimensions to be considered " + "for projection. If this parameter is not set, " + "no dimensions will be considered, i.e. the projection is a zero-dimensional feature space");
+    public static final OptionID SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("projectionfilter.selectedattributes", "a comma separated array of integer values d_i, where 0 <= d_i < the " + "dimensionality of the feature space " + "specifying the dimensions to be considered " + "for projection. If this parameter is not set, " + "no dimensions will be considered, i.e. the projection is a zero-dimensional feature space");
 
     /**
      * Selected attributes.
@@ -149,12 +150,12 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID);
-      selectedAttributesP.addConstraint(new ListGreaterEqualConstraint(Integer.valueOf(1)));
+      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
       if (config.grab(selectedAttributesP)) {
         selectedAttributes = new BitSet();
         List<Integer> dimensionList = selectedAttributesP.getValue();
         for (int d : dimensionList) {
-          selectedAttributes.set(d - 1);
+          selectedAttributes.set(d);
         }
       }
     }

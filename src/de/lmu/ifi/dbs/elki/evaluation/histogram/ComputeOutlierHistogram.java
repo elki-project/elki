@@ -255,7 +255,8 @@ public class ComputeOutlierHistogram implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID, true);
+      PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
+      positiveClassNameP.setOptional(true);
       if(config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }

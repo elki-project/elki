@@ -30,7 +30,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
 /**
  * Parameter class for a parameter specifying a list of integer values.
@@ -39,41 +38,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Erich Schubert
  */
 public class IntListParameter extends ListParameter<Integer> {
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
-   * @param defaultValue the default value
-   */
-  public IntListParameter(OptionID optionID, ParameterConstraint<? super List<? super Integer>> constraint, List<Integer> defaultValue) {
-    super(optionID, defaultValue);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
-   * @param optional specifies if this parameter is an optional parameter
-   */
-  public IntListParameter(OptionID optionID, ParameterConstraint<? super List<? super Integer>> constraint, boolean optional) {
-    super(optionID, optional);
-    addConstraint(constraint);
-  }
-
-  /**
-   * Constructs an integer list parameter
-   * 
-   * @param optionID the unique id of this parameter
-   * @param constraint the constraint of this parameter, may be null
-   */
-  public IntListParameter(OptionID optionID, ParameterConstraint<? super List<? super Integer>> constraint) {
-    super(optionID);
-    addConstraint(constraint);
-  }
-
   /**
    * Constructs an integer list parameter
    * 
@@ -134,19 +98,6 @@ public class IntListParameter extends ListParameter<Integer> {
     }
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Integer values!");
   }
-
-  /**
-   * Sets the default value of this parameter.
-   * 
-   * @param allListDefaultValue default value for all list elements of this
-   *        parameter
-   */
-  // unused?
-  /*public void setDefaultValue(int allListDefaultValue) {
-    for(int i = 0; i < defaultValue.size(); i++) {
-      defaultValue.set(i, allListDefaultValue);
-    }
-  }*/
 
   /**
    * Returns a string representation of the parameter's type.
