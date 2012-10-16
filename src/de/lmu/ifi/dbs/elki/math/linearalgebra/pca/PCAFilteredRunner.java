@@ -214,14 +214,14 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
       DoubleParameter bigP = new DoubleParameter(BIG_ID, 1.0);
       bigP.addConstraint(new GreaterConstraint(0));
       if (config.grab(bigP)) {
-        big = bigP.getValue();
+        big = bigP.doubleValue();
 
       }
 
       DoubleParameter smallP = new DoubleParameter(SMALL_ID, 0.0);
       smallP.addConstraint(new GreaterEqualConstraint(0));
       if (config.grab(smallP)) {
-        small = smallP.getValue();
+        small = smallP.doubleValue();
       }
 
       // global constraint small <--> big

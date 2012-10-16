@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -94,7 +93,7 @@ public class LUDecomposition implements java.io.Serializable {
     this.n = n;
     // Use a "left-looking", dot-product, Crout/Doolittle algorithm.
     piv = new int[m];
-    for(int i = 0; i < m; i++) {
+    for (int i = 0; i < m; i++) {
       piv[i] = i;
     }
     pivsign = 1;
@@ -103,23 +102,23 @@ public class LUDecomposition implements java.io.Serializable {
 
     // Outer loop.
 
-    for(int j = 0; j < n; j++) {
+    for (int j = 0; j < n; j++) {
       // Make a copy of the j-th column to localize references.
 
-      for(int i = 0; i < m; i++) {
+      for (int i = 0; i < m; i++) {
         LUcolj[i] = LU[i][j];
       }
 
       // Apply previous transformations.
 
-      for(int i = 0; i < m; i++) {
+      for (int i = 0; i < m; i++) {
         LUrowi = LU[i];
 
         // Most of the time is spent in the following dot product.
 
         int kmax = Math.min(i, j);
         double s = 0.0;
-        for(int k = 0; k < kmax; k++) {
+        for (int k = 0; k < kmax; k++) {
           s += LUrowi[k] * LUcolj[k];
         }
 
@@ -129,13 +128,13 @@ public class LUDecomposition implements java.io.Serializable {
       // Find pivot and exchange if necessary.
 
       int p = j;
-      for(int i = j + 1; i < m; i++) {
-        if(Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
+      for (int i = j + 1; i < m; i++) {
+        if (Math.abs(LUcolj[i]) > Math.abs(LUcolj[p])) {
           p = i;
         }
       }
-      if(p != j) {
-        for(int k = 0; k < n; k++) {
+      if (p != j) {
+        for (int k = 0; k < n; k++) {
           double t = LU[p][k];
           LU[p][k] = LU[j][k];
           LU[j][k] = t;
@@ -148,8 +147,8 @@ public class LUDecomposition implements java.io.Serializable {
 
       // Compute multipliers.
 
-      if(j < m & LU[j][j] != 0.0) {
-        for(int i = j + 1; i < m; i++) {
+      if (j < m && LU[j][j] != 0.0) {
+        for (int i = j + 1; i < m; i++) {
           LU[i][j] /= LU[j][j];
         }
       }
@@ -166,8 +165,8 @@ public class LUDecomposition implements java.io.Serializable {
    * @return true if U, and hence A, is nonsingular.
    */
   public boolean isNonsingular() {
-    for(int j = 0; j < n; j++) {
-      if(LU[j][j] == 0) {
+    for (int j = 0; j < n; j++) {
+      if (LU[j][j] == 0) {
         return false;
       }
     }
@@ -182,15 +181,13 @@ public class LUDecomposition implements java.io.Serializable {
   public Matrix getL() {
     Matrix X = new Matrix(m, n);
     double[][] L = X.getArrayRef();
-    for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++) {
-        if(i > j) {
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
+        if (i > j) {
           L[i][j] = LU[i][j];
-        }
-        else if(i == j) {
+        } else if (i == j) {
           L[i][j] = 1.0;
-        }
-        else {
+        } else {
           L[i][j] = 0.0;
         }
       }
@@ -206,12 +203,11 @@ public class LUDecomposition implements java.io.Serializable {
   public Matrix getU() {
     Matrix X = new Matrix(n, n);
     double[][] U = X.getArrayRef();
-    for(int i = 0; i < n; i++) {
-      for(int j = 0; j < n; j++) {
-        if(i <= j) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        if (i <= j) {
           U[i][j] = LU[i][j];
-        }
-        else {
+        } else {
           U[i][j] = 0.0;
         }
       }
@@ -226,9 +222,7 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public int[] getPivot() {
     int[] p = new int[m];
-    for(int i = 0; i < m; i++) {
-      p[i] = piv[i];
-    }
+    System.arraycopy(piv, 0, p, 0, m);
     return p;
   }
 
@@ -239,8 +233,8 @@ public class LUDecomposition implements java.io.Serializable {
    */
   public double[] getDoublePivot() {
     double[] vals = new double[m];
-    for(int i = 0; i < m; i++) {
-      vals[i] = piv[i];
+    for (int i = 0; i < m; i++) {
+      vals[i] = (double) piv[i];
     }
     return vals;
   }
@@ -252,11 +246,11 @@ public class LUDecomposition implements java.io.Serializable {
    * @exception IllegalArgumentException Matrix must be square
    */
   public double det() {
-    if(m != n) {
+    if (m != n) {
       throw new IllegalArgumentException("Matrix must be square.");
     }
     double d = pivsign;
-    for(int j = 0; j < n; j++) {
+    for (int j = 0; j < n; j++) {
       d *= LU[j][j];
     }
     return d;
@@ -271,10 +265,10 @@ public class LUDecomposition implements java.io.Serializable {
    * @exception RuntimeException Matrix is singular.
    */
   public Matrix solve(Matrix B) {
-    if(B.getRowDimensionality() != m) {
+    if (B.getRowDimensionality() != m) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
-    if(!this.isNonsingular()) {
+    if (!this.isNonsingular()) {
       throw new RuntimeException("Matrix is singular.");
     }
 
@@ -298,10 +292,10 @@ public class LUDecomposition implements java.io.Serializable {
   public double[][] solve(double[][] B) {
     int mx = B.length;
     int nx = B[0].length;
-    if(mx != m) {
+    if (mx != m) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
-    if(!this.isNonsingular()) {
+    if (!this.isNonsingular()) {
       throw new RuntimeException("Matrix is singular.");
     }
     double[][] Xmat = new Matrix(B).getMatrix(piv, 0, nx - 1).getArrayRef();
@@ -317,20 +311,20 @@ public class LUDecomposition implements java.io.Serializable {
    */
   private void solveInplace(double[][] B, int nx) {
     // Solve L*Y = B(piv,:)
-    for(int k = 0; k < n; k++) {
-      for(int i = k + 1; i < n; i++) {
-        for(int j = 0; j < nx; j++) {
+    for (int k = 0; k < n; k++) {
+      for (int i = k + 1; i < n; i++) {
+        for (int j = 0; j < nx; j++) {
           B[i][j] -= B[k][j] * LU[i][k];
         }
       }
     }
     // Solve U*X = Y;
-    for(int k = n - 1; k >= 0; k--) {
-      for(int j = 0; j < nx; j++) {
+    for (int k = n - 1; k >= 0; k--) {
+      for (int j = 0; j < nx; j++) {
         B[k][j] /= LU[k][k];
       }
-      for(int i = 0; i < k; i++) {
-        for(int j = 0; j < nx; j++) {
+      for (int i = 0; i < k; i++) {
+        for (int j = 0; j < nx; j++) {
           B[i][j] -= B[k][j] * LU[i][k];
         }
       }

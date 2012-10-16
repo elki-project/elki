@@ -152,7 +152,7 @@ public class SweepHullDelaunay2D {
           besttri.copyFrom(testtri);
           besti = i;
         }
-        else if(besttri.r2 * 4 < sort[i].first) {
+        else if(besttri.r2 * 4. < sort[i].first) {
           // Stop early, points are too far away from seed.
           break;
         }
@@ -412,7 +412,7 @@ public class SweepHullDelaunay2D {
   void debugHull() {
     StringBuilder buf = new StringBuilder();
     for(IntIntPair p : hull) {
-      buf.append(p).append(" ");
+      buf.append(p).append(' ');
     }
     LOG.debugFinest(buf);
   }

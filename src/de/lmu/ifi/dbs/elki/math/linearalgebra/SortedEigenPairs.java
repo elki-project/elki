@@ -187,7 +187,7 @@ public class SortedEigenPairs {
   public String toString() {
     StringBuilder result = new StringBuilder();
     for(EigenPair eigenPair : eigenPairs) {
-      result.append("\n").append(eigenPair);
+      result.append('\n').append(eigenPair);
     }
     return result.toString();
   }

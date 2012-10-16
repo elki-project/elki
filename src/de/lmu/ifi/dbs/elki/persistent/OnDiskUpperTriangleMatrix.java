@@ -121,7 +121,7 @@ public class OnDiskUpperTriangleMatrix {
    * @return size of the array
    */
   private static int arraysize(int matrixsize) {
-    return matrixsize * (matrixsize + 1) / 2;
+    return (matrixsize * (matrixsize + 1)) >> 1;
   }
 
   /**
@@ -135,7 +135,7 @@ public class OnDiskUpperTriangleMatrix {
     if(y > x) {
       return computeOffset(y, x);
     }
-    return (x * (x + 1)) / 2 + y;
+    return ((x * (x + 1)) >> 1) + y;
   }
 
   /**

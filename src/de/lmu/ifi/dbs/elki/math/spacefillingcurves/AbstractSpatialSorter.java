@@ -65,32 +65,31 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
   protected <T extends SpatialComparable> int pivotizeList1D(List<T> objs, int start, int end, int dim, double threshold, boolean desc) {
     threshold = 2 * threshold; // faster
     int s = start, e = end;
-    while(s < e) {
-      if(!desc) {
+    while (s < e) {
+      if (!desc) {
         double sminmax = getMinPlusMaxObject(objs, s, dim);
-        while((sminmax < threshold) && s + 1 <= e && s + 1 < end) {
+        while ((sminmax < threshold) && s + 1 <= e && s + 1 < end) {
           s++;
           sminmax = getMinPlusMaxObject(objs, s, dim);
         }
         double eminmax = getMinPlusMaxObject(objs, e - 1, dim);
-        while((eminmax >= threshold) && s < e - 1 && start < e - 1) {
+        while ((eminmax >= threshold) && s < e - 1 && start < e - 1) {
           e--;
           eminmax = getMinPlusMaxObject(objs, e - 1, dim);
         }
-      }
-      else {
+      } else {
         double sminmax = getMinPlusMaxObject(objs, s, dim);
-        while((sminmax > threshold) && s + 1 <= e && s + 1 < end) {
+        while ((sminmax > threshold) && s + 1 <= e && s + 1 < end) {
           s++;
           sminmax = getMinPlusMaxObject(objs, s, dim);
         }
         double eminmax = getMinPlusMaxObject(objs, e - 1, dim);
-        while((eminmax <= threshold) && s < e - 1 && start < e - 1) {
+        while ((eminmax <= threshold) && s < e - 1 && start < e - 1) {
           e--;
           eminmax = getMinPlusMaxObject(objs, e - 1, dim);
         }
       }
-      if(s >= e) {
+      if (s >= e) {
         assert (s == e);
         break;
       }
@@ -124,20 +123,20 @@ public abstract class AbstractSpatialSorter implements SpatialSorter {
   public static double[] computeMinMax(List<? extends SpatialComparable> objs) {
     final int dim = objs.get(0).getDimensionality();
     // Compute min and max for each dimension:
-    double[] mm = new double[dim * 2];
+    double[] mm = new double[dim << 1];
     {
-      for(int d = 0; d < dim; d++) {
-        mm[d * 2] = Double.POSITIVE_INFINITY;
-        mm[d * 2 + 1] = Double.NEGATIVE_INFINITY;
+      for (int d = 0; d < dim; d++) {
+        mm[d << 1] = Double.POSITIVE_INFINITY;
+        mm[(d << 1) + 1] = Double.NEGATIVE_INFINITY;
       }
-      for(SpatialComparable obj : objs) {
-        for(int d = 0; d < dim; d++) {
-          mm[2 * d] = Math.min(mm[2 * d], obj.getMin(d));
-          mm[2 * d + 1] = Math.max(mm[2 * d + 1], obj.getMax(d));
+      for (SpatialComparable obj : objs) {
+        for (int d = 0; d < dim; d++) {
+          mm[d << 1] = Math.min(mm[d << 1], obj.getMin(d));
+          mm[(d << 1) + 1] = Math.max(mm[(d << 1) + 1], obj.getMax(d));
         }
       }
-      for(int d = 0; d < dim; d++) {
-        assert (mm[2 * d] <= mm[2 * d + 1]);
+      for (int d = 0; d < dim; d++) {
+        assert (mm[d << 1] <= mm[(d << 1) + 1]);
       }
     }
     return mm;

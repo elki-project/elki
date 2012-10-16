@@ -438,7 +438,7 @@ public final class MathUtil {
    * @return Sum
    */
   public static long sumFirstIntegers(final long i) {
-    return ((i - 1L) * i) / 2;
+    return ((i - 1L) * i) >> 1;
   }
 
   /**
@@ -512,8 +512,8 @@ public final class MathUtil {
     // return EARTH_RADIUS * Math.atan(dist);
 
     // Alternative: Havestine formula, higher precision at < 1 meters:
-    final double slat = Math.sin(dlat / 2);
-    final double slon = Math.sin(dlon / 2);
+    final double slat = Math.sin(dlat * .5);
+    final double slon = Math.sin(dlon * .5);
     final double a = slat * slat + slon * slon * Math.cos(lat1) * Math.cos(lat2);
     final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return EARTH_RADIUS * c;

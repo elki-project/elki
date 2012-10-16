@@ -102,7 +102,7 @@ public class DoubleMinMax extends DoubleDoublePair {
    */
   public void put(Collection<Double> data) {
     for(Double value : data) {
-      this.put(value);
+      this.put(value.doubleValue());
     }
   }
 

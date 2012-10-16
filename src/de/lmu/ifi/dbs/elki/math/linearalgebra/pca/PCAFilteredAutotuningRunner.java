@@ -77,12 +77,43 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     // be L2-spherical to be unbiased.
     V center = Centroid.make(database, ids).toVector(database);
     DoubleDistanceDBIDList dres = new DoubleDistanceDBIDList(ids.size());
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double dist = EuclideanDistanceFunction.STATIC.doubleDistance(center, database.get(iter));
       dres.add(dist, iter);
     }
     dres.sort();
     return processQueryResult(dres, database);
+  }
+
+  /**
+   * Candidate
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  static class Cand {
+    /** Candidate matrix */
+    Matrix m;
+
+    /** Score */
+    double explain;
+
+    /** Dimensionality */
+    int dim;
+
+    /**
+     * Constructor.
+     * 
+     * @param m Matrix
+     * @param explain Explains core
+     * @param dim Dimensionality
+     */
+    Cand(Matrix m, double explain, int dim) {
+      this.m = m;
+      this.explain = explain;
+      this.dim = dim;
+    }
   }
 
   @Override
@@ -91,26 +122,24 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     final int dim = RelationUtil.dimensionality(database);
 
     List<Matrix> best = new LinkedList<Matrix>();
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       best.add(null);
     }
     double[] beststrength = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       beststrength[i] = -1;
     }
     int[] bestk = new int[dim];
     // 'history'
-    LinkedList<Matrix> prevM = new LinkedList<Matrix>();
-    LinkedList<Double> prevS = new LinkedList<Double>();
-    LinkedList<Integer> prevD = new LinkedList<Integer>();
+    LinkedList<Cand> prev = new LinkedList<Cand>();
     // TODO: starting parameter shouldn't be hardcoded...
     int smooth = 3;
     int startk = 4;
-    if(startk > results.size() - 1) {
+    if (startk > results.size() - 1) {
       startk = results.size() - 1;
     }
     // TODO: add smoothing options, handle border cases better.
-    for(int k = startk; k < results.size(); k++) {
+    for (int k = startk; k < results.size(); k++) {
       // sorted eigenpairs, eigenvectors, eigenvalues
       Matrix covMat = covarianceMatrixBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = new EigenvalueDecomposition(covMat);
@@ -124,49 +153,41 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
       assert ((thisdim > 0) && (thisdim <= dim));
       double thisexplain = computeExplainedVariance(filteredEigenPairs);
 
-      prevM.add(covMat);
-      prevS.add(thisexplain);
-      prevD.add(thisdim);
-      assert (prevS.size() == prevM.size());
-      assert (prevS.size() == prevD.size());
+      prev.add(new Cand(covMat, thisexplain, thisdim));
 
-      if(prevS.size() >= 2 * smooth + 1) {
+      if (prev.size() >= 2 * smooth + 1) {
         // all the same dimension?
         boolean samedim = true;
-        for(Iterator<Integer> it = prevD.iterator(); it.hasNext();) {
-          if(it.next().intValue() != thisdim) {
+        for (Iterator<Cand> it = prev.iterator(); it.hasNext();) {
+          if (it.next().dim != thisdim) {
             samedim = false;
           }
         }
-        if(samedim) {
+        if (samedim) {
           // average their explain values
           double avgexplain = 0.0;
-          for(Iterator<Double> it = prevS.iterator(); it.hasNext();) {
-            avgexplain += it.next().doubleValue();
+          for (Iterator<Cand> it = prev.iterator(); it.hasNext();) {
+            avgexplain += it.next().explain;
           }
-          avgexplain /= prevS.size();
+          avgexplain /= prev.size();
 
-          if(avgexplain > beststrength[thisdim - 1]) {
+          if (avgexplain > beststrength[thisdim - 1]) {
             beststrength[thisdim - 1] = avgexplain;
-            best.set(thisdim - 1, prevM.get(smooth));
+            best.set(thisdim - 1, prev.get(smooth).m);
             bestk[thisdim - 1] = k - smooth;
           }
         }
-        prevM.removeFirst();
-        prevS.removeFirst();
-        prevD.removeFirst();
-        assert (prevS.size() == prevM.size());
-        assert (prevS.size() == prevD.size());
+        prev.removeFirst();
       }
     }
     // Try all dimensions, lowest first.
-    for(int i = 0; i < dim; i++) {
-      if(beststrength[i] > 0.0) {
+    for (int i = 0; i < dim; i++) {
+      if (beststrength[i] > 0.0) {
         // If the best was the lowest or the biggest k, skip it!
-        if(bestk[i] == startk + smooth) {
+        if (bestk[i] == startk + smooth) {
           continue;
         }
-        if(bestk[i] == results.size() - smooth - 1) {
+        if (bestk[i] == results.size() - smooth - 1) {
           continue;
         }
         Matrix covMat = best.get(i);
@@ -191,10 +212,10 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
   private double computeExplainedVariance(FilteredEigenPairs filteredEigenPairs) {
     double strongsum = 0.0;
     double weaksum = 0.0;
-    for(EigenPair ep : filteredEigenPairs.getStrongEigenPairs()) {
+    for (EigenPair ep : filteredEigenPairs.getStrongEigenPairs()) {
       strongsum += ep.getEigenvalue();
     }
-    for(EigenPair ep : filteredEigenPairs.getWeakEigenPairs()) {
+    for (EigenPair ep : filteredEigenPairs.getWeakEigenPairs()) {
       weaksum += ep.getEigenvalue();
     }
     return strongsum / (strongsum / weaksum);
@@ -210,22 +231,20 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     // TODO: sort results instead?
     double dist = -1.0;
     boolean sorted = true;
-    for(DistanceDBIDResultIter<D> it = results.iter(); it.valid(); it.advance()) {
+    for (DistanceDBIDResultIter<D> it = results.iter(); it.valid(); it.advance()) {
       double qr = it.getDistance().doubleValue();
-      if(qr < dist) {
+      if (qr < dist) {
         sorted = false;
       }
       dist = qr;
     }
-    if(!sorted) {
+    if (!sorted) {
       try {
         ModifiableDistanceDBIDResult.class.cast(results).sort();
-      }
-      catch(ClassCastException e) {
-        LoggingUtil.warning("WARNING: results not sorted by distance!");
-      }
-      catch(UnsupportedOperationException e) {
-        LoggingUtil.warning("WARNING: results not sorted by distance!");
+      } catch (ClassCastException e) {
+        LoggingUtil.warning("WARNING: results not sorted by distance!", e);
+      } catch (UnsupportedOperationException e) {
+        LoggingUtil.warning("WARNING: results not sorted by distance!", e);
       }
     }
   }

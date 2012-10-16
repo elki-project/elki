@@ -156,7 +156,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
       alphaP.addConstraint(new GreaterConstraint(0.0));
       alphaP.addConstraint(new LessConstraint(1.0));
       if (config.grab(alphaP)) {
-        alpha = alphaP.getValue();
+        alpha = alphaP.doubleValue();
       }
     }
 

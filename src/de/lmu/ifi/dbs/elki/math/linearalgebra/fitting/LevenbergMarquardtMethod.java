@@ -248,10 +248,8 @@ public class LevenbergMarquardtMethod {
     // build covmat out of fitting matrix by multiplying diagonal elements with
     // 1+lambda
     for(int i = 0; i < numfit; i++) {
-      for(int j = 0; j < numfit; j++) {
-        covmat[i][j] = alpha[i][j];
-      }
-      covmat[i][i] = alpha[i][i] * (1.0 + lambda);
+      System.arraycopy(alpha[i], 0, covmat[i], 0, numfit);
+      covmat[i][i] *= (1.0 + lambda);
     }
     // System.out.println("Chisq: " + chisq);
     // System.out.println("Lambda: " + lambda);
@@ -289,14 +287,10 @@ public class LevenbergMarquardtMethod {
       // keep modified covmat as new alpha matrix
       // and da as new beta
       for(int i = 0; i < numfit; i++) {
-        for(int j = 0; j < numfit; j++) {
-          alpha[i][j] = covmat[i][j];
-        }
+        System.arraycopy(covmat[i], 0, alpha[i], 0, numfit);
         beta[i] = deltaparams[i];
       }
-      for(int i = 0; i < numparams; i++) {
-        params[i] = paramstry[i];
-      }
+      System.arraycopy(paramstry, 0, params, 0, numparams);
     }
     else {
       // TODO: Do we need a larger limit than MAX_VALUE?

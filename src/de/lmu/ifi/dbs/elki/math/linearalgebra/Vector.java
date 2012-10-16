@@ -580,7 +580,7 @@ public class Vector implements NumberVector<Double> {
   @Override
   @Deprecated
   public Double getValue(int dimension) {
-    return elements[dimension];
+    return Double.valueOf(elements[dimension]);
   }
 
   @Override

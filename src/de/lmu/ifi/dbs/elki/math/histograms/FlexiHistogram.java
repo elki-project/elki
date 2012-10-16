@@ -102,7 +102,7 @@ public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
     super(bins, 0.0, 1.0, adapter);
     this.destsize = bins;
     this.downsampler = adapter;
-    tempcache = new ArrayList<DoubleObjPair<D>>(this.destsize * 2);
+    tempcache = new ArrayList<DoubleObjPair<D>>(this.destsize << 1);
   }
 
   private synchronized void materialize() {
@@ -130,7 +130,7 @@ public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
     this.max = max;
     this.binsize = (max - min) / this.destsize;
     // initialize array
-    this.data = new ArrayList<T>(this.destsize * 2);
+    this.data = new ArrayList<T>(this.destsize << 1);
     for(int i = 0; i < this.destsize; i++) {
       this.data.add(downsampler.make());
     }
@@ -154,7 +154,7 @@ public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
   private void testResample() {
     while(super.size >= 2 * this.destsize) {
       // Resampling.
-      ArrayList<T> newdata = new ArrayList<T>(this.destsize * 2);
+      ArrayList<T> newdata = new ArrayList<T>(this.destsize << 1);
       for(int i = 0; i < super.size; i += 2) {
         if(i + 1 < super.size) {
           newdata.add(downsampler.downsample(super.data.get(i), super.data.get(i + 1)));
@@ -171,7 +171,7 @@ public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
       super.base = base;
       super.offset = 0;
       super.size = newdata.size();
-      super.binsize = super.binsize * 2;
+      super.binsize = super.binsize * 2.;
       super.max = super.base + super.binsize * super.size;
     }
   }
@@ -245,7 +245,7 @@ public class FlexiHistogram<T, D> extends AggregatingHistogram<T, D> {
   @Override
   public void aggregate(double coord, D value) {
     if(tempcache != null) {
-      if(tempcache.size() < this.destsize * 2) {
+      if(tempcache.size() < this.destsize << 1) {
         tempcache.add(new DoubleObjPair<D>(coord, downsampler.cloneForCache(value)));
         return;
       }

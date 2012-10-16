@@ -39,7 +39,7 @@ public final class VMath {
    * A small number to handle numbers near 0 as 0.
    */
   public static final double DELTA = 1E-5;
-  
+
   /**
    * Error message (in assertions!) when vector dimensionalities do not agree.
    */
@@ -75,17 +75,16 @@ public final class VMath {
    */
   public static final double[] randomNormalizedVector(final int dimensionality) {
     final double[] v = new double[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
+    for (int i = 0; i < dimensionality; i++) {
       v[i] = Math.random();
     }
     double norm = euclideanLength(v);
-    if(norm != 0) {
-      for(int row = 0; row < v.length; row++) {
+    if (norm != 0) {
+      for (int row = 0; row < v.length; row++) {
         v[row] /= norm;
       }
       return v;
-    }
-    else {
+    } else {
       return randomNormalizedVector(dimensionality);
     }
   }
@@ -121,7 +120,7 @@ public final class VMath {
    */
   public static final double[][] transpose(final double[] v) {
     double[][] re = new double[v.length][1];
-    for(int i = 0; i < v.length; i++) {
+    for (int i = 0; i < v.length; i++) {
       re[i][0] = v[i];
     }
     return re;
@@ -137,7 +136,7 @@ public final class VMath {
   public static final double[] plus(final double[] v1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
     final double[] result = new double[v1.length];
-    for(int i = 0; i < result.length; i++) {
+    for (int i = 0; i < result.length; i++) {
       result[i] = v1[i] + v2[i];
     }
     return result;
@@ -154,7 +153,7 @@ public final class VMath {
   public static final double[] plusTimes(final double[] v1, final double[] v2, final double s2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
     final double[] result = new double[v1.length];
-    for(int i = 0; i < result.length; i++) {
+    for (int i = 0; i < result.length; i++) {
       result[i] = v1[i] + v2[i] * s2;
     }
     return result;
@@ -171,7 +170,7 @@ public final class VMath {
   public static final double[] timesPlus(final double[] v1, final double s1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
     final double[] result = new double[v1.length];
-    for(int i = 0; i < result.length; i++) {
+    for (int i = 0; i < result.length; i++) {
       result[i] = v1[i] * s1 + v2[i];
     }
     return result;
@@ -189,7 +188,7 @@ public final class VMath {
   public static final double[] timesPlusTimes(final double[] v1, final double s1, final double[] v2, final double s2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
     final double[] result = new double[v1.length];
-    for(int i = 0; i < result.length; i++) {
+    for (int i = 0; i < result.length; i++) {
       result[i] = v1[i] * s1 + v2[i] * s2;
     }
     return result;
@@ -204,7 +203,7 @@ public final class VMath {
    */
   public static final double[] plusEquals(final double[] v1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] += v2[i];
     }
     return v1;
@@ -220,7 +219,7 @@ public final class VMath {
    */
   public static final double[] plusTimesEquals(final double[] v1, final double[] v2, final double s2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] += s2 * v2[i];
     }
     return v1;
@@ -236,7 +235,7 @@ public final class VMath {
    */
   public static final double[] timesPlusEquals(final double[] v1, final double s1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] = v1[i] * s1 + v2[i];
     }
     return v1;
@@ -253,7 +252,7 @@ public final class VMath {
    */
   public static final double[] timesPlusTimesEquals(final double[] v1, final double s1, final double[] v2, final double s2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] = v1[i] * s1 + v2[i] * s2;
     }
     return v1;
@@ -268,7 +267,7 @@ public final class VMath {
    */
   public static final double[] plus(final double[] v1, final double d) {
     final double[] result = new double[v1.length];
-    for(int i = 0; i < result.length; i++) {
+    for (int i = 0; i < result.length; i++) {
       result[i] = v1[i] + d;
     }
     return result;
@@ -282,7 +281,7 @@ public final class VMath {
    * @return Modified vector
    */
   public static final double[] plusEquals(final double[] v1, final double d) {
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] += d;
     }
     return v1;
@@ -297,7 +296,7 @@ public final class VMath {
    */
   public static final double[] minus(final double[] v1, final double[] v2) {
     final double[] sub = new double[v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] - v2[i];
     }
     return sub;
@@ -313,7 +312,7 @@ public final class VMath {
    */
   public static final double[] minusTimes(final double[] v1, final double[] v2, final double s2) {
     final double[] sub = new double[v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] - v2[i] * s2;
     }
     return sub;
@@ -329,7 +328,7 @@ public final class VMath {
    */
   public static final double[] timesMinus(final double[] v1, final double s1, final double[] v2) {
     final double[] sub = new double[v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] * s1 - v2[i];
     }
     return sub;
@@ -346,7 +345,7 @@ public final class VMath {
    */
   public static final double[] timesMinusTimes(final double[] v1, final double s1, final double[] v2, final double s2) {
     final double[] sub = new double[v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       sub[i] = v1[i] * s1 - v2[i] * s2;
     }
     return sub;
@@ -361,7 +360,7 @@ public final class VMath {
    */
   public static final double[] minusEquals(final double[] v1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] -= v2[i];
     }
     return v1;
@@ -377,7 +376,7 @@ public final class VMath {
    */
   public static final double[] minusTimesEquals(final double[] v1, final double[] v2, final double s2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] -= v2[i] * s2;
     }
     return v1;
@@ -393,7 +392,7 @@ public final class VMath {
    */
   public static final double[] timesMinusEquals(final double[] v1, final double s1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] = v1[i] * s1 - v2[i];
     }
     return v1;
@@ -410,7 +409,7 @@ public final class VMath {
    */
   public static final double[] timesMinusTimesEquals(final double[] v1, final double s1, final double[] v2, final double s2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] = v1[i] * s1 - v2[i] * s2;
     }
     return v1;
@@ -425,7 +424,7 @@ public final class VMath {
    */
   public static final double[] minus(final double[] v1, final double d) {
     final double[] result = new double[v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       result[i] = v1[i] - d;
     }
     return result;
@@ -439,7 +438,7 @@ public final class VMath {
    * @return v1 = v1 - d
    */
   public static final double[] minusEquals(final double[] v1, final double d) {
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] -= d;
     }
     return v1;
@@ -454,7 +453,7 @@ public final class VMath {
    */
   public static final double[] times(final double[] v1, final double s1) {
     final double[] v = new double[v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v[i] = v1[i] * s1;
     }
     return v;
@@ -468,7 +467,7 @@ public final class VMath {
    * @return v1 = v1 * s1
    */
   public static final double[] timesEquals(final double[] v1, final double s) {
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       v1[i] *= s;
     }
     return v1;
@@ -485,8 +484,8 @@ public final class VMath {
     assert (m2.length == 1) : ERR_MATRIX_INNERDIM;
     final int columndimension = m2[0].length;
     final double[][] re = new double[v1.length][columndimension];
-    for(int j = 0; j < columndimension; j++) {
-      for(int i = 0; i < v1.length; i++) {
+    for (int j = 0; j < columndimension; j++) {
+      for (int i = 0; i < v1.length; i++) {
         re[i][j] = v1[i] * m2[0][j];
       }
     }
@@ -504,9 +503,9 @@ public final class VMath {
     assert (m2.length == v1.length) : ERR_MATRIX_INNERDIM;
     final int columndimension = m2[0].length;
     final double[][] re = new double[1][columndimension];
-    for(int j = 0; j < columndimension; j++) {
+    for (int j = 0; j < columndimension; j++) {
       double s = 0;
-      for(int k = 0; k < v1.length; k++) {
+      for (int k = 0; k < v1.length; k++) {
         s += v1[k] * m2[k][j];
       }
       re[0][j] = s;
@@ -524,7 +523,7 @@ public final class VMath {
   public static final double transposeTimes(final double[] v1, final double[] v2) {
     assert (v2.length == v1.length) : ERR_MATRIX_INNERDIM;
     double s = 0;
-    for(int k = 0; k < v1.length; k++) {
+    for (int k = 0; k < v1.length; k++) {
       s += v1[k] * v2[k];
     }
     return s;
@@ -541,8 +540,8 @@ public final class VMath {
     assert (m2[0].length == 1) : ERR_MATRIX_INNERDIM;
 
     final double[][] re = new double[v1.length][m2.length];
-    for(int j = 0; j < m2.length; j++) {
-      for(int i = 0; i < v1.length; i++) {
+    for (int j = 0; j < m2.length; j++) {
+      for (int i = 0; i < v1.length; i++) {
         re[i][j] = v1[i] * m2[j][0];
       }
     }
@@ -558,8 +557,8 @@ public final class VMath {
    */
   public static final double[][] timesTranspose(final double[] v1, final double[] v2) {
     final double[][] re = new double[v1.length][v2.length];
-    for(int j = 0; j < v2.length; j++) {
-      for(int i = 0; i < v1.length; i++) {
+    for (int j = 0; j < v2.length; j++) {
+      for (int i = 0; i < v1.length; i++) {
         re[i][j] = v1[i] * v2[j];
       }
     }
@@ -578,7 +577,7 @@ public final class VMath {
   public static final double scalarProduct(final double[] v1, final double[] v2) {
     assert (v1.length == v2.length) : ERR_VEC_DIMENSIONS;
     double scalarProduct = 0.0;
-    for(int row = 0; row < v1.length; row++) {
+    for (int row = 0; row < v1.length; row++) {
       scalarProduct += v1[row] * v2[row];
     }
     return scalarProduct;
@@ -592,7 +591,7 @@ public final class VMath {
    */
   public static final double euclideanLength(final double[] v1) {
     double acc = 0.0;
-    for(int row = 0; row < v1.length; row++) {
+    for (int row = 0; row < v1.length; row++) {
       final double v = v1[row];
       acc += v * v;
     }
@@ -608,8 +607,8 @@ public final class VMath {
   public static final double[] normalize(final double[] v1) {
     double norm = euclideanLength(v1);
     double[] re = new double[v1.length];
-    if(norm != 0) {
-      for(int row = 0; row < v1.length; row++) {
+    if (norm != 0) {
+      for (int row = 0; row < v1.length; row++) {
         re[row] = v1[row] / norm;
       }
     }
@@ -624,8 +623,8 @@ public final class VMath {
    */
   public static final double[] normalizeEquals(final double[] v1) {
     double norm = euclideanLength(v1);
-    if(norm != 0) {
-      for(int row = 0; row < v1.length; row++) {
+    if (norm != 0) {
+      for (int row = 0; row < v1.length; row++) {
         v1[row] /= norm;
       }
     }
@@ -644,7 +643,7 @@ public final class VMath {
     final int columndimension = m2[0].length;
 
     double[] sum = new double[v1.length];
-    for(int i = 0; i < columndimension; i++) {
+    for (int i = 0; i < columndimension; i++) {
       // TODO: optimize - copy less.
       double[] v_i = getCol(m2, i);
       plusTimesEquals(sum, v_i, scalarProduct(v1, v_i));
@@ -706,7 +705,7 @@ public final class VMath {
    */
   public static final double[][] unitMatrix(final int dim) {
     final double[][] e = new double[dim][dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       e[i][i] = 1;
     }
     return e;
@@ -732,8 +731,8 @@ public final class VMath {
    */
   public static final double[][] random(final int m, final int n) {
     final double[][] A = new double[m][n];
-    for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++) {
+    for (int i = 0; i < m; i++) {
+      for (int j = 0; j < n; j++) {
         A[i][j] = Math.random();
       }
     }
@@ -749,7 +748,7 @@ public final class VMath {
    */
   public static final double[][] identity(final int m, final int n) {
     final double[][] A = new double[m][n];
-    for(int i = 0; i < Math.min(m, n); i++) {
+    for (int i = 0; i < Math.min(m, n); i++) {
       A[i][i] = 1.0;
     }
     return A;
@@ -764,7 +763,7 @@ public final class VMath {
    */
   public static final double[][] diagonal(final double[] v1) {
     final double[][] result = new double[v1.length][v1.length];
-    for(int i = 0; i < v1.length; i++) {
+    for (int i = 0; i < v1.length; i++) {
       result[i][i] = v1[i];
     }
     return result;
@@ -779,7 +778,7 @@ public final class VMath {
   public static final double[][] copy(final double[][] m1) {
     final int columndimension = m1[0].length;
     final double[][] X = new double[m1.length][columndimension];
-    for(int i = 0; i < m1.length; i++) {
+    for (int i = 0; i < m1.length; i++) {
       System.arraycopy(m1[i], 0, X[i], 0, columndimension);
     }
     return X;
@@ -794,10 +793,8 @@ public final class VMath {
   public static final double[] rowPackedCopy(final double[][] m1) {
     final int columndimension = m1[0].length;
     double[] vals = new double[m1.length * columndimension];
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        vals[i * columndimension + j] = m1[i][j];
-      }
+    for (int i = 0; i < m1.length; i++) {
+      System.arraycopy(m1[i], 0, vals, i * columndimension, columndimension);
     }
     return vals;
   }
@@ -811,8 +808,8 @@ public final class VMath {
   public static final double[] columnPackedCopy(final double[][] m1) {
     final int columndimension = m1[0].length;
     final double[] vals = new double[m1.length * columndimension];
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
+    for (int i = 0; i < m1.length; i++) {
+      for (int j = 0; j < columndimension; j++) {
         vals[i + j * m1.length] = m1[i][j];
       }
     }
@@ -831,10 +828,8 @@ public final class VMath {
    */
   public static final double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1) {
     final double[][] X = new double[r1 - r0 + 1][c1 - c0 + 1];
-    for(int i = r0; i <= r1; i++) {
-      for(int j = c0; j <= c1; j++) {
-        X[i - r0][j - c0] = m1[i][j];
-      }
+    for (int i = r0; i <= r1; i++) {
+      System.arraycopy(m1[i], c0, X[i - r0], 0, c1 - c0 + 1);
     }
     return X;
   }
@@ -849,8 +844,8 @@ public final class VMath {
    */
   public static final double[][] getMatrix(final double[][] m1, final int[] r, final int[] c) {
     final double[][] X = new double[r.length][c.length];
-    for(int i = 0; i < r.length; i++) {
-      for(int j = 0; j < c.length; j++) {
+    for (int i = 0; i < r.length; i++) {
+      for (int j = 0; j < c.length; j++) {
         X[i][j] = m1[r[i]][c[j]];
       }
     }
@@ -868,10 +863,8 @@ public final class VMath {
    */
   public static final double[][] getMatrix(final double[][] m1, final int[] r, final int c0, final int c1) {
     final double[][] X = new double[r.length][c1 - c0 + 1];
-    for(int i = 0; i < r.length; i++) {
-      for(int j = c0; j <= c1; j++) {
-        X[i][j - c0] = m1[r[i]][j];
-      }
+    for (int i = 0; i < r.length; i++) {
+      System.arraycopy(m1[r[i]], c0, X[i], 0, c1 - c0 + 1);
     }
     return X;
   }
@@ -887,8 +880,8 @@ public final class VMath {
    */
   public static final double[][] getMatrix(final double[][] m1, final int r0, final int r1, final int[] c) {
     final double[][] X = new double[r1 - r0 + 1][c.length];
-    for(int i = r0; i <= r1; i++) {
-      for(int j = 0; j < c.length; j++) {
+    for (int i = r0; i <= r1; i++) {
+      for (int j = 0; j < c.length; j++) {
         X[i - r0][j] = m1[i][c[j]];
       }
     }
@@ -906,10 +899,8 @@ public final class VMath {
    * @param m2 New values for m1(r0:r1,c0:c1)
    */
   public static final void setMatrix(final double[][] m1, final int r0, final int r1, final int c0, final int c1, final double[][] m2) {
-    for(int i = r0; i <= r1; i++) {
-      for(int j = c0; j <= c1; j++) {
-        m1[i][j] = m2[i - r0][j - c0];
-      }
+    for (int i = r0; i <= r1; i++) {
+      System.arraycopy(m2[i - r0], 0, m1[i], c0, c1 - c0 + 1);
     }
   }
 
@@ -922,8 +913,8 @@ public final class VMath {
    * @param m2 New values for m1(r(:),c(:))
    */
   public static final void setMatrix(final double[][] m1, final int[] r, final int[] c, final double[][] m2) {
-    for(int i = 0; i < r.length; i++) {
-      for(int j = 0; j < c.length; j++) {
+    for (int i = 0; i < r.length; i++) {
+      for (int j = 0; j < c.length; j++) {
         m1[r[i]][c[j]] = m2[i][j];
       }
     }
@@ -939,10 +930,8 @@ public final class VMath {
    * @param m2 New values for m1(r(:),c0:c1)
    */
   public static final void setMatrix(final double[][] m1, final int[] r, final int c0, final int c1, final double[][] m2) {
-    for(int i = 0; i < r.length; i++) {
-      for(int j = c0; j <= c1; j++) {
-        m1[r[i]][j] = m2[i][j - c0];
-      }
+    for (int i = 0; i < r.length; i++) {
+      System.arraycopy(m2[i], 0, m1[r[i]], c0, c1 - c0 + 1);
     }
   }
 
@@ -956,8 +945,8 @@ public final class VMath {
    * @param m2 New values for m1(r0:r1,c(:))
    */
   public static final void setMatrix(final double[][] m1, final int r0, final int r1, final int[] c, final double[][] m2) {
-    for(int i = r0; i <= r1; i++) {
-      for(int j = 0; j < c.length; j++) {
+    for (int i = r0; i <= r1; i++) {
+      for (int j = 0; j < c.length; j++) {
         m1[i][c[j]] = m2[i - r0][j];
       }
     }
@@ -984,9 +973,7 @@ public final class VMath {
   public static final void setRow(final double[][] m1, final int r, final double[] row) {
     final int columndimension = getColumnDimensionality(m1);
     assert (row.length == columndimension) : ERR_DIMENSIONS;
-    for(int i = 0; i < columndimension; i++) {
-      m1[r][i] = row[i];
-    }
+    System.arraycopy(row, 0, m1[r], 0, columndimension);
   }
 
   /**
@@ -998,7 +985,7 @@ public final class VMath {
    */
   public static final double[] getCol(double[][] m1, int col) {
     double[] ret = new double[m1.length];
-    for(int i = 0; i < ret.length; i++) {
+    for (int i = 0; i < ret.length; i++) {
       ret[i] = m1[i][col];
     }
     return ret;
@@ -1013,7 +1000,7 @@ public final class VMath {
    */
   public static final void setCol(final double[][] m1, final int c, final double[] column) {
     assert (column.length == m1.length) : ERR_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
+    for (int i = 0; i < m1.length; i++) {
       m1[i][c] = column[i];
     }
   }
@@ -1027,8 +1014,8 @@ public final class VMath {
   public static final double[][] transpose(final double[][] m1) {
     final int columndimension = getColumnDimensionality(m1);
     final double[][] re = new double[columndimension][m1.length];
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
+    for (int i = 0; i < m1.length; i++) {
+      for (int j = 0; j < columndimension; j++) {
         re[j][i] = m1[i][j];
       }
     }
@@ -1068,8 +1055,8 @@ public final class VMath {
   public static final double[][] plusEquals(final double[][] m1, final double[][] m2) {
     final int columndimension = getColumnDimensionality(m1);
     assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
+    for (int i = 0; i < m1.length; i++) {
+      for (int j = 0; j < columndimension; j++) {
         m1[i][j] += m2[i][j];
       }
     }
@@ -1087,8 +1074,8 @@ public final class VMath {
   public static final double[][] plusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
     final int columndimension = getColumnDimensionality(m1);
     assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
+    for (int i = 0; i < m1.length; i++) {
+      for (int j = 0; j < columndimension; j++) {
         m1[i][j] += s2 * m2[i][j];
       }
     }
@@ -1128,8 +1115,8 @@ public final class VMath {
   public static final double[][] minusEquals(final double[][] m1, final double[][] m2) {
     final int columndimension = getColumnDimensionality(m1);
     assert (getRowDimensionality(m1) == getRowDimensionality(m2) && columndimension == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
+    for (int i = 0; i < m1.length; i++) {
+      for (int j = 0; j < columndimension; j++) {
         m1[i][j] -= m2[i][j];
       }
     }
@@ -1146,10 +1133,10 @@ public final class VMath {
    */
   public static final double[][] minusTimesEquals(final double[][] m1, final double[][] m2, final double s2) {
     assert (getRowDimensionality(m1) == getRowDimensionality(m2) && getColumnDimensionality(m1) == getColumnDimensionality(m2)) : ERR_MATRIX_DIMENSIONS;
-    for(int i = 0; i < m1.length; i++) {
+    for (int i = 0; i < m1.length; i++) {
       final double[] row1 = m1[i];
       final double[] row2 = m2[i];
-      for(int j = 0; j < row1.length; j++) {
+      for (int j = 0; j < row1.length; j++) {
         row1[j] -= s2 * row2[j];
       }
     }
@@ -1175,9 +1162,9 @@ public final class VMath {
    * @return m1 = s1 * m1, overwriting m1
    */
   public static final double[][] timesEquals(final double[][] m1, final double s1) {
-    for(int i = 0; i < m1.length; i++) {
+    for (int i = 0; i < m1.length; i++) {
       final double[] row = m1[i];
-      for(int j = 0; j < row.length; j++) {
+      for (int j = 0; j < row.length; j++) {
         row[j] *= s1;
       }
     }
@@ -1199,17 +1186,17 @@ public final class VMath {
     final double[][] r2 = new double[m1.length][bcolumndimension];
     // Optimized ala Jama. jik order.
     final double[] Bcolj = new double[columndimension];
-    for(int j = 0; j < bcolumndimension; j++) {
+    for (int j = 0; j < bcolumndimension; j++) {
       // Make a linear copy of column j from B
       // TODO: use column getter from B?
-      for(int k = 0; k < columndimension; k++) {
+      for (int k = 0; k < columndimension; k++) {
         Bcolj[k] = m2[k][j];
       }
       // multiply it with each row from A
-      for(int i = 0; i < m1.length; i++) {
+      for (int i = 0; i < m1.length; i++) {
         final double[] Arowi = m1[i];
         double s = 0;
-        for(int k = 0; k < columndimension; k++) {
+        for (int k = 0; k < columndimension; k++) {
           s += Arowi[k] * Bcolj[k];
         }
         r2[i][j] = s;
@@ -1229,10 +1216,10 @@ public final class VMath {
     assert (v2.length == getColumnDimensionality(m1)) : ERR_MATRIX_INNERDIM;
     final double[] re = new double[m1.length];
     // multiply it with each row from A
-    for(int i = 0; i < m1.length; i++) {
+    for (int i = 0; i < m1.length; i++) {
       final double[] Arowi = m1[i];
       double s = 0;
-      for(int k = 0; k < Arowi.length; k++) {
+      for (int k = 0; k < Arowi.length; k++) {
         s += Arowi[k] * v2[k];
       }
       re[i] = s;
@@ -1252,9 +1239,9 @@ public final class VMath {
     assert (v2.length == m1.length) : ERR_MATRIX_INNERDIM;
     final double[] re = new double[columndimension];
     // multiply it with each row from A
-    for(int i = 0; i < columndimension; i++) {
+    for (int i = 0; i < columndimension; i++) {
       double s = 0;
-      for(int k = 0; k < m1.length; k++) {
+      for (int k = 0; k < m1.length; k++) {
         s += m1[k][i] * v2[k];
       }
       re[i] = s;
@@ -1275,15 +1262,15 @@ public final class VMath {
     assert (m2.length == m1.length) : ERR_MATRIX_INNERDIM;
     final double[][] re = new double[coldim1][coldim2];
     final double[] Bcolj = new double[m1.length];
-    for(int j = 0; j < coldim2; j++) {
+    for (int j = 0; j < coldim2; j++) {
       // Make a linear copy of column j from B
-      for(int k = 0; k < m1.length; k++) {
+      for (int k = 0; k < m1.length; k++) {
         Bcolj[k] = m2[k][j];
       }
       // multiply it with each row from A
-      for(int i = 0; i < coldim1; i++) {
+      for (int i = 0; i < coldim1; i++) {
         double s = 0;
-        for(int k = 0; k < m1.length; k++) {
+        for (int k = 0; k < m1.length; k++) {
           s += m1[k][i] * Bcolj[k];
         }
         re[i][j] = s;
@@ -1302,10 +1289,10 @@ public final class VMath {
   public static double transposeTimesTimes(final double[] a, final double[][] B, final double[] c) {
     assert (B.length == a.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
-    for(int j = 0; j < B[0].length; j++) {
+    for (int j = 0; j < B[0].length; j++) {
       // multiply it with each row from A
       double s = 0;
-      for(int k = 0; k < a.length; k++) {
+      for (int k = 0; k < a.length; k++) {
         s += a[k] * B[k][j];
       }
       sum += s * c[j];
@@ -1323,13 +1310,13 @@ public final class VMath {
   public static final double[][] timesTranspose(final double[][] m1, final double[][] m2) {
     assert (getColumnDimensionality(m2) == getColumnDimensionality(m1)) : ERR_MATRIX_INNERDIM;
     final double[][] re = new double[m1.length][m2.length];
-    for(int j = 0; j < re.length; j++) {
+    for (int j = 0; j < re.length; j++) {
       final double[] Browj = m2[j];
       // multiply it with each row from A
-      for(int i = 0; i < m1.length; i++) {
+      for (int i = 0; i < m1.length; i++) {
         final double[] Arowi = m1[i];
         double s = 0;
-        for(int k = 0; k < Browj.length; k++) {
+        for (int k = 0; k < Browj.length; k++) {
           s += Arowi[k] * Browj[k];
         }
         re[i][j] = s;
@@ -1351,17 +1338,17 @@ public final class VMath {
     final double[][] re = new double[getColumnDimensionality(m1)][m2.length];
     // Optimized ala Jama. jik order.
     final double[] Acolj = new double[m1.length];
-    for(int j = 0; j < re.length; j++) {
+    for (int j = 0; j < re.length; j++) {
       // Make a linear copy of column j from B
-      for(int k = 0; k < m1.length; k++) {
+      for (int k = 0; k < m1.length; k++) {
         Acolj[k] = m1[k][j];
       }
       final double[] Xrow = re[j];
       // multiply it with each row from A
-      for(int i = 0; i < m2.length; i++) {
+      for (int i = 0; i < m2.length; i++) {
         final double[] Browi = m2[i];
         double s = 0;
-        for(int k = 0; k < m1.length; k++) {
+        for (int k = 0; k < m1.length; k++) {
           s += Browi[k] * Acolj[k];
         }
         Xrow[i] = s;
@@ -1379,7 +1366,7 @@ public final class VMath {
   public static final double[] getDiagonal(final double[][] m1) {
     final int dim = Math.min(getColumnDimensionality(m1), m1.length);
     final double[] diagonal = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       diagonal[i] = m1[i][i];
     }
     return diagonal;
@@ -1392,18 +1379,17 @@ public final class VMath {
    */
   public static final void normalizeColumns(final double[][] m1) {
     final int columndimension = getColumnDimensionality(m1);
-    for(int col = 0; col < columndimension; col++) {
+    for (int col = 0; col < columndimension; col++) {
       double norm = 0.0;
-      for(int row = 0; row < m1.length; row++) {
+      for (int row = 0; row < m1.length; row++) {
         norm = norm + (m1[row][col] * m1[row][col]);
       }
       norm = Math.sqrt(norm);
-      if(norm != 0) {
-        for(int row = 0; row < m1.length; row++) {
+      if (norm != 0) {
+        for (int row = 0; row < m1.length; row++) {
           m1[row][col] /= norm;
         }
-      }
-      else {
+      } else {
         // TODO: else: throw an exception?
       }
     }
@@ -1423,12 +1409,11 @@ public final class VMath {
 
     final int rcolumndimension = columndimension + ccolumndimension;
     final double[][] result = new double[m1.length][rcolumndimension];
-    for(int i = 0; i < rcolumndimension; i++) {
+    for (int i = 0; i < rcolumndimension; i++) {
       // FIXME: optimize - excess copying!
-      if(i < columndimension) {
+      if (i < columndimension) {
         setCol(result, i, getCol(m1, i));
-      }
-      else {
+      } else {
         setCol(result, i, getCol(m2, i - columndimension));
       }
     }
@@ -1446,10 +1431,10 @@ public final class VMath {
     double[][] v = copy(m1);
 
     // FIXME: optimize - excess copying!
-    for(int i = 1; i < columndimension; i++) {
+    for (int i = 1; i < columndimension; i++) {
       final double[] u_i = getCol(m1, i);
       final double[] sum = new double[m1.length];
-      for(int j = 0; j < i; j++) {
+      for (int j = 0; j < i; j++) {
         final double[] v_j = getCol(v, j);
         double scalar = scalarProduct(u_i, v_j) / scalarProduct(v_j, v_j);
         plusEquals(sum, times(v_j, scalar));
@@ -1493,25 +1478,25 @@ public final class VMath {
    * @return true if delta smaller than maximum
    */
   public static final boolean almostEquals(final double[][] m1, final double[][] m2, final double maxdelta) {
-    if(m1 == m2) {
+    if (m1 == m2) {
       return true;
     }
-    if(m2 == null) {
+    if (m2 == null) {
       return false;
     }
-    if(m1.getClass() != m2.getClass()) {
+    if (m1.getClass() != m2.getClass()) {
       return false;
     }
-    if(m1.length != m2.length) {
+    if (m1.length != m2.length) {
       return false;
     }
     final int columndimension = getColumnDimensionality(m1);
-    if(columndimension != getColumnDimensionality(m2)) {
+    if (columndimension != getColumnDimensionality(m2)) {
       return false;
     }
-    for(int i = 0; i < m1.length; i++) {
-      for(int j = 0; j < columndimension; j++) {
-        if(Math.abs(m1[i][j] - m2[i][j]) > maxdelta) {
+    for (int i = 0; i < m1.length; i++) {
+      for (int j = 0; j < columndimension; j++) {
+        if (Math.abs(m1[i][j] - m2[i][j]) > maxdelta) {
           return false;
         }
       }
