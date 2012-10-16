@@ -5,7 +5,7 @@ import java.util.BitSet;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /*
@@ -53,7 +53,7 @@ public class AlphaShape {
   /**
    * Delaunay triangulation
    */
-  private ArrayList<Triangle> delaunay = null;
+  private ArrayList<SweepHullDelaunay2D.Triangle> delaunay = null;
 
   public AlphaShape(List<Vector> points, double alpha) {
     this.alpha2 = alpha * alpha;
@@ -71,9 +71,9 @@ public class AlphaShape {
     List<Vector> cur = new ArrayList<Vector>();
 
     for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = used.nextClearBit(i + 1)) {
-      if(used.get(i) == false) {
+      if(!used.get(i)) {
         used.set(i);
-        Triangle tri = delaunay.get(i);
+        SweepHullDelaunay2D.Triangle tri = delaunay.get(i);
         if(tri.r2 <= alpha2) {
           // Check neighbors
           processNeighbor(cur, used, i, tri.ab, tri.b);
@@ -96,7 +96,7 @@ public class AlphaShape {
         return;
       }
       used.set(ab);
-      final Triangle next = delaunay.get(ab);
+      final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
       if(next.r2 < alpha2) {
         // Continue where we left off...
         if(next.ab == i) {

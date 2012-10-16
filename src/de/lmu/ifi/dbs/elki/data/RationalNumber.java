@@ -109,6 +109,17 @@ public class RationalNumber extends Number implements Arithmetic<RationalNumber>
   }
 
   /**
+   * Constructs a RationalNumber out of the given double number.
+   * 
+   * @param number a double number to be represented as a RationalNumber
+   * @throws IllegalArgumentException if the given Double is infinit or not a
+   *         number
+   */
+  public RationalNumber(final double number) throws IllegalArgumentException {
+    this(Double.toString(number));
+  }
+
+  /**
    * Constructs a RationalNumber for a given String representing a double.
    * 
    * @param doubleString a String representing a double number

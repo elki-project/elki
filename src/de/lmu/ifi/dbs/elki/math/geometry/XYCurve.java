@@ -90,7 +90,7 @@ public class XYCurve implements Result, TextWriteable {
    */
   public XYCurve(String labelx, String labely, int size) {
     super();
-    this.data = new TDoubleArrayList(size * 2);
+    this.data = new TDoubleArrayList(size << 1);
     this.labelx = labelx;
     this.labely = labely;
   }
@@ -295,8 +295,8 @@ public class XYCurve implements Result, TextWriteable {
     out.commentPrint(labely);
     out.flush();
     for(int pos = 0; pos < data.size(); pos+=2) {
-      out.inlinePrint(data.get(pos));
-      out.inlinePrint(data.get(pos + 1));
+      out.inlinePrint(Double.toString(data.get(pos)));
+      out.inlinePrint(Double.toString(data.get(pos + 1)));
       out.flush();
     }
   }
@@ -305,11 +305,11 @@ public class XYCurve implements Result, TextWriteable {
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("XYCurve[");
-    buf.append(labelx).append(",").append(labely).append(":");
+    buf.append(labelx).append(',').append(labely).append(':');
     for(int pos = 0; pos < data.size(); pos += 2) {
-      buf.append(" ").append(data.get(pos)).append(",").append(data.get(pos + 1));
+      buf.append(' ').append(data.get(pos)).append(',').append(data.get(pos + 1));
     }
-    buf.append("]");
+    buf.append(']');
     return buf.toString();
   }
 

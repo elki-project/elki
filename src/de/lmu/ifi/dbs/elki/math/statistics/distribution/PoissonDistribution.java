@@ -273,7 +273,7 @@ public class PoissonDistribution implements Distribution {
   private static double stirlingError(int n) {
     // Try to use a table value:
     if(n < 16) {
-      return STIRLING_EXACT_ERROR[n * 2];
+      return STIRLING_EXACT_ERROR[n << 1];
     }
     final double nn = n * n;
     // Use the appropriate number of terms

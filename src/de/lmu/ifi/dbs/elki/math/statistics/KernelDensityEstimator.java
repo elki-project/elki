@@ -71,7 +71,7 @@ public class KernelDensityEstimator {
     dens = new double[data.length];
     var = new double[data.length];
 
-    double halfwidth = ((max - min) / windows) / 2;
+    double halfwidth = ((max - min) / windows) * .5;
 
     // collect data points
     for(int current = 0; current < data.length; current++) {
@@ -84,7 +84,7 @@ public class KernelDensityEstimator {
       }
       double realwidth = (Math.min(data[current] + halfwidth, max) - Math.max(min, data[current] - halfwidth));
       double weight = realwidth / (2 * halfwidth);
-      dens[current] = value / (data.length * realwidth / 2);
+      dens[current] = value / (data.length * realwidth * .5);
       var[current] = 1 / weight;
     }
   }

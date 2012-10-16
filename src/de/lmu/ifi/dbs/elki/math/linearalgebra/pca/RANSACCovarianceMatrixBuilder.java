@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -105,13 +103,12 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
   @Override
   public Matrix processIds(DBIDs ids, Relation<? extends V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    Random random = rnd.getRandom();
 
     DBIDs best = DBIDUtil.EMPTYDBIDS;
     double tresh = ChiSquaredDistribution.quantile(0.85, dim);
 
     for (int i = 0; i < iterations; i++) {
-      DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random.nextLong());
+      DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, rnd);
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
       Vector centroid = cv.getMeanVector();
       Matrix p = cv.destroyToSampleMatrix().inverse();
@@ -177,7 +174,7 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
       IntParameter iterP = new IntParameter(ITER_ID, 1000);
       iterP.addConstraint(new GreaterConstraint(0));
       if (config.grab(iterP)) {
-        iterations = iterP.getValue();
+        iterations = iterP.intValue();
       }
       RandomParameter rndP = new RandomParameter(SEED_ID);
       if (config.grab(rndP)) {

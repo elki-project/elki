@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Page file statistic utility functions.
  * 
@@ -41,9 +40,9 @@ public final class PageFileUtil {
    */
   public static void appendPageFileStatistics(StringBuilder buffer, PageFileStatistics statistics) {
     if(statistics != null) {
-      buffer.append("Page File Layer: ").append(statistics.getClass()).append("\n");
-      buffer.append("Read Operations: ").append(statistics.getReadOperations()).append("\n");
-      buffer.append("Write Operations: ").append(statistics.getWriteOperations()).append("\n");
+      buffer.append("Page File Layer: ").append(statistics.getClass()).append('\n');
+      buffer.append("Read Operations: ").append(statistics.getReadOperations()).append('\n');
+      buffer.append("Write Operations: ").append(statistics.getWriteOperations()).append('\n');
       PageFileStatistics inner = statistics.getInnerStatistics();
       if(inner != null) {
         appendPageFileStatistics(buffer, inner);

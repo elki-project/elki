@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
@@ -168,13 +167,13 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       super.makeOptions(config);
       Flag absoluteF = new Flag(EIGENPAIR_FILTER_ABSOLUTE);
       if (config.grab(absoluteF)) {
-        absolute = absoluteF.getValue();
+        absolute = absoluteF.isTrue();
       }
 
       DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA);
       deltaP.addConstraint(new GreaterEqualConstraint(0));
       if (config.grab(deltaP)) {
-        delta = deltaP.getValue();
+        delta = deltaP.doubleValue();
         // TODO: make this a global constraint?
         if (absolute && deltaP.tookDefaultValue()) {
           config.reportError(new WrongParameterValueException("Illegal parameter setting: " + "Flag " + absoluteF.getName() + " is set, " + "but no value for " + deltaP.getName() + " is specified."));
@@ -185,10 +184,9 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       // delta must be >= 0 and <= 1 if it's a relative value
       // Since relative or absolute is dependent on the absolute flag this is a
       // global constraint!
-      List<ParameterConstraint<? super Double>> cons = new Vector<ParameterConstraint<? super Double>>();
+      List<ParameterConstraint<? super Double>> cons = new ArrayList<ParameterConstraint<? super Double>>();
       // TODO: Keep the constraint here - applies to non-conditional case as
-      // well,
-      // and is set above.
+      // well, and is set above.
       ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0.);
       cons.add(aboveNull);
       ParameterConstraint<Number> underOne = new LessEqualConstraint(1.);

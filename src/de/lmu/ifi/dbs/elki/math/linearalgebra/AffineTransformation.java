@@ -388,8 +388,7 @@ public class AffineTransformation {
   public Vector unhomogeneRelativeVector(Vector v) {
     assert (v.getDimensionality() == dim + 1);
     double[] dv = new double[dim];
-    double scale = v.get(dim);
-    assert (Math.abs(scale) == 0.0);
+    assert (Math.abs(v.get(dim))  < Double.MIN_NORMAL);
     for(int i = 0; i < dim; i++) {
       dv[i] = v.get(i);
     }
@@ -405,11 +404,8 @@ public class AffineTransformation {
   public double[] unhomogeneRelativeVector(double[] v) {
     assert (v.length == dim + 1);
     double[] dv = new double[dim];
-    double scale = v[dim];
-    assert (Math.abs(scale) == 0.0);
-    for(int i = 0; i < dim; i++) {
-      dv[i] = v[i];
-    }
+    System.arraycopy(v, 0, dv, 0, dim);
+    assert (Math.abs(v[dim]) < Double.MIN_NORMAL);
     return dv;
   }
 

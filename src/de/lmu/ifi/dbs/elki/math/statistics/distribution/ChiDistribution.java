@@ -91,7 +91,7 @@ public class ChiDistribution implements DistributionWithRandom {
    * @return CDF value
    */
   public static double cdf(double val, double dof) {
-    return GammaDistribution.regularizedGammaP(dof / 2, val * val / 2);
+    return GammaDistribution.regularizedGammaP(dof * .5, val * val * .5);
   }
 
   // FIXME: implement!

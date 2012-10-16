@@ -61,19 +61,19 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final int dim = minmax.length >> 1;
     List<HilbertRef<T>> tmp = new ArrayList<HilbertRef<T>>(end - start);
     int[] buf = new int[dim];
-    for(int i = start; i < end; i++) {
+    for (int i = start; i < end; i++) {
       T v = objs.get(i);
       // Convert into integers
-      for(int d = 0; d < dim; d++) {
-        double val = (v.getMin(d) + v.getMax(d)) / 2;
-        val = Integer.MAX_VALUE * ((val - minmax[2 * d]) / (minmax[2 * d + 1] - minmax[2 * d]));
+      for (int d = 0, d2 = 0; d < dim; d++, d += 2) {
+        double val = (v.getMin(d) + v.getMax(d)) * .5;
+        val = Integer.MAX_VALUE * ((val - minmax[d2]) / (minmax[d2 + 1] - minmax[d2]));
         buf[d] = (int) val;
       }
       tmp.add(new HilbertRef<T>(v, coordinatesToHilbert(buf, Integer.SIZE - 1, 1)));
     }
     // Sort and copy back
     Collections.sort(tmp);
-    for(int i = start; i < end; i++) {
+    for (int i = start; i < end; i++) {
       objs.set(i, tmp.get(i - start).vec);
     }
   }
@@ -129,7 +129,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for(int i = 0; i < bitsperdim; i++) {
+    for (int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -143,7 +143,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if(!BitsUtil.get(bits, 0)) {
+      if (!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -153,8 +153,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   }
 
   /**
-   * Interleave one int per dimension (using the "bitsperdim" highest bits) to
-   * a hilbert address.
+   * Interleave one int per dimension (using the "bitsperdim" highest bits) to a
+   * hilbert address.
    * 
    * @param coords Original coordinates
    * @param bitsperdim Number of bits to use.
@@ -168,7 +168,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for(int i = 0; i < bitsperdim; i++) {
+    for (int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -182,7 +182,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if(!BitsUtil.get(bits, 0)) {
+      if (!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -207,7 +207,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
 
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for(int i = 0; i < bitsperdim; i++) {
+    for (int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -221,7 +221,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if(!BitsUtil.get(bits, 0)) {
+      if (!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
@@ -243,10 +243,10 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final int numdim = coords.length;
     final int numbits = numdim * bitsperdim;
     final long[] output = BitsUtil.zero(numbits);
-  
+
     int rotation = 0;
     long[] refl = BitsUtil.zero(numdim);
-    for(int i = 0; i < bitsperdim; i++) {
+    for (int i = 0; i < bitsperdim; i++) {
       final long[] hist = interleaveBits(coords, i + offset);
       // System.err.println(BitsUtil.toString(hist,
       // numdim)+" rot:"+rotation+" refl: "+BitsUtil.toString(refl, numdim));
@@ -260,12 +260,12 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
       // numbits)+" bits: "+BitsUtil.toString(bits, numdim));
       refl = hist;
       BitsUtil.flipI(refl, rotation);
-      if(!BitsUtil.get(bits, 0)) {
+      if (!BitsUtil.get(bits, 0)) {
         BitsUtil.flipI(refl, (nextrot - 1 + numdim) % numdim);
       }
       rotation = nextrot;
     }
-  
+
     return output;
   }
 
@@ -281,8 +281,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 63 - iter;
-    for(int dim = 0; dim < numdim; dim++) {
-      if((coords[dim] & mask) != 0) {
+    for (int dim = 0; dim < numdim; dim++) {
+      if ((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
@@ -301,8 +301,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 31 - iter;
-    for(int dim = 0; dim < numdim; dim++) {
-      if((coords[dim] & mask) != 0) {
+    for (int dim = 0; dim < numdim; dim++) {
+      if ((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
@@ -321,8 +321,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 15 - iter;
-    for(int dim = 0; dim < numdim; dim++) {
-      if((coords[dim] & mask) != 0) {
+    for (int dim = 0; dim < numdim; dim++) {
+      if ((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }
@@ -341,8 +341,8 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     final long[] bitset = BitsUtil.zero(numdim);
     // convert longValues into zValues
     final long mask = 1L << 7 - iter;
-    for(int dim = 0; dim < numdim; dim++) {
-      if((coords[dim] & mask) != 0) {
+    for (int dim = 0; dim < numdim; dim++) {
+      if ((coords[dim] & mask) != 0) {
         BitsUtil.setI(bitset, dim);
       }
     }

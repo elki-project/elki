@@ -65,8 +65,8 @@ public class ChiSquaredDistribution extends GammaDistribution {
     if(x == 0) {
       return 0.0;
     }
-    final double k = dof / 2;
-    if(k == 1.0) {
+    final double k = dof * .5;
+    if(Math.abs(k - 1.0) < Double.MIN_NORMAL) {
       return Math.exp(-x * 2.0) * 2.0;
     }
     return Math.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;

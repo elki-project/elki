@@ -73,7 +73,7 @@ public class StudentsTDistribution implements Distribution {
    */
   public static double pdf(double val, int v) {
     // TODO: improve precision by computing "exp" last?
-    return Math.exp(GammaDistribution.logGamma((v + 1) / 2) - GammaDistribution.logGamma(v / 2)) * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) / 2));
+    return Math.exp(GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5)) * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) * .5));
   }
 
   /**
@@ -85,6 +85,6 @@ public class StudentsTDistribution implements Distribution {
    */
   public static double cdf(double val, int v) {
     double x = v / (val * val + v);
-    return 1 - (0.5 * BetaDistribution.regularizedIncBeta(x, v / 2, 0.5));
+    return 1 - (0.5 * BetaDistribution.regularizedIncBeta(x, v * .5, 0.5));
   }
 }

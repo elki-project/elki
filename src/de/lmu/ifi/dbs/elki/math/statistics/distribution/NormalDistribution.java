@@ -315,7 +315,7 @@ public class NormalDistribution implements DistributionWithRandom {
   public static double pdf(double x, double mu, double sigma) {
     final double x_mu = x - mu;
     final double sigmasq = sigma * sigma;
-    return 1 / (Math.sqrt(MathUtil.TWOPI * sigmasq)) * Math.exp(-1 * x_mu * x_mu / 2 / sigmasq);
+    return 1 / (Math.sqrt(MathUtil.TWOPI * sigmasq)) * Math.exp(-.5 * x_mu * x_mu / sigmasq);
   }
 
   /**
