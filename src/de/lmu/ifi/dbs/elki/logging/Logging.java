@@ -61,7 +61,7 @@ public class Logging {
   private static HashMap<String, Logging> loggers = new HashMap<String, Logging>();
 
   /**
-   * Wrapped logger
+   * Wrapped logger of this instance - not static!
    */
   private final Logger logger;
 

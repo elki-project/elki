@@ -77,16 +77,16 @@ public class InputTabPanel extends ParameterTabPanel {
   }
 
   @Override
-  protected String getStatus() {
+  protected Status getStatus() {
     if (input == null) {
-      return STATUS_UNCONFIGURED;
+      return Status.STATUS_UNCONFIGURED;
     }
     if (executed) {
       if (input.getDatabase() == null) {
-        return "No database returned?";
+        return Status.STATUS_FAILED;
       }
-      return STATUS_COMPLETE;
+      return Status.STATUS_COMPLETE;
     }
-    return STATUS_READY;
+    return Status.STATUS_READY;
   }
 }

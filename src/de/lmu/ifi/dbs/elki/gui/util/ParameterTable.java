@@ -151,7 +151,7 @@ public class ParameterTable extends JTable {
         // Simulate a tree using indentation - there is no JTreeTable AFAICT
         StringBuilder buf = new StringBuilder();
         for(int i = 1; i < ((DynamicParameters.Node) value).depth; i++) {
-          buf.append(" ");
+          buf.append(' ');
         }
         buf.append(o.getOptionID().getName());
         setText(buf.toString());

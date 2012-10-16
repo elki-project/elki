@@ -53,7 +53,7 @@ public class FlagParameterConfigurator extends AbstractParameterConfigurator<Fla
     constraints.weightx = 1.0;
     value = new JCheckBox(param.getName());
     if(param.isDefined() && !param.tookDefaultValue()) {
-      value.setSelected(param.getValue());
+      value.setSelected(param.isTrue());
     }
     value.setToolTipText(param.getShortDescription());
     parent.add(value, constraints);
@@ -73,6 +73,6 @@ public class FlagParameterConfigurator extends AbstractParameterConfigurator<Fla
   
   @Override
   public Boolean getUserInput() {
-    return value.isSelected() ? true : null;
+    return value.isSelected() ? Boolean.TRUE : null;
   }
 }

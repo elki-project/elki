@@ -62,29 +62,53 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
   private static final long serialVersionUID = 1L;
 
   /**
-   * Status to signal the step has been configured properly.
+   * Status code enumeration
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  public static final String STATUS_UNCONFIGURED = "unconfigured";
+  public enum Status {
+    /** Status to signal the step has been configured properly. */
+    STATUS_UNCONFIGURED {
+      @Override
+      public String toString() {
+        return "unconfigured";
+      }
+    },
 
-  /**
-   * Status to signal the step has been configured properly.
-   */
-  public static final String STATUS_CONFIGURED = "configured";
+    /** Status to signal the step has been configured properly. */
+    STATUS_CONFIGURED {
+      @Override
+      public String toString() {
+        return "configured";
+      }
+    },
 
-  /**
-   * Status to signal the step is ready to run
-   */
-  public static final String STATUS_READY = "ready to run";
+    /** Status to signal the step is ready to run */
+    STATUS_READY {
+      @Override
+      public String toString() {
+        return "ready to run";
+      }
+    },
 
-  /**
-   * Status to signal the step has been run completely.
-   */
-  public static final String STATUS_COMPLETE = "complete";
+    /** Status to signal the step has been run completely. */
+    STATUS_COMPLETE {
+      @Override
+      public String toString() {
+        return "complete";
+      }
+    },
 
-  /**
-   * Status to signal the step has failed somehow
-   */
-  public static final String STATUS_FAILED = "failed";
+    /** Status to signal the step has failed somehow */
+    STATUS_FAILED {
+      @Override
+      public String toString() {
+        return "failed";
+      }
+    }
+  }
 
   /**
    * ELKI logger for the GUI
@@ -181,7 +205,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     ListParameterization config = new ListParameterization();
     parameterTable.appendParameters(config);
     setParameters(config);
-    if(config.getErrors().size() > 0) {
+    if (config.getErrors().size() > 0) {
       reportErrors(config);
     }
     config.clearErrors();
@@ -202,7 +226,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       parameterTable.setEnabled(false);
 
       parameterTable.clear();
-      for(Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
+      for (Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
         parameterTable.addParameter(pair.first, pair.getSecond(), track);
       }
       // parameters.updateFromTrackParameters(track);
@@ -232,13 +256,13 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    */
   protected void reportErrors(Parameterization config) {
     StringBuilder buf = new StringBuilder();
-    for(ParameterException e : config.getErrors()) {
-      if(e instanceof UnspecifiedParameterException) {
+    for (ParameterException e : config.getErrors()) {
+      if (e instanceof UnspecifiedParameterException) {
         continue;
       }
       buf.append(e.getMessage()).append(FormatUtil.NEWLINE);
     }
-    if(buf.length() > 0) {
+    if (buf.length() > 0) {
       LOG.warning("Configuration errors:" + FormatUtil.NEWLINE + FormatUtil.NEWLINE + buf.toString());
     }
     // config.clearErrors();
@@ -253,19 +277,17 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     runButton.setEnabled(false);
     try {
       configureStep(config);
-      if(config.hasUnusedParameters()) {
+      if (config.hasUnusedParameters()) {
         // List<Pair<OptionID, Object>> remainingParameters =
         // config.getRemainingParameters();
         LOG.warning("Unused parameters: " + "FIXME");
       }
-      if(config.getErrors().size() > 0) {
+      if (config.getErrors().size() > 0) {
         reportErrors(config);
-      }
-      else {
+      } else {
         executeStep();
       }
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       LOG.exception(e);
     }
     updateStatus();
@@ -284,7 +306,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * 
    * @return current status
    */
-  protected abstract String getStatus();
+  protected abstract Status getStatus();
 
   /**
    * Execute the configured step.
@@ -297,8 +319,8 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * @return can-run status
    */
   public boolean canRun() {
-    String status = getStatus();
-    if(status == STATUS_READY || status == STATUS_COMPLETE) {
+    Status status = getStatus();
+    if (Status.STATUS_READY.equals(status) || Status.STATUS_COMPLETE.equals(status)) {
       return true;
     }
     return false;
@@ -310,8 +332,8 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * @return completeness status
    */
   public boolean isComplete() {
-    String status = getStatus();
-    if(status == STATUS_COMPLETE) {
+    Status status = getStatus();
+    if (Status.STATUS_COMPLETE.equals(status)) {
       return true;
     }
     return false;
@@ -321,7 +343,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * Invoked to update the UI when the status could have changed.
    */
   protected void updateStatus() {
-    statusText.setText(getStatus());
+    statusText.setText(getStatus().toString());
     runButton.setEnabled(canRun());
   }
 
@@ -335,7 +357,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
 
   @Override
   public void stateChanged(ChangeEvent e) {
-    if(e.getSource() == this.parameterTable) {
+    if (e.getSource() == this.parameterTable) {
       // logger.warning("stateChanged!");
       updateParameterTable();
     }

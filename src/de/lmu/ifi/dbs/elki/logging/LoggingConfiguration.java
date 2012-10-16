@@ -112,7 +112,7 @@ public final class LoggingConfiguration {
       InputStream cfgdata2 = FileUtil.openSystemFile(cfgfile);
       Properties cfgprop = new Properties();
       cfgprop.load(cfgdata2);
-      DEBUG = Boolean.valueOf(cfgprop.getProperty("debug"));
+      DEBUG = Boolean.parseBoolean(cfgprop.getProperty("debug"));
 
       logger.info("Logging configuration read.");
     }
@@ -150,10 +150,10 @@ public final class LoggingConfiguration {
     }
     else {
       // increase to warning level if it was INFO.
-      if(logger1.getLevel() != null || logger1.getLevel() == Level.INFO) {
+      if(logger1.getLevel() == null || Level.INFO.equals(logger1.getLevel())) {
         logger1.setLevel(Level.WARNING);
       }
-      if(logger2.getLevel() != null || logger2.getLevel() == Level.INFO) {
+      if(logger2.getLevel() == null || Level.INFO.equals(logger2.getLevel())) {
         logger2.setLevel(Level.WARNING);
       }
     }

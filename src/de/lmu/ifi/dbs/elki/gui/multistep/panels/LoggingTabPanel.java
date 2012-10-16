@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  */
 public class LoggingTabPanel extends ParameterTabPanel {
   /**
-   * Serial version. 
+   * Serial version.
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * Constructor.
    */
@@ -55,27 +55,26 @@ public class LoggingTabPanel extends ParameterTabPanel {
     debugParam.setOptional(true);
     Flag verboseFlag = new Flag(OptionID.VERBOSE_FLAG);
     // Verbose mode is a lot simpler
-    if (config.grab(verboseFlag) && verboseFlag.getValue()) {
+    if (config.grab(verboseFlag) && verboseFlag.isTrue()) {
       LoggingConfiguration.setVerbose(true);
     }
     if (config.grab(debugParam)) {
       try {
         LoggingUtil.parseDebugParameter(debugParam);
-      }
-      catch(WrongParameterValueException e) {
+      } catch (WrongParameterValueException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
       }
     }
   }
-  
+
   @Override
   protected void executeStep() {
     // Pass - we don't need to do anything
   }
 
   @Override
-  protected String getStatus() {
+  protected Status getStatus() {
     // We're always complete, too!
-    return STATUS_COMPLETE;
+    return Status.STATUS_COMPLETE;
   }
 }

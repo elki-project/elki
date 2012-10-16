@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.gui.configurator;
  */
 
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
   /**
    * Child options
    */
-  private java.util.Vector<ParameterConfigurator> children = new java.util.Vector<ParameterConfigurator>();
+  private ArrayList<ParameterConfigurator> children = new ArrayList<ParameterConfigurator>();
 
   /**
    * The event listeners for this panel.
@@ -88,9 +89,9 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
   public void addParameter(Object owner, Parameter<?> param, TrackParameters track) {
     this.setBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED));
     ParameterConfigurator cfg = null;
-    {
+    { // Find
       Object cur = owner;
-      while(cfg == null && cur != null) {
+      while(cur != null) {
         cfg = childconfig.get(cur);
         if(cfg != null) {
           break;

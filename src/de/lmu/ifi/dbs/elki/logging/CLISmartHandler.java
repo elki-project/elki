@@ -166,7 +166,7 @@ public class CLISmartHandler extends Handler {
             first = false;
           }
           else {
-            buf.append(" ");
+            buf.append(' ');
           }
           // TODO: use formatter, somehow?
           prog.appendToBuffer(buf);

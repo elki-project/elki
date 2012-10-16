@@ -67,10 +67,10 @@ public class StepProgress extends FiniteProgress {
     if (isComplete()) {
       buf.append(": complete.");
     } else {
-      buf.append(" #").append(getProcessed()+1).append("/").append(getTotal());
+      buf.append(" #").append(getProcessed()+1).append('/').append(getTotal());
       buf.append(": ").append(getStepTitle());
     }
-    buf.append("\n");
+    buf.append('\n');
     return buf;
   }
 
