@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Class to keep track of "alive" progresses.
@@ -41,7 +40,7 @@ public class ProgressTracker {
   /**
    * Set of potentially active progresses.
    */
-  private Vector<WeakReference<Progress>> progresses = new Vector<WeakReference<Progress>>();
+  private ArrayList<WeakReference<Progress>> progresses = new ArrayList<WeakReference<Progress>>();
 
   /**
    * Get a list of progresses tracked.

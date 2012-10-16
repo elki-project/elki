@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
@@ -121,7 +122,7 @@ public class LogPane extends JTextPane {
     try {
       publish(new LogRecord(level, message));
     }
-    catch(Exception e) {
+    catch(BadLocationException e) {
       throw new RuntimeException("Error writing a log-like message.", e);
     }
   }
@@ -132,7 +133,7 @@ public class LogPane extends JTextPane {
    * @param record Log record
    * @throws Exception
    */
-  protected synchronized void publish(LogRecord record) throws Exception {
+  protected synchronized void publish(LogRecord record) throws BadLocationException {
     // choose an appropriate formatter
     final Formatter fmt;
     final Style style;

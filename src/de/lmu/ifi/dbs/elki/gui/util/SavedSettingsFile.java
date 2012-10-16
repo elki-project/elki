@@ -70,9 +70,9 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Save the current data to the given file.
    * 
-   * @throws IOException thrown on output errors.
+   * @throws FileNotFoundException thrown on output errors.
    */
-  public void save() throws IOException {
+  public void save() throws FileNotFoundException {
     PrintStream p = new PrintStream(file);
     p.println(COMMENT_PREFIX + "Saved ELKI settings. First line is title, remaining lines are parameters.");
     for (Pair<String, ArrayList<String>> settings : store) {

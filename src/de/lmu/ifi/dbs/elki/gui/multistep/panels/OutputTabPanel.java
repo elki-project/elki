@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  */
 public class OutputTabPanel extends ParameterTabPanel implements Observer<Object> {
   /**
-   * Serial version. 
+   * Serial version.
    */
   private static final long serialVersionUID = 1L;
-  
+
   /**
    * The data input configured
    */
@@ -56,12 +56,12 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
    * Input step to run on.
    */
   private final InputTabPanel input;
-  
+
   /**
    * Algorithm step to run on.
    */
   private final EvaluationTabPanel evals;
-  
+
   /**
    * Constructor. We depend on an input panel.
    * 
@@ -76,14 +76,14 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
   }
 
   @Override
-  protected synchronized void configureStep(Parameterization config)  {
+  protected synchronized void configureStep(Parameterization config) {
     outs = config.tryInstantiate(OutputStep.class);
     if (config.getErrors().size() > 0) {
       outs = null;
     }
     basedOnResult = null;
   }
-  
+
   @Override
   protected void executeStep() {
     if (input.canRun() && !input.isComplete()) {
@@ -105,19 +105,19 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
   }
 
   @Override
-  protected String getStatus() {
+  protected Status getStatus() {
     if (outs == null) {
-      return STATUS_UNCONFIGURED;
+      return Status.STATUS_UNCONFIGURED;
     }
     if (!input.canRun() || !evals.canRun()) {
-      return STATUS_CONFIGURED;
+      return Status.STATUS_CONFIGURED;
     }
     checkDependencies();
     if (input.isComplete() && evals.isComplete() && basedOnResult != null) {
       // TODO: is there a FAILED state here, too?
-      return STATUS_COMPLETE;
+      return Status.STATUS_COMPLETE;
     }
-    return STATUS_READY;
+    return Status.STATUS_READY;
   }
 
   @Override
@@ -127,13 +127,13 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
       updateStatus();
     }
   }
-  
+
   /**
    * Test if the dependencies are still valid.
    */
   private void checkDependencies() {
-    if(basedOnResult != null) {
-      if(!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResult()) {
+    if (basedOnResult != null) {
+      if (!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResult()) {
         // We've become invalidated, notify.
         basedOnResult = null;
         observers.notifyObservers(this);

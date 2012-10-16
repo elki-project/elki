@@ -92,23 +92,23 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
   }
 
   @Override
-  protected String getStatus() {
+  protected Status getStatus() {
     if(algorithms == null) {
-      return STATUS_UNCONFIGURED;
+      return Status.STATUS_UNCONFIGURED;
     }
     if(!input.canRun()) {
-      return STATUS_CONFIGURED;
+      return Status.STATUS_CONFIGURED;
     }
     checkDependencies();
     if(input.isComplete() && basedOnDatabase != null) {
       if(algorithms.getResult() == null) {
-        return STATUS_FAILED;
+        return Status.STATUS_FAILED;
       }
       else {
-        return STATUS_COMPLETE;
+        return Status.STATUS_COMPLETE;
       }
     }
-    return STATUS_READY;
+    return Status.STATUS_READY;
   }
 
   /**

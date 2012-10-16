@@ -96,7 +96,7 @@ public class EnumParameterConfigurator extends AbstractSingleParameterConfigurat
     if(val.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
       return null;
     }
-    if(val == DynamicParameters.STRING_OPTIONAL) {
+    if(DynamicParameters.STRING_OPTIONAL.equals(val)) {
       return null;
     }
     return val;
