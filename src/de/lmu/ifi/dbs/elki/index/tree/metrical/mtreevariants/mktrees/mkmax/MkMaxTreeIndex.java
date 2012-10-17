@@ -65,11 +65,6 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   private Relation<O> relation;
   
   /**
-   * kNN query used internally
-   */
-  private KNNQuery<O, D> knnq;
-
-  /**
    * Constructor.
    * 
    * @param relation Relation
@@ -81,7 +76,6 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
     super(pagefile, distanceQuery, distanceFunction, k_max);
     this.relation = relation;
-    this.knnq = getKNNQuery(distanceQuery); 
     this.initialize();
   }
 

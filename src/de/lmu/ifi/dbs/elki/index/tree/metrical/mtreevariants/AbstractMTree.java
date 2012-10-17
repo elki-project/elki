@@ -26,16 +26,13 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -45,10 +42,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
-import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -237,69 +232,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   /**
-   * Performs a k-nearest neighbor query for the given FeatureVector with the
-   * given parameter k and the according distance function. The query result is
-   * in ascending order to the distance to the query object.
-   * 
-   * @param q the id of the query object
-   * @param knnList the query result list
-   * 
-   * @deprecated kNN queries have been split out to separate query classes - use
-   *             these instead - they are better optimized!
-   */
-  @Deprecated
-  protected final void doKNNQuery(DBID q, KNNHeap<D> knnList) {
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>();
-    final D nullDistance = getDistanceFactory().nullDistance();
-
-    // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(nullDistance, getRootID()));
-    D d_k = knnList.getKNNDistance();
-
-    // search in tree
-    while (!pq.isEmpty()) {
-      GenericDistanceSearchCandidate<D> pqNode = pq.poll();
-
-      if (pqNode.mindist.compareTo(d_k) > 0) {
-        return;
-      }
-
-      N node = getNode(pqNode.nodeID);
-
-      // directory node
-      if (!node.isLeaf()) {
-        for (int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          DBID o_r = entry.getRoutingObjectID();
-          D r_or = entry.getCoveringRadius();
-          D d3 = distance(o_r, q);
-          if (d3.compareTo(r_or) > 0) {
-            D d_min = d3.minus(r_or);
-            if (d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericDistanceSearchCandidate<D>(d_min, getPageID(entry)));
-            }
-          } else {
-            pq.add(new GenericDistanceSearchCandidate<D>(nullDistance, getPageID(entry)));
-          }
-        }
-      }
-      // data node
-      else {
-        for (int i = 0; i < node.getNumEntries(); i++) {
-          E entry = node.getEntry(i);
-          DBID o_j = entry.getRoutingObjectID();
-
-          D d3 = distanceQuery.distance(o_j, q);
-          if (d3.compareTo(d_k) <= 0) {
-            knnList.add(d3, o_j);
-            d_k = knnList.getKNNDistance();
-          }
-        }
-      }
-    }
-  }
-
-  /**
    * Chooses the best path of the specified subtree for insertion of the given
    * object.
    * 
@@ -354,53 +286,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     }
 
     return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<E>(bestCandidate.getEntry(), bestCandidate.getIndex())));
-  }
-
-  /**
-   * Performs a batch k-nearest neigbor query for a list of query objects.
-   * 
-   * @param node the node reprsenting the subtree on which the query should be
-   *        performed
-   * @param ids the ids of th query objects
-   * @param knnLists the knn lists of the query objcets
-   * 
-   * @deprecated Change to use by-object NN lookups instead.
-   */
-  @Deprecated
-  protected final void batchNN(N node, DBIDs ids, Map<DBID, KNNHeap<D>> knnLists) {
-    // TODO: optimize for double.
-    if (node.isLeaf()) {
-      for (int i = 0; i < node.getNumEntries(); i++) {
-        E p = node.getEntry(i);
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID q = DBIDUtil.deref(iter);
-          KNNHeap<D> knns_q = knnLists.get(q);
-          D knn_q_maxDist = knns_q.getKNNDistance();
-
-          D dist_pq = distanceQuery.distance(p.getRoutingObjectID(), q);
-          if (dist_pq.compareTo(knn_q_maxDist) <= 0) {
-            knns_q.add(dist_pq, p.getRoutingObjectID());
-          }
-        }
-      }
-    } else {
-      List<DistanceEntry<D, E>> entries = getSortedEntries(node, ids);
-      for (DistanceEntry<D, E> distEntry : entries) {
-        D minDist = distEntry.getDistance();
-        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          DBID q = DBIDUtil.deref(iter);
-          KNNHeap<D> knns_q = knnLists.get(q);
-          D knn_q_maxDist = knns_q.getKNNDistance();
-
-          if (minDist.compareTo(knn_q_maxDist) <= 0) {
-            E entry = distEntry.getEntry();
-            N child = getNode(entry);
-            batchNN(child, ids, knnLists);
-            break;
-          }
-        }
-      }
-    }
   }
 
   /**

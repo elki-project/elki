@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
@@ -139,13 +139,13 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
   
   @Override
-  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
+  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNResult<D>> knnLists) {
     MkTabTreeNode<O, D> node = getNode(entry);
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistances(KNNUtil.asDistanceList(knnLists.get(getPageID(leafEntry)).toKNNList()));
+        leafEntry.setKnnDistances(KNNUtil.asDistanceList(knnLists.get(getPageID(leafEntry))));
         knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
       }
     }
