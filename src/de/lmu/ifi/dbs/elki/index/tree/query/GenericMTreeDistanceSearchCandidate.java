@@ -42,6 +42,11 @@ public class GenericMTreeDistanceSearchCandidate<D extends Distance<D>> extends 
    * The id of the routing object.
    */
   public DBID routingObjectID;
+  
+  /**
+   * The distance from the query to the routing object.
+   */
+  public D routingDistance;
 
   /**
    * Creates a new heap node with the specified parameters.
@@ -49,9 +54,11 @@ public class GenericMTreeDistanceSearchCandidate<D extends Distance<D>> extends 
    * @param mindist the minimum distance of the node
    * @param nodeID the id of the node
    * @param routingObjectID the id of the routing object of the node
+   * @param routingDistance the distance from query to routing object
    */
-  public GenericMTreeDistanceSearchCandidate(final D mindist, final Integer nodeID, final DBID routingObjectID) {
+  public GenericMTreeDistanceSearchCandidate(final D mindist, final Integer nodeID, final DBID routingObjectID, final D routingDistance) {
     super(mindist, nodeID);
     this.routingObjectID = routingObjectID;
+    this.routingDistance = routingDistance;
   }
 }

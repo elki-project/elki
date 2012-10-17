@@ -56,7 +56,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
    * The index to use
    */
   protected final AbstractMTree<O, DoubleDistance, ?, ?> index;
-  
+
   /**
    * Distance function
    */
@@ -77,64 +77,61 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
 
   @Override
   public KNNResult<DoubleDistance> getKNNForObject(O q, int k) {
-    if(k < 1) {
+    if (k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
     DoubleDistanceKNNHeap knnList = new DoubleDistanceKNNHeap(k);
     double d_k = Double.POSITIVE_INFINITY;
-    
+
     final Heap<DoubleMTreeDistanceSearchCandidate> pq = new Heap<DoubleMTreeDistanceSearchCandidate>();
 
-    // push root
-    pq.add(new DoubleMTreeDistanceSearchCandidate(0, index.getRootID(), null));
-    
-    // search in tree
-    while(!pq.isEmpty()) {
-      DoubleMTreeDistanceSearchCandidate pqNode = pq.poll();
+    // Push the root node
+    pq.add(new DoubleMTreeDistanceSearchCandidate(0, index.getRootID(), null, 0));
 
-      if(knnList.size() >= k && pqNode.mindist > d_k) {
+    // search in tree
+    while (!pq.isEmpty()) {
+      DoubleMTreeDistanceSearchCandidate pqNode = pq.poll();
+      DBID id_p = pqNode.routingObjectID;
+      double d1 = pqNode.routingDistance;
+
+      if (knnList.size() >= k && pqNode.mindist > d_k) {
         break;
       }
 
       AbstractMTreeNode<?, DoubleDistance, ?, ?> node = index.getNode(pqNode.nodeID);
-      final DBID id_p = pqNode.routingObjectID;
-      final O ob_p = relation.get(id_p);
 
       // directory node
-      if(!node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
+      if (!node.isLeaf()) {
+        for (int i = 0; i < node.getNumEntries(); i++) {
           final MTreeEntry<DoubleDistance> entry = node.getEntry(i);
           final DBID id_i = entry.getRoutingObjectID();
-          final O ob_i = relation.get(id_i);
-          final double or_i = entry.getCoveringRadius().doubleValue();
-          final double d1 = id_p != null ? distf.doubleDistance(ob_p, q) : 0;
-          final double d2 = id_p != null ? distf.doubleDistance(ob_i, ob_p) : 0;
-          final double diff = Math.abs(d1 - d2);
+          double or_i = entry.getCoveringRadius().doubleValue();
+          double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
+          double diff = Math.abs(d1 - d2);
 
-          if(diff <= d_k + or_i) {
+          if (diff <= d_k + or_i) {
+            final O ob_i = relation.get(id_i);
             double d3 = distf.doubleDistance(ob_i, q);
             double d_min = Math.max(d3 - or_i, 0);
-            if(d_min <= d_k) {
-              pq.add(new DoubleMTreeDistanceSearchCandidate(d_min, ((DirectoryEntry)entry).getPageID(), id_i));
+            if (d_min <= d_k) {
+              pq.add(new DoubleMTreeDistanceSearchCandidate(d_min, ((DirectoryEntry) entry).getPageID(), id_i, d3));
             }
           }
         }
       }
       // data node
       else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
+        for (int i = 0; i < node.getNumEntries(); i++) {
           final MTreeEntry<DoubleDistance> entry = node.getEntry(i);
           final DBID id_i = entry.getRoutingObjectID();
-          final O o_i = relation.get(id_i);
+          double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
+          double diff = Math.abs(d1 - d2);
 
-          final double d1 = id_p != null ? distf.doubleDistance(ob_p, q) : 0;
-          final double d2 = id_p != null ? distf.doubleDistance(o_i, ob_p) : 0;
-          final double diff = Math.abs(d1 - d2);
-
-          if(diff <= d_k) {
+          if (diff <= d_k) {
+            final O o_i = relation.get(id_i);
             double d3 = distf.doubleDistance(o_i, q);
-            if(d3 <= d_k) {
+            if (d3 <= d_k) {
               knnList.add(d3, id_i);
               d_k = knnList.doubleKNNDistance();
             }

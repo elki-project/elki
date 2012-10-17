@@ -41,14 +41,22 @@ public class DoubleMTreeDistanceSearchCandidate extends DoubleDistanceSearchCand
   public DBID routingObjectID;
 
   /**
+   * The distance from the query object to the routing object
+   */
+  public double routingDistance;
+
+  /**
    * Creates a new heap node with the specified parameters.
    * 
    * @param mindist the minimum distance of the node
    * @param nodeID the id of the node
    * @param routingObjectID the id of the routing object of the node
+   * @param routingDistance the distance from the query object to the query
+   *        object
    */
-  public DoubleMTreeDistanceSearchCandidate(final double mindist, final Integer nodeID, final DBID routingObjectID) {
+  public DoubleMTreeDistanceSearchCandidate(final double mindist, final Integer nodeID, final DBID routingObjectID, double routingDistance) {
     super(mindist, nodeID);
     this.routingObjectID = routingObjectID;
+    this.routingDistance = routingDistance;
   }
 }

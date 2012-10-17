@@ -72,65 +72,65 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
   @Override
   public KNNResult<D> getKNNForObject(O q, int k) {
-    if(k < 1) {
+    if (k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
+    final D nullDistance = index.getDistanceFactory().nullDistance();
     KNNHeap<D> knnList = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     D d_k = knnList.getKNNDistance();
-    
+
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(index.getDistanceFactory().nullDistance(), index.getRootID(), null));
-    
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(nullDistance, index.getRootID(), null, nullDistance));
+
     // search in tree
-    while(!pq.isEmpty()) {
+    while (!pq.isEmpty()) {
       GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
 
-      if(knnList.size() >= k && pqNode.mindist.compareTo(d_k) > 0) {
+      if (knnList.size() >= k && pqNode.mindist.compareTo(d_k) > 0) {
         break;
       }
 
       AbstractMTreeNode<?, D, ?, ?> node = index.getNode(pqNode.nodeID);
-      DBID o_p = pqNode.routingObjectID;
+      DBID id_p = pqNode.routingObjectID;
+      D d1 = pqNode.routingDistance;
 
       // directory node
-      if(!node.isLeaf()) {
-        for(int i = 0; i < node.getNumEntries(); i++) {
+      if (!node.isLeaf()) {
+        for (int i = 0; i < node.getNumEntries(); i++) {
           MTreeEntry<D> entry = node.getEntry(i);
           DBID o_r = entry.getRoutingObjectID();
           D r_or = entry.getCoveringRadius();
-          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : index.getDistanceFactory().nullDistance();
-          D d2 = o_p != null ? distanceQuery.distance(o_r, o_p) : index.getDistanceFactory().nullDistance();
+          D d2 = id_p != null ? entry.getParentDistance() : nullDistance;
 
           D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
           D sum = d_k.plus(r_or);
 
-          if(diff.compareTo(sum) <= 0) {
+          if (diff.compareTo(sum) <= 0) {
             D d3 = distanceQuery.distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), index.getDistanceFactory().nullDistance());
-            if(d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, ((DirectoryEntry)entry).getPageID(), o_r));
+            if (d_min.compareTo(d_k) <= 0) {
+              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
             }
           }
         }
       }
       // data node
       else {
-        for(int i = 0; i < node.getNumEntries(); i++) {
+        for (int i = 0; i < node.getNumEntries(); i++) {
           MTreeEntry<D> entry = node.getEntry(i);
           DBID o_j = entry.getRoutingObjectID();
 
-          D d1 = o_p != null ? distanceQuery.distance(o_p, q) : index.getDistanceFactory().nullDistance();
-          D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : index.getDistanceFactory().nullDistance();
+          D d2 = id_p != null ? entry.getParentDistance() : nullDistance;
 
-          D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+          D diff = (d1.compareTo(d2) > 0) ? d1.minus(d2) : d2.minus(d1);
 
-          if(diff.compareTo(d_k) <= 0) {
+          if (diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
-            if(d3.compareTo(d_k) <= 0) {
+            if (d3.compareTo(d_k) <= 0) {
               knnList.add(d3, o_j);
               d_k = knnList.getKNNDistance();
             }
