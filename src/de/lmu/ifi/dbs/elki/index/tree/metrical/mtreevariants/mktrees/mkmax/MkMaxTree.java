@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,14 +30,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.ModifiableDistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -108,23 +108,19 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     // refinement of candidates
-    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     ModifiableDBIDs candidateIDs = DBIDUtil.newArray(candidates.size());
     for (DBIDIter candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
-      KNNHeap<D> knns = KNNUtil.newHeap(distanceFunction, k);
-      knnLists.put(DBIDUtil.deref(candidate), knns);
       candidateIDs.add(candidate);
     }
-    batchNN(getRoot(), candidateIDs, knnLists);
+    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), candidateIDs, k);
 
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
       DBID cid = DBIDUtil.deref(iter);
-      KNNHeap<D> cands = knnLists.get(cid);
-      while (cands.size() > 0) {
-        DistanceDBIDPair<D> qr = cands.poll();
-        if(DBIDUtil.equal(id, qr)) {
-          result.add(qr.getDistance(), cid);
+      KNNResult<D> cands = knnLists.get(cid);
+      for (DistanceDBIDResultIter<D> iter2 = cands.iter(); iter2.valid(); iter2.advance()) {
+        if(DBIDUtil.equal(id, iter2)) {
+          result.add(iter2.getDistance(), cid);
           break;
         }
       }
@@ -166,7 +162,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * Adjusts the knn distance in the subtree of the specified root entry.
    */
   @Override
-  protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNHeap<D>> knnLists) {
+  protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNResult<D>> knnLists) {
     MkMaxTreeNode<O, D> node = getNode(entry);
     D knnDist_node = getDistanceQuery().nullDistance();
     if(node.isLeaf()) {
@@ -261,15 +257,13 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
         if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
-          KNNHeap<D> knns_p = KNNUtil.newHeap(distanceFunction, getKmax());
-          knns_p.add(dist_pq, q.getRoutingObjectID());
-          doKNNQuery(p.getRoutingObjectID(), knns_p);
+          KNNResult<D> knns_p = knnq.getKNNForDBID(p.getRoutingObjectID(), getKmax() - 1);
 
-          if(knns_p.size() < getKmax()) {
+          if(knns_p.size() + 1 < getKmax()) {
             p.setKnnDistance(getDistanceQuery().undefinedDistance());
           }
           else {
-            D knnDist_p = knns_p.getKNNDistance();
+            D knnDist_p = DistanceUtil.max(dist_pq, knns_p.getKNNDistance());
             p.setKnnDistance(knnDist_p);
           }
         }

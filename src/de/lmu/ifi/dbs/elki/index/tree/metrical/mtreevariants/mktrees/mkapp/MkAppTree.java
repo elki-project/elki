@@ -24,10 +24,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -41,9 +39,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
@@ -139,30 +135,18 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       initialize(entries.get(0));
     }
 
-    Map<DBID, KNNHeap<D>> knnHeaps = new HashMap<DBID, KNNHeap<D>>(entries.size());
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert
     for(MkAppEntry<D> entry : entries) {
-      DBID id = entry.getRoutingObjectID();
-      // create knnList for the object
-      knnHeaps.put(id, KNNUtil.newHeap(distanceFunction, k_max + 1));
-      // TODO: optimize for double.
-
-      ids.add(id);
+      ids.add(entry.getRoutingObjectID());
       // insert the object
       super.insert(entry, false);
     }
 
     // do batch nn
-    batchNN(getRoot(), ids, knnHeaps);
-
-    // finish KNN lists (sort them completely)
-    Map<DBID, KNNResult<D>> knnLists = new HashMap<DBID, KNNResult<D>>();
-    for(Entry<DBID, KNNHeap<D>> ent : knnHeaps.entrySet()) {
-      knnLists.put(ent.getKey(), ent.getValue().toKNNList());
-    }
-
+    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), ids, k_max + 1);
+    
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
 

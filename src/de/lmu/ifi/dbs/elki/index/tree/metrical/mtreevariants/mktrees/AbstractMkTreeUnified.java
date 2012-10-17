@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -83,35 +81,29 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
 
   @Override
   public void insertAll(List<E> entries) {
-    if(entries.size() <= 0) {
+    if (entries.size() <= 0) {
       return;
     }
-    if(!initialized) {
+    if (!initialized) {
       initialize(entries.get(0));
     }
 
-    Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>();
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert sequentially
-    for(E entry : entries) {
-      // create knnList for the object
-      final DBID id = entry.getRoutingObjectID();
-
-      ids.add(id);
-      knnLists.put(id, KNNUtil.newHeap(distanceFunction, k_max));
-
+    for (E entry : entries) {
+      ids.add(entry.getRoutingObjectID());
       // insert the object
       super.insert(entry, false);
     }
 
     // do batch nn
-    batchNN(getRoot(), ids, knnLists);
+    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), ids, k_max);
 
     // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
 
-    if(EXTRA_INTEGRITY_CHECKS) {
+    if (EXTRA_INTEGRITY_CHECKS) {
       getRoot().integrityCheck(this, getRootEntry());
     }
   }
@@ -122,7 +114,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNHeap<D>> knnLists);
+  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNResult<D>> knnLists);
 
   /**
    * Get the value of k_max.
