@@ -93,26 +93,23 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
     final ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int samplesize = (int) (ids.size() * share);
-    final long iseed = rnd.getRandom().nextLong();
 
-    int i = 0;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
 
-      long rseed = i * 0x7FFFFFFFFFFFFFE7L + iseed;
-      DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rseed);
+      DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rnd);
       for (DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {
         D dist = distanceQuery.distance(iter, iter2);
         kNN.add(dist, iter2);
       }
 
       storage.put(iter, kNN.toKNNList());
-      if(progress != null) {
+      if (progress != null) {
         progress.incrementProcessed(getLogger());
       }
     }
 
-    if(progress != null) {
+    if (progress != null) {
       progress.ensureCompleted(getLogger());
     }
   }
@@ -220,11 +217,11 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
         DoubleParameter shareP = new DoubleParameter(SHARE_ID);
         shareP.addConstraint(new GreaterConstraint(0.0));
         shareP.addConstraint(new LessConstraint(1.0));
-        if(config.grab(shareP)) {
+        if (config.grab(shareP)) {
           share = shareP.getValue();
         }
         RandomParameter rndP = new RandomParameter(SEED_ID);
-        if(config.grab(rndP)) {
+        if (config.grab(rndP)) {
           rnd = rndP.getValue();
         }
       }

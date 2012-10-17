@@ -178,7 +178,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
       if(LOG.isDebugging()) {
         for(int d = 0; d < dim; d++) {
-          msg.append("\n neighbors [").append(d).append("]");
+          msg.append("\n neighbors [").append(d).append(']');
           msg.append(" (").append(allNeighbors[d].size()).append(") = ");
           msg.append(allNeighbors[d]);
         }
@@ -293,7 +293,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     if(LOG.isDebugging()) {
       msg.append("\n preference ");
       msg.append(FormatUtil.format(dimensionality, preferenceVector));
-      msg.append("\n");
+      msg.append('\n');
       LOG.debugFine(msg.toString());
     }
 
@@ -346,7 +346,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     if(LOG.isDebugging()) {
       msg.append("\n preference ");
       msg.append(FormatUtil.format(dimensionality, preferenceVector));
-      msg.append("\n");
+      msg.append('\n');
       LOG.debug(msg.toString());
     }
 

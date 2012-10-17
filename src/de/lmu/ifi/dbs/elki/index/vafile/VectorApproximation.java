@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 
 /**
  * Object in a VA approximation.
@@ -46,7 +47,7 @@ public class VectorApproximation {
 
   /**
    * Constructor.
-   *
+   * 
    * @param id Object represented (may be <code>null</code> for query objects)
    * @param approximation Approximation
    */
@@ -95,9 +96,10 @@ public class VectorApproximation {
    * @param numberOfPartitions the number of relevant partitions
    * @return the cost values (in bytes)
    */
-  //nicht gleich in bytes umwandeln, sonst rundungsfehler erst nachdem *anzahl objekte
+  // nicht gleich in bytes umwandeln, sonst rundungsfehler erst nachdem *anzahl
+  // objekte
   public static int byteOnDisk(int numberOfDimensions, int numberOfPartitions) {
-    //(partition*dimension+id) alles in Bit 32bit für 4 byte id
-    return (int) (Math.ceil(numberOfDimensions * ((Math.log(numberOfPartitions) / Math.log(2)))+32) /8);
+    // (partition*dimension+id) alles in Bit 32bit für 4 byte id
+    return (int) (Math.ceil(numberOfDimensions * ((Math.log(numberOfPartitions) / Math.log(2))) + 32) / ByteArrayUtil.SIZE_DOUBLE);
   }
 }

@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -681,7 +682,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
      * @return the cost value (in bytes)
      */
     private int getIOCosts(int size, int subspaceDims) {
-      return size * (subspaceDims * 8 + 4);
+      return size * (subspaceDims * ByteArrayUtil.SIZE_DOUBLE + 4);
     }
 
     /**

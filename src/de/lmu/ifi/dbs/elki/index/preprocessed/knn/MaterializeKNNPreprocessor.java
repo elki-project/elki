@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent.Type;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
@@ -313,7 +312,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @see KNNListener
    */
   protected void fireKNNsInserted(DBIDs insertions, DBIDs updates) {
-    KNNChangeEvent e = new KNNChangeEvent(this, Type.INSERT, insertions, updates);
+    KNNChangeEvent e = new KNNChangeEvent(this, KNNChangeEvent.Type.INSERT, insertions, updates);
     Object[] listeners = listenerList.getListenerList();
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == KNNListener.class) {
@@ -331,7 +330,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    * @see KNNListener
    */
   protected void fireKNNsRemoved(DBIDs removals, DBIDs updates) {
-    KNNChangeEvent e = new KNNChangeEvent(this, Type.DELETE, removals, updates);
+    KNNChangeEvent e = new KNNChangeEvent(this, KNNChangeEvent.Type.DELETE, removals, updates);
     Object[] listeners = listenerList.getListenerList();
     for(int i = listeners.length - 2; i >= 0; i -= 2) {
       if(listeners[i] == KNNListener.class) {
