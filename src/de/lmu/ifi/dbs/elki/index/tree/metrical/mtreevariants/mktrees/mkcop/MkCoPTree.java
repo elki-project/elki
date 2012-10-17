@@ -295,11 +295,12 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<GenericMTreeDistanceSearchCandidate<D>>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null, null));
 
     // search in tree
     while(!pq.isEmpty()) {
       GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
+      // FIXME: cache the distance to the routing object in the queue node!
 
       MkCoPTreeNode<O, D> node = getNode(pqNode.nodeID);
 
@@ -312,7 +313,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());
 
           if(minDist.compareTo(approximatedKnnDist_cons) <= 0) {
-            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID()));
+            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
           }
         }
       }

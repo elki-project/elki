@@ -70,107 +70,47 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
    * @param r_q the query range
    * @param result the list holding the query results
    */
-  private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, DBID q, D r_q, GenericDistanceDBIDList<D> result) {
-    if(!node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<D> entry = node.getEntry(i);
-        DBID o_r = entry.getRoutingObjectID();
-
-        D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : distanceQuery.nullDistance();
-        // o_p != null ?  distanceFunction.distance(o_r, o_p) :/ distanceFunction.nullDistance();
-
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-        D sum = r_q.plus(r_or);
-
-        if(diff.compareTo(sum) <= 0) {
-          D d3 = distanceQuery.distance(o_r, q);
-          if(d3.compareTo(sum) <= 0) {
-            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry)entry).getPageID());
-            doRangeQuery(o_r, child, q, r_q, result);
-          }
-        }
-
-      }
-    }
-
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<D> entry = node.getEntry(i);
-        DBID o_j = entry.getRoutingObjectID();
-
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
-        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : distanceQuery.nullDistance();
-
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
-
-        if(diff.compareTo(r_q) <= 0) {
-          D d3 = distanceQuery.distance(o_j, q);
-          if(d3.compareTo(r_q) <= 0) {
-            result.add(d3, o_j);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Performs a range query on the specified subtree. It recursively traverses
-   * all paths from the specified node, which cannot be excluded from leading to
-   * qualifying objects.
-   * 
-   * @param o_p the routing object of the specified node
-   * @param node the root of the subtree to be traversed
-   * @param q the id of the query object
-   * @param r_q the query range
-   * @param result the list holding the query results
-   */
   private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, O q, D r_q, GenericDistanceDBIDList<D> result) {
-    if(!node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    final D nullDistance = distanceQuery.nullDistance();
+    D d1 = o_p != null ? distanceQuery.distance(o_p, q) : nullDistance;
+    if (!node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<D> entry = node.getEntry(i);
         DBID o_r = entry.getRoutingObjectID();
 
         D r_or = entry.getCoveringRadius();
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
-        D d2 = o_p != null ? entry.getParentDistance() : distanceQuery.nullDistance();
-        // o_p != null ? distanceFunction.distance(o_r, o_p) : distanceFunction.nullDistance();
-
+        D d2 = o_p != null ? entry.getParentDistance() : nullDistance;
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
         D sum = r_q.plus(r_or);
 
-        if(diff.compareTo(sum) <= 0) {
+        if (diff.compareTo(sum) <= 0) {
           D d3 = distanceQuery.distance(o_r, q);
-          if(d3.compareTo(sum) <= 0) {
-            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry)entry).getPageID());
+          if (d3.compareTo(sum) <= 0) {
+            AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
         }
       }
-    }
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    } else {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<D> entry = node.getEntry(i);
         DBID o_j = entry.getRoutingObjectID();
 
-        D d1 = o_p != null ? distanceQuery.distance(o_p, q) : distanceQuery.nullDistance();
-        D d2 = o_p != null ? distanceQuery.distance(o_j, o_p) : distanceQuery.nullDistance();
+        D d2 = o_p != null ? entry.getParentDistance() : nullDistance;
 
         D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
 
-        if(diff.compareTo(r_q) <= 0) {
+        if (diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
-          if(d3.compareTo(r_q) <= 0) {
+          if (d3.compareTo(r_q) <= 0) {
             result.add(d3, o_j);
           }
         }
       }
     }
   }
-  
+
   @Override
   public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
     final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();

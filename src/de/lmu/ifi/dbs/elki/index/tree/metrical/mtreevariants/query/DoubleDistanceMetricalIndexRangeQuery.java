@@ -80,40 +80,38 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
    */
   private void doRangeQuery(DBID id_p, AbstractMTreeNode<O, DoubleDistance, ?, ?> node, O q, double r_q, DoubleDistanceDBIDList result) {
     final O o_p = id_p != null ? relation.get(id_p) : null;
-    if(!node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    double d1 = id_p != null ? distf.doubleDistance(o_p, q) : 0;
+    if (!node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<DoubleDistance> entry = node.getEntry(i);
-        DBID id_r = entry.getRoutingObjectID();
 
         double r_or = entry.getCoveringRadius().doubleValue();
-        double d1 = id_p != null ? distf.doubleDistance(o_p, q) : 0;
         double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
         double diff = Math.abs(d1 - d2);
 
         double sum = r_q + r_or;
 
-        if(diff <= sum) {
+        if (diff <= sum) {
+          DBID id_r = entry.getRoutingObjectID();
           double d3 = distf.doubleDistance(relation.get(id_r), q);
-          if(d3 <= sum) {
+          if (d3 <= sum) {
             AbstractMTreeNode<O, DoubleDistance, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
             doRangeQuery(id_r, child, q, r_q, result);
           }
         }
       }
-    }
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    } else {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<DoubleDistance> entry = node.getEntry(i);
-        DBID id_j = entry.getRoutingObjectID();
-        O o_j = relation.get(id_j);
 
-        double d1 = id_p != null ? distf.doubleDistance(o_p, q) : 0;
-        double d2 = id_p != null ? distf.doubleDistance(o_j, o_p) : 0;
+        double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
         double diff = Math.abs(d1 - d2);
 
-        if(diff <= r_q) {
+        if (diff <= r_q) {
+          DBID id_j = entry.getRoutingObjectID();
+          O o_j = relation.get(id_j);
           double d3 = distf.doubleDistance(o_j, q);
-          if(d3 <= r_q) {
+          if (d3 <= r_q) {
             result.add(d3, id_j);
           }
         }
