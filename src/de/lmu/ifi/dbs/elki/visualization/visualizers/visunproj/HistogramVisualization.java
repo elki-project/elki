@@ -104,7 +104,7 @@ public class HistogramVisualization extends AbstractVisFactory {
         // TODO: test and throw always
         assert (dim == vec.getDimensionality());
       }
-      for (int i = 0; i <= dim; i++) {
+      for (int i = 0; i < dim; i++) {
         yminmax.put(vec.doubleValue(i));
       }
     }
