@@ -91,7 +91,7 @@ public final class Util {
     }
     return (int) result;
   }
-
+  
   /**
    * Static instance.
    */

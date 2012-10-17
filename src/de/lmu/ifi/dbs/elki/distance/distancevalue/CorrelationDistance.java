@@ -48,8 +48,8 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
   /**
    * The pattern used for correlation distances
    */
-  public static final Pattern CORRELATION_DISTANCE_PATTERN = Pattern.compile("\\d+" + Pattern.quote(SEPARATOR) + "\\d+(\\.\\d+)?([eE][-]?\\d+)?");  
-  
+  public static final Pattern CORRELATION_DISTANCE_PATTERN = Pattern.compile("\\d+" + Pattern.quote(SEPARATOR) + "\\d+(\\.\\d+)?([eE][-]?\\d+)?");
+
   /**
    * Generated SerialVersionUID.
    */
@@ -110,11 +110,10 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
    */
   @Override
   public int compareTo(D other) {
-    int compare = new Integer(this.correlationValue).compareTo(other.getCorrelationValue());
-    if(compare != 0) {
+    int compare = (this.correlationValue < other.getCorrelationValue()) ? -1 : (this.correlationValue > other.getCorrelationValue()) ? +1 : 0;
+    if (compare != 0) {
       return compare;
-    }
-    else {
+    } else {
       return Double.compare(this.euclideanValue, other.getEuclideanValue());
     }
   }
@@ -124,7 +123,7 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
     int result;
     long temp;
     result = correlationValue;
-    temp = euclideanValue != +0.0d ? Double.doubleToLongBits(euclideanValue) : 0L;
+    temp = euclideanValue >= Double.MIN_NORMAL ? Double.doubleToLongBits(euclideanValue) : 0L;
     result = 29 * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
@@ -132,17 +131,17 @@ public abstract class CorrelationDistance<D extends CorrelationDistance<D>> exte
   @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     final CorrelationDistance<D> other = (CorrelationDistance<D>) obj;
-    if(this.correlationValue != other.correlationValue) {
+    if (this.correlationValue != other.correlationValue) {
       return false;
     }
-    if(this.euclideanValue != other.euclideanValue) {
+    if (this.euclideanValue != other.euclideanValue) {
       return false;
     }
     return true;

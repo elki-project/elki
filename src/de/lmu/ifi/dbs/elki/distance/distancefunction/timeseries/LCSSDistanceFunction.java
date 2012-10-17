@@ -191,6 +191,9 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
+    if (obj == this) {
+      return true;
+    }
     if (obj == null) {
       return false;
     }
@@ -208,9 +211,9 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected Double pDelta = 0.0;
+    protected double pDelta = 0.0;
 
-    protected Double pEpsilon = 0.0;
+    protected double pEpsilon = 0.0;
 
     @Override
     protected void makeOptions(Parameterization config) {
