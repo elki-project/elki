@@ -75,12 +75,12 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
 
   @Override
   public IntegerDistance minus(IntegerDistance distance) {
-    return new IntegerDistance(this.getValue() - distance.getValue());
+    return new IntegerDistance(this.value - distance.value);
   }
 
   @Override
   public IntegerDistance plus(IntegerDistance distance) {
-    return new IntegerDistance(this.getValue() + distance.getValue());
+    return new IntegerDistance(this.value + distance.value);
   }
 
   /**
@@ -88,7 +88,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeInt(getValue());
+    out.writeInt(value);
   }
 
   /**
@@ -96,7 +96,7 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException {
-    setValue(in.readInt());
+    value = in.readInt();
   }
 
   /**
@@ -108,16 +108,6 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
   @Override
   public int externalizableSize() {
     return 4;
-  }
-
-  @Override
-  public Integer getValue() {
-    return this.value;
-  }
-
-  @Override
-  void setValue(Integer value) {
-    this.value = value;
   }
 
   @Override
@@ -172,12 +162,39 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
 
   @Override
   public IntegerDistance parseString(String val) throws IllegalArgumentException {
-    if(testInputPattern(val)) {
+    if (testInputPattern(val)) {
       return new IntegerDistance(Integer.parseInt(val));
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
+  }
+
+  @Override
+  public String toString() {
+    return Integer.toString(value);
+  }
+
+  @Override
+  public int hashCode() {
+    return value;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    IntegerDistance other = (IntegerDistance) obj;
+    if (value != other.value) {
+      return false;
+    }
+    return true;
   }
 
   @Override

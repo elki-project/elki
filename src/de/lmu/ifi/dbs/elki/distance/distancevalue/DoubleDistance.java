@@ -28,6 +28,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+
 /**
  * Provides a Distance for a double-valued distance.
  * 
@@ -48,7 +50,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    * Undefined distance constant
    */
   public static final DoubleDistance UNDEFINED_DISTANCE = new DoubleDistance(Double.NaN);
-  
+
   /**
    * The static factory instance
    */
@@ -148,16 +150,6 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   }
 
   @Override
-  public Double getValue() {
-    return (Double) this.value;
-  }
-
-  @Override
-  void setValue(Double value) {
-    this.value = (double) value;
-  }
-
-  @Override
   public double doubleValue() {
     return value;
   }
@@ -170,18 +162,6 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   @Override
   public int compareTo(DoubleDistance other) {
     return Double.compare(this.value, other.value);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    double delta = Math.abs(value - ((DoubleDistance) o).value);
-    return delta < Double.MIN_NORMAL;
   }
 
   /**
@@ -214,13 +194,12 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
    */
   @Override
   public DoubleDistance parseString(String val) throws IllegalArgumentException {
-    if(val.equals(INFINITY_PATTERN)) {
+    if (val.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
-    if(testInputPattern(val)) {
+    if (testInputPattern(val)) {
       return new DoubleDistance(Double.parseDouble(val));
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }
@@ -232,7 +211,7 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
 
   @Override
   public boolean isNullDistance() {
-    return (value == 0.0);
+    return (value <= 0.0);
   }
 
   @Override
@@ -246,8 +225,31 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
   }
 
   @Override
+  public String toString() {
+    return FormatUtil.NF8.format(value);
+  }
+
+  @Override
   public int hashCode() {
-    long bits = Double.doubleToLongBits(value);
+    final long bits = Double.doubleToLongBits(value);
     return (int) (bits ^ (bits >>> 32));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DoubleDistance other = (DoubleDistance) obj;
+    if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value)) {
+      return false;
+    }
+    return true;
   }
 }

@@ -28,6 +28,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+
 /**
  * Provides a Distance for a float-valued distance.
  * 
@@ -73,12 +75,12 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
 
   @Override
   public FloatDistance plus(FloatDistance distance) {
-    return new FloatDistance(this.getValue() + distance.getValue());
+    return new FloatDistance(value + distance.value);
   }
 
   @Override
   public FloatDistance minus(FloatDistance distance) {
-    return new FloatDistance(this.getValue() - distance.getValue());
+    return new FloatDistance(value - distance.value);
   }
 
   /**
@@ -90,7 +92,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    *         distance
    */
   public FloatDistance times(FloatDistance distance) {
-    return new FloatDistance(this.getValue() * distance.getValue());
+    return new FloatDistance(value * distance.value);
   }
 
   /**
@@ -102,7 +104,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    *         value
    */
   public FloatDistance times(float lambda) {
-    return new FloatDistance(this.getValue() * lambda);
+    return new FloatDistance(value * lambda);
   }
 
   /**
@@ -110,7 +112,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeFloat(getValue());
+    out.writeFloat(value);
   }
 
   /**
@@ -118,7 +120,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException {
-    setValue(in.readFloat());
+    value = in.readFloat();
   }
 
   /**
@@ -130,16 +132,6 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   @Override
   public int externalizableSize() {
     return 4;
-  }
-
-  @Override
-  public Float getValue() {
-    return this.value;
-  }
-
-  @Override
-  void setValue(Float value) {
-    this.value = value;
   }
 
   @Override
@@ -160,18 +152,6 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   @Override
   public int compareTo(FloatDistance other) {
     return Float.compare(this.value, other.value);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    float delta = Math.abs(value - ((FloatDistance) o).value);
-    return delta < Float.MIN_NORMAL;
   }
 
   /**
@@ -204,35 +184,62 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    */
   @Override
   public FloatDistance parseString(String val) throws IllegalArgumentException {
-    if(val.equals(INFINITY_PATTERN)) {
+    if (val.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
 
-    if(DoubleDistance.DOUBLE_PATTERN.matcher(val).matches()) {
+    if (DoubleDistance.DOUBLE_PATTERN.matcher(val).matches()) {
       return new FloatDistance(Float.parseFloat(val));
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }
 
   @Override
   public boolean isInfiniteDistance() {
-    return Double.isInfinite(value);
+    return Float.isInfinite(value);
   }
 
   @Override
   public boolean isNullDistance() {
-    return (value == 0.0);
+    return (value <= 0.0);
   }
 
   @Override
   public boolean isUndefinedDistance() {
-    return Double.isNaN(value);
+    return Float.isNaN(value);
   }
 
   @Override
   public Pattern getPattern() {
     return DOUBLE_PATTERN;
+  }
+
+  @Override
+  public String toString() {
+    return FormatUtil.NF8.format(value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Float.floatToIntBits(value);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    FloatDistance other = (FloatDistance) obj;
+    if (Float.floatToIntBits(value) != Float.floatToIntBits(other.value)) {
+      return false;
+    }
+    return true;
   }
 }

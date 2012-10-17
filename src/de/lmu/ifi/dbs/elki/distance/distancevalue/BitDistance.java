@@ -108,7 +108,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    out.writeBoolean(this.bitValue());
+    out.writeBoolean(value);
   }
 
   /**
@@ -116,7 +116,7 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException {
-    setValue(new Bit(in.readBoolean()));
+    value = in.readBoolean();
   }
 
   /**
@@ -128,16 +128,6 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   @Override
   public int externalizableSize() {
     return 1;
-  }
-
-  @Override
-  public Bit getValue() {
-    return new Bit(this.value);
-  }
-
-  @Override
-  void setValue(Bit value) {
-    this.value = value.bitValue();
   }
 
   @Override
@@ -162,10 +152,9 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
 
   @Override
   public BitDistance parseString(String val) throws IllegalArgumentException {
-    if(testInputPattern(val)) {
+    if (testInputPattern(val)) {
       return new BitDistance(Bit.valueOf(val).bitValue());
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }
@@ -203,5 +192,30 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
   @Override
   public boolean isUndefinedDistance() {
     return false;
+  }
+
+  @Override
+  public String toString() {
+    return Boolean.toString(value);
+  }
+
+  @Override
+  public int hashCode() {
+    return (value ? 1231 : 1237);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    BitDistance other = (BitDistance) obj;
+    return (value == other.value);
   }
 }

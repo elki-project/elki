@@ -42,7 +42,7 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
    * The static factory instance
    */
   public static final SubspaceDistance FACTORY = new SubspaceDistance();
-  
+
   /**
    * Serial version number.
    */
@@ -124,23 +124,44 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
   @Override
   public int compareTo(SubspaceDistance other) {
     int compare = Double.compare(this.subspaceDistance, other.subspaceDistance);
-    if(compare != 0) {
+    if (compare != 0) {
       return compare;
-    }
-    else {
+    } else {
       return Double.compare(this.affineDistance, other.affineDistance);
     }
   }
 
   @Override
   public int hashCode() {
-    int result;
+    final int prime = 31;
+    int result = 1;
     long temp;
-    temp = subspaceDistance != 0.0d ? Double.doubleToLongBits(subspaceDistance) : 0L;
-    result = (int) (temp ^ (temp >>> 32));
-    temp = affineDistance != 0.0d ? Double.doubleToLongBits(affineDistance) : 0L;
-    result = 29 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(subspaceDistance);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(affineDistance);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
     return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    SubspaceDistance other = (SubspaceDistance) obj;
+    if (Double.doubleToLongBits(affineDistance) != Double.doubleToLongBits(other.affineDistance)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(subspaceDistance) != Double.doubleToLongBits(other.subspaceDistance)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -199,14 +220,13 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
 
   @Override
   public SubspaceDistance parseString(String val) throws IllegalArgumentException {
-    if(val.equals(INFINITY_PATTERN)) {
+    if (val.equals(INFINITY_PATTERN)) {
       return infiniteDistance();
     }
-    if(testInputPattern(val)) {
+    if (testInputPattern(val)) {
       String[] values = SEPARATOR.split(val);
       return new SubspaceDistance(Double.parseDouble(values[0]), Double.parseDouble(values[1]));
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Given pattern \"" + val + "\" does not match required pattern \"" + requiredInputPattern() + "\"");
     }
   }

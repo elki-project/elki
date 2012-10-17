@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancevalue;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Provides a Distance for a number-valued distance.
  * 
@@ -42,7 +41,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
   public NumberDistance() {
     super();
   }
-  
+
   /**
    * Build a new instance from a double value.
    * 
@@ -52,66 +51,12 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
   public abstract D fromDouble(double val);
 
   /**
-   * Returns the hash code for this NumberDistance, which is the hash code of
-   * its value.
-   * 
-   * @return the hash code of the value
-   */
-  @Override
-  public int hashCode() {
-    return getValue().hashCode();
-  }
-
-  /**
-   * Compares this NumberDistance with the given NumberDistance wrt the
-   * represented value.
-   * <p/>
-   * <code>d1.compareTo(d2)</code> is the same as
-   * {@link Double#compare(double,double) Double.compare(d1.value.doubleValue(),
-   * d2.value.doubleValue())}. Subclasses may need to overwrite this method if
-   * necessary.
-   * 
-   * @param other Other object
-   * @return a negative integer, zero, or a positive integer as the value of
-   *         this NumberDistance is less than, equal to, or greater than the
-   *         value of the specified NumberDistance.
-   */
-  @Override
-  public int compareTo(D other) {
-    return Double.compare(this.doubleValue(), other.doubleValue());
-  }
-
-  /**
-   * Returns a string representation of this NumberDistance.
-   * 
-   * @return the value of this NumberDistance.
-   */
-  @Override
-  public final String toString() {
-    return getValue().toString();
-  }
-
-  /**
-   * Returns the value of this NumberDistance.
-   * 
-   * @return the value of this NumberDistance
-   */
-  public abstract N getValue();
-
-  /**
-   * Sets the value of this NumberDistance.
-   * 
-   * @param value the value to be set
-   */
-  abstract void setValue(N value);
-  
-  /**
    * Get the value as double.
    * 
    * @return same result as getValue().doubleValue() but may be more efficient.
    */
   public abstract double doubleValue();
-  
+
   /**
    * Get the value as float.
    * 
@@ -120,7 +65,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
   public float floatValue() {
     return (float) doubleValue();
   }
-  
+
   /**
    * Get the value as int.
    * 
@@ -129,14 +74,14 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
   public int intValue() {
     return (int) longValue();
   }
-  
+
   /**
    * Get the value as long.
    * 
    * @return same result as getValue().longValue() but may be more efficient.
    */
   public abstract long longValue();
-  
+
   /**
    * Get the value as short.
    * 
@@ -145,7 +90,7 @@ public abstract class NumberDistance<D extends NumberDistance<D, N>, N extends N
   public short shortValue() {
     return (short) longValue();
   }
-  
+
   /**
    * Get the value as byte.
    * 
