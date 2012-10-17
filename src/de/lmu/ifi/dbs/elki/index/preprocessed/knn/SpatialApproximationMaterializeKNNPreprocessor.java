@@ -119,7 +119,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
+      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>((size * size * 3) >> 3);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {

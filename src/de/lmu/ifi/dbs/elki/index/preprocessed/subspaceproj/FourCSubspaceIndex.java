@@ -102,7 +102,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
 
     if (LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
-      msg.append(id).append(" "); // .append(database.getObjectLabelQuery().get(id));
+      msg.append(id).append(' '); // .append(database.getObjectLabelQuery().get(id));
       msg.append("\ncorrDim ").append(pcares.getCorrelationDimension());
       LOG.debugFine(msg.toString());
     }

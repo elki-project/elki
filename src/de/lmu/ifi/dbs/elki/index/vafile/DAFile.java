@@ -28,6 +28,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -110,6 +111,6 @@ public class DAFile {
    * @return IO costs
    */
   public int getIOCosts() {
-    return splitPositions.length * 8 + 4;
+    return splitPositions.length * ByteArrayUtil.SIZE_DOUBLE + 4;
   }
 }

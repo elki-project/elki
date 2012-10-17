@@ -115,7 +115,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
           ids.add(iter);
         }
       }
-      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>(size * size * 3 / 8);
+      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>((size * size * 3) >> 3);
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
