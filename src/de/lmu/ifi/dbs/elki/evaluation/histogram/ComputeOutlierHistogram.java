@@ -36,15 +36,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
-import de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -54,7 +54,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
@@ -74,11 +73,6 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @apiviz.has HistogramResult oneway - - «create»
  */
 public class ComputeOutlierHistogram implements Evaluator {
-  /**
-   * Logger for debugging.
-   */
-  private static final Logging LOG = Logging.getLogger(ComputeOutlierHistogram.class);
-
   /**
    * The object pattern to identify positive classes
    * <p>
@@ -158,7 +152,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    * @return Result
    */
   public HistogramResult<DoubleVector> evaluateOutlierResult(Database database, OutlierResult or) {
-    if(scaling instanceof OutlierScalingFunction) {
+    if (scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(or);
     }
@@ -166,45 +160,83 @@ public class ComputeOutlierHistogram implements Evaluator {
     ModifiableDBIDs ids = DBIDUtil.newHashSet(or.getScores().getDBIDs());
     DBIDs outlierIds = DatabaseUtil.getObjectsByLabelMatch(database, positiveClassName);
     // first value for outliers, second for each object
-    final AggregatingHistogram<DoubleDoublePair, DoubleDoublePair> hist;
     // If we have useful (finite) min/max, use these for binning.
     double min = scaling.getMin();
     double max = scaling.getMax();
-    if(Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
-      hist = FlexiHistogram.DoubleSumDoubleSumHistogram(bins);
+    final ObjHistogram<DoubleDoublePair> hist;
+    if (Double.isInfinite(min) || Double.isNaN(min) || Double.isInfinite(max) || Double.isNaN(max)) {
+      hist = new AbstractObjDynamicHistogram<DoubleDoublePair>(bins) {
+        @Override
+        public DoubleDoublePair aggregate(DoubleDoublePair first, DoubleDoublePair second) {
+          first.first += second.first;
+          first.second += second.second;
+          return first;
+        }
+
+        @Override
+        protected DoubleDoublePair makeObject() {
+          return new DoubleDoublePair(0., 0.);
+        }
+
+        @Override
+        protected DoubleDoublePair cloneForCache(DoubleDoublePair data) {
+          return new DoubleDoublePair(data.first, data.second);
+        }
+
+        @Override
+        protected DoubleDoublePair downsample(Object[] data, int start, int end, int size) {
+          DoubleDoublePair sum = new DoubleDoublePair(0, 0);
+          for (int i = start; i < end; i++) {
+            DoubleDoublePair p = (DoubleDoublePair) data[i];
+            if (p != null) {
+              sum.first += p.first;
+              sum.second += p.second;
+            }
+          }
+          return sum;
+        }
+      };
+    } else {
+      hist = new AbstractObjStaticHistogram<DoubleDoublePair>(bins, min, max) {
+        @Override
+        protected DoubleDoublePair makeObject() {
+          return new DoubleDoublePair(0., 0.);
+        }
+
+        @Override
+        public void putData(double coord, DoubleDoublePair data) {
+          DoubleDoublePair exist = get(coord);
+          exist.first += data.first;
+          exist.second += data.second;
+        }
+      };
     }
-    else {
-      hist = AggregatingHistogram.DoubleSumDoubleSumHistogram(bins, min, max);
-    }
+
     // first fill histogram only with values of outliers
-    DoubleDoublePair positive, negative;
-    if(!splitfreq) {
-      positive = new DoubleDoublePair(0., 1. / ids.size());
-      negative = new DoubleDoublePair(1. / ids.size(), 0.);
-    }
-    else {
-      positive = new DoubleDoublePair(0., 1. / outlierIds.size());
-      negative = new DoubleDoublePair(1. / (ids.size() - outlierIds.size()), 0.);
+    DoubleDoublePair negative, positive;
+    if (!splitfreq) {
+      negative = new DoubleDoublePair(1. / ids.size(), 0);
+      positive = new DoubleDoublePair(0, 1. / ids.size());
+    } else {
+      negative = new DoubleDoublePair(1. / (ids.size() - outlierIds.size()), 0);
+      positive = new DoubleDoublePair(0, 1. / outlierIds.size());
     }
     ids.removeDBIDs(outlierIds);
     // fill histogram with values of each object
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().get(iter);
       result = scaling.getScaled(result);
-      hist.aggregate(result, negative);
+      hist.putData(result, negative);
     }
-    for(DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = outlierIds.iter(); iter.valid(); iter.advance()) {
       double result = or.getScores().get(iter);
       result = scaling.getScaled(result);
-      hist.aggregate(result, positive);
+      hist.putData(result, positive);
     }
-
-    // turn into Collection
-
     Collection<DoubleVector> collHist = new ArrayList<DoubleVector>(hist.getNumBins());
-    for(DoubleObjPair<DoubleDoublePair> ppair : hist) {
-      DoubleDoublePair data = ppair.getSecond();
-      DoubleVector row = new DoubleVector(new double[] { ppair.first, data.first, data.second });
+    for (ObjHistogram.Iter<DoubleDoublePair> iter = hist.iter(); iter.valid(); iter.advance()) {
+      DoubleDoublePair data = iter.getValue();
+      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), data.first, data.second });
       collHist.add(row);
     }
     return new HistogramResult<DoubleVector>("Outlier Score Histogram", "outlier-histogram", collHist);
@@ -214,12 +246,12 @@ public class ComputeOutlierHistogram implements Evaluator {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     final Database db = ResultUtil.findDatabase(baseResult);
     List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    if(ors == null || ors.size() <= 0) {
+    if (ors == null || ors.size() <= 0) {
       // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
       return;
     }
 
-    for(OutlierResult or : ors) {
+    for (OutlierResult or : ors) {
       db.getHierarchy().add(or, evaluateOutlierResult(db, or));
     }
   }
@@ -257,23 +289,23 @@ public class ComputeOutlierHistogram implements Evaluator {
       super.makeOptions(config);
       PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
       positiveClassNameP.setOptional(true);
-      if(config.grab(positiveClassNameP)) {
+      if (config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
 
       IntParameter binsP = new IntParameter(BINS_ID, 50);
       binsP.addConstraint(new GreaterConstraint(1));
-      if(config.grab(binsP)) {
+      if (config.grab(binsP)) {
         bins = binsP.getValue();
       }
 
       ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
-      if(config.grab(scalingP)) {
+      if (config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
 
       Flag splitfreqF = new Flag(SPLITFREQ_ID);
-      if(config.grab(splitfreqF)) {
+      if (config.grab(splitfreqF)) {
         splitfreq = splitfreqF.getValue();
       }
 

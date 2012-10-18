@@ -51,20 +51,18 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.MeanVarianceStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -136,7 +134,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
       covmats.put(clus, covmat.destroyToNaiveMatrix());
     }
 
-    AggregatingHistogram<MeanVariance, Double> hist = AggregatingHistogram.MeanVarianceHistogram(numbins, 0.0, 1.0);
+    MeanVarianceStaticHistogram hist = new MeanVarianceStaticHistogram(numbins, 0.0, 1.0);
 
     if (LOG.isVerbose()) {
       LOG.verbose("Processing points...");
@@ -159,7 +157,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
         KNNResult<D> knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
-        hist.aggregate(((double) ind) / clus.size(), result);
+        hist.put(((double) ind) / clus.size(), result);
 
         if (rocloop != null) {
           rocloop.incrementProcessed(LOG);
@@ -173,8 +171,8 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
-    for (DoubleObjPair<MeanVariance> pair : hist) {
-      DoubleVector row = new DoubleVector(new double[] { pair.first, pair.getSecond().getCount(), pair.getSecond().getMean(), pair.getSecond().getSampleVariance() });
+    for (MeanVarianceStaticHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
+      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
       res.add(row);
     }
     return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);

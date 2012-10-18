@@ -53,10 +53,11 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
-import de.lmu.ifi.dbs.elki.math.histograms.FlexiHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.LongArrayStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -67,8 +68,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Algorithm to gather statistics over the distance distribution in the data
@@ -159,18 +158,50 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     MeanVariance momax = new MeanVariance();
     MeanVariance modif = new MeanVariance();
     // Histogram
-    final AggregatingHistogram<Pair<Long, Long>, Pair<Long, Long>> histogram;
+    final ObjHistogram<long[]> histogram;
     if (stepprog != null) {
       stepprog.beginStep(1, "Prepare histogram.", LOG);
     }
     if (exact) {
       gminmax = exactMinMax(relation, distFunc);
-      histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
+      histogram = new LongArrayStaticHistogram(numbin, gminmax.getMin(), gminmax.getMax(), 2);
     } else if (sampling) {
       gminmax = sampleMinMax(relation, distFunc);
-      histogram = AggregatingHistogram.LongSumLongSumHistogram(numbin, gminmax.getMin(), gminmax.getMax());
+      histogram = new LongArrayStaticHistogram(numbin, gminmax.getMin(), gminmax.getMax(), 2);
     } else {
-      histogram = FlexiHistogram.LongSumLongSumHistogram(numbin);
+      histogram = new AbstractObjDynamicHistogram<long[]>(numbin) {
+        @Override
+        protected long[] downsample(Object[] data, int start, int end, int size) {
+          long[] ret = new long[2];
+          for (int i = start; i < end; i++) {
+            long[] existing = (long[]) data[i];
+            if (existing != null) {
+              for (int c = 0; c < 2; c++) {
+                ret[c] += existing[c];
+              }
+            }
+          }
+          return ret;
+        }
+
+        @Override
+        protected long[] aggregate(long[] first, long[] second) {
+          for (int c = 0; c < 2; c++) {
+            first[c] += second[c];
+          }
+          return first;
+        }
+
+        @Override
+        protected long[] cloneForCache(long[] data) {
+          return data.clone();
+        }
+
+        @Override
+        protected long[] makeObject() {
+          return new long[2];
+        }
+      };
     }
 
     if (stepprog != null) {
@@ -178,8 +209,8 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Distance computations", relation.size(), LOG) : null;
     // iterate per cluster
-    final Pair<Long, Long> incFirst = new Pair<Long, Long>(1L, 0L);
-    final Pair<Long, Long> incSecond = new Pair<Long, Long>(0L, 1L);
+    final long[] incFirst = new long[] { 1L, 0L };
+    final long[] incSecond = new long[] { 0L, 1L };
     for (Cluster<?> c1 : split) {
       for (DBIDIter id1 = c1.getIDs().iter(); id1.valid(); id1.advance()) {
         // in-cluster distances
@@ -191,7 +222,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
           }
           double d = distFunc.distance(id1, iter2).doubleValue();
 
-          histogram.aggregate(d, incFirst);
+          histogram.putData(d, incFirst);
 
           iminmax.put(d);
         }
@@ -216,7 +247,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
             }
             double d = distFunc.distance(id1, iter2).doubleValue();
 
-            histogram.aggregate(d, incSecond);
+            histogram.putData(d, incSecond);
 
             ominmax.put(d);
           }
@@ -247,19 +278,20 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     // count the number of samples we have in the data
     long inum = 0;
     long onum = 0;
-    for (DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
-      inum += ppair.getSecond().getFirst();
-      onum += ppair.getSecond().getSecond();
+    for (ObjHistogram.Iter<long[]> iter = histogram.iter(); iter.valid(); iter.advance()) {
+      inum += iter.getValue()[0];
+      onum += iter.getValue()[1];
     }
     long bnum = inum + onum;
 
     Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
-    for (DoubleObjPair<Pair<Long, Long>> ppair : histogram) {
-      final double icof = (inum == 0) ? 0 : ((double) ppair.getSecond().getFirst()) / inum / histogram.getBinsize();
-      final double icaf = ((double) ppair.getSecond().getFirst()) / bnum / histogram.getBinsize();
-      final double ocof = (onum == 0) ? 0 : ((double) ppair.getSecond().getSecond()) / onum / histogram.getBinsize();
-      final double ocaf = ((double) ppair.getSecond().getSecond()) / bnum / histogram.getBinsize();
-      DoubleVector row = new DoubleVector(new double[] { ppair.first, icof, icaf, ocof, ocaf });
+    for (ObjHistogram.Iter<long[]> iter = histogram.iter(); iter.valid(); iter.advance()) {
+      final long[] value = iter.getValue();
+      final double icof = (inum == 0) ? 0 : ((double) value[0]) / inum / histogram.getBinsize();
+      final double icaf = ((double) value[0]) / bnum / histogram.getBinsize();
+      final double ocof = (onum == 0) ? 0 : ((double) value[1]) / onum / histogram.getBinsize();
+      final double ocaf = ((double) value[1]) / bnum / histogram.getBinsize();
+      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), icof, icaf, ocof, ocaf });
       binstat.add(row);
     }
     HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Distance Histogram", "distance-histogram", binstat);

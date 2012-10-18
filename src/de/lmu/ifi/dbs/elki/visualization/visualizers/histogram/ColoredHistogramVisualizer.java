@@ -35,13 +35,13 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleArrayStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualCons
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -114,9 +113,9 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     // Find a style result to visualize:
     Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-    for(StyleResult c : styleres) {
+    for (StyleResult c : styleres) {
       Collection<HistogramProjector<?>> ps = ResultUtil.filterResults(baseResult, HistogramProjector.class);
-      for(HistogramProjector<?> p : ps) {
+      for (HistogramProjector<?> p : ps) {
         // register self
         final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA;
@@ -197,10 +196,9 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       // Styling policy
       final StylingPolicy spol = style.getStylingPolicy();
       final ClassStylingPolicy cspol;
-      if(spol instanceof ClassStylingPolicy) {
+      if (spol instanceof ClassStylingPolicy) {
         cspol = (ClassStylingPolicy) spol;
-      }
-      else {
+      } else {
         cspol = null;
       }
       // TODO also use min style?
@@ -212,52 +210,37 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       DoubleMinMax minmax = new DoubleMinMax();
       final double frac = 1. / relation.size(); // TODO: sampling?
       final int cols = numc + 1;
-      AggregatingHistogram<double[], double[]> histogram = new AggregatingHistogram<double[], double[]>(settings.bins, -.5, .5, new AggregatingHistogram.Adapter<double[], double[]>() {
-        @Override
-        public double[] aggregate(double[] existing, double[] data) {
-          for(int i = 0; i < existing.length; i++) {
-            existing[i] += data[i];
-          }
-          return existing;
-        }
+      DoubleArrayStaticHistogram histogram = new DoubleArrayStaticHistogram(settings.bins, -.5, .5, cols);
 
-        @Override
-        public double[] make() {
-          return new double[cols];
-        }
-      });
-
-      if(cspol != null) {
-        for(int snum = 0; snum < numc; snum++) {
+      if (cspol != null) {
+        for (int snum = 0; snum < numc; snum++) {
           double[] inc = new double[cols];
           inc[0] = frac;
           inc[snum + 1] = frac;
-          for(DBIDIter iter = cspol.iterateClass(snum + off); iter.valid(); iter.advance()) {
-            if(!sample.getSample().contains(iter)) {
+          for (DBIDIter iter = cspol.iterateClass(snum + off); iter.valid(); iter.advance()) {
+            if (!sample.getSample().contains(iter)) {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
               double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) / Projection.SCALE;
-              histogram.aggregate(pos, inc);
-            }
-            catch(ObjectNotFoundException e) {
+              histogram.increment(pos, inc);
+            } catch (ObjectNotFoundException e) {
               // Ignore. The object was probably deleted from the database
             }
           }
         }
-      }
-      else {
+      } else {
         // Actual data distribution.
         double[] inc = new double[cols];
         inc[0] = frac;
-        for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
           double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) / Projection.SCALE;
-          histogram.aggregate(pos, inc);
+          histogram.increment(pos, inc);
         }
       }
       // for scaling, get the maximum occurring value in the bins:
-      for(DoubleObjPair<double[]> bin : histogram) {
-        for(double val : bin.second) {
+      for (DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+        for (double val : iter.getValue()) {
           minmax.put(val);
         }
       }
@@ -272,57 +255,54 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         // draw axes that are non-trivial
         final int dimensionality = RelationUtil.dimensionality(relation);
         double orig = proj.fastProjectScaledToRender(new Vector(dimensionality));
-        for(int d = 0; d < dimensionality; d++) {
+        for (int d = 0; d < dimensionality; d++) {
           Vector v = new Vector(dimensionality);
           v.set(d, 1);
           // projected endpoint of axis
           double ax = proj.fastProjectScaledToRender(v);
-          if(ax < orig || ax > orig) {
+          if (ax < orig || ax > orig) {
             final double left = (orig / Projection.SCALE + 0.5) * xsize;
             final double right = (ax / Projection.SCALE + 0.5) * xsize;
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
           }
         }
-      }
-      catch(CSSNamingConflict e) {
+      } catch (CSSNamingConflict e) {
         LoggingUtil.exception("CSS class exception in axis class.", e);
       }
 
-      double binwidth = histogram.getBinsize();
       // Visualizing
-      if(!settings.curves) {
-        for(DoubleObjPair<double[]> bin : histogram) {
-          double lpos = xscale.getScaled(bin.first - binwidth * .5);
-          double rpos = xscale.getScaled(bin.first + binwidth * .5);
+      if (!settings.curves) {
+        for (DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+          double lpos = xscale.getScaled(iter.getLeft());
+          double rpos = xscale.getScaled(iter.getRight());
           double stack = 0.0;
           final int start = numc > 0 ? 1 : 0;
-          for(int key = start; key < cols; key++) {
-            double val = yscale.getScaled(bin.getSecond()[key]);
+          for (int key = start; key < cols; key++) {
+            double val = yscale.getScaled(iter.getValue()[key]);
             Element row = SVGUtil.svgRect(svgp.getDocument(), xsize * lpos, ysize * (1 - (val + stack)), xsize * (rpos - lpos), ysize * val);
             stack = stack + val;
             SVGUtil.addCSSClass(row, BIN + (off + key - 1));
             layer.appendChild(row);
           }
         }
-      }
-      else {
+      } else {
         double left = xscale.getScaled(histogram.getCoverMinimum());
         double right = left;
 
         SVGPath[] paths = new SVGPath[cols];
         double[] lasty = new double[cols];
-        for(int i = 0; i < cols; i++) {
+        for (int i = 0; i < cols; i++) {
           paths[i] = new SVGPath(xsize * left, ysize * 1);
           lasty[i] = 0;
         }
 
         // draw histogram lines
-        for(DoubleObjPair<double[]> bin : histogram) {
-          left = xscale.getScaled(bin.first - binwidth * .5);
-          right = xscale.getScaled(bin.first + binwidth * .5);
-          for(int i = 0; i < cols; i++) {
-            double val = yscale.getScaled(bin.getSecond()[i]);
-            if(lasty[i] > val || lasty[i] < val) {
+        for (DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
+          left = xscale.getScaled(iter.getLeft());
+          right = xscale.getScaled(iter.getRight());
+          for (int i = 0; i < cols; i++) {
+            double val = yscale.getScaled(iter.getValue()[i]);
+            if (lasty[i] > val || lasty[i] < val) {
               paths[i].lineTo(xsize * left, ysize * (1 - lasty[i]));
               paths[i].lineTo(xsize * left, ysize * (1 - val));
               paths[i].lineTo(xsize * right, ysize * (1 - val));
@@ -331,8 +311,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
           }
         }
         // close and insert all lines.
-        for(int i = 0; i < cols; i++) {
-          if(lasty[i] != 0) {
+        for (int i = 0; i < cols; i++) {
+          if (lasty[i] != 0) {
             paths[i].lineTo(xsize * right, ysize * (1 - lasty[i]));
           }
           paths[i].lineTo(xsize * right, ysize * 1);
@@ -353,24 +333,22 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
       CSSClass allInOne = new CSSClass(svgp, BIN + -1);
-      if(!settings.curves) {
+      if (!settings.curves) {
         allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
         allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
-      }
-      else {
+      } else {
         allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
         allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
         allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
       svgp.addCSSClassOrLogError(allInOne);
 
-      for(int clusterID = 0; clusterID < numc; clusterID++) {
+      for (int clusterID = 0; clusterID < numc; clusterID++) {
         CSSClass bin = new CSSClass(svgp, BIN + clusterID);
 
-        if(!settings.curves) {
+        if (!settings.curves) {
           bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(clusterID));
-        }
-        else {
+        } else {
           bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(clusterID));
           bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
@@ -421,12 +399,12 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag curvesF = new Flag(STYLE_CURVES_ID);
-      if(config.grab(curvesF)) {
+      if (config.grab(curvesF)) {
         curves = curvesF.isTrue();
       }
       IntParameter binsP = new IntParameter(HISTOGRAM_BINS_ID, DEFAULT_BINS);
       binsP.addConstraint(new GreaterEqualConstraint(2));
-      if(config.grab(binsP)) {
+      if (config.grab(binsP)) {
         bins = binsP.intValue();
       }
     }
