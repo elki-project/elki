@@ -35,6 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayIter;
  */
 public interface Histogram {
   /**
+   * This parameter controls the cache size used for dynamic histograms before
+   * setting the initial thresholds.
+   */
+  public final static int CACHE_SHIFT = 2;
+
+  /**
    * Get the number of bins actually in use.
    * 
    * @return number of bins

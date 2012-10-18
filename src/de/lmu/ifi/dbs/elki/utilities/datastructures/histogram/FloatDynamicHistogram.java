@@ -26,12 +26,12 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
- * A flexible histogram storing double, that can dynamically adapt the number of
+ * A flexible histogram storing float, that can dynamically adapt the number of
  * bins to the data fed into the histogram.
  *
  * @author Erich Schubert
  */
-public class DoubleDynamicHistogram extends DoubleStaticHistogram {
+public class FloatDynamicHistogram extends FloatStaticHistogram {
   /**
    * Cache for data to be inserted.
    */
@@ -40,7 +40,7 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
   /**
    * Cache for data to be inserted.
    */
-  private double[] cachev;
+  private float[] cachev;
 
  /**
    * Cache fill size
@@ -58,11 +58,11 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
    * 
    * @param bins Design number of bins - may become twice as large!
    */
-  public DoubleDynamicHistogram(int bins) {
+  public FloatDynamicHistogram(int bins) {
     super(-1, 0.0, 1.0);
     this.destsize = bins;
     cachec = new double[this.destsize << CACHE_SHIFT];
-    cachev = new double[this.destsize << CACHE_SHIFT];
+    cachev = new float[this.destsize << CACHE_SHIFT];
     cachefill = 0;
   }
 
@@ -89,7 +89,7 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
     this.max = max;
     this.binsize = (max - min) / this.destsize;
     // initialize array
-    this.data = new double[this.destsize << 1];
+    this.data = new float[this.destsize << 1];
     size = destsize;
     // re-insert data we have
     final int end = cachefill;
@@ -103,7 +103,7 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
   }
 
   @Override
-  public double get(double coord) {
+  public float get(double coord) {
     materialize();
     testResample(coord);
     return super.get(coord);
@@ -116,7 +116,7 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
    * @param value Value
    */
   @Override
-  public void increment(double coord, double value) {
+  public void increment(double coord, float value) {
     // Store in cache
     if (cachefill >= 0) {
       if (cachefill < cachec.length) {
@@ -238,8 +238,8 @@ public class DoubleDynamicHistogram extends DoubleStaticHistogram {
    *        power of two
    * @return New bin value
    */
-  protected double downsample(double[] data, int start, int end, int size) {
-    double sum = 0;
+  protected float downsample(float[] data, int start, int end, int size) {
+    float sum = 0;
     for (int i = start; i < end; i++) {
       sum += data[i];
     }

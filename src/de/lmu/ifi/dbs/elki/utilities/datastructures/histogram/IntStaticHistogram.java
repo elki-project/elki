@@ -23,15 +23,17 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+
 /**
- * Histogram class storing double values.
+ * Histogram class storing int values.
  * 
- * The histogram will start with "bin" bins, but it can grow dynamicall to the
+ * The histogram will start with "bin" bins, but it can grow dynamically to the
  * left and right.
  * 
  * @author Erich Schubert
  */
-public class IntStaticHistogram extends AbstractStaticHistogram {
+public class IntStaticHistogram extends AbstractStaticHistogram implements IntHistogram {
   /**
    * Constructor.
    * 
@@ -41,7 +43,11 @@ public class IntStaticHistogram extends AbstractStaticHistogram {
    */
   public IntStaticHistogram(int bins, double min, double max) {
     super(bins, min, max);
-    data = new int[bins];
+    if (bins >= 0) {
+      data = new int[bins];
+    } else {
+      data = null;
+    }
   }
 
   /**
@@ -55,22 +61,28 @@ public class IntStaticHistogram extends AbstractStaticHistogram {
    * @param coord Coordinate
    * @param val Value
    */
+  @Override
   public void increment(double coord, int val) {
     int bin = getBinNr(coord);
     if (bin < 0) {
-      int[] tmpdata = new int[size - bin];
-      System.arraycopy(data, 0, tmpdata, -bin, size);
-      tmpdata[0] = val;
-      data = tmpdata;
+      if (size - bin > data.length) {
+        // Reallocate. TODO: use an arraylist-like grow strategy!
+        int[] tmpdata = new int[growSize(data.length, size - bin)];
+        System.arraycopy(data, 0, tmpdata, -bin, size);
+        data = tmpdata;
+      } else {
+        // Shift in place and clear head
+        System.arraycopy(data, 0, data, -bin, size);
+        Arrays.fill(data, 0, -bin, (int) 0);
+      }
+      data[0] = val;
       // Note that bin is negative, -bin is the shift offset!
-      assert (data.length == size - bin);
+      assert (data.length >= size - bin);
       offset -= bin;
       size -= bin;
       // TODO: modCounter++; and have iterators fast-fail
-      // Unset max value when resizing
-      max = Double.MAX_VALUE;
-    } else if (bin >= size) {
-      int[] tmpdata = new int[bin + 1];
+    } else if (bin >= data.length) {
+      int[] tmpdata = new int[growSize(data.length, bin + 1)];
       System.arraycopy(data, 0, tmpdata, 0, size);
       tmpdata[bin] = val;
       data = tmpdata;
@@ -79,41 +91,26 @@ public class IntStaticHistogram extends AbstractStaticHistogram {
       // Unset max value when resizing
       max = Double.MAX_VALUE;
     } else {
+      if (bin >= size) {
+        // TODO: reset bins to 0 first?
+        size = bin + 1;
+      }
       data[bin] += val;
     }
   }
 
   /**
-   * Replace the value of a bin.
+   * Get the value at a particular position.
    * 
    * @param coord Coordinate
-   * @param val Value
+   * @return Value
    */
-  public void replace(double coord, int val) {
+  public int get(double coord) {
     int bin = getBinNr(coord);
-    if (bin < 0) {
-      int[] tmpdata = new int[size - bin];
-      System.arraycopy(data, 0, tmpdata, -bin, size);
-      tmpdata[0] = val;
-      data = tmpdata;
-      // Note that bin is negative, -bin is the shift offset!
-      offset -= bin;
-      size -= bin;
-      // TODO: modCounter++; and have iterators fast-fail
-      // Unset max value when resizing
-      max = Double.MAX_VALUE;
-    } else if (bin >= size) {
-      int[] tmpdata = new int[bin + 1];
-      System.arraycopy(data, 0, tmpdata, 0, size);
-      tmpdata[bin] = val;
-      data = tmpdata;
-      size = bin + 1;
-      // TODO: modCounter++; and have iterators fast-fail
-      // Unset max value when resizing
-      max = Double.MAX_VALUE;
-    } else {
-      data[bin] = val;
+    if (bin < 0 || bin >= size) {
+      return 0;
     }
+    return data[bin];
   }
 
   @Override
@@ -126,13 +123,9 @@ public class IntStaticHistogram extends AbstractStaticHistogram {
    * 
    * @author Erich Schubert
    */
-  public class Iter extends AbstractStaticHistogram.Iter {
-    /**
-     * Get the value of the bin.
-     * 
-     * @return Bin value
-     */
-    public int binValue() {
+  public class Iter extends AbstractStaticHistogram.Iter implements IntHistogram.Iter {
+    @Override
+    public int getValue() {
       return data[bin];
     }
   }

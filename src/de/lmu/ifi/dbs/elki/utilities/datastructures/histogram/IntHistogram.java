@@ -24,20 +24,20 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  */
 
 /**
- * Histogram storing double values.
+ * Histogram storing int values.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has Iter
  */
-public interface DoubleHistogram extends Histogram {
+public interface IntHistogram extends Histogram {
   /**
    * Increment the histogram at a given position.
    * 
    * @param coord Coordinate
    * @param value Value to increment by
    */
-  public void increment(double coord, double value);
+  public void increment(double coord, int value);
   
   @Override
   public Iter iter();
@@ -53,6 +53,6 @@ public interface DoubleHistogram extends Histogram {
      * 
      * @return Bin value
      */
-    public double getValue();
+    public int getValue();
   }
 }
