@@ -66,6 +66,7 @@ public class TestBitsUtil implements JUnit4Test {
     BitsUtil.cycleRightI(test, 6, 8);
     assertEquals(BitsUtil.toString(test), "10000010");
     assertEquals(BitsUtil.numberOfTrailingZerosSigned(test), 1);
+    assertEquals(BitsUtil.numberOfTrailingZeros(test), 1);
 
     BitsUtil.zeroI(test);
     BitsUtil.setI(test, 125);
@@ -86,41 +87,41 @@ public class TestBitsUtil implements JUnit4Test {
     final int cnt = 100;
     long[] rnds = new long[cnt];
     long[][] bits = new long[cnt][];
-    for(int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++) {
       rnds[i] = Math.abs(r.nextLong());
       bits[i] = BitsUtil.make(Long.SIZE, rnds[i]);
     }
 
-    for(int i = 0; i < cnt; i++) {
-      for(int j = 0; j < cnt; j++) {
+    for (int i = 0; i < cnt; i++) {
+      for (int j = 0; j < cnt; j++) {
         assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(bits[i], bits[j]));
       }
     }
 
-    for(int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.copy(bits[i], 64 + r.nextInt(500));
       assertEquals(BitsUtil.compare(btmp, bits[i]), 0);
-      for(int j = 0; j < cnt; j++) {
+      for (int j = 0; j < cnt; j++) {
         assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
 
-    for(int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.truncateI(BitsUtil.copy(bits[i]), 47);
-      for(int j = 0; j < cnt; j++) {
+      for (int j = 0; j < cnt; j++) {
         assertEquals(compare(rnds[i] & ((1 << 48) - 1), rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
 
-    for(int i = 0; i < cnt; i++) {
+    for (int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.cycleRightI(BitsUtil.copy(bits[i]), 13, Long.SIZE - 32);
       long ltmp = BitsUtil.cycleRightC(rnds[i], 13, Long.SIZE - 32);
-      for(int j = 0; j < cnt; j++) {
+      for (int j = 0; j < cnt; j++) {
         assertEquals(compare(ltmp, rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
   }
-  
+
   /**
    * Not jet in Java 6. To come in JDK7 as Long.copmare
    * 
@@ -141,7 +142,8 @@ public class TestBitsUtil implements JUnit4Test {
       i = bitset.nextSetBit(i + 1);
     }
     // Java 7:
-    // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    // assertEquals("Bit strings do not agree.",
+    // BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(4);
     BitsUtil.setI(bituti, 4);
@@ -150,7 +152,8 @@ public class TestBitsUtil implements JUnit4Test {
       i = bitset.nextSetBit(i + 1);
     }
     // Java 7:
-    // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    // assertEquals("Bit strings do not agree.",
+    // BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     bitset.set(15);
     BitsUtil.setI(bituti, 15);
@@ -159,17 +162,21 @@ public class TestBitsUtil implements JUnit4Test {
       i = bitset.nextSetBit(i + 1);
     }
     // Java 7:
-    // assertEquals("Bit strings do not agree.", BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
+    // assertEquals("Bit strings do not agree.",
+    // BitsUtil.toString(bitset.toLongArray()), BitsUtil.toString(bituti));
 
     assertEquals(bitset.nextSetBit(0), BitsUtil.nextSetBit(bituti, 0));
     assertEquals(bitset.nextSetBit(4), BitsUtil.nextSetBit(bituti, 4));
     assertEquals(bitset.nextSetBit(5), BitsUtil.nextSetBit(bituti, 5));
     // previousSetBit is not in JDK6.
-    // assertEquals(bitset.previousSetBit(64), BitsUtil.previousSetBit(bituti, 64));
-    // assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti, 15));
-    // assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti, 14));
+    // assertEquals(bitset.previousSetBit(64), BitsUtil.previousSetBit(bituti,
+    // 64));
+    // assertEquals(bitset.previousSetBit(15), BitsUtil.previousSetBit(bituti,
+    // 15));
+    // assertEquals(bitset.previousSetBit(14), BitsUtil.previousSetBit(bituti,
+    // 14));
   }
-  
+
   @Test
   public void testGrayCoding() {
     long[] bits = BitsUtil.zero(123);
@@ -182,5 +189,24 @@ public class TestBitsUtil implements JUnit4Test {
     BitsUtil.grayI(bits);
     assertTrue(BitsUtil.get(bits, 122));
     assertEquals(1, BitsUtil.cardinality(bits));
+  }
+
+  @Test
+  public void testLeadingTrailing() {
+    int[] testi = new int[] { 0x7, 0x12345678, 0x23456789, 0x45678900, 0x89000000, 0xFFFF0000 };
+    int[] truli = new int[] { 29, 3, 2, 1, 0, 0 };
+    int[] truti = new int[] { 0, 3, 0, 8, 24, 16 };
+    for (int i = 0; i < testi.length; i++) {
+      assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testi[i]), truli[i], BitsUtil.numberOfLeadingZeros(testi[i]));
+      assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testi[i]), truti[i], BitsUtil.numberOfTrailingZeros(testi[i]));
+    }
+
+    long[] testl = new long[] { 0x7L, 0x12345678L, 0x23456789L, 0x45678900L, 0x89000000L, 0x1FFFF0000L, 0x123456789ABCDEFL, 0x0011001188008800L };
+    int[] trull = new int[] { 61, 35, 34, 33, 32, 31, 7, 11 };
+    int[] trutl = new int[] { 0, 3, 0, 8, 24, 16, 0, 11 };
+    for (int i = 0; i < testl.length; i++) {
+      assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testl[i]), trull[i], BitsUtil.numberOfLeadingZeros(testl[i]));
+      assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testl[i]), trutl[i], BitsUtil.numberOfTrailingZeros(testl[i]));
+    }
   }
 }
