@@ -45,16 +45,15 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.histograms.AggregatingHistogram;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Evaluate a distance function with respect to kNN queries. For each point, the
@@ -116,7 +115,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     // Cluster by labels
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
-    AggregatingHistogram<Double, Double> hist = AggregatingHistogram.DoubleSumHistogram(numbins, 0.0, 1.0);
+    DoubleStaticHistogram hist = new DoubleStaticHistogram(numbins, 0.0, 1.0);
 
     if (LOG.isVerbose()) {
       LOG.verbose("Processing points...");
@@ -131,7 +130,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         mv.put(result);
-        hist.aggregate(result, 1. / relation.size());
+        hist.increment(result, 1. / relation.size());
 
         if (progress != null) {
           progress.incrementProcessed(LOG);
@@ -144,8 +143,8 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
 
     // Transform Histogram into a Double Vector array.
     Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
-    for (DoubleObjPair<Double> pair : hist) {
-      DoubleVector row = new DoubleVector(new double[] { pair.first, pair.getSecond() });
+    for (DoubleStaticHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
+      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), iter.getValue() });
       res.add(row);
     }
     HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);

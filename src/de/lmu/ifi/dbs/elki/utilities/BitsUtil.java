@@ -883,6 +883,18 @@ public final class BitsUtil {
   }
 
   /**
+   * Find the number of trailing zeros.
+   * 
+   * Note: this is the same as {@link Long#numberOfTrailingZeros}
+   * 
+   * @param v Long
+   * @return Position of first set bit, 64 if no set bit was found.
+   */
+  public static int numberOfTrailingZeros(int v) {
+    return Integer.numberOfTrailingZeros(v);
+  }
+
+  /**
    * Find the number of leading zeros.
    * 
    * @param v Bitset
@@ -933,6 +945,22 @@ public final class BitsUtil {
   }
 
   /**
+   * Find the number of leading zeros; -1 if all zero
+   * 
+   * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
+   * when the number is 0.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, -1 if no set bit was found.
+   */
+  public static int numberOfLeadingZerosSigned(int v) {
+    if (v == 0) {
+      return -1;
+    }
+    return Integer.numberOfLeadingZeros(v);
+  }
+
+  /**
    * Find the number of leading zeros; 64 if all zero
    * 
    * Note: this the same as {@link Long#numberOfLeadingZeros}.
@@ -941,7 +969,19 @@ public final class BitsUtil {
    * @return Position of first set bit, 64 if no set bit was found.
    */
   public static int numberOfLeadingZeros(long v) {
-    return Long.numberOfLeadingZeros(v);
+    return Long.SIZE - magnitude(v);
+  }
+
+  /**
+   * Find the number of leading zeros; 64 if all zero
+   * 
+   * Note: this the same as {@link Long#numberOfLeadingZeros}.
+   * 
+   * @param v Bitset
+   * @return Position of first set bit, 64 if no set bit was found.
+   */
+  public static int numberOfLeadingZeros(int v) {
+    return Integer.SIZE - magnitude(v);
   }
 
   /**
@@ -1063,10 +1103,7 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long[] v) {
-    final int l = numberOfLeadingZerosSigned(v);
-    if (l < 0) {
-      return 0;
-    }
+    final int l = numberOfLeadingZeros(v);
     return capacity(v) - l;
   }
 
@@ -1077,11 +1114,65 @@ public final class BitsUtil {
    * @return position of highest bit set, or 0.
    */
   public static int magnitude(long v) {
-    final int l = numberOfLeadingZerosSigned(v);
-    if (l < 0) {
-      return 0;
+    int log = 0, t;
+    if ((v & 0xffffffff00000000L) != 0) {
+      t = (int) (v >>>= 32);
+      log = 32;
+    } else {
+      t = (int) v;
     }
-    return Long.SIZE - l;
+    if ((t & 0xffff0000) != 0) {
+      t >>>= 16;
+      log += 16;
+    }
+    if (t >= 256) {
+      t >>>= 8;
+      log += 8;
+    }
+    if (t >= 16) {
+      t >>>= 4;
+      log += 4;
+    }
+    if (t >= 4) {
+      t >>>= 2;
+      log += 2;
+    }
+    if (t >= 2) {
+      t >>>= 1;
+      log += 1;
+    }
+    return log + t;
+  }
+
+  /**
+   * The magnitude is the position of the highest bit set
+   * 
+   * @param v Vector v
+   * @return position of highest bit set, or 0.
+   */
+  public static int magnitude(int v) {
+    int log = 0;
+    if ((v & 0xffff0000) != 0) {
+      v >>>= 16;
+      log = 16;
+    }
+    if (v >= 256) {
+      v >>>= 8;
+      log += 8;
+    }
+    if (v >= 16) {
+      v >>>= 4;
+      log += 4;
+    }
+    if (v >= 4) {
+      v >>>= 2;
+      log += 2;
+    }
+    if (v >= 2) {
+      v >>>= 1;
+      log += 1;
+    }
+    return log + v;
   }
 
   /**
