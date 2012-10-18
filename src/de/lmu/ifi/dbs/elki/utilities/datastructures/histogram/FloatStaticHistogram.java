@@ -26,14 +26,14 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
 import java.util.Arrays;
 
 /**
- * Histogram class storing long values.
+ * Histogram class storing float values.
  * 
  * The histogram will start with "bin" bins, but it can grow dynamically to the
  * left and right.
  * 
  * @author Erich Schubert
  */
-public class LongStaticHistogram extends AbstractStaticHistogram implements LongHistogram {
+public class FloatStaticHistogram extends AbstractStaticHistogram implements FloatHistogram {
   /**
    * Constructor.
    * 
@@ -41,10 +41,10 @@ public class LongStaticHistogram extends AbstractStaticHistogram implements Long
    * @param min Cover minimum
    * @param max Cover maximum
    */
-  public LongStaticHistogram(int bins, double min, double max) {
+  public FloatStaticHistogram(int bins, double min, double max) {
     super(bins, min, max);
     if (bins >= 0) {
-      data = new long[bins];
+      data = new float[bins];
     } else {
       data = null;
     }
@@ -53,7 +53,7 @@ public class LongStaticHistogram extends AbstractStaticHistogram implements Long
   /**
    * Data store
    */
-  long[] data;
+  float[] data;
 
   /**
    * Increment the value of a bin.
@@ -62,18 +62,18 @@ public class LongStaticHistogram extends AbstractStaticHistogram implements Long
    * @param val Value
    */
   @Override
-  public void increment(double coord, long val) {
+  public void increment(double coord, float val) {
     int bin = getBinNr(coord);
     if (bin < 0) {
       if (size - bin > data.length) {
         // Reallocate. TODO: use an arraylist-like grow strategy!
-        long[] tmpdata = new long[growSize(data.length, size - bin)];
+        float[] tmpdata = new float[growSize(data.length, size - bin)];
         System.arraycopy(data, 0, tmpdata, -bin, size);
         data = tmpdata;
       } else {
         // Shift in place and clear head
         System.arraycopy(data, 0, data, -bin, size);
-        Arrays.fill(data, 0, -bin, (long) 0);
+        Arrays.fill(data, 0, -bin, (float) 0);
       }
       data[0] = val;
       // Note that bin is negative, -bin is the shift offset!
@@ -82,7 +82,7 @@ public class LongStaticHistogram extends AbstractStaticHistogram implements Long
       size -= bin;
       // TODO: modCounter++; and have iterators fast-fail
     } else if (bin >= data.length) {
-      long[] tmpdata = new long[growSize(data.length, bin + 1)];
+      float[] tmpdata = new float[growSize(data.length, bin + 1)];
       System.arraycopy(data, 0, tmpdata, 0, size);
       tmpdata[bin] = val;
       data = tmpdata;
@@ -105,7 +105,7 @@ public class LongStaticHistogram extends AbstractStaticHistogram implements Long
    * @param coord Coordinate
    * @return Value
    */
-  public long get(double coord) {
+  public float get(double coord) {
     int bin = getBinNr(coord);
     if (bin < 0 || bin >= size) {
       return 0;
@@ -123,9 +123,9 @@ public class LongStaticHistogram extends AbstractStaticHistogram implements Long
    * 
    * @author Erich Schubert
    */
-  public class Iter extends AbstractStaticHistogram.Iter implements LongHistogram.Iter {
+  public class Iter extends AbstractStaticHistogram.Iter implements FloatHistogram.Iter {
     @Override
-    public long getValue() {
+    public float getValue() {
       return data[bin];
     }
   }
