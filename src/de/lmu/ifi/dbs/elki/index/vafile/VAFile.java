@@ -404,11 +404,8 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
         candidates.add(new DoubleObjPair<DBID>(minDist, va.id));
 
         // Update candidate pruning heap
-        minMaxHeap.add(maxDist);
-        while(minMaxHeap.size() > k) {
-          minMaxHeap.poll();
-        }
-        if(minMaxHeap.size() > k) {
+        minMaxHeap.add(maxDist, k);
+        if(minMaxHeap.size() >= k) {
           minMaxDist = minMaxHeap.peek();
         }
       }

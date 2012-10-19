@@ -85,9 +85,8 @@ public class DoubleMaxHeap {
    * Add a key-value pair to the heap
    * 
    * @param key Key
-   * @return Success code
    */
-  public boolean add(double key) {
+  public void add(double key) {
     // resize when needed
     if(size + 1 > keys.length) {
       resize(size + 1);
@@ -97,9 +96,37 @@ public class DoubleMaxHeap {
     this.size += 1;
     heapifyUp(size - 1, key);
     validSize += 1;
-    // We have changed - return true according to {@link Collection#put}
-    modCount++;
-    return true;
+    heapModified();
+  }
+
+  /**
+   * Add a key-value pair to the heap, except if the new element
+   * is larger than the top, and we are at design size (overflow)
+   * 
+   * @param key Key
+   * @param max Maximum size of heap
+   */
+  public void add(double key, int max) {
+    if (size < max) {
+      add(key);
+    } else if (key < peek()) {
+      replaceTopElement(key);
+    }
+  }
+
+  /**
+   * Combined operation that removes the top element, and inserts a new element
+   * instead.
+   * 
+   * @param e New element to insert
+   * @return Previous top element of the heap
+   */
+  public double replaceTopElement(double e) {
+    ensureValid();
+    double oldroot = keys[0];
+    heapifyDown(0, e);
+    heapModified();
+    return oldroot;
   }
 
   /**
@@ -177,7 +204,7 @@ public class DoubleMaxHeap {
       validSize = Math.min(pos >>> 1, validSize);
       keys[pos] = reinkey;
     }
-    modCount++;
+    heapModified();
   }
 
   /**
@@ -267,6 +294,13 @@ public class DoubleMaxHeap {
   public void clear() {
     this.size = 0;
     this.validSize = -1;
+    heapModified();
+  }
+
+  /**
+   * Called at the end of each heap modification.
+   */
+  protected void heapModified() {
     modCount++;
   }
 
