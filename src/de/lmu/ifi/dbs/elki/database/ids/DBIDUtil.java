@@ -213,7 +213,6 @@ public final class DBIDUtil {
     return DBIDFactory.FACTORY.newVar(val);
   }
 
-  
   /**
    * Make a new (modifiable) array of DBIDs.
    * 
@@ -456,6 +455,41 @@ public final class DBIDUtil {
   }
 
   /**
+   * Produce a random shuffling of the given DBID array.
+   * 
+   * @param ids Original DBIDs
+   * @param rnd Random generator
+   */
+  public static void randomShuffle(ArrayModifiableDBIDs ids, RandomFactory rnd) {
+    randomShuffle(ids, rnd.getRandom(), ids.size());
+  }
+
+  /**
+   * Produce a random shuffling of the given DBID array.
+   * 
+   * @param ids Original DBIDs
+   * @param rnd Random generator
+   */
+  public static void randomShuffle(ArrayModifiableDBIDs ids, Random random) {
+    randomShuffle(ids, random, ids.size());
+  }
+
+  /**
+   * Produce a random shuffling of the given DBID array.
+   * 
+   * Only the first {@code limit} elements will be randomized.
+   * 
+   * @param ids Original DBIDs
+   * @param rnd Random generator
+   * @param limit Shuffling limit.
+   */
+  public static void randomShuffle(ArrayModifiableDBIDs ids, Random random, final int limit) {
+    for (int i = 1; i < limit; i++) {
+      ids.swap(i - 1, i + random.nextInt(limit - i));
+    }
+  }
+
+  /**
    * Produce a random sample of the given DBIDs.
    * 
    * @param source Original DBIDs
@@ -478,8 +512,7 @@ public final class DBIDUtil {
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Long seed) {
     if (seed != null) {
       return randomSample(source, k, new Random(seed.longValue()));
-    }
-    else {
+    } else {
       return randomSample(source, k, new Random());
     }
   }
@@ -512,15 +545,10 @@ public final class DBIDUtil {
       return sample;
     } else {
       ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
-      while (sample.size() > k) {
-        // Element to remove
-        int idx = random.nextInt(sample.size());
-        // Remove last element
-        DBID last = sample.remove(sample.size() - 1);
-        // Replace target element:
-        if (idx < sample.size()) {
-          sample.set(idx, last);
-        }
+      randomShuffle(sample, random, k);
+      // Delete trailing elements
+      for (int i = sample.size() - 1; i >= k; i++) {
+        sample.remove(i);
       }
       return sample;
     }
