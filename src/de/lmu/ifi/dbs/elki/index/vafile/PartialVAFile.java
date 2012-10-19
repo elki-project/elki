@@ -62,8 +62,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -606,7 +605,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
           }
           candidates2 = new LinkedList<PartialVACandidate>();
 
-          Heap<Double> kMinMaxDists = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
+          DoubleMaxHeap kMinMaxDists = new DoubleMaxHeap(k+1);
           for(PartialVACandidate va : candidates1) {
             int dimension = daFiles.get(addition).getDimension();
             int objectCell = va.getApproximation(dimension);
@@ -617,6 +616,9 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
             if(kMinMaxDists.size() < k || va.minDistP <= kMinMaxDists.peek()) {
               candidates2.add(va);
               kMinMaxDists.add(va.maxDistP);
+              while (kMinMaxDists.size() > k) {
+                kMinMaxDists.poll();
+              }
             }
           }
 
@@ -643,7 +645,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
 
     private LinkedList<PartialVACandidate> filter1(int k, int reducedDims, List<DAFile> daFiles, VectorApproximation queryApprox, int subspaceDims, VALPNormDistance dist) {
       LinkedList<PartialVACandidate> candidates1 = new LinkedList<PartialVACandidate>();
-      Heap<Double> minmaxdist = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
+      DoubleMaxHeap minmaxdist = new DoubleMaxHeap(k+1);
 
       for(VectorApproximation va : vectorApprox) {
         PartialVACandidate pva = new PartialVACandidate(va);
@@ -659,6 +661,9 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
         if(minmaxdist.size() < k || pva.minDistP <= minmaxdist.peek()) {
           candidates1.add(pva);
           minmaxdist.add(pva.maxDistP);
+          while(minmaxdist.size() > k) {
+            minmaxdist.poll();
+          }
         }
       }
       // Drop candidates that don't satisfy the latest minmaxdist
