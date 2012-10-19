@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface NumberVector defines the methods that should be implemented by any
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
  * @apiviz.landmark
  * @apiviz.has Vector
  */
-public interface NumberVector<N extends Number> extends FeatureVector<N>, SpatialComparable, Parameterizable {
+public interface NumberVector<N extends Number> extends FeatureVector<N>, SpatialComparable {
   @Deprecated
   @Override
   N getValue(int dimension);
