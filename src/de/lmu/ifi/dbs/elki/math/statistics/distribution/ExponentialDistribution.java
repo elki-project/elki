@@ -103,8 +103,8 @@ public class ExponentialDistribution implements DistributionWithRandom {
    * Quantile function, static version
    * 
    * @param val Value to compute quantile for
-   * @param rate
-   * @return
+   * @param rate Rate parameter
+   * @return Quantile
    */
   public static double quantile(double val, double rate) {
     return -Math.log(1 - val) / rate;
