@@ -615,10 +615,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
 
             if(kMinMaxDists.size() < k || va.minDistP <= kMinMaxDists.peek()) {
               candidates2.add(va);
-              kMinMaxDists.add(va.maxDistP);
-              while (kMinMaxDists.size() > k) {
-                kMinMaxDists.poll();
-              }
+              kMinMaxDists.add(va.maxDistP, k);
             }
           }
 
@@ -660,10 +657,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
         }
         if(minmaxdist.size() < k || pva.minDistP <= minmaxdist.peek()) {
           candidates1.add(pva);
-          minmaxdist.add(pva.maxDistP);
-          while(minmaxdist.size() > k) {
-            minmaxdist.poll();
-          }
+          minmaxdist.add(pva.maxDistP, k);
         }
       }
       // Drop candidates that don't satisfy the latest minmaxdist
