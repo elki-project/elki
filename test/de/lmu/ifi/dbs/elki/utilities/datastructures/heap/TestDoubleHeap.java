@@ -1,11 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.Random;
-
-import org.junit.Test;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,55 +23,68 @@ import org.junit.Test;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class TestTDoubleObjHeaps {
+import static org.junit.Assert.assertTrue;
+
+import java.util.Random;
+
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+
+/**
+ * Perform standard unit tests on the double-indexed heap structures.
+ * 
+ * @author Erich Schubert
+ */
+public class TestDoubleHeap implements JUnit4Test {
   @Test
-  public void testTDoubleObjMinHeap() {
+  public void testDoubleMinHeap() {
     Random r = new Random();
-    DoubleObjMinHeap<Double> heap = new DoubleObjMinHeap<Double>();
-    for(int i = 0; i < 1000; i++) {
+    DoubleMinHeap heap = new DoubleMinHeap();
+    for (int i = 0; i < 1000; i++) {
       double key = r.nextDouble();
-      heap.add(key, key);
+      heap.add(key);
     }
     double cur = Double.NEGATIVE_INFINITY;
     for (int i = 0; i < 500; i++) {
-      assertTrue("Heap incorrectly ordered!", cur <= heap.peekKey());
-      cur = heap.peekKey();
+      assertTrue("Heap incorrectly ordered!", cur <= heap.peek());
+      cur = heap.peek();
       heap.poll();
     }
-    for(int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; i++) {
       double key = r.nextDouble();
-      heap.add(key, key);
+      heap.add(key);
     }
     cur = Double.NEGATIVE_INFINITY;
-    while(heap.size() > 0) {
-      assertTrue("Heap incorrectly ordered!", cur <= heap.peekKey());
-      cur = heap.peekKey();
+    while (heap.size() > 0) {
+      assertTrue("Heap incorrectly ordered!", cur <= heap.peek());
+      cur = heap.peek();
       heap.poll();
     }
   }
 
   @Test
-  public void testTDoubleObjMaxHeap() {
+  public void testDoubleMaxHeap() {
     Random r = new Random();
-    DoubleObjMaxHeap<Double> heap = new DoubleObjMaxHeap<Double>();
-    for(int i = 0; i < 1000; i++) {
+    DoubleMaxHeap heap = new DoubleMaxHeap();
+    for (int i = 0; i < 1000; i++) {
       double key = r.nextDouble();
-      heap.add(key, key);
+      heap.add(key);
     }
     double cur = Double.POSITIVE_INFINITY;
     for (int i = 0; i < 500; i++) {
-      assertTrue("Heap incorrectly ordered!", cur >= heap.peekKey());
-      cur = heap.peekKey();
+      assertTrue("Heap incorrectly ordered! "+cur+" < "+heap.peek(), cur >= heap.peek());
+      cur = heap.peek();
       heap.poll();
     }
-    for(int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; i++) {
       double key = r.nextDouble();
-      heap.add(key, key);
+      heap.add(key);
     }
     cur = Double.POSITIVE_INFINITY;
-    while(heap.size() > 0) {
-      assertTrue("Heap incorrectly ordered!", cur >= heap.peekKey());
-      cur = heap.peekKey();
+    while (heap.size() > 0) {
+      assertTrue("Heap incorrectly ordered!", cur >= heap.peek());
+      cur = heap.peek();
       heap.poll();
     }
   }
