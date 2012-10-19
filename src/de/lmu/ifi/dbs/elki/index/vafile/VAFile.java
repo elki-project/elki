@@ -54,8 +54,7 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -383,8 +382,8 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       // Approximative distance function
       VALPNormDistance vadist = new VALPNormDistance(p, splitPositions, query, queryApprox);
 
-      // Heap for the kth smallest maximum distance
-      Heap<Double> minMaxHeap = new TopBoundedHeap<Double>(k, Collections.reverseOrder());
+      // Heap for the kth smallest maximum distance (yes, we need a max heap!)
+      DoubleMaxHeap minMaxHeap = new DoubleMaxHeap(k+1);
       double minMaxDist = Double.POSITIVE_INFINITY;
       // Candidates with minDist <= kth maxDist
       ArrayList<DoubleObjPair<DBID>> candidates = new ArrayList<DoubleObjPair<DBID>>(vectorApprox.size());
@@ -406,7 +405,10 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
 
         // Update candidate pruning heap
         minMaxHeap.add(maxDist);
-        if(minMaxHeap.size() >= k) {
+        while(minMaxHeap.size() > k) {
+          minMaxHeap.poll();
+        }
+        if(minMaxHeap.size() > k) {
           minMaxDist = minMaxHeap.peek();
         }
       }
