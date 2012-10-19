@@ -32,11 +32,11 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * 
  * @author Erich Schubert
  */
-public class DoubleMaxHeap extends DoubleHeap {
+public class IntegerMaxHeap extends IntegerHeap {
   /**
    * Constructor with default capacity.
    */
-  public DoubleMaxHeap() {
+  public IntegerMaxHeap() {
     super(DEFAULT_INITIAL_CAPACITY);
   }
 
@@ -45,7 +45,7 @@ public class DoubleMaxHeap extends DoubleHeap {
    * 
    * @param size initial capacity
    */
-  public DoubleMaxHeap(int size) {
+  public IntegerMaxHeap(int size) {
     super(size);
   }
 
@@ -56,7 +56,7 @@ public class DoubleMaxHeap extends DoubleHeap {
    * @param o2 Second object
    */
   @Override
-  protected boolean comp(double o1, double o2) {
+  protected boolean comp(int o1, int o2) {
     return o1 < o2;
   }
 }

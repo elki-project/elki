@@ -32,13 +32,13 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
 /**
- * Perform standard unit tests on the double-indexed heap structures.
+ * Perform standard unit tests on the double-object heap structures.
  * 
  * @author Erich Schubert
  */
 public class TestDoubleObjHeaps implements JUnit4Test {
   @Test
-  public void testTDoubleObjMinHeap() {
+  public void testDoubleObjMinHeap() {
     Random r = new Random();
     DoubleObjMinHeap<Double> heap = new DoubleObjMinHeap<Double>();
     for(int i = 0; i < 1000; i++) {
@@ -64,7 +64,7 @@ public class TestDoubleObjHeaps implements JUnit4Test {
   }
 
   @Test
-  public void testTDoubleObjMaxHeap() {
+  public void testDoubleObjMaxHeap() {
     Random r = new Random();
     DoubleObjMaxHeap<Double> heap = new DoubleObjMaxHeap<Double>();
     for(int i = 0; i < 1000; i++) {
