@@ -59,7 +59,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * 
    * @param objs Object list
    * @param start Subinterval start
-   * @param end Subinteval end
+   * @param end Subinterval end
    * @param depth Iteration depth (must be less than dimensionality!)
    * @param dims Total number of dimensions
    * @param maxEntries Maximum page size
@@ -68,7 +68,6 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * @param <T> data type
    */
   protected <T extends SpatialComparable> void strPartition(List<T> objs, int start, int end, int depth, int dims, int maxEntries, Compare<T> c, List<List<T>> ret) {
-    c.dim = depth;
     final int p = (int) Math.ceil((end - start) / (double) maxEntries);
     final int s = (int) Math.ceil(Math.pow(p, 1.0 / (dims - depth)));
 
@@ -79,6 +78,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
       int e2 = start + (int) (((i + 1) * len) / s);
       // LoggingUtil.warning("STR " + dim + " s2:" + s2 + " e2:" + e2);
       if(e2 < end) {
+        c.dim = depth;
         QuickSelect.quickSelect(objs, c, s2, end, e2);
       }
       if(depth + 1 == dims) {
