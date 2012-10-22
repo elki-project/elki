@@ -95,6 +95,7 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
    * @param desc Current ordering
    */
   protected <T extends SpatialComparable> void peanoSort(List<T> objs, int start, int end, double[] mms, int dim, BitSet bits, boolean desc) {
+    final int dims = mms.length >> 1;
     // Find the splitting points.
     final double min = mms[2 * dim], max = mms[2 * dim + 1];
     final double tfirst = (min + min + max) / 3.;
@@ -116,14 +117,14 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
     // Split the data set into three parts
     int fsplit, ssplit;
     if(!inv) {
-      fsplit = pivotizeList1D(objs, start, end, dim + 1, tfirst, false);
-      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim + 1, tsecond, false) : fsplit;
+      fsplit = pivotizeList1D(objs, start, end, dim, tfirst, false);
+      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim, tsecond, false) : fsplit;
     }
     else {
-      fsplit = pivotizeList1D(objs, start, end, dim + 1, tsecond, true);
-      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim + 1, tfirst, true) : fsplit;
+      fsplit = pivotizeList1D(objs, start, end, dim, tsecond, true);
+      ssplit = (fsplit < end - 1) ? pivotizeList1D(objs, fsplit, end, dim, tfirst, true) : fsplit;
     }
-    int nextdim = (dim + 1) % objs.get(0).getDimensionality();
+    int nextdim = (dim + 1) % dims;
     // Do we need to update the min/max values?
     if(start < fsplit - 1) {
       mms[2 * dim] = !inv ? min : tsecond;

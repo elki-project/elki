@@ -68,7 +68,7 @@ public class ZCurveSpatialSorter extends AbstractSpatialSorter {
         return;
       }
     }
-    int split = pivotizeList1D(objs, start, end, dim + 1, spos, false);
+    int split = pivotizeList1D(objs, start, end, dim, spos, false);
     assert (start <= split && split <= end);
     int nextdim = (dim + 1) % objs.get(0).getDimensionality();
     // LoggingUtil.warning("dim: " + dim + " min: " + min + " split: " + spos +
