@@ -146,7 +146,7 @@ public class AxisVisualization extends AbstractVisFactory {
             // TODO: move axis labeling into drawAxis function.
             double offx = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
             double offy = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
-            Element label = svgp.svgText(ax[0] + offx, ax[1] + offy, RelationUtil.getColumnLabel(rel, d + 1));
+            Element label = svgp.svgText(ax[0] + offx, ax[1] + offy, RelationUtil.getColumnLabel(rel, d));
             SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
             SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, righthand ? SVGConstants.SVG_START_VALUE : SVGConstants.SVG_END_VALUE);
             layer.appendChild(label);
