@@ -70,47 +70,58 @@ public class GreeneSplit implements SplitStrategy {
 
       // Compute individual areas
       double[] areas = new double[num];
-      for(int e1 = 0; e1 < num - 1; e1++) {
+      for (int e1 = 0; e1 < num - 1; e1++) {
         final E e1i = getter.get(entries, e1);
         areas[e1] = SpatialUtil.volume(e1i);
       }
       // Compute area increase
-      for(int e1 = 0; e1 < num - 1; e1++) {
+      for (int e1 = 0; e1 < num - 1; e1++) {
         final E e1i = getter.get(entries, e1);
-        for(int e2 = e1 + 1; e2 < num; e2++) {
+        for (int e2 = e1 + 1; e2 < num; e2++) {
           final E e2i = getter.get(entries, e2);
           final double areaJ = SpatialUtil.volumeUnion(e1i, e2i);
           final double d = areaJ - areas[e1] - areas[e2];
-          if(d > worst) {
+          if (d > worst) {
             worst = d;
             w1 = e1;
             w2 = e2;
           }
         }
       }
-      // Data to keep
-      // Initial mbrs and areas
-      E m1 = getter.get(entries, w1);
-      E m2 = getter.get(entries, w2);
+      if (worst > 0) {
+        // Data to keep
+        // Initial mbrs and areas
+        E m1 = getter.get(entries, w1);
+        E m2 = getter.get(entries, w2);
 
-      double bestsep = Double.NEGATIVE_INFINITY;
-      double bestsep2 = Double.NEGATIVE_INFINITY;
-      for(int d = 0; d < m1.getDimensionality(); d++) {
-        final double s1 = m1.getMin(d) - m2.getMax(d);
-        final double s2 = m2.getMin(d) - m1.getMax(d);
-        final double sm = Math.max(s1, s2);
-        final double no = Math.max(m1.getMax(d), m2.getMax(d)) - Math.min(m1.getMin(d), m2.getMin(d));
-        final double sep = sm / no;
-        if(sep > bestsep || (sep == bestsep && sm > bestsep2)) {
-          bestsep = sep;
-          bestsep2 = sm;
-          axis = d;
+        double bestsep = Double.NEGATIVE_INFINITY;
+        double bestsep2 = Double.NEGATIVE_INFINITY;
+        for (int d = 0; d < m1.getDimensionality(); d++) {
+          final double s1 = m1.getMin(d) - m2.getMax(d);
+          final double s2 = m2.getMin(d) - m1.getMax(d);
+          final double sm = Math.max(s1, s2);
+          final double no = Math.max(m1.getMax(d), m2.getMax(d)) - Math.min(m1.getMin(d), m2.getMin(d));
+          final double sep = sm / no;
+          if (sep > bestsep || (sep == bestsep && sm > bestsep2)) {
+            bestsep = sep;
+            bestsep2 = sm;
+            axis = d;
+          }
         }
+      } else {
+        // All objects are identical!
+        final BitSet assignment = new BitSet(num);
+        final int half = (num + 1) >> 1;
+        // Put the first half into second node
+        for (int i = 0; i < half; i++) {
+          assignment.set(i);
+        }
+        return assignment;
       }
     }
     // Sort by minimum value
     DoubleIntPair[] data = new DoubleIntPair[num];
-    for(int i = 0; i < num; i++) {
+    for (int i = 0; i < num; i++) {
       data[i] = new DoubleIntPair(getter.get(entries, i).getMin(axis), i);
     }
     Arrays.sort(data);
@@ -118,24 +129,24 @@ public class GreeneSplit implements SplitStrategy {
     final BitSet assignment = new BitSet(num);
     final int half = (num + 1) >> 1;
     // Put the first half into second node
-    for(int i = 0; i < half; i++) {
+    for (int i = 0; i < half; i++) {
       assignment.set(data[i].second);
     }
     // Tie handling
-    if(num % 2 == 0) {
+    if (num % 2 == 0) {
       // We need to compute the bounding boxes
       ModifiableHyperBoundingBox mbr1 = new ModifiableHyperBoundingBox(getter.get(entries, data[0].second));
-      for(int i = 1; i < half; i++) {
+      for (int i = 1; i < half; i++) {
         mbr1.extend(getter.get(entries, data[i].second));
       }
       ModifiableHyperBoundingBox mbr2 = new ModifiableHyperBoundingBox(getter.get(entries, data[num - 1].second));
-      for(int i = half + 1; i < num - 1; i++) {
+      for (int i = half + 1; i < num - 1; i++) {
         mbr2.extend(getter.get(entries, data[i].second));
       }
       E e = getter.get(entries, data[half].second);
       double inc1 = SpatialUtil.volumeUnion(mbr1, e) - SpatialUtil.volume(mbr1);
       double inc2 = SpatialUtil.volumeUnion(mbr2, e) - SpatialUtil.volume(mbr2);
-      if(inc1 < inc2) {
+      if (inc1 < inc2) {
         assignment.set(data[half].second);
       }
     }
