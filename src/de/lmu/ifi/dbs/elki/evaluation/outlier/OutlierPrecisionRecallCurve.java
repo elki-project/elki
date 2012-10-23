@@ -91,7 +91,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
-    if(positiveids.size() == 0) {
+    if (positiveids.size() == 0) {
       LOG.warning("Computing a ROC curve failed - no objects matched.");
       return;
     }
@@ -99,7 +99,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
-    for(OutlierResult o : oresults) {
+    for (OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().iter(o.getOrdering().getDBIDs());
       XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
       db.getHierarchy().add(o, curve);
@@ -109,7 +109,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
-    for(OrderingResult or : orderings) {
+    for (OrderingResult or : orderings) {
       DBIDs sorted = or.iter(or.getDBIDs());
       XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
       db.getHierarchy().add(or, curve);
@@ -119,10 +119,10 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   private XYCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, Relation<Double> scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
-    XYCurve curve = new PRCurve(postot + 2);
+    XYCurve curve = new PRCurve(postot + 2, postot);
 
     double prevscore = Double.NaN;
-    for(; iter.valid(); iter.advance()) {
+    for (; iter.valid(); iter.advance()) {
       // Previous precision rate - y axis
       final double curprec = ((double) poscnt) / total;
       // Previous recall rate - x axis
@@ -130,18 +130,18 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
       // Analyze next point
       // positive or negative match?
-      if(ids.contains(iter)) {
+      if (ids.contains(iter)) {
         poscnt += 1;
       }
       total += 1;
       // First iteration ends here
-      if(total == 1) {
+      if (total == 1) {
         continue;
       }
       // defer calculation for ties
-      if(scores != null) {
+      if (scores != null) {
         double curscore = scores.get(iter);
-        if(Double.compare(prevscore, curscore) == 0) {
+        if (Double.compare(prevscore, curscore) == 0) {
           continue;
         }
         prevscore = curscore;
@@ -171,12 +171,19 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     double auc = Double.NaN;
 
     /**
+     * Number of positive observations
+     */
+    int positive;
+
+    /**
      * Constructor.
      * 
      * @param size Size estimation
+     * @param positive Number of positive elements (for AUC correction)
      */
-    public PRCurve(int size) {
+    public PRCurve(int size, int positive) {
       super("Recall", "Precision", size);
+      this.positive = positive;
     }
 
     @Override
@@ -195,8 +202,9 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
      * @return AUC value
      */
     public double getAUC() {
-      if(Double.isNaN(auc)) {
-        auc = areaUnderCurve(this);
+      if (Double.isNaN(auc)) {
+        double max = 1 - 1. / positive; 
+        auc = areaUnderCurve(this) / max;
       }
       return auc;
     }
@@ -223,7 +231,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if(config.grab(positiveClassNameP)) {
+      if (config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
     }
