@@ -54,8 +54,8 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
    */
   public Simple2D(LinearScale[] scales, int ax1, int ax2) {
     super(scales);
-    this.dim1 = ax1 - 1;
-    this.dim2 = ax2 - 1;
+    this.dim1 = ax1;
+    this.dim2 = ax2;
   }
 
   @Override

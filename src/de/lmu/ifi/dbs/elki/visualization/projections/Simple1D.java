@@ -42,11 +42,11 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
    * Simple 1D projection using scaling only.
    * 
    * @param scales Scales to use
-   * @param dnum Dimension (starting at 1)
+   * @param dnum Dimension (starting at 0)
    */
   public Simple1D(LinearScale[] scales, int dnum) {
     super(scales);
-    this.dnum = dnum - 1;
+    this.dnum = dnum;
   }
 
   @Override
