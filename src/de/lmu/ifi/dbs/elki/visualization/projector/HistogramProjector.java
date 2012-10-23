@@ -94,7 +94,7 @@ public class HistogramProjector<V extends NumberVector<?>> extends AbstractHiera
       // Add labels
       for(int d1 = 0; d1 < dmax; d1++) {
         PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
-        LabelVisualization lbl = new LabelVisualization(RelationUtil.getColumnLabel(rel, d1 + 1));
+        LabelVisualization lbl = new LabelVisualization(RelationUtil.getColumnLabel(rel, d1));
         final VisualizationTask task = new VisualizationTask("", null, null, lbl);
         task.height = lheight;
         task.width = 1;
