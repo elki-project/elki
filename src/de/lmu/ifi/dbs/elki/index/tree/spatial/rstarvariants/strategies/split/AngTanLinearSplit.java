@@ -105,7 +105,7 @@ public class AngTanLinearSplit implements SplitStrategy {
           continue;
         }
         if(card < bestcard) {
-          axis = d + 1;
+          axis = d;
           bestcard = card;
           bestset = cand;
           bestover = Double.NaN;
@@ -117,16 +117,16 @@ public class AngTanLinearSplit implements SplitStrategy {
           }
           double overlap = computeOverlap(entries, getter, cand);
           if(overlap < bestover) {
-            axis = d + 1;
+            axis = d;
             bestcard = card;
             bestset = cand;
             bestover = overlap;
           }
           else if(overlap == bestover) {
             double bestlen = total.getMax(axis) - total.getMin(axis);
-            double candlen = total.getMax(d + 1) - total.getMin(d + 1);
+            double candlen = total.getMax(d) - total.getMin(d);
             if(candlen < bestlen) {
-              axis = d + 1;
+              axis = d;
               bestcard = card;
               bestset = cand;
               bestover = overlap;
