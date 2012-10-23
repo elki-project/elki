@@ -87,7 +87,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
         // In 2d, make the plot twice as big.
         master = new PlotItem(2 + .1, 2 + .1, null);
         {
-          Projection2D proj = new Simple2D(scales.getScales(), 1, 2);
+          Projection2D proj = new Simple2D(scales.getScales(), 0, 1);
           PlotItem it = new PlotItem(.1, 0, 2., 2., proj);
           it.tasks = tasks;
           master.subitems.add(it);
@@ -117,10 +117,10 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
         final double sizeh = Math.ceil((dmax - 1) / 2.0);
         master = new PlotItem(sizeh * 2. + .1, dmax - 1 + .1, null);
 
-        for(int d1 = 1; d1 < dmax; d1++) {
-          for(int d2 = d1 + 1; d2 <= dmax; d2++) {
+        for(int d1 = 0; d1 < dmax - 1; d1++) {
+          for(int d2 = d1 + 1; d2 < dmax; d2++) {
             Projection2D proj = new Simple2D(scales.getScales(), d1, d2);
-            PlotItem it = new PlotItem(d1 - 1 + .1, d2 - 2, 1., 1., proj);
+            PlotItem it = new PlotItem(d1 + .1, d2 - 1, 1., 1., proj);
             it.tasks = tasks;
             master.subitems.add(it);
           }

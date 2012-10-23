@@ -85,7 +85,7 @@ public class HistogramProjector<V extends NumberVector<?>> extends AbstractHiera
       PlotItem master = new PlotItem(dmax + xoff, hheight + lheight, null);
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       for(int d1 = 0; d1 < dmax; d1++) {
-        Projection1D proj = new Simple1D(scales.getScales(), d1 + 1);
+        Projection1D proj = new Simple1D(scales.getScales(), d1);
         final PlotItem it = new PlotItem(d1 + xoff, lheight, 1., hheight, proj);
         it.tasks = tasks;
         master.subitems.add(it);
