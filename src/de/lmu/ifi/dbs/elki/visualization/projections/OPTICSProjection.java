@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.projector;
+package de.lmu.ifi.dbs.elki.visualization.projections;
 
 /*
  This file is part of ELKI:
@@ -23,44 +23,34 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
-import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
+import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 
 /**
- * Projection for OPTICS plots.
+ * OPTICS projection. This is not really needed, but a quick hack to have more
+ * consistency in the visualizer API.
  * 
  * @author Erich Schubert
  */
-public class OPTICSProjector<D extends Distance<D>> extends AbstractHierarchicalResult implements Projector {
+public class OPTICSProjection<D extends Distance<D>> extends AbstractHierarchicalResult implements Projection {
   /**
-   * Cluster order result
+   * The projector we were generated from.
    */
-  private ClusterOrderResult<D> clusterOrder;
-
-  /**
-   * OPTICS plot image
-   */
-  private OPTICSPlot<D> plot = null;
+  OPTICSProjector<D> projector;
 
   /**
    * Constructor.
-   * 
-   * @param co Cluster order
+   *
+   * @param opticsProjector OPTICS projector
    */
-  public OPTICSProjector(ClusterOrderResult<D> co) {
+  public OPTICSProjection(OPTICSProjector<D> opticsProjector) {
     super();
-    this.clusterOrder = co;
+    this.projector = opticsProjector;
   }
 
   @Override
@@ -70,28 +60,17 @@ public class OPTICSProjector<D extends Distance<D>> extends AbstractHierarchical
 
   @Override
   public String getShortName() {
-    return "optics";
+    return "OPTICSproj";
   }
 
   @Override
-  public Collection<PlotItem> arrange() {
-    List<PlotItem> col = new ArrayList<PlotItem>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
-    if (tasks.size() > 0) {
-      final PlotItem it = new PlotItem(4., 1., new OPTICSProjection<D>(this));
-      it.tasks = tasks;
-      col.add(it);
-    }
-    return col;
+  public int getInputDimensionality() {
+    return -1;
   }
 
-  /**
-   * Get the cluster order
-   * 
-   * @return the cluster order
-   */
-  public ClusterOrderResult<D> getResult() {
-    return clusterOrder;
+  @Override
+  public LinearScale getScale(int d) {
+    return null;
   }
 
   /**
@@ -101,9 +80,15 @@ public class OPTICSProjector<D extends Distance<D>> extends AbstractHierarchical
    * @return Plot
    */
   public OPTICSPlot<D> getOPTICSPlot(VisualizerContext context) {
-    if(plot == null) {
-      plot = OPTICSPlot.plotForClusterOrder(clusterOrder, context);
-    }
-    return plot;
+    return projector.getOPTICSPlot(context);
+  }
+
+  /**
+   * Get the OPTICS cluster order.
+   * 
+   * @return Cluster oder result.
+   */
+  public ClusterOrderResult<D> getResult() {
+    return projector.getResult();
   }
 }
