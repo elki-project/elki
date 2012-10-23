@@ -64,7 +64,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
     for (int i = start; i < end; i++) {
       T v = objs.get(i);
       // Convert into integers
-      for (int d = 0, d2 = 0; d < dim; d++, d += 2) {
+      for (int d = 0, d2 = 0; d < dim; d++, d2 += 2) {
         double val = (v.getMin(d) + v.getMax(d)) * .5;
         val = Integer.MAX_VALUE * ((val - minmax[d2]) / (minmax[d2 + 1] - minmax[d2]));
         buf[d] = (int) val;
