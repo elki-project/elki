@@ -158,7 +158,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair>, PairInterface<D
   }
 
   /**
-   * Comparator to compare by second component only
+   * Comparator to compare by first component only
    */
   public static final Comparator<DoubleIntPair> BYFIRST_COMPARATOR = new Comparator<DoubleIntPair>() {
     @Override
