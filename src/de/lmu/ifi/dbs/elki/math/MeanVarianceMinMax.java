@@ -101,6 +101,15 @@ public class MeanVarianceMinMax extends MeanVariance {
   public double getMax() {
     return this.max;
   }
+  
+  /**
+   * Get the current minimum and maximum.
+   * 
+   * @return current minimum and maximum
+   */
+  public DoubleMinMax getDoubleMinMax(){
+    return new DoubleMinMax(this.min,this.max);
+  }
 
   /**
    * Return the difference between minimum and maximum.
