@@ -63,10 +63,11 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
   final JButton button;
 
   /**
-   * The actual file chooser
+   * Constructor.
+   * 
+   * @param fp File parameter
+   * @param parent Component to attach to.
    */
-  final JFileChooser fc = new JFileChooser(new File("."));
-
   public FileParameterConfigurator(FileParameter fp, JComponent parent) {
     super(fp, parent);
     // create components
@@ -78,17 +79,14 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     button.addActionListener(this);
     // fill with value
     File f = null;
-    if(fp.isDefined()) {
+    if (fp.isDefined()) {
       f = fp.getValue();
     }
-    if(f != null) {
+    if (f != null) {
       String fn = f.getPath();
       textfield.setText(fn);
-      fc.setSelectedFile(f);
-    }
-    else {
+    } else {
       textfield.setText("");
-      fc.setSelectedFile(null);
     }
 
     // make a panel
@@ -98,7 +96,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
     panel = new JPanel(new BorderLayout());
     panel.add(textfield, BorderLayout.CENTER);
     panel.add(button, BorderLayout.EAST);
-    
+
     parent.add(panel, constraints);
     finishGridRow();
   }
@@ -108,21 +106,24 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
    */
   @Override
   public void actionPerformed(ActionEvent e) {
-    if(e.getSource() == button) {
+    // Use a new JFileChooser. Inconsistent behaviour otherwise!
+    final JFileChooser fc = new JFileChooser(new File("."));
+    if (param.isDefined()) {
+      fc.setSelectedFile(param.getValue());
+    }
+
+    if (e.getSource() == button) {
       int returnVal = fc.showOpenDialog(button);
 
-      if(returnVal == JFileChooser.APPROVE_OPTION) {
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
         textfield.setText(fc.getSelectedFile().getPath());
         fireValueChanged();
-      }
-      else {
+      } else {
         // Do nothing on cancel.
       }
-    }
-    else if(e.getSource() == textfield) {
+    } else if (e.getSource() == textfield) {
       fireValueChanged();
-    }
-    else {
+    } else {
       LoggingUtil.warning("actionPerformed triggered by unknown source: " + e.getSource());
     }
   }
