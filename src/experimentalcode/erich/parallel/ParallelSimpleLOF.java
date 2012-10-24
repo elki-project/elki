@@ -26,22 +26,21 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import experimentalcode.erich.parallel.mapper.DoubleMinMaxMapper;
-import experimentalcode.erich.parallel.mapper.KDoubleDistanceMapper;
 import experimentalcode.erich.parallel.mapper.KNNMapper;
 import experimentalcode.erich.parallel.mapper.LOFMapper;
-import experimentalcode.erich.parallel.mapper.LRDMapper;
+import experimentalcode.erich.parallel.mapper.SimpleLRDMapper;
 import experimentalcode.erich.parallel.mapper.WriteDataStoreMapper;
 import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
 
 /**
- * Parallel implementation of Local Outlier Factor using mappers.
+ * Parallel implementation of Simple-LOF Outlier detection using mappers.
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -53,7 +52,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelLOF(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public ParallelSimpleLOF(DistanceFunction<? super O, D> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -61,7 +60,7 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(ParallelLOF.class);
+  private static final Logging LOG = Logging.getLogger(ParallelSimpleLOF.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -74,7 +73,6 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
     KNNQuery<O, D> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist
-    WritableDoubleDataStore kdists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     WritableDataStore<KNNResult<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNResult.class);
     {
       // Compute kNN
@@ -83,21 +81,14 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
       WriteDataStoreMapper<KNNResult<D>> storek = new WriteDataStoreMapper<KNNResult<D>>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
-      // Compute k-dist
-      KDoubleDistanceMapper kdistm = new KDoubleDistanceMapper(k + 1);
-      SharedDouble kdistv = new SharedDouble();
-      WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(kdists);
-      kdistm.connectKNNInput(knnv);
-      kdistm.connectDistanceOutput(kdistv);
-      storem.connectInput(kdistv);
 
-      new ParallelMapExecutor().run(ids, knnm, storek, kdistm, storem);
+      new ParallelMapExecutor().run(ids, knnm, storek);
     }
 
     // Phase two: lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      LRDMapper<D> lrdm = new LRDMapper<D>(knns, kdists);
+      SimpleLRDMapper<D> lrdm = new SimpleLRDMapper<D>(knns);
       SharedDouble lrdv = new SharedDouble();
       WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
 
@@ -105,8 +96,6 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
       storelrd.connectInput(lrdv);
       new ParallelMapExecutor().run(ids, lrdm, storelrd);
     }
-    kdists.destroy(); // No longer needed.
-    kdists = null;
 
     // Phase three: LOF
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
@@ -162,8 +151,8 @@ public class ParallelLOF<O, D extends NumberDistance<D, ?>> extends AbstractDist
     }
 
     @Override
-    protected ParallelLOF<O, D> makeInstance() {
-      return new ParallelLOF<O, D>(distanceFunction, k);
+    protected ParallelSimpleLOF<O, D> makeInstance() {
+      return new ParallelSimpleLOF<O, D>(distanceFunction, k);
     }
   }
 }
