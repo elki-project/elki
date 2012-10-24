@@ -65,7 +65,7 @@ public class FileParameterConfigurator extends AbstractSingleParameterConfigurat
   /**
    * The actual file chooser
    */
-  final JFileChooser fc = new JFileChooser();
+  final JFileChooser fc = new JFileChooser(new File("."));
 
   public FileParameterConfigurator(FileParameter fp, JComponent parent) {
     super(fp, parent);
