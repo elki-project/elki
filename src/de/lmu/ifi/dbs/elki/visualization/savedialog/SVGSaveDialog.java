@@ -94,7 +94,7 @@ public class SVGSaveDialog {
     double quality = 1.0;
     int ret = -1;
 
-    JFileChooser fc = new JFileChooser();
+    JFileChooser fc = new JFileChooser(new File("."));
     fc.setDialogTitle(DEFAULT_TITLE);
     // fc.setFileFilter(new ImageFilter());
     SaveOptionsPanel optionsPanel = new SaveOptionsPanel(fc, width, height);
