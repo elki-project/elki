@@ -258,7 +258,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Show a single visualization.
    * 
-   * @param context Visualization conext
+   * @param context Visualization context
    * @param factory Visualizer factory
    * @param task Visualization task
    */
