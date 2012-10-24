@@ -30,9 +30,25 @@ import javax.swing.JLabel;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
+/**
+ * Base class for MiniGUI input helpers
+ * 
+ * @author Erich Schubert
+ *
+ * @param <T> Parameter type
+ */
 public abstract class AbstractSingleParameterConfigurator<T extends Parameter<?>> extends AbstractParameterConfigurator<T> {
+  /**
+   * Label
+   */
   final JLabel label;
 
+  /**
+   * Constructor.
+   *
+   * @param param Parameter
+   * @param parent Parent edit control
+   */
   public AbstractSingleParameterConfigurator(T param, JComponent parent) {
     super(param, parent);
     // Label

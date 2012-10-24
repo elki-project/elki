@@ -303,11 +303,6 @@ public class ParameterTable extends JTable {
     final JButton button = new JButton("...");
 
     /**
-     * The actual file chooser
-     */
-    final JFileChooser fc = new JFileChooser();
-
-    /**
      * Constructor.
      */
     public FileNameEditor() {
@@ -322,6 +317,11 @@ public class ParameterTable extends JTable {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+      final JFileChooser fc = new JFileChooser(new File("."));
+      final String curr = textfield.getText();
+      if (curr != null && curr.length() > 0) {
+        fc.setSelectedFile(new File(curr));
+      }
       int returnVal = fc.showOpenDialog(button);
 
       if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -357,11 +357,9 @@ public class ParameterTable extends JTable {
           if(f != null) {
             String fn = f.getPath();
             textfield.setText(fn);
-            fc.setSelectedFile(f);
           }
           else {
             textfield.setText("");
-            fc.setSelectedFile(null);
           }
         }
       }
