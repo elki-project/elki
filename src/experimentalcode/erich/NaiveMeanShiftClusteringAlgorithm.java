@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.statistics.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction;
@@ -122,11 +123,13 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
     ArrayList<Pair<V, ModifiableDBIDs>> clusters = new ArrayList<Pair<V, ModifiableDBIDs>>();
 
     ModifiableDBIDs noise = DBIDUtil.newArray();
+    
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Mean-shift clustering", relation.size(), LOG) : null;
 
-    mainloop: for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       // Initial position:
       V position = relation.get(iter);
-      for (int j = 1; j <= MAXITER; j++) {
+      iterations: for (int j = 1; j <= MAXITER; j++) {
         // Compute new position:
         V newvec = null;
         {
@@ -143,7 +146,7 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
           }
           if (!okay) {
             noise.add(iter);
-            continue mainloop;
+            break iterations;
           }
         }
         // Test if we are close to one of the known clusters:
@@ -160,14 +163,14 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
         D delta = distq.distance(position, newvec);
         if (bestd < 10 * threshold || bestd * 2 < delta.doubleValue()) {
           bestp.second.add(iter);
-          continue mainloop;
+          break iterations;
         }
         if (j == MAXITER) {
           LOG.warning("No convergence after " + MAXITER + " iterations. Distance: " + delta.toString());
         }
         if (Double.isNaN(delta.doubleValue())) {
           LOG.warning("Encountered NaN distance. Invalid center vector? " + newvec.toString());
-          continue mainloop;
+          break iterations;
         }
         if (j == MAXITER || delta.doubleValue() < threshold) {
           if (LOG.isDebuggingFine()) {
@@ -176,10 +179,16 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
           ArrayModifiableDBIDs cids = DBIDUtil.newArray();
           cids.add(iter);
           clusters.add(new Pair<V, ModifiableDBIDs>(newvec, cids));
-          continue mainloop;
+          break iterations;
         }
         position = newvec;
       }
+      if (prog != null) {
+        prog.incrementProcessed(LOG);
+      }
+    }
+    if (prog != null) {
+      prog.ensureCompleted(LOG);
     }
 
     ArrayList<Cluster<MeanModel<V>>> cs = new ArrayList<Cluster<MeanModel<V>>>(clusters.size());
