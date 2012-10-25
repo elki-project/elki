@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 /*
  This file is part of ELKI:
@@ -25,7 +25,6 @@ package experimentalcode.erich;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -50,6 +49,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.statistics.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DistanceParameter;
@@ -57,22 +57,37 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
- * Mean-shift clustering algorithm. Naive implementation.
+ * Mean-shift based clustering algorithm. Naive implementation: there does not
+ * seem to be "the" mean-shift clustering algorithm, but it is a general
+ * concept. For the naive implementation, mean-shift is applied to all objects
+ * until they converge to other. This implementation is quite naive, and various
+ * optimizations can be made.
+ * 
+ * It also is not really parameter-free: the kernel needs to be specified,
+ * including a radius/bandwidth.
+ * 
+ * By using range queries, the algorithm does benefit from index structures!
  * 
  * TODO: add methods to automatically choose the bandwidth?
  * 
- * TODO: what is the most appropriate reference for this?
+ * <p>
+ * Reference:<br />
+ * Y. Cheng<br />
+ * Mean shift, mode seeking, and clustering<br />
+ * IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8
+ * </p>
  * 
  * @author Erich Schubert
  * 
  * @param <V> Vector type
  * @param <D> Distance type
  */
-public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
+@Reference(authors = "Y. Cheng", title = "Mean shift, mode seeking, and clustering", booktitle = "IEEE Transactions on Pattern Analysis and Machine Intelligence 17-8", url = "http://dx.doi.org/10.1109/34.400568")
+public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, Clustering<MeanModel<V>>> implements ClusteringAlgorithm<Clustering<MeanModel<V>>> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(NaiveMeanShiftClusteringAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(NaiveMeanShiftClustering.class);
 
   /**
    * Density estimation kernel.
@@ -96,7 +111,7 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
    * @param kernel Kernel function
    * @param range Kernel radius
    */
-  public NaiveMeanShiftClusteringAlgorithm(DistanceFunction<? super V, D> distanceFunction, KernelDensityFunction kernel, D range) {
+  public NaiveMeanShiftClustering(DistanceFunction<? super V, D> distanceFunction, KernelDensityFunction kernel, D range) {
     super(distanceFunction);
     this.kernel = kernel;
     this.range = range;
@@ -123,7 +138,7 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
     ArrayList<Pair<V, ModifiableDBIDs>> clusters = new ArrayList<Pair<V, ModifiableDBIDs>>();
 
     ModifiableDBIDs noise = DBIDUtil.newArray();
-    
+
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Mean-shift clustering", relation.size(), LOG) : null;
 
     for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
@@ -229,9 +244,9 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
     public static final OptionID KERNEL_ID = OptionID.getOrCreateOptionID("meanshift.kernel", "Kernel function to use with mean-shift clustering.");
 
     /**
-     * Parameter for kernel radius.
+     * Parameter for kernel radius/range/bandwidth.
      */
-    public static final OptionID RANGE_ID = OptionID.getOrCreateOptionID("meanshift.kernel-range", "Range of the kernel to use (aka: radius, bandwidth).");
+    public static final OptionID RANGE_ID = OptionID.getOrCreateOptionID("meanshift.kernel-bandwidth", "Range of the kernel to use (aka: radius, bandwidth).");
 
     /**
      * Kernel function.
@@ -257,8 +272,8 @@ public class NaiveMeanShiftClusteringAlgorithm<V extends NumberVector<?>, D exte
     }
 
     @Override
-    protected NaiveMeanShiftClusteringAlgorithm<V, D> makeInstance() {
-      return new NaiveMeanShiftClusteringAlgorithm<V, D>(distanceFunction, kernel, range);
+    protected NaiveMeanShiftClustering<V, D> makeInstance() {
+      return new NaiveMeanShiftClustering<V, D>(distanceFunction, kernel, range);
     }
   }
 }
