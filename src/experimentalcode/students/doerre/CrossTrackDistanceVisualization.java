@@ -58,12 +58,10 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
    * Get a logger for this class.
    */
   protected final static Logging logger = Logging.getLogger(ExportVisualizations.class);
-
   /**
    * Holds the file to print results to.
    */
   private File out;
-
   /**
    * Constructor.
    * 
@@ -74,7 +72,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
     super();
     this.out = out;
   }
-
+  
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     Database db = ResultUtil.findDatabase(baseResult);
@@ -86,10 +84,9 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
   private void processRelation(Database db, Relation<V> rel) {
 
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(rel);
-
     SpatialPrimitiveDoubleDistanceFunction<? super V> df2 = LatLngDistanceFunction.STATIC;
     
-    //latlong-schreibweise
+    // Parameter precedence: Latitude, Longitude
     V newyork2 = factory.newNumberVector(new double[]{40.788800, -74.011533});
     V berlin2 = factory.newNumberVector(new double[]{52.31, 13.24});
 
@@ -97,13 +94,10 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
     V p2 = newyork2;
 
     double dist_bn = df2.doubleDistance(berlin2, newyork2);
-    
     int distance_of_points = 5;
-    
     int number_of_points = (int) (dist_bn / distance_of_points);
     
-    double [] [] dest_points = new double [number_of_points][2];
-    
+    double [] [] dest_points = new double [number_of_points][2];   
     int i = 0;
     
     for (int iter=distance_of_points; iter<(int) dist_bn; iter=iter+distance_of_points){
@@ -111,29 +105,27 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
       dest_points[i] = dest_point;
       i++;
     }
-
-    final int width = 2000, height = 1000;
     
+    final int width = 2000, height = 1000;  
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     
-    // Calculate Cross-Track and Along-Track distances of all points 
-    
+    // Calculate Cross-Track and Along-Track distances of all points  
     double [][] cross_track_distances = new double [width][height];
     DoubleMinMax minmax = new DoubleMinMax();
-
     
     for (int x = 0; x < width; x++) {
       for (int y = 0; y < height; y++) {
-        // x/y in lat/long übersetzen..
+        
+        // Calculate latitude and longitude values from x/y values
         double lon = x * 360. / width - 180.;
         double lat = y * -180. / height + 90.;
-        // ..und übergeben
+        
+        // Calculace Cross-track distance
         double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(0),p1.doubleValue(1),p2.doubleValue(0),p2.doubleValue(1),lat,lon,0);    
         cross_track_distances [x][y] = ctd;
         minmax.put(ctd);
       }
-    }
-    
+    }  
     // Red: left off-course, green: right off-course
     int red=0xffff0000;
     int green=0xff00ff00;
@@ -163,12 +155,10 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
     g2d.setColor(Color.black);
     
     // Read the coordinate values from the list - and draw points (mapped to 2000*1000)
-    for (int iter2=0; iter2<number_of_points; iter2++) {
-        
+    for (int iter2=0; iter2<number_of_points; iter2++) {     
         int point_y2 = (int) ((dest_points[iter2][0] + 90) / 180. * height); 
         int point_y3 = height - point_y2; // changing of sides necessary
-        int point_x2 = (int) ((dest_points[iter2][1] + 180) / 360. * width);
-        
+        int point_x2 = (int) ((dest_points[iter2][1] + 180) / 360. * width);     
         g2d.drawRect(point_x2, point_y3, 1, 1);
     }
     
@@ -185,12 +175,10 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
   }
 
   public static class Parameterizer extends AbstractParameterizer {
-
     /**
      * Holds the file to print results to.
      */
     protected File out = null;
-
     /**
      * Parameter distanceOfLines.
      */
@@ -203,8 +191,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
       FileParameter outputP = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
       if(config.grab(outputP)) {
         out = outputP.getValue();
-      }
-      
+      }    
     }
 
     @Override
@@ -212,5 +199,4 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
       return new CrossTrackDistanceVisualization(out);
     }
   }
-
 }
