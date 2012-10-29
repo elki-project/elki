@@ -106,9 +106,10 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    *         {@inheritDoc}
    */
   @Override
+  @Deprecated
   public Integer getValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return Integer.valueOf(values[dimension - 1]);
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }

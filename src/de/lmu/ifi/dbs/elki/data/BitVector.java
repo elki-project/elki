@@ -96,6 +96,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
   }
 
   @Override
+  @Deprecated
   public Bit getValue(int dimension) {
     if (dimension < 1 || dimension > dimensionality) {
       throw new IllegalArgumentException("illegal dimension: " + dimension);

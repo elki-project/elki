@@ -209,6 +209,6 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
     if(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null) {
       return false;
     }
-    return !(routingObjectID != null ? !routingObjectID.equals(that.routingObjectID) : that.routingObjectID != null);
+    return !(routingObjectID != null ? !DBIDUtil.equal(routingObjectID, that.routingObjectID) : that.routingObjectID != null);
   }
 }
