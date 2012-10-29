@@ -82,10 +82,10 @@ public class FiniteProgress extends AbstractProgress {
    */
   @Override
   public void setProcessed(int processed) throws IllegalArgumentException {
-    if(processed > total) {
+    if (processed > total) {
       throw new IllegalArgumentException(processed + " exceeds total: " + total);
     }
-    if(processed < 0) {
+    if (processed < 0) {
       throw new IllegalArgumentException("Negative number of processed: " + processed);
     }
     super.setProcessed(processed);
@@ -103,15 +103,15 @@ public class FiniteProgress extends AbstractProgress {
     int percentage = (int) (getProcessed() * 100.0 / total);
     buf.append(getTask());
     buf.append(": ");
-    for(int i = 0; i < totalLength - processedString.length(); i++) {
+    for (int i = 0; i < totalLength - processedString.length(); i++) {
       buf.append(' ');
     }
     buf.append(getProcessed());
     buf.append(" [");
-    if(percentage < 100) {
+    if (percentage < 100) {
       buf.append(' ');
     }
-    if(percentage < 10) {
+    if (percentage < 10) {
       buf.append(' ');
     }
     buf.append(percentage);
@@ -142,8 +142,8 @@ public class FiniteProgress extends AbstractProgress {
    * @param logger Logger to report to.
    */
   public void ensureCompleted(Logging logger) {
-    if(!isComplete()) {
-      logger.warning("Progress had not completed automatically as expected.", new Throwable());
+    if (!isComplete()) {
+      logger.warning("Progress had not completed automatically as expected: " + getProcessed() + "/" + total, new Throwable());
       setProcessed(getTotal());
       logger.progress(this);
     }
