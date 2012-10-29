@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -40,21 +39,16 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * 
  * @param <V> value type
  */
-public class DoubleObjMinHeap<V> implements Serializable {
-  /**
-   * Serial version
-   */
-  private static final long serialVersionUID = 1L;
-
+public class DoubleObjMinHeap<V> {
   /**
    * Heap storage: keys
    */
-  protected transient double[] keys;
+  protected double[] keys;
 
   /**
    * Heap storage: values
    */
-  protected transient Object[] values;
+  protected Object[] values;
 
   /**
    * Current number of objects
