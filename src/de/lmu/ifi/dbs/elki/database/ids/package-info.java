@@ -25,7 +25,7 @@
  * </tr>
  * <tr>
  * <th style="border-right: 2px">{@link de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs StaticDBIDs}</th>
- * <td>{@link de.lmu.ifi.dbs.elki.database.ids.IntegerArrayStaticDBIDs ArrayStaticDBIDs}</td>
+ * <td>{@link de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs ArrayStaticDBIDs}</td>
  * <td>n/a</td>
  * </tr>
  * </table>
@@ -50,7 +50,6 @@
  * }</pre>
  * 
  * <h2>Utility functions:</h2>
- * The static {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil DBIDUtil} class provides various utility functions, including:
  * <ul>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#ensureArray DBIDUtil.ensureArray} to ensure {@link de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs ArrayDBIDs}</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#ensureModifiable DBIDUtil.ensureModifiable} to ensure {@link de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs ModifiableDBIDS}</li>
