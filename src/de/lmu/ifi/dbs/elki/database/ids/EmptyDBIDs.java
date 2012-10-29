@@ -68,6 +68,11 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
+  public void assign(int index, DBIDVar var) {
+    throw new ArrayIndexOutOfBoundsException();
+  }
+
+  @Override
   public DBIDArrayMIter iter() {
     return EMPTY_ITERATOR;
   }

@@ -60,6 +60,15 @@ public final class DBIDUtil {
   public static final EmptyDBIDs EMPTYDBIDS = new EmptyDBIDs();
 
   /**
+   * Get the invalid special ID.
+   * 
+   * @return invalid ID value
+   */
+  public static DBIDRef invalid() {
+    return DBIDFactory.FACTORY.invalid();
+  }
+
+  /**
    * Import and integer as DBID.
    * 
    * Note: this may not be possible for some factories!
@@ -209,8 +218,17 @@ public final class DBIDUtil {
    * @param val Initial value.
    * @return Variable
    */
-  public DBIDVar newVar(DBIDRef val) {
+  public static DBIDVar newVar(DBIDRef val) {
     return DBIDFactory.FACTORY.newVar(val);
+  }
+
+  /**
+   * Make a new DBID variable.
+   * 
+   * @return Variable
+   */
+  public static DBIDVar newVar() {
+    return DBIDFactory.FACTORY.newVar(DBIDFactory.FACTORY.invalid());
   }
 
   /**
@@ -547,7 +565,7 @@ public final class DBIDUtil {
       ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
       randomShuffle(sample, random, k);
       // Delete trailing elements
-      for (int i = sample.size() - 1; i >= k; i++) {
+      for (int i = sample.size() - 1; i > k; i--) {
         sample.remove(i);
       }
       return sample;

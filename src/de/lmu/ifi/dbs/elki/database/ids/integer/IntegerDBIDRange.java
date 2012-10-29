@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * Representing a DBID range allocation.
@@ -112,7 +113,7 @@ class IntegerDBIDRange implements DBIDRange {
 
     @Override
     public boolean valid() {
-      return pos < len;
+      return pos < len && pos >= 0;
     }
 
     @Override
@@ -185,6 +186,16 @@ class IntegerDBIDRange implements DBIDRange {
   @Override
   public int getOffset(DBIDRef dbid) {
     return dbid.internalGetIndex() - start;
+  }
+
+  @Override
+  public void assign(int index, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar)var).internalSetIndex(start + index);
+    } else {
+      // Much less efficient:
+      var.set(get(index));
+    }
   }
 
   @Override

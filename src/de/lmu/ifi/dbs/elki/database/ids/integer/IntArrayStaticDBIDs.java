@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -74,7 +75,7 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
 
     @Override
     public boolean valid() {
-      return pos < ids.length;
+      return pos < ids.length && pos >= 0;
     }
 
     @Override
@@ -145,6 +146,16 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
   @Override
   public DBID get(int i) {
     return DBIDFactory.FACTORY.importInteger(ids[i]);
+  }
+
+  @Override
+  public void assign(int i, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar)var).internalSetIndex(ids[i]);
+    } else {
+      // Much less efficient:
+      var.set(get(i));
+    }
   }
 
   @Override

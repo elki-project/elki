@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * Unmodifiable wrapper for DBIDs.
@@ -86,6 +87,11 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   @Override
   public DBID get(int i) {
     return inner.get(i);
+  }
+
+  @Override
+  public void assign(int index, DBIDVar var) {
+    inner.assign(index, var);
   }
 
   @Override

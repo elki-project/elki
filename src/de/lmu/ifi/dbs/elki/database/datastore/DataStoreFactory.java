@@ -88,6 +88,16 @@ public interface DataStoreFactory {
    * @param hints Hints for the storage manager
    * @return new data store
    */
+  public WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints);
+
+  /**
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @return new data store
+   */
   public WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints);
 
   /**

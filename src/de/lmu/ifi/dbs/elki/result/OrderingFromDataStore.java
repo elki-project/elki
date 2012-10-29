@@ -27,7 +27,7 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
@@ -134,9 +134,9 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
    * 
    * @apiviz.exclude
    */
-  protected final class ImpliedComparator implements Comparator<DBID> {
+  protected final class ImpliedComparator implements Comparator<DBIDRef> {
     @Override
-    public int compare(DBID id1, DBID id2) {
+    public int compare(DBIDRef id1, DBIDRef id2) {
       T k1 = map.get(id1);
       T k2 = map.get(id2);
       assert (k1 != null);
@@ -153,9 +153,9 @@ public class OrderingFromDataStore<T extends Comparable<T>> extends BasicResult 
    * 
    * @apiviz.exclude
    */
-  protected final class DerivedComparator implements Comparator<DBID> {
+  protected final class DerivedComparator implements Comparator<DBIDRef> {
     @Override
-    public int compare(DBID id1, DBID id2) {
+    public int compare(DBIDRef id1, DBIDRef id2) {
       T k1 = map.get(id1);
       T k2 = map.get(id2);
       assert (k1 != null);

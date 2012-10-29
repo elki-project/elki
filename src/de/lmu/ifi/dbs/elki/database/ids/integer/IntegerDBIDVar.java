@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * TODO: what is the actual memory cost for adding a flag to indicate "null"
  * values, to allow the variable to be unset? Given 8-byte alignment of Java, it
  * should come for free!
- *
+ * 
  * @author Erich Schubert
  */
 class IntegerDBIDVar implements DBIDVar {
@@ -56,6 +56,15 @@ class IntegerDBIDVar implements DBIDVar {
   @Override
   public int internalGetIndex() {
     return id;
+  }
+
+  /**
+   * Internal set to integer.
+   * 
+   * @param i integer value
+   */
+  protected void internalSetIndex(int i) {
+    id = i;
   }
 
   @Override
@@ -165,4 +174,18 @@ class IntegerDBIDVar implements DBIDVar {
     return false;
   }
 
+  @Override
+  public void assign(int i, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar)var).internalSetIndex(i);
+    } else {
+      // Much less efficient:
+      var.set(get(i));
+    }
+  }
+  
+  @Override
+  public String toString() {
+    return Integer.toString(id);
+  }
 }

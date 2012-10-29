@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
@@ -55,6 +56,16 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
   @Override
   public DBID get(int index) {
     return new IntegerDBID(getStore().get(index));
+  }
+
+  @Override
+  public void assign(int index, DBIDVar var) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar)var).internalSetIndex(getStore().get(index));
+    } else {
+      // Much less efficient:
+      var.set(get(index));
+    }
   }
 
   @Override
@@ -121,7 +132,7 @@ public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
 
     @Override
     public boolean valid() {
-      return pos < store.size();
+      return pos < store.size() && pos >= 0;
     }
 
     @Override
