@@ -241,6 +241,8 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   /**
    * Removes the objects from the database (by calling {@link #doDelete(DBID)}
    * for each object) and indexes and fires a deletion event.
+   * 
+   * {@inheritDoc} 
    */
   @Override
   public MultipleObjectsBundle delete(DBIDs ids) {
@@ -270,6 +272,8 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   /**
    * Removes the object from the database (by calling {@link #doDelete(DBID)})
    * and indexes and fires a deletion event.
+   *
+   * {@inheritDoc} 
    */
   @Override
   public SingleObjectBundle delete(DBIDRef id) {

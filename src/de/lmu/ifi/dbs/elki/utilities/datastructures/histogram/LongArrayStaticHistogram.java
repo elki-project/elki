@@ -70,7 +70,7 @@ public final class LongArrayStaticHistogram extends AbstractObjStaticHistogram<l
    * 
    * Data is combined by incrementing.
    * 
-   * @Deprecated use the explicit {@link #increment} instead.
+   * @deprecated use the explicit {@link #increment} instead.
    */
   @Deprecated
   @Override

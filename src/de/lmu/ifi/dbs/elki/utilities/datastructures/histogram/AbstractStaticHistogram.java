@@ -94,7 +94,8 @@ public abstract class AbstractStaticHistogram implements Histogram {
   /**
    * Compute the size to grow to.
    * 
-   * @param min Minium size required
+   * @param current Current size
+   * @param requiredSize Required size
    * @return Size to allocate
    */
   protected static int growSize(int current, int requiredSize) {

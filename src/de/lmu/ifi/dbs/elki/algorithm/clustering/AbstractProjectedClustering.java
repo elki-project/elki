@@ -50,17 +50,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 public abstract class AbstractProjectedClustering<R extends Clustering<?>, V extends NumberVector<?>> extends AbstractAlgorithm<R> implements ClusteringAlgorithm<R> {
   /**
-   * Holds the value of {@link #K_ID}.
+   * Holds the value of {@link Parameterizer#K_ID}.
    */
   protected int k;
 
   /**
-   * Holds the value of {@link #K_I_ID}.
+   * Holds the value of {@link Parameterizer#K_I_ID}.
    */
   protected int k_i;
 
   /**
-   * Holds the value of {@link #L_ID}.
+   * Holds the value of {@link Parameterizer#L_ID}.
    */
   protected int l;
 

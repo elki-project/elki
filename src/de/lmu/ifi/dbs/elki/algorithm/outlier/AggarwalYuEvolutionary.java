@@ -97,7 +97,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
   protected final static int MAX_ITERATIONS = 1000;
 
   /**
-   * Holds the value of {@link #M_ID}.
+   * Holds the value of {@link Parameterizer#M_ID}.
    */
   private int m;
 

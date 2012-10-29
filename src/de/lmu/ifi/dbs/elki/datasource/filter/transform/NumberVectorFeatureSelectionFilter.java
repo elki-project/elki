@@ -87,7 +87,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
   /**
    * <p>
    * Sets the bits set to true in the given BitSet as selected attributes in
-   * {@link #SELECTED_ATTRIBUTES_ID}.
+   * {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
    * </p>
    * 
    * The index in the BitSet is expected to be shifted to the left by one, i.e.,
@@ -102,7 +102,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
   /**
    * <p>
    * Provides a BitSet with the bits set to true corresponding to the selected
-   * attributes in {@link #SELECTED_ATTRIBUTES_ID}.
+   * attributes in {@link Parameterizer#SELECTED_ATTRIBUTES_ID}.
    * </p>
    * 
    * The index in the BitSet is shifted to the left by one, i.e., index 0 in the

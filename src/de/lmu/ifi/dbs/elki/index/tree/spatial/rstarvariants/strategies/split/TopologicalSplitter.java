@@ -283,7 +283,7 @@ public class TopologicalSplitter implements SplitStrategy {
     /**
      * Get an entry.
      * 
-     * @param off Offset
+     * @param pair Entry pair
      * @return Entry
      */
     private E get(DoubleIntPair pair) {
