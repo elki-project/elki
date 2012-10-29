@@ -71,7 +71,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
       if(!pchi.contains(child)) {
         pchi.add(child);
       } else {
-        LoggingUtil.warning("Result added twice: "+parent+" -> "+child);
+        LoggingUtil.warning("Result added twice: "+parent+" -> "+child, new Throwable());
       }
     }
     // Add child to parent
@@ -84,7 +84,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
       if(!cpar.contains(parent)) {
         cpar.add(parent);
       } else {
-        LoggingUtil.warning("Result added twice: "+parent+" <- "+child);
+        LoggingUtil.warning("Result added twice: "+parent+" <- "+child, new Throwable());
       }
     }
   }
