@@ -45,6 +45,8 @@ public interface SparseNumberVector<N extends Number> extends NumberVector<N>, S
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.has SparseNumberVector
+   * 
    * @param <V> Vector type number type
    * @param <N> Number type
    */

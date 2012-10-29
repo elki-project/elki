@@ -212,6 +212,8 @@ public class BitVector extends AbstractNumberVector<Bit> {
    * Factory for bit vectors.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has BitVector
    */
   public static class Factory extends AbstractNumberVector.Factory<BitVector, Bit> {
     @Override
@@ -269,7 +271,7 @@ public class BitVector extends AbstractNumberVector<Bit> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has IntegerVector
+   * @apiviz.uses BitVector - - «serializes»
    */
   public static class ShortSerializer implements ByteBufferSerializer<BitVector> {
     @Override

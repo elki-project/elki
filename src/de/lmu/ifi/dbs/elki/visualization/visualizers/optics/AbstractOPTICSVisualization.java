@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses OPTICSProjector
+ * @apiviz.uses OPTICSProjecton
  * 
  * @param <D>
  */

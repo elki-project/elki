@@ -40,6 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * TODO: resize buffer when necessary?
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses FileChannel
  */
 public class BundleReader implements BundleStreamSource {
   /**

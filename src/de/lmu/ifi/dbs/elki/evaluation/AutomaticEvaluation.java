@@ -48,6 +48,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
  * 
  * @author Erich Schubert
  * 
+ * @apiviz.landmark
+ * 
  * @apiviz.uses OutlierResult
  * @apiviz.uses Clustering
  * @apiviz.composedOf OutlierROCCurve

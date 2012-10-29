@@ -136,6 +136,8 @@ public interface NumberVector<N extends Number> extends FeatureVector<N>, Spatia
    * 
    * @author Erich Schubert
    * 
+   * @apiviz.has NumberVector
+   * 
    * @param <V> Vector type
    * @param <N> Data type of vector
    */

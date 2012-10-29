@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * Abstract base class for visualizations.
  * 
  * @author Erich Schubert
+ * @apiviz.excludeSubtypes
  */
 public abstract class AbstractVisualization implements Visualization, ResultListener {
   /**
