@@ -239,7 +239,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   /**
-   * Removes the objects from the database (by calling {@link #doDelete(DBID)}
+   * Removes the objects from the database (by calling {@link #doDelete(DBIDRef)}
    * for each object) and indexes and fires a deletion event.
    * 
    * {@inheritDoc} 
@@ -270,7 +270,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   /**
-   * Removes the object from the database (by calling {@link #doDelete(DBID)})
+   * Removes the object from the database (by calling {@link #doDelete(DBIDRef)})
    * and indexes and fires a deletion event.
    *
    * {@inheritDoc} 

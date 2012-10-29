@@ -65,7 +65,7 @@ public class MeanVarianceStaticHistogram extends AbstractObjStaticHistogram<Mean
   /**
    * {@inheritDoc}
    * 
-   * Data is combined by using {@link MeanVariance#put(MeanVariance)}.
+   * Data is combined by using {@link MeanVariance#put(Mean)}.
    */
   @Override
   public void putData(double coord, MeanVariance data) {
