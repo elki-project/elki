@@ -47,7 +47,6 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
    * Constructor.
    * 
    * @param size Expected size
-   * @param def Default value
    */
   public MapIntegerDBIDDBIDStore(int size) {
     super();

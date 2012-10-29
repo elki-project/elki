@@ -36,7 +36,7 @@ public interface DBIDDataStore extends DataStore<DBID> {
   /**
    * Getter, but using objects.
    * 
-   * @deprecated Use {@link #updateVar} instead, to avoid boxing/unboxing cost.
+   * @deprecated Use {@link #assignVar} and a {@link DBIDVar} instead, to avoid boxing/unboxing cost.
    */
   @Override
   @Deprecated

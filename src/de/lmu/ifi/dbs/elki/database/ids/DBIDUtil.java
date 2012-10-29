@@ -486,7 +486,7 @@ public final class DBIDUtil {
    * Produce a random shuffling of the given DBID array.
    * 
    * @param ids Original DBIDs
-   * @param rnd Random generator
+   * @param random Random generator
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, Random random) {
     randomShuffle(ids, random, ids.size());
@@ -498,7 +498,7 @@ public final class DBIDUtil {
    * Only the first {@code limit} elements will be randomized.
    * 
    * @param ids Original DBIDs
-   * @param rnd Random generator
+   * @param random Random generator
    * @param limit Shuffling limit.
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, Random random, final int limit) {
@@ -540,7 +540,7 @@ public final class DBIDUtil {
    * 
    * @param source Original DBIDs
    * @param k k Parameter
-   * @param seed Random generator seed
+   * @param random Random generator
    * @return new DBIDs
    */
   public static ModifiableDBIDs randomSample(DBIDs source, int k, Random random) {

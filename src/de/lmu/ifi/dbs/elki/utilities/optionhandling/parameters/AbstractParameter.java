@@ -342,7 +342,7 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
   /**
    * Add a collection of constraints.
    * 
-   * @param constraints Constraints to add
+   * @param cs Constraints to add
    */
   public void addConstraints(Collection<? extends ParameterConstraint<? super T>> cs) {
     if (constraints == null) {
