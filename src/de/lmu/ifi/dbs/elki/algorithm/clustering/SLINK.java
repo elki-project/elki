@@ -24,34 +24,30 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -74,7 +70,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Implementation of the efficient Single-Link Algorithm SLINK of R. Sibson.
@@ -98,14 +93,9 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   private static final Logging LOG = Logging.getLogger(SLINK.class);
 
   /**
-   * The minimum number of clusters to extract
-   */
-  public static final OptionID SLINK_MINCLUSTERS_ID = OptionID.getOrCreateOptionID("slink.minclusters", "The maximum number of clusters to extract.");
-
-  /**
    * The values of the function Pi of the pointer representation.
    */
-  private WritableDataStore<DBID> pi;
+  private WritableDBIDDataStore pi;
 
   /**
    * The values of the function Lambda of the pointer representation.
@@ -115,15 +105,15 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   /**
    * Minimum number of clusters to extract
    */
-  private Integer minclusters;
+  private int minclusters = -1;
 
   /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
-   * @param minclusters Minimum clusters to extract. Can be null
+   * @param minclusters Minimum clusters to extract. Can be {@code -1}.
    */
-  public SLINK(DistanceFunction<? super O, D> distanceFunction, Integer minclusters) {
+  public SLINK(DistanceFunction<? super O, D> distanceFunction, int minclusters) {
     super(distanceFunction);
     this.minclusters = minclusters;
   }
@@ -131,13 +121,12 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   /**
    * Performs the SLINK algorithm on the given database.
    */
-  @SuppressWarnings("unchecked")
   public Result run(Database database, Relation<O> relation) {
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
+    @SuppressWarnings("unchecked")
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
-    WritableRecordStore store = DataStoreUtil.makeRecordStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBID.class, distCls);
-    pi = store.getStorage(0, DBID.class);
-    lambda = store.getStorage(1, distCls);
+    pi = DataStoreUtil.makeDBIDStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    lambda = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, distCls);
     // Temporary storage for m.
     WritableDataStore<D> m = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
@@ -146,21 +135,20 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     ModifiableDBIDs processedIDs = DBIDUtil.newArray(relation.size());
 
     // apply the algorithm
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DBID id  = DBIDUtil.deref(iditer); // TODO: can we use the reference?
-      step1(id);
-      step2(id, processedIDs, distQuery, m);
-      step3(id, processedIDs, m);
-      step4(id, processedIDs);
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      step1(iditer);
+      step2(iditer, processedIDs, distQuery, m);
+      step3(iditer, processedIDs, m);
+      step4(iditer, processedIDs);
 
-      processedIDs.add(id);
+      processedIDs.add(iditer);
 
-      if(progress != null) {
+      if (progress != null) {
         progress.incrementProcessed(LOG);
       }
     }
 
-    if(progress != null) {
+    if (progress != null) {
       progress.ensureCompleted(LOG);
     }
     // We don't need m anymore.
@@ -171,8 +159,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     BasicResult result = null;
 
     // Build clusters identified by their target object
-    int minc = minclusters != null ? minclusters.intValue() : relation.size();
-    result = extractClusters(relation.getDBIDs(), pi, lambda, minc);
+    result = extractClusters(relation.getDBIDs(), pi, lambda, minclusters);
 
     result.addChildResult(new MaterializedRelation<DBID>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
     result.addChildResult(new MaterializedRelation<D>("SLINK lambda", "slink-order", new SimpleTypeInformation<D>(distCls), lambda, processedIDs));
@@ -186,7 +173,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param newID the id of the object to be inserted into the pointer
    *        representation
    */
-  private void step1(DBID newID) {
+  private void step1(DBIDRef newID) {
     // P(n+1) = n+1:
     pi.put(newID, newID);
     // L(n+1) = infinity
@@ -204,7 +191,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param distFunc Distance function to use
    */
   private void step2(DBIDRef newID, DBIDs processedIDs, DistanceQuery<O, D> distFunc, WritableDataStore<D> m) {
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+    for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       // M(i) = dist(i, n+1)
       m.put(it, distFunc.distance(it, newID));
     }
@@ -220,14 +207,15 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    */
   private void step3(DBIDRef newID, DBIDs processedIDs, WritableDataStore<D> m) {
     // for i = 1..n
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+    DBIDVar p_i = DBIDUtil.newVar();
+    for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       D l_i = lambda.get(it);
       D m_i = m.get(it);
-      DBID p_i = pi.get(it);
+      pi.assignVar(it, p_i);
       D mp_i = m.get(p_i);
 
       // if L(i) >= M(i)
-      if(l_i.compareTo(m_i) >= 0) {
+      if (l_i.compareTo(m_i) >= 0) {
         // M(P(i)) = min { M(P(i)), L(i) }
         m.put(p_i, DistanceUtil.min(mp_i, l_i));
 
@@ -235,9 +223,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
         lambda.put(it, m_i);
 
         // P(i) = n+1;
-        pi.put(it, DBIDUtil.deref(newID));
-      }
-      else {
+        pi.put(it, newID);
+      } else {
         // M(P(i)) = min { M(P(i)), M(i) }
         m.put(p_i, DistanceUtil.min(mp_i, m_i));
       }
@@ -252,28 +239,18 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    */
   private void step4(DBIDRef newID, DBIDs processedIDs) {
     // for i = 1..n
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+    DBIDVar p_i = DBIDUtil.newVar();
+    for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       D l_i = lambda.get(it);
-      D lp_i = lambda.get(pi.get(it));
+      pi.assignVar(it, p_i);
+      D lp_i = lambda.get(p_i);
 
       // if L(i) >= L(P(i))
-      if(l_i.compareTo(lp_i) >= 0) {
+      if (l_i.compareTo(lp_i) >= 0) {
         // P(i) = n+1
-        pi.put(it, DBIDUtil.deref(newID));
+        pi.put(it, newID);
       }
     }
-  }
-
-  private DBIDRef lastObjectInCluster(DBIDRef id, D stopdist, final DataStore<DBID> pi, final DataStore<D> lambda) {
-    if(stopdist == null) {
-      return id;
-    }
-
-    DBIDRef currentID = id;
-    while(lambda.get(currentID).compareTo(stopdist) < 1) {
-      currentID = pi.get(currentID);
-    }
-    return currentID;
   }
 
   /**
@@ -286,290 +263,171 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * 
    * @return Hierarchical clustering
    */
-  private Clustering<DendrogramModel<D>> extractClusters(DBIDs ids, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
+  private Clustering<DendrogramModel<D>> extractClusters(DBIDs ids, final DBIDDataStore pi, final DataStore<D> lambda, int minclusters) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
+    D nulldist = getDistanceFunction().getDistanceFactory().nullDistance();
 
-    // stopdist
-    D stopdist = null;
-    // sort by lambda
+    // Sort DBIDs by lambda. We need this for two things:
+    // a) to determine the stop distance from "minclusters" parameter
+    // b) to process arrows in decreasing / increasing order
     ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
     order.sort(new CompareByLambda<D>(lambda));
-    int index = ids.size() - minclusters - 1;
-    while(index >= 0) {
-      if(lambda.get(order.get(index)).equals(lambda.get(order.get(index + 1)))) {
-        index--;
-      }
-      else {
-        stopdist = lambda.get(order.get(index));
-        break;
+
+    // Stop distance:
+    final D stopdist = (minclusters > 0) ? lambda.get(order.get(ids.size() - minclusters)) : null;
+
+    // The initial pass is top-down.
+    DBIDArrayIter it = order.iter();
+    int split = (minclusters > 0) ? Math.max(ids.size() - minclusters, 0) : 0;
+    // Tie handling: decrement split.
+    if (stopdist != null) {
+      while (split > 0) {
+        it.seek(split - 1);
+        if (stopdist.compareTo(lambda.get(it)) == 0) {
+          split--;
+          minclusters++;
+        } else {
+          break;
+        }
       }
     }
 
-    // extract the child clusters
-    Map<DBID, ModifiableDBIDs> cluster_ids = new HashMap<DBID, ModifiableDBIDs>();
-    Map<DBID, D> cluster_distances = new HashMap<DBID, D>();
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      DBID lastObjectInCluster = DBIDUtil.deref(lastObjectInCluster(it, stopdist, pi, lambda));
-      ModifiableDBIDs cluster = cluster_ids.get(lastObjectInCluster);
-      if(cluster == null) {
-        cluster = DBIDUtil.newArray();
-        cluster_ids.put(lastObjectInCluster, cluster);
-      }
-      cluster.add(it);
+    // Extract the child clusters
+    int cnum = 0;
+    int expcnum = Math.max(0, minclusters);
+    WritableIntegerDataStore cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
+    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<ModifiableDBIDs>(expcnum);
+    ArrayList<D> cluster_dist = new ArrayList<D>(expcnum);
+    ArrayModifiableDBIDs cluster_leads = DBIDUtil.newArray(expcnum);
 
-      D lambda_id = lambda.get(it);
-      if(stopdist != null && lambda_id.compareTo(stopdist) <= 0 && (cluster_distances.get(lastObjectInCluster) == null || lambda_id.compareTo(cluster_distances.get(lastObjectInCluster)) > 0)) {
-        cluster_distances.put(lastObjectInCluster, lambda_id);
+    DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
+    // Go backwards on the lower part.
+    for (it.seek(split - 1); it.valid(); it.retract()) {
+      D dist = lambda.get(it); // Distance to successor
+      pi.assignVar(it, succ); // succ = pi(it)
+      int clusterid = cluster_map.intValue(succ);
+      // Successor cluster has already been created:
+      if (clusterid >= 0) {
+        cluster_dbids.get(clusterid).add(it);
+        cluster_map.putInt(it, clusterid);
+        // Update distance to maximum encountered:
+        if (cluster_dist.get(clusterid).compareTo(dist) < 0) {
+          cluster_dist.set(clusterid, dist);
+        }
+      } else {
+        // Need to start a new cluster:
+        clusterid = cnum; // next cluster number.
+        ModifiableDBIDs cids = DBIDUtil.newArray();
+        // Add element and successor as initial members:
+        cids.add(succ);
+        cluster_map.putInt(succ, clusterid);
+        cids.add(it);
+        cluster_map.putInt(it, clusterid);
+        // Store new cluster.
+        cluster_dbids.add(cids);
+        cluster_leads.add(succ);
+        cluster_dist.add(dist);
+        cnum++;
       }
 
       // Decrement counter
-      if(progress != null) {
+      if (progress != null) {
         progress.incrementProcessed(LOG);
       }
     }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
+    // Build a hierarchy out of these clusters.
+    Cluster<DendrogramModel<D>> root = null;
+    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<Cluster<DendrogramModel<D>>>();
+    ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<Cluster<DendrogramModel<D>>>(ids.size() + expcnum - split);
+    // Convert initial clusters to cluster objects
+    {
+      int i = 0;
+      for (DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
+        clusters.add(makeCluster(it2, cluster_dist.get(i), cluster_dbids.get(i), hier));
+      }
+      cluster_dist = null; // Invalidate
+      cluster_dbids = null; // Invalidate
+    }
+    // Process the upper part, bottom-up.
+    for (it.seek(split); it.valid(); it.advance()) {
+      int clusterid = cluster_map.intValue(it);
+      // The current cluster:
+      final Cluster<DendrogramModel<D>> clus;
+      if (clusterid >= 0) {
+        clus = clusters.get(clusterid);
+      } else {
+        ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
+        cids.add(it);
+        clus = makeCluster(it, nulldist, cids, hier);
+        // No need to store in clusters: cannot have another incoming pi
+        // pointer!
+      }
+      // The successor to join:
+      pi.assignVar(it, succ); // succ = pi(it)
+      if (DBIDUtil.equal(it, succ)) {
+        assert (root == null);
+        root = clus;
+      } else {
+        // Parent cluster:
+        int parentid = cluster_map.intValue(succ);
+        D depth = lambda.get(it);
+        // Parent cluster exists - merge as a new cluster:
+        if (parentid >= 0) {
+          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS, hier);
+          hier.add(pclus, clusters.get(parentid));
+          hier.add(pclus, clus);
+          clusters.set(parentid, pclus); // Replace existing parent cluster
+        } else {
+          // Create a new, one-element, parent cluster.
+          parentid = cnum;
+          cnum++;
+          ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
+          cids.add(succ);
+          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids, hier);
+          hier.add(pclus, clus);
+          assert(clusters.size() == parentid);
+          clusters.add(pclus); // Remember parent cluster
+          cluster_map.putInt(succ, parentid); // Reference
+        }
+      }
+
+      // Decrement counter
+      if (progress != null) {
+        progress.incrementProcessed(LOG);
+      }
     }
 
+    if (progress != null) {
+      progress.ensureCompleted(LOG);
+    }
     // build hierarchy
     final Clustering<DendrogramModel<D>> dendrogram = new Clustering<DendrogramModel<D>>("Single-Link-Dendrogram", "slink-dendrogram");
-    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<Cluster<DendrogramModel<D>>>();
-    Cluster<DendrogramModel<D>> root = root(cluster_ids, cluster_distances, pi, lambda, hier, progress);
     dendrogram.addCluster(root);
 
     return dendrogram;
   }
 
-  private Cluster<DendrogramModel<D>> root(Map<DBID, ModifiableDBIDs> cluster_ids, Map<DBID, D> cluster_distances, final DataStore<DBID> pi, final DataStore<D> lambda, ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier, FiniteProgress progress) {
-    if(cluster_ids.size() == 1) {
-      DBID id = cluster_ids.keySet().iterator().next();
-      String name = "cluster_" + id + "_" + cluster_distances.get(id);
-      return new Cluster<DendrogramModel<D>>(name, cluster_ids.get(id), new DendrogramModel<D>(cluster_distances.get(id)), hier);
-    }
-
-    // sort leafs by lambda
-    List<Pair<DBID, D>> leafs = new ArrayList<Pair<DBID, D>>(cluster_ids.size());
-    for(DBID id : cluster_ids.keySet()) {
-      leafs.add(new Pair<DBID, D>(id, lambda.get(id)));
-    }
-
-    Collections.sort(leafs, new Comparator<Pair<DBID, D>>() {
-      @Override
-      public int compare(Pair<DBID, D> o1, Pair<DBID, D> o2) {
-        D k1 = lambda.get(o1.first);
-        D k2 = lambda.get(o2.first);
-        if(k1 == null && k2 == null) {
-          return 0;
-        }
-        else if(k1 == null) {
-          return -1;
-        }
-        else if(k2 == null) {
-          return 1;
-        }
-        else {
-          return k1.compareTo(k2);
-        }
-      }
-    });
-
-    // create nodes of the dendrogram
-    Cluster<DendrogramModel<D>> parent = null;
-    Map<DBID, Cluster<DendrogramModel<D>>> nodes = new HashMap<DBID, Cluster<DendrogramModel<D>>>();
-    int nodeCount = 0;
-    int clusterCount = 0;
-    while(!leafs.isEmpty()) {
-      // left child
-      Pair<DBID, D> leaf = leafs.remove(0);
-      DBID leftID = leaf.first;
-      Cluster<DendrogramModel<D>> left = nodes.get(leftID);
-      if(left == null) {
-        // String name = "cluster_" + leftID + "_" +
-        // cluster_distances.get(leftID);
-        String name = "cluster_" + (++clusterCount);
-        left = new Cluster<DendrogramModel<D>>(name, cluster_ids.get(leftID), new DendrogramModel<D>(cluster_distances.get(leftID)), hier);
-        nodes.put(leftID, left);
-      }
-      // right child
-      DBID rightID = pi.get(leftID);
-      if(DBIDUtil.equal(leftID, rightID)) {
-        break;
-      }
-      Cluster<DendrogramModel<D>> right = nodes.get(rightID);
-      if(right == null) {
-        // String name = "cluster_" + rightID + "_" +
-        // cluster_distances.get(rightID);
-        String name = "cluster_" + (++clusterCount);
-        right = new Cluster<DendrogramModel<D>>(name, cluster_ids.get(rightID), new DendrogramModel<D>(cluster_distances.get(rightID)), hier);
-        nodes.put(rightID, right);
-      }
-      // parent
-      // String name = "node" + (++nodeCount) + "_" + leaf.second;
-      String name = "node_" + (++nodeCount);
-      parent = createParent(name, lastAncestor(left, hier), lastAncestor(right, hier), leaf.second, hier);
-
-      // Decrement counter
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
-    }
-    // root = parent
-    return parent;
-  }
-
   /**
-   * Determines recursively the last ancestor of the specified cluster.
+   * Make the cluster for the given object
    * 
-   * @param cluster the child
-   * @param hier the cluster hierarchy
-   * @return the (currently) last ancestor
+   * @param lead Leading object
+   * @param depth Linkage depth
+   * @param members Member objects
+   * @param hier Cluster hierarchy
+   * @return Cluster
    */
-  private Cluster<DendrogramModel<D>> lastAncestor(Cluster<DendrogramModel<D>> cluster, ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier) {
-    List<Cluster<DendrogramModel<D>>> parents = hier.getParents(cluster);
-    if(parents.isEmpty()) {
-      return cluster;
+  private Cluster<DendrogramModel<D>> makeCluster(DBIDRef lead, D depth, DBIDs members, ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier) {
+    final String name;
+    if (members.size() == 0) {
+      name = "merge_" + lead + "_" + depth;
+    } else if (depth.isInfiniteDistance()) {
+      assert (members.contains(lead));
+      name = "object_" + lead;
+    } else {
+      name = "cluster_" + lead + "_" + depth;
     }
-    else {
-      if(parents.size() > 1) {
-        LOG.warning("More than one parent in Single-Link dendrogram: " + cluster + " parents: " + parents);
-        return null;
-      }
-      return lastAncestor(parents.get(0), hier);
-    }
-  }
-
-  private Cluster<DendrogramModel<D>> createParent(String name, Cluster<DendrogramModel<D>> leftChild, Cluster<DendrogramModel<D>> rightChild, D distance, ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier) {
-    // DBIDs ids = DBIDUtil.union(leftChild.getIDs(), rightChild.getIDs());
-    Cluster<DendrogramModel<D>> parent = new Cluster<DendrogramModel<D>>(name, DBIDUtil.EMPTYDBIDS, new DendrogramModel<D>(distance), hier);
-
-    hier.add(parent, leftChild);
-    hier.add(parent, rightChild);
-
-    return parent;
-  }
-
-  /**
-   * Extract all clusters from the pi-lambda-representation.
-   * 
-   * @param ids Object ids to process
-   * @param pi Pi store
-   * @param lambda Lambda store
-   * @param minclusters Minimum number of clusters to extract
-   * 
-   * @return Hierarchical clustering
-   */
-  @SuppressWarnings("unused")
-  private Clustering<Model> extractClusters_erich(DBIDs ids, final DataStore<DBID> pi, final DataStore<D> lambda, int minclusters) {
-    // extract a hierarchical clustering
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-    // sort by lambda
-    order.sort(new CompareByLambda<D>(lambda));
-    D curdist = null;
-
-    D stopdist = null;
-    if(minclusters < ids.size()) {
-      stopdist = lambda.get(order.get(ids.size() - minclusters));
-    }
-
-    ModifiableHierarchy<Cluster<Model>> hier = new HierarchyHashmapList<Cluster<Model>>();
-    Map<DBID, Cluster<Model>> clusters = new HashMap<DBID, Cluster<Model>>();
-    Map<DBID, ModifiableDBIDs> cids = new HashMap<DBID, ModifiableDBIDs>();
-
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
-
-    for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
-      DBID dest = pi.get(it);
-      D l = lambda.get(it);
-      // logger.debugFine("DBID " + cur.toString() + " dist: " + l.toString());
-      if(stopdist != null && stopdist.compareTo(l) > 0) {
-        ModifiableDBIDs curset = cids.remove(it);
-        ModifiableDBIDs destset = cids.get(dest);
-        if(destset == null) {
-          if(curset != null) {
-            destset = curset;
-          }
-          else {
-            destset = DBIDUtil.newHashSet();
-            destset.add(it);
-          }
-          destset.add(dest);
-          cids.put(dest, destset);
-        }
-        else {
-          if(curset != null) {
-            destset.addDBIDs(curset);
-          }
-          else {
-            destset.add(it);
-          }
-        }
-        curdist = l;
-      }
-      else {
-        if(curdist == null || l.compareTo(curdist) > 0) {
-          // New distance level reached. Post-process the current objects
-          for(Entry<DBID, ModifiableDBIDs> ent : cids.entrySet()) {
-            DBID key = ent.getKey();
-            ModifiableDBIDs clusids = ent.getValue();
-            // Make a new cluster
-            String cname = "Cluster_" + key.toString() + "_" + curdist.toString();
-            Cluster<Model> cluster = new Cluster<Model>(cname, clusids, ClusterModel.CLUSTER, hier);
-            // Collect child clusters and clean up the cluster ids, keeping only
-            // "new" objects.
-            for(DBIDMIter iter = clusids.iter(); iter.valid(); iter.advance()) {
-              Cluster<Model> chiclus = clusters.get(iter);
-              if(chiclus != null) {
-                hier.add(cluster, chiclus);
-                clusters.remove(iter);
-                iter.remove();
-              }
-            }
-            clusters.put(key, cluster);
-          }
-          if(LOG.isDebuggingFine()) {
-            StringBuilder buf = new StringBuilder();
-            buf.append("Number of clusters at depth ");
-            buf.append((curdist != null ? curdist.toString() : "null"));
-            buf.append(": ").append(clusters.size()).append(' ');
-            buf.append("last-objects:");
-            for(DBID id : clusters.keySet()) {
-              buf.append(' ').append(id.toString());
-            }
-            LOG.debugFine(buf.toString());
-          }
-          cids.clear();
-          curdist = l;
-        }
-        // Add the current object to the destinations cluster
-        {
-          ModifiableDBIDs destset = cids.get(dest);
-          if(destset == null) {
-            destset = DBIDUtil.newHashSet();
-            cids.put(dest, destset);
-            destset.add(dest);
-          }
-          destset.add(it);
-        }
-      }
-      // Decrement counter
-      if(progress != null) {
-        progress.incrementProcessed(LOG);
-      }
-    }
-    if(progress != null) {
-      progress.ensureCompleted(LOG);
-    }
-    // There should be one cluster remaining at infinite distance...
-    if(clusters.size() != 1) {
-      LOG.warning("Single-link is expected to have a single cluster at the top level!");
-      return null;
-    }
-    final Clustering<Model> clustering = new Clustering<Model>("Single-Link-Clustering", "slink-clustering");
-    // FIXME: validate this is works correctly for a single-object dataset!
-    for(Cluster<Model> cluster : clusters.values()) {
-      clustering.addCluster(cluster);
-    }
-    return clustering;
+    Cluster<DendrogramModel<D>> cluster = new Cluster<DendrogramModel<D>>(name, members, new DendrogramModel<D>(depth), hier);
+    return cluster;
   }
 
   @Override
@@ -591,7 +449,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * 
    * @param <D> Distance type
    */
-  private static final class CompareByLambda<D extends Distance<D>> implements Comparator<DBID> {
+  private static final class CompareByLambda<D extends Distance<D>> implements Comparator<DBIDRef> {
     /**
      * Lambda storage
      */
@@ -607,7 +465,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     }
 
     @Override
-    public int compare(DBID id1, DBID id2) {
+    public int compare(DBIDRef id1, DBIDRef id2) {
       D k1 = lambda.get(id1);
       D k2 = lambda.get(id2);
       assert (k1 != null);
@@ -624,7 +482,12 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
-    protected Integer minclusters = null;
+    /**
+     * The minimum number of clusters to extract
+     */
+    public static final OptionID SLINK_MINCLUSTERS_ID = OptionID.getOrCreateOptionID("slink.minclusters", "The maximum number of clusters to extract.");
+
+    protected int minclusters = -1;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -632,7 +495,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       IntParameter minclustersP = new IntParameter(SLINK_MINCLUSTERS_ID);
       minclustersP.addConstraint(new GreaterEqualConstraint(1));
       minclustersP.setOptional(true);
-      if(config.grab(minclustersP)) {
+      if (config.grab(minclustersP)) {
         minclusters = minclustersP.intValue();
       }
     }

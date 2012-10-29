@@ -42,6 +42,14 @@ public interface ArrayDBIDs extends DBIDs {
   public DBID get(int i);
 
   /**
+   * Assign a DBID variable the value of position {@code index}.
+   * 
+   * @param index Position
+   * @param var Variable to assign the value to.
+   */
+  public void assign(int index, DBIDVar var);
+
+  /**
    * Iterable
    * 
    * @return Iterator

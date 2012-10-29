@@ -33,9 +33,16 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  */
 // TODO: comments
 public class DendrogramModel<D extends Distance<D>> extends BaseModel {
-
+  /**
+   * Distance to child cluster
+   */
   private D distance;
 
+  /**
+   * Constructor.
+   *
+   * @param distance Distance to child cluster.
+   */
   public DendrogramModel(D distance) {
     super();
     this.distance = distance;

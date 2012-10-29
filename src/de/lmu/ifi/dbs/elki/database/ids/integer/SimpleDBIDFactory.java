@@ -66,6 +66,11 @@ public class SimpleDBIDFactory implements DBIDFactory {
    * The starting point for static DBID range allocations.
    */
   int rangestart = 0;
+  
+  /**
+   * Invalid ID.
+   */
+  DBID invalid = new IntegerDBID(Integer.MIN_VALUE);
 
   /**
    * Constructor.
@@ -106,6 +111,15 @@ public class SimpleDBIDFactory implements DBIDFactory {
   @Override
   public DBID importInteger(int id) {
     return new IntegerDBID(id);
+  }
+
+  @Override
+  public void assignVar(DBIDVar var, int val) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar)var).internalSetIndex(val);
+    } else {
+      var.set(new IntegerDBID(val));
+    }
   }
 
   @Override
@@ -197,5 +211,10 @@ public class SimpleDBIDFactory implements DBIDFactory {
   @Override
   public Class<? extends DBID> getTypeRestriction() {
     return IntegerDBID.class;
+  }
+
+  @Override
+  public DBIDRef invalid() {
+    return invalid;
   }
 }

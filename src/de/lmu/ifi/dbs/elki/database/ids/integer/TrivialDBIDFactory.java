@@ -65,6 +65,11 @@ final public class TrivialDBIDFactory implements DBIDFactory {
   AtomicInteger next = new AtomicInteger(1);
 
   /**
+   * Invalid ID.
+   */
+  DBID invalid = new IntegerDBID(Integer.MIN_VALUE);
+
+  /**
    * Constructor.
    */
   public TrivialDBIDFactory() {
@@ -104,6 +109,15 @@ final public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public DBID importInteger(int id) {
     return new IntegerDBID(id);
+  }
+
+  @Override
+  public void assignVar(DBIDVar var, int val) {
+    if (var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar)var).internalSetIndex(val);
+    } else {
+      var.set(new IntegerDBID(val));
+    }
   }
 
   @Override
@@ -195,5 +209,10 @@ final public class TrivialDBIDFactory implements DBIDFactory {
   @Override
   public Class<? extends DBID> getTypeRestriction() {
     return IntegerDBID.class;
+  }
+
+  @Override
+  public DBIDRef invalid() {
+    return invalid;
   }
 }

@@ -129,7 +129,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
-  public void sort(Comparator<? super DBID> comparator) {
+  public void sort(Comparator<? super DBIDRef> comparator) {
     // FIXME: optimize, avoid the extra copy?
     // Clone data
     DBID[] data = new DBID[store.size()];

@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -128,6 +129,14 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
       throw new ArrayIndexOutOfBoundsException();
     }
     return this;
+  }
+
+  @Override
+  public void assign(int index, DBIDVar var) {
+    if (index != 0) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    var.set(this);
   }
 
   @Override

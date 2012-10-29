@@ -60,7 +60,7 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(SLINK.SLINK_MINCLUSTERS_ID, 3);
+    params.addParameter(SLINK.Parameterizer.SLINK_MINCLUSTERS_ID, 3);
     SLINK<DoubleVector, DoubleDistance> slink = ClassGenericsUtil.parameterizeOrAbort(SLINK.class, params);
     testParameterizationOk(params);
 

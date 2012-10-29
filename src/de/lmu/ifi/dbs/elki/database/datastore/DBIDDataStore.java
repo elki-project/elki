@@ -1,6 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids;
-
-import java.util.Comparator;
+package de.lmu.ifi.dbs.elki.database.datastore;
 
 /*
  This file is part of ELKI:
@@ -25,51 +23,30 @@ import java.util.Comparator;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+
 /**
- * Array-oriented implementation of a modifiable DBID collection.
+ * DBID-valued data store (avoids boxing/unboxing).
  * 
  * @author Erich Schubert
- * 
- * @apiviz.has DBIDArrayMIter
  */
-public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
+public interface DBIDDataStore extends DataStore<DBID> {
   /**
-   * Sort the DBID set.
-   */
-  void sort();
-
-  /**
-   * Sort the DBID set.
+   * Getter, but using objects.
    * 
-   * @param comparator Comparator to use
+   * @deprecated Use {@link #updateVar} instead, to avoid boxing/unboxing cost.
    */
-  void sort(Comparator<? super DBIDRef> comparator);
-
-  /**
-   * Remove the i'th entry (starting at 0)
-   * 
-   * @param i Index
-   * @return value removed
-   */
-  public DBID remove(int i);
-
-  /**
-   * Replace the i'th entry (starting at 0)
-   * 
-   * @param i Index
-   * @param newval New value
-   * @return previous value
-   */
-  public DBID set(int i, DBIDRef newval);
-
-  /**
-   * Swap DBIDs add positions a and b.
-   * 
-   * @param a First position
-   * @param b Second position
-   */
-  public void swap(int a, int b);
-
   @Override
-  public DBIDArrayMIter iter();
+  @Deprecated
+  public DBID get(DBIDRef id);
+
+  /**
+   * Retrieves an object from the storage.
+   * 
+   * @param id Database ID.
+   * @param var Variable to update.
+   */
+  public void assignVar(DBIDRef id, DBIDVar var);
 }

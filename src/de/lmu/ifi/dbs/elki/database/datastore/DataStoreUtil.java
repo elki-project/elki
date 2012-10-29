@@ -54,6 +54,17 @@ public final class DataStoreUtil {
    * @param hints Hints for the storage manager
    * @return new data store
    */
+  public static WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints) {
+    return DataStoreFactory.FACTORY.makeDBIDStorage(ids, hints);
+  }
+  
+  /**
+   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * 
+   * @param ids DBIDs to store data for
+   * @param hints Hints for the storage manager
+   * @return new data store
+   */
   public static WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {
     return DataStoreFactory.FACTORY.makeDoubleStorage(ids, hints);
   }

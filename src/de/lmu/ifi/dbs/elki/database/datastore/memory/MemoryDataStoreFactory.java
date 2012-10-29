@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
  */
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
@@ -63,6 +64,17 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
     }
     else {
       return new MapIntegerDBIDStore<T>(ids.size());
+    }
+  }
+
+  @Override
+  public WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints) {
+    if(ids instanceof DBIDRange) {
+      DBIDRange range = (DBIDRange) ids;
+      return new ArrayDBIDStore(range.size(), range);
+    }
+    else {
+      return new MapIntegerDBIDDBIDStore(ids.size());
     }
   }
 

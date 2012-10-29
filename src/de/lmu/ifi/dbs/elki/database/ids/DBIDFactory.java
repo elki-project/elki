@@ -69,6 +69,16 @@ public interface DBIDFactory {
   DBID importInteger(int id);
 
   /**
+   * Assign an integer value to a DBID variable.
+   * 
+   * Note: this may not be possible for some factories!
+   * 
+   * @param var Variable
+   * @param val Integer value
+   */
+  void assignVar(DBIDVar var, int val);
+
+  /**
    * Generate a single DBID.
    * 
    * @return A single DBID
@@ -227,4 +237,11 @@ public interface DBIDFactory {
    * @return Formatted ID
    */
   String toString(DBIDRef id);
+
+  /**
+   * Get the invalid DBID value, usable as "undefined" placeholder.
+   * 
+   * @return Invalid value
+   */
+  DBIDRef invalid();
 }
