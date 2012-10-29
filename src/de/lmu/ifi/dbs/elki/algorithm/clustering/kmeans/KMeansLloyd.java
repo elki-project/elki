@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Arthur Zimek
  * 
  * @apiviz.landmark
+ * @apiviz.has KMeansModel
  * 
  * @param <V> vector datatype
  * @param <D> distance value type

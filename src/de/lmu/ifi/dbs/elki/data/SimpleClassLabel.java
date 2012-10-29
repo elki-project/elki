@@ -124,7 +124,7 @@ public class SimpleClassLabel extends ClassLabel {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has SimpleClassLabel - - «serializes»
+   * @apiviz.uses SimpleClassLabel - - «serializes»
    */
   public static class Serializer implements ByteBufferSerializer<SimpleClassLabel> {
     @Override

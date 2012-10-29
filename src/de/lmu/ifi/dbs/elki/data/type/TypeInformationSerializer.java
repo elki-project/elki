@@ -45,6 +45,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * possible.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf SimpleTypeSerializer
+ * @apiviz.composedOf VectorTypeSerializer
+ * @apiviz.composedOf VectorFieldTypeSerializer
  */
 public class TypeInformationSerializer implements ByteBufferSerializer<TypeInformation> {
   /**
@@ -141,6 +145,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
    * Serialization class for pure simple types.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.uses SimpleTypeInformation
    */
   static class SimpleTypeSerializer implements ByteBufferSerializer<SimpleTypeInformation<?>> {
     @SuppressWarnings("unchecked")
@@ -218,6 +224,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
    * FIXME: "label" is actually not supported.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.uses VectorTypeInformation
    */
   static class VectorTypeSerializer implements ByteBufferSerializer<VectorTypeInformation<?>> {
     @SuppressWarnings("unchecked")
@@ -302,6 +310,8 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
    * FIXME: "relation label" is actually not properly supported.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.uses VectorFieldTypeInformation
    */
   static class VectorFieldTypeSerializer implements ByteBufferSerializer<VectorFieldTypeInformation<?>> {
     @SuppressWarnings("unchecked")

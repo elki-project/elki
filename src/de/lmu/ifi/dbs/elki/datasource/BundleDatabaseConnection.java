@@ -46,6 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * indexes.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf BundleStreamSource 
  */
 public class BundleDatabaseConnection extends AbstractDatabaseConnection {
   /**

@@ -31,6 +31,8 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * Utility functions for handling database relation.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses Relation oneway
  */
 public final class RelationUtil {
   /**

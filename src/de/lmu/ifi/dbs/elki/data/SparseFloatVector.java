@@ -287,6 +287,8 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
    * Factory class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has SparseFloatVector
    */
   public static class Factory extends AbstractNumberVector.Factory<SparseFloatVector, Float> implements SparseNumberVector.Factory<SparseFloatVector, Float> {
     @Override

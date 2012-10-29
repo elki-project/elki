@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * @author Remigius Wojdanowski
  * 
  * @apiviz.uses ThumbnailVisualization oneway - - «create»
+ * @apiviz.excludeSubtypes
  */
 public abstract class AbstractVisFactory implements VisFactory {
   /**

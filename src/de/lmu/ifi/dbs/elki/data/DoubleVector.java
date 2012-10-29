@@ -264,7 +264,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has DoubleVector
+   * @apiviz.uses DoubleVector - - «serializes»
    */
   public static class SmallSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
@@ -302,7 +302,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has DoubleVector
+   * @apiviz.uses DoubleVector - - «serializes»
    */
   public static class ShortSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
@@ -338,7 +338,7 @@ public class DoubleVector extends AbstractNumberVector<Double> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has DoubleVector
+   * @apiviz.uses DoubleVector - - «serializes»
    */
   public static class VariableSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override

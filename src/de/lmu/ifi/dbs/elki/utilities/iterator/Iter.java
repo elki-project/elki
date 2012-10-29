@@ -52,6 +52,8 @@ package de.lmu.ifi.dbs.elki.utilities.iterator;
  * </pre>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
  */
 public interface Iter {
   /**

@@ -285,6 +285,8 @@ public class SparseDoubleVector extends AbstractNumberVector<Double> implements 
    * Factory class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has SparseDoubleVector
    */
   public static class Factory extends AbstractNumberVector.Factory<SparseDoubleVector, Double> implements SparseNumberVector.Factory<SparseDoubleVector, Double> {
     @Override

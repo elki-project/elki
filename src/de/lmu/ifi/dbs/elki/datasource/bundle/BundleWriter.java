@@ -39,6 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Bundle streams that add new columns are not supported.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses BundleStreamSource
+ * @apiviz.uses WritableByteChannel
  */
 public class BundleWriter {
   /**

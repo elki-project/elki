@@ -89,6 +89,8 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector<Double> {
    * Factory class.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has OneDimensionalDoubleVector
    */
   public static class Factory extends AbstractNumberVector.Factory<OneDimensionalDoubleVector, Double> {
     @Override

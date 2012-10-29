@@ -184,6 +184,8 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * Factory for float vectors.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has FloatVector
    */
   public static class Factory extends AbstractNumberVector.Factory<FloatVector, Float> {
     @Override
@@ -237,7 +239,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has FloatVector
+   * @apiviz.uses FloatVector - - «serializes»
    */
   public static class SmallSerializer implements ByteBufferSerializer<FloatVector> {
     @Override
@@ -275,7 +277,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has FloatVector
+   * @apiviz.uses FloatVector - - «serializes»
    */
   public static class ShortSerializer implements ByteBufferSerializer<FloatVector> {
     @Override
@@ -311,7 +313,7 @@ public class FloatVector extends AbstractNumberVector<Float> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has FloatVector
+   * @apiviz.uses FloatVector - - «serializes»
    */
   public static class VariableSerializer implements ByteBufferSerializer<FloatVector> {
     @Override

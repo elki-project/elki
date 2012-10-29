@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * 
  * @author Robert Rödler
  * @author Erich Schubert
+ * 
+ * @apiviz.uses SweepHullDelaunay2D.Triangle
+ * @apiviz.uses Projection2D
  */
 public class VoronoiDraw {
   /**

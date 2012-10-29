@@ -191,6 +191,8 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * Factory for integer vectors.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.has IntegerVector
    */
   public static class Factory extends AbstractNumberVector.Factory<IntegerVector, Integer> {
     @Override
@@ -244,7 +246,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has IntegerVector
+   * @apiviz.uses IntegerVector - - «serializes»
    */
   public static class SmallSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
@@ -282,7 +284,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has IntegerVector
+   * @apiviz.uses IntegerVector - - «serializes»
    */
   public static class ShortSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
@@ -318,7 +320,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.has IntegerVector
+   * @apiviz.uses IntegerVector - - «serializes»
    */
   public static class VariableSerializer implements ByteBufferSerializer<IntegerVector> {
     @Override
