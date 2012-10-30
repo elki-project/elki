@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDistanceDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -55,6 +56,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -93,16 +95,6 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
   private static final Logging LOG = Logging.getLogger(SLINK.class);
 
   /**
-   * The values of the function Pi of the pointer representation.
-   */
-  private WritableDBIDDataStore pi;
-
-  /**
-   * The values of the function Lambda of the pointer representation.
-   */
-  private WritableDataStore<D> lambda;
-
-  /**
    * Minimum number of clusters to extract
    */
   private int minclusters = -1;
@@ -125,8 +117,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     DistanceQuery<O, D> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     @SuppressWarnings("unchecked")
     Class<D> distCls = (Class<D>) getDistanceFunction().getDistanceFactory().getClass();
-    pi = DataStoreUtil.makeDBIDStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    lambda = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, distCls);
+    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    WritableDataStore<D> lambda = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, distCls);
     // Temporary storage for m.
     WritableDataStore<D> m = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, distCls);
 
@@ -134,17 +126,38 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     // has to be an array for monotonicity reasons!
     ModifiableDBIDs processedIDs = DBIDUtil.newArray(relation.size());
 
-    // apply the algorithm
-    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      step1(iditer);
-      step2(iditer, processedIDs, distQuery, m);
-      step3(iditer, processedIDs, m);
-      step4(iditer, processedIDs);
+    // Optimized code path for double distances
+    if (getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction && lambda instanceof WritableDoubleDistanceDataStore && m instanceof WritableDoubleDistanceDataStore) {
+      @SuppressWarnings("unchecked")
+      PrimitiveDoubleDistanceFunction<? super O> dist = (PrimitiveDoubleDistanceFunction<? super O>) getDistanceFunction();
+      WritableDoubleDistanceDataStore lambdad = (WritableDoubleDistanceDataStore) lambda;
+      WritableDoubleDistanceDataStore md = (WritableDoubleDistanceDataStore) m;
+      // apply the algorithm
+      for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+        step1double(id, pi, lambdad);
+        step2double(id, processedIDs, distQuery.getRelation(), dist, md);
+        step3double(id, pi, lambdad, processedIDs, md);
+        step4double(id, pi, lambdad, processedIDs);
 
-      processedIDs.add(iditer);
+        processedIDs.add(id);
 
-      if (progress != null) {
-        progress.incrementProcessed(LOG);
+        if (progress != null) {
+          progress.incrementProcessed(LOG);
+        }
+      }
+    } else {
+      // apply the algorithm
+      for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+        step1(id, pi, lambda);
+        step2(id, processedIDs, distQuery, m);
+        step3(id, pi, lambda, processedIDs, m);
+        step4(id, pi, lambda, processedIDs);
+
+        processedIDs.add(id);
+
+        if (progress != null) {
+          progress.incrementProcessed(LOG);
+        }
       }
     }
 
@@ -169,49 +182,52 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
   /**
    * First step: Initialize P(id) = id, L(id) = infinity.
-   * 
-   * @param newID the id of the object to be inserted into the pointer
+   * @param id the id of the object to be inserted into the pointer
    *        representation
+   * @param pi Pi data store
+   * @param lambda Lambda data store
    */
-  private void step1(DBIDRef newID) {
+  private void step1(DBIDRef id, WritableDBIDDataStore pi, WritableDataStore<D> lambda) {
     // P(n+1) = n+1:
-    pi.put(newID, newID);
+    pi.put(id, id);
     // L(n+1) = infinity
-    lambda.put(newID, getDistanceFunction().getDistanceFactory().infiniteDistance());
+    lambda.put(id, getDistanceFunction().getDistanceFactory().infiniteDistance());
   }
 
   /**
    * Second step: Determine the pairwise distances from all objects in the
    * pointer representation to the new object with the specified id.
    * 
-   * @param newID the id of the object to be inserted into the pointer
+   * @param id the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
    * @param m Data store
    * @param distFunc Distance function to use
    */
-  private void step2(DBIDRef newID, DBIDs processedIDs, DistanceQuery<O, D> distFunc, WritableDataStore<D> m) {
+  private void step2(DBIDRef id, DBIDs processedIDs, DistanceQuery<O, D> distFunc, WritableDataStore<D> m) {
+    O newObj = distFunc.getRelation().get(id);
     for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       // M(i) = dist(i, n+1)
-      m.put(it, distFunc.distance(it, newID));
+      m.put(it, distFunc.distance(it, newObj));
     }
   }
 
   /**
    * Third step: Determine the values for P and L
-   * 
-   * @param newID the id of the object to be inserted into the pointer
+   * @param id the id of the object to be inserted into the pointer
    *        representation
+   * @param pi Pi data store
+   * @param lambda Lambda data store
    * @param processedIDs the already processed ids
    * @param m Data store
    */
-  private void step3(DBIDRef newID, DBIDs processedIDs, WritableDataStore<D> m) {
-    // for i = 1..n
+  private void step3(DBIDRef id, WritableDBIDDataStore pi, WritableDataStore<D> lambda, DBIDs processedIDs, WritableDataStore<D> m) {
     DBIDVar p_i = DBIDUtil.newVar();
+    // for i = 1..n
     for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       D l_i = lambda.get(it);
       D m_i = m.get(it);
-      pi.assignVar(it, p_i);
+      pi.assignVar(it, p_i); // p_i = pi(it)
       D mp_i = m.get(p_i);
 
       // if L(i) >= M(i)
@@ -223,7 +239,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
         lambda.put(it, m_i);
 
         // P(i) = n+1;
-        pi.put(it, newID);
+        pi.put(it, id);
       } else {
         // M(P(i)) = min { M(P(i)), M(i) }
         m.put(p_i, DistanceUtil.min(mp_i, m_i));
@@ -233,22 +249,114 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
   /**
    * Fourth step: Actualize the clusters if necessary
-   * 
-   * @param newID the id of the current object
+   * @param id the id of the current object
+   * @param pi Pi data store
+   * @param lambda Lambda data store
    * @param processedIDs the already processed ids
    */
-  private void step4(DBIDRef newID, DBIDs processedIDs) {
-    // for i = 1..n
+  private void step4(DBIDRef id, WritableDBIDDataStore pi, WritableDataStore<D> lambda, DBIDs processedIDs) {
     DBIDVar p_i = DBIDUtil.newVar();
+    // for i = 1..n
     for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
       D l_i = lambda.get(it);
-      pi.assignVar(it, p_i);
+      pi.assignVar(it, p_i); // p_i = pi(it)
       D lp_i = lambda.get(p_i);
 
       // if L(i) >= L(P(i))
       if (l_i.compareTo(lp_i) >= 0) {
         // P(i) = n+1
-        pi.put(it, newID);
+        pi.put(it, id);
+      }
+    }
+  }
+
+  /**
+   * First step: Initialize P(id) = id, L(id) = infinity.
+   * @param id the id of the object to be inserted into the pointer
+   *        representation
+   * @param pi Pi data store
+   * @param lambda Lambda data store
+   */
+  private void step1double(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDistanceDataStore lambda) {
+    // P(n+1) = n+1:
+    pi.put(id, id);
+    // L(n+1) = infinity
+    lambda.putDouble(id, Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Second step: Determine the pairwise distances from all objects in the
+   * pointer representation to the new object with the specified id.
+   * 
+   * @param id the id of the object to be inserted into the pointer
+   *        representation
+   * @param processedIDs the already processed ids
+   * @param m Data store
+   * @param relation Data relation
+   * @param distFunc Distance function to use
+   */
+  private void step2double(DBIDRef id, DBIDs processedIDs, Relation<? extends O> relation, PrimitiveDoubleDistanceFunction<? super O> distFunc, WritableDoubleDistanceDataStore m) {
+    O newObj = relation.get(id);
+    for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+      // M(i) = dist(i, n+1)
+      m.putDouble(it, distFunc.doubleDistance(relation.get(it), newObj));
+    }
+  }
+
+  /**
+   * Third step: Determine the values for P and L
+   * @param id the id of the object to be inserted into the pointer
+   *        representation
+   * @param pi Pi data store
+   * @param lambda Lambda data store
+   * @param processedIDs the already processed ids
+   * @param m Data store
+   */
+  private void step3double(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDistanceDataStore lambda, DBIDs processedIDs, WritableDoubleDistanceDataStore m) {
+    DBIDVar p_i = DBIDUtil.newVar();
+    // for i = 1..n
+    for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+      double l_i = lambda.doubleValue(it);
+      double m_i = m.doubleValue(it);
+      pi.assignVar(it, p_i);  // p_i = pi(it)
+      double mp_i = m.doubleValue(p_i);
+  
+      // if L(i) >= M(i)
+      if (l_i >= m_i) {
+        // M(P(i)) = min { M(P(i)), L(i) }
+        m.putDouble(p_i, Math.min(mp_i, l_i));
+  
+        // L(i) = M(i)
+        lambda.putDouble(it, m_i);
+  
+        // P(i) = n+1;
+        pi.put(it, id);
+      } else {
+        // M(P(i)) = min { M(P(i)), M(i) }
+        m.putDouble(p_i, Math.min(mp_i, m_i));
+      }
+    }
+  }
+
+  /**
+   * Fourth step: Actualize the clusters if necessary
+   * @param id the id of the current object
+   * @param pi Pi data store
+   * @param lambda Lambda data store
+   * @param processedIDs the already processed ids
+   */
+  private void step4double(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDistanceDataStore lambda, DBIDs processedIDs) {
+    DBIDVar p_i = DBIDUtil.newVar();
+    // for i = 1..n
+    for (DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+      double l_i = lambda.doubleValue(it);
+      pi.assignVar(it, p_i); // p_i = pi(it)
+      double lp_i = lambda.doubleValue(p_i);
+  
+      // if L(i) >= L(P(i))
+      if (l_i >= lp_i) {
+        // P(i) = n+1
+        pi.put(it, id);
       }
     }
   }
@@ -385,7 +493,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
           cids.add(succ);
           Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids, hier);
           hier.add(pclus, clus);
-          assert(clusters.size() == parentid);
+          assert (clusters.size() == parentid);
           clusters.add(pclus); // Remember parent cluster
           cluster_map.putInt(succ, parentid); // Reference
         }

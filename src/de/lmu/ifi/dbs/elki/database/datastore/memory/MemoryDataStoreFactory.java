@@ -27,10 +27,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDistanceDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Simple factory class that will store all data in memory using object arrays
@@ -51,6 +53,9 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
   @SuppressWarnings("unchecked")
   @Override
   public <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass) {
+    if (DoubleDistance.class.equals(dataclass)) {
+      return (WritableDataStore<T>) makeDoubleDistanceStorage(ids, hints);
+    }
     if (Double.class.equals(dataclass)) {
       return (WritableDataStore<T>) makeDoubleStorage(ids, hints);
     }
@@ -75,6 +80,23 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
     }
     else {
       return new MapIntegerDBIDDBIDStore(ids.size());
+    }
+  }
+
+  /**
+   * Make a data storage for double distances.
+   * 
+   * @param ids IDs to store for
+   * @param hints Storage hints
+   * @return double distance storage
+   */
+  public WritableDoubleDistanceDataStore makeDoubleDistanceStorage(DBIDs ids, int hints) {
+    if(ids instanceof DBIDRange) {
+      DBIDRange range = (DBIDRange) ids;
+      return new ArrayDoubleDistanceStore(range.size(), range);
+    }
+    else {
+      return new MapIntegerDBIDDoubleDistanceStore(ids.size());
     }
   }
 
