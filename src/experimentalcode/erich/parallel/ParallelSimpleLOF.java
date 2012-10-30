@@ -114,7 +114,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
       minmax = mmm.getMinMax();
     }
 
-    Relation<Double> scoreres = new MaterializedRelation<Double>("Local Outlier Factor", "lof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    Relation<Double> scoreres = new MaterializedRelation<Double>("Simple Local Outlier Factor", "simple-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(meta, scoreres);
   }
