@@ -32,12 +32,16 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * @apiviz.landmark
  * @apiviz.composedOf StylingPolicy
  */
-// TODO: pull style library etc. from VisualizerContext here?
 public class StyleResult implements Result {
   /**
    * Styling policy
    */
   StylingPolicy policy;
+
+  /**
+   * Style library
+   */
+  StyleLibrary library;
 
   /**
    * Get the active styling policy
@@ -55,6 +59,24 @@ public class StyleResult implements Result {
    */
   public void setStylingPolicy(StylingPolicy policy) {
     this.policy = policy;
+  }
+
+  /**
+   * Get the style library
+   * 
+   * @return Style library
+   */
+  public StyleLibrary getStyleLibrary() {
+    return library;
+  }
+
+  /**
+   * Get the style library
+   * 
+   * @param library Style library
+   */
+  public void setStyleLibrary(StyleLibrary library) {
+    this.library = library;
   }
 
   @Override

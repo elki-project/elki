@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
-import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
@@ -89,11 +88,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * The style library of this context
-   */
-  private StyleLibrary stylelib;
-
-  /**
    * Projectors to use
    */
   private Collection<ProjectorFactory> projectors;
@@ -117,14 +111,12 @@ public class VisualizerContext implements DataStoreListener, Result {
    * Constructor. We currently require a Database and a Result.
    * 
    * @param result Result
-   * @param stylelib Style library
    * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
    */
   public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
     super();
     this.result = result;
-    this.stylelib = stylelib;
     this.projectors = projectors;
     this.factories = factories;
 
@@ -133,16 +125,16 @@ public class VisualizerContext implements DataStoreListener, Result {
     final Database db = ResultUtil.findDatabase(result);
     ResultUtil.ensureClusteringResult(db, result);
     this.selection = ResultUtil.ensureSelectionResult(db);
-    for(Relation<?> rel : ResultUtil.getRelations(result)) {
+    for (Relation<?> rel : ResultUtil.getRelations(result)) {
       ResultUtil.getSamplingResult(rel);
       // FIXME: this is a really ugly workaround. :-(
-      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      if (TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<? extends NumberVector<?>> vrel = (Relation<? extends NumberVector<?>>) rel;
         ResultUtil.getScalesResult(vrel);
       }
     }
-    getStyleResult();
+    makeStyleResult(stylelib);
 
     // result.getHierarchy().add(result, this);
 
@@ -151,7 +143,8 @@ public class VisualizerContext implements DataStoreListener, Result {
 
     // For proxying events.
     ResultUtil.findDatabase(result).addDataStoreListener(this);
-    // Add a result listener. Don't expose these methods to avoid inappropriate use.
+    // Add a result listener. Don't expose these methods to avoid inappropriate
+    // use.
     addResultListener(new ResultListener() {
       @Override
       public void resultAdded(Result child, Result parent) {
@@ -168,6 +161,27 @@ public class VisualizerContext implements DataStoreListener, Result {
         // FIXME: implement
       }
     });
+  }
+
+  /**
+   * Wrap style library into a style result.
+   * 
+   * @param stylelib Style library
+   * @return Style result
+   */
+  protected void makeStyleResult(StyleLibrary stylelib) {
+    styleresult = new StyleResult();
+    styleresult.setStyleLibrary(stylelib);
+    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
+    if (clusterings.size() > 0) {
+      styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
+      result.getHierarchy().add(result, styleresult);
+      return;
+    } else {
+      Clustering<Model> c = generateDefaultClustering();
+      styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
+      result.getHierarchy().add(result, styleresult);
+    }
   }
 
   /**
@@ -193,11 +207,9 @@ public class VisualizerContext implements DataStoreListener, Result {
    * 
    * @return style library
    */
+  @Deprecated
   public StyleLibrary getStyleLibrary() {
-    if(stylelib == null) {
-      stylelib = new PropertiesBasedStyleLibrary();
-    }
-    return stylelib;
+    return getStyleResult().getStyleLibrary();
   }
 
   /**
@@ -206,19 +218,6 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @return Style result
    */
   public StyleResult getStyleResult() {
-    if(styleresult == null) {
-      styleresult = new StyleResult();
-      List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
-      if(clusterings.size() > 0) {
-        styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
-        result.getHierarchy().add(result, styleresult);
-        return styleresult;
-      }
-      Clustering<Model> c = generateDefaultClustering();
-      styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
-      result.getHierarchy().add(result, styleresult);
-      return styleresult;
-    }
     return styleresult;
   }
 
@@ -234,8 +233,7 @@ public class VisualizerContext implements DataStoreListener, Result {
       // Try to cluster by labels
       ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
       c = split.run(db);
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // Put everything into one
       c = new TrivialAllInOne().run(db);
     }
@@ -304,7 +302,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   @Override
   public void contentChanged(DataStoreEvent e) {
-    for(DataStoreListener listener : listenerList.getListeners(DataStoreListener.class)) {
+    for (DataStoreListener listener : listenerList.getListeners(DataStoreListener.class)) {
       listener.contentChanged(e);
     }
   }
@@ -316,20 +314,18 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param newResult Newly added Result
    */
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    for(ProjectorFactory p : projectors) {
+    for (ProjectorFactory p : projectors) {
       try {
         p.processNewResult(baseResult, newResult);
-      }
-      catch(Throwable e) {
+      } catch (Throwable e) {
         LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
       }
     }
     // Collect all visualizers.
-    for(VisFactory f : factories) {
+    for (VisFactory f : factories) {
       try {
         f.processNewResult(baseResult, newResult);
-      }
-      catch(Throwable e) {
+      } catch (Throwable e) {
         LOG.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
       }
     }
