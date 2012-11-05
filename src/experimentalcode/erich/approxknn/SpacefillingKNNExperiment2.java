@@ -254,7 +254,7 @@ public class SpacefillingKNNExperiment2 {
           // Candidate set size: distance computations
           mdic.get(i)[0].put(rec.get(0).first.size());
           // Intersection size = recall
-          final int isize = DBIDUtil.intersection(trueIds, rec.get(0).first).size();
+          final int isize = DBIDUtil.intersectionSize(trueIds, rec.get(0).first);
           mrec.get(i)[0].put(isize);
           // Error = quotient of distances
           double err = rec.get(0).second.doubleKNNDistance() / trueNN.getKNNDistance().doubleValue();

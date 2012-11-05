@@ -145,7 +145,7 @@ public class SpacefillingKNNExperiment {
             candz.add(zs.get(posi[0] + off).id);
           }
 
-          final int isize = DBIDUtil.intersection(trueIds, candz).size();
+          final int isize = DBIDUtil.intersectionSize(trueIds, candz);
           mvs.get(off)[0].put(isize);
         }
       }
@@ -162,7 +162,7 @@ public class SpacefillingKNNExperiment {
             candp.add(ps.get(posi[1] + off).id);
           }
 
-          final int isize = DBIDUtil.intersection(trueIds, candp).size();
+          final int isize = DBIDUtil.intersectionSize(trueIds, candp);
           mvs.get(off)[1].put(isize);
         }
       }
@@ -179,7 +179,7 @@ public class SpacefillingKNNExperiment {
             candh.add(hs.get(posi[2] + off).id);
           }
 
-          final int isize = DBIDUtil.intersection(trueIds, candh).size();
+          final int isize = DBIDUtil.intersectionSize(trueIds, candh);
           mvs.get(off)[2].put(isize);
         }
       }
@@ -209,7 +209,7 @@ public class SpacefillingKNNExperiment {
             cands.add(hs.get(posi[2] + off).id);
           }
 
-          final int isize = DBIDUtil.intersection(trueIds, cands).size();
+          final int isize = DBIDUtil.intersectionSize(trueIds, cands);
           mvs.get(off)[3].put(isize);
         }
       }
