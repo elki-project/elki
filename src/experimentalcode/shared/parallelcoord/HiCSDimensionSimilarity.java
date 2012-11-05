@@ -52,7 +52,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
   /**
    * Random generator
    */
-  private RandomFactory rnd;
+  private RandomFactory rnd = RandomFactory.DEFAULT;
 
   @Override
   public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, ProjectionParallel proj, DBIDs subset) {
