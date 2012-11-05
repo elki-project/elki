@@ -296,7 +296,7 @@ public final class DBIDUtil {
    * @param second Second set
    * @return result.
    */
-  // TODO: optimize?
+  // TODO: optimize better?
   public static ModifiableDBIDs intersection(DBIDs first, DBIDs second) {
     if (first.size() > second.size()) {
       return intersection(second, first);
@@ -308,6 +308,26 @@ public final class DBIDUtil {
       }
     }
     return inter;
+  }
+
+  /**
+   * Compute the set intersection size of two sets.
+   * 
+   * @param first First set
+   * @param second Second set
+   * @return size
+   */
+  public static int intersectionSize(DBIDs first, DBIDs second) {
+    if (first.size() > second.size()) {
+      return intersectionSize(second, first);
+    }
+    int c = 0;
+    for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
+      if (second.contains(it)) {
+        c++;
+      }
+    }
+    return c;
   }
 
   /**

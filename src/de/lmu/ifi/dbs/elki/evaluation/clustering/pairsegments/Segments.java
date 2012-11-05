@@ -207,7 +207,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
         else {
           // Add to results.
           // In fact, nfirstp should equal nsecond here
-          int selfpairs = DBIDUtil.intersection(nfirstp, nsecond).size();
+          int selfpairs = DBIDUtil.intersectionSize(nfirstp, nsecond);
           if(objectsegment) {
             makeOrUpdateSegment(path, nfirstp, (nfirstp.size() * nsecond.size()) - selfpairs);
           }
