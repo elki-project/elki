@@ -36,4 +36,8 @@ public interface HashSetModifiableDBIDs extends HashSetDBIDs, ModifiableDBIDs {
    * @return true when modified
    */
   public boolean retainAll(DBIDs set);
+
+  // To help the compilers...
+  @Override
+  DBIDMIter iter();
 }
