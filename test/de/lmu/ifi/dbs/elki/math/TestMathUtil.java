@@ -44,7 +44,7 @@ public class TestMathUtil implements JUnit4Test {
     double[] weight2 = new double[size];
 
     Random r = new Random(seed);
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
       data1[i] = r.nextDouble();
       data2[i] = r.nextDouble();
       weight1[i] = 1.0;
@@ -84,7 +84,7 @@ public class TestMathUtil implements JUnit4Test {
   @Test
   public void testFloatToDouble() {
     Random r = new Random(1l);
-    for(int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; i++) {
       final double dbl = Double.longBitsToDouble(r.nextLong());
       final float flt = (float) dbl;
       final double uppd = MathUtil.floatToDoubleUpper(flt);
