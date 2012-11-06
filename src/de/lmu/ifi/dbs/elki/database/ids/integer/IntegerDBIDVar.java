@@ -49,6 +49,15 @@ class IntegerDBIDVar implements DBIDVar {
    * 
    * @param val
    */
+  protected IntegerDBIDVar() {
+    this.id = -1;
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param val
+   */
   protected IntegerDBIDVar(DBIDRef val) {
     this.id = val.internalGetIndex();
   }
