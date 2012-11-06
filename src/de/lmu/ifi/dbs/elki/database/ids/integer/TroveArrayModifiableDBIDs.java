@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
@@ -82,7 +81,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   @Override
   public boolean addDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       success |= store.add(DBIDUtil.asInteger(iter));
     }
     return success;
@@ -91,7 +90,7 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   @Override
   public boolean removeDBIDs(DBIDs ids) {
     boolean success = false;
-    for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
+    for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       success |= store.remove(DBIDUtil.asInteger(id));
     }
     return success;
@@ -130,18 +129,12 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
 
   @Override
   public void sort(Comparator<? super DBIDRef> comparator) {
-    // FIXME: optimize, avoid the extra copy?
-    // Clone data
-    DBID[] data = new DBID[store.size()];
-    for(int i = 0; i < store.size(); i++) {
-      data[i] = new IntegerDBID(store.get(i));
-    }
-    // Sort
-    Arrays.sort(data, comparator);
-    // Copy back
-    for(int i = 0; i < store.size(); i++) {
-      store.set(i, DBIDUtil.asInteger(data[i]));
-    }
+    // TODO: we no longer produce a lot of DBIDs anymore, but it would be even
+    // cooler if we could access store._data directly...
+    int[] data = store.toArray();
+    IntegerDBIDArrayQuickSort.sort(data, comparator);
+    store.clear();
+    store.add(data);
   }
 
   @Override
