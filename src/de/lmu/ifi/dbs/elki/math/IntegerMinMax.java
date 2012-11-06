@@ -29,7 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 /**
  * Class to find the minimum and maximum int values in data.
  * 
- * @author Erich Schubert, Arthur Zimek
+ * @author Erich Schubert
+ * @author Arthur Zimek
  */
 public class IntegerMinMax extends IntIntPair {
   /**
