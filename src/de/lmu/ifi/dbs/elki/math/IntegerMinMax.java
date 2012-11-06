@@ -111,7 +111,7 @@ public class IntegerMinMax extends IntIntPair {
    * 
    * @return current minimum.
    */
-  public double getMin() {
+  public int getMin() {
     return this.first;
   }
 
@@ -120,7 +120,7 @@ public class IntegerMinMax extends IntIntPair {
    * 
    * @return current maximum.
    */
-  public double getMax() {
+  public int getMax() {
     return this.second;
   }
 
@@ -129,7 +129,7 @@ public class IntegerMinMax extends IntIntPair {
    * 
    * @return Difference of current Minimum and Maximum.
    */
-  public double getDiff() {
+  public int getDiff() {
     return this.getMax() - this.getMin();
   }
 
@@ -147,8 +147,8 @@ public class IntegerMinMax extends IntIntPair {
    * 
    * @return Minimum, Maximum
    */
-  public double[] asDoubleArray() {
-    return new double[] { this.getMin(), this.getMax() };
+  public int[] asIntArray() {
+    return new int[] { this.getMin(), this.getMax() };
   }
 
   /**
