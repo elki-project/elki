@@ -1,4 +1,4 @@
-package experimentalcode.shared.parallelcoord;
+package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
 
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 
