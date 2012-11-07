@@ -215,7 +215,7 @@ public abstract class DimensionSimilarityMatrix {
 
     @Override
     public double distance(DimensionSimilarityMatrix data, int i, int j) {
-      return Math.abs(data.get(i, j));
+      return -Math.abs(data.get(i, j));
     }
 
     @Override
