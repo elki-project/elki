@@ -39,7 +39,7 @@ public interface DimensionSimilarity<V> {
    * 
    * @param relation Relation
    * @param subset DBID subset (for sampling / selection)
-   * @return similarity matrix
+   * @param matrix Matrix to fill
    */
-  public double[][] computeDimensionSimilarites(Relation<? extends V> relation, DBIDs subset);
+  public void computeDimensionSimilarites(Relation<? extends V> relation, DBIDs subset, DimensionSimilarityMatrix matrix);
 }

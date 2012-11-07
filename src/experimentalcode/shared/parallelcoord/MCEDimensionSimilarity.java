@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -61,9 +60,8 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
   public static final int TARGET = 35;
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
-    final int dim = RelationUtil.dimensionality(relation);
-    double[][] mat = new double[dim][dim];
+  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
 
     // Find a number of bins as recommended by Cheng et al.
     double p = Math.log(subset.size() / (double) TARGET) / MathUtil.LOG2;
@@ -73,7 +71,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
     int gridsize = 1 << power;
     double loggrid = Math.log((double) gridsize);
 
-    ArrayList<ArrayList<DBIDs>> parts = buildPartitions(relation, subset, power);
+    ArrayList<ArrayList<DBIDs>> parts = buildPartitions(relation, subset, power, matrix);
 
     // Partition sizes
     int[][] psizes = new int[dim][gridsize];
@@ -86,19 +84,15 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
     }
 
     int[][] res = new int[gridsize][gridsize];
-    for (int i = 0; i < dim - 1; i++) {
-      ArrayList<DBIDs> partsi = parts.get(i);
-      for (int j = i + 1; j < dim; j++) {
-        ArrayList<DBIDs> partsj = parts.get(j);
+    for (int x = 0; x < dim; x++) {
+      ArrayList<DBIDs> partsi = parts.get(x);
+      for (int y = x + 1; y < dim; y++) {
+        ArrayList<DBIDs> partsj = parts.get(y);
         // Fill the intersection matrix
         intersectionMatrix(res, partsi, partsj, gridsize);
-        double temp = 1. - getMCEntropy(res, psizes[i], psizes[j], subset.size(), gridsize, loggrid);
-        mat[i][j] = temp;
-        mat[j][i] = temp;
+        matrix.set(x, y, 1. - getMCEntropy(res, psizes[x], psizes[y], subset.size(), gridsize, loggrid));
       }
     }
-
-    return mat;
   }
 
   /**
@@ -171,27 +165,29 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
    * 
    * @param relation Relation to index
    * @param ids IDs to use
+   * @param matrix Matrix for dimension information
    * @return List of sorted objects
    */
-  private ArrayList<ArrayList<DBIDs>> buildPartitions(Relation<? extends NumberVector<?>> relation, DBIDs ids, int depth) {
-    final int dim = RelationUtil.dimensionality(relation);
+  private ArrayList<ArrayList<DBIDs>> buildPartitions(Relation<? extends NumberVector<?>> relation, DBIDs ids, int depth, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
     ArrayList<ArrayList<DBIDs>> subspaceIndex = new ArrayList<ArrayList<DBIDs>>(dim);
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
     double[] tmp = new double[ids.size()];
     Mean mean = new Mean();
 
     for (int i = 0; i < dim; i++) {
+      final int d = matrix.dim(i);
       // Index for a single dimension:
       ArrayList<DBIDs> idx = new ArrayList<DBIDs>(1 << depth);
       // First, we need a copy of the DBIDs and sort it.
       ArrayModifiableDBIDs sids = DBIDUtil.newArray(ids);
-      comp.setDimension(i);
+      comp.setDimension(d);
       sids.sort(comp);
       // Now we build the temp array, and compute the first mean.
       DBIDArrayIter it = sids.iter();
       for (int j = 0; j < tmp.length; j++, it.advance()) {
         assert (it.valid());
-        tmp[j] = relation.get(it).doubleValue(i);
+        tmp[j] = relation.get(it).doubleValue(d);
       }
       divide(it, tmp, idx, 0, tmp.length, depth, mean);
       assert (idx.size() == (1 << depth));

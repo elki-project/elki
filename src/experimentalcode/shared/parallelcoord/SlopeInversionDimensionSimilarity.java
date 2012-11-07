@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -58,8 +57,8 @@ public class SlopeInversionDimensionSimilarity implements DimensionSimilarity<Nu
   private final static double RESCALE = PRECISION * .5;
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
-    final int dim = RelationUtil.dimensionality(relation);
+  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
     final int size = subset.size();
 
     // Collect angular histograms.
@@ -75,8 +74,8 @@ public class SlopeInversionDimensionSimilarity implements DimensionSimilarity<Nu
       NumberVector<?> min = mm.first;
       NumberVector<?> max = mm.second;
       for (int d = 0; d < dim; d++) {
-        off[d] = min.doubleValue(d);
-        final double m = max.doubleValue(d);
+        off[d] = min.doubleValue(matrix.dim(d));
+        final double m = max.doubleValue(matrix.dim(d));
         scale[d] = (m > off[d]) ? 1. / (m - off[d]) : 1;
       }
     }
@@ -87,7 +86,7 @@ public class SlopeInversionDimensionSimilarity implements DimensionSimilarity<Nu
       final NumberVector<?> obj = relation.get(id);
       // Map values to 0..1
       for (int d = 0; d < dim; d++) {
-        vec[d] = (obj.doubleValue(d) - off[d]) * scale[d];
+        vec[d] = (obj.doubleValue(matrix.dim(d)) - off[d]) * scale[d];
       }
       for (int i = 0; i < dim - 1; i++) {
         for (int j = i + 1; j < dim; j++) {
@@ -112,12 +111,11 @@ public class SlopeInversionDimensionSimilarity implements DimensionSimilarity<Nu
     }
 
     // Compute entropy in each combination:
-    double[][] angmat = new double[dim][dim];
-    for (int i = 0; i < dim - 1; i++) {
-      for (int j = i + 1; j < dim; j++) {
+    for (int x = 0; x < dim; x++) {
+      for (int y = x + 1; y < dim; y++) {
         double entropy = 0., entropyI = 0;
         {
-          int[] as = angles[i][j];
+          int[] as = angles[x][y];
           for (int l = 0; l < PRECISION; l++) {
             if (as[l] > 0) {
               final double p = as[l] / (double) size;
@@ -126,7 +124,7 @@ public class SlopeInversionDimensionSimilarity implements DimensionSimilarity<Nu
           }
         }
         {
-          int[] as = angleI[i][j];
+          int[] as = angleI[x][y];
           for (int l = 0; l < PRECISION; l++) {
             if (as[l] > 0) {
               final double p = as[l] / (double) size;
@@ -136,16 +134,13 @@ public class SlopeInversionDimensionSimilarity implements DimensionSimilarity<Nu
         }
         if (entropy >= entropyI) {
           entropy = 1 + entropy / LOG_PRECISION;
-          angmat[i][j] = entropy;
-          angmat[j][i] = entropy;
+          matrix.set(x, y, entropy);
         } else {
           entropyI = 1 + entropyI / LOG_PRECISION;
           // Negative sign to indicate the axes might be inversely related
-          angmat[i][j] = -entropyI;
-          angmat[j][i] = -entropyI;
+          matrix.set(x, y, -entropyI);
         }
       }
     }
-    return angmat;
   }
 }

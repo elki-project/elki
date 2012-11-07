@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.Mean;
@@ -64,17 +63,19 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", title = "Subspace Selection for Clustering High-Dimensional Data", booktitle = "IEEE International Conference on Data Mining, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10112")
 public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
-    final int dim = RelationUtil.dimensionality(relation);
+  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
     final Database db = relation.getDatabase();
-    double[][] mat = new double[dim][dim];
     Mean kdistmean = new Mean();
     final int k = Math.max(1, subset.size() / 10);
 
     double[] knns = new double[subset.size()];
 
-    for (int i = 0; i < dim - 1; i++) {
-      for (int j = i + 1; j < dim; j++) {
+    // TODO: optimize by using 1d indexes?
+    for (int x = 0; x < dim; x++) {
+      final int i = matrix.dim(x);
+      for (int y = x + 1; y < dim; y++) {
+        final int j = matrix.dim(y);
         BitSet dims = new BitSet(dim);
         dims.set(i);
         dims.set(j);
@@ -98,11 +99,8 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
             below++;
           }
         }
-        final double quality = (below > 0) ? diff / (2. * mean * below) : 0;
-        mat[i][j] = quality;
-        mat[j][i] = quality;
+        matrix.set(x, y, (below > 0) ? diff / (2. * mean * below) : 0);
       }
     }
-    return mat;
   }
 }

@@ -25,7 +25,6 @@ package experimentalcode.shared.parallelcoord;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 
 /**
@@ -35,25 +34,22 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
  */
 public class CovarianceDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
-    final int dim = RelationUtil.dimensionality(relation);
+  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
+    // FIXME: Use only necessary dimensions!
     CovarianceMatrix covmat = CovarianceMatrix.make(relation, subset);
     double[][] mat = covmat.destroyToSampleMatrix().getArrayRef();
     // Transform diagonal to 1 / stddev
-    for (int i = 0; i < dim; i++) {
+    for (int i = 0; i < mat.length; i++) {
       mat[i][i] = 1. / Math.sqrt(mat[i][i]);
     }
-    // Rescale others using the expected covariance
-    for (int i = 0; i < dim; i++) {
-      for (int j = i + 1; j < dim; j++) {
-        mat[i][j] = mat[i][j] * mat[i][i] * mat[j][j];
-        mat[j][i] = mat[i][j];
+    // Fill output matrix:
+    for (int x = 0; x < dim; x++) {
+      final int i = matrix.dim(x);
+      for (int y = x + 1; y < dim; y++) {
+        final int j = matrix.dim(y);
+        matrix.set(x, y, mat[i][j] * mat[i][i] * mat[j][j]);
       }
     }
-    // To avoid confusion, zero out the diagonal.
-    for (int i = 0; i < dim; i++) {
-      mat[i][i] = 0;
-    }
-    return mat;
   }
 }

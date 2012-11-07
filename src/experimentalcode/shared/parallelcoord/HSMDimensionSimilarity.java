@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.SinCosTable;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -66,8 +65,8 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   SinCosTable table = SinCosTable.make(STEPS);
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
-    final int dim = RelationUtil.dimensionality(relation);
+  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
     final int resolution = 500;
     byte[][][][] pics = new byte[dim][dim][][]; // [resolution][resolution];
 
@@ -85,8 +84,8 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
       NumberVector<?> min = mm.first;
       NumberVector<?> max = mm.second;
       for (int d = 0; d < dim; d++) {
-        off[d] = min.doubleValue(d);
-        final double m = max.doubleValue(d);
+        off[d] = min.doubleValue(matrix.dim(d));
+        final double m = max.doubleValue(matrix.dim(d));
         scale[d] = (m > off[d]) ? 1. / (m - off[d]) : 1;
       }
     }
@@ -95,17 +94,18 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
       NumberVector<?> pvec = relation.get(id);
       for (int i = 0; i < dim - 1; i++) {
         for (int j = i + 1; j < dim; j++) {
-          double xi = (pvec.doubleValue(i) - off[i]) * scale[i];
-          double xj = (pvec.doubleValue(j) - off[j]) * scale[j];
+          double xi = (pvec.doubleValue(matrix.dim(i)) - off[i]) * scale[i];
+          double xj = (pvec.doubleValue(matrix.dim(j)) - off[j]) * scale[j];
           drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pics[i][j]);
         }
       }
     }
 
     final double stepsq = (double) STEPS * (double) STEPS;
-    double[][] mat = new double[dim][dim];
-    for (int i = 0; i < dim - 1; i++) {
-      for (int j = i + 1; j < dim; j++) {
+    for (int x = 0; x < dim; x++) {
+      final int i = matrix.dim(x);
+      for (int y = x + 1; y < dim; y++) {
+        final int j = matrix.dim(y);
         int[][] hough = houghTransformation(pics[i][j]);
         pics[i][j] = null; // Release picture
         // The original publication said "median", but judging from the text,
@@ -114,11 +114,9 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
         double mean = sumMatrix(hough) / stepsq;
         int abovemean = countAboveThreshold(hough, mean);
 
-        mat[i][j] = 1. - (abovemean / stepsq);
-        mat[j][i] = 1. - (abovemean / stepsq);
+        matrix.set(x, y, 1. - (abovemean / stepsq));
       }
     }
-    return mat;
   }
 
   /**
