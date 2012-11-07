@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Class to compute the dimension similarity based on covariances.
@@ -33,6 +34,18 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
  * @author Erich Schubert
  */
 public class CovarianceDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+  /**
+   * Static instance
+   */
+  public static final CovarianceDimensionSimilarity STATIC = new CovarianceDimensionSimilarity();
+
+  /**
+   * Constructor. Use static instance.
+   */
+  protected CovarianceDimensionSimilarity() {
+    super();
+  }
+
   @Override
   public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
@@ -50,6 +63,20 @@ public class CovarianceDimensionSimilarity implements DimensionSimilarity<Number
         final int j = matrix.dim(y);
         matrix.set(x, y, mat[i][j] * mat[i][i] * mat[j][j]);
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected CovarianceDimensionSimilarity makeInstance() {
+      return STATIC;
     }
   }
 }

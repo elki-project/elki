@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -38,19 +39,31 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   /**
+   * Static instance.
+   */
+  public static final SlopeDimensionSimilarity STATIC = new SlopeDimensionSimilarity();
+
+  /**
    * Full precision.
    */
-  private final static int PRECISION = 40;
+  protected final static int PRECISION = 40;
 
   /**
    * Precision for entropy normalization.
    */
-  private final static double LOG_PRECISION = Math.log(PRECISION);
+  protected final static double LOG_PRECISION = Math.log(PRECISION);
 
   /**
    * Scaling factor.
    */
-  private final static double RESCALE = PRECISION * .5;
+  protected final static double RESCALE = PRECISION * .5;
+
+  /**
+   * Constructor. Use static instance instead!
+   */
+  protected SlopeDimensionSimilarity() {
+    super();
+  }
 
   @Override
   public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
@@ -110,6 +123,20 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
 
         matrix.set(x, y, 1 + entropy);
       }
+    }
+  }
+  
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected SlopeDimensionSimilarity makeInstance() {
+      return STATIC;
     }
   }
 }
