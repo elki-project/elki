@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
@@ -77,22 +76,21 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
   private RandomFactory rnd = RandomFactory.DEFAULT;
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
+  public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final Random random = rnd.getRandom();
-    final int dim = RelationUtil.dimensionality(relation);
+    final int dim = matrix.size();
 
-    ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation, subset);
+    // FIXME: only compute indexes necessary.
+    ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation, subset, matrix);
 
-    double[][] mat = new double[dim][dim];
     // compute two-element sets of subspaces
-    for (int i = 0; i < dim; i++) {
-      for (int j = i + 1; j < dim; j++) {
-        double contrast = calculateContrast(relation, subspaceIndex, subset, i, j, random);
-        mat[i][j] = contrast;
-        mat[j][i] = contrast;
+    for (int x = 0; x < dim; x++) {
+      final int i = matrix.dim(x);
+      for (int y = x + 1; y < dim; y++) {
+        final int j = matrix.dim(y);
+        matrix.set(x, y, calculateContrast(relation, subset, subspaceIndex.get(x), subspaceIndex.get(y), i, j, random));
       }
     }
-    return mat;
   }
 
   /**
@@ -102,16 +100,17 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    * 
    * @param relation Relation to index
    * @param ids IDs to use
+   * @param matrix Matrix (for dimension subset)
    * @return List of sorted objects
    */
-  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation, DBIDs ids) {
-    final int dim = RelationUtil.dimensionality(relation);
+  private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation, DBIDs ids, DimensionSimilarityMatrix matrix) {
+    final int dim = matrix.size();
     ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
     for (int i = 0; i < dim; i++) {
       ArrayModifiableDBIDs amDBIDs = DBIDUtil.newArray(ids);
-      comp.setDimension(i);
+      comp.setDimension(matrix.dim(i));
       amDBIDs.sort(comp);
       subspaceIndex.add(amDBIDs);
     }
@@ -123,14 +122,15 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    * Calculates the actual contrast of a given subspace
    * 
    * @param relation Data relation
-   * @param subspaceIndex Subspace indexes
    * @param subset Subset to process
+   * @param subspaceIndex1 Index of first subspace
+   * @param subspaceIndex2 Index of second subspace
    * @param dim1 First dimension
    * @param dim2 Second dimension
    * @param random Random generator
    * @return Contrast
    */
-  private double calculateContrast(Relation<? extends NumberVector<?>> relation, ArrayList<ArrayDBIDs> subspaceIndex, DBIDs subset, int dim1, int dim2, Random random) {
+  private double calculateContrast(Relation<? extends NumberVector<?>> relation, DBIDs subset, ArrayDBIDs subspaceIndex1, ArrayDBIDs subspaceIndex2, int dim1, int dim2, Random random) {
     final double alpha1 = Math.pow(alpha, .5);
     final int windowsize = (int) (relation.size() * alpha1);
 
@@ -139,16 +139,19 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     double deviationSum = 0.0;
     for (int i = 0; i < m; i++) {
       // Randomly switch dimensions
-      final int cdim1, cdim2;
+      final int cdim1;
+      ArrayDBIDs cindex1, cindex2;
       if (random.nextDouble() > .5) {
         cdim1 = dim1;
-        cdim2 = dim2;
+        cindex1 = subspaceIndex1;
+        cindex2 = subspaceIndex2;
       } else {
         cdim1 = dim2;
-        cdim2 = dim1;
+        cindex1 = subspaceIndex2;
+        cindex2 = subspaceIndex1;
       }
       // Build the sample
-      DBIDArrayIter iter = subspaceIndex.get(cdim2).iter();
+      DBIDArrayIter iter = cindex2.iter();
       HashSetModifiableDBIDs conditionalSample = DBIDUtil.newHashSet();
       iter.seek(random.nextInt(subset.size() - windowsize));
       for (int k = 0; k < windowsize && iter.valid(); k++, iter.advance()) {
@@ -160,7 +163,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
       {
         int l = 0, s = 0;
         // Note: we use the sorted index sets.
-        for (DBIDIter id = subspaceIndex.get(cdim1).iter(); id.valid(); id.advance(), l++) {
+        for (DBIDIter id = cindex1.iter(); id.valid(); id.advance(), l++) {
           final double val = relation.get(id).doubleValue(cdim1);
           fullValues[l] = val;
           if (conditionalSample.contains(id)) {
