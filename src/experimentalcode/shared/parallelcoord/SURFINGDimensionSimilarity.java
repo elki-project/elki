@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanD
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Compute the similarity of dimensions using the SURFING score. The parameter k
@@ -62,6 +63,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and Peer Kröger", title = "Subspace Selection for Clustering High-Dimensional Data", booktitle = "IEEE International Conference on Data Mining, 2004", url = "http://dx.doi.org/10.1109/ICDM.2004.10112")
 public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
+  /**
+   * Static instance.
+   */
+  public static final SURFINGDimensionSimilarity STATIC = new SURFINGDimensionSimilarity();
+
+  /**
+   * Constructor. Use static instance instead!
+   */
+  protected SURFINGDimensionSimilarity() {
+    super();
+  }
+
   @Override
   public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
@@ -101,6 +114,20 @@ public class SURFINGDimensionSimilarity implements DimensionSimilarity<NumberVec
         }
         matrix.set(x, y, (below > 0) ? diff / (2. * mean * below) : 0);
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected SURFINGDimensionSimilarity makeInstance() {
+      return STATIC;
     }
   }
 }

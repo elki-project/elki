@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Compute dimension similarity by using a nested means discretization.
@@ -55,9 +56,24 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "Diansheng Guo", title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", booktitle = "Information Visualization, 2(4)", url = "http://dx.doi.org/10.1057/palgrave.ivs.9500053")
 public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   /**
+   * Static instance.
+   */
+  public static final MCEDimensionSimilarity STATIC = new MCEDimensionSimilarity();
+
+  /**
    * Desired size: 35 observations.
+   * 
+   * While this could trivially be made parameterizable, it is a reasonable rule
+   * of thumb and not expected to have a major effect.
    */
   public static final int TARGET = 35;
+
+  /**
+   * Constructor. Use static instance instead!
+   */
+  protected MCEDimensionSimilarity() {
+    super();
+  }
 
   @Override
   public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
@@ -253,6 +269,20 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
         divide(it, data, idx, start, end, depth - 1, mean);
         divide(it, data, idx, start, end, depth - 1, mean);
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected MCEDimensionSimilarity makeInstance() {
+      return STATIC;
     }
   }
 }

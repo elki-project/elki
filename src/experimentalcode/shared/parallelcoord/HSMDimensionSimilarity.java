@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.SinCosTable;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -53,6 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and D. A. Keim.", title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", booktitle = "IEEE Trans. Visualization and Computer Graphics, 2011", url = "http://dx.doi.org/10.1109/TVCG.2010.242")
 public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   /**
+   * Static instance.
+   */
+  public static final HSMDimensionSimilarity STATIC = new HSMDimensionSimilarity();
+
+  /**
    * Angular resolution. Best if divisible by 4: smaller tables.
    * 
    * The original publication used 50.
@@ -62,7 +68,14 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   /**
    * Precompute sinus and cosinus
    */
-  SinCosTable table = SinCosTable.make(STEPS);
+  private final static SinCosTable table = SinCosTable.make(STEPS);
+
+  /**
+   * Constructor. Use static instance instead!
+   */
+  protected HSMDimensionSimilarity() {
+    super();
+  }
 
   @Override
   public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
@@ -219,6 +232,20 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
         err += dx;
         y0 += sy;
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected HSMDimensionSimilarity makeInstance() {
+      return STATIC;
     }
   }
 }

@@ -26,6 +26,7 @@ package experimentalcode.shared.parallelcoord;
 import java.util.ArrayList;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
@@ -40,6 +41,13 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Use the statistical tests as used by HiCS to arrange dimensions.
@@ -68,12 +76,28 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
   /**
    * Statistical test to use
    */
-  private GoodnessOfFitTest statTest = new KolmogorovSmirnovTest();
+  private GoodnessOfFitTest statTest;
 
   /**
    * Random generator
    */
-  private RandomFactory rnd = RandomFactory.DEFAULT;
+  private RandomFactory rnd;
+
+  /**
+   * Constructor.
+   * 
+   * @param statTest Test function
+   * @param m Number of monte-carlo iterations
+   * @param alpha Alpha threshold
+   * @param rnd Random source
+   */
+  public HiCSDimensionSimilarity(GoodnessOfFitTest statTest, int m, double alpha, RandomFactory rnd) {
+    super();
+    this.statTest = statTest;
+    this.m = m;
+    this.alpha = alpha;
+    this.rnd = rnd;
+  }
 
   @Override
   public void computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset, DimensionSimilarityMatrix matrix) {
@@ -181,5 +205,65 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
       deviationSum += contrast;
     }
     return deviationSum / m;
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Statistical test to use
+     */
+    private GoodnessOfFitTest statTest;
+
+    /**
+     * Holds the value of {@link #M_ID}.
+     */
+    private int m = 50;
+
+    /**
+     * Holds the value of {@link #ALPHA_ID}.
+     */
+    private double alpha = 0.1;
+
+    /**
+     * Random generator.
+     */
+    private RandomFactory rnd;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      final IntParameter mP = new IntParameter(HiCS.Parameterizer.M_ID, 50);
+      mP.addConstraint(new GreaterConstraint(1));
+      if (config.grab(mP)) {
+        m = mP.intValue();
+      }
+
+      final DoubleParameter alphaP = new DoubleParameter(HiCS.Parameterizer.ALPHA_ID, 0.1);
+      alphaP.addConstraint(new GreaterConstraint(0));
+      if (config.grab(alphaP)) {
+        alpha = alphaP.doubleValue();
+      }
+
+      final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<GoodnessOfFitTest>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
+      if (config.grab(testP)) {
+        statTest = testP.instantiateClass(config);
+      }
+
+      final RandomParameter rndP = new RandomParameter(HiCS.Parameterizer.SEED_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
+      }
+    }
+
+    @Override
+    protected HiCSDimensionSimilarity makeInstance() {
+      return new HiCSDimensionSimilarity(statTest, m, alpha, rnd);
+    }
   }
 }
