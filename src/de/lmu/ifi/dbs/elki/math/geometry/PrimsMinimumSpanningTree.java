@@ -1,9 +1,4 @@
-package experimentalcode.shared.parallelcoord;
-
-import java.util.Arrays;
-import java.util.BitSet;
-
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+package de.lmu.ifi.dbs.elki.math.geometry;
 
 /*
  This file is part of ELKI:
@@ -28,6 +23,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+import java.util.BitSet;
+
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Prim's algorithm for finding the minimum spanning tree.
  * 
@@ -50,7 +50,7 @@ public class PrimsMinimumSpanningTree {
    * @param mat Distance matrix
    * @return list of node number pairs representing the edges
    */
-  public static int[] run(double[][] mat) {
+  public static int[] processDense(double[][] mat) {
     // Number of nodes
     final int n = mat.length;
     // Output array storage
@@ -74,17 +74,15 @@ public class PrimsMinimumSpanningTree {
       // Update best and src from current:
       int newbesti = -1;
       double newbestd = Double.POSITIVE_INFINITY;
-      // Note: we assume we started with 0.
-      for (int j = 1; j < n; j++) {
-        if (!in.get(j)) {
-          if (mat[current][j] < best[j]) {
-            best[j] = mat[current][j];
-            src[j] = current;
-          }
-          if (best[j] < newbestd) {
-            newbestd = best[j];
-            newbesti = j;
-          }
+      // Note: we assume we started with 0, and can thus skip it
+      for (int j = in.nextClearBit(1); j < n && j > 0; j = in.nextClearBit(j + 1)) {
+        if (mat[current][j] < best[j]) {
+          best[j] = mat[current][j];
+          src[j] = current;
+        }
+        if (best[j] < newbestd) {
+          newbestd = best[j];
+          newbesti = j;
         }
       }
       assert (newbesti >= 0);
@@ -97,26 +95,5 @@ public class PrimsMinimumSpanningTree {
       current = newbesti;
     }
     return mst;
-  }
-
-  // FIXME: turn into a proper unit test.
-  public static void main(String[] args) {
-    // A simple test.
-    final double inf = Double.POSITIVE_INFINITY;
-    double[][] mat = new double[][] {//
-    { 0.0, 7.0, inf, 5.0, inf, inf, inf }, //
-    { 7.0, 0.0, 8.0, 9.0, 7.0, inf, inf }, //
-    { inf, 8.0, 0.0, inf, 5.0, inf, inf }, //
-    { 5.0, 9.0, inf, 0.0, 15., 6.0, inf }, //
-    { inf, 7.0, 5.0, 15., 0.0, 8.0, 9.0 }, //
-    { inf, inf, inf, 6.0, 8.0, 0.0, 11. }, //
-    { inf, inf, inf, inf, 9.0, 11., 0.0 }, //
-    };
-    int[] ret = run(mat);
-    // "correct" edges (ignore order and direction!)
-    int[] correct = new int[] { 0, 1, 0, 4, 1, 5, 2, 5, 5, 7, 4, 6 };
-    for (int i = 0; i < ret.length; i += 2) {
-      System.out.println((char) ('A' + ret[i]) + " -> " + (char) ('A' + ret[i + 1]));
-    }
   }
 }
