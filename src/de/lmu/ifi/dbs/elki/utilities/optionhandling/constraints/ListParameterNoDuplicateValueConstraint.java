@@ -38,20 +38,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * @author Arthur Zimek
  */
 public class ListParameterNoDuplicateValueConstraint<T extends Object> implements ParameterConstraint<List<T>> {
-  /**
-   * List of number parameters to be checked.
-   */
-  private List<T> parametervalues;
 
   /**
    * Constructs a Not-Equal-Value parameter constraint. That is, the
    * elements of a list of parameter values are not allowed to have equal
    * values.
    * 
-   * @param parametervalues list of parameter values to be tested
    */
-  public ListParameterNoDuplicateValueConstraint(List<T> parametervalues) {
-    this.parametervalues = parametervalues;
+  public ListParameterNoDuplicateValueConstraint() {
   }
 
 
@@ -65,7 +59,7 @@ public class ListParameterNoDuplicateValueConstraint<T extends Object> implement
   public void test(List<T> list) throws ParameterException {
     Set<T> values = new HashSet<T>();
 
-    for(T pv : parametervalues) {
+    for(T pv : list) {
       if(!values.add(pv)) {
         Object[] parametervaluesarr = list.toArray();
         throw new WrongParameterValueException("Global Parameter Constraint Error:\n" + "Parameter values must have different values. Current values: " + Arrays.deepToString(parametervaluesarr) + ".\n");
@@ -75,7 +69,7 @@ public class ListParameterNoDuplicateValueConstraint<T extends Object> implement
   
   @Override
   public String getDescription(String parameterName) {
-    return "Parameters " + (parametervalues) + " must have different values.";
+    return "Values for parameter "+parameterName+" must have different values.";
   }
 
 
