@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.GoodnessOfFitTest;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
-import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 
 /**
  * Use the statistical tests as used by HiCS to arrange dimensions.
@@ -78,7 +77,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
   private RandomFactory rnd = RandomFactory.DEFAULT;
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, ProjectionParallel proj, DBIDs subset) {
+  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
     final Random random = rnd.getRandom();
     final int dim = RelationUtil.dimensionality(relation);
 

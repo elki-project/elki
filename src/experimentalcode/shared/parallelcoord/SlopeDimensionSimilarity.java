@@ -28,8 +28,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Arrange dimensions based on the entropy of the slope spectrum.
@@ -51,25 +51,43 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
   /**
    * Scaling factor.
    */
-  private final static double RESCALE = PRECISION * .5 / StyleLibrary.SCALE;
+  private final static double RESCALE = PRECISION * .5;
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, ProjectionParallel proj, DBIDs subset) {
+  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
     final int dim = RelationUtil.dimensionality(relation);
     final int size = subset.size();
+
+    // FIXME: Get/keep these statistics in the relation, or compute for the
+    // sample only.
+    double[] off = new double[dim], scale = new double[dim];
+    {
+      Pair<? extends NumberVector<?>, ? extends NumberVector<?>> mm = DatabaseUtil.computeMinMax(relation);
+      NumberVector<?> min = mm.first;
+      NumberVector<?> max = mm.second;
+      for (int d = 0; d < dim; d++) {
+        off[d] = min.doubleValue(d);
+        final double m = max.doubleValue(d);
+        scale[d] = (m > off[d]) ? 1. / (m - off[d]) : 1;
+      }
+    }
 
     // Collect angular histograms.
     // Note, we only fill half of the matrix
     int[][][] angles = new int[dim][dim][PRECISION];
 
+    // Scratch buffer
+    double[] vec = new double[dim];
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
       final NumberVector<?> obj = relation.get(id);
-      // This is on 0 .. StyleLibrary.SCALE:
-      double[] vec = proj.fastProjectDataToRenderSpace(obj);
+      // Map values to 0..1
+      for (int d = 0; d < dim; d++) {
+        vec[d] = (obj.doubleValue(d) - off[d]) * scale[d];
+      }
       for (int i = 0; i < dim - 1; i++) {
         for (int j = i + 1; j < dim; j++) {
-          // This will be on a scale of 0 .. 2*StyleLibrary.SCALE:
-          final double delta = vec[j] - vec[i] + StyleLibrary.SCALE;
+          // This will be on a scale of 0 .. 2:
+          final double delta = vec[j] - vec[i] + 1;
           int div = (int) Math.round(delta * RESCALE);
           // TODO: do we really need this check?
           div = (div < 0) ? 0 : (div >= PRECISION) ? PRECISION - 1 : div;

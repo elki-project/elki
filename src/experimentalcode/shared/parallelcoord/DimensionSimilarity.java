@@ -24,7 +24,6 @@ package experimentalcode.shared.parallelcoord;
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 
 /**
  * Interface for computing pairwise dimension similarities, used for arranging
@@ -39,9 +38,8 @@ public interface DimensionSimilarity<V> {
    * Compute the dimension similarity matrix
    * 
    * @param relation Relation
-   * @param proj Projection
    * @param subset DBID subset (for sampling / selection)
    * @return similarity matrix
    */
-  public double[][] computeDimensionSimilarites(Relation<? extends V> relation, ProjectionParallel proj, DBIDs subset);
+  public double[][] computeDimensionSimilarites(Relation<? extends V> relation, DBIDs subset);
 }

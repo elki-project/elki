@@ -23,12 +23,10 @@ package experimentalcode.shared.parallelcoord;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 
 /**
  * Class to compute the dimension similarity based on covariances.
@@ -37,13 +35,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
  */
 public class CovarianceDimensionSimilarity implements DimensionSimilarity<NumberVector<?>> {
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, ProjectionParallel proj, DBIDs subset) {
+  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
     final int dim = RelationUtil.dimensionality(relation);
-    CovarianceMatrix covmat = new CovarianceMatrix(dim);
-    for (DBIDIter it = subset.iter(); it.valid(); it.advance()) {
-      double[] pvec = proj.fastProjectDataToRenderSpace(relation.get(it));
-      covmat.put(pvec);
-    }
+    CovarianceMatrix covmat = CovarianceMatrix.make(relation, subset);
     double[][] mat = covmat.destroyToSampleMatrix().getArrayRef();
     // Transform diagonal to 1 / stddev
     for (int i = 0; i < dim; i++) {
