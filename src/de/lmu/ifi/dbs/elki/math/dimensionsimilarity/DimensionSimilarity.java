@@ -1,4 +1,4 @@
-package experimentalcode.shared.parallelcoord;
+package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
 
 /*
  This file is part of ELKI:
@@ -24,6 +24,7 @@ package experimentalcode.shared.parallelcoord;
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Interface for computing pairwise dimension similarities, used for arranging
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * 
  * @param <V> Object type
  */
-public interface DimensionSimilarity<V> {
+public interface DimensionSimilarity<V> extends Parameterizable {
   /**
    * Compute the dimension similarity matrix
    * 

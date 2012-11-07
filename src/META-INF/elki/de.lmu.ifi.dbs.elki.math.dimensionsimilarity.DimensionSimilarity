@@ -1,0 +1,7 @@
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.CovarianceDimensionSimilarity
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.HSMDimensionSimilarity
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.HiCSDimensionSimilarity
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.MCEDimensionSimilarity
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.SURFINGDimensionSimilarity
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.SlopeDimensionSimilarity
+de.lmu.ifi.dbs.elki.math.dimensionsimilarity.SlopeInversionDimensionSimilarity
