@@ -120,6 +120,22 @@ public abstract class DimensionSimilarityMatrix {
     return ((y * (y - 1)) >> 1) + x;
   }
 
+  @Override
+  public String toString() {
+    StringBuffer buf = new StringBuffer();
+    final int d = size();
+    for (int x = 1; x < d; x++) {
+      for (int y = 0; y < x; y++) {
+        if (y > 0) {
+          buf.append(' ');
+        }
+        buf.append(get(x, y));
+      }
+      buf.append('\n');
+    }
+    return buf.toString();
+  }
+
   /**
    * Complete matrix of pairwise dimension similarities.
    * 
@@ -207,5 +223,25 @@ public abstract class DimensionSimilarityMatrix {
       return data.size();
     }
 
+  }
+
+  /**
+   * Make a full dimension similarity matrix.
+   * 
+   * @param dims Number of dimensions.
+   * @return Matrix
+   */
+  public static DimensionSimilarityMatrix make(int dims) {
+    return new FullDimensionSimilarityMatrix(dims);
+  }
+
+  /**
+   * Make a partial dimension similarity matrix.
+   * 
+   * @param dims Array of relevant dimensions
+   * @return Matrix
+   */
+  public static DimensionSimilarityMatrix make(int[] dims) {
+    return new PartialDimensionSimilarityMatrix(dims);
   }
 }
