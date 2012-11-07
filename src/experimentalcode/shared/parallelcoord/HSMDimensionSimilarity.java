@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.SinCosTable;
+import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * FIXME: This needs serious TESTING before release. Large parts have been
@@ -66,7 +66,7 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
   SinCosTable table = SinCosTable.make(STEPS);
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, ProjectionParallel proj, DBIDs subset) {
+  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
     final int dim = RelationUtil.dimensionality(relation);
     final int resolution = 500;
     byte[][][][] pics = new byte[dim][dim][][]; // [resolution][resolution];
@@ -77,13 +77,26 @@ public class HSMDimensionSimilarity implements DimensionSimilarity<NumberVector<
         pics[i][j] = new byte[resolution][resolution];
       }
     }
+    // FIXME: Get/keep these statistics in the relation, or compute for the
+    // sample only.
+    double[] off = new double[dim], scale = new double[dim];
+    {
+      Pair<? extends NumberVector<?>, ? extends NumberVector<?>> mm = DatabaseUtil.computeMinMax(relation);
+      NumberVector<?> min = mm.first;
+      NumberVector<?> max = mm.second;
+      for (int d = 0; d < dim; d++) {
+        off[d] = min.doubleValue(d);
+        final double m = max.doubleValue(d);
+        scale[d] = (m > off[d]) ? 1. / (m - off[d]) : 1;
+      }
+    }
     // Iterate dataset
     for (DBIDIter id = subset.iter(); id.valid(); id.advance()) {
-      double[] pvec = proj.fastProjectDataToRenderSpace(relation.get(id));
+      NumberVector<?> pvec = relation.get(id);
       for (int i = 0; i < dim - 1; i++) {
         for (int j = i + 1; j < dim; j++) {
-          double xi = pvec[i] / StyleLibrary.SCALE; // to 0..1
-          double xj = pvec[j] / StyleLibrary.SCALE; // to 0..1
+          double xi = (pvec.doubleValue(i) - off[i]) * scale[i];
+          double xj = (pvec.doubleValue(j) - off[j]) * scale[j];
           drawLine(0, (int) (resolution * xi), resolution - 1, (int) (resolution * xj), pics[i][j]);
         }
       }

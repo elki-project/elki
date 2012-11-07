@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 
 /**
  * Compute dimension similarity by using a nested means discretization.
@@ -62,7 +61,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
   public static final int TARGET = 35;
 
   @Override
-  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, ProjectionParallel proj, DBIDs subset) {
+  public double[][] computeDimensionSimilarites(Relation<? extends NumberVector<?>> relation, DBIDs subset) {
     final int dim = RelationUtil.dimensionality(relation);
     double[][] mat = new double[dim][dim];
 
