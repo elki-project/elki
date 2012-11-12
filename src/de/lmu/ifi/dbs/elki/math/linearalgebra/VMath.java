@@ -566,7 +566,7 @@ public final class VMath {
   }
 
   /**
-   * Returns the scalar product of this vector and the specified vector v.
+   * Returns the scalar product (dot product) of this vector and the specified vector v.
    * 
    * This is the same as transposeTimes.
    * 
