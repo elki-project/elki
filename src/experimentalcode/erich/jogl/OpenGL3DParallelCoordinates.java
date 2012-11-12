@@ -470,7 +470,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       gl.glLoadIdentity();
       // Perspective.
       glu.gluPerspective(35, ratio, 1, 1000);
-      glu.gluLookAt(0, -4, 2, // pos
+      glu.gluLookAt(4 * Math.cos(rotation), 4 * Math.sin(rotation), 2, // pos
           0, 0, 0, // center
           0, 0, 1 // up
       );
@@ -610,10 +610,8 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       }
 
       protected void drawParallelPlot(GLAutoDrawable drawable, final int dim, GL2 gl) {
-        double cos = Math.cos(rotation), sin = Math.sin(rotation);
-
         gl.glPushMatrix();
-        gl.glRotatef((float) MathUtil.rad2deg(rotation), 0.f, 0.f, 1.f);
+        // gl.glRotatef((float) MathUtil.rad2deg(rotation), 0.f, 0.f, 1.f);
         // Enable shading
         gl.glShadeModel(GL2.GL_SMOOTH);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
@@ -631,12 +629,17 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
         // Simple Z sorting for edge groups
         DoubleIntPair[] depth = new DoubleIntPair[edges.length >> 1];
-        for (int e = 0, e2 = 0; e2 < edges.length; e++, e2 += 2) {
-          double d1 = sin * nodes[edges[e2]].x + cos * nodes[edges[e2]].y;
-          double d2 = sin * nodes[edges[e2 + 1]].x + cos * nodes[edges[e2 + 1]].y;
-          depth[e] = new DoubleIntPair(-(d1 + d2), e);
+        {
+          // We need to compute the depth wrt. z, and the same rotation as the
+          // camera uses. If you change the camera above, adjust this rotation!
+          double cos = Math.cos(rotation), sin = Math.sin(rotation);
+          for (int e = 0, e2 = 0; e2 < edges.length; e++, e2 += 2) {
+            double d1 = cos * nodes[edges[e2]].x + sin * nodes[edges[e2]].y;
+            double d2 = cos * nodes[edges[e2 + 1]].x + sin * nodes[edges[e2 + 1]].y;
+            depth[e] = new DoubleIntPair((d1 + d2), e);
+          }
+          Arrays.sort(depth);
         }
-        Arrays.sort(depth);
 
         for (int e = 0; e < depth.length; e++) {
           final int eoff = depth[e].second * (size << 1);
@@ -659,24 +662,35 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         gl.glPopMatrix();
 
         // Render labels
-        textrenderer.begin3DRendering();
-        gl.glRotatef(90.f, 1.f, 0.f, 0.f);
-        textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-        float axisdist = 1; // (float) ratio / (dim - 1f);
-        float defaultscale = .025f / dim;
-        float targetwidth = 0.95f * axisdist;
-        for (int i = 0; i < dim; i++) {
-          Rectangle2D b = textrenderer.getBounds(labels[i]);
-          float scale = defaultscale;
-          if (b.getWidth() * scale > targetwidth) {
-            scale = targetwidth / (float) b.getWidth();
+        {
+          textrenderer.begin3DRendering();
+          // UNDO the camera rotation. This will mess up text orientation!
+          gl.glRotatef((float) MathUtil.rad2deg(rotation), 0.f, 0.f, 1.f);
+          // Rotate to have the text face the camera direction, which looks +X
+          // While the text will be visible from +Z and +X is baseline.
+          gl.glRotatef(90.f, 0.f, 0.f, 1.f);
+          gl.glRotatef(90.f, 1.f, 0.f, 0.f);
+          // HalfPI: 90 degree extra rotation, for text orientation.
+          double cos = Math.cos(rotation + MathUtil.HALFPI), sin = Math.sin(rotation + MathUtil.HALFPI);
+
+          textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+          float axisdist = 1; // (float) ratio / (dim - 1f);
+          float defaultscale = .025f / dim;
+          float targetwidth = 0.95f * axisdist;
+          for (int i = 0; i < dim; i++) {
+            Rectangle2D b = textrenderer.getBounds(labels[i]);
+            float scale = defaultscale;
+            if (b.getWidth() * scale > targetwidth) {
+              scale = targetwidth / (float) b.getWidth();
+            }
+            float w = (float) b.getWidth() * scale;
+            // Rotate manually, in x-z plane
+            float x = (float) (cos * nodes[i].x + sin * nodes[i].y);
+            float y = (float) (-sin * nodes[i].x + cos * nodes[i].y);
+            textrenderer.draw3D(labels[i], (x - w * .5f), 1.01f, -y, scale);
           }
-          float w = (float) b.getWidth() * scale;
-          float x = (float) (cos * nodes[i].x - sin * nodes[i].y);
-          float y = (float) (sin * nodes[i].x + cos * nodes[i].y);
-          textrenderer.draw3D(labels[i], (x - w * .5f), 1.01f, -y, scale);
+          textrenderer.end3DRendering();
         }
-        textrenderer.end3DRendering();
       }
     }
   }
