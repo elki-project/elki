@@ -85,13 +85,13 @@ public class Vector implements NumberVector<Double> {
   public static final Vector randomNormalizedVector(final int dimensionality) {
     final Vector v = new Vector(dimensionality);
     double norm = 0;
-    while(norm <= 0) {
-      for(int i = 0; i < dimensionality; i++) {
+    while (norm <= 0) {
+      for (int i = 0; i < dimensionality; i++) {
         v.elements[i] = Math.random();
       }
       norm = v.euclideanLength();
     }
-    for(int row = 0; row < dimensionality; row++) {
+    for (int row = 0; row < dimensionality; row++) {
       v.elements[row] /= norm;
     }
     return v;
@@ -185,7 +185,7 @@ public class Vector implements NumberVector<Double> {
   public final Vector plus(final Vector v) {
     assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
     final Vector result = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i];
     }
     return result;
@@ -202,7 +202,7 @@ public class Vector implements NumberVector<Double> {
   public final Vector plusTimes(final Vector v, final double s) {
     assert (this.elements.length == v.elements.length) : ERR_VEC_DIMENSIONS;
     final Vector result = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       result.elements[i] = elements[i] + v.elements[i] * s;
     }
     return result;
@@ -216,7 +216,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector plusEquals(final Vector b) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] += b.elements[i];
     }
     return this;
@@ -231,7 +231,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector plusTimesEquals(final Vector b, final double s) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] += s * b.elements[i];
     }
     return this;
@@ -244,7 +244,7 @@ public class Vector implements NumberVector<Double> {
    * @return Modified vector
    */
   public final Vector plusEquals(final double d) {
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] += d;
     }
     return this;
@@ -258,7 +258,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector minus(final Vector v) {
     final Vector sub = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       sub.elements[i] = elements[i] - v.elements[i];
     }
     return sub;
@@ -273,7 +273,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector minusTimes(final Vector v, final double s) {
     final Vector sub = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       sub.elements[i] = elements[i] - v.elements[i] * s;
     }
     return sub;
@@ -287,7 +287,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector minusEquals(final Vector b) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] -= b.elements[i];
     }
     return this;
@@ -302,7 +302,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector minusTimesEquals(final Vector b, final double s) {
     assert (this.elements.length == b.elements.length) : ERR_VEC_DIMENSIONS;
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] -= s * b.elements[i];
     }
     return this;
@@ -315,7 +315,7 @@ public class Vector implements NumberVector<Double> {
    * @return Modified vector
    */
   public final Vector minusEquals(final double d) {
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] -= d;
     }
     return this;
@@ -330,7 +330,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector times(final double s) {
     final Vector v = new Vector(elements.length);
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       v.elements[i] = elements[i] * s;
     }
     return v;
@@ -343,7 +343,7 @@ public class Vector implements NumberVector<Double> {
    * @return replace A by s*A
    */
   public final Vector timesEquals(final double s) {
-    for(int i = 0; i < elements.length; i++) {
+    for (int i = 0; i < elements.length; i++) {
       elements[i] *= s;
     }
     return this;
@@ -358,8 +358,8 @@ public class Vector implements NumberVector<Double> {
   public final Matrix times(final Matrix B) {
     assert (B.elements.length == 1) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(this.elements.length, B.columndimension);
-    for(int j = 0; j < B.columndimension; j++) {
-      for(int i = 0; i < this.elements.length; i++) {
+    for (int j = 0; j < B.columndimension; j++) {
+      for (int i = 0; i < this.elements.length; i++) {
         X.elements[i][j] = elements[i] * B.elements[0][j];
       }
     }
@@ -375,10 +375,10 @@ public class Vector implements NumberVector<Double> {
   public final Matrix transposeTimes(final Matrix B) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(1, B.columndimension);
-    for(int j = 0; j < B.columndimension; j++) {
+    for (int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
       double s = 0;
-      for(int k = 0; k < this.elements.length; k++) {
+      for (int k = 0; k < this.elements.length; k++) {
         s += this.elements[k] * B.elements[k][j];
       }
       X.elements[0][j] = s;
@@ -396,10 +396,10 @@ public class Vector implements NumberVector<Double> {
   public final double transposeTimesTimes(final Matrix B, final Vector c) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     double sum = 0.0;
-    for(int j = 0; j < B.columndimension; j++) {
+    for (int j = 0; j < B.columndimension; j++) {
       // multiply it with each row from A
       double s = 0;
-      for(int k = 0; k < this.elements.length; k++) {
+      for (int k = 0; k < this.elements.length; k++) {
         s += this.elements[k] * B.elements[k][j];
       }
       sum += s * c.elements[j];
@@ -416,7 +416,7 @@ public class Vector implements NumberVector<Double> {
   public final double transposeTimes(final Vector B) {
     assert (B.elements.length == this.elements.length) : ERR_MATRIX_INNERDIM;
     double s = 0;
-    for(int k = 0; k < this.elements.length; k++) {
+    for (int k = 0; k < this.elements.length; k++) {
       s += this.elements[k] * B.elements[k];
     }
     return s;
@@ -431,8 +431,8 @@ public class Vector implements NumberVector<Double> {
   public final Matrix timesTranspose(final Matrix B) {
     assert (B.columndimension == 1) : ERR_MATRIX_INNERDIM;
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
-    for(int j = 0; j < B.elements.length; j++) {
-      for(int i = 0; i < this.elements.length; i++) {
+    for (int j = 0; j < B.elements.length; j++) {
+      for (int i = 0; i < this.elements.length; i++) {
         X.elements[i][j] = elements[i] * B.elements[j][0];
       }
     }
@@ -447,8 +447,8 @@ public class Vector implements NumberVector<Double> {
    */
   public final Matrix timesTranspose(final Vector B) {
     final Matrix X = new Matrix(this.elements.length, B.elements.length);
-    for(int j = 0; j < B.elements.length; j++) {
-      for(int i = 0; i < this.elements.length; i++) {
+    for (int j = 0; j < B.elements.length; j++) {
+      for (int i = 0; i < this.elements.length; i++) {
         X.elements[i][j] = elements[i] * B.elements[j];
       }
     }
@@ -462,7 +462,7 @@ public class Vector implements NumberVector<Double> {
    */
   public final double euclideanLength() {
     double acc = 0.0;
-    for(int row = 0; row < elements.length; row++) {
+    for (int row = 0; row < elements.length; row++) {
       final double v = elements[row];
       acc += v * v;
     }
@@ -476,8 +476,8 @@ public class Vector implements NumberVector<Double> {
    */
   public final Vector normalize() {
     double norm = euclideanLength();
-    if(norm != 0) {
-      for(int row = 0; row < elements.length; row++) {
+    if (norm != 0) {
+      for (int row = 0; row < elements.length; row++) {
         elements[row] /= norm;
       }
     }
@@ -494,7 +494,7 @@ public class Vector implements NumberVector<Double> {
   public final Vector projection(final Matrix v) {
     assert (elements.length == v.elements.length) : ERR_DIMENSIONS;
     Vector sum = new Vector(elements.length);
-    for(int i = 0; i < v.columndimension; i++) {
+    for (int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less?
       Vector v_i = v.getCol(i);
       sum.plusTimesEquals(v_i, this.transposeTimes(v_i));
@@ -509,17 +509,17 @@ public class Vector implements NumberVector<Double> {
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
+    if (this == obj) {
       return true;
     }
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     final Vector other = (Vector) obj;
-    if(this.elements.length != other.elements.length) {
+    if (this.elements.length != other.elements.length) {
       return false;
     }
     return Arrays.equals(this.elements, other.elements);
@@ -563,6 +563,21 @@ public class Vector implements NumberVector<Double> {
     elements[0] = elements[1];
     elements[1] = -temp;
     return this;
+  }
+
+  /**
+   * Cross product for 3d vectors, i.e. <code>this x other</code>
+   * 
+   * @param other Other vector
+   * @return Cross product of this vector and the other vector
+   */
+  public Vector cross3D(Vector other) {
+    assert (elements.length == 3 && other.elements.length == 3);
+    Vector out = new Vector(3);
+    out.elements[0] = (elements[1] * other.elements[2]) - (elements[2] * other.elements[1]);
+    out.elements[1] = (elements[2] * other.elements[0]) - (elements[0] * other.elements[2]);
+    out.elements[2] = (elements[0] * other.elements[1]) - (elements[1] * other.elements[0]);
+    return out;
   }
 
   // ////// NumberVector API. A bit hackish. :-(
