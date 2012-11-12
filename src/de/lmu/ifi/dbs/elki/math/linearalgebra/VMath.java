@@ -1535,4 +1535,17 @@ public final class VMath {
   public static final int getColumnDimensionality(final double[][] m1) {
     return m1[0].length;
   }
+
+  /**
+   * Cross product for 3d vectors, i.e. <code>vo = v1 x v2</code>
+   * 
+   * @param vo Output vector
+   * @param v1 First input vector
+   * @param v2 Second input vector
+   */
+  public static void cross3D(double[] vo, double[] v1, double[] v2) {
+    vo[0] = (v1[1] * v2[2]) - (v1[2] * v2[1]);
+    vo[1] = (v1[2] * v2[0]) - (v1[0] * v2[2]);
+    vo[2] = (v1[0] * v2[1]) - (v1[1] * v2[0]);
+  }
 }
