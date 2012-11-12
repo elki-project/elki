@@ -78,6 +78,10 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
@@ -104,6 +108,17 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
    */
   private static final Logging LOG = Logging.getLogger(ResultHandler.class);
 
+  Settings settings = new Settings();
+  
+  /**
+   * Constructor.
+   *
+   * @param sim Similarity measure
+   */
+  public OpenGL3DParallelCoordinates(DimensionSimilarity<NumberVector<?>> sim) {
+    settings.sim = sim;
+  }
+
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     StyleResult style = getStyleResult(baseResult);
@@ -112,7 +127,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       Relation<? extends NumberVector<?>> rel = iter.next();
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
-      new Instance(rel, proj, new Settings(), style).run();
+      new Instance(rel, proj, settings, style).run();
     }
   }
 
@@ -999,6 +1014,39 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 1.f, (float) -Math.sin(-initialrot + startangle) * 1.f, 1.f);
         gl.glEnd();
       }
+    }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Option for similarity measure.
+     */
+    public static final OptionID SIM_ID = OptionID.getOrCreateOptionID("parallel3d.sim", "Similarity measure for spanning tree.");
+
+    /**
+     * Similarity measure
+     */
+    DimensionSimilarity<NumberVector<?>> sim;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<DimensionSimilarity<NumberVector<?>>>(SIM_ID, DimensionSimilarity.class);
+      if (config.grab(simP)) {
+        sim = simP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected OpenGL3DParallelCoordinates makeInstance() {
+      return new OpenGL3DParallelCoordinates(sim);
     }
   }
 }
