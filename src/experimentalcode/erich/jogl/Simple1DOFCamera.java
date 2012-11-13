@@ -50,12 +50,12 @@ public class Simple1DOFCamera {
   /**
    * Distance
    */
-  private double distance = 4;
+  private double distance = 3;
 
   /**
    * Height
    */
-  private double height = 2;
+  private double height = 1.5;
 
   /**
    * Screen ratio
@@ -230,7 +230,7 @@ public class Simple1DOFCamera {
     // Perspective.
     glu.gluPerspective(35, ratio, 1, 1000);
     glu.gluLookAt(distance * sinZ, distance * -cosZ, height, // pos
-        0, 0, 0, // center
+        0, 0, .5, // center
         0, 0, 1 // up
     );
     // Change back to model view matrix.

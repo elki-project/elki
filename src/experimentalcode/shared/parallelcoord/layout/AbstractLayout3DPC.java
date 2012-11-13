@@ -154,6 +154,21 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
   }
 
   /**
+   * Compute the depth of the graph.
+   * 
+   * @param node Current node
+   * @return Depth
+   */
+  protected int maxDepth(Layout.Node node) {
+    int depth = 0;
+    for (int i = 0; i < node.numChildren(); i++) {
+      Layout.Node child = node.getChild(i);
+      depth = Math.max(depth, maxDepth(child));
+    }
+    return depth + 1;
+  }
+
+  /**
    * Abstract node implementation.
    * 
    * @author Erich Schubert
