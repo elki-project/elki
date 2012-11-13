@@ -539,9 +539,8 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
           double cos = Math.cos(camera.getRotationZ()), sin = Math.sin(camera.getRotationZ());
 
           textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-          float axisdist = 1; // (float) ratio / (dim - 1f);
           float defaultscale = .025f / dim;
-          float targetwidth = 0.95f * axisdist;
+          float targetwidth = 0.7f;
           for (int i = 0; i < dim; i++) {
             Rectangle2D b = textrenderer.getBounds(labels[i]);
             float scale = defaultscale;

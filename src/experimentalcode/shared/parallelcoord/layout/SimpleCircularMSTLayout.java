@@ -70,8 +70,9 @@ public class SimpleCircularMSTLayout extends AbstractLayout3DPC<SimpleCircularMS
   Layout process(int dim, DimensionSimilarityMatrix mat) {
     Layout l = new Layout();
     Node rootnode = buildSpanningTree(mat, l);
+    int maxdepth = maxDepth(rootnode);
     computeWeights(rootnode);
-    computePositions(rootnode, 0, 0, MathUtil.TWOPI);
+    computePositions(rootnode, 0, 0, MathUtil.TWOPI, maxdepth);
     return l;
   }
 
@@ -96,15 +97,17 @@ public class SimpleCircularMSTLayout extends AbstractLayout3DPC<SimpleCircularMS
    * @param depth Depth of the node
    * @param aoff Angular offset
    * @param awid Angular width
+   * @param maxdepth Maximum depth (used for radius computations)
    */
-  public static void computePositions(Node node, int depth, double aoff, double awid) {
-    node.x = Math.sin(aoff + awid / 2) * depth * .5;
-    node.y = Math.cos(aoff + awid / 2) * depth * .5;
+  public static void computePositions(Node node, int depth, double aoff, double awid, int maxdepth) {
+    double r = depth / (maxdepth - 1.);
+    node.x = Math.sin(aoff + awid * .5) * r;
+    node.y = Math.cos(aoff + awid * .5) * r;
 
     double cpos = aoff;
     double cwid = awid / node.weight;
     for (Node c : node.children) {
-      computePositions(c, depth + 1, cpos, cwid * c.weight);
+      computePositions(c, depth + 1, cpos, cwid * c.weight, maxdepth);
       cpos += cwid * c.weight;
     }
   }
