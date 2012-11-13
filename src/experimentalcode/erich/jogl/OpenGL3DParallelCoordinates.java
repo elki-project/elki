@@ -23,9 +23,6 @@ package experimentalcode.erich.jogl;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
@@ -66,10 +63,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.CovarianceDimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
-import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -94,6 +87,11 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import experimentalcode.shared.parallelcoord.layout.Layout;
+import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
+import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
+import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
@@ -101,6 +99,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @author Erich Schubert
  * 
  * TODO: FPSAnimator is currently unused. Remove.
+ * 
+ * TODO: Improve generics of Layout3DPC.
  */
 public class OpenGL3DParallelCoordinates implements ResultHandler {
   /**
@@ -113,10 +113,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
   /**
    * Constructor.
    *
-   * @param sim Similarity measure
+   * @param layout Layout
    */
-  public OpenGL3DParallelCoordinates(DimensionSimilarity<NumberVector<?>> sim) {
-    settings.sim = sim;
+  public OpenGL3DParallelCoordinates(Layouter3DPC<? super NumberVector<?>> layout) {
+    settings.layout = layout;
   }
 
   @Override
@@ -161,6 +161,11 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
    */
   public static class Settings {
     /**
+     * Layouting method.
+     */
+    public Layouter3DPC<? super NumberVector<?>> layout;
+
+    /**
      * Alpha effect: 1=solid, 0=full alpha effect
      * 
      * Note: since OpenGL usually works with 8 bit color depth, this puts a
@@ -173,147 +178,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      * Line width
      */
     public float linewidth = 2f;
-
-    /**
-     * Similarity measure
-     */
-    DimensionSimilarity<NumberVector<?>> sim = CovarianceDimensionSimilarity.STATIC;
-  }
-
-  public static void computePositions(Node rootnode, int depth, double aoff, double awid, Node[] nodes) {
-    rootnode.x = Math.sin(aoff + awid / 2) * depth * .5;
-    rootnode.y = Math.cos(aoff + awid / 2) * depth * .5;
-    {
-      double cpos = aoff;
-      double cwid = (awid / (rootnode.fanout));
-      for (Node c : rootnode.children) {
-        computePositions(c, depth + 1, cpos, cwid * c.fanout, nodes);
-        cpos += cwid * c.fanout;
-      }
-    }
-    nodes[rootnode.dim] = rootnode;
-  }
-
-  public static Node buildTree(int[] msg, int cur, int parent) {
-    // Count the number of children:
-    int c = 0;
-    for (int i = 0; i < msg.length; i += 2) {
-      if (msg[i] == cur && msg[i + 1] != parent) {
-        c++;
-      }
-      if (msg[i + 1] == cur && msg[i] != parent) {
-        c++;
-      }
-    }
-    // Build children:
-    int fanout = 0;
-    Node[] chi = (c > 0) ? new Node[c] : Node.EMPTY;
-    for (int i = 0; i < msg.length; i += 2) {
-      if (msg[i] == cur && msg[i + 1] != parent) {
-        c--;
-        chi[c] = buildTree(msg, msg[i + 1], cur);
-        fanout += chi[c].fanout;
-      }
-      if (msg[i + 1] == cur && msg[i] != parent) {
-        c--;
-        chi[c] = buildTree(msg, msg[i], cur);
-        fanout += chi[c].fanout;
-      }
-    }
-    assert (c == 0);
-    Node n = new Node(cur, chi, Math.max(1, fanout));
-    return n;
-  }
-
-  /**
-   * Find the "optimal" root of a spanning tree. Optimal in the sense of: one of
-   * the most central nodes.
-   * 
-   * This uses a simple message passing approach. Every node that has only one
-   * unset neighbor will emit a message to this neighbor. The node last to emit
-   * wins.
-   * 
-   * @param msg Minimum spanning graph.
-   * @return
-   */
-  public static int findOptimalRoot(int[] msg) {
-    final int size = (msg.length >> 1) + 1;
-
-    int[] depth = new int[size];
-    int[] missing = new int[size];
-
-    // We shouldn't need more iterations in any case ever.
-    int root = -1;
-    for (int i = 1; i < size; i++) {
-      boolean active = false;
-      for (int e = 0; e < msg.length; e += 2) {
-        if (depth[msg[e]] == 0) {
-          missing[msg[e + 1]]++;
-        }
-        if (depth[msg[e + 1]] == 0) {
-          missing[msg[e]]++;
-        }
-      }
-      for (int n = 0; n < size; n++) {
-        if (depth[n] == 0 && missing[n] <= 1) {
-          depth[n] = i;
-          root = n;
-          active = true;
-        }
-      }
-      if (!active) {
-        break;
-      }
-      Arrays.fill(missing, 0); // Clean up.
-    }
-    return root;
-  }
-
-  /**
-   * Minimalistic representation of the tree.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  public static class Node {
-    /**
-     * Empty array.
-     */
-    public static final Node[] EMPTY = new Node[0];
-
-    /**
-     * Constructor.
-     * 
-     * @param dim Node number
-     * @param children Children
-     * @param fanout Fanout
-     */
-    public Node(int dim, Node[] children, int fanout) {
-      this.dim = dim;
-      this.children = children;
-      this.fanout = fanout;
-    }
-
-    /**
-     * Dimension represented by this node.
-     */
-    public int dim;
-
-    /**
-     * Weight (fanout needed)
-     */
-    public int fanout;
-
-    /**
-     * Position in plot
-     */
-    public double x, y;
-
-    /**
-     * Child nodes.
-     */
-    public Node[] children;
   }
 
   /**
@@ -363,13 +227,9 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     String[] labels;
 
     /**
-     * Node hashmap.
+     * Layout
      */
-    Node[] nodes;
-
-    private Node rootnode;
-
-    private int[] edges;
+    private Layout layout;
 
     /**
      * JOGL animator
@@ -432,7 +292,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     }
 
     public void run() {
-      layoutParallel();
+      layout = settings.layout.layout(rel);
 
       assert (frame != null);
       frame.setVisible(true);
@@ -474,18 +334,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
       camera.ratio = width / (double) height;
-    }
-
-    private void layoutParallel() {
-      int dim = RelationUtil.dimensionality(rel);
-      DimensionSimilarityMatrix mat = DimensionSimilarityMatrix.make(dim);
-      settings.sim.computeDimensionSimilarites(rel, rel.getDBIDs(), mat);
-      // Minimum spanning tree (as graph)
-      edges = PrimsMinimumSpanningTree.processDense(mat, DimensionSimilarityMatrix.PRIM_ADAPTER);
-      int root = findOptimalRoot(edges);
-      rootnode = buildTree(edges, root, -1);
-      nodes = new Node[dim];
-      computePositions(rootnode, 0, 0, MathUtil.TWOPI, nodes);
     }
 
     /**
@@ -729,7 +577,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         size = rel.size();
         final float sz = (float) (1 / StyleLibrary.SCALE);
 
-        int lines = (edges.length >> 1) * size;
+        int lines = layout.edges.size() * size;
 
         // Setup buffer IDs:
         int[] vbi = new int[1];
@@ -755,17 +603,18 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             for (DBIDIter it = csp.iterateClass(s); it.valid(); it.advance(), c++, csum++) {
               int coff = (csum << 2) + (csum << 1); // * 6
               double[] vec = proj.fastProjectDataToRenderSpace(rel.get(it));
-              for (int i = 0; i < edges.length; i += 2, coff += (size << 2) + (size << 1)) {
+              for (Layout.Edge e : layout.edges) {
                 // Seek to appropriate position.
                 // See buffer layout discussed above.
                 vertices.position(coff);
-                final int d0 = edges[i], d1 = edges[i + 1];
-                vertices.put((float) nodes[d0].x);
-                vertices.put((float) nodes[d0].y);
+                final int d0 = e.dim1, d1 = e.dim2;
+                vertices.put((float) layout.getNode(d0).getX());
+                vertices.put((float) layout.getNode(d0).getY());
                 vertices.put(1.f - sz * (float) vec[d0]);
-                vertices.put((float) nodes[d1].x);
-                vertices.put((float) nodes[d1].y);
+                vertices.put((float) layout.getNode(d1).getX());
+                vertices.put((float) layout.getNode(d1).getY());
                 vertices.put(1.f - sz * (float) vec[d1]);
+                coff += (size << 2) + (size << 1);
               }
             }
             // Skip empty classes
@@ -822,16 +671,18 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
         // See buffer layout above!
 
         // Simple Z sorting for edge groups
-        DoubleIntPair[] depth = new DoubleIntPair[edges.length >> 1];
+        DoubleIntPair[] depth = new DoubleIntPair[layout.edges.size()];
         {
           double[] buf = new double[3];
           double[] z = new double[dim];
           for (int d = 0; d < dim; d++) {
-            camera.project(nodes[d].x, nodes[d].y, 0, buf);
+            camera.project(layout.getNode(d).getX(), layout.getNode(d).getY(), 0, buf);
             z[d] = buf[2];
           }
-          for (int e = 0, e2 = 0; e2 < edges.length; e++, e2 += 2) {
-            depth[e] = new DoubleIntPair(-(z[edges[e2]] + z[edges[e2 + 1]]), e);
+          int e = 0;
+          for (Layout.Edge edge : layout.edges) {
+            depth[e] = new DoubleIntPair(-(z[edge.dim1] + z[edge.dim2]), e);
+            e++;
           }
           Arrays.sort(depth);
         }
@@ -881,8 +732,8 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
             }
             float w = (float) b.getWidth() * scale;
             // Rotate manually, in x-z plane
-            float x = (float) (cos * nodes[i].x + sin * nodes[i].y);
-            float y = (float) (-sin * nodes[i].x + cos * nodes[i].y);
+            float x = (float) (cos * layout.getNode(i).getX() + sin * layout.getNode(i).getY());
+            float y = (float) (-sin * layout.getNode(i).getX() + cos * layout.getNode(i).getY());
             textrenderer.draw3D(labels[i], (x - w * .5f), 1.01f, -y, scale);
           }
           textrenderer.end3DRendering();
@@ -1026,27 +877,27 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Option for similarity measure.
+     * Option for layouting method
      */
-    public static final OptionID SIM_ID = OptionID.getOrCreateOptionID("parallel3d.sim", "Similarity measure for spanning tree.");
+    public static final OptionID LAYOUT_ID = OptionID.getOrCreateOptionID("parallel3d.layout", "Layouting method for 3DPC.");
 
     /**
      * Similarity measure
      */
-    DimensionSimilarity<NumberVector<?>> sim;
+    Layouter3DPC<? super NumberVector<?>> layout;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<DimensionSimilarity<NumberVector<?>>>(SIM_ID, DimensionSimilarity.class);
-      if (config.grab(simP)) {
-        sim = simP.instantiateClass(config);
+      ObjectParameter<Layouter3DPC<? super NumberVector<?>>> layoutP = new ObjectParameter<Layouter3DPC<? super NumberVector<?>>>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout.class);
+      if (config.grab(layoutP)) {
+        layout = layoutP.instantiateClass(config);
       }
     }
 
     @Override
     protected OpenGL3DParallelCoordinates makeInstance() {
-      return new OpenGL3DParallelCoordinates(sim);
+      return new OpenGL3DParallelCoordinates(layout);
     }
   }
 }
