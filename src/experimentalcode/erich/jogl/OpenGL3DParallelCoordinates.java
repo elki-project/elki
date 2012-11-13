@@ -25,9 +25,6 @@ package experimentalcode.erich.jogl;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
@@ -47,12 +44,9 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.fixedfunc.GLMatrixFunc;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
-import javax.swing.event.MouseInputAdapter;
 
-import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.awt.TextRenderer;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -63,7 +57,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -87,6 +80,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import experimentalcode.erich.jogl.Simple1DOFCamera.CameraListener;
 import experimentalcode.shared.parallelcoord.layout.Layout;
 import experimentalcode.shared.parallelcoord.layout.Layouter3DPC;
 import experimentalcode.shared.parallelcoord.layout.SimpleCircularMSTLayout;
@@ -98,9 +92,7 @@ import gnu.trove.list.array.TIntArrayList;
  * 
  * @author Erich Schubert
  * 
- * TODO: FPSAnimator is currently unused. Remove.
- * 
- * TODO: Improve generics of Layout3DPC.
+ *         TODO: Improve generics of Layout3DPC.
  */
 public class OpenGL3DParallelCoordinates implements ResultHandler {
   /**
@@ -109,10 +101,10 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
   private static final Logging LOG = Logging.getLogger(ResultHandler.class);
 
   Settings settings = new Settings();
-  
+
   /**
    * Constructor.
-   *
+   * 
    * @param layout Layout
    */
   public OpenGL3DParallelCoordinates(Layouter3DPC<? super NumberVector<?>> layout) {
@@ -231,11 +223,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
      */
     private Layout layout;
 
-    /**
-     * JOGL animator
-     */
-    private FPSAnimator animator;
-
     private Parallel3DRenderer prenderer;
 
     /**
@@ -279,12 +266,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
       caps.setDoubleBuffered(true);
       canvas = new GLCanvas(caps);
       canvas.addGLEventListener(this);
-      arcball = new Arcball1DOFAdapter();
-      canvas.addMouseListener(arcball);
-      canvas.addMouseMotionListener(arcball);
-      canvas.addMouseWheelListener(arcball);
-      animator = new FPSAnimator(canvas, 20);
-      animator.add(canvas);
 
       frame = new JFrame("EKLI OpenGL Visualization");
       frame.setSize(600, 600);
@@ -324,188 +305,26 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
 
       glu = new GLU();
       camera = new Simple1DOFCamera(glu);
+      camera.addCameraListener(new CameraListener() {
+        @Override
+        public void cameraChanged() {
+          canvas.display();
+        }
+      });
+
+      // Setup arcball:
+      arcball = new Arcball1DOFAdapter(camera);
+      canvas.addMouseListener(arcball);
+      canvas.addMouseMotionListener(arcball);
+      canvas.addMouseWheelListener(arcball);
 
       prenderer.setupVertexBuffer(gl);
       textrenderer = new TextRenderer(new Font("SansSerif", Font.BOLD, 36));
-
-      animator.start();
     }
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
-      camera.ratio = width / (double) height;
-    }
-
-    /**
-     * Class for a simple camera. Restricted: always looks at 0,0,0 from a
-     * position defined by rotationX, distance and height.
-     * 
-     * For rotationX = 0, the camera will be at y=distance, x=0, so that the
-     * default view will have the usual X/Y plane on the ground.
-     * 
-     * @author Erich Schubert
-     */
-    public static class Simple1DOFCamera {
-      /**
-       * Rotation on X axis.
-       */
-      private double rotationZ = 0.;
-
-      /**
-       * Distance
-       */
-      public double distance = 4;
-
-      /**
-       * Height
-       */
-      public double height = 2;
-
-      /**
-       * Screen ratio
-       */
-      public double ratio = 1.0;
-
-      /**
-       * GLU viewport storage
-       */
-      private int[] viewp = new int[4];
-
-      /**
-       * GLU model view matrix
-       */
-      private double[] modelview = new double[16];
-
-      /**
-       * GLU projection matrix
-       */
-      private double[] projection = new double[16];
-
-      /**
-       * GLU utility
-       */
-      private GLU glu;
-
-      /**
-       * Cache the Z rotation cosine
-       */
-      private double cosZ;
-
-      /**
-       * Cache the Z rotation sine
-       */
-      private double sinZ;
-
-      /**
-       * Constructor.
-       * 
-       * @param glu GLU utility class
-       */
-      public Simple1DOFCamera(GLU glu) {
-        super();
-        this.glu = glu;
-        viewp = new int[4];
-        modelview = new double[16];
-        projection = new double[16];
-        // Initial angle:
-        rotationZ = 0;
-        cosZ = 1.0;
-        sinZ = 0.0;
-      }
-
-      /**
-       * Copy constructor, for freezing a camera position.
-       */
-      public Simple1DOFCamera(Simple1DOFCamera other) {
-        super();
-        this.rotationZ = other.rotationZ;
-        this.distance = other.distance;
-        this.height = other.height;
-        this.ratio = other.ratio;
-        this.viewp = other.viewp.clone();
-        this.modelview = other.modelview.clone();
-        this.projection = other.projection.clone();
-        this.glu = other.glu;
-      }
-
-      /**
-       * Get the Z rotation in radians.
-       * 
-       * @return Z rotation angle (radians)
-       */
-      public double getRotationZ() {
-        return rotationZ;
-      }
-
-      /**
-       * Set the z rotation angle in radians.
-       * 
-       * @param rotationZ Z rotation angle.
-       */
-      public void setRotationZ(double rotationZ) {
-        this.rotationZ = rotationZ;
-        this.cosZ = Math.cos(rotationZ);
-        this.sinZ = Math.sin(rotationZ);
-      }
-
-      /**
-       * Apply the camera to a GL context.
-       * 
-       * @param gl GL context.
-       */
-      public void apply(GL2 gl) {
-        // 3D projection
-        gl.glMatrixMode(GL2.GL_PROJECTION);
-        gl.glLoadIdentity();
-        // Perspective.
-        glu.gluPerspective(35, ratio, 1, 1000);
-        glu.gluLookAt(distance * sinZ, distance * -cosZ, height, // pos
-            0, 0, 0, // center
-            0, 0, 1 // up
-        );
-        // Change back to model view matrix.
-        gl.glMatrixMode(GL2.GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-        // Store the matrixes for reference.
-        gl.glGetIntegerv(GL.GL_VIEWPORT, viewp, 0);
-        gl.glGetDoublev(GLMatrixFunc.GL_MODELVIEW_MATRIX, modelview, 0);
-        gl.glGetDoublev(GLMatrixFunc.GL_PROJECTION_MATRIX, projection, 0);
-      }
-
-      /**
-       * Unproject a screen coordinate (at depth 0) to 3D model coordinates.
-       * 
-       * @param x X
-       * @param y Y
-       * @return model coordinates
-       */
-      public double[] unproject(double x, double y, double z) {
-        double[] out = new double[3];
-        unproject(x, y, z, out);
-        return out;
-      }
-
-      /**
-       * Unproject a screen coordinate (at depth 0) to 3D model coordinates.
-       * 
-       * @param x X
-       * @param y Y
-       * @param Out output buffer
-       */
-      public void unproject(double x, double y, double z, double[] out) {
-        glu.gluUnProject(x, y, z, modelview, 0, projection, 0, viewp, 0, out, 0);
-      }
-
-      /**
-       * Project a coordinate
-       * 
-       * @param vec Input vector buffer
-       * @param Out output buffer
-       */
-      public void project(double x, double y, double z, double[] out) {
-        glu.gluProject(x, y, z, modelview, 0, projection, 0, viewp, 0, out, 0);
-      }
+      camera.setRatio(width / (double) height);
     }
 
     @Override
@@ -527,7 +346,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     public void dispose(GLAutoDrawable drawable) {
       GL gl = drawable.getGL();
       prenderer.dispose(gl);
-      animator.stop();
     }
 
     /**
@@ -739,131 +557,6 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
           textrenderer.end3DRendering();
           gl.glPopMatrix();
         }
-      }
-    }
-
-    /**
-     * Arcball style helper.
-     * 
-     * @author Erich Schubert
-     */
-    public class Arcball1DOFAdapter extends MouseInputAdapter {
-      /**
-       * Debug flag.
-       */
-      private static final boolean DEBUG = false;
-
-      /**
-       * Starting point of drag.
-       */
-      private double[] startvec = new double[3];
-
-      /**
-       * Ending point of drag.
-       */
-      private double[] endvec = new double[3];
-
-      /**
-       * Temp buffer we use for computations.
-       */
-      double[] tmp = new double[3];
-
-      /**
-       * Initial camera rotation
-       */
-      private double initialrot;
-
-      /**
-       * Starting angle for dragging.
-       */
-      double startangle;
-
-      /**
-       * Camera that was in use when the drag started.
-       */
-      private Simple1DOFCamera startcamera;
-
-      @Override
-      public void mouseWheelMoved(MouseWheelEvent e) {
-        int s = e.getWheelRotation();
-        for (; s >= 1; s--) {
-          camera.distance += .1;
-        }
-        for (; s <= -1; s++) {
-          if (camera.distance > .15) {
-            camera.distance -= .1;
-          }
-        }
-        canvas.display();
-      }
-
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        if (animator.isPaused()) {
-          animator.start();
-        } else {
-          animator.pause();
-        }
-      }
-
-      @Override
-      public void mousePressed(MouseEvent e) {
-        // Start drag.
-        startcamera = new Simple1DOFCamera(camera);
-
-        Point startPoint = e.getPoint();
-        mapMouseToPlane(startcamera, startPoint, startvec);
-        initialrot = startcamera.getRotationZ();
-        startangle = Math.atan2(startvec[1], startvec[0]);
-      }
-
-      /**
-       * Map the coordinates. Note: vec will be overwritten!
-       * 
-       * @param camera Camera
-       * @param point2d Input point
-       * @param vec Output vector
-       */
-      private void mapMouseToPlane(Simple1DOFCamera camera, Point point2d, double[] vec) {
-        double[] far = new double[3], near = new double[3];
-        // Far plane
-        camera.unproject(point2d.x, point2d.y, 0., far);
-        // Near plane
-        camera.unproject(point2d.x, point2d.y, 1., near);
-        // Delta vector: far -= near.
-        VMath.minusEquals(far, near);
-        // Intersection with z=0 plane:
-        // far.z - a * near.z = 0 -> a = far.z / near.z
-        if (near[2] < 0 || near[2] > 0) {
-          double a = far[2] / near[2];
-          vec[0] = far[0] - a * near[0];
-          vec[1] = far[1] - a * near[1];
-          vec[2] = 0;
-        }
-      }
-
-      @Override
-      public void mouseDragged(MouseEvent e) {
-        mapMouseToPlane(startcamera, e.getPoint(), endvec);
-        double upangle = Math.atan2(endvec[1], endvec[0]);
-        camera.setRotationZ(initialrot + (upangle - startangle));
-        canvas.display();
-        // TODO: add full arcball support?
-      }
-
-      @SuppressWarnings("unused")
-      public void debugRender(GL2 gl) {
-        if (!DEBUG || (startcamera == null)) {
-          return;
-        }
-        gl.glLineWidth(3f);
-        gl.glColor4f(1.f, 0.f, 0.f, .66f);
-        gl.glBegin(GL.GL_LINES);
-        gl.glVertex3f(0.f, 0.f, 0.f);
-        gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 4.f, (float) -Math.sin(-initialrot + startangle) * 4.f, 0.f);
-        gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 1.f, (float) -Math.sin(-initialrot + startangle) * 1.f, 0.f);
-        gl.glVertex3f((float) Math.cos(-initialrot + startangle) * 1.f, (float) -Math.sin(-initialrot + startangle) * 1.f, 1.f);
-        gl.glEnd();
       }
     }
   }
