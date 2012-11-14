@@ -160,13 +160,15 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    */
   public double outresScore(final int s, BitSet subspace, DBIDRef id, KernelDensityEstimator kernel) {
     double score = 1.0; // Initial score is 1.0
+    final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(subspace);
+    MeanVariance meanv = new MeanVariance();
 
     for(int i = s; i < kernel.dim; i++) {
       if(subspace.get(i)) { // TODO: needed? Or should we always start with i=0?
         continue;
       }
       subspace.set(i);
-      final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(subspace);
+      df.setSelectedDimensions(subspace);
       final double adjustedEps = kernel.adjustedEps(kernel.dim);
       // Query with a larger window, to also get neighbors of neighbors
       // Subspace euclidean is metric!
@@ -179,14 +181,13 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
         // Relevance test
         if(relevantSubspace(subspace, neigh, kernel)) {
           final double density = kernel.subspaceDensity(subspace, neigh);
-          final double deviation;
           // Compute mean and standard deviation for densities of neighbors.
-          MeanVariance meanv = new MeanVariance();
+          meanv.reset();
           for (DoubleDistanceDBIDResultIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
             DoubleDistanceDBIDList n2 = subsetNeighborhoodQuery(neighc, neighbor, df, adjustedEps, kernel);
             meanv.put(kernel.subspaceDensity(subspace, n2));
           }
-          deviation = (meanv.getMean() - density) / (2. * meanv.getSampleStddev());
+          final double deviation = (meanv.getMean() - density) / (2. * meanv.getSampleStddev());
           // High deviation:
           if(deviation >= 1) {
             score *= (density / deviation);
