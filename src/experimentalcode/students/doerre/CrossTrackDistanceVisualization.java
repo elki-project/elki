@@ -30,6 +30,7 @@ import javax.imageio.ImageIO;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.GeoUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -68,6 +69,8 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
     CTD,
     /** Along track distance */
     ATD,
+    /** Mindist */
+    MINDIST
   }
 
   /**
@@ -108,21 +111,34 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
   @Override
   public void run() throws UnableToComplyException {
     // Format: Latitude, Longitude
-    // Berlin:
-    DoubleVector stap = new DoubleVector(new double[] { 52.31, 13.24 });
+    // München:
+    DoubleVector stap = new DoubleVector(new double[] { 48.133333, 11.566667 });
     // New York:
     DoubleVector endp = new DoubleVector(new double[] { 40.712778, -74.005833 });
+    // Bavaria:
+    ModifiableHyperBoundingBox bb = new ModifiableHyperBoundingBox(new double[] { 47.27011150, 8.97634970 }, new double[] { 50.56471420, 13.83963710 });
+    // Bavaria slice on lat
+    // bb = new ModifiableHyperBoundingBox(new double[] { 47.27011150, -80 }, //
+    // new double[] { 50.56471420, 80 });
+    // Bavaria slice on lon
+    // bb = new ModifiableHyperBoundingBox(new double[] { -60, 8.97634970 }, //
+    // new double[] { 60, 13.83963710 });
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
     final double max;
     switch(mode) {
     case ATD:
-      max = 2 * GeoUtil.EARTH_RADIUS * Math.PI;
+      // Currently half the circumference - we're missing the sign
+      max = GeoUtil.EARTH_RADIUS * Math.PI;
       break;
     case CTD:
       // Quarter (!) the circumference is the maximum CTD!
       max = .5 * GeoUtil.EARTH_RADIUS * Math.PI;
+      break;
+    case MINDIST:
+      // Half the circumference
+      max = GeoUtil.EARTH_RADIUS * Math.PI;
       break;
     default:
       throw new AbortException("Invalid mode: " + mode);
@@ -138,23 +154,31 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
         switch(mode) {
         case ATD: {
           final double atd = GeoUtil.alongTrackDistance(stap.doubleValue(0), stap.doubleValue(1), lat, lon, endp.doubleValue(0), endp.doubleValue(1));
-          double reldist = atd / max;
-          img.setRGB(x, y, colorMultiply(green, reldist));
+          if (atd < 0) {
+            img.setRGB(x, y, colorMultiply(red, -atd / max, false));
+          } else {
+            img.setRGB(x, y, colorMultiply(green, atd / max, false));
+          }
           break;
         }
         case CTD: {
           final double ctd = GeoUtil.crossTrackDistance(stap.doubleValue(0), stap.doubleValue(1), lat, lon, endp.doubleValue(0), endp.doubleValue(1));
           if (ctd < 0) {
-            double reldist = -ctd / max;
-            img.setRGB(x, y, colorMultiply(red, reldist));
+            img.setRGB(x, y, colorMultiply(red, -ctd / max, false));
           } else {
-            double reldist = ctd / max;
-            img.setRGB(x, y, colorMultiply(green, reldist));
+            img.setRGB(x, y, colorMultiply(green, ctd / max, false));
           }
           break;
         }
-        default:
-          throw new AbortException("Invalid mode: " + mode);
+        case MINDIST: {
+          final double dist = GeoUtil.latlngMinDist(lat, lon, bb.getMin(0), bb.getMin(1), bb.getMax(0), bb.getMax(1));
+          if (dist < 0) {
+            img.setRGB(x, y, colorMultiply(red, -dist / max, true));
+          } else {
+            img.setRGB(x, y, colorMultiply(green, dist / max, true));
+          }
+          break;
+        }
         }
       }
     }
@@ -166,9 +190,13 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
     }
   }
 
-  private int colorMultiply(int col, double reldist) {
+  private int colorMultiply(int col, double reldist, boolean ceil) {
     if (steps > 0) {
-      reldist = Math.round(reldist * steps) * 1. / steps;
+      if (!ceil) {
+        reldist = Math.round(reldist * steps) * 1. / steps;
+      } else {
+        reldist = Math.ceil(reldist * steps) / steps;
+      }
     }
     int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = (col) & 0xFF;
     a = (int) (a * Math.sqrt(reldist)) & 0xFF;

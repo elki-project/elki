@@ -256,7 +256,31 @@ public final class GeoUtil {
   public static double alongTrackDistance(double latS, double lonS, double latQ, double lonQ, double latE, double lonE) {
     double distSQ = haversineFormula(latS, lonS, latQ, lonQ);
     double ctd = crossTrackDistance(latS, lonS, latQ, lonQ, latE, lonE, distSQ);
-    return EARTH_RADIUS * Math.acos(Math.cos(distSQ / EARTH_RADIUS) / Math.cos(ctd / EARTH_RADIUS));
+    return alongTrackDistance(latS, lonS, latQ, lonQ, latE, lonE, distSQ, ctd);
+  }
+
+  /**
+   * The along track distance, is the distance from S to Q along the track S to
+   * E.
+   * 
+   * ATD=acos(cos(dist_SQ)/cos(XTD))
+   * 
+   * FIXME: can we get a proper sign into this?
+   * 
+   * @param latS Latitude of starting point.
+   * @param lonS Longitude of starting point.
+   * @param latQ Latitude of query point.
+   * @param lonQ Longitude of query point.
+   * @param latE Latitude of destination point.
+   * @param lonE Longitude of destination point.
+   * @param distSQ Distance S to Q
+   * @param ctd Cross-track-distance
+   * @return Along-track distance in km. May be negative - this gives the side.
+   */
+  public static double alongTrackDistance(double latS, double lonS, double latQ, double lonQ, double latE, double lonE, double distSQ, double ctd) {
+    // TODO: optimize the sign computation!
+    int sign = Math.abs(bearing(latS, lonS, latE, lonE) - bearing(latS, lonS, latQ, lonQ)) < MathUtil.HALFPI ? +1 : -1;
+    return sign * EARTH_RADIUS * Math.acos(Math.cos(distSQ / EARTH_RADIUS) / Math.cos(ctd / EARTH_RADIUS));
     // TODO: for short distances, use this instead:
     // asin(sqrt( (sin(dist_AD))^2 - (sin(XTD))^2 )/cos(XTD))
   }
@@ -306,15 +330,96 @@ public final class GeoUtil {
     }
     // East, to min edge:
     if (lngE <= lngW) {
-      double distN = haversineFormula(plat, plng, rmaxlat, rminlng);
-      double distS = haversineFormula(plat, plng, rminlat, rminlng);
-      double distC = crossTrackDistance(rminlat, rminlng, plat, plng, rmaxlat, rminlng);
-      return Math.min(distN, Math.min(distS, distC));
+      final double slatQ = Math.sin(MathUtil.deg2rad(plat));
+      final double clatQ = Math.cos(MathUtil.deg2rad(plat));
+      final double slatN = Math.sin(MathUtil.deg2rad(rmaxlat));
+      final double clatN = Math.cos(MathUtil.deg2rad(rmaxlat));
+      final double slatS = Math.sin(MathUtil.deg2rad(rminlat));
+      final double clatS = Math.cos(MathUtil.deg2rad(rminlat));
+      final double slngD = Math.sin(MathUtil.deg2rad(lngE));
+      final double clngD = Math.cos(MathUtil.deg2rad(lngE));
+
+      // Haversine in parallel for same latitude:
+      final double slatN2 = Math.sin(MathUtil.deg2rad(plat - rmaxlat) * .5);
+      final double slatS2 = Math.sin(MathUtil.deg2rad(plat - rminlat) * .5);
+      final double slon = Math.sin(MathUtil.deg2rad(plng - rminlng) * .5);
+      final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
+      final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatN;
+      final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
+      final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
+
+      // Cross-track-error from south pole:
+
+      // Bearing from south
+      double bs = Math.atan2(-slngD * clatQ, clatS * slatQ - slatS * clatQ * clngD);
+      if (bs > -MathUtil.HALFPI) {
+        // Bearing from north
+        double bn = Math.atan2(-slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
+        if (bn < -MathUtil.HALFPI) {
+          // Radians from south = abs(ATD)
+          final double radFromS = MathUtil.deg2rad(90 - plat);
+          // Cross-track-distance to longitude line.
+          double cross = -Math.asin(Math.sin(radFromS) * -Math.sin(MathUtil.deg2rad(lngE)));
+
+          return EARTH_RADIUS * cross;
+        }
+      }
+      return EARTH_RADIUS * Math.min(distN, distS);
     } else { // West, to max edge
-      double distN = haversineFormula(plat, plng, rmaxlat, rmaxlng);
-      double distS = haversineFormula(plat, plng, rminlat, rmaxlng);
-      double distC = crossTrackDistance(rminlat, rmaxlng, plat, plng, rmaxlat, rmaxlng);
-      return Math.min(distN, Math.min(distS, distC));
+      final double slatQ = Math.sin(MathUtil.deg2rad(plat));
+      final double clatQ = Math.cos(MathUtil.deg2rad(plat));
+      final double slatN = Math.sin(MathUtil.deg2rad(rmaxlat));
+      final double clatN = Math.cos(MathUtil.deg2rad(rmaxlat));
+      final double slatS = Math.sin(MathUtil.deg2rad(rminlat));
+      final double clatS = Math.cos(MathUtil.deg2rad(rminlat));
+      final double slngD = Math.sin(MathUtil.deg2rad(-lngW));
+      final double clngD = Math.cos(MathUtil.deg2rad(-lngW));
+
+      // Haversine in parallel for same latitude:
+      final double slatN2 = Math.sin(MathUtil.deg2rad(plat - rmaxlat) * .5);
+      final double slatS2 = Math.sin(MathUtil.deg2rad(plat - rminlat) * .5);
+      final double slon = Math.sin(MathUtil.deg2rad(plng - rmaxlng) * .5);
+      final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
+      final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatN;
+      final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
+      final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
+
+      // Bearing from south
+      double bs = Math.atan2(-slngD * clatQ, clatS * slatQ - slatS * clatQ * clngD);
+      if (bs < MathUtil.HALFPI) {
+        // Bearing from north
+        double bn = Math.atan2(-slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
+        if (bn > MathUtil.HALFPI) {
+          // Radians from south = abs(ATD)
+          final double radFromS = MathUtil.deg2rad(90 - plat);
+          // Cross-track-distance to longitude line.
+          double cross = -Math.asin(Math.sin(radFromS) * -Math.sin(MathUtil.deg2rad(lngW)));
+
+          return EARTH_RADIUS * cross;
+        }
+      }
+      return EARTH_RADIUS * Math.min(distN, distS);
     }
+  }
+
+  /**
+   * Compute the bearing from start to end.
+   * 
+   * @param latS Start latitude, in degree
+   * @param lngS Start longitude, in degree
+   * @param latE End latitude, in degree
+   * @param lngE End longitude, in degree
+   * @return Bearing in radians
+   */
+  public static double bearing(double latS, double lngS, double latE, double lngE) {
+    latS = MathUtil.deg2rad(latS);
+    latE = MathUtil.deg2rad(latE);
+    lngS = MathUtil.deg2rad(lngS);
+    lngE = MathUtil.deg2rad(lngE);
+    final double slatS = Math.sin(latS);
+    final double clatS = Math.cos(latS);
+    final double slatE = Math.sin(latE);
+    final double clatE = Math.cos(latE);
+    return Math.atan2(-Math.sin(lngS - lngE) * clatE, clatS * slatE - slatS * clatE * Math.cos(lngS - lngE));
   }
 }
