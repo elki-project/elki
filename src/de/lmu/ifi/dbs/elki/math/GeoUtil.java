@@ -135,10 +135,10 @@ public final class GeoUtil {
    * @param lonQ Longitude of query point.
    * @param latE Latitude of destination point.
    * @param lonE Longitude of destination point.
-   * @param distSE Distance from starting point to destination point.
+   * @param distSE Distance from starting point to query point.
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
-  public static double crossTrackDistance(double latS, double lonS, double latQ, double lonQ, double latE, double lonE, double distSE) {
+  public static double crossTrackDistance(double latS, double lonS, double latQ, double lonQ, double latE, double lonE, double distSQ) {
     // Convert to radians.
     latS = MathUtil.deg2rad(latS);
     latQ = MathUtil.deg2rad(latQ);
@@ -173,7 +173,7 @@ public final class GeoUtil {
     }
 
     // Calculate cross-track distance
-    return EARTH_RADIUS * Math.asin(Math.sin(distSE / EARTH_RADIUS) * Math.sin(crsSE - crsSQ));
+    return EARTH_RADIUS * Math.asin(Math.sin(distSQ / EARTH_RADIUS) * Math.sin(crsSQ - crsSE));
   }
 
   /**
@@ -210,12 +210,12 @@ public final class GeoUtil {
 
     // Haversine formula, higher precision at < 1 meters but maybe issues at
     // antipodal points - we do not yet multiply with the radius!
-    double angDistSE;
+    double angDistSQ;
     {
-      final double slat = Math.sin((latE - latS) * .5);
-      final double slon = Math.sin(dlonSE * .5);
-      final double a = slat * slat + slon * slon * clatS * clatE;
-      angDistSE = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      final double slat = Math.sin((latQ - latS) * .5);
+      final double slon = Math.sin(dlonSQ * .5);
+      final double a = slat * slat + slon * slon * clatS * clatQ;
+      angDistSQ = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     // Compute the course
@@ -234,7 +234,7 @@ public final class GeoUtil {
     }
 
     // Calculate cross-track distance
-    return EARTH_RADIUS * Math.asin(Math.sin(angDistSE) * Math.sin(crsSE - crsSQ));
+    return EARTH_RADIUS * Math.asin(Math.sin(angDistSQ) * Math.sin(crsSQ - crsSE));
   }
 
   /**
@@ -242,6 +242,8 @@ public final class GeoUtil {
    * E.
    * 
    * ATD=acos(cos(dist_SQ)/cos(XTD))
+   * 
+   * FIXME: can we get a proper sign into this?
    * 
    * @param latS Latitude of starting point.
    * @param lonS Longitude of starting point.
@@ -252,9 +254,11 @@ public final class GeoUtil {
    * @return Along-track distance in km. May be negative - this gives the side.
    */
   public static double alongTrackDistance(double latS, double lonS, double latQ, double lonQ, double latE, double lonE) {
-    double distSQ = haversineFormula(latS, lonS, latQ, lonQ) / EARTH_RADIUS;
-    double ctd = crossTrackDistance(latS, lonS, latQ, lonQ, latE, lonE) / EARTH_RADIUS;
-    return EARTH_RADIUS * Math.acos(Math.cos(distSQ) / Math.cos(ctd));
+    double distSQ = haversineFormula(latS, lonS, latQ, lonQ);
+    double ctd = crossTrackDistance(latS, lonS, latQ, lonQ, latE, lonE, distSQ);
+    return EARTH_RADIUS * Math.acos(Math.cos(distSQ / EARTH_RADIUS) / Math.cos(ctd / EARTH_RADIUS));
+    // TODO: for short distances, use this instead:
+    // asin(sqrt( (sin(dist_AD))^2 - (sin(XTD))^2 )/cos(XTD))
   }
 
   /**
@@ -270,7 +274,7 @@ public final class GeoUtil {
    */
   public static double latlngMinDist(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
-    
+
     // Degenerate rectangles:
     if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormula(rminlat, rminlng, plat, plng);

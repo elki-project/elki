@@ -1,33 +1,5 @@
 package experimentalcode.students.doerre;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.GeoUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHandler;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import de.lmu.ifi.dbs.elki.visualization.ExportVisualizations;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -50,155 +22,223 @@ import de.lmu.ifi.dbs.elki.visualization.ExportVisualizations;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.GeoUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * @author Niels Dörre
  * Visualization function for Cross-track distance function
+ * 
+ * TODO: make resolution configurable.
+ * 
+ * TODO: make start and end configurable.
+ * 
+ * @author Niels Dörre
+ * @author Erich Schubert
  */
-public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implements ResultHandler {
+public class CrossTrackDistanceVisualization extends AbstractApplication {
   /**
    * Get a logger for this class.
    */
-  protected final static Logging logger = Logging.getLogger(ExportVisualizations.class);
+  private final static Logging LOG = Logging.getLogger(CrossTrackDistanceVisualization.class);
+
+  /**
+   * Visualization mode.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static enum Mode {
+    /** Cross track distance */
+    CTD,
+    /** Along track distance */
+    ATD,
+  }
+
   /**
    * Holds the file to print results to.
    */
   private File out;
+
+  /**
+   * Image size.
+   */
+  final int width = 2000, height = 1000;
+
+  /**
+   * Number of steps for shades.
+   */
+  protected int steps = 10;
+
+  /**
+   * Visualiaztion mode
+   */
+  private Mode mode = Mode.CTD;
+
   /**
    * Constructor.
    * 
-   * @param out
-   * 
+   * @param verbose Verbose flag
+   * @param out Output filename
+   * @param steps Number of steps in the color map
+   * @param mode Visualization mode
    */
-  public CrossTrackDistanceVisualization(File out) {
-    super();
+  public CrossTrackDistanceVisualization(boolean verbose, File out, int steps, Mode mode) {
+    super(verbose);
     this.out = out;
+    this.steps = steps;
+    this.mode = mode;
   }
-  
+
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Database db = ResultUtil.findDatabase(baseResult);
-    VectorTypeInformation<V> type = new VectorFieldTypeInformation<V>(NumberVector.class, 2, 2);
-    Relation<V> rel = db.getRelation(type);
-    processRelation(db, rel);
-  }
+  public void run() throws UnableToComplyException {
+    // Format: Latitude, Longitude
+    // Berlin:
+    DoubleVector stap = new DoubleVector(new double[] { 52.31, 13.24 });
+    // New York:
+    DoubleVector endp = new DoubleVector(new double[] { 40.712778, -74.005833 });
 
-  private void processRelation(Database db, Relation<V> rel) {
-
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(rel);
-    SpatialPrimitiveDoubleDistanceFunction<? super V> df2 = LatLngDistanceFunction.STATIC;
-    
-    // Parameter precedence: Latitude, Longitude
-    V newyork2 = factory.newNumberVector(new double[]{40.788800, -74.011533});
-    V berlin2 = factory.newNumberVector(new double[]{52.31, 13.24});
-
-    V p1 = berlin2;
-    V p2 = newyork2;
-
-    double dist_bn = df2.doubleDistance(berlin2, newyork2);
-    int distance_of_points = 5;
-    int number_of_points = (int) (dist_bn / distance_of_points);
-    
-    double [] [] dest_points = new double [number_of_points][2];   
-    int i = 0;
-    
-    for (int iter=distance_of_points; iter<(int) dist_bn; iter=iter+distance_of_points){
-      double []dest_point = experimentalcode.students.doerre.DestinationPointCalculation.DestinationPointCalculation(p1.doubleValue(0),p1.doubleValue(1),p2.doubleValue(0),p2.doubleValue(1), iter);
-      dest_points[i] = dest_point;
-      i++;
-    }
-    
-    final int width = 2000, height = 1000;  
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-    
-    // Calculate Cross-Track and Along-Track distances of all points  
-    double [][] cross_track_distances = new double [width][height];
-    DoubleMinMax minmax = new DoubleMinMax();
-    
-    for (int x = 0; x < width; x++) {
-      for (int y = 0; y < height; y++) {
-        
-        // Calculate latitude and longitude values from x/y values
-        double lon = x * 360. / width - 180.;
-        double lat = y * -180. / height + 90.;
-        
-        // Calculace Cross-track distance
-        double ctd = GeoUtil.crossTrackDistance (p1.doubleValue(0),p1.doubleValue(1),lat,lon,p2.doubleValue(0),p2.doubleValue(1));    
-        cross_track_distances [x][y] = ctd;
-        minmax.put(ctd);
-      }
-    }  
+
+    final double max;
+    switch(mode) {
+    case ATD:
+      max = 2 * GeoUtil.EARTH_RADIUS * Math.PI;
+      break;
+    case CTD:
+      // Quarter (!) the circumference is the maximum CTD!
+      max = .5 * GeoUtil.EARTH_RADIUS * Math.PI;
+      break;
+    default:
+      throw new AbortException("Invalid mode: " + mode);
+    }
     // Red: left off-course, green: right off-course
-    int red=0xffff0000;
-    int green=0xff00ff00;
-    
-    for(int x = 0; x < width; x++) {
-      for(int y = 0; y < height; y++) {
-        if (cross_track_distances[x][y] < 0) { 
-          double reldist = cross_track_distances[x][y] / minmax.getMax();
-          int val = 255 - (0xFF & 16* (int) (15 * reldist - .95));
-          int col = val << 24;
-          int col_red = red - col;  // red
-          img.setRGB(x, y, col_red);
-        } else if (cross_track_distances[x][y] > 0){
-          double reldist = cross_track_distances[x][y] / minmax.getMax();
-          int val = 255 - (0xFF & 16* (int) (.5 + 15 * reldist));
-          int col = val << 24;
-          int col_green = green + col;  // green
-          img.setRGB(x, y, col_green); 
+    int red = 0xffff0000;
+    int green = 0xff00ff00;
+
+    for (int x = 0; x < width; x++) {
+      final double lon = x * 360. / width - 180.;
+      for (int y = 0; y < height; y++) {
+        final double lat = y * -180. / height + 90.;
+        switch(mode) {
+        case ATD: {
+          final double atd = GeoUtil.alongTrackDistance(stap.doubleValue(0), stap.doubleValue(1), lat, lon, endp.doubleValue(0), endp.doubleValue(1));
+          double reldist = atd / max;
+          img.setRGB(x, y, colorMultiply(green, reldist));
+          break;
+        }
+        case CTD: {
+          final double ctd = GeoUtil.crossTrackDistance(stap.doubleValue(0), stap.doubleValue(1), lat, lon, endp.doubleValue(0), endp.doubleValue(1));
+          if (ctd < 0) {
+            double reldist = -ctd / max;
+            img.setRGB(x, y, colorMultiply(red, reldist));
+          } else {
+            double reldist = ctd / max;
+            img.setRGB(x, y, colorMultiply(green, reldist));
+          }
+          break;
+        }
+        default:
+          throw new AbortException("Invalid mode: " + mode);
         }
       }
     }
-    
-    // Create a graphics contents on the buffered image
-    Graphics2D g2d = img.createGraphics();
-    
-    // Draw course points
-    g2d.setColor(Color.black);
-    
-    // Read the coordinate values from the list - and draw points (mapped to 2000*1000)
-    for (int iter2=0; iter2<number_of_points; iter2++) {     
-        int point_y2 = (int) ((dest_points[iter2][0] + 90) / 180. * height); 
-        int point_y3 = height - point_y2; // changing of sides necessary
-        int point_x2 = (int) ((dest_points[iter2][1] + 180) / 360. * width);     
-        g2d.drawRect(point_x2, point_y3, 1, 1);
-    }
-    
-    // Graphics context no longer needed so dispose it
-    g2d.dispose();
 
     try {
       ImageIO.write(img, "png", out);
-    }
-    catch(IOException e) {
-      // Auto-generated catch block
-      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+    } catch (IOException e) {
+      LOG.exception(e);
     }
   }
 
-  public static class Parameterizer extends AbstractParameterizer {
+  private int colorMultiply(int col, double reldist) {
+    if (steps > 0) {
+      reldist = Math.round(reldist * steps) * 1. / steps;
+    }
+    int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = (col) & 0xFF;
+    a = (int) (a * Math.sqrt(reldist)) & 0xFF;
+    // r = (int) (r * (1 - reldist)) & 0xFF;
+    // g = (int) (g * (1 - reldist)) & 0xFF;
+    // b = (int) (b * (1 - reldist)) & 0xFF;
+    return a << 24 | r << 16 | g << 8 | b;
+  }
+
+  /**
+   * Main method for application.
+   * 
+   * @param args Parameters
+   */
+  public static void main(String[] args) {
+    CrossTrackDistanceVisualization.runCLIApplication(CrossTrackDistanceVisualization.class, args);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractApplication.Parameterizer {
+    /**
+     * Number of steps in the distance map.
+     */
+    public static final OptionID STEPS_ID = OptionID.getOrCreateOptionID("ctdvis.steps", "Number of steps for the distance map.");
+
+    /**
+     * Visualization mode.
+     */
+    public static final OptionID MODE_ID = OptionID.getOrCreateOptionID("ctdvis.mode", "Visualization mode.");
+
     /**
      * Holds the file to print results to.
      */
     protected File out = null;
+
     /**
-     * Parameter distanceOfLines.
+     * Number of steps in the color map
      */
-    protected int distanceOfLines;
+    protected int steps = 0;
+
+    /**
+     * Visualization mode
+     */
+    protected Mode mode = Mode.CTD;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // FileParameter for output file
-      FileParameter outputP = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE, true);
-      if(config.grab(outputP)) {
-        out = outputP.getValue();
-      }    
+      out = super.getParameterOutputFile(config, "Output image file");
+      IntParameter stepsP = new IntParameter(STEPS_ID);
+      stepsP.setOptional(true);
+      stepsP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(stepsP)) {
+        steps = stepsP.intValue();
+      }
+      EnumParameter<Mode> modeP = new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.CTD);
+      if (config.grab(modeP)) {
+        mode = modeP.getValue();
+      }
     }
 
     @Override
     protected CrossTrackDistanceVisualization makeInstance() {
-      return new CrossTrackDistanceVisualization(out);
+      return new CrossTrackDistanceVisualization(verbose, out, steps, mode);
     }
   }
 }
