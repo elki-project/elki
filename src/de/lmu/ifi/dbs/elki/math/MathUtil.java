@@ -111,11 +111,6 @@ public final class MathUtil {
   public static final double RAD2DEG = 180 / Math.PI;
 
   /**
-   * Earth radius approximation we are using.
-   */
-  public static final double EARTH_RADIUS = 6371; // km.
-
-  /**
    * Fake constructor for static class.
    */
   private MathUtil() {
@@ -469,6 +464,9 @@ public final class MathUtil {
   /**
    * Convert Degree to Radians.
    * 
+   * This is essentially the same as {@link Math#toRadians}, but we keep it for
+   * now, it might be marginally faster, but certainly not slower.
+   * 
    * @param deg Degree value
    * @return Radian value
    */
@@ -479,44 +477,14 @@ public final class MathUtil {
   /**
    * Radians to Degree.
    * 
+   * This is essentially the same as {@link Math#toRadians}, but we keep it for
+   * now, it might be marginally faster, but certainly not slower.
+   * 
    * @param rad Radians value
    * @return Degree value
    */
   public static double rad2deg(double rad) {
     return rad * RAD2DEG;
-  }
-
-  /**
-   * Compute the approximate on-earth-surface distance of two points.
-   * 
-   * @param lat1 Latitude of first point in degree
-   * @param lon1 Longitude of first point in degree
-   * @param lat2 Latitude of second point in degree
-   * @param lon2 Longitude of second point in degree
-   * @return Distance in km (approximately)
-   */
-  public static double latlngDistance(double lat1, double lon1, double lat2, double lon2) {
-    // Work in radians
-    lat1 = MathUtil.deg2rad(lat1);
-    lat2 = MathUtil.deg2rad(lat2);
-    lon1 = MathUtil.deg2rad(lon1);
-    lon2 = MathUtil.deg2rad(lon2);
-    // Delta
-    final double dlat = lat1 - lat2;
-    final double dlon = lon1 - lon2;
-
-    // Spherical Law of Cosines
-    // NOTE: there seems to be a signedness issue in this code!
-    // double dist = Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) *
-    // Math.cos(lat2) * Math.cos(dlon);
-    // return EARTH_RADIUS * Math.atan(dist);
-
-    // Alternative: Havestine formula, higher precision at < 1 meters:
-    final double slat = Math.sin(dlat * .5);
-    final double slon = Math.sin(dlon * .5);
-    final double a = slat * slat + slon * slon * Math.cos(lat1) * Math.cos(lat2);
-    final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return EARTH_RADIUS * c;
   }
 
   /**

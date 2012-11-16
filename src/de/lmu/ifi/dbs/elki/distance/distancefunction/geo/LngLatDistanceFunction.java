@@ -24,10 +24,15 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.geo;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.math.GeoUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -35,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction {
+public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance.
    */
@@ -51,7 +56,31 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    return MathUtil.latlngDistance(o1.doubleValue(1), o1.doubleValue(0), o2.doubleValue(1), o2.doubleValue(0));
+    return GeoUtil.haversineFormula(o1.doubleValue(1), o1.doubleValue(0), o2.doubleValue(1), o2.doubleValue(0));
+  }
+
+  @Override
+  public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    if (mbr1 instanceof NumberVector) {
+      if (mbr2 instanceof NumberVector) {
+        return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
+      } else {
+        NumberVector<?> o1 = (NumberVector<?>) mbr1;
+        return GeoUtil.latlngMinDist(o1.doubleValue(1), o1.doubleValue(0), mbr2.getMin(1), mbr2.getMin(0), mbr2.getMax(1), mbr2.getMax(0));
+      }
+    } else {
+      if (mbr2 instanceof NumberVector) {
+        NumberVector<?> o2 = (NumberVector<?>) mbr2;
+        return GeoUtil.latlngMinDist(o2.doubleValue(1), o2.doubleValue(0), mbr1.getMin(1), mbr1.getMin(0), mbr1.getMax(1), mbr1.getMax(0));
+      } else {
+        throw new UnsupportedOperationException("MBR to MBR mindist is not yet implemented.");
+      }
+    }
+  }
+
+  @Override
+  public DoubleDistance minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    return new DoubleDistance(doubleMinDist(mbr1, mbr2));
   }
 
   @Override
@@ -61,18 +90,23 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if (obj == null) {
       return false;
     }
-    if(obj == this) {
+    if (obj == this) {
       return true;
     }
-    if(this.getClass().equals(obj.getClass())) {
+    if (this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);
   }
 
+  @Override
+  public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
+    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
+  }
+  
   /**
    * Parameterization class.
    * 
