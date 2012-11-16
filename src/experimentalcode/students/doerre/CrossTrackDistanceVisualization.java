@@ -15,8 +15,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.GeoUtil;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
@@ -121,7 +123,7 @@ public class CrossTrackDistanceVisualization<V extends NumberVector<?>> implemen
         double lat = y * -180. / height + 90.;
         
         // Calculace Cross-track distance
-        double ctd = experimentalcode.students.doerre.CrossTrackDistance.CrossTrackDistance (p1.doubleValue(0),p1.doubleValue(1),p2.doubleValue(0),p2.doubleValue(1),lat,lon,0);    
+        double ctd = GeoUtil.crossTrackDistance (p1.doubleValue(0),p1.doubleValue(1),lat,lon,p2.doubleValue(0),p2.doubleValue(1));    
         cross_track_distances [x][y] = ctd;
         minmax.put(ctd);
       }
