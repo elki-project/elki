@@ -87,4 +87,5 @@ de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin
 de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 tutorial.outlier.DistanceStddevOutlier
