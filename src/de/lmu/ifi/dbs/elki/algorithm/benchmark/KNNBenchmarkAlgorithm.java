@@ -52,7 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Benchmarking algorithm that computes the k nearest neighbors for each query
- * point.
+ * point. The query points can either come from a separate data source, or from
+ * the original database.
  * 
  * @author Erich Schubert
  * 

@@ -28,4 +28,5 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 tutorial.outlier.DistanceStddevOutlier
