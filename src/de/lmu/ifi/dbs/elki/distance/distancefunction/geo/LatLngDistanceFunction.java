@@ -66,12 +66,12 @@ public class LatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       } else {
         NumberVector<?> o1 = (NumberVector<?>) mbr1;
-        return GeoUtil.latlngMinDist(o1.doubleValue(0), o1.doubleValue(1), mbr2.getMin(0), mbr2.getMin(1), mbr2.getMax(0), mbr2.getMax(1));
+        return GeoUtil.latlngMinDistDeg(o1.doubleValue(0), o1.doubleValue(1), mbr2.getMin(0), mbr2.getMin(1), mbr2.getMax(0), mbr2.getMax(1));
       }
     } else {
       if (mbr2 instanceof NumberVector) {
         NumberVector<?> o2 = (NumberVector<?>) mbr2;
-        return GeoUtil.latlngMinDist(o2.doubleValue(0), o2.doubleValue(1), mbr1.getMin(0), mbr1.getMin(1), mbr1.getMax(0), mbr1.getMax(1));
+        return GeoUtil.latlngMinDistDeg(o2.doubleValue(0), o2.doubleValue(1), mbr1.getMin(0), mbr1.getMin(1), mbr1.getMax(0), mbr1.getMax(1));
       } else {
         throw new UnsupportedOperationException("MBR to MBR mindist is not yet implemented.");
       }

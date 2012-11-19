@@ -80,12 +80,12 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       } else {
         NumberVector<?> o1 = (NumberVector<?>) mbr1;
-        return GeoUtil.latlngMinDist(o1.doubleValue(dimlat), o1.doubleValue(dimlng), mbr2.getMin(dimlat), mbr2.getMin(dimlng), mbr2.getMax(dimlat), mbr2.getMax(dimlng));
+        return GeoUtil.latlngMinDistDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), mbr2.getMin(dimlat), mbr2.getMin(dimlng), mbr2.getMax(dimlat), mbr2.getMax(dimlng));
       }
     } else {
       if (mbr2 instanceof NumberVector) {
         NumberVector<?> o2 = (NumberVector<?>) mbr2;
-        return GeoUtil.latlngMinDist(o2.doubleValue(dimlat), o2.doubleValue(dimlng), mbr1.getMin(dimlat), mbr1.getMin(dimlng), mbr1.getMax(dimlat), mbr1.getMax(dimlng));
+        return GeoUtil.latlngMinDistDeg(o2.doubleValue(dimlat), o2.doubleValue(dimlng), mbr1.getMin(dimlat), mbr1.getMin(dimlng), mbr1.getMax(dimlat), mbr1.getMax(dimlng));
       } else {
         throw new UnsupportedOperationException("MBR to MBR mindist is not yet implemented.");
       }
