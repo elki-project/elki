@@ -56,7 +56,7 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    return GeoUtil.haversineFormula(o1.doubleValue(1), o1.doubleValue(0), o2.doubleValue(1), o2.doubleValue(0));
+    return GeoUtil.haversineFormulaDeg(o1.doubleValue(1), o1.doubleValue(0), o2.doubleValue(1), o2.doubleValue(0));
   }
 
   @Override

@@ -81,7 +81,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
   /**
    * Image size.
    */
-  final int width = 2000, height = 1000;
+  final int width = 4000, height = 2000;
 
   /**
    * Number of steps for shades.
@@ -89,7 +89,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
   protected int steps = 10;
 
   /**
-   * Visualiaztion mode
+   * Visualization mode
    */
   private Mode mode = Mode.CTD;
 
@@ -121,8 +121,8 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
     // bb = new ModifiableHyperBoundingBox(new double[] { 47.27011150, -80 }, //
     // new double[] { 50.56471420, 80 });
     // Bavaria slice on lon
-    // bb = new ModifiableHyperBoundingBox(new double[] { -60, 8.97634970 }, //
-    // new double[] { 60, 13.83963710 });
+     bb = new ModifiableHyperBoundingBox(new double[] { -10, 8.97634970 }, //
+     new double[] { 50, 13.83963710 });
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
@@ -153,7 +153,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
         final double lat = y * -180. / height + 90.;
         switch(mode) {
         case ATD: {
-          final double atd = GeoUtil.alongTrackDistance(stap.doubleValue(0), stap.doubleValue(1), lat, lon, endp.doubleValue(0), endp.doubleValue(1));
+          final double atd = GeoUtil.alongTrackDistance(stap.doubleValue(0), stap.doubleValue(1), endp.doubleValue(0), endp.doubleValue(1), lat, lon);
           if (atd < 0) {
             img.setRGB(x, y, colorMultiply(red, -atd / max, false));
           } else {
@@ -162,7 +162,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
           break;
         }
         case CTD: {
-          final double ctd = GeoUtil.crossTrackDistance(stap.doubleValue(0), stap.doubleValue(1), lat, lon, endp.doubleValue(0), endp.doubleValue(1));
+          final double ctd = GeoUtil.crossTrackDistance(stap.doubleValue(0), stap.doubleValue(1), endp.doubleValue(0), endp.doubleValue(1), lat, lon);
           if (ctd < 0) {
             img.setRGB(x, y, colorMultiply(red, -ctd / max, false));
           } else {
