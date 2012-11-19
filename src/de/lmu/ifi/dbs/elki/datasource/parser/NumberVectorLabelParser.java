@@ -337,8 +337,6 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * @return Prototype object
    */
   SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
-    @SuppressWarnings("unchecked")
-    Class<V> cls = (Class<V>) factory.getClass();
     if (dimensionality > 0) {
       String[] colnames = null;
       if (columnnames != null) {
@@ -356,7 +354,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
     }
     // Variable dimensionality - return non-vector field type
     if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<V>(cls, factory.getDefaultSerializer());
+      return new SimpleTypeInformation<V>(factory.getRestrictionClass(), factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
