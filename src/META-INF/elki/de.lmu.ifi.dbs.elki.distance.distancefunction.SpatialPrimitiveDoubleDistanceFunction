@@ -9,6 +9,9 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction

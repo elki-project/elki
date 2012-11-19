@@ -70,7 +70,7 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
 
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    return GeoUtil.haversineFormula(o1.doubleValue(dimlat), o1.doubleValue(dimlng), o2.doubleValue(dimlat), o2.doubleValue(dimlng));
+    return GeoUtil.haversineFormulaDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), o2.doubleValue(dimlat), o2.doubleValue(dimlng));
   }
 
   @Override
