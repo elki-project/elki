@@ -1,4 +1,4 @@
-package experimentalcode.students.doerre;
+package de.lmu.ifi.dbs.elki.application.geo;
 
 /*
  This file is part of ELKI:
@@ -46,16 +46,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * TODO: make resolution configurable.
  * 
- * TODO: make start and end configurable.
+ * TODO: make origin point / rectangle configurable.
  * 
  * @author Niels Dörre
  * @author Erich Schubert
  */
-public class CrossTrackDistanceVisualization extends AbstractApplication {
+public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Get a logger for this class.
    */
-  private final static Logging LOG = Logging.getLogger(CrossTrackDistanceVisualization.class);
+  private final static Logging LOG = Logging.getLogger(VisualizeGeodesicDistances.class);
 
   /**
    * Visualization mode.
@@ -81,7 +81,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
   /**
    * Image size.
    */
-  final int width = 4000, height = 2000;
+  final int width = 2000, height = 1000;
 
   /**
    * Number of steps for shades.
@@ -101,7 +101,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
    * @param steps Number of steps in the color map
    * @param mode Visualization mode
    */
-  public CrossTrackDistanceVisualization(boolean verbose, File out, int steps, Mode mode) {
+  public VisualizeGeodesicDistances(boolean verbose, File out, int steps, Mode mode) {
     super(verbose);
     this.out = out;
     this.steps = steps;
@@ -121,8 +121,8 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
     // bb = new ModifiableHyperBoundingBox(new double[] { 47.27011150, -80 }, //
     // new double[] { 50.56471420, 80 });
     // Bavaria slice on lon
-     bb = new ModifiableHyperBoundingBox(new double[] { -10, 8.97634970 }, //
-     new double[] { 50, 13.83963710 });
+    // bb = new ModifiableHyperBoundingBox(new double[] { -10, 8.97634970 }, //
+    // new double[] { 50, 13.83963710 });
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
@@ -171,7 +171,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
           break;
         }
         case MINDIST: {
-          final double dist = GeoUtil.latlngMinDist(lat, lon, bb.getMin(0), bb.getMin(1), bb.getMax(0), bb.getMax(1));
+          final double dist = GeoUtil.latlngMinDistDeg(lat, lon, bb.getMin(0), bb.getMin(1), bb.getMax(0), bb.getMax(1));
           if (dist < 0) {
             img.setRGB(x, y, colorMultiply(red, -dist / max, true));
           } else {
@@ -200,9 +200,6 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
     }
     int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = (col) & 0xFF;
     a = (int) (a * Math.sqrt(reldist)) & 0xFF;
-    // r = (int) (r * (1 - reldist)) & 0xFF;
-    // g = (int) (g * (1 - reldist)) & 0xFF;
-    // b = (int) (b * (1 - reldist)) & 0xFF;
     return a << 24 | r << 16 | g << 8 | b;
   }
 
@@ -212,7 +209,7 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
    * @param args Parameters
    */
   public static void main(String[] args) {
-    CrossTrackDistanceVisualization.runCLIApplication(CrossTrackDistanceVisualization.class, args);
+    VisualizeGeodesicDistances.runCLIApplication(VisualizeGeodesicDistances.class, args);
   }
 
   /**
@@ -265,8 +262,8 @@ public class CrossTrackDistanceVisualization extends AbstractApplication {
     }
 
     @Override
-    protected CrossTrackDistanceVisualization makeInstance() {
-      return new CrossTrackDistanceVisualization(verbose, out, steps, mode);
+    protected VisualizeGeodesicDistances makeInstance() {
+      return new VisualizeGeodesicDistances(verbose, out, steps, mode);
     }
   }
 }

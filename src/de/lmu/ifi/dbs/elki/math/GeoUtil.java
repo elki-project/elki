@@ -28,11 +28,19 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Class with utility functions for geographic computations.
  * 
+ * The majority of formulas are adapted from:
+ * <p>
+ * Ed Williams<br />
+ * Aviation Formulary<br />
+ * Online: http://williams.best.vwh.net/avform.htm
+ * </p>
+ * 
  * TODO: add ellipsoid version of Vinentry formula.
  * 
  * @author Erich Schubert
  * @author Niels Dörre
  */
+@Reference(authors = "Ed Williams", title = "Aviation Formulary", booktitle = "", url = "http://williams.best.vwh.net/avform.htm")
 public final class GeoUtil {
   /**
    * Earth radius approximation we are using.
@@ -387,14 +395,7 @@ public final class GeoUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance
    */
-  public static double latlngMinDist(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
-    // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
-
-    // Degenerate rectangles:
-    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
-      return haversineFormulaDeg(rminlat, rminlng, plat, plng);
-    }
-
+  public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // Convert to radians.
     plat = MathUtil.deg2rad(plat);
     plng = MathUtil.deg2rad(plng);
@@ -402,6 +403,35 @@ public final class GeoUtil {
     rminlng = MathUtil.deg2rad(rminlng);
     rmaxlat = MathUtil.deg2rad(rmaxlat);
     rmaxlng = MathUtil.deg2rad(rmaxlng);
+
+    return latlngMinDistRad(plat, plng, rminlat, rminlng, rmaxlat, rmaxlng);
+  }
+
+  /**
+   * Point to rectangle minimum distance.
+   * 
+   * Complexity:
+   * <ul>
+   * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
+   * <li>Cross-track case: 10+2 trig</li>
+   * <li>Corner case: 10+3 trig, 2 sqrt</li>
+   * </ul>
+   * 
+   * @param plat Latitude of query point.
+   * @param plng Longitude of query point.
+   * @param rminlat Min latitude of rectangle.
+   * @param rminlng Min longitude of rectangle.
+   * @param rmaxlat Max latitude of rectangle.
+   * @param rmaxlng Max longitude of rectangle.
+   * @return Distance
+   */
+  public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
+    // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
+
+    // Degenerate rectangles:
+    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+      return haversineFormulaRad(rminlat, rminlng, plat, plng);
+    }
 
     // The simplest case is when the query point is in the same "slice":
     if (rminlng <= plng && plng <= rmaxlng) {
@@ -424,6 +454,7 @@ public final class GeoUtil {
     double lngW = rmaxlng - plng;
     lngW -= (lngW > 0) ? MathUtil.TWOPI : 0;
 
+    // Compute sine and cosine values we will certainly need below:
     final double slatQ = Math.sin(plat);
     final double clatQ = Math.cos(plat);
     final double slatN = Math.sin(rmaxlat);
