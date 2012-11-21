@@ -86,13 +86,12 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param histogrammaker Class to compute histograms with
    * @param inputFile Input file
    * @param maskFile Mask file
    */
-  public ComputeSingleColorHistogram(boolean verbose, ComputeColorHistogram histogrammaker, File inputFile, File maskFile) {
-    super(verbose);
+  public ComputeSingleColorHistogram(ComputeColorHistogram histogrammaker, File inputFile, File maskFile) {
+    super();
     this.histogrammaker = histogrammaker;
     this.inputFile = inputFile;
     this.maskFile = maskFile;
@@ -152,7 +151,7 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
 
     @Override
     protected ComputeSingleColorHistogram makeInstance() {
-      return new ComputeSingleColorHistogram(verbose, histogrammaker, inputFile, maskFile);
+      return new ComputeSingleColorHistogram(histogrammaker, inputFile, maskFile);
     }
   }
 

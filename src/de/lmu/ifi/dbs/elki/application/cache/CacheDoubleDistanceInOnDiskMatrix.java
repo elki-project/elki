@@ -102,13 +102,12 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param database Database
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceInOnDiskMatrix(boolean verbose, Database database, DistanceFunction<O, D> distance, File out) {
-    super(verbose);
+  public CacheDoubleDistanceInOnDiskMatrix(Database database, DistanceFunction<O, D> distance, File out) {
+    super();
     this.database = database;
     this.distance = distance;
     this.out = out;
@@ -204,7 +203,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
 
     @Override
     protected CacheDoubleDistanceInOnDiskMatrix<O, D> makeInstance() {
-      return new CacheDoubleDistanceInOnDiskMatrix<O, D>(verbose, database, distance, out);
+      return new CacheDoubleDistanceInOnDiskMatrix<O, D>(database, distance, out);
     }
   }
 

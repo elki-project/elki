@@ -48,11 +48,10 @@ public class KDDCLIApplication extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param task Task to run
    */
-  public KDDCLIApplication(boolean verbose, KDDTask task) {
-    super(verbose);
+  public KDDCLIApplication(KDDTask task) {
+    super();
     this.task = task;
   }
 
@@ -82,7 +81,7 @@ public class KDDCLIApplication extends AbstractApplication {
 
     @Override
     protected KDDCLIApplication makeInstance() {
-      return new KDDCLIApplication(verbose, task);
+      return new KDDCLIApplication(task);
     }
   }
 

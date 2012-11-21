@@ -161,12 +161,11 @@ public class KNNExplorer<O extends NumberVector<?>, D extends NumberDistance<D, 
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param database Database
    * @param distanceFunction Distance function
    */
-  public KNNExplorer(boolean verbose, Database database, DistanceFunction<O, D> distanceFunction) {
-    super(verbose);
+  public KNNExplorer(Database database, DistanceFunction<O, D> distanceFunction) {
+    super();
     this.database = database;
     this.distanceFunction = distanceFunction;
   }
@@ -572,7 +571,7 @@ public class KNNExplorer<O extends NumberVector<?>, D extends NumberDistance<D, 
 
     @Override
     protected KNNExplorer<O, D> makeInstance() {
-      return new KNNExplorer<O, D>(verbose, database, distanceFunction);
+      return new KNNExplorer<O, D>(database, distanceFunction);
     }
   }
 

@@ -139,7 +139,6 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param inputstep Input step
    * @param distf Distance function
    * @param startk Starting value of k
@@ -148,8 +147,8 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
    * @param bylabel By label outlier (reference)
    * @param outfile Output file
    */
-  public ComputeKNNOutlierScores(boolean verbose, InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
-    super(verbose);
+  public ComputeKNNOutlierScores(InputStep inputstep, DistanceFunction<? super O, D> distf, int startk, int stepk, int maxk, ByLabelOutlier bylabel, File outfile) {
+    super();
     this.distf = distf;
     this.startk = startk;
     this.stepk = stepk;
@@ -457,7 +456,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new ComputeKNNOutlierScores<O, D>(verbose, inputstep, distf, startk, stepk, maxk, bylabel, outfile);
+      return new ComputeKNNOutlierScores<O, D>(inputstep, distf, startk, stepk, maxk, bylabel, outfile);
     }
   }
 

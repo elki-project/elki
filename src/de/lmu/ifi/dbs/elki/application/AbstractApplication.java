@@ -78,48 +78,10 @@ public abstract class AbstractApplication implements Parameterizable {
   public static final String INFORMATION = "ELKI Version 0.5.0~beta1 (2012, April)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th" + NEWLINE + "International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
 
   /**
-   * Parameter that specifies the name of the output file.
-   * <p>
-   * Key: {@code -app.out}
-   * </p>
-   */
-  public static final OptionID OUTPUT_ID = OptionID.getOrCreateOptionID("app.out", "");
-
-  /**
-   * Parameter that specifies the name of the input file.
-   * <p>
-   * Key: {@code -app.in}
-   * </p>
-   */
-  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("app.in", "");
-
-  /**
-   * Value of verbose flag.
-   */
-  private boolean verbose;
-
-  /**
    * Constructor.
-   * 
-   * @param verbose Verbose flag.
    */
-  public AbstractApplication(boolean verbose) {
-    if (verbose) {
-      // Note: do not unset verbose if not --verbose - someone else might
-      // have set it intentionally. So don't setVerbose(verbose)!
-      LoggingConfiguration.setVerbose(true);
-    }
-  }
-
-  /**
-   * Returns whether verbose messages should be printed while executing the
-   * application.
-   * 
-   * @return whether verbose messages should be printed while executing the
-   *         application
-   */
-  public final boolean isVerbose() {
-    return verbose;
+  public AbstractApplication() {
+    super();
   }
 
   /**
@@ -250,9 +212,20 @@ public abstract class AbstractApplication implements Parameterizable {
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
-     * Verbose flag
+     * Parameter that specifies the name of the output file.
+     * <p>
+     * Key: {@code -app.out}
+     * </p>
      */
-    protected boolean verbose = false;
+    public static final OptionID OUTPUT_ID = OptionID.getOrCreateOptionID("app.out", "");
+
+    /**
+     * Parameter that specifies the name of the input file.
+     * <p>
+     * Key: {@code -app.in}
+     * </p>
+     */
+    public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("app.in", "");
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -270,7 +243,7 @@ public abstract class AbstractApplication implements Parameterizable {
     protected void configVerbose(Parameterization config) {
       final Flag verboseF = new Flag(OptionID.VERBOSE_FLAG);
       if (config.grab(verboseF)) {
-        verbose = verboseF.getValue();
+        LoggingConfiguration.setVerbose(verboseF.isTrue());
       }
     }
 

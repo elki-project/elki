@@ -107,12 +107,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbosity
    * @param inputstep Input step
    * @param vispar Visualizer parameterizer
    */
-  public VisualizePairwiseGainMatrix(boolean verbose, InputStep inputstep, VisualizerParameterizer vispar) {
-    super(verbose);
+  public VisualizePairwiseGainMatrix(InputStep inputstep, VisualizerParameterizer vispar) {
+    super();
     this.inputstep = inputstep;
     this.vispar = vispar;
   }
@@ -303,7 +302,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new VisualizePairwiseGainMatrix(verbose, inputstep, vispar);
+      return new VisualizePairwiseGainMatrix(inputstep, vispar);
     }
   }
 

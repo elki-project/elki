@@ -81,12 +81,11 @@ public class GeneratorXMLSpec extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param output Output file
    * @param generator GeneratorXMLDatabaseConnection
    */
-  public GeneratorXMLSpec(boolean verbose, File output, GeneratorXMLDatabaseConnection generator) {
-    super(verbose);
+  public GeneratorXMLSpec(File output, GeneratorXMLDatabaseConnection generator) {
+    super();
     this.outputFile = output;
     this.generator = generator;
   }
@@ -242,7 +241,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
 
     @Override
     protected GeneratorXMLSpec makeInstance() {
-      return new GeneratorXMLSpec(verbose, outputFile, generator);
+      return new GeneratorXMLSpec(outputFile, generator);
     }
   }
 
