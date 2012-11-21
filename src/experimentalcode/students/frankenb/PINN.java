@@ -54,7 +54,6 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose
    * @param database
    * @param randomProjection
    * @param rocComputer
@@ -62,8 +61,8 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
    * @param kFactor
    * @param outputFile
    */
-  public PINN(boolean verbose, Database database, RandomProjection<V> randomProjection, OutlierROCCurve rocComputer, int k, int kFactor, File outputFile) {
-    super(verbose);
+  public PINN(Database database, RandomProjection<V> randomProjection, OutlierROCCurve rocComputer, int k, int kFactor, File outputFile) {
+    super();
     this.database = database;
     this.randomProjection = randomProjection;
     this.rocComputer = rocComputer;
@@ -161,7 +160,7 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
 
     @Override
     protected PINN<V> makeInstance() {
-      return new PINN<V>(verbose, database, randomProjection, rocComputer, k, kFactor, outputFile);
+      return new PINN<V>(database, randomProjection, rocComputer, k, kFactor, outputFile);
     }
   }
 }
