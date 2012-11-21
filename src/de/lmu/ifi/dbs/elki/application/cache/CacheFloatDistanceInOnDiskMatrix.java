@@ -106,13 +106,12 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param database Database
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(boolean verbose, Database database, DistanceFunction<O, D> distance, File out) {
-    super(verbose);
+  public CacheFloatDistanceInOnDiskMatrix(Database database, DistanceFunction<O, D> distance, File out) {
+    super();
     this.database = database;
     this.distance = distance;
     this.out = out;
@@ -208,7 +207,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
 
     @Override
     protected CacheFloatDistanceInOnDiskMatrix<O, D> makeInstance() {
-      return new CacheFloatDistanceInOnDiskMatrix<O, D>(verbose, database, distance, out);
+      return new CacheFloatDistanceInOnDiskMatrix<O, D>(database, distance, out);
     }
   }
 

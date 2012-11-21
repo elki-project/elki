@@ -63,12 +63,11 @@ public class ConvertToBundleApplication extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param input Data source configuration
    * @param outfile Output filename
    */
-  public ConvertToBundleApplication(boolean verbose, DatabaseConnection input, File outfile) {
-    super(verbose);
+  public ConvertToBundleApplication(DatabaseConnection input, File outfile) {
+    super();
     this.input = input;
     this.outfile = outfile;
   }
@@ -125,7 +124,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
 
     @Override
     protected ConvertToBundleApplication makeInstance() {
-      return new ConvertToBundleApplication(verbose, input, outfile);
+      return new ConvertToBundleApplication(input, outfile);
     }
   }
 

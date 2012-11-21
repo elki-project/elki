@@ -103,11 +103,10 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbosity
    * @param inputstep Input step
    */
-  public GreedyEnsembleExperiment(boolean verbose, InputStep inputstep) {
-    super(verbose);
+  public GreedyEnsembleExperiment(InputStep inputstep) {
+    super();
     this.inputstep = inputstep;
   }
 
@@ -437,7 +436,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new GreedyEnsembleExperiment(verbose, inputstep);
+      return new GreedyEnsembleExperiment(inputstep);
     }
   }
 

@@ -96,13 +96,12 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param verbose Verbose flag
    * @param out Output filename
    * @param steps Number of steps in the color map
    * @param mode Visualization mode
    */
-  public VisualizeGeodesicDistances(boolean verbose, File out, int steps, Mode mode) {
-    super(verbose);
+  public VisualizeGeodesicDistances(File out, int steps, Mode mode) {
+    super();
     this.out = out;
     this.steps = steps;
     this.mode = mode;
@@ -263,7 +262,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
     @Override
     protected VisualizeGeodesicDistances makeInstance() {
-      return new VisualizeGeodesicDistances(verbose, out, steps, mode);
+      return new VisualizeGeodesicDistances(out, steps, mode);
     }
   }
 }
