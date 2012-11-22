@@ -24,6 +24,7 @@ package tutorial.clustering;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -122,18 +123,15 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
 
     // Build the metadata, track the two nearest cluster centers.
     for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-      Candidate c = new Candidate();
+      Candidate c = new Candidate(k);
       V fv = relation.get(id);
       for (int i = 0; i < k; i++) {
-        double dist = df.doubleDistance(fv, means.get(i));
-        if (dist < c.bestd) {
-          c.secondd = c.bestd;
-          c.secondi = c.besti;
-          c.bestd = dist;
-          c.besti = i;
-        } else if (dist < c.secondd) {
-          c.secondd = dist;
-          c.secondi = i;
+        c.dists[i] = df.doubleDistance(fv, means.get(i));
+        if (c.a < 0 || c.dists[i] < c.dists[c.a]) {
+          c.b = c.a;
+          c.a = i;
+        } else if (c.b < 0 || c.dists[i] < c.dists[c.b]) {
+          c.b = i;
         }
       }
       data.put(id, c);
@@ -146,7 +144,11 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         @Override
         public int compare(DBIDRef o1, DBIDRef o2) {
           Candidate c1 = data.get(o1), c2 = data.get(o2);
-          return -Double.compare(c1.secondd - c1.bestd, c2.secondd - c2.bestd);
+          if (c1.b == -1 || c2.b == -1) { // Only one cluster remaining...
+            return -Double.compare(-c1.dists[c1.a], -c2.dists[c2.a]);
+          } else {
+            return -Double.compare(c1.dists[c1.b] - c1.dists[c1.a], c2.dists[c2.b] - c2.dists[c2.a]);
+          }
         }
       };
 
@@ -159,7 +161,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         while (id.valid()) {
           Candidate c = data.get(id);
           // Try best first:
-          ModifiableDBIDs cluster = clusters.get(c.besti);
+          ModifiableDBIDs cluster = clusters.get(c.a);
           if (cluster.size() < maxsize) {
             cluster.add(id);
             start++;
@@ -167,29 +169,25 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
           }
           if (cluster.size() == maxsize) {
             // This is the cluster that is now full.
-            int full = c.besti;
+            int full = c.a;
             // A cluster has been fully consumed.
             // Update the candidates where necessary:
             for (; id.valid(); id.advance()) {
               Candidate ca = data.get(id);
-              if (ca.besti == full) {
-                ca.besti = ca.secondi;
-                ca.bestd = ca.secondd;
-                ca.secondd = Double.POSITIVE_INFINITY;
-              } else if (ca.secondi == full) {
-                ca.secondd = Double.POSITIVE_INFINITY;
+              if (ca.a == full) {
+                ca.a = ca.b;
+                ca.b = -1;
+              } else if (ca.b == full) {
+                ca.b = -1;
               }
-              if (Double.isInfinite(ca.secondd)) {
-                // We need to compute the new second best.
-                V fv = relation.get(id);
+              if (ca.b < 0) {
+                // Update the second best index:
                 for (int i = 0; i < k; i++) {
-                  if (i == full || i == ca.besti || clusters.get(i).size() >= maxsize) {
+                  if (i == full || i == ca.a || clusters.get(i).size() >= maxsize) {
                     continue;
                   }
-                  double dist = df.doubleDistance(fv, means.get(i));
-                  if (dist < ca.secondd) {
-                    ca.secondd = dist;
-                    ca.secondi = i;
+                  if (ca.b < 0 || ca.dists[i] < ca.dists[ca.b]) {
+                    ca.b = i;
                   }
                 }
                 data.put(id, ca);
@@ -197,7 +195,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
             }
           }
         }
-        // Note: we want to have besti == cluster the object is assigned to!
+        // Note: we want to have Candidate.a == cluster the object is assigned
+        // to!
       }
     }
     // Recompute means.
@@ -210,32 +209,29 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         @Override
         public int compare(DBIDRef o1, DBIDRef o2) {
           Candidate c1 = data.get(o1), c2 = data.get(o2);
-          return Double.compare(c1.secondd - c1.bestd, c2.secondd - c2.bestd);
+          return Double.compare(c1.dists[c1.b] - c1.dists[c1.a], c2.dists[c2.b] - c2.dists[c2.a]);
         }
       };
 
       // Initialize transfer lists:
-      ArrayModifiableDBIDs[][] transfer = new ArrayModifiableDBIDs[k][k];
+      ArrayModifiableDBIDs[] transfer = new ArrayModifiableDBIDs[k];
       for (int i = 0; i < k; i++) {
-        for (int j = 0; j < k; j++) {
-          transfer[i][j] = DBIDUtil.newArray();
-        }
+        transfer[i] = DBIDUtil.newArray();
       }
 
       for (int j = 0; maxiter <= 0 || j < maxiter; j++) {
         int active = 0;
         for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
           Candidate c = data.get(id);
-          c.secondd = Double.POSITIVE_INFINITY;
           V fv = relation.get(id);
-          // Update distances to means:
+          // Update distances to means; update second
+          c.b = -1;
           for (int i = 0; i < k; i++) {
-            double dist = df.doubleDistance(fv, means.get(i));
-            if (i == c.besti) {
-              c.bestd = dist;
-            } else if (dist < c.secondd) {
-              c.secondd = dist;
-              c.secondi = i;
+            c.dists[i] = df.doubleDistance(fv, means.get(i));
+            if (i != c.a) {
+              if (c.b < 0 || c.dists[i] < c.dists[c.b]) {
+                c.b = i;
+              }
             }
           }
           data.put(id, c);
@@ -243,65 +239,59 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         tids.sort(comp);
         for (DBIDIter id = tids.iter(); id.valid(); id.advance()) {
           Candidate c = data.get(id);
-          double gain = (c.bestd - c.secondd);
-          ModifiableDBIDs source = clusters.get(c.besti), dest = clusters.get(c.secondi);
-          if (gain > 0) {
-            // If the cluster sizes permit, just perform the move.
-            if (dest.size() < maxsize && source.size() > minsize) {
-              dest.add(id);
-              source.remove(id);
-              c.besti = c.secondi;
-              data.put(id, c);
-              active += 1;
+          ModifiableDBIDs source = clusters.get(c.a);
+          boolean transferred = false;
+          for (int i = 0; !transferred && i < k; i++) {
+            if (i == c.a) {
+              continue;
             }
+            double gain = c.dists[c.a] - c.dists[i];
+            ModifiableDBIDs dest = clusters.get(i);
             // Can we pair this transfer?
-            else if (!transfer[c.secondi][c.besti].isEmpty()) {
-              DBID other = transfer[c.secondi][c.besti].remove(0);
+            if (!transfer[i].isEmpty()) {
+              DBID other = transfer[i].get(0);
               Candidate c2 = data.get(other);
-              // Move other.
-              source.add(other);
-              dest.remove(other);
-              c2.besti = c2.secondi;
-              data.put(id, c2);
-              // Move this.
-              dest.add(id);
-              source.remove(id);
-              c.besti = c.secondi;
-              data.put(id, c);
-              active += 2;
-            } else {
-              transfer[c.besti][c.secondi].add(id);
-            }
-          } else { // gain <= 0
-            if (!transfer[c.secondi][c.besti].isEmpty()) {
-              DBID other = transfer[c.secondi][c.besti].get(0);
-              Candidate c2 = data.get(other);
-              double ogain = (c2.bestd - c2.secondd);
-              if (gain + ogain > 0) {
-                transfer[c.secondi][c.besti].remove(0);
+              double gain2 = c2.dists[i] - c2.dists[c.a];
+              if (gain + gain2 > 0) {
+                transfer[i].remove(0);
                 // Move other.
                 source.add(other);
                 dest.remove(other);
-                c2.besti = c2.secondi;
+                c2.a = c.a;
                 data.put(id, c2);
-                // Move this.
+                // Move current object
                 dest.add(id);
                 source.remove(id);
-                c.besti = c.secondi;
+                c.a = i;
                 data.put(id, c);
                 active += 2;
+                transferred = true;
+                break;
               }
             }
+            // If cluster sizes allow, move a single object.
+            if (gain > 0 && (dest.size() < maxsize && source.size() > minsize)) {
+              dest.add(id);
+              source.remove(id);
+              c.a = i;
+              data.put(id, c);
+              active += 1;
+              transferred = true;
+              break;
+            }
+          }
+          // If the object would prefer a different cluster, put in transfer
+          // list.
+          if (!transferred && c.dists[c.a] - c.dists[c.b] > 0) {
+            transfer[c.a].add(id);
           }
         }
         // TODO: try to get more transfers out of the transfer list done?
         // Clear transfer lists
         int pending = 0;
         for (int i = 0; i < k; i++) {
-          for (int l = 0; l < k; l++) {
-            pending += transfer[i][l].size();
-            transfer[i][l].clear();
-          }
+          pending += transfer[i].size();
+          transfer[i].clear();
         }
         if (LOG.isDebuggingFine()) {
           LOG.debugFine("Performed " + active + " transfers in iteration " + j + " skipped " + pending);
@@ -330,13 +320,16 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
    * @author Erich Schubert
    */
   private class Candidate {
-    double bestd = Double.POSITIVE_INFINITY;
+    double[] dists;
 
-    int besti = -1;
+    int a, b;
 
-    double secondd = Double.POSITIVE_INFINITY;
-
-    int secondi = -1;
+    private Candidate(int k) {
+      dists = new double[k];
+      Arrays.fill(dists, Double.POSITIVE_INFINITY);
+      a = -1;
+      b = -1;
+    }
   }
 
   @Override
@@ -381,7 +374,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       }
 
       IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(new GreaterConstraint(0));
+      kP.addConstraint(new GreaterConstraint(1));
       if (config.grab(kP)) {
         k = kP.getValue();
       }
