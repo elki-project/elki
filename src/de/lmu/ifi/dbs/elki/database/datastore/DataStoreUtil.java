@@ -26,16 +26,18 @@ package de.lmu.ifi.dbs.elki.database.datastore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
- * Storage utility class. Mostly a shorthand for {@link DataStoreFactory#FACTORY}.
+ * Storage utility class. Mostly a shorthand for
+ * {@link DataStoreFactory#FACTORY}.
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.landmark
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
  */
 public final class DataStoreUtil {
   /**
-   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
    * 
    * @param <T> stored data type
    * @param ids DBIDs to store data for
@@ -46,9 +48,10 @@ public final class DataStoreUtil {
   public static <T> WritableDataStore<T> makeStorage(DBIDs ids, int hints, Class<? super T> dataclass) {
     return DataStoreFactory.FACTORY.makeStorage(ids, hints, dataclass);
   }
-  
+
   /**
-   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
@@ -57,9 +60,10 @@ public final class DataStoreUtil {
   public static WritableDBIDDataStore makeDBIDStorage(DBIDs ids, int hints) {
     return DataStoreFactory.FACTORY.makeDBIDStorage(ids, hints);
   }
-  
+
   /**
-   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
@@ -68,9 +72,10 @@ public final class DataStoreUtil {
   public static WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints) {
     return DataStoreFactory.FACTORY.makeDoubleStorage(ids, hints);
   }
-  
+
   /**
-   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
@@ -80,9 +85,10 @@ public final class DataStoreUtil {
   public static WritableDoubleDataStore makeDoubleStorage(DBIDs ids, int hints, double def) {
     return DataStoreFactory.FACTORY.makeDoubleStorage(ids, hints, def);
   }
-  
+
   /**
-   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
@@ -91,9 +97,10 @@ public final class DataStoreUtil {
   public static WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints) {
     return DataStoreFactory.FACTORY.makeIntegerStorage(ids, hints);
   }
-  
+
   /**
-   * Make a new storage, to associate the given ids with an object of class dataclass.
+   * Make a new storage, to associate the given ids with an object of class
+   * dataclass.
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
@@ -103,9 +110,10 @@ public final class DataStoreUtil {
   public static WritableIntegerDataStore makeIntegerStorage(DBIDs ids, int hints, int def) {
     return DataStoreFactory.FACTORY.makeIntegerStorage(ids, hints, def);
   }
-  
+
   /**
-   * Make a new record storage, to associate the given ids with an object of class dataclass.
+   * Make a new record storage, to associate the given ids with an object of
+   * class dataclass.
    * 
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager

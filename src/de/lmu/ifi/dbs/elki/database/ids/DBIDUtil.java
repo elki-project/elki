@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.TroveArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 
@@ -478,6 +479,28 @@ public final class DBIDUtil {
    */
   public static DoubleDBIDPair newPair(double val, DBIDRef id) {
     return DBIDFactory.FACTORY.newPair(val, id);
+  }
+
+  /**
+   * Make a DistanceDBIDPair.
+   * 
+   * @param dist Distance value
+   * @param id ID
+   * @return new pair
+   */
+  public static <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D dist, DBIDRef id) {
+    return DBIDFactory.FACTORY.newDistancePair(dist, id);
+  }
+
+  /**
+   * Make a DoubleDistanceDBIDPair.
+   * 
+   * @param dist Distance value
+   * @param id ID
+   * @return new pair
+   */
+  public static DoubleDistanceDBIDPair newDistancePair(double dist, DBIDRef id) {
+    return DBIDFactory.FACTORY.newDistancePair(dist, id);
   }
 
   /**

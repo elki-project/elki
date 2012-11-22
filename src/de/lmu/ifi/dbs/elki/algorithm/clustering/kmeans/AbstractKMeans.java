@@ -82,7 +82,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(PrimitiveDistanceFunction<NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
+  public AbstractKMeans(PrimitiveDistanceFunction<? super NumberVector<?>, D> distanceFunction, int k, int maxiter, KMeansInitialization<V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;

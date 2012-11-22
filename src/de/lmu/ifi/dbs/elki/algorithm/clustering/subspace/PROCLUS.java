@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -268,7 +267,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     for(DBIDIter iter = s.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       DoubleDistance dist = distFunc.distance(id, m_i);
-      distances.put(id, DBIDFactory.FACTORY.newDistancePair(dist, id));
+      distances.put(id, DBIDUtil.newDistancePair(dist, id));
     }
 
     for(int i = 1; i < m; i++) {
@@ -288,7 +287,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
         DoubleDistance dist_old = distances.get(id).getDistance();
 
         DoubleDistance dist = dist_new.compareTo(dist_old) < 0 ? dist_new : dist_old;
-        distances.put(id, DBIDFactory.FACTORY.newDistancePair(dist, id));
+        distances.put(id, DBIDUtil.newDistancePair(dist, id));
       }
 
       if(LOG.isDebugging()) {
@@ -574,7 +573,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       DistanceDBIDPair<DoubleDistance> minDist = null;
       for(DBID m_i : dimensions.keySet()) {
         V m = database.get(m_i);
-        DistanceDBIDPair<DoubleDistance> currentDist = DBIDFactory.FACTORY.newDistancePair(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
+        DistanceDBIDPair<DoubleDistance> currentDist = DBIDUtil.newDistancePair(manhattanSegmentalDistance(p, m, dimensions.get(m_i)), m_i);
         if(minDist == null || currentDist.compareByDistance(minDist) < 0) {
           minDist = currentDist;
         }

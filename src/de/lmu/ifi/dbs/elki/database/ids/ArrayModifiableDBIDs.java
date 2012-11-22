@@ -46,6 +46,15 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
   void sort(Comparator<? super DBIDRef> comparator);
 
   /**
+   * Sort the DBID set.
+   * 
+   * @param start Starting index, for partial sorting
+   * @param end End index, for partial sorting (exclusive)
+   * @param comparator Comparator to use
+   */
+  void sort(int start, int end, Comparator<? super DBIDRef> comparator);
+
+  /**
    * Remove the i'th entry (starting at 0)
    * 
    * @param i Index
