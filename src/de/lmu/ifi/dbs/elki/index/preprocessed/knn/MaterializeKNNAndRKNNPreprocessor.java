@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -150,9 +149,9 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
   @SuppressWarnings("unchecked")
   private DistanceDBIDPair<D> makePair(DistanceDBIDResultIter<D> iter, DBIDIter id) {
     if(doubleOptimize) {
-      return (DistanceDBIDPair<D>) DBIDFactory.FACTORY.newDistancePair(((DoubleDistanceDBIDPair) iter.getDistancePair()).doubleDistance(), id);
+      return (DistanceDBIDPair<D>) DBIDUtil.newDistancePair(((DoubleDistanceDBIDPair) iter.getDistancePair()).doubleDistance(), id);
     }
-    return DBIDFactory.FACTORY.newDistancePair(iter.getDistance(), id);
+    return DBIDUtil.newDistancePair(iter.getDistance(), id);
   }
 
   @Override

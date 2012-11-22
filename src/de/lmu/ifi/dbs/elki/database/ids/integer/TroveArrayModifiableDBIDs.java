@@ -138,6 +138,16 @@ class TroveArrayModifiableDBIDs extends TroveArrayDBIDs implements ArrayModifiab
   }
 
   @Override
+  public void sort(int start, int end, Comparator<? super DBIDRef> comparator) {
+    // TODO: we no longer produce a lot of DBIDs anymore, but it would be even
+    // cooler if we could access store._data directly...
+    int[] data = store.toArray();
+    IntegerDBIDArrayQuickSort.sort(data, start, end, comparator);
+    store.clear();
+    store.add(data);
+  }
+
+  @Override
   public void swap(int a, int b) {
     store.set(a, store.set(b, store.get(a)));
   }
