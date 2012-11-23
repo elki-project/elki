@@ -120,24 +120,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     @SuppressWarnings("unchecked")
     PrimitiveDoubleDistanceFunction<NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<NumberVector<?>>) getDistanceFunction();
     // Temporary data storage
-    final WritableDataStore<Meta> data = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
-
-    // Build the metadata, track the two nearest cluster centers.
-    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-      Meta c = new Meta(k);
-      V fv = relation.get(id);
-      for (int i = 0; i < k; i++) {
-        c.dists[i] = df.doubleDistance(fv, means.get(i));
-        if (i > 0) {
-          if (c.dists[i] < c.dists[c.primary]) {
-            c.primary = i;
-          } else if (c.dists[i] > c.dists[c.secondary]) {
-            c.secondary = i;
-          }
-        }
-      }
-      data.put(id, c);
-    }
+    final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
+    initializeMeta(relation, means, metas, df);
+    
     // Build a sorted list of objects, by descending distance delta
     ArrayModifiableDBIDs tids = DBIDUtil.newArray(ids);
     {
@@ -145,7 +130,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
         @Override
         public int compare(DBIDRef o1, DBIDRef o2) {
-          Meta c1 = data.get(o1), c2 = data.get(o2);
+          Meta c1 = metas.get(o1), c2 = metas.get(o2);
           return -Double.compare(c1.priority(), c2.priority());
         }
       };
@@ -157,7 +142,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         DBIDArrayIter id = tids.iter();
         id.seek(start);
         while (id.valid()) {
-          Meta c = data.get(id);
+          Meta c = metas.get(id);
           // Assigning to best cluster - which cannot be empty yet!
           ModifiableDBIDs cluster = clusters.get(c.primary);
           cluster.add(id);
@@ -169,7 +154,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
             // A cluster has been fully consumed.
             // Refresh the not yet assigned objects where necessary:
             for (; id.valid(); id.advance()) {
-              Meta ca = data.get(id);
+              Meta ca = metas.get(id);
               if (ca.primary == full) {
                 // Update the best index:
                 for (int i = 0; i < k; i++) {
@@ -180,7 +165,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
                     ca.primary = i;
                   }
                 }
-                data.put(id, ca); // Changed.
+                metas.put(id, ca); // Changed.
               } else if (ca.secondary == full) {
                 // Update the worst index:
                 for (int i = 0; i < k; i++) {
@@ -191,7 +176,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
                     ca.secondary = i;
                   }
                 }
-                data.put(id, ca); // Changed.
+                metas.put(id, ca); // Changed.
               }
             }
             // The next iteration will perform the sorting!
@@ -209,7 +194,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
         @Override
         public int compare(DBIDRef o1, DBIDRef o2) {
-          Meta c1 = data.get(o1), c2 = data.get(o2);
+          Meta c1 = metas.get(o1), c2 = metas.get(o2);
           return Double.compare(c1.priority(), c2.priority());
         }
       };
@@ -222,31 +207,17 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       final PreferenceComparator pcomp = new PreferenceComparator();
 
       // Initialize transfer lists:
-      ArrayModifiableDBIDs[] transfer = new ArrayModifiableDBIDs[k];
+      ArrayModifiableDBIDs[] transfers = new ArrayModifiableDBIDs[k];
       for (int i = 0; i < k; i++) {
-        transfer[i] = DBIDUtil.newArray();
+        transfers[i] = DBIDUtil.newArray();
       }
 
       for (int j = 0; maxiter < 0 || j < maxiter; j++) {
         int active = 0;
-        for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
-          Meta c = data.get(id);
-          V fv = relation.get(id);
-          // Update distances to means.
-          c.secondary = -1;
-          for (int i = 0; i < k; i++) {
-            c.dists[i] = df.doubleDistance(fv, means.get(i));
-            if (c.primary != i) {
-              if (c.secondary < 0 || c.dists[i] < c.dists[c.secondary]) {
-                c.secondary = i;
-              }
-            }
-          }
-          data.put(id, c); // Changed.
-        }
+        updateDistances(relation, means, metas, df);
         tids.sort(comp);
         for (DBIDIter id = tids.iter(); id.valid(); id.advance()) {
-          Meta c = data.get(id);
+          Meta c = metas.get(id);
           ModifiableDBIDs source = clusters.get(c.primary);
           boolean transferred = false;
           pcomp.c = c;
@@ -255,36 +226,23 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
             if (i == c.primary) {
               continue;
             }
-            double gain = c.gain(i);
             ModifiableDBIDs dest = clusters.get(i);
             // Can we pair this transfer?
-            if (!transfer[i].isEmpty()) {
-              DBID other = transfer[i].get(0);
-              Meta c2 = data.get(other);
-              double gain2 = c2.dists[i] - c2.dists[c.primary];
-              if (gain + gain2 > 0) {
-                transfer[i].remove(0);
-                // Move other.
-                source.add(other);
-                dest.remove(other);
-                c2.primary = c.primary;
-                data.put(id, c2); // Changed.
-                // Move current object
-                dest.add(id);
-                source.remove(id);
-                c.primary = i;
-                data.put(id, c); // Changed.
+            if (!transfers[i].isEmpty()) {
+              DBID other = transfers[i].get(0);
+              Meta c2 = metas.get(other);
+              if (c.gain(i) + c2.gain(c.primary) > 0) {
+                transfers[i].remove(0);
+                transfer(metas, c2, dest, source, other, c.primary);
+                transfer(metas, c, source, dest, id, i);
                 active += 2;
                 transferred = true;
                 break;
               }
             }
             // If cluster sizes allow, move a single object.
-            if (gain > 0 && (dest.size() < maxsize && source.size() > minsize)) {
-              dest.add(id);
-              source.remove(id);
-              c.primary = i;
-              data.put(id, c); // Changed.
+            if (c.gain(i) > 0 && (dest.size() < maxsize && source.size() > minsize)) {
+              transfer(metas, c, source, dest, id, i);
               active += 1;
               transferred = true;
               break;
@@ -293,7 +251,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
           // If the object would prefer a different cluster, put in outgoing
           // transfer list.
           if (!transferred && (c.dists[c.primary] > c.dists[c.secondary])) {
-            transfer[c.primary].add(id);
+            transfers[c.primary].add(id);
           }
         }
         // TODO: try to get more transfers out of the transfer lists done by
@@ -301,8 +259,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         int pending = 0;
         // Clear transfer lists for next iteration.
         for (int i = 0; i < k; i++) {
-          pending += transfer[i].size();
-          transfer[i].clear();
+          pending += transfers[i].size();
+          transfers[i].clear();
         }
         if (LOG.isDebuggingFine()) {
           LOG.debugFine("Performed " + active + " transfers in iteration " + j + " skipped " + pending);
@@ -323,6 +281,50 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
     }
     return result;
+  }
+
+  protected void transfer(final WritableDataStore<Meta> metas, Meta meta, ModifiableDBIDs src, ModifiableDBIDs dst, DBIDRef id, Integer dstnum) {
+    dst.add(id);
+    src.remove(id);
+    meta.primary = dstnum;
+    metas.put(id, meta); // Make sure the storage is up to date.
+  }
+
+  protected void initializeMeta(Relation<V> relation, List<? extends NumberVector<?>> means, final WritableDataStore<Meta> metas, PrimitiveDoubleDistanceFunction<NumberVector<?>> df) {
+    // Build the metadata, track the two nearest cluster centers.
+    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+      Meta c = new Meta(k);
+      V fv = relation.get(id);
+      for (int i = 0; i < k; i++) {
+        c.dists[i] = df.doubleDistance(fv, means.get(i));
+        if (i > 0) {
+          if (c.dists[i] < c.dists[c.primary]) {
+            c.primary = i;
+          } else if (c.dists[i] > c.dists[c.secondary]) {
+            c.secondary = i;
+          }
+        }
+      }
+      metas.put(id, c);
+    }
+  }
+
+  protected void updateDistances(Relation<V> relation, List<? extends NumberVector<?>> means, final WritableDataStore<Meta> metas, PrimitiveDoubleDistanceFunction<NumberVector<?>> df) {
+    for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
+      Meta c = metas.get(id);
+      V fv = relation.get(id);
+      // Update distances to means.
+      c.secondary = -1;
+      for (int i = 0; i < k; i++) {
+        c.dists[i] = df.doubleDistance(fv, means.get(i));
+        if (c.primary != i) {
+          if (c.secondary < 0 || c.dists[i] < c.dists[c.secondary]) {
+            c.secondary = i;
+          }
+        }
+      }
+      metas.put(id, c); // Changed.
+    }
   }
 
   /**
