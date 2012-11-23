@@ -40,9 +40,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -107,172 +107,25 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Our desired cluster size:
-    final int minsize = ids.size() / k; // rounded down
     final int maxsize = (ids.size() + k - 1) / k; // rounded up
     // Choose initial means
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for (int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet(maxsize));
+      clusters.add(DBIDUtil.newHashSet(maxsize + 1));
     }
 
-    // This is a safe cast - see constructor.
-    @SuppressWarnings("unchecked")
-    PrimitiveDoubleDistanceFunction<NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<NumberVector<?>>) getDistanceFunction();
     // Temporary data storage
-    final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
-    initializeMeta(relation, means, metas, df);
-    
+    final WritableDataStore<Meta> metas = initializeMeta(relation, means);
+
     // Build a sorted list of objects, by descending distance delta
     ArrayModifiableDBIDs tids = DBIDUtil.newArray(ids);
-    {
-      // Comparator: sort by largest benefit of assigning to preferred cluster.
-      final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
-        @Override
-        public int compare(DBIDRef o1, DBIDRef o2) {
-          Meta c1 = metas.get(o1), c2 = metas.get(o2);
-          return -Double.compare(c1.priority(), c2.priority());
-        }
-      };
-
-      // Initialization phase:
-      int start = 0;
-      while (start < tids.size()) {
-        tids.sort(start, tids.size(), comp);
-        DBIDArrayIter id = tids.iter();
-        id.seek(start);
-        while (id.valid()) {
-          Meta c = metas.get(id);
-          // Assigning to best cluster - which cannot be empty yet!
-          ModifiableDBIDs cluster = clusters.get(c.primary);
-          cluster.add(id);
-          start++;
-          id.advance();
-          // Now the cluster may have become empty:
-          if (cluster.size() == maxsize) {
-            int full = c.primary;
-            // A cluster has been fully consumed.
-            // Refresh the not yet assigned objects where necessary:
-            for (; id.valid(); id.advance()) {
-              Meta ca = metas.get(id);
-              if (ca.primary == full) {
-                // Update the best index:
-                for (int i = 0; i < k; i++) {
-                  if (i == full || clusters.get(i).size() >= maxsize) {
-                    continue;
-                  }
-                  if (ca.primary == full || ca.dists[i] < ca.dists[ca.primary]) {
-                    ca.primary = i;
-                  }
-                }
-                metas.put(id, ca); // Changed.
-              } else if (ca.secondary == full) {
-                // Update the worst index:
-                for (int i = 0; i < k; i++) {
-                  if (i == full || clusters.get(i).size() >= maxsize) {
-                    continue;
-                  }
-                  if (ca.secondary == full || ca.dists[i] > ca.dists[ca.secondary]) {
-                    ca.secondary = i;
-                  }
-                }
-                metas.put(id, ca); // Changed.
-              }
-            }
-            // The next iteration will perform the sorting!
-          }
-        }
-        // Note: we expect Candidate.a == cluster the object is assigned to!
-      }
-    }
-    // Recompute means.
+    // Perform the initial assignment
+    initialAssignment(clusters, metas, tids);
     means = means(clusters, means, relation);
-
-    {
-      // Iteration phase.
-      // Comparator: sort by largest gain by transfer
-      final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
-        @Override
-        public int compare(DBIDRef o1, DBIDRef o2) {
-          Meta c1 = metas.get(o1), c2 = metas.get(o2);
-          return Double.compare(c1.priority(), c2.priority());
-        }
-      };
-      // List for sorting cluster preferences
-      int[] preferences = new int[k];
-      for (int i = 0; i < k; i++) {
-        preferences[i] = i;
-      }
-      // Comparator for this list.
-      final PreferenceComparator pcomp = new PreferenceComparator();
-
-      // Initialize transfer lists:
-      ArrayModifiableDBIDs[] transfers = new ArrayModifiableDBIDs[k];
-      for (int i = 0; i < k; i++) {
-        transfers[i] = DBIDUtil.newArray();
-      }
-
-      for (int j = 0; maxiter < 0 || j < maxiter; j++) {
-        int active = 0;
-        updateDistances(relation, means, metas, df);
-        tids.sort(comp);
-        for (DBIDIter id = tids.iter(); id.valid(); id.advance()) {
-          Meta c = metas.get(id);
-          ModifiableDBIDs source = clusters.get(c.primary);
-          boolean transferred = false;
-          pcomp.c = c;
-          IntegerArrayQuickSort.sort(preferences, pcomp);
-          for (int i : preferences) {
-            if (i == c.primary) {
-              continue;
-            }
-            ModifiableDBIDs dest = clusters.get(i);
-            // Can we pair this transfer?
-            if (!transfers[i].isEmpty()) {
-              DBID other = transfers[i].get(0);
-              Meta c2 = metas.get(other);
-              if (c.gain(i) + c2.gain(c.primary) > 0) {
-                transfers[i].remove(0);
-                transfer(metas, c2, dest, source, other, c.primary);
-                transfer(metas, c, source, dest, id, i);
-                active += 2;
-                transferred = true;
-                break;
-              }
-            }
-            // If cluster sizes allow, move a single object.
-            if (c.gain(i) > 0 && (dest.size() < maxsize && source.size() > minsize)) {
-              transfer(metas, c, source, dest, id, i);
-              active += 1;
-              transferred = true;
-              break;
-            }
-          }
-          // If the object would prefer a different cluster, put in outgoing
-          // transfer list.
-          if (!transferred && (c.dists[c.primary] > c.dists[c.secondary])) {
-            transfers[c.primary].add(id);
-          }
-        }
-        // TODO: try to get more transfers out of the transfer lists done by
-        // considering more than one object?
-        int pending = 0;
-        // Clear transfer lists for next iteration.
-        for (int i = 0; i < k; i++) {
-          pending += transfers[i].size();
-          transfers[i].clear();
-        }
-        if (LOG.isDebuggingFine()) {
-          LOG.debugFine("Performed " + active + " transfers in iteration " + j + " skipped " + pending);
-        }
-        if (active <= 0) {
-          break;
-        }
-        // Recompute means after reassignment
-        means = means(clusters, means, relation);
-      }
-    }
+    // Refine the result via k-means like iterations
+    means = refineResult(relation, means, clusters, metas, tids);
 
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
@@ -284,14 +137,82 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     return result;
   }
 
-  protected void transfer(final WritableDataStore<Meta> metas, Meta meta, ModifiableDBIDs src, ModifiableDBIDs dst, DBIDRef id, Integer dstnum) {
-    dst.add(id);
-    src.remove(id);
-    meta.primary = dstnum;
-    metas.put(id, meta); // Make sure the storage is up to date.
+  protected void initialAssignment(List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
+    // Our desired cluster size:
+    final int maxsize = (tids.size() + k - 1) / k; // rounded up
+    // Comparator: sort by largest benefit of assigning to preferred cluster.
+    final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
+      @Override
+      public int compare(DBIDRef o1, DBIDRef o2) {
+        Meta c1 = metas.get(o1), c2 = metas.get(o2);
+        return -Double.compare(c1.priority(), c2.priority());
+      }
+    };
+
+    // Initialization phase:
+    int start = 0;
+    while (start < tids.size()) {
+      tids.sort(start, tids.size(), comp);
+      DBIDArrayIter id = tids.iter();
+      id.seek(start);
+      while (id.valid()) {
+        Meta c = metas.get(id);
+        // Assigning to best cluster - which cannot be empty yet!
+        ModifiableDBIDs cluster = clusters.get(c.primary);
+        cluster.add(id);
+        start++;
+        id.advance();
+        // Now the cluster may have become empty:
+        if (cluster.size() == maxsize) {
+          int full = c.primary;
+          // A cluster has been fully consumed.
+          // Refresh the not yet assigned objects where necessary:
+          for (; id.valid(); id.advance()) {
+            Meta ca = metas.get(id);
+            if (ca.primary == full) {
+              // Update the best index:
+              for (int i = 0; i < k; i++) {
+                if (i == full || clusters.get(i).size() >= maxsize) {
+                  continue;
+                }
+                if (ca.primary == full || ca.dists[i] < ca.dists[ca.primary]) {
+                  ca.primary = i;
+                }
+              }
+              metas.put(id, ca); // Changed.
+            } else if (ca.secondary == full) {
+              // Update the worst index:
+              for (int i = 0; i < k; i++) {
+                if (i == full || clusters.get(i).size() >= maxsize) {
+                  continue;
+                }
+                if (ca.secondary == full || ca.dists[i] > ca.dists[ca.secondary]) {
+                  ca.secondary = i;
+                }
+              }
+              metas.put(id, ca); // Changed.
+            }
+          }
+          // The next iteration will perform the sorting!
+        }
+      }
+      // Note: we expect Candidate.a == cluster the object is assigned to!
+    }
   }
 
-  protected void initializeMeta(Relation<V> relation, List<? extends NumberVector<?>> means, final WritableDataStore<Meta> metas, PrimitiveDoubleDistanceFunction<NumberVector<?>> df) {
+  /**
+   * Initialize the metadata storage.
+   * 
+   * @param relation Relation to process
+   * @param means Mean vectors
+   * @return Initialized storage
+   */
+  protected WritableDataStore<Meta> initializeMeta(Relation<V> relation, List<? extends NumberVector<?>> means) {
+    // This is a safe cast - see constructor.
+    @SuppressWarnings("unchecked")
+    PrimitiveDoubleDistanceFunction<NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<NumberVector<?>>) getDistanceFunction();
+    // The actual storage
+    final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
     // Build the metadata, track the two nearest cluster centers.
     for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = new Meta(k);
@@ -308,6 +229,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       }
       metas.put(id, c);
     }
+    return metas;
   }
 
   protected void updateDistances(Relation<V> relation, List<? extends NumberVector<?>> means, final WritableDataStore<Meta> metas, PrimitiveDoubleDistanceFunction<NumberVector<?>> df) {
@@ -326,6 +248,114 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       }
       metas.put(id, c); // Changed.
     }
+  }
+
+  protected List<? extends NumberVector<?>> refineResult(Relation<V> relation, List<? extends NumberVector<?>> means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
+    // This is a safe cast - see constructor.
+    @SuppressWarnings("unchecked")
+    PrimitiveDoubleDistanceFunction<NumberVector<?>> df = (PrimitiveDoubleDistanceFunction<NumberVector<?>>) getDistanceFunction();
+    // Our desired cluster size:
+    final int minsize = tids.size() / k; // rounded down
+    final int maxsize = (tids.size() + k - 1) / k; // rounded up
+
+    // Comparator: sort by largest gain by transfer
+    final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
+      @Override
+      public int compare(DBIDRef o1, DBIDRef o2) {
+        Meta c1 = metas.get(o1), c2 = metas.get(o2);
+        return Double.compare(c1.priority(), c2.priority());
+      }
+    };
+    // List for sorting cluster preferences
+    int[] preferences = new int[k];
+    for (int i = 0; i < k; i++) {
+      preferences[i] = i;
+    }
+    // Comparator for this list.
+    final PreferenceComparator pcomp = new PreferenceComparator();
+
+    // Initialize transfer lists:
+    ArrayModifiableDBIDs[] transfers = new ArrayModifiableDBIDs[k];
+    for (int i = 0; i < k; i++) {
+      transfers[i] = DBIDUtil.newArray();
+    }
+
+    for (int j = 0; maxiter < 0 || j < maxiter; j++) {
+      int active = 0;
+      updateDistances(relation, means, metas, df);
+      tids.sort(comp);
+      for (DBIDIter id = tids.iter(); id.valid(); id.advance()) {
+        Meta c = metas.get(id);
+        ModifiableDBIDs source = clusters.get(c.primary);
+        boolean transferred = false;
+        pcomp.c = c;
+        IntegerArrayQuickSort.sort(preferences, pcomp);
+        for (int i : preferences) {
+          if (i == c.primary) {
+            continue;
+          }
+          ModifiableDBIDs dest = clusters.get(i);
+          // Can we pair this transfer?
+          for (DBIDMIter other = transfers[i].iter(); other.valid(); other.advance()) {
+            Meta c2 = metas.get(other);
+            if (c.gain(i) + c2.gain(c.primary) > 0) {
+              transfer(metas, c2, dest, source, other, c.primary);
+              transfer(metas, c, source, dest, id, i);
+              active += 2;
+              transferred = true;
+              other.remove(); // last, as this invalides the reference!
+              break;
+            }
+          }
+          // If cluster sizes allow, move a single object.
+          if (c.gain(i) > 0 && (dest.size() < maxsize && source.size() > minsize)) {
+            transfer(metas, c, source, dest, id, i);
+            active += 1;
+            transferred = true;
+            break;
+          }
+        }
+        // If the object would prefer a different cluster, put in outgoing
+        // transfer list.
+        if (!transferred && (c.dists[c.primary] > c.dists[c.secondary])) {
+          transfers[c.primary].add(id);
+        }
+      }
+      // TODO: try to get more transfers out of the transfer lists done by
+      // considering more than one object?
+      int pending = 0;
+      // Clear transfer lists for next iteration.
+      for (int i = 0; i < k; i++) {
+        pending += transfers[i].size();
+        transfers[i].clear();
+      }
+      if (LOG.isDebuggingFine()) {
+        LOG.debugFine("Performed " + active + " transfers in iteration " + j + " skipped " + pending);
+      }
+      if (active <= 0) {
+        break;
+      }
+      // Recompute means after reassignment
+      means = means(clusters, means, relation);
+    }
+    return means;
+  }
+
+  /**
+   * Transfer a single element from one cluster to another.
+   * 
+   * @param metas Meta storage
+   * @param meta Meta of current object
+   * @param src Source cluster
+   * @param dst Destination cluster
+   * @param id Object ID
+   * @param dstnum Destination cluster number
+   */
+  protected void transfer(final WritableDataStore<Meta> metas, Meta meta, ModifiableDBIDs src, ModifiableDBIDs dst, DBIDRef id, Integer dstnum) {
+    dst.add(id);
+    src.remove(id);
+    meta.primary = dstnum;
+    metas.put(id, meta); // Make sure the storage is up to date.
   }
 
   /**
