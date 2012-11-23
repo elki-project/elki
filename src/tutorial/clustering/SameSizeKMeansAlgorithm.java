@@ -106,98 +106,32 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
-    // Our desired cluster size:
-    final int maxsize = (ids.size() + k - 1) / k; // rounded up
     // Choose initial means
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
     for (int i = 0; i < k; i++) {
-      clusters.add(DBIDUtil.newHashSet(maxsize + 1));
+      clusters.add(DBIDUtil.newHashSet(relation.size() / k + 2));
     }
 
-    // Temporary data storage
+    // Meta data storage
     final WritableDataStore<Meta> metas = initializeMeta(relation, means);
-
-    // Build a sorted list of objects, by descending distance delta
-    ArrayModifiableDBIDs tids = DBIDUtil.newArray(ids);
     // Perform the initial assignment
-    initialAssignment(clusters, metas, tids);
+    ArrayModifiableDBIDs tids = initialAssignment(clusters, metas, ids);
+    // Recompute the means after the initial assignment
     means = means(clusters, means, relation);
     // Refine the result via k-means like iterations
     means = refineResult(relation, means, clusters, metas, tids);
 
     // Wrap result
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
+    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     for (int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
+      V mean = factory.newNumberVector(means.get(i).getColumnVector().getArrayRef());
+      MeanModel<V> model = new MeanModel<V>(mean);
       result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
     }
     return result;
-  }
-
-  protected void initialAssignment(List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
-    // Our desired cluster size:
-    final int maxsize = (tids.size() + k - 1) / k; // rounded up
-    // Comparator: sort by largest benefit of assigning to preferred cluster.
-    final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
-      @Override
-      public int compare(DBIDRef o1, DBIDRef o2) {
-        Meta c1 = metas.get(o1), c2 = metas.get(o2);
-        return -Double.compare(c1.priority(), c2.priority());
-      }
-    };
-
-    // Initialization phase:
-    int start = 0;
-    while (start < tids.size()) {
-      tids.sort(start, tids.size(), comp);
-      DBIDArrayIter id = tids.iter();
-      id.seek(start);
-      while (id.valid()) {
-        Meta c = metas.get(id);
-        // Assigning to best cluster - which cannot be empty yet!
-        ModifiableDBIDs cluster = clusters.get(c.primary);
-        cluster.add(id);
-        start++;
-        id.advance();
-        // Now the cluster may have become empty:
-        if (cluster.size() == maxsize) {
-          int full = c.primary;
-          // A cluster has been fully consumed.
-          // Refresh the not yet assigned objects where necessary:
-          for (; id.valid(); id.advance()) {
-            Meta ca = metas.get(id);
-            if (ca.primary == full) {
-              // Update the best index:
-              for (int i = 0; i < k; i++) {
-                if (i == full || clusters.get(i).size() >= maxsize) {
-                  continue;
-                }
-                if (ca.primary == full || ca.dists[i] < ca.dists[ca.primary]) {
-                  ca.primary = i;
-                }
-              }
-              metas.put(id, ca); // Changed.
-            } else if (ca.secondary == full) {
-              // Update the worst index:
-              for (int i = 0; i < k; i++) {
-                if (i == full || clusters.get(i).size() >= maxsize) {
-                  continue;
-                }
-                if (ca.secondary == full || ca.dists[i] > ca.dists[ca.secondary]) {
-                  ca.secondary = i;
-                }
-              }
-              metas.put(id, ca); // Changed.
-            }
-          }
-          // The next iteration will perform the sorting!
-        }
-      }
-      // Note: we expect Candidate.a == cluster the object is assigned to!
-    }
   }
 
   /**
@@ -232,6 +166,70 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     return metas;
   }
 
+  protected ArrayModifiableDBIDs initialAssignment(List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, DBIDs ids) {
+    // Build a sorted list of objects, by descending distance delta
+    ArrayModifiableDBIDs tids = DBIDUtil.newArray(ids);
+    // Our desired cluster size:
+    final int maxsize = (tids.size() + k - 1) / k; // rounded up
+    // Comparator: sort by largest benefit of assigning to preferred cluster.
+    final Comparator<DBIDRef> comp = new Comparator<DBIDRef>() {
+      @Override
+      public int compare(DBIDRef o1, DBIDRef o2) {
+        Meta c1 = metas.get(o1), c2 = metas.get(o2);
+        return -Double.compare(c1.priority(), c2.priority());
+      }
+    };
+    // We will use this iterator below. It support seeking!
+    DBIDArrayIter id = tids.iter();
+
+    // Initialization phase:
+    for (int start = 0; start < tids.size();) {
+      tids.sort(start, tids.size(), comp);
+      for (id.seek(start); id.valid();) {
+        Meta c = metas.get(id);
+        // Assigning to best cluster - which cannot be full yet!
+        ModifiableDBIDs cluster = clusters.get(c.primary);
+        cluster.add(id);
+        start++;
+        id.advance();
+        // Now the cluster may have become completely filled:
+        if (cluster.size() == maxsize) {
+          final int full = c.primary;
+          // Refresh the not yet assigned objects where necessary:
+          for (; id.valid(); id.advance()) {
+            Meta ca = metas.get(id);
+            if (ca.primary == full) {
+              // Update the best index:
+              for (int i = 0; i < k; i++) {
+                if (i == full || clusters.get(i).size() >= maxsize) {
+                  continue;
+                }
+                if (ca.primary == full || ca.dists[i] < ca.dists[ca.primary]) {
+                  ca.primary = i;
+                }
+              }
+              metas.put(id, ca); // Changed.
+            }
+          }
+          // The next iteration will perform the sorting!
+          break; // not really necessary - iterator is at end anyway.
+        }
+      }
+      // Note: we expect Candidate.a == cluster the object is assigned to!
+    }
+    return tids;
+  }
+
+  /**
+   * Compute the distances of each object to all means. Update
+   * {@link Meta#secondary} to point to the best cluster number except the
+   * current cluster assignment
+   * 
+   * @param relation Data relation
+   * @param means Means
+   * @param metas Metadata storage
+   * @param df Distance function
+   */
   protected void updateDistances(Relation<V> relation, List<? extends NumberVector<?>> means, final WritableDataStore<Meta> metas, PrimitiveDoubleDistanceFunction<NumberVector<?>> df) {
     for (DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
@@ -250,6 +248,16 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     }
   }
 
+  /**
+   * Perform k-means style iterations to improve the clustering result.
+   * 
+   * @param relation Data relation
+   * @param means Means list
+   * @param clusters Cluster list
+   * @param metas Metadata storage
+   * @param tids DBIDs array
+   * @return final means
+   */
   protected List<? extends NumberVector<?>> refineResult(Relation<V> relation, List<? extends NumberVector<?>> means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
     // This is a safe cast - see constructor.
     @SuppressWarnings("unchecked")
@@ -280,19 +288,18 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
       transfers[i] = DBIDUtil.newArray();
     }
 
-    for (int j = 0; maxiter < 0 || j < maxiter; j++) {
-      int active = 0;
+    for (int iter = 0; maxiter < 0 || iter < maxiter; iter++) {
       updateDistances(relation, means, metas, df);
       tids.sort(comp);
+      int active = 0; // Track if anything has changed
       for (DBIDIter id = tids.iter(); id.valid(); id.advance()) {
         Meta c = metas.get(id);
         ModifiableDBIDs source = clusters.get(c.primary);
+        IntegerArrayQuickSort.sort(preferences, pcomp.select(c));
         boolean transferred = false;
-        pcomp.c = c;
-        IntegerArrayQuickSort.sort(preferences, pcomp);
         for (int i : preferences) {
           if (i == c.primary) {
-            continue;
+            continue; // Cannot transfer to the same cluster!
           }
           ModifiableDBIDs dest = clusters.get(i);
           // Can we pair this transfer?
@@ -330,7 +337,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         transfers[i].clear();
       }
       if (LOG.isDebuggingFine()) {
-        LOG.debugFine("Performed " + active + " transfers in iteration " + j + " skipped " + pending);
+        LOG.debugFine("Performed " + active + " transfers in iteration " + iter + " skipped " + pending);
       }
       if (active <= 0) {
         break;
@@ -352,8 +359,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
    * @param dstnum Destination cluster number
    */
   protected void transfer(final WritableDataStore<Meta> metas, Meta meta, ModifiableDBIDs src, ModifiableDBIDs dst, DBIDRef id, Integer dstnum) {
-    dst.add(id);
     src.remove(id);
+    dst.add(id);
     meta.primary = dstnum;
     metas.put(id, meta); // Make sure the storage is up to date.
   }
@@ -391,16 +398,6 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     }
 
     /**
-     * Gain from switching to cluster i.
-     * 
-     * @param i Target cluster
-     * @return Gain
-     */
-    protected double gain(Integer i) {
-      return dists[primary] - dists[i];
-    }
-
-    /**
      * Priority / badness: difference between best and worst. (Assuming that
      * "secondary" is the worst).
      * 
@@ -408,6 +405,16 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
      */
     protected double priority() {
       return dists[secondary] - dists[primary];
+    }
+
+    /**
+     * Gain from switching to cluster i.
+     * 
+     * @param i Target cluster
+     * @return Gain
+     */
+    protected double gain(int i) {
+      return dists[primary] - dists[i];
     }
   }
 
@@ -427,6 +434,17 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     @Override
     public int compare(int o1, int o2) {
       return Double.compare(c.dists[o1], c.dists[o2]);
+    }
+
+    /**
+     * Set the meta to sort by
+     * 
+     * @param c Meta to sort by
+     * @return The comparator
+     */
+    public IntegerComparator select(Meta c) {
+      this.c = c;
+      return this;
     }
   }
 
