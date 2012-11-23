@@ -24,13 +24,13 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 
 /**
  * A filter to sort the data set by some label.
@@ -54,44 +54,44 @@ public class SortByLabelFilter implements ObjectFilter {
 
   @Override
   public MultipleObjectsBundle filter(final MultipleObjectsBundle objects) {
-    if(LOG.isDebugging()) {
+    if (LOG.isDebugging()) {
       LOG.debug("Shuffling the data set");
     }
 
     // Prepare a reposition array for cheap resorting
     final int size = objects.dataLength();
-    final Integer[] offsets = new Integer[size];
-    for(int i = 0; i < size; i++) {
-      offsets[i] = Integer.valueOf(i);
+    final int[] offsets = new int[size];
+    for (int i = 0; i < size; i++) {
+      offsets[i] = i;
     }
     // Sort by labels - identify a label column
     final int lblcol;
     {
       int lblc = -1;
-      for(int i = 0; i < objects.metaLength(); i++) {
-        if(TypeUtil.GUESSED_LABEL.isAssignableFromType(objects.meta(i))) {
+      for (int i = 0; i < objects.metaLength(); i++) {
+        if (TypeUtil.GUESSED_LABEL.isAssignableFromType(objects.meta(i))) {
           lblc = i;
           break;
         }
       }
       lblcol = lblc; // make static
     }
-    Arrays.sort(offsets, new Comparator<Integer>() {
+    IntegerArrayQuickSort.sort(offsets, new IntegerComparator() {
       @Override
-      public int compare(Integer o1, Integer o2) {
-        String l1 = objects.data(o1.intValue(), lblcol).toString();
-        String l2 = objects.data(o2.intValue(), lblcol).toString();
+      public int compare(int o1, int o2) {
+        String l1 = objects.data(o1, lblcol).toString();
+        String l2 = objects.data(o2, lblcol).toString();
         return l1.compareToIgnoreCase(l2);
       }
     });
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    for(int j = 0; j < objects.metaLength(); j++) {
+    for (int j = 0; j < objects.metaLength(); j++) {
       // Reorder column accordingly
       List<?> in = objects.getColumn(j);
       List<Object> data = new ArrayList<Object>(size);
-      for(int i = 0; i < size; i++) {
-        data.add(in.get(offsets[i].intValue()));
+      for (int i = 0; i < size; i++) {
+        data.add(in.get(offsets[i]));
       }
       bundle.appendColumn(objects.meta(j), data);
     }
