@@ -26,21 +26,25 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Class to sort an integer array, using a modified quicksort.
+ * Class to sort an int array, using a modified quicksort.
  * 
  * The implementation is closely based on:
  * <p>
  * Dual-Pivot Quicksort<br />
  * Vladimir Yaroslavskiy
  * </p>
+ *
+ * and differs mostly in that we sort different kinds of arrays,
+ * and allow the use of comparators - useful in particular when
+ * the array references external objects.
  * 
  * @author Erich Schubert
  */
 @Reference(authors = "Vladimir Yaroslavskiy", title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", url = "http://iaroslavski.narod.ru/quicksort/")
-class IntegerArrayQuickSort {
+public class IntegerArrayQuickSort {
   /**
    * Threshold for using insertion sort. Value taken from Javas QuickSort,
-   * assuming that it will be similar for DBIDs.
+   * assuming that it will be similar for our data sets.
    */
   private static final int INSERTION_THRESHOLD = 47;
 

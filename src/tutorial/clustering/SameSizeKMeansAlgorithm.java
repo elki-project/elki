@@ -25,7 +25,6 @@ package tutorial.clustering;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -54,6 +53,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -199,9 +200,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         }
       };
       // List for sorting cluster preferences
-      ArrayList<Integer> preferences = new ArrayList<Integer>(k);
+      int[] preferences = new int[k];
       for (int i = 0; i < k; i++) {
-        preferences.add(i);
+        preferences[i] = i;
       }
       // Comparator for this list.
       final PreferenceComparator pcomp = new PreferenceComparator();
@@ -221,8 +222,8 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
           ModifiableDBIDs source = clusters.get(c.primary);
           boolean transferred = false;
           pcomp.c = c;
-          Collections.sort(preferences, pcomp);
-          for (Integer i : preferences) {
+          IntegerArrayQuickSort.sort(preferences, pcomp);
+          for (int i : preferences) {
             if (i == c.primary) {
               continue;
             }
@@ -387,11 +388,14 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
    * 
    * @apiviz.exclude
    */
-  public class PreferenceComparator implements Comparator<Integer> {
+  public class PreferenceComparator implements IntegerComparator {
+    /**
+     * Meta to use for comparison.
+     */
     Meta c = null;
 
     @Override
-    public int compare(Integer o1, Integer o2) {
+    public int compare(int o1, int o2) {
       return Double.compare(c.dists[o1], c.dists[o2]);
     }
   }
