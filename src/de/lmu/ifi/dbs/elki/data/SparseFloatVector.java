@@ -106,8 +106,8 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
     {
       TIntFloatIterator iter = values.iterator();
       for (int i = 0; iter.hasNext(); i++) {
-        this.indexes[i] = iter.key();
         iter.advance();
+        this.indexes[i] = iter.key();
       }
       Arrays.sort(this.indexes);
     }
@@ -336,7 +336,7 @@ public class SparseFloatVector extends AbstractNumberVector<Float> implements Sp
       // FIXME: add a serializer
       return null;
     }
-    
+
     @Override
     public Class<? super SparseFloatVector> getRestrictionClass() {
       return SparseFloatVector.class;
