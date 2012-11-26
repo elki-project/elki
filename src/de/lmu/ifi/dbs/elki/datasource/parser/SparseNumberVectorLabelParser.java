@@ -117,33 +117,31 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     TIntDoubleHashMap values = new TIntDoubleHashMap(cardinality, 1);
     LabelList labels = null;
 
-    for(int i = 1; i < entries.size() - 1; i++) {
-      if(labelIndices == null || !labelIndices.get(i)) {
+    for (int i = 1; i < entries.size() - 1; i++) {
+      if (labelIndices == null || !labelIndices.get(i)) {
         try {
           int index = Integer.parseInt(entries.get(i));
-          if(index >= maxdim) {
+          if (index >= maxdim) {
             maxdim = index + 1;
           }
           double attribute = Double.parseDouble(entries.get(i));
           values.put(index, attribute);
           i++;
-        }
-        catch(NumberFormatException e) {
-          if(labels == null) {
+        } catch (NumberFormatException e) {
+          if (labels == null) {
             labels = new LabelList(1);
           }
           labels.add(entries.get(i));
           continue;
         }
-      }
-      else {
-        if(labels == null) {
+      } else {
+        if (labels == null) {
           labels = new LabelList(1);
         }
         labels.add(entries.get(i));
       }
     }
-    if(values.size() > maxdim) {
+    if (values.size() > maxdim) {
       throw new AbortException("Invalid sparse vector seen: " + line);
     }
     curvec = sparsefactory.newNumberVector(values, maxdim);
@@ -152,10 +150,10 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
   @Override
   protected SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
-    if(dimensionality > 0) {
+    if (dimensionality > 0) {
       return new VectorFieldTypeInformation<V>(factory, dimensionality);
     }
-    if(dimensionality == DIMENSIONALITY_VARIABLE) {
+    if (dimensionality == DIMENSIONALITY_VARIABLE) {
       return new SimpleTypeInformation<V>(factory.getRestrictionClass(), factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
@@ -177,7 +175,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
     @Override
     protected void getFactory(Parameterization config) {
       ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<SparseNumberVector.Factory<V, ?>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
-      if(config.grab(factoryP)) {
+      if (config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
     }
