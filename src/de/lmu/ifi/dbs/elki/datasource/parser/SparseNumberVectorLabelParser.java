@@ -152,13 +152,11 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
   @Override
   protected SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
-    @SuppressWarnings("unchecked")
-    Class<V> cls = (Class<V>) factory.getClass();
     if(dimensionality > 0) {
       return new VectorFieldTypeInformation<V>(factory, dimensionality);
     }
     if(dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<V>(cls, factory.getDefaultSerializer());
+      return new SimpleTypeInformation<V>(factory.getRestrictionClass(), factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
