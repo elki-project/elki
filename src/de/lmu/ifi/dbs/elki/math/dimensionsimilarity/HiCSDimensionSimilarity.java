@@ -221,12 +221,12 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     private GoodnessOfFitTest statTest;
 
     /**
-     * Holds the value of {@link #M_ID}.
+     * Holds the value of {@link HiCS.Parameterizer#M_ID}.
      */
     private int m = 50;
 
     /**
-     * Holds the value of {@link #ALPHA_ID}.
+     * Holds the value of {@link HiCS.Parameterizer#ALPHA_ID}.
      */
     private double alpha = 0.1;
 

@@ -164,10 +164,9 @@ public class VisualizerContext implements DataStoreListener, Result {
   }
 
   /**
-   * Wrap style library into a style result.
+   * Generate a new style result for the given style library.
    * 
    * @param stylelib Style library
-   * @return Style result
    */
   protected void makeStyleResult(StyleLibrary stylelib) {
     styleresult = new StyleResult();
@@ -175,13 +174,11 @@ public class VisualizerContext implements DataStoreListener, Result {
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
     if (clusterings.size() > 0) {
       styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
-      result.getHierarchy().add(result, styleresult);
-      return;
     } else {
       Clustering<Model> c = generateDefaultClustering();
       styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
-      result.getHierarchy().add(result, styleresult);
     }
+    result.getHierarchy().add(result, styleresult);
   }
 
   /**

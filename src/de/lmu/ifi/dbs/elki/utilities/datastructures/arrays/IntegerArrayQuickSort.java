@@ -77,9 +77,6 @@ public class IntegerArrayQuickSort {
    * @param start First index
    * @param end Last index (inclusive!)
    * @param comp Comparator
-   * @param vl First seeking iterator
-   * @param vk Second seeking iterator
-   * @param vr Third seeking iterator
    */
   private static void quickSort(int[] data, final int start, final int end, IntegerComparator comp) {
     final int len = end - start;
