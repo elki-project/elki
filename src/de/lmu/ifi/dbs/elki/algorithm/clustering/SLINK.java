@@ -760,8 +760,6 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @author Erich Schubert
    * 
    * @apiviz.exclude
-   * 
-   * @param <D> Distance type
    */
   private static final class CompareByDoubleLambda implements Comparator<DBIDRef> {
     /**

@@ -29,8 +29,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Provides a list of database objects and labels associated with these objects
- * and a cache of precomputed distances between the database objects.
+ * Provides a cache of precomputed distances between the database objects.
+ * 
+ * TODO: this class needs to reworked.
  * 
  * @author Elke Achtert
  * 
@@ -46,8 +47,6 @@ public class DistanceParsingResult<D extends Distance<D>> {
    * Provides a list of database objects, a list of label objects associated
    * with these objects and cached distances between these objects.
    * 
-   * @param objectAndLabelList the list of database objects and labels
-   *        associated with these objects
    * @param distanceCache the cache of precomputed distances between the
    *        database objects
    */
