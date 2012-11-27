@@ -105,24 +105,20 @@ public class LOFMapper implements Mapper {
     @Override
     public void map(DBIDRef id) {
       KNNResult<?> knn = knns.get(id);
-      final int size = knn.size() - 1;
       double avlrd = 0.0;
       int cnt = 0;
-      for(DBIDIter n = knn.iter(); n.valid(); n.advance()) {
-        if(DBIDUtil.equal(n, id)) {
-          cnt++;
+      for (DBIDIter n = knn.iter(); n.valid(); n.advance()) {
+        if (DBIDUtil.equal(n, id)) {
           continue;
         }
-        avlrd += lrds.doubleValue(n) / size;
+        avlrd += lrds.doubleValue(n);
+        cnt++;
       }
-      if(cnt != 1) {
-        avlrd = avlrd * (size / ((double) knn.size() - cnt));
-      }
+      avlrd = (cnt > 0) ? (avlrd / cnt) : 0;
       final double lrdp = lrds.doubleValue(id);
-      if(lrdp > 0) {
+      if (lrdp > 0) {
         output.set(avlrd / lrdp);
-      }
-      else {
+      } else {
         output.set(1.0);
       }
     }

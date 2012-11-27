@@ -98,22 +98,18 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
     @Override
     public void map(DBIDRef id) {
       KNNResult<D> knn = knns.get(id);
-      final int size = knn.size() - 1;
       double lrd = 0.0;
-      int dup = 0;
+      int size = 0;
       for(DistanceDBIDResultIter<D> n = knn.iter(); n.valid(); n.advance()) {
         // Do not include the query object
         if(DBIDUtil.equal(n, id)) {
-          dup++;
           continue;
         }
-        lrd += n.getDistance().doubleValue() / size;
+        lrd += n.getDistance().doubleValue();
+        size++;
       }
-      // This shouldn't occur, but we can handle it:
-      if(dup != 1) {
-        lrd = lrd * (size / (knn.size() - (double) dup));
-      }
-      output.set(lrd > 0 ? 1 / lrd : 0);
+      // Avoid division by zero.
+      output.set(lrd > 0 ? size / lrd : 0);
     }
 
     @Override
