@@ -299,7 +299,6 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
-      final int size = neighbors.size() - 1; // estimated
       double sum = 0.0;
       int count = 0;
       if (neighbors instanceof DoubleDistanceKNNList) {
@@ -313,7 +312,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
             } else {
               nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
             }
-            sum += Math.max(neighbor.doubleDistance(), nkdist) / size;
+            sum += Math.max(neighbor.doubleDistance(), nkdist);
             count++;
           }
         }
@@ -321,22 +320,13 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
-            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue()) / size;
+            sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
             count++;
           }
         }
       }
       // Avoid division by 0
-      final double lrd;
-      if (sum <= 0) {
-        lrd = 0.0;
-      } else if (count == size) {
-        lrd = 1 / sum;
-      } else {
-        // Correct estimation
-        sum *= size / (double) count;
-        lrd = 1 / sum;
-      }
+      final double lrd = (sum > 0) ? (count / sum) : 0;
       lrds.putDouble(iter, lrd);
       if (lrdsProgress != null) {
         lrdsProgress.incrementProcessed(LOG);
