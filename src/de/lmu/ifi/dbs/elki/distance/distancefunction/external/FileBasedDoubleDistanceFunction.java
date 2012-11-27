@@ -33,8 +33,6 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -52,6 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Provides a DistanceFunction that is based on double distances given by a
  * distance matrix of an external file.
+ * 
+ * See {@link NumberDistanceParser} for the default input format.
  * 
  * @author Elke Achtert
  */
@@ -127,20 +127,6 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
     DistanceParsingResult<DoubleDistance> res = parser.parse(in);
     cache = res.getDistanceCache();
-  }
-
-  /**
-   * Return a collection of all IDs in the cache.
-   * 
-   * @return Collection of all IDs in the cache.
-   */
-  public DBIDs getIDs() {
-    ModifiableDBIDs ids = DBIDUtil.newHashSet();
-    for(DBIDPair pair : cache.keySet()) {
-      ids.add(pair.getFirst());
-      ids.add(pair.getSecond());
-    }
-    return ids;
   }
 
   @Override

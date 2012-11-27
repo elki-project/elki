@@ -27,24 +27,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.parser.AbstractParser;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -79,8 +77,8 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
   /**
    * Constructor.
    * 
-   * @param colSep
-   * @param quoteChar
+   * @param colSep Column separator pattern
+   * @param quoteChar Quote character
    * @param distanceFactory Distance factory to use
    */
   public NumberDistanceParser(Pattern colSep, char quoteChar, D distanceFactory) {
@@ -93,32 +91,30 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
 
+    IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Parsing distance matrix", LOG) : null;
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
     Map<DBIDPair, D> distanceCache = new HashMap<DBIDPair, D>();
     try {
-      for(String line; (line = reader.readLine()) != null; lineNumber++) {
-        if(lineNumber % 10000 == 0 && LOG.isDebugging()) {
-          LOG.debugFine("parse " + lineNumber / 10000);
-          // logger.fine("parse " + lineNumber / 10000);
+      for (String line; (line = reader.readLine()) != null; lineNumber++) {
+        if (prog != null) {
+          prog.incrementProcessed(LOG);
         }
-        if(!line.startsWith(COMMENT) && line.length() > 0) {
+        if (!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
-          if(entries.size() != 3) {
+          if (entries.size() != 3) {
             throw new IllegalArgumentException("Line " + lineNumber + " does not have the " + "required input format: id1 id2 distanceValue! " + line);
           }
 
           DBID id1, id2;
           try {
             id1 = DBIDUtil.importInteger(Integer.parseInt(entries.get(0)));
-          }
-          catch(NumberFormatException e) {
+          } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ": id1 is no integer!");
           }
 
           try {
             id2 = DBIDUtil.importInteger(Integer.parseInt(entries.get(1)));
-          }
-          catch(NumberFormatException e) {
+          } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ": id2 is no integer!");
           }
 
@@ -127,44 +123,31 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
             put(id1, id2, distance, distanceCache);
             ids.add(id1);
             ids.add(id2);
-          }
-          catch(IllegalArgumentException e) {
+          } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Error in line " + lineNumber + ":" + e.getMessage(), e);
           }
         }
       }
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new IllegalArgumentException("Error while parsing line " + lineNumber + ".");
     }
 
-    if(LOG.isDebugging()) {
-      LOG.debugFine("check");
+    if (prog != null) {
+      prog.setCompleted(LOG);
     }
 
     // check if all distance values are specified
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        if(DBIDUtil.compare(iter2, iter) < 0) {
+        if (DBIDUtil.compare(iter2, iter) < 0) {
           continue;
         }
-        if(!containsKey(iter, iter2, distanceCache)) {
+        if (!containsKey(iter, iter2, distanceCache)) {
           throw new IllegalArgumentException("Distance value for " + DBIDUtil.toString(iter) + " - " + DBIDUtil.toString(iter2) + " is missing!");
         }
       }
     }
-
-    if(LOG.isDebugging()) {
-      LOG.debugFine("add to objectAndLabelsList");
-    }
-
-    // This is unusual for ELKI, but here we really need an ArrayList, not a
-    // DBIDs object. So convert.
-    List<DBID> objects = new ArrayList<DBID>(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      objects.add(DBIDUtil.deref(iter));
-    }
-    return new DistanceParsingResult<D>(MultipleObjectsBundle.makeSimple(TypeUtil.DBID, objects), distanceCache);
+    return new DistanceParsingResult<D>(distanceCache);
   }
 
   /**
@@ -177,14 +160,14 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    */
   private void put(DBID id1, DBID id2, D distance, Map<DBIDPair, D> cache) {
     // the smaller id is the first key
-    if(DBIDUtil.compare(id1, id2) > 0) {
+    if (DBIDUtil.compare(id1, id2) > 0) {
       put(id2, id1, distance, cache);
       return;
     }
 
     D oldDistance = cache.put(DBIDUtil.newPair(id1, id2), distance);
 
-    if(oldDistance != null) {
+    if (oldDistance != null) {
       throw new IllegalArgumentException("Distance value for specified ids is already assigned!");
     }
   }
@@ -200,7 +183,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
    *         specified ids, false otherwise
    */
   public boolean containsKey(DBIDRef id1, DBIDRef id2, Map<DBIDPair, D> cache) {
-    if(DBIDUtil.compare(id1, id2) > 0) {
+    if (DBIDUtil.compare(id1, id2) > 0) {
       return containsKey(id2, id1, cache);
     }
 
@@ -229,7 +212,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<D> distFuncP = new ObjectParameter<D>(DISTANCE_ID, Distance.class);
-      if(config.grab(distFuncP)) {
+      if (config.grab(distFuncP)) {
         distanceFactory = distFuncP.instantiateClass(config);
       }
     }

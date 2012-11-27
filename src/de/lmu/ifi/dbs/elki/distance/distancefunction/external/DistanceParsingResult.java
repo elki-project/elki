@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
 import java.util.Map;
 
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -42,11 +41,6 @@ public class DistanceParsingResult<D extends Distance<D>> {
    * The cache of precomputed distances between the database objects.
    */
   private final Map<DBIDPair, D> distanceCache;
-  
-  /**
-   * Objects representation (DBIDs and/or external IDs)
-   */
-  private MultipleObjectsBundle objects;
 
   /**
    * Provides a list of database objects, a list of label objects associated
@@ -57,8 +51,7 @@ public class DistanceParsingResult<D extends Distance<D>> {
    * @param distanceCache the cache of precomputed distances between the
    *        database objects
    */
-  public DistanceParsingResult(MultipleObjectsBundle objectAndLabelList, Map<DBIDPair, D> distanceCache) {
-    this.objects = objectAndLabelList;
+  public DistanceParsingResult(Map<DBIDPair, D> distanceCache) {
     this.distanceCache = distanceCache;
   }
 
@@ -69,14 +62,5 @@ public class DistanceParsingResult<D extends Distance<D>> {
    */
   public Map<DBIDPair, D> getDistanceCache() {
     return distanceCache;
-  }
-
-  /**
-   * Get the objects
-   * 
-   * @return the objects bundle
-   */
-  public MultipleObjectsBundle getObjects() {
-    return objects;
   }
 }
