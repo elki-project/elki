@@ -41,11 +41,14 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -119,7 +122,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
    * Constructor.
    * 
    * @param distanceFunction Distance function to use
-   * @param queries Query dataset (may be null!)
+   * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
    * @param random Random factory
    */
@@ -158,15 +161,27 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
     }
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    int hash = 0;
+    MeanVariance mv = new MeanVariance();
     for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       D r = dfactory.fromDouble(radrel.get(iditer).doubleValue(0));
-      rangeQuery.getRangeForDBID(iditer, r);
+      DistanceDBIDResult<D> rres = rangeQuery.getRangeForDBID(iditer, r);
+      int ichecksum = 0;
+      for (DBIDIter it = rres.iter(); it.valid(); it.advance()) {
+        ichecksum += it.internalGetIndex();
+      }
+      hash = Util.mixHashCodes(hash, ichecksum);
+      mv.put(rres.size());
       if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
     if (prog != null) {
       prog.ensureCompleted(LOG);
+    }
+    if (LOG.isVerbose()) {
+      LOG.verbose("Result hashcode: " + hash);
+      LOG.verbose("Mean number of results: "+mv.toString());
     }
     return null;
   }
@@ -227,6 +242,8 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       sample = DBIDUtil.randomSample(sids, size, random);
     }
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    int hash = 0;
+    MeanVariance mv = new MeanVariance();
     double[] buf = new double[dim];
     for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       int off = sids.binarySearch(iditer);
@@ -237,13 +254,23 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       }
       O v = ofactory.newNumberVector(buf);
       D r = dfactory.fromDouble(o.doubleValue(dim));
-      rangeQuery.getRangeForObject(v, r);
+      DistanceDBIDResult<D> rres = rangeQuery.getRangeForObject(v, r);
+      int ichecksum = 0;
+      for (DBIDIter it = rres.iter(); it.valid(); it.advance()) {
+        ichecksum += it.internalGetIndex();
+      }
+      hash = Util.mixHashCodes(hash, ichecksum);
+      mv.put(rres.size());
       if (prog != null) {
         prog.incrementProcessed(LOG);
       }
     }
     if (prog != null) {
       prog.ensureCompleted(LOG);
+    }
+    if (LOG.isVerbose()) {
+      LOG.verbose("Result hashcode: " + hash);
+      LOG.verbose("Mean number of results: "+mv.toString());
     }
     return null;
   }

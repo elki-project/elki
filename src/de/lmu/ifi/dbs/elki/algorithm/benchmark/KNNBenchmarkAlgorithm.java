@@ -37,11 +37,14 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -68,7 +71,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
   private static final Logging LOG = Logging.getLogger(KNNBenchmarkAlgorithm.class);
 
   /**
-   * Number of neighbors to retreive.
+   * Number of neighbors to retrieve.
    */
   protected int k = 10;
 
@@ -92,7 +95,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
    * 
    * @param distanceFunction Distance function to use
    * @param k K parameter
-   * @param queries Query dataset (may be null!)
+   * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
    * @param random Random factory
    */
@@ -129,14 +132,26 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
       }
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+      int hash = 0;
+      MeanVariance mv = new MeanVariance();
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-        knnQuery.getKNNForDBID(iditer, k);
+        KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, k);
+        int ichecksum = 0;
+        for (DBIDIter it = knns.iter(); it.valid(); it.advance()) {
+          ichecksum += it.internalGetIndex();
+        }
+        hash = Util.mixHashCodes(hash, ichecksum);
+        mv.put(knns.size());
         if (prog != null) {
           prog.incrementProcessed(LOG);
         }
       }
       if (prog != null) {
         prog.ensureCompleted(LOG);
+      }
+      if (LOG.isVerbose()) {
+        LOG.verbose("Result hashcode: " + hash);
+        LOG.verbose("Mean number of results: "+mv.toString());
       }
     } else {
       // Separate query set.
@@ -167,14 +182,26 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         sample = DBIDUtil.randomSample(sids, size, random);
       }
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+      int hash = 0;
+      MeanVariance mv = new MeanVariance();
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         int off = sids.binarySearch(iditer);
         assert (off >= 0);
         @SuppressWarnings("unchecked")
         O o = (O) bundle.data(off, col);
-        knnQuery.getKNNForObject(o, k);
+        KNNResult<D> knns = knnQuery.getKNNForObject(o, k);
+        int ichecksum = 0;
+        for (DBIDIter it = knns.iter(); it.valid(); it.advance()) {
+          ichecksum += it.internalGetIndex();
+        }
+        hash = Util.mixHashCodes(hash, ichecksum);
+        mv.put(knns.size());
         if (prog != null) {
           prog.incrementProcessed(LOG);
+        }
+        if (LOG.isVerbose()) {
+          LOG.verbose("Result hashcode: " + hash);
+          LOG.verbose("Mean number of results: "+mv.toString());
         }
       }
       if (prog != null) {
