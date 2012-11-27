@@ -120,7 +120,11 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
       return distance(id2, id1);
     }
 
-    return cache.get(DBIDUtil.newPair(id1, id2));
+    DoubleDistance ret = cache.get(DBIDUtil.newPair(id1, id2));
+    if (ret == null && DBIDUtil.equal(id1, id2)) {
+      return DoubleDistance.ZERO_DISTANCE;
+    }
+    return ret;
   }
 
   private void loadCache(DistanceParser<DoubleDistance> parser, File matrixfile) throws IOException {

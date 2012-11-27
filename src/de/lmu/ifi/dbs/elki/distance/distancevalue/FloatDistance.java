@@ -52,6 +52,21 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
   private static final long serialVersionUID = -5702250266358369075L;
 
   /**
+   * Infinite distance.
+   */
+  public static final FloatDistance INFINITE_DISTANCE = new FloatDistance(Float.POSITIVE_INFINITY);
+
+  /**
+   * Zero distance.
+   */
+  public static final FloatDistance ZERO_DISTANCE = new FloatDistance(0.0F);
+
+  /**
+   * Undefined distance.
+   */
+  public static final FloatDistance UNDEFINED_DISTANCE = new FloatDistance(Float.NaN);
+
+  /**
    * Empty constructor for serialization purposes.
    */
   public FloatDistance() {
@@ -160,7 +175,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    */
   @Override
   public FloatDistance infiniteDistance() {
-    return new FloatDistance(Float.POSITIVE_INFINITY);
+    return INFINITE_DISTANCE;
   }
 
   /**
@@ -168,7 +183,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    */
   @Override
   public FloatDistance nullDistance() {
-    return new FloatDistance(0.0F);
+    return ZERO_DISTANCE;
   }
 
   /**
@@ -176,7 +191,7 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
    */
   @Override
   public FloatDistance undefinedDistance() {
-    return new FloatDistance(Float.NaN);
+    return UNDEFINED_DISTANCE;
   }
 
   /**

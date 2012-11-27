@@ -139,7 +139,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     // check if all distance values are specified
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       for (DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-        if (DBIDUtil.compare(iter2, iter) < 0) {
+        if (DBIDUtil.compare(iter2, iter) <= 0) {
           continue;
         }
         if (!containsKey(iter, iter2, distanceCache)) {
