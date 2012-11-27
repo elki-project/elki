@@ -54,7 +54,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, Throwable cause) {
-    this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription(), cause);
+    this("Wrong value of parameter \"" + parameter.getName() + "\".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + cause.getMessage(), cause);
   }
 
   /**
@@ -66,7 +66,7 @@ public class WrongParameterValueException extends ParameterException {
    * @param cause the cause
    */
   public WrongParameterValueException(Parameter<?> parameter, String read, String reason, Throwable cause) {
-    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + reason, cause);
+    this("Wrong value of parameter " + parameter.getName() + ".\n" + "Read: " + read + ".\n" + "Expected: " + parameter.getFullDescription() + "\n" + reason + "\n" + cause.getMessage(), cause);
   }
 
   /**

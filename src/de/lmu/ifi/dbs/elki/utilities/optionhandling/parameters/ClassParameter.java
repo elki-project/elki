@@ -237,8 +237,6 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
         config = config.descend(this);
         instance = ClassGenericsUtil.tryInstantiate(restrictionClass, getValue(), config);
       } catch (InvocationTargetException e) {
-        // inner exception during instantiation. Log, so we don't lose it!
-        LoggingUtil.exception(e);
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
       } catch (NoSuchMethodException e) {
         throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class - no usable public constructor.");
