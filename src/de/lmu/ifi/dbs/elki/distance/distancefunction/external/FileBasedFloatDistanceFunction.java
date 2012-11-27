@@ -119,8 +119,11 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
     if(DBIDUtil.compare(id1, id2) > 0) {
       return distance(id2, id1);
     }
-
-    return cache.get(DBIDUtil.newPair(id1, id2));
+    FloatDistance ret = cache.get(DBIDUtil.newPair(id1, id2));
+    if (ret == null && DBIDUtil.equal(id1, id2)) {
+      return FloatDistance.ZERO_DISTANCE;
+    }
+    return ret;
   }
 
   private void loadCache(DistanceParser<FloatDistance> parser, File matrixfile) throws IOException {
