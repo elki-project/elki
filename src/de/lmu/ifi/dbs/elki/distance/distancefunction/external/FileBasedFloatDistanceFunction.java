@@ -51,6 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Provides a DistanceFunction that is based on float distances given by a
  * distance matrix of an external file.
  * 
+ * See {@link NumberDistanceParser} for the default input format.
+ * 
  * @author Elke Achtert
  */
 @Title("File based float distance for database objects.")
