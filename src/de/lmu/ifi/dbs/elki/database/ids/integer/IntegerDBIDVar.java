@@ -46,8 +46,6 @@ class IntegerDBIDVar implements DBIDVar {
 
   /**
    * Constructor.
-   * 
-   * @param val
    */
   protected IntegerDBIDVar() {
     this.id = -1;

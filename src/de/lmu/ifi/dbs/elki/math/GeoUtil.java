@@ -209,7 +209,7 @@ public final class GeoUtil {
    * @param lon2 Longitude of destination point.
    * @param latQ Latitude of query point.
    * @param lonQ Longitude of query point.
-   * @param distSE Distance from starting point to query point in km.
+   * @param dist1Q Distance from starting point to query point in km.
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
   public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
@@ -232,7 +232,7 @@ public final class GeoUtil {
    * @param lon2 Longitude of destination point.
    * @param latQ Latitude of query point.
    * @param lonQ Longitude of query point.
-   * @param distSE Distance from starting point to query point in km.
+   * @param dist1Q Distance from starting point to query point in km.
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
   public static double crossTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
@@ -295,12 +295,12 @@ public final class GeoUtil {
    * 
    * XTD = asin(sin(dist_SQ)*sin(crs_SQ-crs_SE))
    * 
-   * @param latS Latitude of starting point.
-   * @param lonS Longitude of starting point.
+   * @param lat1 Latitude of starting point.
+   * @param lon1 Longitude of starting point.
+   * @param lat2 Latitude of destination point.
+   * @param lon2 Longitude of destination point.
    * @param latQ Latitude of query point.
    * @param lonQ Longitude of query point.
-   * @param latE Latitude of destination point.
-   * @param lonE Longitude of destination point.
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
   public static double crossTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
