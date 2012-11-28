@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.DistributionWithRandom;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -89,6 +90,11 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
 
   /** Gamma distribution */
   public static final String TAG_GAMMA = "gamma";
+
+  /**
+   * Halton pseudo uniform distribution.
+   */
+  public static final String TAG_HALTON = "halton";
 
   /** Rotation */
   public static final String TAG_ROTATE = "rotate";
@@ -359,6 +365,8 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
         processElementNormal(cluster, child);
       } else if (TAG_GAMMA.equals(child.getNodeName())) {
         processElementGamma(cluster, child);
+      } else if (TAG_HALTON.equals(child.getNodeName())) {
+        processElementHalton(cluster, child);
       } else if (TAG_ROTATE.equals(child.getNodeName())) {
         processElementRotate(cluster, child);
       } else if (TAG_TRANSLATE.equals(child.getNodeName())) {
@@ -464,6 +472,41 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
     // *** New normal distribution generator
     Random random = cluster.getNewRandomGenerator();
     DistributionWithRandom generator = new GammaDistribution(k, theta, random);
+    cluster.addGenerator(generator);
+
+    // TODO: check for unknown attributes.
+    XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
+    while (iter.hasNext()) {
+      Node child = iter.next();
+      if (child.getNodeType() == Node.ELEMENT_NODE) {
+        LOG.warning("Unknown element in XML specification file: " + child.getNodeName());
+      }
+    }
+  }
+
+  /**
+   * Process a 'halton' Element in the XML stream.
+   * 
+   * @param cluster
+   * @param cur Current document nod
+   * @throws UnableToComplyException
+   */
+  private void processElementHalton(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+    double min = 0.0;
+    double max = 1.0;
+
+    String minstr = ((Element) cur).getAttribute(ATTR_MIN);
+    if (minstr != null && minstr.length() > 0) {
+      min = Double.parseDouble(minstr);
+    }
+    String maxstr = ((Element) cur).getAttribute(ATTR_MAX);
+    if (maxstr != null && maxstr.length() > 0) {
+      max = Double.parseDouble(maxstr);
+    }
+
+    // *** new uniform generator
+    Random random = cluster.getNewRandomGenerator();
+    DistributionWithRandom generator = new HaltonUniformDistribution(min, max, random);
     cluster.addGenerator(generator);
 
     // TODO: check for unknown attributes.
