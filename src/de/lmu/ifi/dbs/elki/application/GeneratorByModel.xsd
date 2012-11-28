@@ -21,6 +21,7 @@
           <xs:element ref="uniform" />
           <xs:element ref="normal" />
           <xs:element ref="gamma" />
+          <xs:element ref="halton" />
         </xs:choice>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
           <xs:element ref="translate" />
@@ -52,6 +53,13 @@
     <xs:complexType>
       <xs:attribute name="k" type="xs:decimal" use="optional" />
       <xs:attribute name="theta" type="xs:decimal" use="optional" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="halton">
+    <xs:complexType>
+      <xs:attribute name="max" type="xs:decimal" use="optional" />
+      <xs:attribute name="min" type="xs:decimal" use="optional" />
     </xs:complexType>
   </xs:element>
 
