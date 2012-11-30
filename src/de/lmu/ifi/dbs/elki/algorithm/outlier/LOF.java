@@ -358,23 +358,16 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       final double lof;
       if (lrdp > 0) {
         final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
-        final int size = neighbors.size() - 1; // estimated
         double sum = 0.0;
         int count = 0;
         for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
           if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            sum += lrds.doubleValue(neighbor) / size;
+            sum += lrds.doubleValue(neighbor);
             count++;
           }
         }
-        if (count == size) {
-          lof = sum / lrdp;
-        } else {
-          // Correct estimation
-          sum *= size / (double) count;
-          lof = sum / lrdp;
-        }
+        lof = sum / (count * lrdp);
       } else {
         lof = 1.0;
       }
