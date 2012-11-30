@@ -230,11 +230,6 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
      */
     protected int k = 2;
 
-    /**
-     * Neighborhood distance function.
-     */
-    protected DistanceFunction<O, D> neighborhoodDistanceFunction = null;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);

@@ -244,7 +244,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
    */
   public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     /**
-     * Option ID for kernel density LOF.
+     * Option ID for kernel density LOF kernel.
      */
     public static final OptionID KERNEL_ID = OptionID.getOrCreateOptionID("kernellof.kernel", "Kernel to use for kernel density LOF.");
 
@@ -252,11 +252,6 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
      * The neighborhood size to use.
      */
     protected int k = 2;
-
-    /**
-     * Neighborhood distance function.
-     */
-    protected DistanceFunction<O, D> neighborhoodDistanceFunction = null;
 
     /**
      * Kernel density function parameter
