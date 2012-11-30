@@ -129,7 +129,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
     KernelDensityEstimator kernel = new KernelDensityEstimator(relation);
     BitSet subspace = new BitSet(kernel.dim);
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OutRank scores", relation.size(), LOG) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OutRES scores", relation.size(), LOG) : null;
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       subspace.clear();
@@ -150,7 +150,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
   }
 
   /**
-   * Main loop of OUTRES. Run for each object
+   * Main loop of OutRES. Run for each object
    * 
    * @param s start dimension
    * @param subspace Current subspace
