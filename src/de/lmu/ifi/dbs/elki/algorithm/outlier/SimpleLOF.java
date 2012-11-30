@@ -75,14 +75,6 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
   private static final Logging LOG = Logging.getLogger(SimpleLOF.class);
 
   /**
-   * Include object itself in kNN neighborhood.
-   * 
-   * In the official LOF publication, the point itself is not considered to be
-   * part of its k nearest neighbors.
-   */
-  private static boolean objectIsInKNN = false;
-
-  /**
    * Parameter k.
    */
   protected int k;
@@ -94,7 +86,7 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
    */
   public SimpleLOF(int k, DistanceFunction<? super O, D> distance) {
     super(distance);
-    this.k = k + (objectIsInKNN ? 0 : 1);
+    this.k = k + 1;
   }
 
   /**
@@ -127,29 +119,31 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
     }
     WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
-    for (DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
-      final KNNResult<D> neighbors1 = knnq.getKNNForDBID(iter1, k);
-      double sum1 = 0.0;
-      int count1 = 0;
-      if (neighbors1 instanceof DoubleDistanceKNNList) {
+    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
+      double sum = 0.0;
+      int count = 0;
+      if (neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
-        for (DoubleDistanceDBIDResultIter neighbor2 = ((DoubleDistanceKNNList) neighbors1).iter(); neighbor2.valid(); neighbor2.advance()) {
-          if (objectIsInKNN || !DBIDUtil.equal(neighbor2, iter1)) {
-            sum1 += neighbor2.doubleDistance();
-            count1++;
+        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+          if (DBIDUtil.equal(neighbor, it)) {
+            continue;
           }
+          sum += neighbor.doubleDistance();
+          count++;
         }
       } else {
-        for (DistanceDBIDResultIter<D> neighbor1 = neighbors1.iter(); neighbor1.valid(); neighbor1.advance()) {
-          if (objectIsInKNN || !DBIDUtil.equal(neighbor1, iter1)) {
-            sum1 += neighbor1.getDistance().doubleValue();
-            count1++;
+        for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          if (DBIDUtil.equal(neighbor, it)) {
+            continue;
           }
+          sum += neighbor.getDistance().doubleValue();
+          count++;
         }
       }
       // Avoid division by 0
-      final double lrd = (sum1 > 0) ? (count1 / sum1) : 0;
-      dens.putDouble(iter1, lrd);
+      final double lrd = (sum > 0) ? (count / sum) : 0;
+      dens.putDouble(it, lrd);
       if (densProgress != null) {
         densProgress.incrementProcessed(LOG);
       }
@@ -167,32 +161,26 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
     DoubleMinMax lofminmax = new DoubleMinMax();
 
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double lrdp = dens.doubleValue(iter);
+    for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      final double lrdp = dens.doubleValue(it);
       final double lof;
       if (lrdp > 0) {
-        final KNNResult<D> neighbors = knnq.getKNNForDBID(iter, k);
-        final int size = neighbors.size() - 1; // estimated
+        final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
         double sum = 0.0;
         int count = 0;
         for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           // skip the point itself
-          if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            sum += dens.doubleValue(neighbor) / size;
-            count++;
+          if (DBIDUtil.equal(neighbor, it)) {
+            continue;
           }
+          sum += dens.doubleValue(neighbor);
+          count++;
         }
-        if (count == size) {
-          lof = sum / lrdp;
-        } else {
-          // Correct estimation
-          sum *= size / (double) count;
-          lof = sum / lrdp;
-        }
+        lof = sum / (count * lrdp);
       } else {
         lof = 1.0;
       }
-      lofs.putDouble(iter, lof);
+      lofs.putDouble(it, lof);
       // update minimum and maximum
       lofminmax.put(lof);
 
@@ -232,6 +220,9 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> vector type
+   * @param <D> distance type
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     /**
