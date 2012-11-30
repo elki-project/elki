@@ -160,7 +160,7 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
 
-    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simple LOF scores.", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = dens.doubleValue(it);
       final double lof;
