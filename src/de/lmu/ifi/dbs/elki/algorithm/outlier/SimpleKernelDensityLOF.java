@@ -138,29 +138,31 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
-      final double max;
+      int count = 0;
       double sum = 0.0;
       if (neighbors instanceof DoubleDistanceKNNList) {
-        max = ((DoubleDistanceKNNList) neighbors).doubleKNNDistance();
         // Fast version for double distances
         for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
+          double max = ((DoubleDistanceKNNList)knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
           final double v = neighbor.doubleDistance() / max;
-          sum += kernel.density(v);
+          sum += kernel.density(v) / Math.pow(max, dim);
+          count++;
         }
       } else {
-        max = neighbors.getKNNDistance().doubleValue();
         for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
+          double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
           final double v = neighbor.getDistance().doubleValue() / max;
-          sum += kernel.density(v);
+          sum += kernel.density(v) / Math.pow(max, dim);
+          count++;
         }
       }
-      final double density = sum / Math.pow(max, dim);
+      final double density = sum / count;
       dens.putDouble(it, density);
       if (densProgress != null) {
         densProgress.incrementProcessed(LOG);
