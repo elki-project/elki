@@ -68,7 +68,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
   /**
    * Parameter to specify the neighborhood file
    */
-  public static final OptionID NEIGHBORHOOD_FILE_ID = OptionID.getOrCreateOptionID("externalneighbors.file", "The file listing the neighbors.");
+  public static final OptionID NEIGHBORHOOD_FILE_ID = new OptionID("externalneighbors.file", "The file listing the neighbors.");
 
   /**
    * Constructor.

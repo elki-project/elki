@@ -373,17 +373,17 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     /**
      * Option ID for k step size.
      */
-    public static final OptionID STEPK_ID = OptionID.getOrCreateOptionID("stepk", "Step size for k.");
+    public static final OptionID STEPK_ID = new OptionID("stepk", "Step size for k.");
 
     /**
      * Option ID for k start size.
      */
-    public static final OptionID STARTK_ID = OptionID.getOrCreateOptionID("startk", "Minimum value for k.");
+    public static final OptionID STARTK_ID = new OptionID("startk", "Minimum value for k.");
 
     /**
      * Option ID for k step size.
      */
-    public static final OptionID MAXK_ID = OptionID.getOrCreateOptionID("maxk", "Maximum value for k.");
+    public static final OptionID MAXK_ID = new OptionID("maxk", "Maximum value for k.");
 
     /**
      * k step size

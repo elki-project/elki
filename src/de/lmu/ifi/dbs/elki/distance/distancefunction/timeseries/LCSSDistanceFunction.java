@@ -80,12 +80,12 @@ public class LCSSDistanceFunction extends AbstractVectorDoubleDistanceFunction {
   /**
    * PDELTA parameter
    */
-  public static final OptionID PDELTA_ID = OptionID.getOrCreateOptionID("lcss.pDelta", "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
+  public static final OptionID PDELTA_ID = new OptionID("lcss.pDelta", "the allowed deviation in x direction for LCSS alignment (positive double value, 0 <= pDelta <= 1)");
 
   /**
    * PEPSILON parameter
    */
-  public static final OptionID PEPSILON_ID = OptionID.getOrCreateOptionID("lcss.pEpsilon", "the allowed deviation in y directionfor LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
+  public static final OptionID PEPSILON_ID = new OptionID("lcss.pEpsilon", "the allowed deviation in y directionfor LCSS alignment (positive double value, 0 <= pEpsilon <= 1)");
 
   /**
    * Keeps the currently set pDelta.

@@ -41,7 +41,7 @@ public class ComputeNaiveRGBColorHistogram extends AbstractComputeColorHistogram
    * Key: {@code -rgbhist.bpp}
    * </p>
    */
-  public static final OptionID BINSPERPLANE_ID = OptionID.getOrCreateOptionID("rgbhist.bpp", "Bins per plane for RGB histogram. This will result in bpp ** 3 bins.");
+  public static final OptionID BINSPERPLANE_ID = new OptionID("rgbhist.bpp", "Bins per plane for RGB histogram. This will result in bpp ** 3 bins.");
 
   /**
    * Number of bins in each dimension to use.

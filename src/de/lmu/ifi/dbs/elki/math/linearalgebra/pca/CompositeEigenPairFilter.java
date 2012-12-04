@@ -42,7 +42,7 @@ public class CompositeEigenPairFilter implements EigenPairFilter {
   /**
    * The list of filters to use.
    */
-  public static final OptionID EIGENPAIR_FILTER_COMPOSITE_LIST = OptionID.getOrCreateOptionID("pca.filter.composite.list", "A comma separated list of the class names of the filters to be used. " + "The specified filters will be applied sequentially in the given order.");
+  public static final OptionID EIGENPAIR_FILTER_COMPOSITE_LIST = new OptionID("pca.filter.composite.list", "A comma separated list of the class names of the filters to be used. " + "The specified filters will be applied sequentially in the given order.");
 
   /**
    * The filters to be applied.

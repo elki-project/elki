@@ -115,7 +115,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -cash.minpts}
    * </p>
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
+  public static final OptionID MINPTS_ID = new OptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
 
   /**
    * Parameter to specify the maximum level for splitting the hypercube, must be
@@ -124,7 +124,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -cash.maxlevel}
    * </p>
    */
-  public static final OptionID MAXLEVEL_ID = OptionID.getOrCreateOptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
+  public static final OptionID MAXLEVEL_ID = new OptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
 
   /**
    * Parameter to specify the minimum dimensionality of the subspaces to be
@@ -136,7 +136,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -cash.mindim}
    * </p>
    */
-  public static final OptionID MINDIM_ID = OptionID.getOrCreateOptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
+  public static final OptionID MINDIM_ID = new OptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
 
   /**
    * Parameter to specify the maximum jitter for distance values, must be a
@@ -145,7 +145,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -cash.jitter}
    * </p>
    */
-  public static final OptionID JITTER_ID = OptionID.getOrCreateOptionID("cash.jitter", "The maximum jitter for distance values.");
+  public static final OptionID JITTER_ID = new OptionID("cash.jitter", "The maximum jitter for distance values.");
 
   /**
    * Flag to indicate that an adjustment of the applied heuristic for choosing
@@ -154,7 +154,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -cash.adjust}
    * </p>
    */
-  public static final OptionID ADJUST_ID = OptionID.getOrCreateOptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
+  public static final OptionID ADJUST_ID = new OptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
 
   /**
    * Holds the value of {@link #MINPTS_ID}.

@@ -70,7 +70,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
   /**
    * Expected share of outliers
    */
-  public static final OptionID EXPECT_ID = OptionID.getOrCreateOptionID("modeloutlier.expect", "Expected amount of outliers, for making the scores more intuitive.");
+  public static final OptionID EXPECT_ID = new OptionID("modeloutlier.expect", "Expected amount of outliers, for making the scores more intuitive.");
 
   /**
    * Expected share of outliers.

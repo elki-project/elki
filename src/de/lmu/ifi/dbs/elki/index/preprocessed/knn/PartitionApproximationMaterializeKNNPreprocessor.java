@@ -237,7 +237,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
        * Key: {@code -partknn.p}
        * </p>
        */
-      public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("partknn.p", "The number of partitions to use for approximate kNN.");
+      public static final OptionID PARTITIONS_ID = new OptionID("partknn.p", "The number of partitions to use for approximate kNN.");
 
       /**
        * Parameter to specify the random number generator.
@@ -245,7 +245,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
        * Key: {@code -partknn.seed}
        * </p>
        */
-      public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("partknn.seed", "The random number generator seed.");
+      public static final OptionID SEED_ID = new OptionID("partknn.seed", "The random number generator seed.");
 
       /**
        * Number of partitions

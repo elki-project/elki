@@ -227,7 +227,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
      * Key: {@code -index.fill}
      * </p>
      */
-    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("index.fill", "Partially transparent filling of index pages.");
+    public static final OptionID FILL_ID = new OptionID("index.fill", "Partially transparent filling of index pages.");
 
     protected boolean fill = false;
 

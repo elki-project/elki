@@ -38,7 +38,7 @@ public class GammaScaling implements StaticScalingFunction {
   /**
    * OptionID for the gamma value.
    */
-  public static final OptionID GAMMA_ID = OptionID.getOrCreateOptionID("scaling.gamma", "Gamma value for scaling.");
+  public static final OptionID GAMMA_ID = new OptionID("scaling.gamma", "Gamma value for scaling.");
 
   /**
    * Gamma value.

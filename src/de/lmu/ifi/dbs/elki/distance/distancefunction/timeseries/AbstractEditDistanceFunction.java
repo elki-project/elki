@@ -43,7 +43,7 @@ public abstract class AbstractEditDistanceFunction extends AbstractVectorDoubleD
   /**
    * BANDSIZE parameter
    */
-  public static final OptionID BANDSIZE_ID = OptionID.getOrCreateOptionID("edit.bandSize", "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
+  public static final OptionID BANDSIZE_ID = new OptionID("edit.bandSize", "the band size for Edit Distance alignment (positive double value, 0 <= bandSize <= 1)");
 
   /**
    * Keeps the currently set bandSize.

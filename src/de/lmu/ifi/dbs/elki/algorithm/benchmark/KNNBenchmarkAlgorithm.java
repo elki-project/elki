@@ -235,22 +235,22 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
     /**
      * Parameter for the number of neighbors.
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnbench.k", "Number of neighbors to retreive for kNN benchmarking.");
+    public static final OptionID K_ID = new OptionID("knnbench.k", "Number of neighbors to retreive for kNN benchmarking.");
 
     /**
      * Parameter for the query dataset.
      */
-    public static final OptionID QUERY_ID = OptionID.getOrCreateOptionID("knnbench.query", "Data source for the queries. If not set, the queries are taken from the database.");
+    public static final OptionID QUERY_ID = new OptionID("knnbench.query", "Data source for the queries. If not set, the queries are taken from the database.");
 
     /**
      * Parameter for the sampling size.
      */
-    public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("knnbench.sampling", "Sampling size parameter. If the value is less or equal 1, it is assumed to be the relative share. Larger values will be interpreted as integer sizes. By default, all data will be used.");
+    public static final OptionID SAMPLING_ID = new OptionID("knnbench.sampling", "Sampling size parameter. If the value is less or equal 1, it is assumed to be the relative share. Larger values will be interpreted as integer sizes. By default, all data will be used.");
 
     /**
      * Parameter for the random generator
      */
-    public static final OptionID RANDOM_ID = OptionID.getOrCreateOptionID("knnbench.random", "Random generator for sampling.");
+    public static final OptionID RANDOM_ID = new OptionID("knnbench.random", "Random generator for sampling.");
 
     /**
      * K parameter

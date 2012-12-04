@@ -62,12 +62,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
   /**
    * Parameter for means.
    */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
+  public static final OptionID MEAN_ID = new OptionID("normalize.mean", "a comma separated concatenation of the mean values in each dimension that are mapped to 0. If no value is specified, the mean value of the attribute range in this dimension will be taken.");
 
   /**
    * Parameter for stddevs.
    */
-  public static final OptionID STDDEV_ID = OptionID.getOrCreateOptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
+  public static final OptionID STDDEV_ID = new OptionID("normalize.stddev", "a comma separated concatenation of the standard deviations in each dimension that are scaled to 1. If no value is specified, the standard deviation of the attribute range in this dimension will be taken.");
 
   /**
    * Stores the mean in each dimension.

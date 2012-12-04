@@ -95,31 +95,31 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
    * The distance function to determine the reachability distance between
    * database objects.
    */
-  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.referencedistfunction", "Distance function to determine the density of an object.");
+  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = new OptionID("loop.referencedistfunction", "Distance function to determine the density of an object.");
 
   /**
    * The distance function to determine the reachability distance between
    * database objects.
    */
-  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
+  public static final OptionID COMPARISON_DISTANCE_FUNCTION_ID = new OptionID("loop.comparedistfunction", "Distance function to determine the reference set of an object.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID KREACH_ID = OptionID.getOrCreateOptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
+  public static final OptionID KREACH_ID = new OptionID("loop.kref", "The number of nearest neighbors of an object to be used for the PRD value.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID KCOMP_ID = OptionID.getOrCreateOptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
+  public static final OptionID KCOMP_ID = new OptionID("loop.kcomp", "The number of nearest neighbors of an object to be considered for computing its LOOP_SCORE.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOOP_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
+  public static final OptionID LAMBDA_ID = new OptionID("loop.lambda", "The number of standard deviations to consider for density computation.");
 
   /**
    * Holds the value of {@link #KREACH_ID}.

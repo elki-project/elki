@@ -64,7 +64,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * Key: {@code -distance.matrix}
    * </p>
    */
-  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
+  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", "The name of the file containing the distance matrix.");
 
   /**
    * Optional parameter to specify the parsers to provide a database, must
@@ -74,7 +74,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
    * Key: {@code -distance.parser}
    * </p>
    */
-  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("distance.parser", "Parser used to load the distance matrix.");
+  public static final OptionID PARSER_ID = new OptionID("distance.parser", "Parser used to load the distance matrix.");
 
   /**
    * The distance cache

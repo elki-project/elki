@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
-
 /**
  * An OptionID is used by option handlers as a unique identifier for specific
  * options. There is no option possible without a specific OptionID defined
@@ -32,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.ConstantObject;
  * 
  * @author Elke Achtert
  */
-public final class OptionID extends ConstantObject<OptionID> {
+public final class OptionID {
   /**
    * Flag to obtain help-message.
    * <p>
@@ -113,6 +111,11 @@ public final class OptionID extends ConstantObject<OptionID> {
   public static final OptionID TIME_FLAG = new OptionID("time", "Enable logging of runtime data. Do not combine with more verbose logging, since verbose logging can significantly impact performance.");
 
   /**
+   * Option name
+   */
+  private String name;
+
+  /**
    * The description of the OptionID.
    */
   private String description;
@@ -126,8 +129,9 @@ public final class OptionID extends ConstantObject<OptionID> {
    * @param name the name of the option
    * @param description the description of the option
    */
-  private OptionID(final String name, final String description) {
-    super(name);
+  public OptionID(final String name, final String description) {
+    super();
+    this.name = name;
     this.description = description;
   }
 
@@ -138,15 +142,6 @@ public final class OptionID extends ConstantObject<OptionID> {
    */
   public String getDescription() {
     return description;
-  }
-
-  /**
-   * Sets the description of this OptionID.
-   * 
-   * @param description the description to be set
-   */
-  public void setDescription(String description) {
-    this.description = description;
   }
 
   /**
@@ -163,24 +158,7 @@ public final class OptionID extends ConstantObject<OptionID> {
    * @return the OptionID for the given name
    */
   public static OptionID getOrCreateOptionID(final String name, final String description) {
-    OptionID optionID = getOptionID(name);
-    if(optionID == null) {
-      optionID = new OptionID(name, description);
-    }
-    else {
-      optionID.setDescription(description);
-    }
-    return optionID;
-  }
-
-  /**
-   * Returns the OptionID for the given name if it exists, null otherwise.
-   * 
-   * @param name name of the desired OptionID
-   * @return the OptionID for the given name
-   */
-  public static OptionID getOptionID(final String name) {
-    return OptionID.lookup(OptionID.class, name);
+    return new OptionID(name, description);
   }
 
   /**
@@ -194,4 +172,12 @@ public final class OptionID extends ConstantObject<OptionID> {
     return getName();
   }
 
+  /**
+   * Get the option name.
+   * 
+   * @return Option name
+   */
+  public String getName() {
+    return name;
+  }
 }

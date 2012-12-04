@@ -43,7 +43,7 @@ public class EDRDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * DELTA parameter
    */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("edr.delta", "the delta parameter (similarity threshold) for EDR (positive number)");
+  public static final OptionID DELTA_ID = new OptionID("edr.delta", "the delta parameter (similarity threshold) for EDR (positive number)");
 
   /**
    * Keeps the currently set delta.

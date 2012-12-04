@@ -290,7 +290,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * Key: {@code -cop.k}
      * </p>
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
+    public static final OptionID K_ID = new OptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
     /**
      * Distribution assumption for distances.
@@ -298,7 +298,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * Key: {@code -cop.dist}
      * </p>
      */
-    public static final OptionID DIST_ID = OptionID.getOrCreateOptionID("cop.dist", "The assumed distribution of squared distances. ChiSquared is faster, Gamma expected to be more accurate but could also overfit.");
+    public static final OptionID DIST_ID = new OptionID("cop.dist", "The assumed distribution of squared distances. ChiSquared is faster, Gamma expected to be more accurate but could also overfit.");
 
     /**
      * Class to compute the PCA with.
@@ -306,7 +306,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * Key: {@code -cop.pcarunner}
      * </p>
      */
-    public static final OptionID PCARUNNER_ID = OptionID.getOrCreateOptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
+    public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
 
     /**
      * Expected share of outliers.
@@ -316,7 +316,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      * Default: 0.001
      * </p>
      */
-    public static final OptionID EXPECT_ID = OptionID.getOrCreateOptionID("cop.expect", "Expected share of outliers. Only affect score normalization.");
+    public static final OptionID EXPECT_ID = new OptionID("cop.expect", "Expected share of outliers. Only affect score normalization.");
 
     /**
      * Number of neighbors to be considered.

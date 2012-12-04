@@ -216,7 +216,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * Key: {@code -hisc.alpha}
      * </p>
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
+    public static final OptionID ALPHA_ID = new OptionID("hisc.alpha", "The maximum absolute variance along a coordinate axis.");
 
     /**
      * The number of nearest neighbors considered to determine the preference
@@ -229,7 +229,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * Default value: three times of the dimensionality of the database objects
      * </p>
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
+    public static final OptionID K_ID = new OptionID("hisc.k", "The number of nearest neighbors considered to determine the preference vector. If this value is not defined, k ist set to three times of the dimensionality of the database objects.");
 
     /**
      * Holds the value of parameter {@link #ALPHA_ID}.

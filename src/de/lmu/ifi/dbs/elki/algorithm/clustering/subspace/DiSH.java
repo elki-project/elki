@@ -118,7 +118,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -dish.epsilon}
    * </p>
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "The maximum radius of the neighborhood " + "to be considered in each dimension for determination of " + "the preference vector.");
+  public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", "The maximum radius of the neighborhood " + "to be considered in each dimension for determination of " + "the preference vector.");
 
   /**
    * Parameter that specifies the a minimum number of points as a smoothing
@@ -130,7 +130,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Key: {@code -dish.mu}
    * </p>
    */
-  public static final OptionID MU_ID = OptionID.getOrCreateOptionID("dish.mu", "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
+  public static final OptionID MU_ID = new OptionID("dish.mu", "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
 
   /**
    * Holds the value of {@link #EPSILON_ID}.

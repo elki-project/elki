@@ -65,7 +65,7 @@ public class KNNClassifier<O, D extends Distance<D>, L extends ClassLabel> exten
    * OptionID for
    * {@link experimentalcode.shared.algorithm.classifier.KNNClassifier#K_PARAM}
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnclassifier.k", "The number of neighbors to take into account for classification.");
+  public static final OptionID K_ID = new OptionID("knnclassifier.k", "The number of neighbors to take into account for classification.");
 
   /**
    * Parameter to specify the number of neighbors to take into account for

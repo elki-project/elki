@@ -899,28 +899,28 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
      * Parameter to specify how many next neighbors should be used in the
      * computation
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("HilOut.k", "Compute up to k next neighbors");
+    public static final OptionID K_ID = new OptionID("HilOut.k", "Compute up to k next neighbors");
 
     /**
      * Parameter to specify how many outliers should be computed
      */
-    public static final OptionID N_ID = OptionID.getOrCreateOptionID("HilOut.n", "Compute n outliers");
+    public static final OptionID N_ID = new OptionID("HilOut.n", "Compute n outliers");
 
     /**
      * Parameter to specify the maximum Hilbert-Level
      */
-    public static final OptionID H_ID = OptionID.getOrCreateOptionID("HilOut.h", "Max. Hilbert-Level");
+    public static final OptionID H_ID = new OptionID("HilOut.h", "Max. Hilbert-Level");
 
     /**
      * Parameter to specify p of LP-NormDistance
      */
-    public static final OptionID T_ID = OptionID.getOrCreateOptionID("HilOut.t", "t of Lt Metric");
+    public static final OptionID T_ID = new OptionID("HilOut.t", "t of Lt Metric");
 
     /**
      * Parameter to specify if only the Top n, or also approximations for the
      * other elements, should be returned
      */
-    public static final OptionID TN_ID = OptionID.getOrCreateOptionID("HilOut.tn", "output of Top n or all elements");
+    public static final OptionID TN_ID = new OptionID("HilOut.tn", "output of Top n or all elements");
 
     /**
      * Neighborhood size

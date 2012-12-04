@@ -58,7 +58,7 @@ public abstract class AbstractPreferenceVectorBasedCorrelationDistanceFunction<V
    * Key: {@code -pvbasedcorrelationdf.epsilon}
    * </p>
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("distancefunction.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
+  public static final OptionID EPSILON_ID = new OptionID("distancefunction.epsilon", "The maximum distance between two vectors with equal preference vectors before considering them as parallel.");
 
   /**
    * Holds the value of {@link #EPSILON_ID}.

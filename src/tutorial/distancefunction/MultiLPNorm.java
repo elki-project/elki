@@ -104,7 +104,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
      *  -multinorm.ps
      * </code>
      */
-    public static final OptionID EXPONENTS_ID = OptionID.getOrCreateOptionID("multinorm.ps", "The exponents to use for this distance function");
+    public static final OptionID EXPONENTS_ID = new OptionID("multinorm.ps", "The exponents to use for this distance function");
 
     /**
      * P exponents

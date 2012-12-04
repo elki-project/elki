@@ -561,12 +561,12 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
      * Key: {@code -orclus.alpha}
      * </p>
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
+    public static final OptionID ALPHA_ID = new OptionID("orclus.alpha", "The factor for reducing the number of current clusters in each iteration.");
 
     /**
      * Parameter to specify the random generator seed.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("orclus.seed", "The random number generator seed.");
+    public static final OptionID SEED_ID = new OptionID("orclus.seed", "The random number generator seed.");
 
     protected double alpha = -1;
 

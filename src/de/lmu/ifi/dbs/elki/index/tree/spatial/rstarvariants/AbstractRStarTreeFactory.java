@@ -60,27 +60,27 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
   /**
    * Fast-insertion parameter. Optional.
    */
-  public static OptionID INSERTION_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
+  public static OptionID INSERTION_STRATEGY_ID = new OptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
 
   /**
    * Split strategy parameter. Optional.
    */
-  public static OptionID SPLIT_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
+  public static OptionID SPLIT_STRATEGY_ID = new OptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
 
   /**
    * Parameter for bulk strategy
    */
-  public static final OptionID BULK_SPLIT_ID = OptionID.getOrCreateOptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
+  public static final OptionID BULK_SPLIT_ID = new OptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
 
   /**
    * Parameter for the relative minimum fill.
    */
-  public static final OptionID MINIMUM_FILL_ID = OptionID.getOrCreateOptionID("rtree.minimum-fill", "Minimum relative fill required for data pages.");
+  public static final OptionID MINIMUM_FILL_ID = new OptionID("rtree.minimum-fill", "Minimum relative fill required for data pages.");
 
   /**
    * Overflow treatment.
    */
-  public static OptionID OVERFLOW_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
+  public static OptionID OVERFLOW_STRATEGY_ID = new OptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
 
   /**
    * Strategy to find the insertion node with.

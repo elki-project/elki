@@ -68,7 +68,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
    * Key: {@code -loader.diskcache}
    * </p>
    */
-  public static final OptionID CACHE_ID = OptionID.getOrCreateOptionID("loader.diskcache", "File name of the disk cache to create.");
+  public static final OptionID CACHE_ID = new OptionID("loader.diskcache", "File name of the disk cache to create.");
 
   /**
    * Parameter that specifies the name of the directory to be re-parsed.
@@ -76,7 +76,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
    * Key: {@code -loader.distance}
    * </p>
    */
-  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("loader.distance", "Distance function to cache.");
+  public static final OptionID DISTANCE_ID = new OptionID("loader.distance", "Distance function to cache.");
 
   /**
    * Debug flag, to double-check all write operations.

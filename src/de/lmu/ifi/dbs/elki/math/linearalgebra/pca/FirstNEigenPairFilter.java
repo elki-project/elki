@@ -55,7 +55,7 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
   /**
    * Paremeter n
    */
-  public static final OptionID EIGENPAIR_FILTER_N = OptionID.getOrCreateOptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
+  public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
 
   /**
    * The threshold for strong eigenvectors: n eigenvectors with the n highest

@@ -84,7 +84,7 @@ public class OutlierROCCurve implements Evaluator {
    * Key: {@code -rocauc.positive}
    * </p>
    */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("rocauc.positive", "Class label for the 'positive' class.");
+  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("rocauc.positive", "Class label for the 'positive' class.");
 
   /**
    * Stores the "positive" class.

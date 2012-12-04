@@ -45,7 +45,7 @@ public class LPNormDistanceFunction extends AbstractVectorDoubleDistanceNorm imp
   /**
    * OptionID for the "p" parameter
    */
-  public static final OptionID P_ID = OptionID.getOrCreateOptionID("lpnorm.p", "the degree of the L-P-Norm (positive number)");
+  public static final OptionID P_ID = new OptionID("lpnorm.p", "the degree of the L-P-Norm (positive number)");
 
   /**
    * Keeps the currently set p.

@@ -127,7 +127,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
      * Default value: three times of the dimensionality of the database objects
      * </p>
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
+    public static final OptionID K_ID = new OptionID("localpca.k", "The number of nearest neighbors considered in the PCA. " + "If this parameter is not set, k ist set to three " + "times of the dimensionality of the database objects.");
 
     /**
      * Holds the value of {@link #K_ID}.

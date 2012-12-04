@@ -70,7 +70,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("metaoutlier.scaling", "Class to use as scaling function.");
+  public static final OptionID SCALING_ID = new OptionID("metaoutlier.scaling", "Class to use as scaling function.");
 
   /**
    * Holds the algorithm to run.

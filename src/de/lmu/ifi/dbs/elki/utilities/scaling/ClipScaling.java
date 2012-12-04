@@ -42,7 +42,7 @@ public class ClipScaling implements StaticScalingFunction {
    * Key: {@code -clipscale.min}
    * </p>
    */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("clipscale.min", "Minimum value to allow.");
+  public static final OptionID MIN_ID = new OptionID("clipscale.min", "Minimum value to allow.");
 
   /**
    * Parameter to specify the maximum value
@@ -50,7 +50,7 @@ public class ClipScaling implements StaticScalingFunction {
    * Key: {@code -clipscale.max}
    * </p>
    */
-  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("clipscale.max", "Maximum value to allow.");
+  public static final OptionID MAX_ID = new OptionID("clipscale.max", "Maximum value to allow.");
 
   /**
    * Field storing the minimum to use

@@ -50,7 +50,7 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    * Key: {@code -colorhist.generator}
    * </p>
    */
-  public static OptionID COLORHIST_ID = OptionID.getOrCreateOptionID("colorhist.generator", "Class that is used to generate a color histogram.");
+  public static OptionID COLORHIST_ID = new OptionID("colorhist.generator", "Class that is used to generate a color histogram.");
 
   /**
    * Parameter that specifies the name of the input file.
@@ -58,7 +58,7 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    * Key: {@code -colorhist.in}
    * </p>
    */
-  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("colorhist.in", "Input image file for color histogram.");
+  public static final OptionID INPUT_ID = new OptionID("colorhist.in", "Input image file for color histogram.");
 
   /**
    * Parameter that specifies the name of the mask input file.
@@ -66,7 +66,7 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
    * Key: {@code -colorhist.mask}
    * </p>
    */
-  public static final OptionID MASK_ID = OptionID.getOrCreateOptionID("colorhist.mask", "Input mask image file.");
+  public static final OptionID MASK_ID = new OptionID("colorhist.mask", "Input mask image file.");
 
   /**
    * Class that will compute the actual histogram

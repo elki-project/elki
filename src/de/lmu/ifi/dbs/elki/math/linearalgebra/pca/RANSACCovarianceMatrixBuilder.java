@@ -151,12 +151,12 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
     /**
      * Number of iterations.
      */
-    public static final OptionID ITER_ID = OptionID.getOrCreateOptionID("ransacpca.iterations", "The number of iterations to perform.");
+    public static final OptionID ITER_ID = new OptionID("ransacpca.iterations", "The number of iterations to perform.");
 
     /**
      * Random seed
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ransacpca.seed", "Random seed (optional).");
+    public static final OptionID SEED_ID = new OptionID("ransacpca.seed", "Random seed (optional).");
 
     /**
      * Number of iterations to perform

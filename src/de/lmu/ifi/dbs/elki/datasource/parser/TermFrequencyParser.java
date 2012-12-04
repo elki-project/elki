@@ -178,7 +178,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     /**
      * Option ID for normalization.
      */
-    public static final OptionID NORMALIZE_FLAG = OptionID.getOrCreateOptionID("tf.normalize", "Normalize vectors to manhattan length 1 (convert term counts to term frequencies)");
+    public static final OptionID NORMALIZE_FLAG = new OptionID("tf.normalize", "Normalize vectors to manhattan length 1 (convert term counts to term frequencies)");
 
     /**
      * Normalization flag.

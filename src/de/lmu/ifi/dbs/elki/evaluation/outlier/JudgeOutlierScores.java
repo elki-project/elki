@@ -80,7 +80,7 @@ public class JudgeOutlierScores implements Evaluator {
    * Key: {@code -comphist.positive}
    * </p>
    */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("comphist.positive", "Class label for the 'positive' class.");
+  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
 
   /**
    * Parameter to specify a scaling function to use.
@@ -88,7 +88,7 @@ public class JudgeOutlierScores implements Evaluator {
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
+  public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
 
   /**
    * Stores the "positive" class.

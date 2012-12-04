@@ -49,7 +49,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Parameter for k
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
+  public static final OptionID K_ID = new OptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
 
   /**
    * Parameter k.

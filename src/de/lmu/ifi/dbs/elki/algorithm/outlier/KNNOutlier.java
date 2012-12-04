@@ -84,7 +84,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
   /**
    * Parameter to specify the k nearest neighbor
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("knno.k", "k nearest neighbor");
+  public static final OptionID K_ID = new OptionID("knno.k", "k nearest neighbor");
 
   /**
    * The parameter k

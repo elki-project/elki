@@ -71,17 +71,17 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
   /**
    * OptionID for the base distance used to compute reachability
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("reachdist.basedistance", "Base distance function to use.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("reachdist.basedistance", "Base distance function to use.");
 
   /**
    * OptionID for the KNN query class to use (preprocessor, approximation, ...)
    */
-  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("reachdist.knnquery", "kNN query to use");
+  public static final OptionID KNNQUERY_ID = new OptionID("reachdist.knnquery", "kNN query to use");
 
   /**
    * OptionID for the "k" parameter.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("reachdist.k", "The number of nearest neighbors of an object to be considered for computing its reachability distance.");
+  public static final OptionID K_ID = new OptionID("reachdist.k", "The number of nearest neighbors of an object to be considered for computing its reachability distance.");
 
   /**
    * The distance function to determine the exact distance.

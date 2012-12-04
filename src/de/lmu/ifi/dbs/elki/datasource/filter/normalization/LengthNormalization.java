@@ -91,7 +91,7 @@ public class LengthNormalization<V extends NumberVector<?>> extends AbstractStre
     /**
      * Option ID for normalization norm.
      */
-    public static final OptionID NORM_ID = OptionID.getOrCreateOptionID("normalization.norm", "Norm (length function) to use for computing the vector length.");
+    public static final OptionID NORM_ID = new OptionID("normalization.norm", "Norm (length function) to use for computing the vector length.");
 
     /**
      * Norm to use.

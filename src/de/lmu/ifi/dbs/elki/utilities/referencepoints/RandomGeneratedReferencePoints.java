@@ -53,7 +53,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implement
    * Key: {@code -generate.n}
    * </p>
    */
-  public static final OptionID N_ID = OptionID.getOrCreateOptionID("generate.n", "The number of reference points to be generated.");
+  public static final OptionID N_ID = new OptionID("generate.n", "The number of reference points to be generated.");
 
   /**
    * Parameter for additional scaling of the space, to allow out-of-space
@@ -62,7 +62,7 @@ public class RandomGeneratedReferencePoints<V extends NumberVector<?>> implement
    * Key: {@code -generate.scale}
    * </p>
    */
-  public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
+  public static final OptionID SCALE_ID = new OptionID("generate.scale", "Scale the grid by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
    * Holds the value of {@link #N_ID}.

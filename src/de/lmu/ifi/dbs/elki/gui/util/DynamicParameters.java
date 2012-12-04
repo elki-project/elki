@@ -250,7 +250,7 @@ public class DynamicParameters {
   /**
    * OptionID for unrecognized options.
    */
-  protected static OptionID REMAINING_OPTIONS_ID = OptionID.getOrCreateOptionID("UNUSED", "Unrecognized options.");
+  protected static OptionID REMAINING_OPTIONS_ID = new OptionID("UNUSED", "Unrecognized options.");
 
   /**
    * Dummy option class that represents unhandled options

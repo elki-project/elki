@@ -239,7 +239,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
      * Key: {@code -selectionrange.nofill}
      * </p>
      */
-    public static final OptionID NOFILL_ID = OptionID.getOrCreateOptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
+    public static final OptionID NOFILL_ID = new OptionID("selectionrange.nofill", "Use wireframe style for selection ranges.");
 
     /**
      * Fill parameter.

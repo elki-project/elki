@@ -55,7 +55,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
    * Key: {@code -axisref.scale}
    * </p>
    */
-  public static final OptionID SPACE_SCALE_ID = OptionID.getOrCreateOptionID("axisref.scale", "Scale the data space extension by the given factor.");
+  public static final OptionID SPACE_SCALE_ID = new OptionID("axisref.scale", "Scale the data space extension by the given factor.");
 
   /**
    * Holds the value of {@link #SPACE_SCALE_ID}.

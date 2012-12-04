@@ -54,7 +54,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.min}
    * </p>
    */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("linearscale.min", "Fixed minimum to use in linear scaling.");
+  public static final OptionID MIN_ID = new OptionID("linearscale.min", "Fixed minimum to use in linear scaling.");
 
   /**
    * Parameter to specify the maximum value.
@@ -62,7 +62,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.max}
    * </p>
    */
-  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("linearscale.max", "Fixed maximum to use in linear scaling.");
+  public static final OptionID MAX_ID = new OptionID("linearscale.max", "Fixed maximum to use in linear scaling.");
 
   /**
    * Flag to use the mean as minimum for scaling.
@@ -71,7 +71,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.usemean}
    * </p>
    */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("linearscale.usemean", "Use the mean as minimum for scaling.");
+  public static final OptionID MEAN_ID = new OptionID("linearscale.usemean", "Use the mean as minimum for scaling.");
 
   /**
    * Flag to use ignore zeros when computing the min and max.
@@ -80,7 +80,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
    * Key: {@code -linearscale.ignorezero}
    * </p>
    */
-  public static final OptionID NOZEROS_ID = OptionID.getOrCreateOptionID("linearscale.ignorezero", "Ignore zero entries when computing the minimum and maximum.");
+  public static final OptionID NOZEROS_ID = new OptionID("linearscale.ignorezero", "Ignore zero entries when computing the minimum and maximum.");
 
   /**
    * Field storing the Minimum to use

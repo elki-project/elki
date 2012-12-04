@@ -56,7 +56,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
    * Key: {@code -sample.n}
    * </p>
    */
-  public static final OptionID N_ID = OptionID.getOrCreateOptionID("sample.n", "The number of samples to draw.");
+  public static final OptionID N_ID = new OptionID("sample.n", "The number of samples to draw.");
 
   /**
    * Constant used in choosing optimal table sizes.

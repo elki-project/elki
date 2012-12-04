@@ -65,7 +65,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
    * {@link de.lmu.ifi.dbs.elki.distance.similarityfunction.FractionalSharedNearestNeighborSimilarityFunction}
    * </p>
    */
-  public static final OptionID SIMILARITY_FUNCTION_ID = OptionID.getOrCreateOptionID("adapter.similarityfunction", "Similarity function to derive the distance between database objects from.");
+  public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("adapter.similarityfunction", "Similarity function to derive the distance between database objects from.");
 
   /**
    * Holds the similarity function.

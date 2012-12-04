@@ -86,7 +86,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * Default: default properties file
    * </p>
    */
-  public static final OptionID STYLELIB_ID = OptionID.getOrCreateOptionID("visualizer.stylesheet", "Style properties file to use");
+  public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use");
 
   /**
    * Default pattern for visualizer enabling.
@@ -102,7 +102,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * Default: ELKI core
    * </p>
    */
-  public static final OptionID ENABLEVIS_ID = OptionID.getOrCreateOptionID("vis.enable", "Visualizers to enable by default.");
+  public static final OptionID ENABLEVIS_ID = new OptionID("vis.enable", "Visualizers to enable by default.");
 
   /**
    * Parameter to set the sampling level
@@ -111,7 +111,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * Key: -vis.sampling
    * </p>
    */
-  public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
+  public static final OptionID SAMPLING_ID = new OptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
 
   /**
    * Style library to use.

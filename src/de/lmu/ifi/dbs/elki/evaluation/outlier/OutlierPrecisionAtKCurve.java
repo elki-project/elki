@@ -68,7 +68,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
    * Key: {@code -precision.positive}
    * </p>
    */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("precision.positive", "Class label for the 'positive' class.");
+  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
 
   /**
    * Maximum value for k
@@ -77,7 +77,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
    * Key: {@code -precision.k}
    * </p>
    */
-  public static final OptionID MAX_K_ID = OptionID.getOrCreateOptionID("precision.maxk", "Maximum value of 'k' to compute the curve up to.");
+  public static final OptionID MAX_K_ID = new OptionID("precision.maxk", "Maximum value of 'k' to compute the curve up to.");
 
   /**
    * Stores the "positive" class.

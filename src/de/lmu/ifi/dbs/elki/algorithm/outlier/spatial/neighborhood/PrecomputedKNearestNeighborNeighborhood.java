@@ -148,12 +148,12 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
       /**
        * Parameter k
        */
-      public static final OptionID K_ID = OptionID.getOrCreateOptionID("neighborhood.k", "the number of neighbors");
+      public static final OptionID K_ID = new OptionID("neighborhood.k", "the number of neighbors");
 
       /**
        * Parameter to specify the distance function to use
        */
-      public static final OptionID DISTANCEFUNCTION_ID = OptionID.getOrCreateOptionID("neighborhood.distancefunction", "the distance function to use");
+      public static final OptionID DISTANCEFUNCTION_ID = new OptionID("neighborhood.distancefunction", "the distance function to use");
 
       /**
        * Parameter k

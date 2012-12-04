@@ -73,12 +73,12 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
     /**
      * Reinsertion share
      */
-    public static OptionID REINSERT_AMOUNT_ID = OptionID.getOrCreateOptionID("rtree.reinsertion-amount", "The amount of entries to reinsert.");
+    public static OptionID REINSERT_AMOUNT_ID = new OptionID("rtree.reinsertion-amount", "The amount of entries to reinsert.");
 
     /**
      * Reinsertion share
      */
-    public static OptionID REINSERT_DISTANCE_ID = OptionID.getOrCreateOptionID("rtree.reinsertion-distancce", "The distance function to compute reinsertion candidates by.");
+    public static OptionID REINSERT_DISTANCE_ID = new OptionID("rtree.reinsertion-distancce", "The distance function to compute reinsertion candidates by.");
 
     /**
      * The actual reinsertion strategy

@@ -58,7 +58,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtstddevscale.min}
    * </p>
    */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.min", "Fixed minimum to use in sqrt scaling.");
+  public static final OptionID MIN_ID = new OptionID("sqrtstddevscale.min", "Fixed minimum to use in sqrt scaling.");
 
   /**
    * Parameter to specify a fixed mean to use.
@@ -66,7 +66,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtstddevscale.mean}
    * </p>
    */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.mean", "Fixed mean to use in standard deviation scaling.");
+  public static final OptionID MEAN_ID = new OptionID("sqrtstddevscale.mean", "Fixed mean to use in standard deviation scaling.");
 
   /**
    * Parameter to specify the lambda value
@@ -74,7 +74,7 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtstddevscale.lambda}
    * </p>
    */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("sqrtstddevscale.lambda", "Significance level to use for error function.");
+  public static final OptionID LAMBDA_ID = new OptionID("sqrtstddevscale.lambda", "Significance level to use for error function.");
 
   /**
    * Field storing the lambda value

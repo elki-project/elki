@@ -60,7 +60,7 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    * Key: {@code -treeindex.file}
    * </p>
    */
-  public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("treeindex.file", "The name of the file storing the index. " + "If this parameter is not set the index is hold in the main memory.");
+  public static final OptionID FILE_ID = new OptionID("treeindex.file", "The name of the file storing the index. " + "If this parameter is not set the index is hold in the main memory.");
 
   /**
    * Parameter to specify the size of a page in bytes, must be an integer
@@ -72,7 +72,7 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    * Key: {@code -treeindex.pagesize}
    * </p>
    */
-  public static final OptionID PAGE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.pagesize", "The size of a page in bytes.");
+  public static final OptionID PAGE_SIZE_ID = new OptionID("treeindex.pagesize", "The size of a page in bytes.");
 
   /**
    * Parameter to specify the size of the cache in bytes, must be an integer
@@ -84,7 +84,7 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    * Key: {@code -treeindex.cachesize}
    * </p>
    */
-  public static final OptionID CACHE_SIZE_ID = OptionID.getOrCreateOptionID("treeindex.cachesize", "The size of the cache in bytes.");
+  public static final OptionID CACHE_SIZE_ID = new OptionID("treeindex.cachesize", "The size of the cache in bytes.");
 
   /**
    * Holds the name of the file storing the index specified by {@link #FILE_ID},

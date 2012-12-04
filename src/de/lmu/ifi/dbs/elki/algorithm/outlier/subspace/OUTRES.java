@@ -408,7 +408,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
     /**
      * Option ID for Epsilon parameter
      */
-    public static final OptionID D_ID = OptionID.getOrCreateOptionID("outres.epsilon", "Range value for OUTRES in 2 dimensions.");
+    public static final OptionID D_ID = new OptionID("outres.epsilon", "Range value for OUTRES in 2 dimensions.");
 
     /**
      * Query radius

@@ -131,7 +131,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
      * Constraint: &ge;1
      * </p>
      */
-    public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("randomprojection.numberselected", "number of selected attributes");
+    public static final OptionID NUMBER_SELECTED_ATTRIBUTES_ID = new OptionID("randomprojection.numberselected", "number of selected attributes");
 
     /**
      * Optional parameter to specify a seed for random projection. If unused,
@@ -140,7 +140,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
      * Key: {@code -randomprojection.seed}
      * </p>
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("randomprojection.seed", "Seed for random selection of projection attributes.");
+    public static final OptionID SEED_ID = new OptionID("randomprojection.seed", "Seed for random selection of projection attributes.");
 
     /**
      * Number of attributes to select.

@@ -161,12 +161,12 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     /**
      * Clustering algorithm to use.
      */
-    public static final OptionID ALGORITHM_ID = OptionID.getOrCreateOptionID("outrank.algorithm", "Subspace clustering algorithm to use.");
+    public static final OptionID ALGORITHM_ID = new OptionID("outrank.algorithm", "Subspace clustering algorithm to use.");
 
     /**
      * Alpha parameter for S1
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("outrank.s1.alpha", "Alpha parameter for S1 score.");
+    public static final OptionID ALPHA_ID = new OptionID("outrank.s1.alpha", "Alpha parameter for S1 score.");
 
     /**
      * Clustering algorithm to run.

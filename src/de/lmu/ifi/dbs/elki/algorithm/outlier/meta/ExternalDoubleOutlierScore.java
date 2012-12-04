@@ -246,7 +246,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
      * Key: {@code -externaloutlier.file}
      * </p>
      */
-    public static final OptionID FILE_ID = OptionID.getOrCreateOptionID("externaloutlier.file", "The file name containing the (external) outlier scores.");
+    public static final OptionID FILE_ID = new OptionID("externaloutlier.file", "The file name containing the (external) outlier scores.");
 
     /**
      * Parameter that specifies the object ID pattern
@@ -255,7 +255,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
      * Default: ^ID=
      * </p>
      */
-    public static final OptionID ID_ID = OptionID.getOrCreateOptionID("externaloutlier.idpattern", "The pattern to match object ID prefix");
+    public static final OptionID ID_ID = new OptionID("externaloutlier.idpattern", "The pattern to match object ID prefix");
 
     /**
      * Parameter that specifies the object score pattern
@@ -263,7 +263,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
      * Key: {@code -externaloutlier.scorepattern}<br />
      * </p>
      */
-    public static final OptionID SCORE_ID = OptionID.getOrCreateOptionID("externaloutlier.scorepattern", "The pattern to match object score prefix");
+    public static final OptionID SCORE_ID = new OptionID("externaloutlier.scorepattern", "The pattern to match object score prefix");
 
     /**
      * Parameter to specify a scaling function to use.
@@ -271,12 +271,12 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
      * Key: {@code -externaloutlier.scaling}
      * </p>
      */
-    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("externaloutlier.scaling", "Class to use as scaling function.");
+    public static final OptionID SCALING_ID = new OptionID("externaloutlier.scaling", "Class to use as scaling function.");
 
     /**
      * Flag parameter for inverted scores.
      */
-    public static final OptionID INVERTED_ID = OptionID.getOrCreateOptionID("externaloutlier.inverted", "Flag to signal an inverted outlier score.");
+    public static final OptionID INVERTED_ID = new OptionID("externaloutlier.inverted", "Flag to signal an inverted outlier score.");
 
     /**
      * The file to be reparsed

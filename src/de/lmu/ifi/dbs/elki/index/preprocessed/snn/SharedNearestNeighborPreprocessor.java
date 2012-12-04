@@ -189,7 +189,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
      * Key: {@code sharedNearestNeighbors}
      * </p>
      */
-    public static final OptionID NUMBER_OF_NEIGHBORS_ID = OptionID.getOrCreateOptionID("sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)");
+    public static final OptionID NUMBER_OF_NEIGHBORS_ID = new OptionID("sharedNearestNeighbors", "number of nearest neighbors to consider (at least 1)");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the
@@ -202,7 +202,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
      * Key: {@code SNNDistanceFunction}
      * </p>
      */
-    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("SNNDistanceFunction", "the distance function to asses the nearest neighbors");
+    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("SNNDistanceFunction", "the distance function to asses the nearest neighbors");
 
     /**
      * Holds the number of nearest neighbors to be used.

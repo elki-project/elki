@@ -87,7 +87,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
   /**
    * Parameter progressive alpha.
    */
-  public static final OptionID EIGENPAIR_FILTER_PALPHA = OptionID.getOrCreateOptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
+  public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
 
   /**
    * The default value for alpha.

@@ -115,7 +115,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
      * Key: {@code -dbc.seed}
      * </p>
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("dbc.genseed", "Seed for randomly generating vectors");
+    public static final OptionID SEED_ID = new OptionID("dbc.genseed", "Seed for randomly generating vectors");
 
     /**
      * Database to specify the random vector dimensionality.
@@ -123,7 +123,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
      * Key: {@code -dbc.dim}
      * </p>
      */
-    public static final OptionID DIM_ID = OptionID.getOrCreateOptionID("dbc.dim", "Dimensionality of the vectors to generate.");
+    public static final OptionID DIM_ID = new OptionID("dbc.dim", "Dimensionality of the vectors to generate.");
 
     /**
      * Parameter to specify the database size to generate.
@@ -131,7 +131,7 @@ public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnec
      * Key: {@code -dbc.size}
      * </p>
      */
-    public static final OptionID SIZE_ID = OptionID.getOrCreateOptionID("dbc.size", "Database size to generate.");
+    public static final OptionID SIZE_ID = new OptionID("dbc.size", "Database size to generate.");
 
     /**
      * Dimensionality.

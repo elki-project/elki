@@ -131,7 +131,7 @@ public class OutlierThresholdClustering implements Evaluator {
      * Key: {@code -thresholdclust.scaling}
      * </p>
      */
-    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("thresholdclust.scaling", "Class to use as scaling function.");
+    public static final OptionID SCALING_ID = new OptionID("thresholdclust.scaling", "Class to use as scaling function.");
 
     /**
      * Parameter to specify the threshold
@@ -139,7 +139,7 @@ public class OutlierThresholdClustering implements Evaluator {
      * Key: {@code -thresholdclust.threshold}
      * </p>
      */
-    public static final OptionID THRESHOLD_ID = OptionID.getOrCreateOptionID("thresholdclust.threshold", "Threshold(s) to apply.");
+    public static final OptionID THRESHOLD_ID = new OptionID("thresholdclust.threshold", "Threshold(s) to apply.");
 
     /**
      * Scaling function to use

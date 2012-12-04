@@ -63,17 +63,17 @@ public class EvaluateClustering implements Evaluator {
    * Parameter to obtain the reference clustering. Defaults to a flat label
    * clustering.
    */
-  public static final OptionID REFERENCE_ID = OptionID.getOrCreateOptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
+  public static final OptionID REFERENCE_ID = new OptionID("paircounting.reference", "Reference clustering to compare with. Defaults to a by-label clustering.");
 
   /**
    * Parameter flag for special noise handling.
    */
-  public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
+  public static final OptionID NOISE_ID = new OptionID("paircounting.noisespecial", "Use special handling for noise clusters.");
 
   /**
    * Parameter flag to disable self-pairing
    */
-  public static final OptionID SELFPAIR_ID = OptionID.getOrCreateOptionID("paircounting.selfpair", "Enable self-pairing for cluster comparison.");
+  public static final OptionID SELFPAIR_ID = new OptionID("paircounting.selfpair", "Enable self-pairing for cluster comparison.");
 
   /**
    * Reference algorithm.

@@ -387,7 +387,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
      * Key: {@code -kml.scaling}
      * </p>
      */
-    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("kml.scaling", "Additional scaling function for KML colorization.");
+    public static final OptionID SCALING_ID = new OptionID("kml.scaling", "Additional scaling function for KML colorization.");
 
     /**
      * Parameter for compatibility mode.
@@ -396,7 +396,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
      * Key: {@code -kml.compat}
      * </p>
      */
-    public static final OptionID COMPAT_ID = OptionID.getOrCreateOptionID("kml.compat", "Use simpler KML objects, compatibility mode.");
+    public static final OptionID COMPAT_ID = new OptionID("kml.compat", "Use simpler KML objects, compatibility mode.");
 
     /**
      * Parameter for automatically opening the output file.
@@ -405,7 +405,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
      * Key: {@code -kml.autoopen}
      * </p>
      */
-    public static final OptionID AUTOOPEN_ID = OptionID.getOrCreateOptionID("kml.autoopen", "Automatically open the result file.");
+    public static final OptionID AUTOOPEN_ID = new OptionID("kml.autoopen", "Automatically open the result file.");
 
     /**
      * Output file name

@@ -653,22 +653,22 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
     /**
      * Parameter to specify the minimum neighborhood size
      */
-    public static final OptionID NMIN_ID = OptionID.getOrCreateOptionID("loci.nmin", "Minimum neighborhood size to be considered.");
+    public static final OptionID NMIN_ID = new OptionID("loci.nmin", "Minimum neighborhood size to be considered.");
 
     /**
      * Parameter to specify the averaging neighborhood scaling.
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("loci.alpha", "Scaling factor for averaging neighborhood");
+    public static final OptionID ALPHA_ID = new OptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
     /**
      * Parameter to specify the number of Grids to use.
      */
-    public static final OptionID GRIDS_ID = OptionID.getOrCreateOptionID("loci.g", "The number of Grids to use.");
+    public static final OptionID GRIDS_ID = new OptionID("loci.g", "The number of Grids to use.");
 
     /**
      * Parameter to specify the seed to initialize Random.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("loci.seed", "The seed to use for initializing Random.");
+    public static final OptionID SEED_ID = new OptionID("loci.seed", "The seed to use for initializing Random.");
 
     /**
      * Neighborhood minimum size

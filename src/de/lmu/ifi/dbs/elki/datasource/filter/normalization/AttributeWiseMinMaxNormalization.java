@@ -54,12 +54,12 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
   /**
    * Parameter for minimum.
    */
-  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
+  public static final OptionID MINIMA_ID = new OptionID("normalize.min", "a comma separated concatenation of the minimum values in each dimension that are mapped to 0. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
 
   /**
    * Parameter for maximum.
    */
-  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
+  public static final OptionID MAXIMA_ID = new OptionID("normalize.max", "a comma separated concatenation of the maximum values in each dimension that are mapped to 1. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
 
   /**
    * Stores the maximum in each dimension.

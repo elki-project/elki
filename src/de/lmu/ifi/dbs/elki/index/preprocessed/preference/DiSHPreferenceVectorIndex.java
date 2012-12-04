@@ -459,7 +459,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * Default value: {@link #DEFAULT_EPSILON}
      * </p>
      */
-    public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dish.epsilon", "A comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
+    public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", "A comma separated list of positive doubles specifying the " + "maximum radius of the neighborhood to be " + "considered in each dimension for determination of " + "the preference vector " + "(default is " + DEFAULT_EPSILON + " in each dimension). " + "If only one value is specified, this value " + "will be used for each dimension.");
 
     /**
      * Option name for {@link #MINPTS_ID}.
@@ -480,7 +480,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * Key: {@code -dish.minpts}
      * </p>
      */
-    public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID(MINPTS_P, "Positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
+    public static final OptionID MINPTS_ID = new OptionID(MINPTS_P, "Positive threshold for minumum numbers of points in the epsilon-" + "neighborhood of a point. " + CONDITION);
 
     /**
      * Default strategy.
@@ -499,7 +499,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
      * Default value: {@link #DEFAULT_STRATEGY}
      * </p>
      */
-    public static final OptionID STRATEGY_ID = OptionID.getOrCreateOptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
+    public static final OptionID STRATEGY_ID = new OptionID("dish.strategy", "The strategy for determination of the preference vector, " + "available strategies are: [" + Strategy.APRIORI + "| " + Strategy.MAX_INTERSECTION + "]" + "(default is " + DEFAULT_STRATEGY + ")");
 
     /**
      * The epsilon value for each dimension.

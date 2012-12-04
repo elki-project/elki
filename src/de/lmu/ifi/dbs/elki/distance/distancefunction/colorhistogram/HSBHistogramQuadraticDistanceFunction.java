@@ -55,7 +55,7 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
   /**
    * Parameter for the kernel dimensionality.
    */
-  public static final OptionID BPP_ID = OptionID.getOrCreateOptionID("hsbhist.bpp", "The dimensionality of the histogram in hue, saturation and brightness.");
+  public static final OptionID BPP_ID = new OptionID("hsbhist.bpp", "The dimensionality of the histogram in hue, saturation and brightness.");
 
   /**
    * Constructor.

@@ -80,7 +80,7 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
    * Key: {@code -hico.mu}
    * </p>
    */
-  public static final OptionID MU_ID = OptionID.getOrCreateOptionID("hico.mu", "Specifies the smoothing factor. The mu-nearest neighbor is used to compute the correlation reachability of an object.");
+  public static final OptionID MU_ID = new OptionID("hico.mu", "Specifies the smoothing factor. The mu-nearest neighbor is used to compute the correlation reachability of an object.");
 
   /**
    * Optional parameter to specify the number of nearest neighbors considered in
@@ -93,7 +93,7 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
    * Default value: {@link #MU_ID}
    * </p>
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("hico.k", "Optional parameter to specify the number of nearest neighbors considered in the PCA. If this parameter is not set, k is set to the value of parameter mu.");
+  public static final OptionID K_ID = new OptionID("hico.k", "Optional parameter to specify the number of nearest neighbors considered in the PCA. If this parameter is not set, k is set to the value of parameter mu.");
 
   /**
    * Parameter to specify the threshold of a distance between a vector q and a
@@ -106,7 +106,7 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
    * Key: {@code -hico.delta}
    * </p>
    */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("hico.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
+  public static final OptionID DELTA_ID = new OptionID("hico.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
 
   /**
    * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
@@ -118,7 +118,7 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
    * Key: {@code -hico.alpha}
    * </p>
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hico.alpha", "The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain a portion of at least alpha of the total variance.");
+  public static final OptionID ALPHA_ID = new OptionID("hico.alpha", "The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain a portion of at least alpha of the total variance.");
 
   /**
    * The default value for {@link #DELTA_ID}.

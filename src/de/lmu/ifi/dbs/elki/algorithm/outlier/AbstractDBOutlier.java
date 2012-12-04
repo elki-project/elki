@@ -56,7 +56,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
   /**
    * Parameter to specify the size of the D-neighborhood
    */
-  public static final OptionID D_ID = OptionID.getOrCreateOptionID("dbod.d", "size of the D-neighborhood");
+  public static final OptionID D_ID = new OptionID("dbod.d", "size of the D-neighborhood");
 
   /**
    * Holds the value of {@link #D_ID}.

@@ -64,7 +64,7 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
    * Key: {@code -pca.filter.alpha}
    * </p>
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
+  public static final OptionID ALPHA_ID = new OptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
 
   /**
    * The default value for alpha.

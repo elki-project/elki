@@ -302,7 +302,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
      * Key: {@code -voronoi.mode}
      * </p>
      */
-    public static final OptionID MODE_ID = OptionID.getOrCreateOptionID("voronoi.mode", "Mode for drawing the voronoi cells (and/or delaunay triangulation)");
+    public static final OptionID MODE_ID = new OptionID("voronoi.mode", "Mode for drawing the voronoi cells (and/or delaunay triangulation)");
 
     /**
      * Drawing mode.

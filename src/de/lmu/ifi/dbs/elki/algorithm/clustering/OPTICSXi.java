@@ -76,12 +76,12 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
   /**
    * Parameter to specify the actual OPTICS algorithm to use.
    */
-  public static final OptionID XIALG_ID = OptionID.getOrCreateOptionID("opticsxi.algorithm", "The actual OPTICS-type algorithm to use.");
+  public static final OptionID XIALG_ID = new OptionID("opticsxi.algorithm", "The actual OPTICS-type algorithm to use.");
 
   /**
    * Parameter to specify the steepness threshold.
    */
-  public static final OptionID XI_ID = OptionID.getOrCreateOptionID("opticsxi.xi", "Threshold for the steepness requirement.");
+  public static final OptionID XI_ID = new OptionID("opticsxi.xi", "Threshold for the steepness requirement.");
 
   /**
    * The actual algorithm we use.

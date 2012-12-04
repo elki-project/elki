@@ -129,7 +129,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #SEED_PARAM}.
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("chengandchurch.random", "Seed for the random that creates the missing values.");
+  public static final OptionID SEED_ID = new OptionID("chengandchurch.random", "Seed for the random that creates the missing values.");
 
   /**
    * Parameter to specify the seed for the random that creates the missing
@@ -146,7 +146,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #DELTA_PARAM}.
    */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("chengandchurch.delta", "Threshold value to determine the maximal acceptable score (mean squared residue) of a bicluster.");
+  public static final OptionID DELTA_ID = new OptionID("chengandchurch.delta", "Threshold value to determine the maximal acceptable score (mean squared residue) of a bicluster.");
 
   /**
    * Threshold value to determine the maximal acceptable score (mean squared
@@ -160,7 +160,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #ALPHA_PARAM}.
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("chengandchurch.alpha", "Parameter for multiple node deletion to accelerate the algorithm.");
+  public static final OptionID ALPHA_ID = new OptionID("chengandchurch.alpha", "Parameter for multiple node deletion to accelerate the algorithm.");
 
   /**
    * Parameter for multiple node deletion to accelerate the algorithm. (&gt;= 1)
@@ -173,7 +173,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #N_PARAM}.
    */
-  public static final OptionID N_ID = OptionID.getOrCreateOptionID("chengandchurch.n", "The number of biclusters to be found.");
+  public static final OptionID N_ID = new OptionID("chengandchurch.n", "The number of biclusters to be found.");
 
   /**
    * Number of biclusters to be found.
@@ -189,7 +189,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #BEGIN_PARAM}.
    */
-  public static final OptionID BEGIN_ID = OptionID.getOrCreateOptionID("chengandchurch.begin", "The lower limit for the masking and missing values. Must be smaller than the upper limit.");
+  public static final OptionID BEGIN_ID = new OptionID("chengandchurch.begin", "The lower limit for the masking and missing values. Must be smaller than the upper limit.");
 
   /**
    * Lower limit for the masking and missing values.
@@ -202,7 +202,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #END_PARAM}.
    */
-  public static final OptionID END_ID = OptionID.getOrCreateOptionID("chengandchurch.end", "The upper limit for the masking and missing values.");
+  public static final OptionID END_ID = new OptionID("chengandchurch.end", "The upper limit for the masking and missing values.");
 
   /**
    * Upper limit for the masking and missing values.
@@ -215,7 +215,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #MISSING_PARAM}.
    */
-  public static final OptionID MISSING_ID = OptionID.getOrCreateOptionID("chengandchurch.missing", "This value in database will be replaced with random values in the range from begin to end.");
+  public static final OptionID MISSING_ID = new OptionID("chengandchurch.missing", "This value in database will be replaced with random values in the range from begin to end.");
 
   /**
    * A parameter to indicate what value the missing values in the database
@@ -241,7 +241,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
   /**
    * OptionID for the parameter {@link #MULTIPLE_ADDITION_PARAM}.
    */
-  public static final OptionID MULTIPLE_ADDITION_ID = OptionID.getOrCreateOptionID("chengandchurch.multipleAddition", "Indicates how many times the algorithm to add Nodes should be performed.");
+  public static final OptionID MULTIPLE_ADDITION_ID = new OptionID("chengandchurch.multipleAddition", "Indicates how many times the algorithm to add Nodes should be performed.");
 
   /**
    * Parameter to indicate how many times an addition should be performed in

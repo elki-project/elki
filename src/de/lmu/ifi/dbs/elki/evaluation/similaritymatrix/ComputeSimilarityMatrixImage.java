@@ -80,12 +80,12 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   /**
    * OptionID for the scaling function to use
    */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("simmatrix.scaling", "Class to use as scaling function.");
+  public static final OptionID SCALING_ID = new OptionID("simmatrix.scaling", "Class to use as scaling function.");
 
   /**
    * OptionID to skip zero values when plotting to increase contrast.
    */
-  public static final OptionID SKIPZERO_ID = OptionID.getOrCreateOptionID("simmatrix.skipzero", "Skip zero values when computing the colors to increase contrast.");
+  public static final OptionID SKIPZERO_ID = new OptionID("simmatrix.skipzero", "Skip zero values when computing the colors to increase contrast.");
 
   /**
    * The distance function to use

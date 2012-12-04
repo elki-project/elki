@@ -55,7 +55,7 @@ public class ClassLabelFilter implements ObjectFilter {
    * Key: {@code -dbc.classLabelIndex}
    * </p>
    */
-  public static final OptionID CLASS_LABEL_INDEX_ID = OptionID.getOrCreateOptionID("dbc.classLabelIndex", "The index of the label to be used as class label.");
+  public static final OptionID CLASS_LABEL_INDEX_ID = new OptionID("dbc.classLabelIndex", "The index of the label to be used as class label.");
 
   /**
    * Parameter to specify the class of occurring class labels.
@@ -63,7 +63,7 @@ public class ClassLabelFilter implements ObjectFilter {
    * Key: {@code -dbc.classLabelClass}
    * </p>
    */
-  public static final OptionID CLASS_LABEL_CLASS_ID = OptionID.getOrCreateOptionID("dbc.classLabelClass", "Class label class to use.");
+  public static final OptionID CLASS_LABEL_CLASS_ID = new OptionID("dbc.classLabelClass", "Class label class to use.");
 
   /**
    * The index of the label to be used as class label, null if no class label is

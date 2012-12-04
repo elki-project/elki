@@ -44,7 +44,7 @@ public abstract class AbstractNeighborhoodOutlier<O> extends AbstractAlgorithm<O
   /**
    * Parameter to specify the neighborhood predicate to use.
    */
-  public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("neighborhood", "The neighborhood predicate to use in comparison step.");
+  public static final OptionID NEIGHBORHOOD_ID = new OptionID("neighborhood", "The neighborhood predicate to use in comparison step.");
 
   /**
    * Our predicate to obtain the neighbors

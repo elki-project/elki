@@ -65,13 +65,13 @@ public abstract class AbstractParser {
    * OptionID for the column separator parameter (defaults to whitespace as in
    * {@link #DEFAULT_SEPARATOR}.
    */
-  public static final OptionID COLUMN_SEPARATOR_ID = OptionID.getOrCreateOptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
+  public static final OptionID COLUMN_SEPARATOR_ID = new OptionID("parser.colsep", "Column separator pattern. The default assumes whitespace separated data.");
 
   /**
    * OptionID for the quote character parameter (defaults to a double quotation
    * mark as in {@link #QUOTE_CHAR}.
    */
-  public static final OptionID QUOTE_ID = OptionID.getOrCreateOptionID("parser.quote", "Quotation character. The default is to use a double quote.");
+  public static final OptionID QUOTE_ID = new OptionID("parser.quote", "Quotation character. The default is to use a double quote.");
 
   /**
    * Stores the column separator pattern

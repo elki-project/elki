@@ -85,7 +85,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * Key: {@code -parser.labelIndices}
    * </p>
    */
-  public static final OptionID LABEL_INDICES_ID = OptionID.getOrCreateOptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
+  public static final OptionID LABEL_INDICES_ID = new OptionID("parser.labelIndices", "A comma separated list of the indices of labels (may be numeric), counting whitespace separated entries in a line starting with 0. The corresponding entries will be treated as a label.");
 
   /**
    * Parameter to specify the type of vectors to produce.
@@ -94,7 +94,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
    * Default: DoubleVector
    * </p>
    */
-  public static final OptionID VECTOR_TYPE_ID = OptionID.getOrCreateOptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
+  public static final OptionID VECTOR_TYPE_ID = new OptionID("parser.vector-type", "The type of vectors to create for numerical attributes.");
 
   /**
    * Constant used for unknown dimensionality (e.g. empty files)

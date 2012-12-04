@@ -271,22 +271,22 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     /**
      * Option ID for kernel.
      */
-    public static final OptionID KERNEL_ID = OptionID.getOrCreateOptionID("ldf.kernel", "Kernel to use for LDF.");
+    public static final OptionID KERNEL_ID = new OptionID("ldf.kernel", "Kernel to use for LDF.");
 
     /**
      * Option ID for k
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("ldf.k", "Number of neighbors to use for LDF.");
+    public static final OptionID K_ID = new OptionID("ldf.k", "Number of neighbors to use for LDF.");
 
     /**
      * Option ID for h - kernel bandwidth scaling
      */
-    public static final OptionID H_ID = OptionID.getOrCreateOptionID("ldf.h", "Kernel bandwidth multiplier for LDF.");
+    public static final OptionID H_ID = new OptionID("ldf.h", "Kernel bandwidth multiplier for LDF.");
 
     /**
      * Option ID for c
      */
-    public static final OptionID C_ID = OptionID.getOrCreateOptionID("ldf.c", "Score scaling parameter for LDF.");
+    public static final OptionID C_ID = new OptionID("ldf.c", "Score scaling parameter for LDF.");
 
     /**
      * The neighborhood size to use.

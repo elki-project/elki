@@ -72,7 +72,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
    * Key: {@code -db.index}
    * </p>
    */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("db.index", "Database indexes to add.");
+  public static final OptionID INDEX_ID = new OptionID("db.index", "Database indexes to add.");
 
   /**
    * The event manager, collects events and fires them on demand.

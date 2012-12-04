@@ -34,22 +34,22 @@ public interface KMeans {
   /**
    * Parameter to specify the initialization method
    */
-  public static final OptionID INIT_ID = OptionID.getOrCreateOptionID("kmeans.initialization", "Method to choose the initial means.");
+  public static final OptionID INIT_ID = new OptionID("kmeans.initialization", "Method to choose the initial means.");
 
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("kmeans.k", "The number of clusters to find.");
+  public static final OptionID K_ID = new OptionID("kmeans.k", "The number of clusters to find.");
 
   /**
    * Parameter to specify the number of clusters to find, must be an integer
    * greater or equal to 0, where 0 means no limit.
    */
-  public static final OptionID MAXITER_ID = OptionID.getOrCreateOptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
+  public static final OptionID MAXITER_ID = new OptionID("kmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
 
   /**
    * Parameter to specify the random generator seed.
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("kmeans.seed", "The random number generator seed.");
+  public static final OptionID SEED_ID = new OptionID("kmeans.seed", "The random number generator seed.");
 }

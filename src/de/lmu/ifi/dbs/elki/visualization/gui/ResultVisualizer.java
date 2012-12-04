@@ -62,7 +62,7 @@ public class ResultVisualizer implements ResultHandler {
    * Default value: "ELKI Result Visualization"
    * </p>
    */
-  public static final OptionID WINDOW_TITLE_ID = OptionID.getOrCreateOptionID("vis.window.title", "Title to use for visualization window.");
+  public static final OptionID WINDOW_TITLE_ID = new OptionID("vis.window.title", "Title to use for visualization window.");
 
   /**
    * Flag to set single display
@@ -71,7 +71,7 @@ public class ResultVisualizer implements ResultHandler {
    * Key: -vis.single
    * </p>
    */
-  public static final OptionID SINGLE_ID = OptionID.getOrCreateOptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
+  public static final OptionID SINGLE_ID = new OptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
   
   /**
    * Stores the set title.

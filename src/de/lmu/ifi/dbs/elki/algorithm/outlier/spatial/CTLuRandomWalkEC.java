@@ -255,17 +255,17 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
     /**
      * Parameter to specify the number of neighbors.
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("randomwalkec.k", "Number of nearest neighbors to use.");
+    public static final OptionID K_ID = new OptionID("randomwalkec.k", "Number of nearest neighbors to use.");
 
     /**
      * Parameter to specify alpha.
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("randomwalkec.alpha", "Scaling exponent for value differences.");
+    public static final OptionID ALPHA_ID = new OptionID("randomwalkec.alpha", "Scaling exponent for value differences.");
 
     /**
      * Parameter to specify the c.
      */
-    public static final OptionID C_ID = OptionID.getOrCreateOptionID("randomwalkec.c", "The damping parameter c.");
+    public static final OptionID C_ID = new OptionID("randomwalkec.c", "The damping parameter c.");
 
     /**
      * Parameter alpha: scaling.

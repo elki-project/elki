@@ -63,7 +63,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * Key: {@code -ericdf.delta}
    * </p>
    */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
+  public static final OptionID DELTA_ID = new OptionID("ericdf.delta", "Threshold for approximate linear dependency: " + "the strong eigenvectors of q are approximately linear dependent " + "from the strong eigenvectors p if the following condition " + "holds for all stroneg eigenvectors q_i of q (lambda_q < lambda_p): " + "q_i' * M^check_p * q_i <= delta^2.");
 
   /**
    * Parameter to specify the threshold for the maximum distance between two
@@ -77,7 +77,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
    * Key: {@code -ericdf.tau}
    * </p>
    */
-  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
+  public static final OptionID TAU_ID = new OptionID("ericdf.tau", "Threshold for the maximum distance between two approximately linear " + "dependent subspaces of two objects p and q " + "(lambda_q < lambda_p) before considering them as parallel.");
 
   /**
    * Holds the value of {@link #DELTA_ID}.

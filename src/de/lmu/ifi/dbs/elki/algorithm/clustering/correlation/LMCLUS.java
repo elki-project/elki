@@ -511,27 +511,27 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     /**
      * Parameter with the maximum dimension to search for
      */
-    public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("lmclus.maxdim", "Maximum linear manifold dimension to search.");
+    public static final OptionID MAXDIM_ID = new OptionID("lmclus.maxdim", "Maximum linear manifold dimension to search.");
 
     /**
      * Parameter for the minimum cluster size
      */
-    public static final OptionID MINSIZE_ID = OptionID.getOrCreateOptionID("lmclus.minsize", "Minimum cluster size to allow.");
+    public static final OptionID MINSIZE_ID = new OptionID("lmclus.minsize", "Minimum cluster size to allow.");
 
     /**
      * Sampling intensity level
      */
-    public static final OptionID SAMPLINGL_ID = OptionID.getOrCreateOptionID("lmclus.sampling-level", "A number used to determine how many samples are taken in each search.");
+    public static final OptionID SAMPLINGL_ID = new OptionID("lmclus.sampling-level", "A number used to determine how many samples are taken in each search.");
 
     /**
      * Global significance threshold
      */
-    public static final OptionID THRESHOLD_ID = OptionID.getOrCreateOptionID("lmclus.threshold", "Threshold to determine if a cluster was found.");
+    public static final OptionID THRESHOLD_ID = new OptionID("lmclus.threshold", "Threshold to determine if a cluster was found.");
 
     /**
      * Random seeding
      */
-    public static final OptionID RANDOM_ID = OptionID.getOrCreateOptionID("lmclus.seed", "Random generator seed.");
+    public static final OptionID RANDOM_ID = new OptionID("lmclus.seed", "Random generator seed.");
 
     /**
      * Maximum dimensionality to search for

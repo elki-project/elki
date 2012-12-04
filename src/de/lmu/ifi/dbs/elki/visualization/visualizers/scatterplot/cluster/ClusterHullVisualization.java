@@ -244,7 +244,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      * Key: {@code -hull.alpha}
      * </p>
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
+    public static final OptionID ALPHA_ID = new OptionID("hull.alpha", "Alpha value for hull drawing (in projected space!).");
 
     /**
      * Alpha value

@@ -43,7 +43,7 @@ public class ERPDistanceFunction extends AbstractEditDistanceFunction {
   /**
    * G parameter
    */
-  public static final OptionID G_ID = OptionID.getOrCreateOptionID("erp.g", "the g parameter ERP (positive number)");
+  public static final OptionID G_ID = new OptionID("erp.g", "the g parameter ERP (positive number)");
 
   /**
    * Keeps the currently set g.

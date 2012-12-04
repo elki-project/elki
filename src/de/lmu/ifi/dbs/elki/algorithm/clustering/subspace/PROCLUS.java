@@ -112,7 +112,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * Key: {@code -proclus.mi}
    * </p>
    */
-  public static final OptionID M_I_ID = OptionID.getOrCreateOptionID("proclus.mi", "The multiplier for the initial number of medoids.");
+  public static final OptionID M_I_ID = new OptionID("proclus.mi", "The multiplier for the initial number of medoids.");
 
   /**
    * Holds the value of {@link #M_I_ID}.
@@ -831,7 +831,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     /**
      * Parameter to specify the random generator seed.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("proclus.seed", "The random number generator seed.");
+    public static final OptionID SEED_ID = new OptionID("proclus.seed", "The random number generator seed.");
 
     protected int m_i = -1;
 

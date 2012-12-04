@@ -628,12 +628,12 @@ public class ArffParser implements Parser {
     /**
      * Pattern for recognizing external ID attributes.
      */
-    public static final OptionID MAGIC_EID_ID = OptionID.getOrCreateOptionID("arff.externalid", "Pattern to recognize external ID attributes.");
+    public static final OptionID MAGIC_EID_ID = new OptionID("arff.externalid", "Pattern to recognize external ID attributes.");
 
     /**
      * Pattern for recognizing class label attributes.
      */
-    public static final OptionID MAGIC_CLASS_ID = OptionID.getOrCreateOptionID("arff.classlabel", "Pattern to recognize class label attributes.");
+    public static final OptionID MAGIC_CLASS_ID = new OptionID("arff.classlabel", "Pattern to recognize class label attributes.");
 
     /**
      * Pattern to recognize external ids

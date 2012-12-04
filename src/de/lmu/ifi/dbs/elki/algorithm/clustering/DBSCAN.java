@@ -85,7 +85,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("dbscan.epsilon", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID EPSILON_ID = new OptionID("dbscan.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Holds the value of {@link #EPSILON_ID}.
@@ -96,7 +96,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Parameter to specify the threshold for minimum number of points in the
    * epsilon-neighborhood of a point, must be an integer greater than 0.
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("dbscan.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+  public static final OptionID MINPTS_ID = new OptionID("dbscan.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
    * Holds the value of {@link #MINPTS_ID}.

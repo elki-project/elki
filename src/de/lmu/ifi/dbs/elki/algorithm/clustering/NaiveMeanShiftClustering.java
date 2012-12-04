@@ -241,12 +241,12 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
     /**
      * Parameter for kernel function.
      */
-    public static final OptionID KERNEL_ID = OptionID.getOrCreateOptionID("meanshift.kernel", "Kernel function to use with mean-shift clustering.");
+    public static final OptionID KERNEL_ID = new OptionID("meanshift.kernel", "Kernel function to use with mean-shift clustering.");
 
     /**
      * Parameter for kernel radius/range/bandwidth.
      */
-    public static final OptionID RANGE_ID = OptionID.getOrCreateOptionID("meanshift.kernel-bandwidth", "Range of the kernel to use (aka: radius, bandwidth).");
+    public static final OptionID RANGE_ID = new OptionID("meanshift.kernel-bandwidth", "Range of the kernel to use (aka: radius, bandwidth).");
 
     /**
      * Kernel function.

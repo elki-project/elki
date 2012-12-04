@@ -67,7 +67,7 @@ public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
    * Key: {@code -pca.covariance}
    * </p>
    */
-  public static final OptionID PCA_COVARIANCE_MATRIX = OptionID.getOrCreateOptionID("pca.covariance", "Class used to compute the covariance matrix.");
+  public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance", "Class used to compute the covariance matrix.");
 
   /**
    * The covariance computation class.

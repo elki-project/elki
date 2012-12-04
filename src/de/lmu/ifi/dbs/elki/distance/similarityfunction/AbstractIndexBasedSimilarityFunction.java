@@ -53,7 +53,7 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index, R
    * Key: {@code -similarityfunction.preprocessor}
    * </p>
    */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("similarityfunction.preprocessor", "Preprocessor to use.");
+  public static final OptionID INDEX_ID = new OptionID("similarityfunction.preprocessor", "Preprocessor to use.");
 
   /**
    * Parameter to specify the preprocessor to be used.

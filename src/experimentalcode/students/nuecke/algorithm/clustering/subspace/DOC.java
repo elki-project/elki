@@ -71,15 +71,15 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
   // Configuration
   // ---------------------------------------------------------------------- //
 
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("doc.alpha", "Minimum relative density for a set of points to be considered a cluster (|C|>=doc.alpha*|S|).");
+  public static final OptionID ALPHA_ID = new OptionID("doc.alpha", "Minimum relative density for a set of points to be considered a cluster (|C|>=doc.alpha*|S|).");
 
-  public static final OptionID BETA_ID = OptionID.getOrCreateOptionID("doc.beta", "Preference of cluster size versus number of relevant dimensions (higher value means higher priority on larger clusters).");
+  public static final OptionID BETA_ID = new OptionID("doc.beta", "Preference of cluster size versus number of relevant dimensions (higher value means higher priority on larger clusters).");
 
-  public static final OptionID W_ID = OptionID.getOrCreateOptionID("doc.w", "Maximum extent of scattering of points along a single attribute for the attribute to be considered relevant.");
+  public static final OptionID W_ID = new OptionID("doc.w", "Maximum extent of scattering of points along a single attribute for the attribute to be considered relevant.");
 
-  public static final OptionID HEURISTICS_ID = OptionID.getOrCreateOptionID("doc.fastdoc", "Use heuristics as described, thus using the FastDOC algorithm (not yet implemented).");
+  public static final OptionID HEURISTICS_ID = new OptionID("doc.fastdoc", "Use heuristics as described, thus using the FastDOC algorithm (not yet implemented).");
 
-  public static final OptionID D_ZERO_ID = OptionID.getOrCreateOptionID("doc.d0", "Parameter for FastDOC, setting the number of relevant attributes which, when found for a cluster, are deemed enough to stop iterating.");
+  public static final OptionID D_ZERO_ID = new OptionID("doc.d0", "Parameter for FastDOC, setting the number of relevant attributes which, when found for a cluster, are deemed enough to stop iterating.");
 
   /**
    * Holds the value of {@link #ALPHA_ID}.

@@ -61,12 +61,12 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   /**
    * "absolute" Flag
    */
-  public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = OptionID.getOrCreateOptionID("pca.filter.absolute", "Flag to mark delta as an absolute value.");
+  public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = new OptionID("pca.filter.absolute", "Flag to mark delta as an absolute value.");
 
   /**
    * Parameter delta
    */
-  public static final OptionID EIGENPAIR_FILTER_DELTA = OptionID.getOrCreateOptionID("pca.filter.delta", "The threshold for strong Eigenvalues. If not otherwise specified, delta " + "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " + "a double between 0 and 1. To mark delta as an absolute value, use " + "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + ".");
+  public static final OptionID EIGENPAIR_FILTER_DELTA = new OptionID("pca.filter.delta", "The threshold for strong Eigenvalues. If not otherwise specified, delta " + "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " + "a double between 0 and 1. To mark delta as an absolute value, use " + "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + ".");
 
   /**
    * The default value for delta.

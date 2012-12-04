@@ -69,7 +69,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * Parameter to specify the distance of the k-distant object to be assessed,
    * must be an integer greater than 0.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("knndistanceorder.k", "Specifies the distance of the k-distant object to be assessed.");
+  public static final OptionID K_ID = new OptionID("knndistanceorder.k", "Specifies the distance of the k-distant object to be assessed.");
 
   /**
    * Holds the value of {@link #K_ID}.
@@ -81,7 +81,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
    * be provided in the result, must be a double greater than 0 and less than or
    * equal to 1.
    */
-  public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID("knndistanceorder.percentage", "The average percentage of distances randomly choosen to be provided in the result.");
+  public static final OptionID PERCENTAGE_ID = new OptionID("knndistanceorder.percentage", "The average percentage of distances randomly choosen to be provided in the result.");
 
   /**
    * Holds the value of {@link #PERCENTAGE_ID}.

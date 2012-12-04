@@ -190,7 +190,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
        * Key: {@code -randomknn.share}
        * </p>
        */
-      public static final OptionID SHARE_ID = OptionID.getOrCreateOptionID("randomknn.share", "The relative amount of objects to consider for kNN computations.");
+      public static final OptionID SHARE_ID = new OptionID("randomknn.share", "The relative amount of objects to consider for kNN computations.");
 
       /**
        * Random number generator seed.
@@ -199,7 +199,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
        * Key: {@code -randomknn.seed}
        * </p>
        */
-      public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("randomknn.seed", "The random number seed.");
+      public static final OptionID SEED_ID = new OptionID("randomknn.seed", "The random number seed.");
 
       /**
        * Relative share of objects to get

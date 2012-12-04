@@ -45,7 +45,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
    * Key: {@code -topk.k}
    * </p>
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("topk.k", "Number of outliers to keep.");
+  public static final OptionID K_ID = new OptionID("topk.k", "Number of outliers to keep.");
 
   /**
    * Parameter to specify the lambda value
@@ -53,7 +53,7 @@ public class TopKOutlierScaling implements OutlierScalingFunction {
    * Key: {@code -topk.binary}
    * </p>
    */
-  public static final OptionID BINARY_ID = OptionID.getOrCreateOptionID("topk.binary", "Make the top k a binary scaling.");
+  public static final OptionID BINARY_ID = new OptionID("topk.binary", "Make the top k a binary scaling.");
 
   /**
    * Number of outliers to keep.
