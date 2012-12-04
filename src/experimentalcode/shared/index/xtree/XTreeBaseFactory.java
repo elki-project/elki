@@ -83,18 +83,18 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
    * minimum overlap split; defaults to <code>.3</code> times the number of
    * maximum entries.
    */
-  public static final OptionID MIN_FANOUT_ID = OptionID.getOrCreateOptionID("xtree.min_fanout_fraction", "The fraction (in [0,1]) of maximally allowed directory page entries which is to be tolerated as minimum number of directory page entries for minimum overlap splits");
+  public static final OptionID MIN_FANOUT_ID = new OptionID("xtree.min_fanout_fraction", "The fraction (in [0,1]) of maximally allowed directory page entries which is to be tolerated as minimum number of directory page entries for minimum overlap splits");
 
   /**
    * Parameter for the number of re-insertions to be performed instead of doing
    * a split; defaults to <code>.3</code> times the number of maximum entries.
    */
-  public static final OptionID REINSERT_ID = OptionID.getOrCreateOptionID("xtree.reinsert_fraction", "The fraction (in [0,1]) of entries to be reinserted instead of performing a split");
+  public static final OptionID REINSERT_ID = new OptionID("xtree.reinsert_fraction", "The fraction (in [0,1]) of entries to be reinserted instead of performing a split");
 
   /**
    * Parameter for the maximally allowed overlap. Defaults to <code>.2</code>.
    */
-  public static final OptionID MAX_OVERLAP_ID = OptionID.getOrCreateOptionID("xtree.max_overlap_fraction", "The fraction (in [0,1]) of allowed entry overlaps. Overlap type specified in xtree.overlap_type");
+  public static final OptionID MAX_OVERLAP_ID = new OptionID("xtree.max_overlap_fraction", "The fraction (in [0,1]) of allowed entry overlaps. Overlap type specified in xtree.overlap_type");
 
   /**
    * Parameter for defining the overlap type to be used for the maximum overlap
@@ -113,7 +113,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
    * </dl>
    * Defaults to <code>VolumeOverlap</code>.
    */
-  public static final OptionID OVERLAP_TYPE_ID = OptionID.getOrCreateOptionID("xtree.overlap_type", "How to calculate the maximum overlap? Options: \"DataOverlap\" = {ratio of data objects in the overlapping region}, \"VolumeOverlap\" = {(overlap volume) / (volume 1 + volume 2)}");
+  public static final OptionID OVERLAP_TYPE_ID = new OptionID("xtree.overlap_type", "How to calculate the maximum overlap? Options: \"DataOverlap\" = {ratio of data objects in the overlapping region}, \"VolumeOverlap\" = {(overlap volume) / (volume 1 + volume 2)}");
 
   /**
    * Parameterizable API.
