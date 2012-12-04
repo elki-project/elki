@@ -35,9 +35,9 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
    */
   private static final Logging logger = Logging.getLogger(PINN.class);
 
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("k", "k for kNN search");
+  public static final OptionID K_ID = new OptionID("k", "k for kNN search");
 
-  public static final OptionID K_FACTOR_ID = OptionID.getOrCreateOptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
+  public static final OptionID K_FACTOR_ID = new OptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
 
   private final Database database;
 

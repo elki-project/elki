@@ -27,11 +27,11 @@ public class RandomProjection<V extends NumberVector<?>> {
    */
   private static final Logging LOG = Logging.getLogger(RandomProjection.class);
 
-  public static final OptionID SPARSITY_ID = OptionID.getOrCreateOptionID("sparsity", "frequency of zeros in the projection matrix");
+  public static final OptionID SPARSITY_ID = new OptionID("sparsity", "frequency of zeros in the projection matrix");
 
   private final IntParameter SPARSITY_PARAM = new IntParameter(SPARSITY_ID, 3);
 
-  public static final OptionID NEW_DIMENSIONALITY_ID = OptionID.getOrCreateOptionID("newdimensionality", "amount of dimensions to project down to");
+  public static final OptionID NEW_DIMENSIONALITY_ID = new OptionID("newdimensionality", "amount of dimensions to project down to");
 
   private final IntParameter NEW_DIMENSIONALITY_PARAM = new IntParameter(NEW_DIMENSIONALITY_ID);
 

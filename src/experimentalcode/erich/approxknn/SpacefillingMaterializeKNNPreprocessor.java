@@ -370,17 +370,17 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       /**
        * Parameter for choosing the space filling curves to use.
        */
-      public static final OptionID CURVES_ID = OptionID.getOrCreateOptionID("sfcknn.curves", "Space filling curve generators to use for kNN approximation.");
+      public static final OptionID CURVES_ID = new OptionID("sfcknn.curves", "Space filling curve generators to use for kNN approximation.");
 
       /**
        * Parameter for setting the widows size multiplicator.
        */
-      public static final OptionID WINDOW_ID = OptionID.getOrCreateOptionID("sfcknn.windowmult", "Window size multiplicator.");
+      public static final OptionID WINDOW_ID = new OptionID("sfcknn.windowmult", "Window size multiplicator.");
 
       /**
        * Parameter for choosing the number of variants to use.
        */
-      public static final OptionID VARIANTS_ID = OptionID.getOrCreateOptionID("sfcknn.variants", "Number of curve variants to generate.");
+      public static final OptionID VARIANTS_ID = new OptionID("sfcknn.variants", "Number of curve variants to generate.");
 
       /**
        * Spatial curve generators
