@@ -180,17 +180,17 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     /**
      * Parameter k to compute the average precision at.
      */
-    private static final OptionID K_ID = OptionID.getOrCreateOptionID("avep.k", "K to compute the average precision at.");
+    private static final OptionID K_ID = new OptionID("avep.k", "K to compute the average precision at.");
 
     /**
      * Parameter to enable sampling.
      */
-    public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("avep.sampling", "Relative amount of object to sample.");
+    public static final OptionID SAMPLING_ID = new OptionID("avep.sampling", "Relative amount of object to sample.");
 
     /**
      * Parameter to control the sampling random seed.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("avep.sampling-seed", "Random seed for deterministic sampling.");
+    public static final OptionID SEED_ID = new OptionID("avep.sampling-seed", "Random seed for deterministic sampling.");
 
     /**
      * Neighborhood size.

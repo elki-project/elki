@@ -41,7 +41,7 @@ public interface IndexBasedDistanceFunction<O, D extends Distance<D>> extends Di
   /**
    * OptionID for the index parameter
    */
-  public static final OptionID INDEX_ID = OptionID.getOrCreateOptionID("distancefunction.index", "Distance index to use.");
+  public static final OptionID INDEX_ID = new OptionID("distancefunction.index", "Distance index to use.");
 
   /**
    * Instance interface for Index based distance functions.

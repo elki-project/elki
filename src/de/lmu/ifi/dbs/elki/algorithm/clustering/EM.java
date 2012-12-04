@@ -103,7 +103,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * Parameter to specify the number of clusters to find, must be an integer
    * greater than 0.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("em.k", "The number of clusters to find.");
+  public static final OptionID K_ID = new OptionID("em.k", "The number of clusters to find.");
 
   /**
    * Holds the value of {@link #K_ID}.
@@ -114,12 +114,12 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
    * Parameter to specify the termination criterion for maximization of E(M):
    * E(M) - E(M') < em.delta, must be a double equal to or greater than 0.
    */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("em.delta", "The termination criterion for maximization of E(M): " + "E(M) - E(M') < em.delta");
+  public static final OptionID DELTA_ID = new OptionID("em.delta", "The termination criterion for maximization of E(M): " + "E(M) - E(M') < em.delta");
 
   /**
    * Parameter to specify the initialization method
    */
-  public static final OptionID INIT_ID = OptionID.getOrCreateOptionID("kmeans.initialization", "Method to choose the initial means.");
+  public static final OptionID INIT_ID = new OptionID("kmeans.initialization", "Method to choose the initial means.");
 
   private static final double MIN_LOGLIKELIHOOD = -100000;
 

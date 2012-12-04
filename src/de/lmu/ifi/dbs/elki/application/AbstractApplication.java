@@ -217,7 +217,7 @@ public abstract class AbstractApplication implements Parameterizable {
      * Key: {@code -app.out}
      * </p>
      */
-    public static final OptionID OUTPUT_ID = OptionID.getOrCreateOptionID("app.out", "");
+    public static final OptionID OUTPUT_ID = new OptionID("app.out", "");
 
     /**
      * Parameter that specifies the name of the input file.
@@ -225,7 +225,7 @@ public abstract class AbstractApplication implements Parameterizable {
      * Key: {@code -app.in}
      * </p>
      */
-    public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("app.in", "");
+    public static final OptionID INPUT_ID = new OptionID("app.in", "");
 
     @Override
     protected void makeOptions(Parameterization config) {

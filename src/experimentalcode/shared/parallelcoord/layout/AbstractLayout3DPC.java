@@ -283,7 +283,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
     /**
      * Option for similarity measure.
      */
-    public static final OptionID SIM_ID = OptionID.getOrCreateOptionID("parallel3d.sim", "Similarity measure for spanning tree.");
+    public static final OptionID SIM_ID = new OptionID("parallel3d.sim", "Similarity measure for spanning tree.");
 
     /**
      * Similarity measure

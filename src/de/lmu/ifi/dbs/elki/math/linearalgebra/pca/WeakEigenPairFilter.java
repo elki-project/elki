@@ -52,7 +52,7 @@ public class WeakEigenPairFilter implements EigenPairFilter {
    * and
    * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter}
    */
-  public static final OptionID EIGENPAIR_FILTER_WALPHA = OptionID.getOrCreateOptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
+  public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
 
   /**
    * The default value for walpha.

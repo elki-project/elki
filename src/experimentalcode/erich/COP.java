@@ -88,9 +88,9 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * Key: {@code -cop.k}
    * </p>
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
+  public static final OptionID K_ID = new OptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
 
-  public static final OptionID PCARUNNER_ID = OptionID.getOrCreateOptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
+  public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
 
   /**
    * Number of neighbors to be considered.

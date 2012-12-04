@@ -765,7 +765,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
      * -vafile.partitions 8
      * </pre>
      */
-    public static final OptionID PARTITIONS_ID = OptionID.getOrCreateOptionID("vafile.partitions", "Number of partitions to use in each dimension.");
+    public static final OptionID PARTITIONS_ID = new OptionID("vafile.partitions", "Number of partitions to use in each dimension.");
 
     /**
      * Page size.

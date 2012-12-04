@@ -100,7 +100,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Key: {@code -subclu.distancefunction}
    * </p>
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("subclu.distancefunction", "Distance function to determine the distance between database objects.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("subclu.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -110,7 +110,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Key: {@code -subclu.epsilon}
    * </p>
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("subclu.epsilon", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID EPSILON_ID = new OptionID("subclu.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
@@ -119,7 +119,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Key: {@code -subclu.minpts}
    * </p>
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+  public static final OptionID MINPTS_ID = new OptionID("subclu.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
    * Holds the instance of the distance function specified by

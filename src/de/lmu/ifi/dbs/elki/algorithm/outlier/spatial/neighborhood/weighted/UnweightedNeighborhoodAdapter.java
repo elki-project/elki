@@ -120,7 +120,7 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
       /**
        * The parameter to give the non-weighted neighborhood to use.
        */
-      public static final OptionID INNER_ID = OptionID.getOrCreateOptionID("neighborhood.inner", "Parameter for the non-weighted neighborhood to use.");
+      public static final OptionID INNER_ID = new OptionID("neighborhood.inner", "Parameter for the non-weighted neighborhood to use.");
 
       /**
        * The actual predicate.

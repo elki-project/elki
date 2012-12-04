@@ -106,18 +106,18 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * considered for learning the subspace properties., must be an integer
    * greater than 0.
    */
-  public static final OptionID KNN_ID = OptionID.getOrCreateOptionID("sod.knn", "The number of most snn-similar objects to use as reference set for learning the subspace properties.");
+  public static final OptionID KNN_ID = new OptionID("sod.knn", "The number of most snn-similar objects to use as reference set for learning the subspace properties.");
 
   /**
    * Parameter to indicate the multiplier for the discriminance value for
    * discerning small from large variances.
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
+  public static final OptionID ALPHA_ID = new OptionID("sod.alpha", "The multiplier for the discriminance value for discerning small from large variances.");
 
   /**
    * Parameter for the similarity function.
    */
-  public static final OptionID SIM_ID = OptionID.getOrCreateOptionID("sod.similarity", "The similarity function used for the neighborhood set.");
+  public static final OptionID SIM_ID = new OptionID("sod.similarity", "The similarity function used for the neighborhood set.");
 
   /**
    * Holds the value of {@link #KNN_ID}.

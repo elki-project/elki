@@ -79,7 +79,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * a double greater than or equal to 0 and less than or equal to 1.
    * Alternatively to parameter {@link #MINSUPP_ID}).
    */
-  public static final OptionID MINFREQ_ID = OptionID.getOrCreateOptionID("apriori.minfreq", "Threshold for minimum frequency as percentage value " + "(alternatively to parameter apriori.minsupp).");
+  public static final OptionID MINFREQ_ID = new OptionID("apriori.minfreq", "Threshold for minimum frequency as percentage value " + "(alternatively to parameter apriori.minsupp).");
 
   /**
    * Parameter to specify the threshold for minimum support as minimally
@@ -88,7 +88,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * {@link #MINSUPP_ID} is slightly preferable over setting {@link #MINFREQ_ID}
    * in terms of efficiency.
    */
-  public static final OptionID MINSUPP_ID = OptionID.getOrCreateOptionID("apriori.minsupp", "Threshold for minimum support as minimally required number of transactions " + "(alternatively to parameter apriori.minfreq" + " - setting apriori.minsupp is slightly preferable over setting " + "apriori.minfreq in terms of efficiency).");
+  public static final OptionID MINSUPP_ID = new OptionID("apriori.minsupp", "Threshold for minimum support as minimally required number of transactions " + "(alternatively to parameter apriori.minfreq" + " - setting apriori.minsupp is slightly preferable over setting " + "apriori.minfreq in terms of efficiency).");
 
   /**
    * Holds the value of {@link #MINFREQ_ID}.

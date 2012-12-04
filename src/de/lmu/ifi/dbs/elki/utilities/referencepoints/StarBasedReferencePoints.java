@@ -52,7 +52,7 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
    * Key: {@code -star.nocenter}
    * </p>
    */
-  public static final OptionID NOCENTER_ID = OptionID.getOrCreateOptionID("star.nocenter", "Do not use the center as extra reference point.");
+  public static final OptionID NOCENTER_ID = new OptionID("star.nocenter", "Do not use the center as extra reference point.");
 
   /**
    * Parameter to specify the extra scaling of the space, to allow
@@ -61,7 +61,7 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
    * Key: {@code -star.scale}
    * </p>
    */
-  public static final OptionID SCALE_ID = OptionID.getOrCreateOptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
+  public static final OptionID SCALE_ID = new OptionID("star.scale", "Scale the reference points by the given factor. This can be used to obtain reference points outside the used data space.");
 
   /**
    * Holds the value of {@link #NOCENTER_ID}.

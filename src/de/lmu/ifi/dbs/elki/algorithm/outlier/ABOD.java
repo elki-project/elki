@@ -99,22 +99,22 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   /**
    * Parameter for k, the number of neighbors used in kNN queries.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("abod.k", "Parameter k for kNN queries.");
+  public static final OptionID K_ID = new OptionID("abod.k", "Parameter k for kNN queries.");
 
   /**
    * Parameter for sample size to be used in fast mode.
    */
-  public static final OptionID FAST_SAMPLE_ID = OptionID.getOrCreateOptionID("abod.samplesize", "Sample size to enable fast mode.");
+  public static final OptionID FAST_SAMPLE_ID = new OptionID("abod.samplesize", "Sample size to enable fast mode.");
 
   /**
    * Parameter for the kernel function.
    */
-  public static final OptionID KERNEL_FUNCTION_ID = OptionID.getOrCreateOptionID("abod.kernelfunction", "Kernel function to use.");
+  public static final OptionID KERNEL_FUNCTION_ID = new OptionID("abod.kernelfunction", "Kernel function to use.");
 
   /**
    * The preprocessor used to materialize the kNN neighborhoods.
    */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("abod.knnquery", "Processor to compute the kNN neighborhoods.");
+  public static final OptionID PREPROCESSOR_ID = new OptionID("abod.knnquery", "Processor to compute the kNN neighborhoods.");
 
   /**
    * use alternate code below.

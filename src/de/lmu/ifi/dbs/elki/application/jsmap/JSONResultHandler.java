@@ -81,7 +81,7 @@ public class JSONResultHandler implements ResultHandler {
     /**
      * Port to use for listening
      */
-    public static final OptionID PORT_ID = OptionID.getOrCreateOptionID("json.port", "Port for the JSON web server to listen on.");
+    public static final OptionID PORT_ID = new OptionID("json.port", "Port for the JSON web server to listen on.");
 
     /**
      * Our port

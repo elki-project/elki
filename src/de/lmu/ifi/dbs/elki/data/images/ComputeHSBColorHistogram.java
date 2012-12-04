@@ -48,7 +48,7 @@ public class ComputeHSBColorHistogram extends AbstractComputeColorHistogram {
    * Key: {@code -rgbhist.bpp}
    * </p>
    */
-  public static final OptionID BINSPERPLANE_ID = OptionID.getOrCreateOptionID("hsbhist.bpp", "Bins per plane for HSV/HSB histogram. This will result in bpp ** 3 bins.");
+  public static final OptionID BINSPERPLANE_ID = new OptionID("hsbhist.bpp", "Bins per plane for HSV/HSB histogram. This will result in bpp ** 3 bins.");
 
   /**
    * Number of bins in hue to use.

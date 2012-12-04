@@ -85,13 +85,13 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("optics.epsilon", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID EPSILON_ID = new OptionID("optics.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
    * epsilon-neighborhood of a point, must be an integer greater than 0.
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+  public static final OptionID MINPTS_ID = new OptionID("optics.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
 
   /**
    * Hold the value of {@link #EPSILON_ID}.

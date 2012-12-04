@@ -57,7 +57,7 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
   /**
    * Parameter relative alpha.
    */
-  public static final OptionID EIGENPAIR_FILTER_RALPHA = OptionID.getOrCreateOptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
+  public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
 
   /**
    * The default value for ralpha.

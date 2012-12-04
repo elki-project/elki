@@ -248,7 +248,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
     /**
      * Option ID for kernel density LOF kernel.
      */
-    public static final OptionID KERNEL_ID = OptionID.getOrCreateOptionID("kernellof.kernel", "Kernel to use for kernel density LOF.");
+    public static final OptionID KERNEL_ID = new OptionID("kernellof.kernel", "Kernel to use for kernel density LOF.");
 
     /**
      * The neighborhood size to use.

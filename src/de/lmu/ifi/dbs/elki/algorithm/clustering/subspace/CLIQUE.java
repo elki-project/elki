@@ -109,7 +109,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Key: {@code -clique.xsi}
    * </p>
    */
-  public static final OptionID XSI_ID = OptionID.getOrCreateOptionID("clique.xsi", "The number of intervals (units) in each dimension.");
+  public static final OptionID XSI_ID = new OptionID("clique.xsi", "The number of intervals (units) in each dimension.");
 
   /**
    * Parameter to specify the density threshold for the selectivity of a unit,
@@ -119,7 +119,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Key: {@code -clique.tau}
    * </p>
    */
-  public static final OptionID TAU_ID = OptionID.getOrCreateOptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
+  public static final OptionID TAU_ID = new OptionID("clique.tau", "The density threshold for the selectivity of a unit, where the selectivity is" + "the fraction of total feature vectors contained in this unit.");
 
   /**
    * Flag to indicate that only subspaces with large coverage (i.e. the fraction
@@ -129,7 +129,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * Key: {@code -clique.prune}
    * </p>
    */
-  public static final OptionID PRUNE_ID = OptionID.getOrCreateOptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
+  public static final OptionID PRUNE_ID = new OptionID("clique.prune", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
 
   /**
    * Holds the value of {@link #XSI_ID}.

@@ -273,7 +273,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
      * Key: {@code -fbagging.num}
      * </p>
      */
-    public static final OptionID NUM_ID = OptionID.getOrCreateOptionID("fbagging.num", "The number of instances to use in the ensemble.");
+    public static final OptionID NUM_ID = new OptionID("fbagging.num", "The number of instances to use in the ensemble.");
 
     /**
      * The flag for using the breadth first approach.
@@ -281,7 +281,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
      * Key: {@code -fbagging.breadth}
      * </p>
      */
-    public static final OptionID BREADTH_ID = OptionID.getOrCreateOptionID("fbagging.breadth", "Use the breadth first combinations instead of the cumulative sum approach");
+    public static final OptionID BREADTH_ID = new OptionID("fbagging.breadth", "Use the breadth first combinations instead of the cumulative sum approach");
 
     /**
      * The parameter to specify the random seed.
@@ -289,7 +289,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
      * Key: {@code -fbagging.seed}
      * </p>
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("fbagging.seed", "Specify a particular random seed.");
+    public static final OptionID SEED_ID = new OptionID("fbagging.seed", "Specify a particular random seed.");
 
     /**
      * The neighborhood size to use.

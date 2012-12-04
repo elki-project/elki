@@ -48,7 +48,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
   /**
    * Parameter for dimensionality.
    */
-  public static final OptionID DIM_ID = OptionID.getOrCreateOptionID("dim", "an integer between 1 and the dimensionality of the " + "feature space 1 specifying the dimension to be considered " + "for distance computation.");
+  public static final OptionID DIM_ID = new OptionID("dim", "an integer between 1 and the dimensionality of the " + "feature space 1 specifying the dimension to be considered " + "for distance computation.");
 
   /**
    * The dimension to be considered for distance computation.

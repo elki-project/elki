@@ -51,7 +51,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * Key: {@code -dbc.in}
    * </p>
    */
-  public static final OptionID INPUT_ID = OptionID.getOrCreateOptionID("dbc.in", "The name of the input file to be parsed.");
+  public static final OptionID INPUT_ID = new OptionID("dbc.in", "The name of the input file to be parsed.");
 
   /**
    * Constructor.

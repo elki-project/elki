@@ -88,7 +88,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LDOF_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("ldof.k", "The number of nearest neighbors of an object to be considered for computing its LDOF_SCORE.");
+  public static final OptionID K_ID = new OptionID("ldof.k", "The number of nearest neighbors of an object to be considered for computing its LDOF_SCORE.");
 
   /**
    * The baseline for LDOF values. The paper gives 0.5 for uniform

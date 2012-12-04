@@ -159,7 +159,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
     /**
      * The parameter listing the split dimensions.
      */
-    public static final OptionID SELECTED_ATTRIBUTES_ID = OptionID.getOrCreateOptionID("split.dims", "Dimensions to split into the first relation.");
+    public static final OptionID SELECTED_ATTRIBUTES_ID = new OptionID("split.dims", "Dimensions to split into the first relation.");
 
     /**
      * Dimensions to use.

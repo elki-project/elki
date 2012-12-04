@@ -152,7 +152,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> exten
      * 
      * Key: {@code -localpca.distancefunction}
      */
-    public static final OptionID PCA_DISTANCE_ID = OptionID.getOrCreateOptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
+    public static final OptionID PCA_DISTANCE_ID = new OptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
 
     /**
      * Holds the instance of the distance function specified by

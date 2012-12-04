@@ -59,7 +59,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
    * Key: {@code -pcabasedcorrelationdf.delta}
    * </p>
    */
-  public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("pcabasedcorrelationdf.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
+  public static final OptionID DELTA_ID = new OptionID("pcabasedcorrelationdf.delta", "Threshold of a distance between a vector q and a given space that indicates that " + "q adds a new dimension to the space.");
 
   /**
    * Holds the value of {@link #DELTA_ID}.

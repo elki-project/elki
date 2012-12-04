@@ -269,7 +269,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
      * -cluster.stars
      * </pre>
      */
-    public static final OptionID STARS_ID = OptionID.getOrCreateOptionID("cluster.stars", "Visualize mean-based clusters using stars.");
+    public static final OptionID STARS_ID = new OptionID("cluster.stars", "Visualize mean-based clusters using stars.");
 
     /**
      * Whether to draw cluster stars

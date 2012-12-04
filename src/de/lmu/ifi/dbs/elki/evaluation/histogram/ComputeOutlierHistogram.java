@@ -79,7 +79,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    * Key: {@code -comphist.positive}
    * </p>
    */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("comphist.positive", "Class label for the 'positive' class.");
+  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
 
   /**
    * number of bins for the histogram
@@ -90,7 +90,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    * Key: {@code -comphist.bins}
    * </p>
    */
-  public static final OptionID BINS_ID = OptionID.getOrCreateOptionID("comphist.bins", "number of bins");
+  public static final OptionID BINS_ID = new OptionID("comphist.bins", "number of bins");
 
   /**
    * Parameter to specify a scaling function to use.
@@ -98,7 +98,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    * Key: {@code -comphist.scaling}
    * </p>
    */
-  public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("comphist.scaling", "Class to use as scaling function.");
+  public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
 
   /**
    * Flag to count frequencies of outliers and non-outliers separately
@@ -106,7 +106,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    * Key: {@code -histogram.splitfreq}
    * </p>
    */
-  public static final OptionID SPLITFREQ_ID = OptionID.getOrCreateOptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
+  public static final OptionID SPLITFREQ_ID = new OptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
 
   /**
    * Stores the "positive" class.

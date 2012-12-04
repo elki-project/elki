@@ -169,17 +169,17 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
   /**
    * Parameter to give the configuration file
    */
-  public static final OptionID CONFIGFILE_ID = OptionID.getOrCreateOptionID("bymodel.spec", "The generator specification file.");
+  public static final OptionID CONFIGFILE_ID = new OptionID("bymodel.spec", "The generator specification file.");
 
   /**
    * Parameter to give the configuration file
    */
-  public static final OptionID RANDOMSEED_ID = OptionID.getOrCreateOptionID("bymodel.randomseed", "The random generator seed.");
+  public static final OptionID RANDOMSEED_ID = new OptionID("bymodel.randomseed", "The random generator seed.");
 
   /**
    * Parameter to give the configuration file
    */
-  public static final OptionID SIZE_SCALE_ID = OptionID.getOrCreateOptionID("bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
+  public static final OptionID SIZE_SCALE_ID = new OptionID("bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
 
   /**
    * File name of the generators XML Schema file.

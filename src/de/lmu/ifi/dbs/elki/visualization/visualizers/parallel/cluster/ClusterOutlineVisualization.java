@@ -70,7 +70,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   /**
    * Currently unused option to enable/disable rounding
    */
-  public static final OptionID ROUNDED_ID = OptionID.getOrCreateOptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
+  public static final OptionID ROUNDED_ID = new OptionID("parallel.clusteroutline.rounded", "Draw lines rounded");
 
   /**
    * Currently, always enabled.

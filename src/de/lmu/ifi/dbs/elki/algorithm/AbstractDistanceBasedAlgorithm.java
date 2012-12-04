@@ -49,7 +49,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O, D extends Distance<D>, R
   /**
    * OptionID for {@link #DISTANCE_FUNCTION_ID}.
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("algorithm.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Holds the instance of the distance function specified by

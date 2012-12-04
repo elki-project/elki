@@ -118,12 +118,12 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
     /**
      * Latitude dimension parameter.
      */
-    public static final OptionID LATDIM_ID = OptionID.getOrCreateOptionID("distance.latitudedim", "The dimension containing the latitude.");
+    public static final OptionID LATDIM_ID = new OptionID("distance.latitudedim", "The dimension containing the latitude.");
 
     /**
      * Longitude dimension parameter.
      */
-    public static final OptionID LNGDIM_ID = OptionID.getOrCreateOptionID("distance.longitudedim", "The dimension containing the longitude.");
+    public static final OptionID LNGDIM_ID = new OptionID("distance.longitudedim", "The dimension containing the longitude.");
 
     /**
      * Latitude dimension.

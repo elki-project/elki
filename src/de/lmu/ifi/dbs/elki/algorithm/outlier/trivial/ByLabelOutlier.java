@@ -145,7 +145,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
      * Key: {@code -outlier.pattern}
      * </p>
      */
-    public static final OptionID OUTLIER_PATTERN_ID = OptionID.getOrCreateOptionID("outlier.pattern", "Label pattern to match outliers.");
+    public static final OptionID OUTLIER_PATTERN_ID = new OptionID("outlier.pattern", "Label pattern to match outliers.");
     /**
      * Stores the "outlier" class.
      */

@@ -194,7 +194,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
      * Key: {@code -materialize.k}
      * </p>
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
+    public static final OptionID K_ID = new OptionID("materialize.k", "The number of nearest neighbors of an object to be materialized.");
 
     /**
      * Parameter to indicate the distance function to be used to ascertain the
@@ -207,7 +207,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
      * Key: {@code materialize.distance}
      * </p>
      */
-    public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
+    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("materialize.distance", "the distance function to materialize the nearest neighbors");
 
     /**
      * Holds the value of {@link #K_ID}.

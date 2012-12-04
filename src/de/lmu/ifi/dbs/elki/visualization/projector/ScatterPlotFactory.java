@@ -97,7 +97,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
      * Code: -vis.maxdim
      * </p>
      */
-    public static final OptionID MAXDIM_ID = OptionID.getOrCreateOptionID("vis.maxdim", "Maximum number of dimensions to display.");
+    public static final OptionID MAXDIM_ID = new OptionID("vis.maxdim", "Maximum number of dimensions to display.");
 
     /**
      * Stores the maximum number of dimensions to show.

@@ -217,7 +217,7 @@ public class TrimmedMeanApproach<N> extends AbstractNeighborhoodOutlier<N> {
     /**
      * Parameter for the percentile value p.
      */
-    public static final OptionID P_ID = OptionID.getOrCreateOptionID("tma.p", "the percentile parameter");
+    public static final OptionID P_ID = new OptionID("tma.p", "the percentile parameter");
 
     /**
      * Percentile parameter p.

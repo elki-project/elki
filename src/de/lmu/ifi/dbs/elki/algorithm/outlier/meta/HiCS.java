@@ -535,35 +535,35 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
      * Parameter that specifies the number of iterations in the Monte-Carlo
      * process of identifying high contrast subspaces.
      */
-    public static final OptionID M_ID = OptionID.getOrCreateOptionID("hics.m", "The number of iterations in the Monte-Carlo processing.");
+    public static final OptionID M_ID = new OptionID("hics.m", "The number of iterations in the Monte-Carlo processing.");
 
     /**
      * Parameter that determines the size of the test statistic during the
      * Monte-Carlo iteration.
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("hics.alpha", "The discriminance value that determines the size of the test statistic .");
+    public static final OptionID ALPHA_ID = new OptionID("hics.alpha", "The discriminance value that determines the size of the test statistic .");
 
     /**
      * Parameter that specifies which outlier detection algorithm to use on the
      * resulting set of high contrast subspaces.
      */
-    public static final OptionID ALGO_ID = OptionID.getOrCreateOptionID("hics.algo", "The Algorithm that performs the actual outlier detection on the resulting set of subspace");
+    public static final OptionID ALGO_ID = new OptionID("hics.algo", "The Algorithm that performs the actual outlier detection on the resulting set of subspace");
 
     /**
      * Parameter that specifies which statistical test to use in order to
      * calculate the deviation of two given data samples.
      */
-    public static final OptionID TEST_ID = OptionID.getOrCreateOptionID("hics.test", "The statistical test that is used to calculate the deviation of two data samples");
+    public static final OptionID TEST_ID = new OptionID("hics.test", "The statistical test that is used to calculate the deviation of two data samples");
 
     /**
      * Parameter that specifies the candidate_cutoff.
      */
-    public static final OptionID LIMIT_ID = OptionID.getOrCreateOptionID("hics.limit", "The threshold that determines how many d-dimensional subspace candidates to retain in each step of the generation");
+    public static final OptionID LIMIT_ID = new OptionID("hics.limit", "The threshold that determines how many d-dimensional subspace candidates to retain in each step of the generation");
 
     /**
      * Parameter that specifies the random seed.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("hics.seed", "The random seed.");
+    public static final OptionID SEED_ID = new OptionID("hics.seed", "The random seed.");
 
     /**
      * Holds the value of {@link #M_ID}.

@@ -144,7 +144,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     /**
      * Fast-insertion parameter. Optional.
      */
-    public static OptionID INSERTION_CANDIDATES_ID = OptionID.getOrCreateOptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object.");
+    public static OptionID INSERTION_CANDIDATES_ID = new OptionID("rtree.insertion-candidates", "defines how many children are tested for finding the child generating the least overlap when inserting an object.");
 
     /**
      * The number of candidates to use

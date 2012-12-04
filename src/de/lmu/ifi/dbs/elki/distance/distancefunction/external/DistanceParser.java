@@ -41,7 +41,7 @@ public interface DistanceParser<D extends Distance<D>> {
   /**
    * Parameter for distance function.
    */
-  public static final OptionID DISTANCE_ID = OptionID.getOrCreateOptionID("parser.distance", "Distance type used for parsing values.");
+  public static final OptionID DISTANCE_ID = new OptionID("parser.distance", "Distance type used for parsing values.");
 
   /**
    * Returns a list of the objects parsed from the specified input stream

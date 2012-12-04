@@ -82,7 +82,7 @@ public class SpatialSortBulkSplit extends AbstractBulkSplit {
     /**
      * Option ID for spatial sorting
      */
-    public static final OptionID SORTER_ID = OptionID.getOrCreateOptionID("rtree.bulk.spatial-sort", "Strategy for spatial sorting in bulk loading.");
+    public static final OptionID SORTER_ID = new OptionID("rtree.bulk.spatial-sort", "Strategy for spatial sorting in bulk loading.");
 
     /**
      * Sorting class

@@ -70,7 +70,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   /**
    * Pattern to recognize noise clusters with
    */
-  public static final OptionID NOISE_ID = OptionID.getOrCreateOptionID("bymodel.noise", "Pattern to recognize noise models by their label.");
+  public static final OptionID NOISE_ID = new OptionID("bymodel.noise", "Pattern to recognize noise models by their label.");
 
   /**
    * Holds the value of {@link #NOISE_ID}.

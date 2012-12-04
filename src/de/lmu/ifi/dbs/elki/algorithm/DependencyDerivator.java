@@ -87,13 +87,13 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
    * Flag to use random sample (use knn query around centroid, if flag is not
    * set).
    */
-  public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = OptionID.getOrCreateOptionID("derivator.randomSample", "Flag to use random sample (use knn query around centroid, if flag is not set).");
+  public static final OptionID DEPENDENCY_DERIVATOR_RANDOM_SAMPLE = new OptionID("derivator.randomSample", "Flag to use random sample (use knn query around centroid, if flag is not set).");
 
   /**
    * Parameter to specify the threshold for output accuracy fraction digits,
    * must be an integer equal to or greater than 0.
    */
-  public static final OptionID OUTPUT_ACCURACY_ID = OptionID.getOrCreateOptionID("derivator.accuracy", "Threshold for output accuracy fraction digits.");
+  public static final OptionID OUTPUT_ACCURACY_ID = new OptionID("derivator.accuracy", "Threshold for output accuracy fraction digits.");
 
   /**
    * Optional parameter to specify the threshold for the size of the random
@@ -102,7 +102,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
    * Default value: the size of the complete dataset
    * </p>
    */
-  public static final OptionID SAMPLE_SIZE_ID = OptionID.getOrCreateOptionID("derivator.sampleSize", "Threshold for the size of the random sample to use. " + "Default value is size of the complete dataset.");
+  public static final OptionID SAMPLE_SIZE_ID = new OptionID("derivator.sampleSize", "Threshold for the size of the random sample to use. " + "Default value is size of the complete dataset.");
 
   /**
    * Holds the value of {@link #SAMPLE_SIZE_ID}.

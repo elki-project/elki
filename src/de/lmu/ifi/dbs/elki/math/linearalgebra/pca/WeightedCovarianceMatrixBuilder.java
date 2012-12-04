@@ -83,7 +83,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
    * Key: {@code -pca.weight}
    * </p>
    */
-  public static final OptionID WEIGHT_ID = OptionID.getOrCreateOptionID("pca.weight", "Weight function to use in weighted PCA.");
+  public static final OptionID WEIGHT_ID = new OptionID("pca.weight", "Weight function to use in weighted PCA.");
 
   /**
    * Holds the weight function.

@@ -50,17 +50,17 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Parameter for nolog
    */
-  public static final OptionID NOLOG_ID = OptionID.getOrCreateOptionID("mkapp.nolog", "Flag to indicate that the approximation is done in the ''normal'' space instead of the log-log space (which is default).");
+  public static final OptionID NOLOG_ID = new OptionID("mkapp.nolog", "Flag to indicate that the approximation is done in the ''normal'' space instead of the log-log space (which is default).");
 
   /**
    * Parameter for k
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("mkapp.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
+  public static final OptionID K_ID = new OptionID("mkapp.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
 
   /**
    * Parameter for p
    */
-  public static final OptionID P_ID = OptionID.getOrCreateOptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
+  public static final OptionID P_ID = new OptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
 
   /**
    * Parameter k.

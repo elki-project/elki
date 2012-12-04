@@ -88,12 +88,12 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
     /**
      * Insertion strategy for directory nodes.
      */
-    public static final OptionID DIR_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.insert-directory", "Insertion strategy for directory nodes.");
+    public static final OptionID DIR_STRATEGY_ID = new OptionID("rtree.insert-directory", "Insertion strategy for directory nodes.");
 
     /**
      * Insertion strategy for leaf nodes.
      */
-    public static final OptionID LEAF_STRATEGY_ID = OptionID.getOrCreateOptionID("rtree.insert-leaf", "Insertion strategy for leaf nodes.");
+    public static final OptionID LEAF_STRATEGY_ID = new OptionID("rtree.insert-leaf", "Insertion strategy for leaf nodes.");
 
     /**
      * Strategy when inserting into directory nodes

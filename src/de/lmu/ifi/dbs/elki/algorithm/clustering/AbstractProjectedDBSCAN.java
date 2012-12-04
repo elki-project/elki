@@ -83,12 +83,12 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.LocallyWeightedDistanceFunction}
    * </p>
    */
-  public static final OptionID OUTER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.outerdistancefunction", "Distance function to determine the distance between database objects.");
+  public static final OptionID OUTER_DISTANCE_FUNCTION_ID = new OptionID("projdbscan.outerdistancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Parameter distance function
    */
-  public static final OptionID INNER_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("projdbscan.distancefunction", "Distance function to determine the neighbors for variance analysis.");
+  public static final OptionID INNER_DISTANCE_FUNCTION_ID = new OptionID("projdbscan.distancefunction", "Distance function to determine the neighbors for variance analysis.");
 
   /**
    * Parameter to specify the maximum radius of the neighborhood to be
@@ -97,7 +97,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * Key: {@code -projdbscan.epsilon}
    * </p>
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("projdbscan.epsilon", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID EPSILON_ID = new OptionID("projdbscan.epsilon", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Parameter to specify the intrinsic dimensionality of the clusters to find,
@@ -106,7 +106,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * Key: {@code -projdbscan.lambda}
    * </p>
    */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("projdbscan.lambda", "The intrinsic dimensionality of the clusters to find.");
+  public static final OptionID LAMBDA_ID = new OptionID("projdbscan.lambda", "The intrinsic dimensionality of the clusters to find.");
 
   /**
    * Parameter to specify the threshold for minimum number of points in the
@@ -115,7 +115,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
    * Key: {@code -projdbscan.minpts}
    * </p>
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("projdbscan.minpts", "Threshold for minimum number of points in " + "the epsilon-neighborhood of a point.");
+  public static final OptionID MINPTS_ID = new OptionID("projdbscan.minpts", "Threshold for minimum number of points in " + "the epsilon-neighborhood of a point.");
 
   /**
    * Holds the instance of the distance function specified by

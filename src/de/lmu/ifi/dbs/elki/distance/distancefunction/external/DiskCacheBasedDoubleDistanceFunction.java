@@ -57,7 +57,7 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDDistanceFu
    * Key: {@code -distance.matrix}
    * </p>
    */
-  public static final OptionID MATRIX_ID = OptionID.getOrCreateOptionID("distance.matrix", "The name of the file containing the distance matrix.");
+  public static final OptionID MATRIX_ID = new OptionID("distance.matrix", "The name of the file containing the distance matrix.");
 
   /**
    * Magic to identify double cache matrices

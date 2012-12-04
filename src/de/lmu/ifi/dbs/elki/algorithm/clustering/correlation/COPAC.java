@@ -105,7 +105,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * Key: {@code -copac.preprocessor}
    * </p>
    */
-  public static final OptionID PREPROCESSOR_ID = OptionID.getOrCreateOptionID("copac.preprocessor", "Local PCA Preprocessor to derive partition criterion.");
+  public static final OptionID PREPROCESSOR_ID = new OptionID("copac.preprocessor", "Local PCA Preprocessor to derive partition criterion.");
 
   /**
    * Parameter to specify the distance function to use inside the partitions
@@ -119,7 +119,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * Key: {@code -copac.partitionDistance}
    * </p>
    */
-  public static final OptionID PARTITION_DISTANCE_ID = OptionID.getOrCreateOptionID("copac.partitionDistance", "Distance to use for the inner algorithms.");
+  public static final OptionID PARTITION_DISTANCE_ID = new OptionID("copac.partitionDistance", "Distance to use for the inner algorithms.");
 
   /**
    * Parameter to specify the clustering algorithm to apply to each partition,
@@ -129,7 +129,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * Key: {@code -copac.partitionAlgorithm}
    * </p>
    */
-  public static final OptionID PARTITION_ALGORITHM_ID = OptionID.getOrCreateOptionID("copac.partitionAlgorithm", "Clustering algorithm to apply to each partition.");
+  public static final OptionID PARTITION_ALGORITHM_ID = new OptionID("copac.partitionAlgorithm", "Clustering algorithm to apply to each partition.");
 
   /**
    * Holds the instance of the preprocessed distance function

@@ -571,7 +571,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     /**
      * Option for layouting method
      */
-    public static final OptionID LAYOUT_ID = OptionID.getOrCreateOptionID("parallel3d.layout", "Layouting method for 3DPC.");
+    public static final OptionID LAYOUT_ID = new OptionID("parallel3d.layout", "Layouting method for 3DPC.");
 
     /**
      * Similarity measure

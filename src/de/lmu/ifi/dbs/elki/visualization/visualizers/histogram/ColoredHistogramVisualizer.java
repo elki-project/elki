@@ -374,7 +374,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
      * Key: {@code -histogram.curves}
      * </p>
      */
-    public static final OptionID STYLE_CURVES_ID = OptionID.getOrCreateOptionID("projhistogram.curves", "Use curves instead of the stacked histogram style.");
+    public static final OptionID STYLE_CURVES_ID = new OptionID("projhistogram.curves", "Use curves instead of the stacked histogram style.");
 
     /**
      * Parameter to specify the number of bins to use in histogram.
@@ -383,7 +383,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
      * Key: {@code -projhistogram.bins} Default: 20
      * </p>
      */
-    public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("projhistogram.bins", "Number of bins in the distribution histogram");
+    public static final OptionID HISTOGRAM_BINS_ID = new OptionID("projhistogram.bins", "Number of bins in the distribution histogram");
 
     /**
      * Internal storage of the curves flag.

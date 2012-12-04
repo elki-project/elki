@@ -122,7 +122,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
     /**
      * Option ID for parameterization.
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("stddevout.k", "Number of neighbors to get for stddev based outlier detection.");
+    public static final OptionID K_ID = new OptionID("stddevout.k", "Number of neighbors to get for stddev based outlier detection.");
 
     /**
      * Number of neighbors to get

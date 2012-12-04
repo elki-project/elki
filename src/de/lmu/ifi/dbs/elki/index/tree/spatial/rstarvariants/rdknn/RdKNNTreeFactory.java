@@ -55,7 +55,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
   /**
    * Parameter for k
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("rdknn.k", "positive integer specifying the maximal number k of reverse " + "k nearest neighbors to be supported.");
+  public static final OptionID K_ID = new OptionID("rdknn.k", "positive integer specifying the maximal number k of reverse " + "k nearest neighbors to be supported.");
 
   /**
    * The default distance function.
@@ -65,7 +65,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
   /**
    * Parameter for distance function
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("rdknn.distancefunction", "Distance function to determine the distance between database objects.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("rdknn.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Parameter k.

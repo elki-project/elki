@@ -90,17 +90,17 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
   /**
    * Flag to compute exact value range for binning.
    */
-  public static final OptionID EXACT_ID = OptionID.getOrCreateOptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
+  public static final OptionID EXACT_ID = new OptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
 
   /**
    * Flag to enable sampling.
    */
-  public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
+  public static final OptionID SAMPLING_ID = new OptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
 
   /**
    * Option to configure the number of bins to use.
    */
-  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
+  public static final OptionID HISTOGRAM_BINS_ID = new OptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
 
   /**
    * Number of bins to use in sampling.

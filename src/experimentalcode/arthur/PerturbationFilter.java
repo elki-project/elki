@@ -255,12 +255,12 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     /**
      * Parameter for minimum.
      */
-    public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.min", "Only used, if " + ScalingReference.MINMAX + " is set as scaling reference: a comma separated concatenation of the minimum values in each dimension assumed as a reference. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
+    public static final OptionID MINIMA_ID = new OptionID("perturbationfilter.min", "Only used, if " + ScalingReference.MINMAX + " is set as scaling reference: a comma separated concatenation of the minimum values in each dimension assumed as a reference. If no value is specified, the minimum value of the attribute range in this dimension will be taken.");
 
     /**
      * Parameter for maximum.
      */
-    public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("perturbationfilter.max", "Only used, if " + ScalingReference.MINMAX + " is set as scaling reference: a comma separated concatenation of the maximum values in each dimension assumed as a reference. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
+    public static final OptionID MAXIMA_ID = new OptionID("perturbationfilter.max", "Only used, if " + ScalingReference.MINMAX + " is set as scaling reference: a comma separated concatenation of the maximum values in each dimension assumed as a reference. If no value is specified, the maximum value of the attribute range in this dimension will be taken.");
 
     /**
      * Stores the maximum in each dimension.
@@ -279,7 +279,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
      * Key: {@code -perturbationfilter.seed}
      * </p>
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("perturbationfilter.seed", "Seed for random noise generation.");
+    public static final OptionID SEED_ID = new OptionID("perturbationfilter.seed", "Seed for random noise generation.");
 
     /**
      * Seed for randomly shuffling the rows of the database. If null, system
@@ -303,7 +303,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
      * Constraint: 0 &lt; percentage &leq;1
      * </p>
      */
-    public static final OptionID PERCENTAGE_ID = OptionID.getOrCreateOptionID("perturbationfilter.percentage", "Percentage of the standard deviation of the random Gaussian noise generation per attribute, given the standard deviation of the corresponding attribute in the original data distribution (assuming a Gaussian distribution there).");
+    public static final OptionID PERCENTAGE_ID = new OptionID("perturbationfilter.percentage", "Percentage of the standard deviation of the random Gaussian noise generation per attribute, given the standard deviation of the corresponding attribute in the original data distribution (assuming a Gaussian distribution there).");
 
     /**
      * Parameter for selecting scaling reference.
@@ -314,7 +314,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
      * Default: <code>ScalingReference.UNITCUBE</code>
      * </p>
      */
-    public static final OptionID SCALINGREFERENCE_ID = OptionID.getOrCreateOptionID("perturbationfilter.scalingreference", "The reference for scaling the Gaussian noise. Default is " + ScalingReference.UNITCUBE + ", parameter " + PERCENTAGE_ID.getName() + " will then directly define the standard deviation of all noise Gaussians. For options " + ScalingReference.STDDEV + " and  " + ScalingReference.MINMAX + ", the percentage of the attributewise standard deviation or extension, repectively, will define the attributewise standard deviation of the noise Gaussians.");
+    public static final OptionID SCALINGREFERENCE_ID = new OptionID("perturbationfilter.scalingreference", "The reference for scaling the Gaussian noise. Default is " + ScalingReference.UNITCUBE + ", parameter " + PERCENTAGE_ID.getName() + " will then directly define the standard deviation of all noise Gaussians. For options " + ScalingReference.STDDEV + " and  " + ScalingReference.MINMAX + ", the percentage of the attributewise standard deviation or extension, repectively, will define the attributewise standard deviation of the noise Gaussians.");
 
     /**
      * Percentage of the variance of the random Gaussian noise generation, given

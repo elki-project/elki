@@ -52,7 +52,7 @@ public class PolynomialKernelFunction extends AbstractPrimitiveDistanceFunction<
   /**
    * Degree parameter.
    */
-  public static final OptionID DEGREE_ID = OptionID.getOrCreateOptionID("kernel.degree", "The degree of the polynomial kernel function. Default: " + DEFAULT_DEGREE);
+  public static final OptionID DEGREE_ID = new OptionID("kernel.degree", "The degree of the polynomial kernel function. Default: " + DEFAULT_DEGREE);
 
   /**
    * Degree of the polynomial kernel function.

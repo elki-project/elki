@@ -692,12 +692,12 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      * Key: {@code -eafod.m}
      * </p>
      */
-    public static final OptionID M_ID = OptionID.getOrCreateOptionID("ay.m", "Population size for evolutionary algorithm.");
+    public static final OptionID M_ID = new OptionID("ay.m", "Population size for evolutionary algorithm.");
 
     /**
      * Parameter to specify the random generator seed.
      */
-    public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("ay.seed", "The random number generator seed.");
+    public static final OptionID SEED_ID = new OptionID("ay.seed", "The random number generator seed.");
 
     protected int m = 0;
 

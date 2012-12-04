@@ -145,7 +145,7 @@ public class KNNExplorer<O extends NumberVector<?>, D extends NumberDistance<D, 
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("explorer.distancefunction", "Distance function to determine the distance between database objects.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("explorer.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Holds the database connection to have the algorithm run with.

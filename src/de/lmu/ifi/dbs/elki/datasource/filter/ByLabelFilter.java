@@ -155,7 +155,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
      * Key: {@code -patternfilter.pattern}
      * </p>
      */
-    public static final OptionID LABELFILTER_PATTERN_ID = OptionID.getOrCreateOptionID("patternfilter.pattern", "The filter pattern to use.");
+    public static final OptionID LABELFILTER_PATTERN_ID = new OptionID("patternfilter.pattern", "The filter pattern to use.");
 
     /**
      * Flag to use the pattern in inverted mode
@@ -163,7 +163,7 @@ public class ByLabelFilter extends AbstractStreamFilter {
      * Key: {@code -patternfilter.invert}
      * </p>
      */
-    public static final OptionID LABELFILTER_PATTERN_INVERT_ID = OptionID.getOrCreateOptionID("patternfilter.invert", "Flag to invert pattern.");
+    public static final OptionID LABELFILTER_PATTERN_INVERT_ID = new OptionID("patternfilter.invert", "Flag to invert pattern.");
 
     /**
      * The pattern configured.

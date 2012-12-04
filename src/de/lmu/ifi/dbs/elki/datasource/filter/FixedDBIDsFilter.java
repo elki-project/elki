@@ -47,7 +47,7 @@ public class FixedDBIDsFilter extends AbstractStreamFilter {
    * Key: {@code -dbc.startid}
    * </p>
    */
-  public static final OptionID IDSTART_ID = OptionID.getOrCreateOptionID("dbc.startid", "Object ID to start counting with");
+  public static final OptionID IDSTART_ID = new OptionID("dbc.startid", "Object ID to start counting with");
 
   /**
    * The filtered meta

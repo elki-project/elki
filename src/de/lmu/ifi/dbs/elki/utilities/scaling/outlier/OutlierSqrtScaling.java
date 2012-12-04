@@ -48,7 +48,7 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtscale.min}
    * </p>
    */
-  public static final OptionID MIN_ID = OptionID.getOrCreateOptionID("sqrtscale.min", "Fixed minimum to use in sqrt scaling.");
+  public static final OptionID MIN_ID = new OptionID("sqrtscale.min", "Fixed minimum to use in sqrt scaling.");
 
   /**
    * Parameter to specify the fixed maximum to use.
@@ -56,7 +56,7 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
    * Key: {@code -sqrtscale.max}
    * </p>
    */
-  public static final OptionID MAX_ID = OptionID.getOrCreateOptionID("sqrtscale.max", "Fixed maximum to use in sqrt scaling.");
+  public static final OptionID MAX_ID = new OptionID("sqrtscale.max", "Fixed maximum to use in sqrt scaling.");
 
   /**
    * Field storing the minimum value

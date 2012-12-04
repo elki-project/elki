@@ -45,7 +45,7 @@ public abstract class AbstractDistanceBasedSpatialOutlier<N, O, D extends Number
   /**
    * Parameter to specify the non spatial distance function to use
    */
-  public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("spatialoutlier.nonspatialdistance", "The distance function to use for non spatial attributes");
+  public static final OptionID NON_SPATIAL_DISTANCE_FUNCTION_ID = new OptionID("spatialoutlier.nonspatialdistance", "The distance function to use for non spatial attributes");
 
   /**
    * The distance function to use

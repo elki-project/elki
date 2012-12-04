@@ -288,7 +288,7 @@ public class BubbleVisualization extends AbstractVisFactory {
      * Key: {@code -bubble.fill}
      * </p>
      */
-    public static final OptionID FILL_ID = OptionID.getOrCreateOptionID("bubble.fill", "Half-transparent filling of bubbles.");
+    public static final OptionID FILL_ID = new OptionID("bubble.fill", "Half-transparent filling of bubbles.");
 
     /**
      * Parameter for scaling functions
@@ -297,7 +297,7 @@ public class BubbleVisualization extends AbstractVisFactory {
      * Key: {@code -bubble.scaling}
      * </p>
      */
-    public static final OptionID SCALING_ID = OptionID.getOrCreateOptionID("bubble.scaling", "Additional scaling function for bubbles.");
+    public static final OptionID SCALING_ID = new OptionID("bubble.scaling", "Additional scaling function for bubbles.");
 
     /**
      * Fill parameter.

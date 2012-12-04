@@ -126,13 +126,13 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
    * The distance function to determine the reachability distance between
    * database objects.
    */
-  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("lof.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
+  public static final OptionID REACHABILITY_DISTANCE_FUNCTION_ID = new OptionID("lof.reachdistfunction", "Distance function to determine the reachability distance between database objects.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object to be
    * considered for computing its LOF_SCORE, must be an integer greater than 1.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
+  public static final OptionID K_ID = new OptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF_SCORE.");
 
   /**
    * Holds the value of {@link #K_ID}.

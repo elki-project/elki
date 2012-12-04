@@ -229,7 +229,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
      * Default value: 4
      * </p>
      */
-    public static final OptionID DIGITS_ID = OptionID.getOrCreateOptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
+    public static final OptionID DIGITS_ID = new OptionID("tooltip.digits", "Number of digits to show (e.g. when visualizing outlier scores)");
 
     @Override
     protected void makeOptions(Parameterization config) {

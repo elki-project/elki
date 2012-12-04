@@ -73,7 +73,7 @@ public class ExportVisualizations implements ResultHandler {
    * Default value: 1.33
    * </p>
    */
-  public static final OptionID RATIO_ID = OptionID.getOrCreateOptionID("vis.ratio", "The width/heigh ratio of the output.");
+  public static final OptionID RATIO_ID = new OptionID("vis.ratio", "The width/heigh ratio of the output.");
 
   /**
    * Parameter to specify the output folder
@@ -81,7 +81,7 @@ public class ExportVisualizations implements ResultHandler {
    * Key: {@code -vis.output}
    * </p>
    */
-  public static final OptionID FOLDER_ID = OptionID.getOrCreateOptionID("vis.output", "The output folder.");
+  public static final OptionID FOLDER_ID = new OptionID("vis.output", "The output folder.");
 
   /**
    * Output folder

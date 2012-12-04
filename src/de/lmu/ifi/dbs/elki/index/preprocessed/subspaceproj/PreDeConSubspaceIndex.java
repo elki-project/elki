@@ -190,7 +190,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
     /**
      * Parameter for Delta.
      */
-    public static final OptionID DELTA_ID = OptionID.getOrCreateOptionID("predecon.delta", "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = " + DEFAULT_DELTA + ").");
+    public static final OptionID DELTA_ID = new OptionID("predecon.delta", "a double between 0 and 1 specifying the threshold for small Eigenvalues (default is delta = " + DEFAULT_DELTA + ").");
 
     /**
      * The threshold for small eigenvalues.

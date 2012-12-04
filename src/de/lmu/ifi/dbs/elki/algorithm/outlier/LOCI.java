@@ -93,17 +93,17 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
    * Parameter to specify the maximum radius of the neighborhood to be
    * considered, must be suitable to the distance function specified.
    */
-  public static final OptionID RMAX_ID = OptionID.getOrCreateOptionID("loci.rmax", "The maximum radius of the neighborhood to be considered.");
+  public static final OptionID RMAX_ID = new OptionID("loci.rmax", "The maximum radius of the neighborhood to be considered.");
 
   /**
    * Parameter to specify the minimum neighborhood size
    */
-  public static final OptionID NMIN_ID = OptionID.getOrCreateOptionID("loci.nmin", "Minimum neighborhood size to be considered.");
+  public static final OptionID NMIN_ID = new OptionID("loci.nmin", "Minimum neighborhood size to be considered.");
 
   /**
    * Parameter to specify the averaging neighborhood scaling.
    */
-  public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("loci.alpha", "Scaling factor for averaging neighborhood");
+  public static final OptionID ALPHA_ID = new OptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
   /**
    * Holds the value of {@link #RMAX_ID}.

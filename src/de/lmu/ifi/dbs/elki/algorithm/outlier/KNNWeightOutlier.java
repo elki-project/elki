@@ -81,12 +81,12 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Parameter to specify the k nearest neighbor
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnwod.k", "k nearest neighbor");
+  public static final OptionID K_ID = new OptionID("knnwod.k", "k nearest neighbor");
 
   /**
    * The kNN query used.
    */
-  public static final OptionID KNNQUERY_ID = OptionID.getOrCreateOptionID("knnwod.knnquery", "kNN query to use");
+  public static final OptionID KNNQUERY_ID = new OptionID("knnwod.knnquery", "kNN query to use");
 
   /**
    * Holds the value of {@link #K_ID}.

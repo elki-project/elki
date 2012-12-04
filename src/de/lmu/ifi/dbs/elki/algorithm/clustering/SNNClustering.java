@@ -87,7 +87,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * Parameter to specify the minimum SNN density, must be an integer greater
    * than 0.
    */
-  public static final OptionID EPSILON_ID = OptionID.getOrCreateOptionID("snn.epsilon", "The minimum SNN density.");
+  public static final OptionID EPSILON_ID = new OptionID("snn.epsilon", "The minimum SNN density.");
 
   /**
    * Holds the value of {@link #EPSILON_ID}.
@@ -98,7 +98,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * Parameter to specify the threshold for minimum number of points in the
    * epsilon-SNN-neighborhood of a point, must be an integer greater than 0.
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("snn.minpts", "Threshold for minimum number of points in " + "the epsilon-SNN-neighborhood of a point.");
+  public static final OptionID MINPTS_ID = new OptionID("snn.minpts", "Threshold for minimum number of points in " + "the epsilon-SNN-neighborhood of a point.");
 
   /**
    * Holds the value of {@link #MINPTS_ID}.

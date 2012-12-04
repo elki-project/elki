@@ -94,7 +94,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
    * Parameter that specifies the k-nearest neighbors to be assigned, must be an
    * integer greater than 0. Default value: 1.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
+  public static final OptionID K_ID = new OptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
 
   /**
    * The k parameter.

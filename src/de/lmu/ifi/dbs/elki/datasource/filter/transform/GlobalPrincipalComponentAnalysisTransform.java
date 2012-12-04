@@ -190,7 +190,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
     /**
      * To specify the eigenvectors to keep.
      */
-    public static final OptionID FILTER_ID = OptionID.getOrCreateOptionID("globalpca.filter", "Filter to use for dimensionality reduction.");
+    public static final OptionID FILTER_ID = new OptionID("globalpca.filter", "Filter to use for dimensionality reduction.");
 
     /**
      * Filter to use for dimensionality reduction.

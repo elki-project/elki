@@ -116,7 +116,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      * Key: {@code -projectedclustering.k}
      * </p>
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("projectedclustering.k", "The number of clusters to find.");
+    public static final OptionID K_ID = new OptionID("projectedclustering.k", "The number of clusters to find.");
 
     /**
      * Parameter to specify the multiplier for the initial number of seeds, must
@@ -128,7 +128,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      * Key: {@code -projectedclustering.k_i}
      * </p>
      */
-    public static final OptionID K_I_ID = OptionID.getOrCreateOptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
+    public static final OptionID K_I_ID = new OptionID("projectedclustering.k_i", "The multiplier for the initial number of seeds.");
 
     /**
      * Parameter to specify the dimensionality of the clusters to find, must be
@@ -137,7 +137,7 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
      * Key: {@code -projectedclustering.l}
      * </p>
      */
-    public static final OptionID L_ID = OptionID.getOrCreateOptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
+    public static final OptionID L_ID = new OptionID("projectedclustering.l", "The dimensionality of the clusters to find.");
 
     protected int k;
 

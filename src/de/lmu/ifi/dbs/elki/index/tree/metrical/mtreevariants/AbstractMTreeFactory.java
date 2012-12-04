@@ -60,7 +60,7 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
    * Holds the instance of the distance function specified by

@@ -178,12 +178,12 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
       /**
        * Parameter to specify the neighborhood predicate to use.
        */
-      public static final OptionID NEIGHBORHOOD_ID = OptionID.getOrCreateOptionID("extendedneighbors.neighborhood", "The inner neighborhood predicate to use.");
+      public static final OptionID NEIGHBORHOOD_ID = new OptionID("extendedneighbors.neighborhood", "The inner neighborhood predicate to use.");
 
       /**
        * Parameter to specify the number of steps allowed
        */
-      public static final OptionID STEPS_ID = OptionID.getOrCreateOptionID("extendedneighbors.steps", "The number of steps allowed in the neighborhood graph.");
+      public static final OptionID STEPS_ID = new OptionID("extendedneighbors.steps", "The number of steps allowed in the neighborhood graph.");
 
       /**
        * The number of steps to do.

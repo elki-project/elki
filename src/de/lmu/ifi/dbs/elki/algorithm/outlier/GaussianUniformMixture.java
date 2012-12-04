@@ -87,12 +87,12 @@ public class GaussianUniformMixture<V extends NumberVector<?>> extends AbstractA
   /**
    * Parameter to specify the fraction of expected outliers.
    */
-  public static final OptionID L_ID = OptionID.getOrCreateOptionID("mmo.l", "expected fraction of outliers");
+  public static final OptionID L_ID = new OptionID("mmo.l", "expected fraction of outliers");
 
   /**
    * Parameter to specify the cutoff.
    */
-  public static final OptionID C_ID = OptionID.getOrCreateOptionID("mmo.c", "cutoff");
+  public static final OptionID C_ID = new OptionID("mmo.c", "cutoff");
 
   /**
    * Small value to increment diagonally of a matrix in order to avoid

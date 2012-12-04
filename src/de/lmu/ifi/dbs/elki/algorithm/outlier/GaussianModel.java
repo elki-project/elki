@@ -69,7 +69,7 @@ public class GaussianModel<V extends NumberVector<?>> extends AbstractAlgorithm<
   /**
    * OptionID for inversion flag.
    */
-  public static final OptionID INVERT_ID = OptionID.getOrCreateOptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
+  public static final OptionID INVERT_ID = new OptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
 
   /**
    * Small value to increment diagonally of a matrix in order to avoid

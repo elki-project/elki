@@ -221,12 +221,12 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
     /**
      * OptionID for the grid size.
      */
-    public static final OptionID PHI_ID = OptionID.getOrCreateOptionID("ay.phi", "The number of equi-depth grid ranges to use in each dimension.");
+    public static final OptionID PHI_ID = new OptionID("ay.phi", "The number of equi-depth grid ranges to use in each dimension.");
 
     /**
      * OptionID for the target dimensionality.
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("ay.k", "Subspace dimensionality to search for.");
+    public static final OptionID K_ID = new OptionID("ay.k", "Subspace dimensionality to search for.");
 
     /**
      * Phi parameter.

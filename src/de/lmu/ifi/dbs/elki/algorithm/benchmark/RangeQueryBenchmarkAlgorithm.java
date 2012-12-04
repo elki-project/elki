@@ -303,17 +303,17 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
     /**
      * Parameter for the query dataset.
      */
-    public static final OptionID QUERY_ID = OptionID.getOrCreateOptionID("rangebench.query", "Data source for the queries. If not set, the queries are taken from the database.");
+    public static final OptionID QUERY_ID = new OptionID("rangebench.query", "Data source for the queries. If not set, the queries are taken from the database.");
 
     /**
      * Parameter for the sampling size.
      */
-    public static final OptionID SAMPLING_ID = OptionID.getOrCreateOptionID("rangebench.sampling", "Sampling size parameter. If the value is less or equal 1, it is assumed to be the relative share. Larger values will be interpreted as integer sizes. By default, all data will be used.");
+    public static final OptionID SAMPLING_ID = new OptionID("rangebench.sampling", "Sampling size parameter. If the value is less or equal 1, it is assumed to be the relative share. Larger values will be interpreted as integer sizes. By default, all data will be used.");
 
     /**
      * Parameter for the random generator
      */
-    public static final OptionID RANDOM_ID = OptionID.getOrCreateOptionID("rangebench.random", "Random generator for sampling.");
+    public static final OptionID RANDOM_ID = new OptionID("rangebench.random", "Random generator for sampling.");
 
     /**
      * The alternate query point source. Optional.

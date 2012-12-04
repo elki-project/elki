@@ -49,7 +49,7 @@ public class InvertedDistanceSimilarityFunction<O> extends AbstractPrimitiveSimi
    * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction}
    * </p>
    */
-  public static final OptionID DISTANCE_FUNCTION_ID = OptionID.getOrCreateOptionID("adapter.distancefunction", "Distance function to derive the similarity between database objects from.");
+  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("adapter.distancefunction", "Distance function to derive the similarity between database objects from.");
 
   /**
    * Holds the similarity function.

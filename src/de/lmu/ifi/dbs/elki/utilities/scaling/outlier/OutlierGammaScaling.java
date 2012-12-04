@@ -50,7 +50,7 @@ public class OutlierGammaScaling implements OutlierScalingFunction {
    * -gammascale.normalize
    * </pre>
    */
-  public static final OptionID NORMALIZE_ID = OptionID.getOrCreateOptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
+  public static final OptionID NORMALIZE_ID = new OptionID("gammascale.normalize", "Regularize scores before using Gamma scaling.");
 
   /**
    * Gamma parameter k

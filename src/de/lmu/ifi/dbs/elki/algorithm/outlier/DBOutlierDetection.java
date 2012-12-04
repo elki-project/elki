@@ -78,7 +78,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
    * Parameter to specify the minimum fraction of objects that must be outside
    * the D- neighborhood of an outlier
    */
-  public static final OptionID P_ID = OptionID.getOrCreateOptionID("dbod.p", "minimum fraction of objects that must be outside the D-neighborhood of an outlier");
+  public static final OptionID P_ID = new OptionID("dbod.p", "minimum fraction of objects that must be outside the D-neighborhood of an outlier");
 
   /**
    * Holds the value of {@link #P_ID}.

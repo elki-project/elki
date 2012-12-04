@@ -90,7 +90,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * <p>
    * see paper "Two-way search method" 3.2
    */
-  public static final OptionID M_ID = OptionID.getOrCreateOptionID("inflo.m", "The threshold");
+  public static final OptionID M_ID = new OptionID("inflo.m", "The threshold");
 
   /**
    * Holds the value of {@link #M_ID}.
@@ -102,7 +102,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
    * considered for computing its INFLO_SCORE. must be an integer greater than
    * 1.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("inflo.k", "The number of nearest neighbors of an object to be considered for computing its INFLO_SCORE.");
+  public static final OptionID K_ID = new OptionID("inflo.k", "The number of nearest neighbors of an object to be considered for computing its INFLO_SCORE.");
 
   /**
    * Holds the value of {@link #K_ID}.

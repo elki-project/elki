@@ -208,7 +208,7 @@ public class ExternalIDJoinDatabaseConnection extends AbstractDatabaseConnection
     /**
      * The static option ID
      */
-    public static final OptionID SOURCES_ID = OptionID.getOrCreateOptionID("join.sources", "The data sources to join.");
+    public static final OptionID SOURCES_ID = new OptionID("join.sources", "The data sources to join.");
 
     /**
      * The data souces to use.

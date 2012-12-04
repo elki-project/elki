@@ -54,7 +54,7 @@ public class ExternalIDFilter implements ObjectFilter {
    * Key: {@code -dbc.externalIdIndex}
    * </p>
    */
-  public static final OptionID EXTERNALID_INDEX_ID = OptionID.getOrCreateOptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
+  public static final OptionID EXTERNALID_INDEX_ID = new OptionID("dbc.externalIdIndex", "The index of the label to be used as external Id.");
 
   /**
    * The index of the label to be used as external Id.

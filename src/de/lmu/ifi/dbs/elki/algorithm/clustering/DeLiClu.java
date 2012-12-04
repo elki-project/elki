@@ -94,7 +94,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
    * Parameter to specify the threshold for minimum number of points within a
    * cluster, must be an integer greater than 0.
    */
-  public static final OptionID MINPTS_ID = OptionID.getOrCreateOptionID("deliclu.minpts", "Threshold for minimum number of points within a cluster.");
+  public static final OptionID MINPTS_ID = new OptionID("deliclu.minpts", "Threshold for minimum number of points within a cluster.");
 
   /**
    * The priority queue for the algorithm.

@@ -95,7 +95,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
   /**
    * Option to configure the number of bins to use.
    */
-  public static final OptionID HISTOGRAM_BINS_ID = OptionID.getOrCreateOptionID("rankqual.bins", "Number of bins to use in the histogram");
+  public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
 
   /**
    * Constructor.

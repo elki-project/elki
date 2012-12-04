@@ -54,7 +54,7 @@ public class ShuffleObjectsFilter implements ObjectFilter {
    * Key: {@code -shuffle.seed}
    * </p>
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
+  public static final OptionID SEED_ID = new OptionID("shuffle.seed", "Seed for randomly shuffling the rows for the database. If the parameter is not set, a random seed will be used.");
 
   /**
    * Random generator.

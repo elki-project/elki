@@ -52,7 +52,7 @@ public class FooKernelFunction extends AbstractPrimitiveDistanceFunction<NumberV
   /**
    * Parameter for the maximum degree
    */
-  public static final OptionID MAX_DEGREE_ID = OptionID.getOrCreateOptionID("fookernel.max_degree", "The max degree of the" + FooKernelFunction.class.getSimpleName() + ". Default: " + DEFAULT_MAX_DEGREE);
+  public static final OptionID MAX_DEGREE_ID = new OptionID("fookernel.max_degree", "The max degree of the" + FooKernelFunction.class.getSimpleName() + ". Default: " + DEFAULT_MAX_DEGREE);
 
   /**
    * Degree of the polynomial kernel function

@@ -95,14 +95,14 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?>, D extends
   /**
    * Parameter for the reference points heuristic.
    */
-  public static final OptionID REFP_ID = OptionID.getOrCreateOptionID("refod.refp", "The heuristic for finding reference points.");
+  public static final OptionID REFP_ID = new OptionID("refod.refp", "The heuristic for finding reference points.");
 
   /**
    * Parameter to specify the number of nearest neighbors of an object, to be
    * considered for computing its REFOD_SCORE, must be an integer greater than
    * 1.
    */
-  public static final OptionID K_ID = OptionID.getOrCreateOptionID("refod.k", "The number of nearest neighbors");
+  public static final OptionID K_ID = new OptionID("refod.k", "The number of nearest neighbors");
 
   /**
    * Holds the value of {@link #K_ID}.

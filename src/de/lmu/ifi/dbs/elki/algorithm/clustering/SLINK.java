@@ -795,7 +795,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     /**
      * The minimum number of clusters to extract
      */
-    public static final OptionID SLINK_MINCLUSTERS_ID = OptionID.getOrCreateOptionID("slink.minclusters", "The maximum number of clusters to extract.");
+    public static final OptionID SLINK_MINCLUSTERS_ID = new OptionID("slink.minclusters", "The maximum number of clusters to extract.");
 
     protected int minclusters = -1;
 

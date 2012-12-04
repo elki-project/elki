@@ -222,12 +222,12 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     /**
      * Number of steps in the distance map.
      */
-    public static final OptionID STEPS_ID = OptionID.getOrCreateOptionID("ctdvis.steps", "Number of steps for the distance map.");
+    public static final OptionID STEPS_ID = new OptionID("ctdvis.steps", "Number of steps for the distance map.");
 
     /**
      * Visualization mode.
      */
-    public static final OptionID MODE_ID = OptionID.getOrCreateOptionID("ctdvis.mode", "Visualization mode.");
+    public static final OptionID MODE_ID = new OptionID("ctdvis.mode", "Visualization mode.");
 
     /**
      * Holds the file to print results to.

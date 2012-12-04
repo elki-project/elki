@@ -56,7 +56,7 @@ public class ResultWriter implements ResultHandler {
    * Key: {@code -out.gzip}
    * </p>
    */
-  public static final OptionID GZIP_OUTPUT_ID = OptionID.getOrCreateOptionID("out.gzip", "Enable gzip compression of output files.");
+  public static final OptionID GZIP_OUTPUT_ID = new OptionID("out.gzip", "Enable gzip compression of output files.");
 
   /**
    * Flag to suppress overwrite warning.
@@ -64,7 +64,7 @@ public class ResultWriter implements ResultHandler {
    * Key: {@code -out.silentoverwrite}
    * </p>
    */
-  public static final OptionID OVERWRITE_OPTION_ID = OptionID.getOrCreateOptionID("out.silentoverwrite", "Silently overwrite output files.");
+  public static final OptionID OVERWRITE_OPTION_ID = new OptionID("out.silentoverwrite", "Silently overwrite output files.");
 
   /**
    * Holds the file to print results to.

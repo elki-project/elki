@@ -54,7 +54,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
    */
   private static final Logging logger = Logging.getLogger(HopkinsStatistic.class);
 
-  public static final OptionID SAMPLESIZE_ID = OptionID.getOrCreateOptionID("hopkins.samplesize", "List of the size of datasamples");
+  public static final OptionID SAMPLESIZE_ID = new OptionID("hopkins.samplesize", "List of the size of datasamples");
 
   /**
    * The parameter sampleSizes
@@ -65,7 +65,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
    * Parameter to specify the number of repetitions of computing the hopkins
    * value.
    */
-  public static final OptionID REP_ID = OptionID.getOrCreateOptionID("hopkins.rep", "The number of repetitions.");
+  public static final OptionID REP_ID = new OptionID("hopkins.rep", "The number of repetitions.");
 
   private int rep;
  
@@ -74,7 +74,7 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
   /**
    * Parameter to specify the random generator seed.
    */
-  public static final OptionID SEED_ID = OptionID.getOrCreateOptionID("hopkins.seed", "The random number generator seed.");
+  public static final OptionID SEED_ID = new OptionID("hopkins.seed", "The random number generator seed.");
 
   /**
    * Holds the value of {@link #SEED_ID}.
@@ -84,12 +84,12 @@ public class HopkinsStatistic<V extends NumberVector<?>, D extends NumberDistanc
   /**
    * Parameter for minimum.
    */
-  public static final OptionID MINIMA_ID = OptionID.getOrCreateOptionID("hopkins.min", "a comma separated concatenation of the minimum values in each dimension. If no value is specified, the minimum value of the attribute range in this dimension will be taken. If only one value is specified, this value will be taken for all dimensions.");
+  public static final OptionID MINIMA_ID = new OptionID("hopkins.min", "a comma separated concatenation of the minimum values in each dimension. If no value is specified, the minimum value of the attribute range in this dimension will be taken. If only one value is specified, this value will be taken for all dimensions.");
 
   /**
    * Parameter for maximum.
    */
-  public static final OptionID MAXIMA_ID = OptionID.getOrCreateOptionID("hopkins.max", "a comma separated concatenation of the maximum values in each dimension. If no value is specified, the maximum value of the attribute range in this dimension will be taken.  If only one value is specified, this value will be taken for all dimensions.");
+  public static final OptionID MAXIMA_ID = new OptionID("hopkins.max", "a comma separated concatenation of the maximum values in each dimension. If no value is specified, the maximum value of the attribute range in this dimension will be taken.  If only one value is specified, this value will be taken for all dimensions.");
 
   /**
    * Stores the maximum in each dimension.

@@ -62,7 +62,7 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
    * Key: {@code -pca.filter}
    * </p>
    */
-  public static final OptionID PCA_EIGENPAIR_FILTER = OptionID.getOrCreateOptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
+  public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("pca.filter", "Filter class to determine the strong and weak eigenvectors.");
 
   /**
    * Parameter to specify a constant big value to reset high eigenvalues, must
@@ -74,7 +74,7 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
    * Key: {@code -pca.big}
    * </p>
    */
-  public static final OptionID BIG_ID = OptionID.getOrCreateOptionID("pca.big", "A constant big value to reset high eigenvalues.");
+  public static final OptionID BIG_ID = new OptionID("pca.big", "A constant big value to reset high eigenvalues.");
 
   /**
    * Parameter to specify a constant small value to reset low eigenvalues, must
@@ -86,7 +86,7 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
    * Key: {@code -pca.small}
    * </p>
    */
-  public static final OptionID SMALL_ID = OptionID.getOrCreateOptionID("pca.small", "A constant small value to reset low eigenvalues.");
+  public static final OptionID SMALL_ID = new OptionID("pca.small", "A constant small value to reset low eigenvalues.");
 
   /**
    * Holds the instance of the EigenPairFilter specified by

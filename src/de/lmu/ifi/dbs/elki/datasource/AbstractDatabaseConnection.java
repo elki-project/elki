@@ -58,7 +58,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * Key: {@code -dbc.filter}
    * </p>
    */
-  public static final OptionID FILTERS_ID = OptionID.getOrCreateOptionID("dbc.filter", "The filters to apply to the input data.");
+  public static final OptionID FILTERS_ID = new OptionID("dbc.filter", "The filters to apply to the input data.");
 
   /**
    * Parameter to specify the parser to provide a database.
@@ -66,7 +66,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
    * Key: {@code -dbc.parser}
    * </p>
    */
-  public static final OptionID PARSER_ID = OptionID.getOrCreateOptionID("dbc.parser", "Parser to provide the database.");
+  public static final OptionID PARSER_ID = new OptionID("dbc.parser", "Parser to provide the database.");
 
   /**
    * The filters to invoke

@@ -134,7 +134,7 @@ public class AddSingleScale implements Algorithm {
     /**
      * Minimum and maximum values.
      */
-    public static final OptionID MINMAX_ID = OptionID.getOrCreateOptionID("scales.minmax", "Forcibly set the scales to the given range.");
+    public static final OptionID MINMAX_ID = new OptionID("scales.minmax", "Forcibly set the scales to the given range.");
 
     @Override
     protected void makeOptions(Parameterization config) {

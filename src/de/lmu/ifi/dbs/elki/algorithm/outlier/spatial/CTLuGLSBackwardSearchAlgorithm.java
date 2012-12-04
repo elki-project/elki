@@ -276,12 +276,12 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
     /**
      * Holds the alpha value - significance niveau
      */
-    public static final OptionID ALPHA_ID = OptionID.getOrCreateOptionID("glsbs.alpha", "Significance niveau");
+    public static final OptionID ALPHA_ID = new OptionID("glsbs.alpha", "Significance niveau");
 
     /**
      * Parameter to specify the k nearest neighbors
      */
-    public static final OptionID K_ID = OptionID.getOrCreateOptionID("glsbs.k", "k nearest neighbors to use");
+    public static final OptionID K_ID = new OptionID("glsbs.k", "k nearest neighbors to use");
 
     /**
      * Parameter Alpha - significance niveau

@@ -68,7 +68,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
    * Key: {@code -precision.positive}
    * </p>
    */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = OptionID.getOrCreateOptionID("precision.positive", "Class label for the 'positive' class.");
+  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
 
   /**
    * Stores the "positive" class.

@@ -102,7 +102,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * Option ID for the bundle parameter.
      */
-    private static final OptionID BUNDLE_ID = OptionID.getOrCreateOptionID("bundle.input", "Bundle file to load the data from.");
+    private static final OptionID BUNDLE_ID = new OptionID("bundle.input", "Bundle file to load the data from.");
 
     /**
      * File to load.

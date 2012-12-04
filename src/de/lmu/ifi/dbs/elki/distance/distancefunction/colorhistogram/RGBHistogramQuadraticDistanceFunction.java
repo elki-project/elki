@@ -51,7 +51,7 @@ public class RGBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
   /**
    * Parameter for the kernel dimensionality.
    */
-  public static final OptionID BPP_ID = OptionID.getOrCreateOptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
+  public static final OptionID BPP_ID = new OptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
 
   /**
    * Constructor.

@@ -55,7 +55,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
    * Key: {@code -mktree.kmax}
    * </p>
    */
-  public static final OptionID K_MAX_ID = OptionID.getOrCreateOptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
+  public static final OptionID K_MAX_ID = new OptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
 
   /**
    * Holds the value of parameter {@link #K_MAX_ID}.

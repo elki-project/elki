@@ -55,7 +55,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -stddevscale.mean}
    * </p>
    */
-  public static final OptionID MEAN_ID = OptionID.getOrCreateOptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
+  public static final OptionID MEAN_ID = new OptionID("stddevscale.mean", "Fixed mean to use in standard deviation scaling.");
 
   /**
    * Parameter to specify the lambda value
@@ -63,7 +63,7 @@ public class StandardDeviationScaling implements OutlierScalingFunction {
    * Key: {@code -stddevscale.lambda}
    * </p>
    */
-  public static final OptionID LAMBDA_ID = OptionID.getOrCreateOptionID("stddevscale.lambda", "Significance level to use for error function.");
+  public static final OptionID LAMBDA_ID = new OptionID("stddevscale.lambda", "Significance level to use for error function.");
 
   /**
    * Field storing the fixed mean to use
