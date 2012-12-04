@@ -5,6 +5,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  This file is part of ELKI:
@@ -43,12 +44,17 @@ public class ParallelCore {
   /**
    * Static core
    */
-  private static final ParallelCore STATIC = new ParallelCore(Runtime.getRuntime().availableProcessors());
+  private static final ParallelCore STATIC = new ParallelCore(ALL_PROCESSORS);
 
   /**
    * Executor service.
    */
   ThreadPoolExecutor executor;
+
+  /**
+   * Number of connected submitters.
+   */
+  private AtomicInteger connected = new AtomicInteger(0);
 
   /**
    * Constructor.
@@ -73,7 +79,7 @@ public class ParallelCore {
    * @return Number of threads to run in parallel
    */
   public int getParallelism() {
-    return ALL_PROCESSORS;
+    return executor.getMaximumPoolSize();
   }
 
   /**
@@ -85,5 +91,27 @@ public class ParallelCore {
    */
   public <T> Future<T> submit(Callable<T> task) {
     return executor.submit(task);
+  }
+
+  /**
+   * Connect to the executor.
+   */
+  public void connect() {
+    int c = this.connected.incrementAndGet();
+    if (c == 1) {
+      executor.allowCoreThreadTimeOut(false);
+      executor.setCorePoolSize(executor.getMaximumPoolSize());
+    }
+  }
+
+  /**
+   * Disconnect to the executor.
+   */
+  public void disconnect() {
+    int c = this.connected.decrementAndGet();
+    if (c == 0) {
+      executor.allowCoreThreadTimeOut(true);
+      executor.setCorePoolSize(0);
+    }
   }
 }
