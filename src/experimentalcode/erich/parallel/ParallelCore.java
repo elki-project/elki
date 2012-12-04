@@ -1,9 +1,10 @@
 package experimentalcode.erich.parallel;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /*
  This file is part of ELKI:
@@ -37,7 +38,7 @@ public class ParallelCore {
   /**
    * The number of CPUs to use.
    */
-  public static final int processors = Runtime.getRuntime().availableProcessors();
+  public static final int ALL_PROCESSORS = Runtime.getRuntime().availableProcessors();
 
   /**
    * Static core
@@ -47,14 +48,14 @@ public class ParallelCore {
   /**
    * Executor service.
    */
-  ExecutorService executor;
+  ThreadPoolExecutor executor;
 
   /**
    * Constructor.
    */
   protected ParallelCore(int processors) {
     super();
-    executor = Executors.newFixedThreadPool(processors);
+    executor = new ThreadPoolExecutor(0, processors, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
   }
 
   /**
@@ -72,14 +73,14 @@ public class ParallelCore {
    * @return Number of threads to run in parallel
    */
   public int getParallelism() {
-    return processors;
+    return ALL_PROCESSORS;
   }
 
   /**
    * Submit a task to the executor core.
    * 
    * @param task Submitted task
-   *
+   * 
    * @return Future to observe completion
    */
   public <T> Future<T> submit(Callable<T> task) {
