@@ -57,24 +57,27 @@ public class ParallelMapExecutor {
     // TODO: use more segments than processors for better handling runtime
     // differences?
     ParallelCore core = ParallelCore.getCore();
+    core.connect();
     final int numparts = core.getParallelism();
 
+    final int size = aids.size();
+    final int blocksize = (size + (numparts - 1)) / numparts;
     List<Future<ArrayDBIDs>> parts = new ArrayList<Future<ArrayDBIDs>>(numparts);
-    for(int i = 0; i < numparts; i++) {
-      Callable<ArrayDBIDs> run = new InterleavedArrayRunner(aids, i, aids.size(), numparts, mapper);
+    for (int i = 0; i < numparts; i++) {
+      Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, i * blocksize, Math.min((i + 1) * blocksize, size), mapper);
       parts.add(core.submit(run));
     }
 
     try {
-      for(Future<ArrayDBIDs> fut : parts) {
+      for (Future<ArrayDBIDs> fut : parts) {
         fut.get();
       }
-    }
-    catch(ExecutionException e) {
+    } catch (ExecutionException e) {
       throw new RuntimeException("Mapper execution failed.", e);
-    }
-    catch(InterruptedException e) {
+    } catch (InterruptedException e) {
       throw new RuntimeException("Parallel execution interrupted.");
+    } finally {
+      core.disconnect();
     }
   }
 
@@ -132,7 +135,92 @@ public class ParallelMapExecutor {
       this.end = end;
       this.step = step;
       this.mapper = new Mapper.Instance[mapper.length];
-      for(int i = 0; i < mapper.length; i++) {
+      for (int i = 0; i < mapper.length; i++) {
+        this.mapper[i] = mapper[i].instantiate(this);
+      }
+    }
+
+    @Override
+    public ArrayDBIDs call() {
+      System.err.println("mapper at " + start + " step=" + step + " started.");
+      DBIDArrayIter iter = ids.iter();
+      iter.seek(start);
+      for (; iter.valid() && iter.getOffset() < end; iter.advance(step)) {
+        for (int i = 0; i < mapper.length; i++) {
+          mapper[i].map(iter);
+        }
+        // This is a good moment for multitasking
+        Thread.yield();
+      }
+      System.err.println("mapper at " + start + " step=" + step + " finished.");
+      return ids;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls) {
+      SharedVariable.Instance<?> inst = channels.get(parent);
+      if (inst == null) {
+        return null;
+      } else {
+        return (I) cls.cast(inst);
+      }
+    }
+
+    @Override
+    public void addShared(SharedVariable<?> chan, SharedVariable.Instance<?> inst) {
+      channels.put(chan, inst);
+    }
+  }
+
+  /**
+   * Run for an array aprt, without step size.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.composedOf Mapper.Instance
+   */
+  protected class BlockArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
+    /**
+     * Array IDs to process
+     */
+    private ArrayDBIDs ids;
+
+    /**
+     * Start position
+     */
+    private int start;
+
+    /**
+     * End position
+     */
+    private int end;
+
+    /**
+     * Mapper
+     */
+    private Mapper.Instance[] mapper;
+
+    /**
+     * Channel map
+     */
+    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<SharedVariable<?>, SharedVariable.Instance<?>>();
+
+    /**
+     * Constructor.
+     * 
+     * @param ids IDs to process
+     * @param start Starting position
+     * @param end End position
+     * @param done Counter to decrement when done.
+     */
+    protected BlockArrayRunner(ArrayDBIDs ids, int start, int end, Mapper[] mapper) {
+      super();
+      this.ids = ids;
+      this.start = start;
+      this.end = end;
+      this.mapper = new Mapper.Instance[mapper.length];
+      for (int i = 0; i < mapper.length; i++) {
         this.mapper[i] = mapper[i].instantiate(this);
       }
     }
@@ -141,8 +229,8 @@ public class ParallelMapExecutor {
     public ArrayDBIDs call() {
       DBIDArrayIter iter = ids.iter();
       iter.seek(start);
-      for(; iter.valid() && iter.getOffset() < end; iter.advance(step)) {
-        for(int i = 0; i < mapper.length; i++) {
+      for (int c = end - start; iter.valid() && c >= 0; iter.advance(), c--) {
+        for (int i = 0; i < mapper.length; i++) {
           mapper[i].map(iter);
         }
         // This is a good moment for multitasking
@@ -155,10 +243,9 @@ public class ParallelMapExecutor {
     @Override
     public <C extends SharedVariable<?>, I extends SharedVariable.Instance<?>> I getShared(C parent, Class<? super I> cls) {
       SharedVariable.Instance<?> inst = channels.get(parent);
-      if(inst == null) {
+      if (inst == null) {
         return null;
-      }
-      else {
+      } else {
         return (I) cls.cast(inst);
       }
     }
