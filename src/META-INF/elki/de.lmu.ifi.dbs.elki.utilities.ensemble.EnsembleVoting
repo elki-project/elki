@@ -1,0 +1,6 @@
+de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean
+de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMin
+de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMax
+de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMedian
+de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingBayes
+de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingRestrictedBayes

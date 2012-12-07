@@ -74,6 +74,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.meta.ExternalDoubleOutlierScore
 de.lmu.ifi.dbs.elki.algorithm.outlier.meta.FeatureBagging
 de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS
 de.lmu.ifi.dbs.elki.algorithm.outlier.meta.RescaleMetaOutlierAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.outlier.meta.SimpleOutlierEnsemble
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAllOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialNoOutlier
