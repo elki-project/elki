@@ -221,12 +221,12 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
     private GoodnessOfFitTest statTest;
 
     /**
-     * Holds the value of {@link HiCS.Parameterizer#M_ID}.
+     * Holds the value of {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#M_ID}.
      */
     private int m = 50;
 
     /**
-     * Holds the value of {@link HiCS.Parameterizer#ALPHA_ID}.
+     * Holds the value of {@link de.lmu.ifi.dbs.elki.algorithm.outlier.meta.HiCS.Parameterizer#ALPHA_ID}.
      */
     private double alpha = 0.1;
 
