@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -167,9 +168,10 @@ public class BubbleVisualization extends AbstractVisFactory {
 
     @Override
     public void redraw() {
-      StylingPolicy stylepolicy = context.getStyleResult().getStylingPolicy();
+      final StyleResult style = context.getStyleResult();
+      StylingPolicy stylepolicy = style.getStylingPolicy();
       // bubble size
-      final double bubble_size = context.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
+      final double bubble_size = style.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
       if(stylepolicy instanceof ClassStylingPolicy) {
         ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
         setupCSS(svgp, colors);
@@ -197,16 +199,16 @@ public class BubbleVisualization extends AbstractVisFactory {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
               int color = stylepolicy.getColorForDBID(objId);
-              final StringBuilder style = new StringBuilder();
+              final StringBuilder cssstyle = new StringBuilder();
               if(settings.fill) {
-                style.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGUtil.colorToString(color));
-                style.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY).append(":0.5");
+                cssstyle.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGUtil.colorToString(color));
+                cssstyle.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY).append(":0.5");
               }
               else {
-                style.append(SVGConstants.CSS_STROKE_VALUE).append(':').append(SVGUtil.colorToString(color));
-                style.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGConstants.CSS_NONE_VALUE);
+                cssstyle.append(SVGConstants.CSS_STROKE_VALUE).append(':').append(SVGUtil.colorToString(color));
+                cssstyle.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGConstants.CSS_NONE_VALUE);
               }
-              SVGUtil.setAtt(circle, SVGConstants.SVG_STYLE_ATTRIBUTE, style.toString());
+              SVGUtil.setAtt(circle, SVGConstants.SVG_STYLE_ATTRIBUTE, cssstyle.toString());
               layer.appendChild(circle);
             }
           }
@@ -229,12 +231,13 @@ public class BubbleVisualization extends AbstractVisFactory {
      * @param policy Clustering to use
      */
     private void setupCSS(SVGPlot svgp, ClassStylingPolicy policy) {
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       // creating IDs manually because cluster often return a null-ID.
       for(int clusterID = policy.getMinStyle(); clusterID < policy.getMaxStyle(); clusterID++) {
         CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
-        bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
 
         String color = colors.getColor(clusterID);
 
