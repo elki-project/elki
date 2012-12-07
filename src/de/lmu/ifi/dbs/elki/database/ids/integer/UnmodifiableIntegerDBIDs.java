@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses DBIDs
+ * @apiviz.uses IntegerDBIDs
  * @apiviz.has UnmodifiableDBIDIter
  */
 public class UnmodifiableIntegerDBIDs implements StaticDBIDs, IntegerDBIDs {

@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses OPTICSProjecton
+ * @apiviz.uses OPTICSProjection
  * 
  * @param <D>
  */
@@ -76,7 +76,7 @@ public abstract class AbstractOPTICSVisualization<D extends Distance<D>> extends
   protected void makeLayerElement() {
     plotwidth = StyleLibrary.SCALE;
     plotheight = StyleLibrary.SCALE / optics.getOPTICSPlot(context).getRatio();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
     layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), plotwidth, plotheight, margin * .5);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);

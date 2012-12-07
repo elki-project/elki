@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * @author Erich Schubert
  * 
  * @apiviz.has IntegerDBID
- * @apiviz.has TroveIteratorAdapter
+ * @apiviz.has DBIDItr
  */
 class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBIDs {
   /**

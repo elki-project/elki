@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * @author Erich Schubert
  * 
  * @apiviz.has IntegerDBID
- * @apiviz.has TroveIteratorAdapter
+ * @apiviz.has DBIDItr
  */
 public abstract class TroveArrayDBIDs implements ArrayDBIDs, IntegerDBIDs {
   /**
