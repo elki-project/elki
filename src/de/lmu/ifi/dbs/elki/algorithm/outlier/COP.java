@@ -93,6 +93,21 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   private static final Logging LOG = Logging.getLogger(COP.class);
 
   /**
+   * Result name for the COP outlier scores.
+   */
+  public static final String COP_SCORES = "cop-outlier";
+
+  /**
+   * Result name for the dimensionality.
+   */
+  public static final String COP_DIM = "cop-dim";
+
+  /**
+   * Result name for the error vectors.
+   */
+  public static final String COP_ERRORVEC = "cop-errorvec";
+
+  /**
    * Number of neighbors to be considered.
    */
   int k;
@@ -256,11 +271,11 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     // combine results.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Correlation Outlier Probabilities", "cop-outlier", TypeUtil.DOUBLE, cop_score, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Correlation Outlier Probabilities", COP_SCORES, TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", "cop-dim", TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", "cop-errorvec", TypeUtil.VECTOR, cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
     return result;
   }
 
