@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses ArrayDBIDs
+ * @apiviz.uses TroveArrayDBIDs
  * @apiviz.has UnmodifiableDBIDIter
  */
 public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
