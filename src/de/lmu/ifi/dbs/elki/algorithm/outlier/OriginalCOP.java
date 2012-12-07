@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 /*
  This file is part of ELKI:
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -67,30 +67,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Algorithm to compute local correlation outlier probability.
- * <p/>
- * Publication pending
+ * 
+ * This is the original version of COP, as published in
+ * <p>
+ * Arthur Zimek<br />
+ * Correlation Clustering.<br />
+ * PhD thesis, Chapter 18
+ * </p>
  * 
  * @author Erich Schubert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Title("COP: Correlation Outlier Probability")
-@Description("Algorithm to compute correlation-based local outlier probabilitys in a database based on the parameter 'k' and different distance functions.")
-public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> {
+@Title("Original COP: Correlation Outlier Probability")
+@Reference(authors = "Arthur Zimek", title = "Correlation Clustering. PhD thesis, Chapter 18", booktitle = "")
+public class OriginalCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(COP.class);
-
-  /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its COP_SCORE, must be an integer greater than 0.
-   * <p/>
-   * Key: {@code -cop.k}
-   * </p>
-   */
-  public static final OptionID K_ID = new OptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
-
-  public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
+  private static final Logging LOG = Logging.getLogger(OriginalCOP.class);
 
   /**
    * Number of neighbors to be considered.
@@ -105,11 +99,11 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
   /**
    * Constructor.
    * 
-   * @param distanceFunction
-   * @param k
-   * @param pca
+   * @param distanceFunction Distance function
+   * @param k k Parameter
+   * @param pca PCA runner-
    */
-  public COP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
+  public OriginalCOP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
     super(distanceFunction);
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<V, D>(null, FormatUtil.NF8, pca, 0, false);
@@ -128,7 +122,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), LOG) : null;
       double sqrt2 = Math.sqrt(2.0);
-      for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
+      for (DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
         KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);
         nids.remove(id);
@@ -136,15 +130,6 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         // TODO: do we want to use the query point as centroid?
         CorrelationAnalysisSolution<V> depsol = dependencyDerivator.generateModel(data, nids);
 
-        // temp code, experimental.
-        /*
-         * if(false) { double traddistance =
-         * depsol.getCentroid().minus(database.
-         * get(id).getColumnVector()).euclideanNorm(0); if(traddistance > 0.0) {
-         * double distance = depsol.distance(database.get(id));
-         * cop_score.put(id, distance / traddistance); } else {
-         * cop_score.put(id, 0.0); } }
-         */
         double stddev = depsol.getStandardDeviation();
         double distance = depsol.distance(data.get(id));
         double prob = NormalDistribution.erf(distance / (stddev * sqrt2));
@@ -161,21 +146,21 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
         cop_sol.put(id, depsol);
 
-        if(progressLocalPCA != null) {
+        if (progressLocalPCA != null) {
           progressLocalPCA.incrementProcessed(LOG);
         }
       }
-      if(progressLocalPCA != null) {
+      if (progressLocalPCA != null) {
         progressLocalPCA.ensureCompleted(LOG);
       }
     }
     // combine results.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Correlation Outlier Probabilities", "cop-outlier", TypeUtil.DOUBLE, cop_score, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Original Correlation Outlier Probabilities", "origcop-outlier", TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", "cop-dim", TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", "cop-errorvec", TypeUtil.VECTOR, cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", COP.COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
     result.addChildResult(new MaterializedRelation<Matrix>("Data vectors", "cop-datavec", TypeUtil.MATRIX, cop_datav, ids));
     result.addChildResult(new MaterializedRelation<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
@@ -200,6 +185,25 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    */
   public static class Parameterizer<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<V, D> {
     /**
+     * Parameter to specify the number of nearest neighbors of an object to be
+     * considered for computing its COP_SCORE, must be an integer greater than
+     * 0.
+     * <p/>
+     * Key: {@code -cop.k}
+     * </p>
+     */
+    public static final OptionID K_ID = new OptionID("cop.k", "The number of nearest neighbors of an object to be considered for computing its COP_SCORE.");
+
+    /**
+     * Parameter for the PCA runner class.
+     * 
+     * <p>
+     * Key: {@code -cop.pcarunner}
+     * </p>
+     */
+    public static final OptionID PCARUNNER_ID = new OptionID("cop.pcarunner", "The class to compute (filtered) PCA.");
+
+    /**
      * Number of neighbors to be considered.
      */
     int k;
@@ -214,18 +218,18 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      if (config.grab(kP)) {
         k = kP.intValue();
       }
       ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<PCAFilteredRunner<V>>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
-      if(config.grab(pcaP)) {
+      if (config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }
     }
 
     @Override
-    protected COP<V, D> makeInstance() {
-      return new COP<V, D>(distanceFunction, k, pca);
+    protected OriginalCOP<V, D> makeInstance() {
+      return new OriginalCOP<V, D>(distanceFunction, k, pca);
     }
   }
 }
