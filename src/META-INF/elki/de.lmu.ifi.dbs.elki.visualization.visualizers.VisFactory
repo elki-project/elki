@@ -9,6 +9,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterOrderVi
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeSphereVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier.BubbleVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier.COPVectorVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipScoreVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipStringVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ToolBox2DVisualization
