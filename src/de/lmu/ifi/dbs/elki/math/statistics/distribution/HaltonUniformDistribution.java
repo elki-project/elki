@@ -130,7 +130,8 @@ public class HaltonUniformDistribution implements DistributionWithRandom {
    * 
    * @param min Minimum value
    * @param max Maximum value
-   * @param random Random generator
+   * @param base Base value
+   * @param seed Random seed (starting value)
    */
   public HaltonUniformDistribution(double min, double max, int base, double seed) {
     super();
