@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * @author Erich Schubert
  * 
  * @apiviz.uses ArrayDBIDs
- * @apiviz.has UnmodifiableDBIDArrayIter
+ * @apiviz.has UnmodifiableDBIDIter
  */
 public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   /**
@@ -66,7 +66,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   public IntegerDBIDArrayIter iter() {
     IntegerDBIDArrayIter it = inner.iter();
     if (it instanceof DBIDMIter) {
-      return new UnmodifiableDBIDArrayIter(it);
+      return new UnmodifiableDBIDIter(it);
     }
     return it;
   }
@@ -101,7 +101,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
    * 
    * @author Erich Schubert
    */
-  class UnmodifiableDBIDArrayIter implements IntegerDBIDArrayIter {
+  class UnmodifiableDBIDIter implements IntegerDBIDArrayIter {
     /**
      * Wrapped iterator.
      */
@@ -112,7 +112,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
      * 
      * @param it inner iterator
      */
-    public UnmodifiableDBIDArrayIter(IntegerDBIDArrayIter it) {
+    public UnmodifiableDBIDIter(IntegerDBIDArrayIter it) {
       super();
       this.it = it;
     }

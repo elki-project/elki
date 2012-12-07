@@ -86,7 +86,7 @@ public class ParallelMapExecutor {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.composedOf Mapper.Instance
+   * @apiviz.uses Mapper
    */
   protected class InterleavedArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
     /**
@@ -178,7 +178,7 @@ public class ParallelMapExecutor {
    * 
    * @author Erich Schubert
    * 
-   * @apiviz.composedOf Mapper.Instance
+   * @apiviz.uses Mapper
    */
   protected class BlockArrayRunner implements Callable<ArrayDBIDs>, MapExecutor {
     /**
