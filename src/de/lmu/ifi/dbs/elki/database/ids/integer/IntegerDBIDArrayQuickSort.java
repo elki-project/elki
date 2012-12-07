@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses TroveArrayModifiableDBIDs
  */
 @Reference(authors = "Vladimir Yaroslavskiy", title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", url = "http://iaroslavski.narod.ru/quicksort/")
 class IntegerDBIDArrayQuickSort {

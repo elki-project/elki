@@ -39,6 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * the array references external objects.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.uses IntegerComparator
  */
 @Reference(authors = "Vladimir Yaroslavskiy", title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", url = "http://iaroslavski.narod.ru/quicksort/")
 public class IntegerArrayQuickSort {
