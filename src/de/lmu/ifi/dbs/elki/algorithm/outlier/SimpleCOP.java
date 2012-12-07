@@ -68,23 +68,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Algorithm to compute local correlation outlier probability.
  * 
- * This is the original version of COP, as published in
+ * This is the simpler, original version of COP, as published in
  * <p>
  * Arthur Zimek<br />
  * Correlation Clustering.<br />
  * PhD thesis, Chapter 18
  * </p>
+ * which has then been refined to the method published as {@link COP}
  * 
  * @author Erich Schubert
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Title("Original COP: Correlation Outlier Probability")
+@Title("Simple COP: Correlation Outlier Probability")
 @Reference(authors = "Arthur Zimek", title = "Correlation Clustering. PhD thesis, Chapter 18", booktitle = "")
-public class OriginalCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
+public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<V, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(OriginalCOP.class);
+  private static final Logging LOG = Logging.getLogger(SimpleCOP.class);
 
   /**
    * Number of neighbors to be considered.
@@ -103,7 +104,7 @@ public class OriginalCOP<V extends NumberVector<?>, D extends NumberDistance<D, 
    * @param k k Parameter
    * @param pca PCA runner-
    */
-  public OriginalCOP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
+  public SimpleCOP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
     super(distanceFunction);
     this.k = k;
     this.dependencyDerivator = new DependencyDerivator<V, D>(null, FormatUtil.NF8, pca, 0, false);
@@ -228,8 +229,8 @@ public class OriginalCOP<V extends NumberVector<?>, D extends NumberDistance<D, 
     }
 
     @Override
-    protected OriginalCOP<V, D> makeInstance() {
-      return new OriginalCOP<V, D>(distanceFunction, k, pca);
+    protected SimpleCOP<V, D> makeInstance() {
+      return new SimpleCOP<V, D>(distanceFunction, k, pca);
     }
   }
 }
