@@ -47,11 +47,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.gui.GUIUtil;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
 import de.lmu.ifi.dbs.elki.gui.util.LogPanel;
 import de.lmu.ifi.dbs.elki.gui.util.ParameterTable;
@@ -59,6 +60,7 @@ import de.lmu.ifi.dbs.elki.gui.util.ParametersModel;
 import de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -75,12 +77,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * @apiviz.owns ParameterTable
  * @apiviz.owns DynamicParameters
  */
-public class MiniGUI extends JPanel {
-  /**
-   * Serial version.
-   */
-  private static final long serialVersionUID = 1L;
-
+public class MiniGUI extends AbstractApplication {
   /**
    * Filename for saved settings.
    */
@@ -95,6 +92,16 @@ public class MiniGUI extends JPanel {
    * ELKI logger for the GUI.
    */
   private static final Logging LOG = Logging.getLogger(MiniGUI.class);
+
+  /**
+   * The frame
+   */
+  JFrame frame;
+
+  /**
+   * The main panel.
+   */
+  JPanel panel;
 
   /**
    * Logging output area.
@@ -136,7 +143,18 @@ public class MiniGUI extends JPanel {
    */
   public MiniGUI() {
     super();
-    this.setLayout(new GridBagLayout());
+    // Create and set up the window.
+    frame = new JFrame("ELKI MiniGUI");
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    try {
+      frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
+    } catch (Exception e) {
+      // Ignore - icon not found is not fatal.
+    }
+
+    panel = new JPanel();
+    panel.setOpaque(true); // content panes must be opaque
+    panel.setLayout(new GridBagLayout());
 
     {
       // Button panel
@@ -221,7 +239,7 @@ public class MiniGUI extends JPanel {
       constraints.gridy = 1;
       constraints.weightx = 1.0;
       constraints.weighty = 0.01;
-      add(buttonPanel, constraints);
+      panel.add(buttonPanel, constraints);
     }
 
     {
@@ -248,7 +266,7 @@ public class MiniGUI extends JPanel {
       constraints.gridy = 0;
       constraints.weightx = 1;
       constraints.weighty = 1;
-      add(scrollPane, constraints);
+      panel.add(scrollPane, constraints);
     }
 
     {
@@ -266,25 +284,7 @@ public class MiniGUI extends JPanel {
       constraints.gridy = 2;
       constraints.weightx = 1;
       constraints.weighty = 1;
-      add(outputPane, constraints);
-
-      // reconfigure logging
-      outputArea.becomeDefaultLogger();
-    }
-
-    // refresh Parameters
-    ArrayList<String> ps = new ArrayList<String>();
-    doSetParameters(ps);
-
-    try {
-      Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-        @Override
-        public void uncaughtException(Thread t, Throwable e) {
-          LOG.exception(e);
-        }
-      });
-    } catch (SecurityException e) {
-      LOG.warning("Could not set the Default Uncaught Exception Handler", e);
+      panel.add(outputPane, constraints);
     }
 
     // load saved settings (we wanted to have the logger first!)
@@ -297,6 +297,9 @@ public class MiniGUI extends JPanel {
       LOG.exception(e);
     }
 
+    // Finalize the frame.
+    frame.setContentPane(panel);
+    frame.pack();
   }
 
   /**
@@ -323,8 +326,10 @@ public class MiniGUI extends JPanel {
     track.tryInstantiate(KDDTask.class);
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
-    if (config.getErrors().size() > 0) {
+    if (config.getErrors().size() > 0 && params.size() > 0) {
       reportErrors(config);
+    }
+    if (config.getErrors().size() > 0) {
       runButton.setEnabled(false);
     } else {
       runButton.setEnabled(true);
@@ -403,7 +408,7 @@ public class MiniGUI extends JPanel {
    */
   protected void reportErrors(SerializedParameterization config) {
     StringBuilder buf = new StringBuilder();
-    buf.append("Could not run task because of configuration errors:" + NEWLINE + NEWLINE);
+    buf.append("Task is not completely configured:" + NEWLINE + NEWLINE);
     for (ParameterException e : config.getErrors()) {
       buf.append(e.getMessage() + NEWLINE);
     }
@@ -411,41 +416,10 @@ public class MiniGUI extends JPanel {
     config.clearErrors();
   }
 
-  /**
-   * Create the GUI and show it. For thread safety, this method should be
-   * invoked from the event-dispatching thread.
-   * 
-   * @param args Command line arguments
-   */
-  protected static void createAndShowGUI(String[] args) {
-    // Create and set up the window.
-    JFrame frame = new JFrame("ELKI MiniGUI");
-    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-      // Class<?> cls =
-      // ClassLoader.getSystemClassLoader().loadClass("org.jdesktop.swinghelper.debug.CheckThreadViolationRepaintManager");
-      // RepaintManager.setCurrentManager((RepaintManager) cls.newInstance());
-    } catch (Exception e) {
-      // ignore
-    }
-    try {
-      frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
-    } catch (Exception e) {
-      // Ignore - icon not found is not fatal.
-    }
-
-    // Create and set up the content pane.
-    MiniGUI newContentPane = new MiniGUI();
-    if (args != null && args.length > 0) {
-      newContentPane.doSetParameters(Arrays.asList(args));
-    }
-    newContentPane.setOpaque(true); // content panes must be opaque
-    frame.setContentPane(newContentPane);
-
-    // Display the window.
-    frame.pack();
+  @Override
+  public void run() throws UnableToComplyException {
     frame.setVisible(true);
+    outputArea.becomeDefaultLogger();
   }
 
   /**
@@ -454,11 +428,24 @@ public class MiniGUI extends JPanel {
    * @param args command line parameters
    */
   public static void main(final String[] args) {
+    GUIUtil.logUncaughtExceptions(LOG);
+    GUIUtil.setLookAndFeel();
     OutputStep.setDefaultHandlerVisualizer();
+
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        createAndShowGUI(args);
+        try {
+          final MiniGUI gui = new MiniGUI();
+          gui.run();
+          if (args != null && args.length > 0) {
+            gui.doSetParameters(Arrays.asList(args));
+          } else {
+            gui.doSetParameters(new ArrayList<String>());
+          }
+        } catch (UnableToComplyException e) {
+          LOG.exception(e);
+        }
       }
     });
   }

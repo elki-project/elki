@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 
 import javax.swing.JFrame;
 
+import de.lmu.ifi.dbs.elki.gui.GUIUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -124,6 +125,7 @@ public class ResultVisualizer implements ResultHandler {
       @Override
       public void run() {
         try {
+          GUIUtil.setLookAndFeel();
           ResultWindow window = new ResultWindow(title, top, context, single);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);

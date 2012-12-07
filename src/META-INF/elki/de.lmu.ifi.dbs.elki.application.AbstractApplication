@@ -1,0 +1,12 @@
+de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI
+de.lmu.ifi.dbs.elki.application.KDDCLIApplication
+de.lmu.ifi.dbs.elki.application.GeneratorXMLSpec
+de.lmu.ifi.dbs.elki.application.ConvertToBundleApplication
+de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix
+de.lmu.ifi.dbs.elki.application.cache.CacheFloatDistanceInOnDiskMatrix
+de.lmu.ifi.dbs.elki.application.geo.VisualizeGeodesicDistances
+de.lmu.ifi.dbs.elki.application.greedyensemble.ComputeKNNOutlierScores
+de.lmu.ifi.dbs.elki.application.greedyensemble.GreedyEnsembleExperiment
+de.lmu.ifi.dbs.elki.application.greedyensemble.VisualizePairwiseGainMatrix
+de.lmu.ifi.dbs.elki.application.visualization.KNNExplorer
+de.lmu.ifi.dbs.elki.application.ComputeSingleColorHistogram
