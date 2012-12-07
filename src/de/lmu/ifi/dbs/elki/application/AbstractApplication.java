@@ -75,7 +75,7 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * Information for citation and version.
    */
-  public static final String INFORMATION = "ELKI Version 0.5.0~beta1 (2012, April)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th" + NEWLINE + "International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
+  public static final String INFORMATION = "ELKI Version 0.5.5 (2012, December)" + NEWLINE + NEWLINE + "published in:" + NEWLINE + "E. Achtert, S. Goldhofer, H.-P. Kriegel, E. Schubert, A. Zimek:" + NEWLINE + "Evaluation of Clusterings – Metrics and Visual Support." + NEWLINE + "In Proceedings of the 28th" + NEWLINE + "International Conference on Data Engineering (ICDE), Washington, DC, 2012." + NEWLINE;
 
   /**
    * Constructor.
@@ -162,7 +162,7 @@ public abstract class AbstractApplication implements Parameterizable {
     usage.append(NEWLINE).append("Parameters:").append(NEWLINE);
     OptionUtil.formatForConsole(usage, FormatUtil.getConsoleWidth(), "   ", options);
 
-    // FIXME: re-add constraints!
+    // FIXME: re-add global constraints!
     return usage.toString();
   }
 
@@ -198,8 +198,8 @@ public abstract class AbstractApplication implements Parameterizable {
   /**
    * Runs the application.
    * 
-   * @throws de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException if
-   *         an error occurs during running the application
+   * @throws UnableToComplyException if an error occurs during running the
+   *         application
    */
   public abstract void run() throws UnableToComplyException;
 
