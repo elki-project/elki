@@ -22,9 +22,9 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.LDF
 de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.OriginalCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleKernelDensityLOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
