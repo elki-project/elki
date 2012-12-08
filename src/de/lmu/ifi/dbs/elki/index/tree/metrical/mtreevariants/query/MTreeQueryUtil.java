@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -53,8 +53,8 @@ public final class MTreeQueryUtil {
   public static <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(AbstractMTree<O, D, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
     DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
     // Can we use an optimized query?
-    if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) df;
+    if(df instanceof PrimitiveDoubleDistanceFunction) {
+      PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
       AbstractMTree<O, DoubleDistance, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?>) tree;
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
       KNNQuery<O, ?> q = new DoubleDistanceMetricalIndexKNNQuery<O>(treec, dqc, dfc);
@@ -78,8 +78,8 @@ public final class MTreeQueryUtil {
   public static <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(AbstractMTree<O, D, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
     DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
     // Can we use an optimized query?
-    if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
-      SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) df;
+    if(df instanceof PrimitiveDoubleDistanceFunction) {
+      PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
       AbstractMTree<O, DoubleDistance, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?>) tree;
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
       RangeQuery<O, ?> q = new DoubleDistanceMetricalIndexRangeQuery<O>(treec, dqc, dfc);
