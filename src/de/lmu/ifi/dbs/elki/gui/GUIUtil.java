@@ -77,7 +77,6 @@ public final class GUIUtil {
         Method testm = suntoolkit.getMethod("isNativeGTKAvailable");
         if(suntoolkit.isInstance(toolkit) && (Boolean) testm.invoke(toolkit)) {
           UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-          System.err.println("Set GTK.");
           return;
         }
       }
