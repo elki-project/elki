@@ -207,6 +207,6 @@ public class VectorListParameter extends ListParameter<List<Double>> {
    */
   @Override
   public String getSyntax() {
-    return "<double_11,...,double_1n:...:double_m1,...,double_mn>";
+    return "double_11,...,double_1n:...:double_m1,...,double_mn";
   }
 }

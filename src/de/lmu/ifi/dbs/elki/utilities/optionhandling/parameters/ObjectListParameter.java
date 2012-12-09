@@ -70,7 +70,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   
   @Override
   public String getSyntax() {
-    return "<object_1|class_1,...,object_n|class_n>";
+    return "object_1|class_1,...,object_n|class_n";
   }
 
   @SuppressWarnings("unchecked")

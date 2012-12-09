@@ -102,10 +102,10 @@ public class IntListParameter extends ListParameter<Integer> {
   /**
    * Returns a string representation of the parameter's type.
    * 
-   * @return &quot;&lt;int_1,...,int_n&gt;&quot;
+   * @return &quot;int_1,...,int_n&quot;
    */
   @Override
   public String getSyntax() {
-    return "<int_1,...,int_n>";
+    return "int_1,...,int_n";
   }
 }

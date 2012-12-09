@@ -141,10 +141,10 @@ public class FileListParameter extends ListParameter<File> {
   /**
    * Returns a string representation of the parameter's type.
    * 
-   * @return &quot;&lt;file_1,...,file_n&gt;&quot;
+   * @return &quot;file_1,...,file_n&quot;
    */
   @Override
   public String getSyntax() {
-    return "<file_1,...,file_n>";
+    return "file_1,...,file_n";
   }
 }
