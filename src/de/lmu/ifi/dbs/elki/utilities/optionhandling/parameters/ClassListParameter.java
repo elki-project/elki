@@ -198,11 +198,11 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   /**
    * Returns a string representation of the parameter's type.
    * 
-   * @return &quot;&lt;class_1,...,class_n&gt;&quot;
+   * @return &quot;class_1,...,class_n&quot;
    */
   @Override
   public String getSyntax() {
-    return "<class_1,...,class_n>";
+    return "class_1,...,class_n";
   }
 
   /**
