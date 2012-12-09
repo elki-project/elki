@@ -106,10 +106,10 @@ public class DoubleListParameter extends ListParameter<Double> {
   /**
    * Returns a string representation of the parameter's type.
    * 
-   * @return &quot;double_1,...,double_n&quot;
+   * @return &quot;&lt;double_1,...,double_n&gt;&quot;
    */
   @Override
   public String getSyntax() {
-    return "double_1,...,double_n";
+    return "<double_1,...,double_n>";
   }
 }
