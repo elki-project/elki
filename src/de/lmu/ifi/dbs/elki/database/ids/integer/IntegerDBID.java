@@ -98,6 +98,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
+  @Deprecated
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

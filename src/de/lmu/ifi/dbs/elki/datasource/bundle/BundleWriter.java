@@ -144,11 +144,12 @@ public class BundleWriter {
    * @return Array of serializers
    * @throws IOException on IO errors
    */
+  @SuppressWarnings("unchecked")
   private ByteBufferSerializer<Object>[] writeHeader(BundleStreamSource source, ByteBuffer buffer, WritableByteChannel output) throws IOException {
     final BundleMeta meta = source.getMeta();
     final int nummeta = meta.size();
-    @SuppressWarnings("unchecked")
-    final ByteBufferSerializer<Object>[] serializers = new ByteBufferSerializer[nummeta];
+    @SuppressWarnings("rawtypes")
+    final ByteBufferSerializer[] serializers = new ByteBufferSerializer[nummeta];
     // Write our magic ID first.
     assert (buffer.position() == 0) : "Buffer is supposed to be at 0.";
     buffer.putInt(MAGIC);
@@ -156,7 +157,6 @@ public class BundleWriter {
     buffer.putInt(nummeta);
     for (int i = 0; i < nummeta; i++) {
       SimpleTypeInformation<?> type = meta.get(i);
-      @SuppressWarnings("unchecked")
       ByteBufferSerializer<Object> ser = (ByteBufferSerializer<Object>) type.getSerializer();
       if (ser == null) {
         throw new AbortException("Cannot serialize - no serializer found for type: " + type.toString());
