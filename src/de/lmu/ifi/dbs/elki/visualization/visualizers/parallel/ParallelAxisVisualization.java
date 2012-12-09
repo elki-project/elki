@@ -130,11 +130,12 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
           }
           final int truedim = proj.getDimForVisibleAxis(vdim);
           final double axisX = getVisibleAxisX(vdim);
+          final StyleLibrary style = context.getStyleResult().getStyleLibrary();
           if(!proj.isAxisInverted(vdim)) {
-            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, style);
           }
           else {
-            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, context.getStyleLibrary());
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, style);
           }
           // Get axis label
           final String label = RelationUtil.getColumnLabel(relation, truedim);
@@ -163,7 +164,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
      * @param svgp Plot to draw to
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleLibrary();
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(AXIS_LABEL)) {
         CSSClass cls = new CSSClass(this, AXIS_LABEL);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));

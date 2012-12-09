@@ -275,10 +275,11 @@ public class VoronoiVisualization extends AbstractVisFactory {
     private void addCSSClasses(SVGPlot svgp) {
       // Class for the distance markers
       if (!svgp.getCSSClassManager().contains(KMEANSBORDER)) {
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         CSSClass cls = new CSSClass(this, KMEANSBORDER);
         cls = new CSSClass(this, KMEANSBORDER);
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) * .5);
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
         cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

@@ -163,7 +163,8 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       for(int i = 0; i < tree.getHeight(); i++) {
         if(!svgp.getCSSClassManager().contains(INDEX + i)) {
@@ -173,13 +174,13 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
           final double relDepth = 1. - (((double) i) / tree.getHeight());
           if(settings.fill) {
             cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * style.getLineWidth(StyleLibrary.PLOT));
             cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
             cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.2);
           }
           else {
             cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * style.getLineWidth(StyleLibrary.PLOT));
             cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
           }
           cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

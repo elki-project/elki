@@ -134,10 +134,11 @@ public class PolygonVisualization extends AbstractVisFactory {
 
     @Override
     public void redraw() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       CSSClass css = new CSSClass(svgp, POLYS);
       // TODO: separate fill and line colors?
-      css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.POLYGONS));
-      css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.POLYGONS));
+      css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.POLYGONS));
+      css.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.POLYGONS));
       css.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(css);
       svgp.updateStyleElement();

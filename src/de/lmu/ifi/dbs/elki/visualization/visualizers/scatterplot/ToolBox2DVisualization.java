@@ -235,10 +235,11 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       }
       // Class for the text of the tools
       if(!svgp.getCSSClassManager().contains(CSS_TOOL_CAPTION)) {
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         final CSSClass label = new CSSClass(svgp, CSS_TOOL_CAPTION);
-        label.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
-        label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
-        label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL) * .8);
+        label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, style.getTextSize(StyleLibrary.AXIS_LABEL) * .8);
 
         svgp.addCSSClassOrLogError(label);
       }

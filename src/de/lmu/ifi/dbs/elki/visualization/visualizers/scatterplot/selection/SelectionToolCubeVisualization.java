@@ -283,7 +283,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       // Class for the range marking
       if (!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        final StyleLibrary style = context.getStyleLibrary();
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);

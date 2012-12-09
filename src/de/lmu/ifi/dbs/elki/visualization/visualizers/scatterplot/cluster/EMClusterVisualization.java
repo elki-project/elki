@@ -441,14 +441,15 @@ public class EMClusterVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses(SVGPlot svgp) {
       if(!svgp.getCSSClassManager().contains(EMBORDER)) {
-        ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
         String color;
         int clusterID = 0;
 
         for(@SuppressWarnings("unused")
         Cluster<?> cluster : clustering.getAllClusters()) {
           CSSClass cls = new CSSClass(this, EMBORDER + clusterID);
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) * .5);
+          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
 
           if(clustering.getAllClusters().size() == 1) {
             color = "black";

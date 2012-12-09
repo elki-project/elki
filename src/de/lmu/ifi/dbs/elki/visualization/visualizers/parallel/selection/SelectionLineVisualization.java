@@ -149,7 +149,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleLibrary();
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       // Class for the cube
       if(!svgp.getCSSClassManager().contains(MARKER)) {
         CSSClass cls = new CSSClass(this, MARKER);

@@ -115,12 +115,10 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
-      // TODO: Use width, height, imgratio, number of OPTICS plots!
-      double scale = StyleLibrary.SCALE;
-
-      final double sizex = scale;
-      final double sizey = scale * task.getHeight() / task.getWidth();
-      final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final double sizex = StyleLibrary.SCALE;
+      final double sizey = StyleLibrary.SCALE * task.getHeight() / task.getWidth();
+      final double margin = style.getSize(StyleLibrary.MARGIN);
       layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
       final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
@@ -137,15 +135,15 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
       SVGUtil.setAtt(itag, SVGConstants.SVG_IMAGE_RENDERING_ATTRIBUTE, SVGConstants.SVG_OPTIMIZE_SPEED_VALUE);
       SVGUtil.setAtt(itag, SVGConstants.SVG_X_ATTRIBUTE, margin * 0.75);
       SVGUtil.setAtt(itag, SVGConstants.SVG_Y_ATTRIBUTE, margin * 0.75);
-      SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, scale * zoom * iratio);
-      SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, scale * zoom);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_WIDTH_ATTRIBUTE, StyleLibrary.SCALE * zoom * iratio);
+      SVGUtil.setAtt(itag, SVGConstants.SVG_HEIGHT_ATTRIBUTE, StyleLibrary.SCALE * zoom);
       itag.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, result.getAsFile().toURI().toString());
       layer.appendChild(itag);
 
       // Add object labels
       final int size = result.getIDs().size();
-      final double hlsize = scale * zoom * iratio / size;
-      final double vlsize = scale * zoom / size;
+      final double hlsize = StyleLibrary.SCALE * zoom * iratio / size;
+      final double vlsize = StyleLibrary.SCALE * zoom / size;
       int i = 0;
       final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(result.getRelation().getDatabase());
       for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {

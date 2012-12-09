@@ -190,13 +190,14 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses(SVGPlot svgp) {
       if (!svgp.getCSSClassManager().contains(CLUSTERMEAN)) {
-        ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
         int clusterID = 0;
 
         for (@SuppressWarnings("unused")
         Cluster<?> cluster : clustering.getAllClusters()) {
           CSSClass cls = new CSSClass(this, CLUSTERMEAN + clusterID);
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT) * 2.);
+          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * 2.);
 
           final String color;
           if (clustering.getAllClusters().size() == 1) {

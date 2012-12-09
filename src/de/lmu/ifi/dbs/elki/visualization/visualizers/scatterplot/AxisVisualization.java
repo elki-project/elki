@@ -108,7 +108,8 @@ public class AxisVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
-      int dim = RelationUtil.dimensionality(rel);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final int dim = RelationUtil.dimensionality(rel);
 
       // origin
       double[] orig = proj.fastProjectScaledToRenderSpace(new double[dim]);
@@ -121,11 +122,11 @@ public class AxisVisualization extends AbstractVisFactory {
       // compute angle to diagonal line, used for axis labeling.
       double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
 
-      double alfontsize = 1.1 * context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL);
+      double alfontsize = 1.1 * style.getTextSize(StyleLibrary.AXIS_LABEL);
       CSSClass alcls = new CSSClass(AxisVisualization.class, "unmanaged");
       alcls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(alfontsize));
-      alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
-      alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
+      alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
+      alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
 
       // draw axes
       for(int d = 0; d < dim; d++) {
@@ -142,7 +143,7 @@ public class AxisVisualization extends AbstractVisFactory {
         // " "+(axa*180/Math.PI)+" "+(diaga*180/Math.PI));
         if(ax[0] != orig[0] || ax[1] != orig[1]) {
           try {
-            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig[0], orig[1], ax[0], ax[1], righthand ? SVGSimpleLinearAxis.LabelStyle.RIGHTHAND : SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), orig[0], orig[1], ax[0], ax[1], righthand ? SVGSimpleLinearAxis.LabelStyle.RIGHTHAND : SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
             // TODO: move axis labeling into drawAxis function.
             double offx = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;
             double offy = (righthand ? 1 : -1) * 0.02 * Projection.SCALE;

@@ -182,7 +182,7 @@ public class LineVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
-      final StyleLibrary style = context.getStyleLibrary();
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       final LineStyleLibrary lines = style.lines();
       final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
       if(sp instanceof ClassStylingPolicy) {

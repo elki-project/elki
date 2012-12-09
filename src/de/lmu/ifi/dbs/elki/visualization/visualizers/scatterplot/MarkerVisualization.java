@@ -133,8 +133,8 @@ public class MarkerVisualization extends AbstractVisFactory {
 
     @Override
     public void redraw() {
-      final MarkerLibrary ml = context.getStyleLibrary().markers();
-      final double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
+      final MarkerLibrary ml = style.getStyleLibrary().markers();
+      final double marker_size = style.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
       final StylingPolicy spol = style.getStylingPolicy();
 
       if(spol instanceof ClassStylingPolicy) {

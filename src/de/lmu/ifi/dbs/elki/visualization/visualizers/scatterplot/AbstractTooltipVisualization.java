@@ -90,8 +90,8 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
   @Override
   public void redraw() {
     setupCSS(svgp);
-
-    double dotsize = context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT);
+    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    double dotsize = style.getLineWidth(StyleLibrary.PLOT);
 
     for(DBIDIter id = sample.getSample().iter(); id.valid(); id.advance()) {
       double[] v = proj.fastProjectDataToRenderSpace(rel.get(id));

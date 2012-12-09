@@ -155,7 +155,7 @@ public class KeyVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       SVGPlot svgp = task.getPlot();
-      StyleLibrary style = context.getStyleLibrary();
+      StyleLibrary style = context.getStyleResult().getStyleLibrary();
       MarkerLibrary ml = style.markers();
 
       // Maximum width (compared to height) of labels - guess.
@@ -226,7 +226,7 @@ public class KeyVisualization extends AbstractVisFactory {
      * Trigger a style change.
      */
     protected void setStylePolicy() {
-      context.getStyleResult().setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleLibrary()));
+      context.getStyleResult().setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleResult().getStyleLibrary()));
       context.getHierarchy().resultChanged(context.getStyleResult());
     }
   }

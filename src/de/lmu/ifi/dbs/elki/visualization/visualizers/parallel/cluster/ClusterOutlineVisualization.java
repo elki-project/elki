@@ -232,7 +232,8 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses(SVGPlot svgp) {
       if(!svgp.getCSSClassManager().contains(CLUSTERAREA)) {
-        ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
         int clusterID = 0;
 
         for(@SuppressWarnings("unused")

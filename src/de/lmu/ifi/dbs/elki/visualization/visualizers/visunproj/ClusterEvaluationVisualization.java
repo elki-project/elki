@@ -181,7 +181,8 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
     double cols = 10; // Math.max(10, (int) (i * task.getHeight() /
     // task.getWidth()));
     double rows = ypos;
-    final double margin = task.getContext().getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final StyleLibrary style = task.getContext().getStyleResult().getStyleLibrary();
+    final double margin = style.getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 

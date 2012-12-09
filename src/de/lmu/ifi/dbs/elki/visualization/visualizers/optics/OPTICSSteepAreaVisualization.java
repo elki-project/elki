@@ -186,26 +186,27 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the markers
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_STEEP_DOWN)) {
         final CSSClass cls = new CSSClass(this, CSS_STEEP_DOWN);
-        Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+        Color color = SVGUtil.stringToColor(style.getColor(StyleLibrary.PLOT));
         if(color == null) {
           color = Color.BLACK;
         }
         color = new Color((int) (color.getRed() * 0.8), (int) (color.getGreen() * 0.8 + 0.2 * 256.), (int) (color.getBlue() * 0.8));
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);
       }
       if(!svgp.getCSSClassManager().contains(CSS_STEEP_UP)) {
         final CSSClass cls = new CSSClass(this, CSS_STEEP_UP);
-        Color color = SVGUtil.stringToColor(context.getStyleLibrary().getColor(StyleLibrary.PLOT));
+        Color color = SVGUtil.stringToColor(style.getColor(StyleLibrary.PLOT));
         if(color == null) {
           color = Color.BLACK;
         }
         color = new Color((int) (color.getRed() * 0.8 + 0.2 * 256.), (int) (color.getGreen() * 0.8), (int) (color.getBlue() * 0.8));
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGUtil.colorToString(color));
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);
       }
     }

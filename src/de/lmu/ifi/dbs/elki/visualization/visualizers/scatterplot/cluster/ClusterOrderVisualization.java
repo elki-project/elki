@@ -121,8 +121,9 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
     @Override
     public void redraw() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       CSSClass cls = new CSSClass(this, CSSNAME);
-      context.getStyleLibrary().lines().formatCSSClass(cls, 0, context.getStyleLibrary().getLineWidth(StyleLibrary.CLUSTERORDER));
+      style.lines().formatCSSClass(cls, 0, style.getLineWidth(StyleLibrary.CLUSTERORDER));
 
       svgp.addCSSClassOrLogError(cls);
 
