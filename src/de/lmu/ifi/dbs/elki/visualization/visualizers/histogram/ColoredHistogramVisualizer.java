@@ -185,7 +185,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
-      double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+      double margin = style.getStyleLibrary().getSize(StyleLibrary.MARGIN);
       layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
       double xsize = Projection.SCALE * task.getWidth() / task.getHeight();
       double ysize = Projection.SCALE;
@@ -250,7 +250,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
       // Axis. TODO: Add an AxisVisualizer for this?
       try {
-        SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, ysize, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style.getStyleLibrary());
 
         // draw axes that are non-trivial
         final int dimensionality = RelationUtil.dimensionality(relation);
@@ -263,7 +263,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
           if (ax < orig || ax > orig) {
             final double left = (orig / Projection.SCALE + 0.5) * xsize;
             final double right = (ax / Projection.SCALE + 0.5) * xsize;
-            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
+            SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getScale(d), left, ysize, right, ysize, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style.getStyleLibrary());
           }
         }
       } catch (CSSNamingConflict e) {
@@ -330,7 +330,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
      * @param numc Number of classes we need.
      */
     private void setupCSS(SVGPlot svgp, int numc) {
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      ColorLibrary colors = style.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
 
       CSSClass allInOne = new CSSClass(svgp, BIN + -1);
       if (!settings.curves) {
@@ -338,7 +338,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         allInOne.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 1.0);
       } else {
         allInOne.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
-        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        allInOne.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
         allInOne.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       }
       svgp.addCSSClassOrLogError(allInOne);
@@ -350,7 +350,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
           bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(clusterID));
         } else {
           bin.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(clusterID));
-          bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+          bin.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
           bin.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
         }
 

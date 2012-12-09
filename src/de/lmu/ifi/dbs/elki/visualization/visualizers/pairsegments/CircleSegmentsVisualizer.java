@@ -252,7 +252,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       policy = task.getResult();
       segments = policy.segments;
       // FIXME: handle this more generally.
-      policy.setStyleLibrary(context.getStyleLibrary());
+      policy.setStyleLibrary(context.getStyleResult().getStyleLibrary());
       // Listen for result changes (Selection changed)
       context.addResultListener(this);
     }
@@ -333,7 +333,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * Define and add required CSS classes
      */
     protected void addCSSClasses(int maxClusterSize) {
-      StyleLibrary style = context.getStyleLibrary();
+      StyleLibrary style = context.getStyleResult().getStyleLibrary();
 
       // Cluster separation lines
       CSSClass cssReferenceBorder = new CSSClass(this.getClass(), CLR_BORDER_CLASS);
@@ -375,6 +375,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * Create the segments
      */
     private void drawSegments() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       final int clusterings = segments.getClusterings();
 
       // Reinitialize
@@ -479,7 +480,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
         else {
           int idx = policy.indexOfSegment(segment);
           if(idx >= 0) {
-            String color = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT).getColor(idx);
+            String color = style.getColorSet(StyleLibrary.PLOT).getColor(idx);
             extension.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ":" + color);
           }
           else {
@@ -496,6 +497,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     }
 
     private void redrawSelection() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       LOG.debug("Updating selection only.");
       for(Entry<Segment, List<Element>> entry : segmentToElements.entrySet()) {
         Segment segment = entry.getKey();
@@ -513,7 +515,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
         else {
           int idx = policy.indexOfSegment(segment);
           if(idx >= 0) {
-            String color = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT).getColor(idx);
+            String color = style.getColorSet(StyleLibrary.PLOT).getColor(idx);
             extension.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_FILL_PROPERTY + ":" + color);
           }
           else {

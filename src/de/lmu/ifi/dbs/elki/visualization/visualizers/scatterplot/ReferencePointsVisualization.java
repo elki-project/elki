@@ -119,10 +119,11 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
     @Override
     public void redraw() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       setupCSS(svgp);
       Iterator<? extends NumberVector<?>> iter = result.iterator();
 
-      final double dotsize = context.getStyleLibrary().getSize(StyleLibrary.REFERENCE_POINTS);
+      final double dotsize = style.getSize(StyleLibrary.REFERENCE_POINTS);
       while(iter.hasNext()) {
         NumberVector<?> v = iter.next();
         double[] projected = proj.fastProjectDataToRenderSpace(v);
@@ -138,8 +139,9 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
      * @param svgp the SVGPlot to register the -CSS-Class.
      */
     private void setupCSS(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       CSSClass refpoint = new CSSClass(svgp, REFPOINT);
-      refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.REFERENCE_POINTS));
+      refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.REFERENCE_POINTS));
       svgp.addCSSClassOrLogError(refpoint);
     }
   }

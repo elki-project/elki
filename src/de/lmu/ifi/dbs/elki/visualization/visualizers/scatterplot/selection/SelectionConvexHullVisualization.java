@@ -157,11 +157,12 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
     private void addCSSClasses(SVGPlot svgp) {
       // Class for the dot markers
       if(!svgp.getCSSClassManager().contains(SELECTEDHULL)) {
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         CSSClass cls = new CSSClass(this, SELECTEDHULL);
         // cls = new CSSClass(this, CONVEXHULL);
-        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.SELECTION));
-        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.SELECTION));
+        cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, ".25");
         cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

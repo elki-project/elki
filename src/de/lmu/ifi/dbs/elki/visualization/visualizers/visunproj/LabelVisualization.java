@@ -96,7 +96,7 @@ public class LabelVisualization extends AbstractVisFactory {
     SVGPlot svgp = task.getPlot();
     VisualizerContext context = task.getContext();
     CSSClass cls = new CSSClass(svgp, "unmanaged");
-    StyleLibrary style = context.getStyleLibrary();
+    StyleLibrary style = context.getStyleResult().getStyleLibrary();
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
     cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
     cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("overview.labels"));

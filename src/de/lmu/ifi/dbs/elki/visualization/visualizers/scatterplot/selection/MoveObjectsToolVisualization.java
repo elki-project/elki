@@ -199,7 +199,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       // Class for the rectangle to add eventListeners
       if(!svgp.getCSSClassManager().contains(CSS_ARROW)) {
         final CSSClass acls = new CSSClass(this, CSS_ARROW);
-        final StyleLibrary style = context.getStyleLibrary();
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         acls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         acls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.SELECTION_ACTIVE));
         acls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

@@ -143,8 +143,9 @@ public class TreeMBRVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       int projdim = proj.getVisibleDimensions2D().cardinality();
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       if(tree != null) {
         E root = tree.getRootEntry();
@@ -154,13 +155,13 @@ public class TreeMBRVisualization extends AbstractVisFactory {
           final double relDepth = 1. - (((double) i) / tree.getHeight());
           if(settings.fill) {
             cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * style.getLineWidth(StyleLibrary.PLOT));
             cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, colors.getColor(i));
             cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.1 / (projdim - 1));
           }
           else {
             cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, relDepth * style.getLineWidth(StyleLibrary.PLOT));
             cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
           }
           cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

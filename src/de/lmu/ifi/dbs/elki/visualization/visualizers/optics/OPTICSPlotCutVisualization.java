@@ -281,18 +281,19 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the epsilon-value
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
         final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
-        label.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.AXIS_LABEL));
-        label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, context.getStyleLibrary().getFontFamily(StyleLibrary.AXIS_LABEL));
-        label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, context.getStyleLibrary().getTextSize(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
+        label.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, style.getTextSize(StyleLibrary.AXIS_LABEL));
         svgp.addCSSClassOrLogError(label);
       }
       // Class for the epsilon cut line
       if(!svgp.getCSSClassManager().contains(CSS_LINE)) {
         final CSSClass lcls = new CSSClass(svgp, CSS_LINE);
-        lcls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
-        lcls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.5 * context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        lcls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.PLOT));
+        lcls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, 0.5 * style.getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(lcls);
       }
     }

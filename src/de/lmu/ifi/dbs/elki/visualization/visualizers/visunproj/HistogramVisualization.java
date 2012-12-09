@@ -84,10 +84,10 @@ public class HistogramVisualization extends AbstractVisFactory {
     SVGPlot svgp = task.getPlot();
     HistogramResult<? extends NumberVector<?>> curve = task.getResult();
 
-    double scale = StyleLibrary.SCALE;
-    final double sizex = scale;
-    final double sizey = scale * task.getHeight() / task.getWidth();
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    final double sizex = StyleLibrary.SCALE;
+    final double sizey = StyleLibrary.SCALE * task.getHeight() / task.getWidth();
+    final double margin = style.getSize(StyleLibrary.MARGIN);
     Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
@@ -140,18 +140,18 @@ public class HistogramVisualization extends AbstractVisFactory {
 
     // add axes
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+      SVGSimpleLinearAxis.drawAxis(svgp, layer, xscale, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
     } catch (CSSNamingConflict e) {
       LoggingUtil.exception(e);
     }
     // Setup line styles and insert lines.
-    ColorLibrary cl = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+    ColorLibrary cl = style.getColorSet(StyleLibrary.PLOT);
     for (int d = 0; d < dim; d++) {
       CSSClass csscls = new CSSClass(this, SERIESID + "_" + d);
       csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);
       csscls.setStatement(SVGConstants.SVG_STROKE_ATTRIBUTE, cl.getColor(d));
-      csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, style.getLineWidth(StyleLibrary.PLOT));
       svgp.addCSSClassOrLogError(csscls);
 
       Element line = path[d].makeElement(svgp);

@@ -265,11 +265,12 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       addCSSClasses(svgp);
       final double p = getLPNormP(result);
       final boolean angular = isAngularDistance(result);
 
-      final double size = context.getStyleLibrary().getSize(StyleLibrary.SELECTION);
+      final double size = style.getSize(StyleLibrary.SELECTION);
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
         DBIDs selection = selContext.getSelectedIds();
@@ -329,7 +330,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleLibrary();
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       // Class for the distance markers
       if(!svgp.getCSSClassManager().contains(KNNMARKER)) {
         CSSClass cls = new CSSClass(this, KNNMARKER);

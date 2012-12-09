@@ -154,8 +154,9 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
     protected void redraw() {
       addCSSClasses(svgp);
 
-      MarkerLibrary ml = context.getStyleLibrary().markers();
-      double marker_size = context.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      MarkerLibrary ml = style.markers();
+      double marker_size = style.getSize(StyleLibrary.MARKERPLOT);
 
       Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; ci.hasNext(); cnum++) {
@@ -208,10 +209,11 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_MEAN_CENTER)) {
         CSSClass center = new CSSClass(this, CSS_MEAN_CENTER);
-        center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getTextColor(StyleLibrary.DEFAULT));
-        center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.AXIS_TICK) * .5);
+        center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getTextColor(StyleLibrary.DEFAULT));
+        center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.AXIS_TICK) * .5);
         svgp.addCSSClassOrLogError(center);
       }
       if(!svgp.getCSSClassManager().contains(CSS_MEAN)) {
@@ -220,7 +222,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         svgp.addCSSClassOrLogError(center);
       }
       if(settings.stars) {
-        ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
         Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
         for(int cnum = 0; ci.hasNext(); cnum++) {
@@ -228,7 +230,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
           if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
             CSSClass center = new CSSClass(this, CSS_MEAN_STAR + "_" + cnum);
             center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(cnum));
-            center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+            center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
             center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
             svgp.addCSSClassOrLogError(center);
           }

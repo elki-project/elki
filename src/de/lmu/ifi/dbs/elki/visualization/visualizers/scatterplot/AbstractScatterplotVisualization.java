@@ -73,7 +73,7 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     this.proj = task.getProj();
     this.rel = task.getRelation();
     this.sample = ResultUtil.getSamplingResult(rel);
-    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
   }
 

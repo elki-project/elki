@@ -125,8 +125,9 @@ public class SelectionDotVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       addCSSClasses(svgp);
-      final double size = context.getStyleLibrary().getSize(StyleLibrary.SELECTION);
+      final double size = style.getSize(StyleLibrary.SELECTION);
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
         DBIDs selection = selContext.getSelectedIds();
@@ -153,7 +154,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
       // Class for the dot markers
       if(!svgp.getCSSClassManager().contains(MARKER)) {
         CSSClass cls = new CSSClass(this, MARKER);
-        final StyleLibrary style = context.getStyleLibrary();
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         svgp.addCSSClassOrLogError(cls);

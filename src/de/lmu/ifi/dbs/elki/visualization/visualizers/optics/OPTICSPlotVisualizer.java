@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -123,8 +124,9 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
       layer.appendChild(itag);
 
       try {
-        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, context.getStyleLibrary());
-        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, context.getStyleLibrary());
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), 0, plotheight, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, opticsplot.getScale(), plotwidth, plotheight, plotwidth, 0, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception("CSS naming conflict for axes on OPTICS plot", e);

@@ -167,7 +167,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
       makeLayerElement();
       addCSSClasses();
 
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      ColorLibrary colors = context.getStyleResult().getStyleLibrary().getColorSet(StyleLibrary.PLOT);
       HashMap<Cluster<?>, String> colormap = new HashMap<Cluster<?>, String>();
       int cnum = 0;
       for(Cluster<?> c : clus.getAllClusters()) {
@@ -219,8 +219,9 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
       // Class for the markers
       if(!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
         final CSSClass cls = new CSSClass(this, CSS_BRACKET);
-        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, context.getStyleLibrary().getColor(StyleLibrary.PLOT));
-        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.PLOT));
+        cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);
       }
     }

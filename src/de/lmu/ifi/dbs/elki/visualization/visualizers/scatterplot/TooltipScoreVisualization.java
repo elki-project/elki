@@ -157,7 +157,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
     public Instance(VisualizationTask task) {
       super(task);
       this.result = task.getResult();
-      this.fontsize = 3 * context.getStyleLibrary().getTextSize(StyleLibrary.PLOT);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);
       synchronizedRedraw();
     }
 
@@ -173,7 +174,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
      */
     @Override
     protected void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleLibrary();
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       final double fontsize = style.getTextSize(StyleLibrary.PLOT);
       final String fontfamily = style.getFontFamily(StyleLibrary.PLOT);
 

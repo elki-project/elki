@@ -209,10 +209,11 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
-      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);
-      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, context.getStyleLibrary().getLineWidth(StyleLibrary.PLOT));
+      cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
 
       final String color;
       if(clustering.getAllClusters().size() == 1) {
