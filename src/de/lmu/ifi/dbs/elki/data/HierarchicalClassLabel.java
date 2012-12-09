@@ -134,7 +134,7 @@ public class HierarchicalClassLabel extends ClassLabel {
         return comp;
       }
     }
-    return Integer.compare(this.levelwiseNames.length, h.levelwiseNames.length);
+    return (this.levelwiseNames.length < h.levelwiseNames.length) ? -1 : ((this.levelwiseNames.length == h.levelwiseNames.length) ? 0 : 1);
   }
 
   /**
