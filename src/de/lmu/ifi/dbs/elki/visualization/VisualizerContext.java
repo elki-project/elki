@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -200,16 +199,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   }
 
   /**
-   * Get the style library
-   * 
-   * @return style library
-   */
-  @Deprecated
-  public StyleLibrary getStyleLibrary() {
-    return getStyleResult().getStyleLibrary();
-  }
-
-  /**
    * Get the style result.
    * 
    * @return Style result
@@ -256,21 +245,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   public void setSelection(DBIDSelection sel) {
     selection.setSelection(sel);
     getHierarchy().resultChanged(selection);
-  }
-
-  /**
-   * Change a visualizers visibility.
-   * 
-   * When a Tool visualizer is made visible, other tools are hidden.
-   * 
-   * @param task Visualization task
-   * @param visibility new visibility
-   * 
-   * @deprecated Use {@link VisualizerUtil#setVisible}
-   */
-  @Deprecated
-  public void setVisualizationVisibility(VisualizationTask task, boolean visibility) {
-    VisualizerUtil.setVisible(this, task, visibility);
   }
 
   /**
