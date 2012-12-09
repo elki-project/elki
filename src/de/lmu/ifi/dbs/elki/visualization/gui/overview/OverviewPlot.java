@@ -162,7 +162,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     // Add a background element:
     {
       CSSClass cls = new CSSClass(this, "background");
-      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
+      cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleResult().getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
       addCSSClassOrLogError(cls);
       Element background = this.svgElement(SVGConstants.SVG_RECT_TAG);
       background.setAttribute(SVGConstants.SVG_X_ATTRIBUTE, "0");
