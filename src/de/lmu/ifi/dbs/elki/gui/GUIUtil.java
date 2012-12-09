@@ -24,11 +24,11 @@ package de.lmu.ifi.dbs.elki.gui;
  */
 
 import java.awt.Toolkit;
+import java.lang.reflect.Method;
 
 import javax.swing.RepaintManager;
 import javax.swing.UIManager;
 
-import sun.awt.SunToolkit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
@@ -59,28 +59,36 @@ public final class GUIUtil {
    */
   public static void setLookAndFeel() {
     // If enabled, setup thread debugging.
-    if (THREAD_REPAINT_DEBUG) {
+    if(THREAD_REPAINT_DEBUG) {
       try {
         Class<?> cls = ClassLoader.getSystemClassLoader().loadClass("org.jdesktop.swinghelper.debug.CheckThreadViolationRepaintManager");
         RepaintManager.setCurrentManager((RepaintManager) cls.newInstance());
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         // ignore
       }
     }
-    if (PREFER_GTK) {
-      Toolkit toolkit = Toolkit.getDefaultToolkit();
-      if (toolkit instanceof SunToolkit && ((SunToolkit) toolkit).isNativeGTKAvailable()) {
-        try {
+    if(PREFER_GTK) {
+      try {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        // Note: we don't want to *require* these classes
+        // But if they exist, we're going to try using them.
+        Class<?> suntoolkit = Class.forName("sun.awt.SunToolkit");
+        Method testm = suntoolkit.getMethod("isNativeGTKAvailable");
+        if(suntoolkit.isInstance(toolkit) && (Boolean) testm.invoke(toolkit)) {
           UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+          System.err.println("Set GTK.");
           return;
-        } catch (Exception e) {
-          // ignore
         }
+      }
+      catch(Exception e) {
+        // ignore
       }
     }
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       // ignore
     }
   }
@@ -98,7 +106,8 @@ public final class GUIUtil {
           logger.exception(e);
         }
       });
-    } catch (SecurityException e) {
+    }
+    catch(SecurityException e) {
       logger.warning("Could not set the Default Uncaught Exception Handler", e);
     }
   }
