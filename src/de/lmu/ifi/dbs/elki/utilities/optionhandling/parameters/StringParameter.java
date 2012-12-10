@@ -85,7 +85,7 @@ public class StringParameter extends AbstractParameter<String> {
   public StringParameter(OptionID optionID) {
     super(optionID);
   }
-  
+
   @Override
   public String getValueAsString() {
     return getValue();
@@ -94,13 +94,13 @@ public class StringParameter extends AbstractParameter<String> {
   @Override
   protected String parseValue(Object obj) throws ParameterException {
     if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": Null value given!");
+      throw new UnspecifiedParameterException(this);
     }
-    if (obj instanceof String) {
+    if(obj instanceof String) {
       return (String) obj;
     }
     // TODO: allow anything convertible by toString()?
-    throw new WrongParameterValueException("String parameter "+getName()+" is not a string.");
+    throw new WrongParameterValueException("String parameter " + getName() + " is not a string.");
   }
 
   /**

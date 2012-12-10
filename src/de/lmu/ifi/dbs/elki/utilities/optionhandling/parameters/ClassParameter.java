@@ -126,7 +126,7 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
   @Override
   protected Class<? extends C> parseValue(Object obj) throws ParameterException {
     if (obj == null) {
-      throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
+      throw new UnspecifiedParameterException(this);
     }
     if (obj instanceof Class<?>) {
       return (Class<? extends C>) obj;
@@ -167,7 +167,7 @@ public class ClassParameter<C> extends AbstractParameter<Class<? extends C>> {
   @Override
   public boolean validate(Class<? extends C> obj) throws ParameterException {
     if (obj == null) {
-      throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
+      throw new UnspecifiedParameterException(this);
     }
     if (!restrictionClass.isAssignableFrom(obj)) {
       throw new WrongParameterValueException(this, obj.getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());

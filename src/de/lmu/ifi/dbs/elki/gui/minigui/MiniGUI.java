@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.workflow.LoggingStep;
@@ -148,7 +149,8 @@ public class MiniGUI extends AbstractApplication {
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       // Ignore - icon not found is not fatal.
     }
 
@@ -176,7 +178,7 @@ public class MiniGUI extends AbstractApplication {
         public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
           ArrayList<String> settings = store.get(key);
-          if (settings != null) {
+          if(settings != null) {
             outputArea.clear();
             outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
             doSetParameters(settings);
@@ -196,7 +198,8 @@ public class MiniGUI extends AbstractApplication {
           store.put(key, parameters.serializeParameters());
           try {
             store.save();
-          } catch (IOException e1) {
+          }
+          catch(IOException e1) {
             LOG.exception(e1);
           }
           savedSettingsModel.update();
@@ -213,7 +216,8 @@ public class MiniGUI extends AbstractApplication {
           store.remove(key);
           try {
             store.save();
-          } catch (IOException e1) {
+          }
+          catch(IOException e1) {
             LOG.exception(e1);
           }
           savedCombo.setSelectedItem("[Saved Settings]");
@@ -291,9 +295,11 @@ public class MiniGUI extends AbstractApplication {
     try {
       store.load();
       savedSettingsModel.update();
-    } catch (FileNotFoundException e) {
+    }
+    catch(FileNotFoundException e) {
       // Ignore - probably didn't save any settings yet.
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception(e);
     }
 
@@ -326,14 +332,11 @@ public class MiniGUI extends AbstractApplication {
     track.tryInstantiate(KDDTask.class);
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
-    if (config.getErrors().size() > 0 && params.size() > 0) {
+    final boolean hasErrors = (config.getErrors().size() > 0);
+    if(hasErrors && params.size() > 0) {
       reportErrors(config);
     }
-    if (config.getErrors().size() > 0) {
-      runButton.setEnabled(false);
-    } else {
-      runButton.setEnabled(true);
-    }
+    runButton.setEnabled(!hasErrors);
 
     List<String> remainingParameters = config.getRemainingParameters();
 
@@ -341,11 +344,12 @@ public class MiniGUI extends AbstractApplication {
     parameterTable.setEnabled(false);
     parameters.updateFromTrackParameters(track);
     // Add remaining parameters
-    if (remainingParameters != null && !remainingParameters.isEmpty()) {
+    if(remainingParameters != null && !remainingParameters.isEmpty()) {
       DynamicParameters.RemainingOptions remo = new DynamicParameters.RemainingOptions();
       try {
         remo.setValue(FormatUtil.format(remainingParameters, " "));
-      } catch (ParameterException e) {
+      }
+      catch(ParameterException e) {
         LOG.exception(e);
       }
       BitSet bits = new BitSet();
@@ -354,6 +358,7 @@ public class MiniGUI extends AbstractApplication {
       parameters.addParameter(remo, remo.getValue(), bits, 0);
     }
 
+    config.clearErrors();
     parameterTable.revalidate();
     parameterTable.setEnabled(true);
   }
@@ -380,13 +385,15 @@ public class MiniGUI extends AbstractApplication {
         KDDTask task = config.tryInstantiate(KDDTask.class);
         try {
           config.logUnusedParameters();
-          if (config.getErrors().size() == 0) {
+          if(config.getErrors().size() == 0) {
             task.run();
-          } else {
+          }
+          else {
             reportErrors(config);
           }
           LOG.debug("Task completed successfully.");
-        } catch (Throwable e) {
+        }
+        catch(Throwable e) {
           LOG.exception("Task failed", e);
         }
         return null;
@@ -409,8 +416,15 @@ public class MiniGUI extends AbstractApplication {
   protected void reportErrors(SerializedParameterization config) {
     StringBuilder buf = new StringBuilder();
     buf.append("Task is not completely configured:" + NEWLINE + NEWLINE);
-    for (ParameterException e : config.getErrors()) {
-      buf.append(e.getMessage() + NEWLINE);
+    for(ParameterException e : config.getErrors()) {
+      if(e instanceof UnspecifiedParameterException) {
+        buf.append("The parameter ");
+        buf.append(((UnspecifiedParameterException) e).getParameterName());
+        buf.append(" is required.").append(NEWLINE);
+      }
+      else {
+        buf.append(e.getMessage() + NEWLINE);
+      }
     }
     LOG.warning(buf.toString());
     config.clearErrors();
@@ -438,12 +452,14 @@ public class MiniGUI extends AbstractApplication {
         try {
           final MiniGUI gui = new MiniGUI();
           gui.run();
-          if (args != null && args.length > 0) {
+          if(args != null && args.length > 0) {
             gui.doSetParameters(Arrays.asList(args));
-          } else {
+          }
+          else {
             gui.doSetParameters(new ArrayList<String>());
           }
-        } catch (UnableToComplyException e) {
+        }
+        catch(UnableToComplyException e) {
           LOG.exception(e);
         }
       }
@@ -490,7 +506,7 @@ public class MiniGUI extends AbstractApplication {
 
     @Override
     public void setSelectedItem(Object anItem) {
-      if (anItem instanceof String) {
+      if(anItem instanceof String) {
         selected = (String) anItem;
       }
     }

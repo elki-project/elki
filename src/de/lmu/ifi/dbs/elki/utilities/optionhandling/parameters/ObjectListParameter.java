@@ -77,7 +77,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   @Override
   protected List<Class<? extends C>> parseValue(Object obj) throws ParameterException {
     if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
+      throw new UnspecifiedParameterException(this);
     }
     if (List.class.isInstance(obj)) {
       List<?> l = (List<?>) obj;

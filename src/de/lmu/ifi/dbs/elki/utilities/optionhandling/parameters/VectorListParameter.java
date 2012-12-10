@@ -176,7 +176,7 @@ public class VectorListParameter extends ListParameter<List<Double>> {
     if(obj instanceof String) {
       String[] vectors = VECTOR_SPLIT.split((String) obj);
       if(vectors.length == 0) {
-        throw new UnspecifiedParameterException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is empty!");
+        throw new WrongParameterValueException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is empty!");
       }
       ArrayList<List<Double>> vecs = new ArrayList<List<Double>>();
 

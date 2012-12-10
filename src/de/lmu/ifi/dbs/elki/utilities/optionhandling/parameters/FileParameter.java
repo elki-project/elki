@@ -99,7 +99,7 @@ public class FileParameter extends AbstractParameter<File> {
   @Override
   protected File parseValue(Object obj) throws ParameterException {
     if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": No filename given!");
+      throw new UnspecifiedParameterException(this);
     }
     if(obj instanceof File) {
       return (File) obj;
@@ -107,7 +107,7 @@ public class FileParameter extends AbstractParameter<File> {
     if(obj instanceof String) {
       return new File((String) obj);
     }
-    throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": Unsupported value given!");
+    throw new WrongParameterValueException("Parameter \"" + getName() + "\": Unsupported value given!");
   }
 
   @Override

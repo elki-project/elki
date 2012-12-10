@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Thrown by OptionHandler in case of incorrect parameter-array.
  */

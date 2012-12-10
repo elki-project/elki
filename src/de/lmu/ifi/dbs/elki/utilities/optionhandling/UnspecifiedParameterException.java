@@ -37,30 +37,26 @@ public class UnspecifiedParameterException extends WrongParameterValueException 
   private static final long serialVersionUID = -7142809547201980898L;
 
   /**
+   * Parameter that was missing.
+   */
+  private String parameter;
+
+  /**
    * Constructor with missing Parameter
    * 
    * @param parameter Missing parameter
    */
   public UnspecifiedParameterException(Parameter<?> parameter) {
     super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription());
+    this.parameter = parameter.getName();
   }
 
   /**
-   * Constructor with missing Parameter and cause
+   * Get the parameter name that was missing.
    * 
-   * @param parameter Missing parameter
-   * @param cause Cause
+   * @return Parameter name
    */
-  public UnspecifiedParameterException(Parameter<?> parameter, Throwable cause) {
-    super("No value given for parameter \"" + parameter.getName() + "\":\n" + "Expected: " + parameter.getFullDescription(), cause);
-  }
-
-  /**
-   * Constructor with error message.
-   * 
-   * @param message Message
-   */
-  public UnspecifiedParameterException(String message) {
-    super(message);
+  public String getParameterName() {
+    return parameter;
   }
 }
