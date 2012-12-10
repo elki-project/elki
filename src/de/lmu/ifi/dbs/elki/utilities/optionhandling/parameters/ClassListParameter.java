@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -135,7 +134,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
       String[] classes = SPLIT.split((String) obj);
       // TODO: allow empty lists (and list constraints) to enforce length?
       if(classes.length == 0) {
-        throw new UnspecifiedParameterException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!");
+        throw new WrongParameterValueException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!");
       }
 
       List<Class<? extends C>> cls = new ArrayList<Class<? extends C>>(classes.length);

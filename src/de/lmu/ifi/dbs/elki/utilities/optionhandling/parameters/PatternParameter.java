@@ -75,7 +75,7 @@ public class PatternParameter extends AbstractParameter<Pattern> {
   @Override
   protected Pattern parseValue(Object obj) throws ParameterException {
     if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": Null value given!");
+      throw new UnspecifiedParameterException(this);
     }
     if(obj instanceof Pattern) {
       return (Pattern) obj;

@@ -50,7 +50,9 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -103,15 +105,16 @@ public class DocumentParameters {
    * @param args Command line arguments
    */
   public static void main(String[] args) {
-    if (args.length != 2) {
+    LoggingConfiguration.setVerbose(true);
+    if(args.length != 2) {
       LOG.warning("I need exactly two file names to operate!");
       System.exit(1);
     }
-    if (!args[0].endsWith(".html")) {
+    if(!args[0].endsWith(".html")) {
       LOG.warning("First file name doesn't end with .html!");
       System.exit(1);
     }
-    if (!args[1].endsWith(".html")) {
+    if(!args[1].endsWith(".html")) {
       LOG.warning("Second file name doesn't end with .html!");
       System.exit(1);
     }
@@ -122,7 +125,8 @@ public class DocumentParameters {
     HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?>, Class<?>>>();
     try {
       buildParameterIndex(byclass, byopt);
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       LOG.exception(e);
       System.exit(1);
     }
@@ -131,7 +135,8 @@ public class DocumentParameters {
       FileOutputStream byclassfo;
       try {
         byclassfo = new FileOutputStream(byclsname);
-      } catch (FileNotFoundException e) {
+      }
+      catch(FileNotFoundException e) {
         LOG.exception("Can't create output stream!", e);
         throw new RuntimeException(e);
       }
@@ -142,7 +147,8 @@ public class DocumentParameters {
         byclassstream.flush();
         byclassstream.close();
         byclassfo.close();
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         LOG.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
@@ -152,7 +158,8 @@ public class DocumentParameters {
       FileOutputStream byoptfo;
       try {
         byoptfo = new FileOutputStream(byoptname);
-      } catch (FileNotFoundException e) {
+      }
+      catch(FileNotFoundException e) {
         LOG.exception("Can't create output stream!", e);
         throw new RuntimeException(e);
       }
@@ -163,23 +170,27 @@ public class DocumentParameters {
         byoptstream.flush();
         byoptstream.close();
         byoptfo.close();
-      } catch (IOException e) {
+      }
+      catch(IOException e) {
         LOG.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
     }
+    // Forcibly terminate, as some class may have screwed up.
+    System.exit(0);
   }
 
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?>> byclass, HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
     final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<Pair<Object, Parameter<?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for (final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
+    for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       // Doesn't have a proper name?
-      if (cls.getCanonicalName() == null) {
+      if(cls.getCanonicalName() == null) {
         continue;
       }
-      // Special cases we need to skip...
-      if (cls.getCanonicalName() == "experimentalcode.elke.AlgorithmTest") {
+      // Some of the "applications" do currently not have appropriate
+      // constructors / parameterizers and may start AWT threads - skip them.
+      if(AbstractApplication.class.isAssignableFrom(cls)) {
         continue;
       }
 
@@ -191,31 +202,37 @@ public class DocumentParameters {
         public void run() {
           // Try a V3 style parameterizer first.
           Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
-          if (par != null) {
+          if(par != null) {
             par.configure(track);
-          } else {
+          }
+          else {
             try {
               ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
-            } catch (java.lang.NoSuchMethodException e) {
+            }
+            catch(java.lang.NoSuchMethodException e) {
               LOG.warning("Could not instantiate class " + cls.getName() + " - no appropriate constructor or parameterizer found.");
-            } catch (java.lang.reflect.InvocationTargetException e) {
-              if (e.getCause() instanceof RuntimeException) {
+            }
+            catch(java.lang.reflect.InvocationTargetException e) {
+              if(e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) e.getCause();
               }
-              if (e.getCause() instanceof Error) {
+              if(e.getCause() instanceof Error) {
                 throw (Error) e.getCause();
               }
               throw new RuntimeException(e.getCause());
-            } catch (RuntimeException e) {
+            }
+            catch(RuntimeException e) {
               throw e;
-            } catch (Exception e) {
+            }
+            catch(Exception e) {
               throw new RuntimeException(e);
-            } catch (java.lang.Error e) {
+            }
+            catch(java.lang.Error e) {
               throw new RuntimeException(e);
             }
           }
-          for (Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
-            if (pair.first == null) {
+          for(Pair<Object, Parameter<?>> pair : track.getAllParameters()) {
+            if(pair.first == null) {
               pair.first = cls;
             }
             options.add(pair);
@@ -226,35 +243,51 @@ public class DocumentParameters {
       try {
         // Wait up to one second.
         instantiator.get(1L, TimeUnit.SECONDS);
-      } catch (TimeoutException e) {
+      }
+      catch(TimeoutException e) {
         LOG.warning("Timeout on instantiating " + cls.getName());
         es.shutdownNow();
         throw new RuntimeException(e);
-      } catch (java.util.concurrent.ExecutionException e) {
-        LOG.warning("Error instantiating " + cls.getName(), e.getCause());
-
-        es.shutdownNow();
-        if (e.getCause() instanceof RuntimeException) {
-          throw (RuntimeException) e.getCause();
+      }
+      catch(java.util.concurrent.ExecutionException e) {
+        // Do full reporting only on release branch.
+        if(cls.getName().startsWith("de.lmu.ifi.dbs.elki")) {
+          LOG.warning("Error instantiating " + cls.getName(), e.getCause());
         }
-        throw new RuntimeException(e.getCause());
-
-      } catch (Exception e) {
-        LOG.warning("Error instantiating " + cls.getName());
-        es.shutdownNow();
-        throw new RuntimeException(e);
+        else {
+          LOG.warning("Error instantiating " + cls.getName());
+        }
+        // es.shutdownNow();
+        // if(e.getCause() instanceof RuntimeException) {
+        // throw (RuntimeException) e.getCause();
+        // }
+        // throw new RuntimeException(e.getCause());
+        continue;
+      }
+      catch(Exception e) {
+        // Do full reporting only on release branch.
+        if(cls.getName().startsWith("de.lmu.ifi.dbs.elki")) {
+          LOG.warning("Error instantiating " + cls.getName(), e.getCause());
+        }
+        else {
+          LOG.warning("Error instantiating " + cls.getName());
+        }
+        // es.shutdownNow();
+        // throw new RuntimeException(e);
+        continue;
       }
     }
     LOG.debug("Documenting " + options.size() + " parameter instances.");
-    for (Pair<Object, Parameter<?>> pp : options) {
-      if (pp.first == null || pp.second == null) {
+    for(Pair<Object, Parameter<?>> pp : options) {
+      if(pp.first == null || pp.second == null) {
         LOG.debugFiner("Null: " + pp.first + " " + pp.second);
         continue;
       }
       Class<?> c;
-      if (pp.first instanceof Class) {
+      if(pp.first instanceof Class) {
         c = (Class<?>) pp.first;
-      } else {
+      }
+      else {
         c = pp.first.getClass();
       }
       Parameter<?> o = pp.second;
@@ -263,50 +296,52 @@ public class DocumentParameters {
       {
         List<Parameter<?>> byc = byclass.get(c);
         boolean inlist = false;
-        if (byc != null) {
-          for (Parameter<?> par : byc) {
-            if (par.getOptionID() == o.getOptionID()) {
+        if(byc != null) {
+          for(Parameter<?> par : byc) {
+            if(par.getOptionID() == o.getOptionID()) {
               inlist = true;
               break;
             }
           }
         }
-        if (!inlist) {
+        if(!inlist) {
           byclass.add(c, o);
         }
       }
       {
         List<Pair<Parameter<?>, Class<?>>> byo = byopt.get(o.getOptionID());
         boolean inlist = false;
-        if (byo != null) {
-          for (Pair<Parameter<?>, Class<?>> pair : byo) {
-            if (pair.second.equals(c)) {
+        if(byo != null) {
+          for(Pair<Parameter<?>, Class<?>> pair : byo) {
+            if(pair.second.equals(c)) {
               inlist = true;
               break;
             }
           }
         }
-        if (!inlist) {
+        if(!inlist) {
           byopt.add(o.getOptionID(), new Pair<Parameter<?>, Class<?>>(o, c));
         }
       }
     }
     LOG.debug("byClass: " + byclass.size() + " byOpt: " + byopt.size());
-    // FIXME: This should not be needed, but sometimes this hangs.
-    System.exit(0);
   }
 
   protected static Constructor<?> getConstructor(final Class<?> cls) {
     try {
       return cls.getConstructor(Parameterization.class);
-    } catch (java.lang.NoClassDefFoundError e) {
+    }
+    catch(java.lang.NoClassDefFoundError e) {
       // Class not actually found
-    } catch (RuntimeException e) {
+    }
+    catch(RuntimeException e) {
       // Not parameterizable, usually not even found ...
       LOG.warning("RuntimeException: ", e);
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       // Not parameterizable.
-    } catch (java.lang.Error e) {
+    }
+    catch(java.lang.Error e) {
       // Not parameterizable.
       LOG.warning("Error: ", e);
     }
@@ -318,7 +353,8 @@ public class DocumentParameters {
     DocumentBuilder builder;
     try {
       builder = factory.newDocumentBuilder();
-    } catch (ParserConfigurationException e1) {
+    }
+    catch(ParserConfigurationException e1) {
       throw new RuntimeException(e1);
     }
     DOMImplementation impl = builder.getDOMImplementation();
@@ -371,7 +407,7 @@ public class DocumentParameters {
     List<Class<?>> classes = new ArrayList<Class<?>>(byclass.keySet());
     Collections.sort(classes, new InspectionUtil.ClassSorter());
 
-    for (Class<?> cls : classes) {
+    for(Class<?> cls : classes) {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -394,7 +430,7 @@ public class DocumentParameters {
       // nested definition list for options
       Element classdl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
       classdd.appendChild(classdl);
-      for (Parameter<?> opt : byclass.get(cls)) {
+      for(Parameter<?> opt : byclass.get(cls)) {
         // DT definition term: option name, in TT for typewriter optics
         Element elemdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
         {
@@ -406,18 +442,18 @@ public class DocumentParameters {
         // DD definition description - put the option description here.
         Element elemdd = htmldoc.createElement(HTMLUtil.HTML_DD_TAG);
         Element elemp = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
-        if (opt.getShortDescription() != null) {
+        if(opt.getShortDescription() != null) {
           HTMLUtil.appendMultilineText(htmldoc, elemp, opt.getShortDescription());
         }
         elemdd.appendChild(elemp);
         // class restriction?
-        if (opt instanceof ClassParameter<?>) {
+        if(opt instanceof ClassParameter<?>) {
           appendClassRestriction(htmldoc, ((ClassParameter<?>) opt).getRestrictionClass(), elemdd);
         }
         // default value? completions?
         appendDefaultValueIfSet(htmldoc, opt, elemdd);
         // known values?
-        if (opt instanceof ClassParameter<?>) {
+        if(opt instanceof ClassParameter<?>) {
           appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) opt, elemdd);
         }
         classdl.appendChild(elemdd);
@@ -431,7 +467,8 @@ public class DocumentParameters {
     DocumentBuilder builder;
     try {
       builder = factory.newDocumentBuilder();
-    } catch (ParserConfigurationException e1) {
+    }
+    catch(ParserConfigurationException e1) {
       throw new RuntimeException(e1);
     }
     DOMImplementation impl = builder.getDOMImplementation();
@@ -484,7 +521,7 @@ public class DocumentParameters {
     List<OptionID> opts = new ArrayList<OptionID>(byopt.keySet());
     Collections.sort(opts, new SortByOption());
 
-    for (OptionID oid : opts) {
+    for(OptionID oid : opts) {
       final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
       Element optdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
@@ -510,12 +547,12 @@ public class DocumentParameters {
       }
       // class restriction?
       Class<?> superclass = null;
-      if (firstopt instanceof ClassParameter<?>) {
+      if(firstopt instanceof ClassParameter<?>) {
         // Find superclass heuristically
         superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
-        for (Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
+        for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
           ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
-          if (!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+          if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
             superclass = cls.getRestrictionClass();
           }
         }
@@ -524,7 +561,7 @@ public class DocumentParameters {
       // default value?
       appendDefaultValueIfSet(htmldoc, firstopt, optdd);
       // known values?
-      if (firstopt instanceof ClassParameter<?>) {
+      if(firstopt instanceof ClassParameter<?>) {
         appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) firstopt, optdd);
       }
       maindl.appendChild(optdd);
@@ -536,7 +573,7 @@ public class DocumentParameters {
         optdd.appendChild(p);
       }
       optdd.appendChild(classesul);
-      for (Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
+      for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
         // DT definition term: option name, in TT for typewriter optics
         Element classli = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
 
@@ -547,24 +584,26 @@ public class DocumentParameters {
           classa.setTextContent(clinst.getSecond().getName());
           classli.appendChild(classa);
         }
-        if (clinst.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
+        if(clinst.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
           ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
-          if (cls.getRestrictionClass() != null) {
+          if(cls.getRestrictionClass() != null) {
             // TODO: if it is null, it could still be different!
-            if (!cls.getRestrictionClass().equals(superclass)) {
+            if(!cls.getRestrictionClass().equals(superclass)) {
               appendClassRestriction(htmldoc, cls.getRestrictionClass(), classli);
             }
-          } else {
+          }
+          else {
             appendNoClassRestriction(htmldoc, classli);
           }
         }
         Parameter<?> param = clinst.getFirst();
-        if (param.getDefaultValue() != null) {
-          if (!param.getDefaultValue().equals(firstopt.getDefaultValue())) {
+        if(param.getDefaultValue() != null) {
+          if(!param.getDefaultValue().equals(firstopt.getDefaultValue())) {
             appendDefaultValueIfSet(htmldoc, param, classli);
           }
-        } else {
-          if (firstopt.getDefaultValue() != null) {
+        }
+        else {
+          if(firstopt.getDefaultValue() != null) {
             appendNoDefaultValue(htmldoc, classli);
           }
         }
@@ -583,15 +622,16 @@ public class DocumentParameters {
   }
 
   private static void appendClassRestriction(Document htmldoc, Class<?> restriction, Element elemdd) {
-    if (restriction == null) {
+    if(restriction == null) {
       LOG.warning("No restriction class!");
       return;
     }
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
-    if (restriction.isInterface()) {
+    if(restriction.isInterface()) {
       p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_IMPLEMENTING));
-    } else {
+    }
+    else {
       p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION_EXTENDING));
     }
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
@@ -609,14 +649,14 @@ public class DocumentParameters {
   }
 
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
-    if (opt.getRestrictionClass() != Object.class) {
+    if(opt.getRestrictionClass() != Object.class) {
       List<Class<?>> iter = opt.getKnownImplementations();
-      if (!iter.isEmpty()) {
+      if(!iter.isEmpty()) {
         Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
         p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
         elemdd.appendChild(p);
         Element ul = htmldoc.createElement(HTMLUtil.HTML_UL_TAG);
-        for (Class<?> c : iter) {
+        for(Class<?> c : iter) {
           Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
           Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
           defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
@@ -628,7 +668,7 @@ public class DocumentParameters {
       }
       // Report when not in properties file.
       Iterator<Class<?>> clss = new ELKIServiceLoader(opt.getRestrictionClass());
-      if (!clss.hasNext()) {
+      if(!clss.hasNext()) {
         LOG.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
       }
     }
@@ -642,12 +682,13 @@ public class DocumentParameters {
    * @param optdd HTML Element
    */
   private static void appendDefaultValueIfSet(Document htmldoc, Parameter<?> par, Element optdd) {
-    if (par.hasDefaultValue()) {
+    if(par.hasDefaultValue()) {
       Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
       p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
-      if (par instanceof ClassParameter<?>) {
+      if(par instanceof ClassParameter<?>) {
         appendDefaultClassLink(htmldoc, par, p);
-      } else {
+      }
+      else {
         Object def = par.getDefaultValue();
         p.appendChild(htmldoc.createTextNode(def.toString()));
       }

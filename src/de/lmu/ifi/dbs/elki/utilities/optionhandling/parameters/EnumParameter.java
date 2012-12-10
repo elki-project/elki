@@ -112,7 +112,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<E> {
   @Override
   protected E parseValue(Object obj) throws ParameterException {
     if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter \"" + getName() + "\": Null value given!");
+      throw new UnspecifiedParameterException(this);
     }
     if(obj instanceof String) {
       try {

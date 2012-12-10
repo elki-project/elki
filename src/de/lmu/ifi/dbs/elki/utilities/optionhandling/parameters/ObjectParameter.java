@@ -103,7 +103,7 @@ public class ObjectParameter<C> extends ClassParameter<C> {
   @Override
   protected Class<? extends C> parseValue(Object obj) throws ParameterException {
     if(obj == null) {
-      throw new UnspecifiedParameterException("Parameter Error.\n" + "No value for parameter \"" + getName() + "\" " + "given.");
+      throw new UnspecifiedParameterException(this);
     }
     // does the given objects class fit?
     if(restrictionClass.isInstance(obj)) {
