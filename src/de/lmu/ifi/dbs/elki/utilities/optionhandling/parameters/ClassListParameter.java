@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
@@ -88,12 +89,12 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   public String getValueAsString() {
     StringBuilder buf = new StringBuilder();
     final String defPackage = restrictionClass.getPackage().getName() + ".";
-    for(Class<? extends C> c : getValue()) {
-      if(buf.length() > 0) {
+    for (Class<? extends C> c : getValue()) {
+      if (buf.length() > 0) {
         buf.append(LIST_SEP);
       }
       String name = c.getName();
-      if(name.startsWith(defPackage)) {
+      if (name.startsWith(defPackage)) {
         name = name.substring(defPackage.length());
       }
       buf.append(name);
@@ -107,58 +108,37 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     try {
       List<?> l = List.class.cast(obj);
       // do extra validation:
-      for(Object o : l) {
-        if(!(o instanceof Class)) {
+      for (Object o : l) {
+        if (!(o instanceof Class)) {
           throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
         }
       }
       // TODO: can we use reflection to get extra checks?
       // TODO: Should we copy the list?
       return (List<Class<? extends C>>) l;
-    }
-    catch(ClassCastException e) {
+    } catch (ClassCastException e) {
       // continue with others
     }
     // Did we get a single class?
     try {
-      if(restrictionClass.isAssignableFrom((Class<?>) obj)) {
+      if (restrictionClass.isAssignableFrom((Class<?>) obj)) {
         List<Class<? extends C>> clss = new ArrayList<Class<? extends C>>(1);
         clss.add((Class<? extends C>) obj);
         return clss;
       }
-    }
-    catch(ClassCastException e) {
+    } catch (ClassCastException e) {
       // continue with others
     }
-    if(obj instanceof String) {
+    if (obj instanceof String) {
       String[] classes = SPLIT.split((String) obj);
       // TODO: allow empty lists (and list constraints) to enforce length?
-      if(classes.length == 0) {
+      if (classes.length == 0) {
         throw new WrongParameterValueException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!");
       }
 
       List<Class<? extends C>> cls = new ArrayList<Class<? extends C>>(classes.length);
-      for(String cl : classes) {
-        try {
-          Class<?> c;
-          try {
-            c = loader.loadClass(cl);
-          }
-          catch(ClassNotFoundException e) {
-            // try in package of restriction class
-            c = loader.loadClass(restrictionClass.getPackage().getName() + "." + cl);
-          }
-          // Redundant check, also in validate(), but not expensive.
-          if(!restrictionClass.isAssignableFrom(c)) {
-            throw new WrongParameterValueException(this, cl, "Class \"" + cl + "\" does not extend/implement restriction class " + restrictionClass + ".\n");
-          }
-          else {
-            cls.add((Class<? extends C>) c);
-          }
-        }
-        catch(ClassNotFoundException e) {
-          throw new WrongParameterValueException(this, cl, "Class \"" + cl + "\" not found.\n", e);
-        }
+      for (String cl : classes) {
+        cls.add(parseClassString(cl));
       }
       return cls;
     }
@@ -166,10 +146,50 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a list of Class values!");
   }
 
+  @SuppressWarnings("unchecked")
+  protected Class<? extends C> parseClassString(String value) throws WrongParameterValueException {
+    // Try exact class factory first.
+    try {
+      return (Class<? extends C>) loader.loadClass(value + ClassParameter.FACTORY_POSTFIX);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    try {
+      return (Class<? extends C>) loader.loadClass(value);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    // Try factory for guessed name next
+    try {
+      return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value + ClassParameter.FACTORY_POSTFIX);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    // Last try: guessed name prefix only
+    try {
+      return (Class<? extends C>) loader.loadClass(restrictionClass.getPackage().getName() + "." + value);
+    } catch (ClassNotFoundException e) {
+      // Ignore, retry
+    }
+    // Try aliases:
+    for (Class<?> c : getKnownImplementations()) {
+      if (c.isAnnotationPresent(Alias.class)) {
+        Alias aliases = c.getAnnotation(Alias.class);
+        for (String alias : aliases.value()) {
+          if (alias.equalsIgnoreCase(value)) {
+            return (Class<? extends C>) c;
+          }
+        }
+      }
+    }
+    // Fail.
+    throw new WrongParameterValueException(this, value, "Given class \"" + value + "\" not found.");
+  }
+
   @Override
   protected boolean validate(List<Class<? extends C>> obj) throws ParameterException {
-    for(Class<? extends C> cls : obj) {
-      if(!restrictionClass.isAssignableFrom(cls)) {
+    for (Class<? extends C> cls : obj) {
+      if (!restrictionClass.isAssignableFrom(cls)) {
         throw new WrongParameterValueException(this, cls.getName(), "Class \"" + cls.getName() + "\" does not extend/implement restriction class " + restrictionClass + ".\n");
       }
     }
@@ -218,19 +238,18 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   public List<C> instantiateClasses(Parameterization config) {
     config = config.descend(this);
     List<C> instances = new ArrayList<C>();
-    if(getValue() == null) {
+    if (getValue() == null) {
       config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));
       return instances; // empty list.
     }
 
-    for(Class<? extends C> cls : getValue()) {
+    for (Class<? extends C> cls : getValue()) {
       // NOTE: There is a duplication of this code in ObjectListParameter - keep
       // in sync!
       try {
         C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config);
         instances.add(instance);
-      }
-      catch(Exception e) {
+      } catch (Exception e) {
         config.reportError(new WrongParameterValueException(this, cls.getName(), e));
       }
     }
@@ -247,26 +266,24 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
   public String restrictionString() {
     String prefix = restrictionClass.getPackage().getName() + ".";
     StringBuilder info = new StringBuilder();
-    if(restrictionClass.isInterface()) {
+    if (restrictionClass.isInterface()) {
       info.append("Implementing ");
-    }
-    else {
+    } else {
       info.append("Extending ");
     }
     info.append(restrictionClass.getName());
     info.append(FormatUtil.NEWLINE);
 
     List<Class<?>> known = getKnownImplementations();
-    if(!known.isEmpty()) {
+    if (!known.isEmpty()) {
       info.append("Known classes (default package " + prefix + "):");
       info.append(FormatUtil.NEWLINE);
-      for(Class<?> c : known) {
+      for (Class<?> c : known) {
         info.append("->" + FormatUtil.NONBREAKING_SPACE);
         String name = c.getName();
-        if(name.startsWith(prefix)) {
+        if (name.startsWith(prefix)) {
           info.append(name.substring(prefix.length()));
-        }
-        else {
+        } else {
           info.append(name);
         }
         info.append(FormatUtil.NEWLINE);
@@ -292,7 +309,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    */
   @Override
   public String getValuesDescription() {
-    if(restrictionClass != null && restrictionClass != Object.class) {
+    if (restrictionClass != null && restrictionClass != Object.class) {
       return restrictionString();
     }
     return "";
