@@ -32,6 +32,8 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -47,7 +49,7 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
