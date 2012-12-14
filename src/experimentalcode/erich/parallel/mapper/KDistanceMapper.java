@@ -83,7 +83,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
 
   @Override
   public Instance<D> instantiate(MapExecutor mapper) {
-    return new Instance<D>(k, input.instantiate(mapper), out.instantiate(mapper));
+    return new Instance<>(k, input.instantiate(mapper), out.instantiate(mapper));
   }
 
   /**

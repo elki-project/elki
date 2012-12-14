@@ -37,7 +37,7 @@ public class SharedObject<T> implements SharedVariable<T> {
     final Class<Instance<T>> cls = ClassGenericsUtil.uglyCastIntoSubclass(Instance.class);
     Instance<T> instance = mapper.getShared(this, cls);
     if(instance == null) {
-      instance = new Instance<T>();
+      instance = new Instance<>();
       mapper.addShared(this, instance);
     }
     return instance;

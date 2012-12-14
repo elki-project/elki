@@ -1,10 +1,5 @@
 package tutorial.distancefunction;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,10 +23,17 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanc
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
+
 /**
  * Tutorial example for ELKI.
  * 
- * See <a href="http://elki.dbs.ifi.lmu.de/wiki/Tutorial/DistanceFunctions">Distance function tutorial</a>
+ * See <a
+ * href="http://elki.dbs.ifi.lmu.de/wiki/Tutorial/DistanceFunctions">Distance
+ * function tutorial</a>
  * 
  * @author Erich Schubert
  */
@@ -45,6 +47,6 @@ public class TutorialDistanceFunction extends AbstractVectorDoubleDistanceFuncti
 
   @Override
   public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 2);
+    return new VectorFieldTypeInformation<>(NumberVector.class, 2);
   }
 }

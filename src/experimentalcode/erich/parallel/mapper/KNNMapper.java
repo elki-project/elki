@@ -76,7 +76,7 @@ public class KNNMapper<O, D extends Distance<D>> implements Mapper {
 
   @Override
   public Instance<O, D> instantiate(MapExecutor mapper) {
-    return new Instance<O, D>(k, knnq, out.instantiate(mapper));
+    return new Instance<>(k, knnq, out.instantiate(mapper));
   }
 
   /**

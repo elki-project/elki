@@ -92,8 +92,8 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
     DistanceQuery<O, D> distq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O, D> knnq = database.getKNNQuery(distq, k);
 
-    KNNMapper<O, D> knnm = new KNNMapper<O, D>(k, knnq);
-    SharedObject<KNNResult<D>> knnv = new SharedObject<KNNResult<D>>();
+    KNNMapper<O, D> knnm = new KNNMapper<>(k, knnq);
+    SharedObject<KNNResult<D>> knnv = new SharedObject<>();
     KDoubleDistanceMapper kdistm = new KDoubleDistanceMapper(k);
     SharedDouble kdistv = new SharedDouble();
     WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);
@@ -108,7 +108,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
     new ParallelMapExecutor().run(ids, knnm, kdistm, storem, mmm);
 
     DoubleMinMax minmax = mmm.getMinMax();
-    Relation<Double> scoreres = new MaterializedRelation<Double>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, store, ids);
+    Relation<Double> scoreres = new MaterializedRelation<>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, store, ids);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }
@@ -146,7 +146,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
 
     @Override
     protected ParallelKNNOutlier<O, D> makeInstance() {
-      return new ParallelKNNOutlier<O, D>(distanceFunction, k);
+      return new ParallelKNNOutlier<>(distanceFunction, k);
     }
   }
 }

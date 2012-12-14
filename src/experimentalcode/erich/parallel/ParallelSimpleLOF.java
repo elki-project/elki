@@ -98,9 +98,9 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
     WritableDataStore<KNNResult<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNResult.class);
     {
       // Compute kNN
-      KNNMapper<O, D> knnm = new KNNMapper<O, D>(k + 1, knnq);
-      SharedObject<KNNResult<D>> knnv = new SharedObject<KNNResult<D>>();
-      WriteDataStoreMapper<KNNResult<D>> storek = new WriteDataStoreMapper<KNNResult<D>>(knns);
+      KNNMapper<O, D> knnm = new KNNMapper<>(k + 1, knnq);
+      SharedObject<KNNResult<D>> knnv = new SharedObject<>();
+      WriteDataStoreMapper<KNNResult<D>> storek = new WriteDataStoreMapper<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
 
@@ -110,7 +110,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
     // Phase two: lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
-      SimpleLRDMapper<D> lrdm = new SimpleLRDMapper<D>(knns);
+      SimpleLRDMapper<D> lrdm = new SimpleLRDMapper<>(knns);
       SharedDouble lrdv = new SharedDouble();
       WriteDoubleDataStoreMapper storelrd = new WriteDoubleDataStoreMapper(lrds);
 
@@ -136,7 +136,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
       minmax = mmm.getMinMax();
     }
 
-    Relation<Double> scoreres = new MaterializedRelation<Double>("Simple Local Outlier Factor", "simple-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    Relation<Double> scoreres = new MaterializedRelation<>("Simple Local Outlier Factor", "simple-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(meta, scoreres);
   }
@@ -174,7 +174,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
 
     @Override
     protected ParallelSimpleLOF<O, D> makeInstance() {
-      return new ParallelSimpleLOF<O, D>(distanceFunction, k);
+      return new ParallelSimpleLOF<>(distanceFunction, k);
     }
   }
 }

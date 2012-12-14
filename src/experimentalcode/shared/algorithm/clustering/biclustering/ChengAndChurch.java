@@ -434,9 +434,9 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     }
 
     this.maskedVals = new HashMap<IntIntPair, Double>();
-    this.missingValues = new HashMap<IntIntPair, Double>();
+    this.missingValues = new HashMap<>();
     this.rowMeans = new HashMap<Integer, Double>();
-    this.columnMeans = new HashMap<Integer, Double>();
+    this.columnMeans = new HashMap<>();
   }
 
   /*
@@ -541,8 +541,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
         BitSet unionRows = new BitSet();
         unionRows.or(currentRows);
         unionRows.or(invertedRows);
-        List<Integer> rowsToRemove = new ArrayList<Integer>();
-        // List<Integer> invertedRowsToRemove = new ArrayList<Integer>();
+        List<Integer> rowsToRemove = new ArrayList<>();
+        // List<Integer> invertedRowsToRemove = new ArrayList<>();
         for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
           if(computeRowResidue(i, false) > alphaResidue) {
             rowsToRemove.add(i);
@@ -573,7 +573,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
 
       if(getColDim() > MIN_COLUMN_REMOE_THRESHOLD) {
         // Compute row mean for each column j
-        List<Integer> colsToRemove = new ArrayList<Integer>();
+        List<Integer> colsToRemove = new ArrayList<>();
         for(int j = currentCols.nextSetBit(0); j >= 0; j = currentCols.nextSetBit(j + 1)) {
           if(computeColResidue(j) > alphaResidue) {
             colsToRemove.add(j);
@@ -640,7 +640,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       added = false;
       numberOfAddition--;
       // Compute row mean for each col j
-      List<Integer> colToAdd = new ArrayList<Integer>();
+      List<Integer> colToAdd = new ArrayList<>();
       for(int j = currentCols.nextClearBit(0); j < getColDim(); j = currentCols.nextClearBit(j + 1)) {
         if(computeColResidue(j) <= currentResidue) {
           colToAdd.add(j);
@@ -660,8 +660,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       // unionRows.or(currentRows);
       // unionRows.or(invertedRows);
 
-      List<Integer> rowsToAdd = new ArrayList<Integer>();
-      List<Integer> invertedRowsToAdd = new ArrayList<Integer>();
+      List<Integer> rowsToAdd = new ArrayList<>();
+      List<Integer> invertedRowsToAdd = new ArrayList<>();
       for(int i = currentRows.nextClearBit(0); i < getRowDim(); i = currentRows.nextClearBit(i + 1)) {
         if(computeRowResidue(i, false) <= currentResidue) {
           rowsToAdd.add(i);
@@ -707,7 +707,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     currentMean = 0.0;
 
     rowMeans = new HashMap<Integer, Double>();
-    columnMeans = new HashMap<Integer, Double>();
+    columnMeans = new HashMap<>();
 
     invertedRows.clear();
 

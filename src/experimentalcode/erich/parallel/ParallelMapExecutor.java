@@ -62,7 +62,7 @@ public class ParallelMapExecutor {
 
     final int size = aids.size();
     final int blocksize = (size + (numparts - 1)) / numparts;
-    List<Future<ArrayDBIDs>> parts = new ArrayList<Future<ArrayDBIDs>>(numparts);
+    List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
     for (int i = 0; i < numparts; i++) {
       Callable<ArrayDBIDs> run = new BlockArrayRunner(aids, i * blocksize, Math.min((i + 1) * blocksize, size), mapper);
       parts.add(core.submit(run));
@@ -117,7 +117,7 @@ public class ParallelMapExecutor {
     /**
      * Channel map
      */
-    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<SharedVariable<?>, SharedVariable.Instance<?>>();
+    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<>();
 
     /**
      * Constructor.
@@ -204,7 +204,7 @@ public class ParallelMapExecutor {
     /**
      * Channel map
      */
-    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<SharedVariable<?>, SharedVariable.Instance<?>>();
+    private HashMap<SharedVariable<?>, SharedVariable.Instance<?>> channels = new HashMap<>();
 
     /**
      * Constructor.

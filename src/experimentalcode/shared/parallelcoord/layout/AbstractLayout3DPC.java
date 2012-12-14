@@ -91,14 +91,14 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
     int root = findOptimalRoot(iedges);
 
     // Convert edges:
-    ArrayList<Edge> edges = new ArrayList<Edge>(iedges.length >> 1);
+    ArrayList<Edge> edges = new ArrayList<>(iedges.length >> 1);
     for (int i = 0; i < iedges.length; i += 2) {
       edges.add(new Edge(iedges[i], iedges[i + 1]));
     }
     layout.edges = edges;
 
     // Prefill nodes array with nulls.
-    ArrayList<N> nodes = new ArrayList<N>(mat.size());
+    ArrayList<N> nodes = new ArrayList<>(mat.size());
     for (int i = 0; i < mat.size(); i++) {
       nodes.add(null);
     }
@@ -293,7 +293,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<DimensionSimilarity<NumberVector<?>>>(SIM_ID, DimensionSimilarity.class);
+      ObjectParameter<DimensionSimilarity<NumberVector<?>>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class);
       if (config.grab(simP)) {
         sim = simP.instantiateClass(config);
       }
