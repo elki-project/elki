@@ -112,20 +112,19 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
     try {
       String fullName = PREFIX + parent.getName();
       configfiles = cl.getResources(fullName);
-    }
-    catch(IOException x) {
+    } catch (IOException x) {
       throw new AbortException("Could not load service configuration files.", x);
     }
   }
 
   @Override
   public boolean hasNext() {
-    if(nextclass != null) {
+    if (nextclass != null) {
       return true;
     }
     // Find next iterator
-    while((curiter == null) || !curiter.hasNext()) {
-      if(!configfiles.hasMoreElements()) {
+    while ((curiter == null) || !curiter.hasNext()) {
+      if (!configfiles.hasMoreElements()) {
         return false;
       }
       curiter = parseFile(configfiles.nextElement());
@@ -138,55 +137,52 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
     ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
     try {
       BufferedReader r = new BufferedReader(new InputStreamReader(nextElement.openStream(), "utf-8"));
-      while(parseLine(r.readLine(), classes, nextElement)) {
+      while (parseLine(r.readLine(), classes, nextElement)) {
         // Continue
       }
-    }
-    catch(IOException x) {
+    } catch (IOException x) {
       throw new AbortException("Error reading configuration file", x);
     }
     return classes.iterator();
   }
 
   private boolean parseLine(String line, ArrayList<Class<?>> classes, URL nextElement) {
-    if(line == null) {
+    if (line == null) {
       return false;
     }
     // Ignore comments, trim whitespace
     {
       int begin = 0;
       int end = line.indexOf(COMMENT_CHAR);
-      if(end < 0) {
+      if (end < 0) {
         end = line.length();
       }
-      while(begin < end && line.charAt(begin) == ' ') {
+      while (begin < end && line.charAt(begin) == ' ') {
         begin++;
       }
-      while(end - 1 > begin && line.charAt(end - 1) == ' ') {
+      while (end - 1 > begin && line.charAt(end - 1) == ' ') {
         end--;
       }
-      if(begin > 0 || end < line.length()) {
+      if (begin > 0 || end < line.length()) {
         line = line.substring(begin, end);
       }
     }
-    if(line.length() <= 0) {
+    if (line.length() <= 0) {
       return true; // Empty/comment lines are okay, continue
     }
     // Try to load the class
     try {
       Class<?> cls = cl.loadClass(line);
       // Should not happen. Check anyway.
-      if(cls == null) {
+      if (cls == null) {
         return true;
       }
-      if(parent.isAssignableFrom(cls)) {
+      if (parent.isAssignableFrom(cls)) {
         classes.add(cls);
-      }
-      else {
+      } else {
         LOG.warning("Class " + line + " does not implement " + parent + " but listed in service file " + nextElement);
       }
-    }
-    catch(ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       LOG.warning("Class not found: " + line + "; listed in service file " + nextElement, e);
     }
     return true;

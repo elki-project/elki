@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -36,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-// TODO: add spatial?
+@Alias({ "minimum", "min" })
 public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance. Use this.

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -45,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", title = "Computer programs for hierarchical polythetic classification (similarity analysis).", booktitle = "Computer Journal, Volume 9, Issue 1", url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
+@Alias({ "canberra" })
 public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
    * Static instance. Use this!
@@ -62,7 +64,7 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
     final int dim = o1.getDimensionality();
     double sum = 0.0;
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       double v1 = o1.doubleValue(i);
       double v2 = o2.doubleValue(i);
       final double div = Math.abs(v1) + Math.abs(v2);
@@ -77,17 +79,15 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   public double doubleMinDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = mbr1.getDimensionality();
     double sum = 0.0;
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       final double m1, m2;
-      if(mbr1.getMax(d) < mbr2.getMin(d)) {
+      if (mbr1.getMax(d) < mbr2.getMin(d)) {
         m1 = mbr2.getMin(d);
         m2 = mbr1.getMax(d);
-      }
-      else if(mbr1.getMin(d) > mbr2.getMax(d)) {
+      } else if (mbr1.getMin(d) > mbr2.getMax(d)) {
         m1 = mbr1.getMin(d);
         m2 = mbr2.getMax(d);
-      }
-      else { // The mbrs intersect!
+      } else { // The mbrs intersect!
         continue;
       }
       final double manhattanI = m1 - m2;
