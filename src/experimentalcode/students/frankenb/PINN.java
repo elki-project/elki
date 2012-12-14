@@ -3,8 +3,8 @@ package experimentalcode.students.frankenb;
 import java.io.File;
 import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.algorithm.outlier.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
