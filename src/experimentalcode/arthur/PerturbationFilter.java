@@ -330,7 +330,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<ScalingReference>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
+      EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
       if (config.grab(scalingReferenceP)) {
         scalingreference = scalingReferenceP.getValue();
       }
@@ -356,12 +356,12 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
-      ArrayList<Parameter<?>> globalSetMinAndMax = new ArrayList<Parameter<?>>();
+      ArrayList<Parameter<?>> globalSetMinAndMax = new ArrayList<>();
       globalSetMinAndMax.add(minimaP);
       globalSetMinAndMax.add(maximaP);
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(globalSetMinAndMax));
 
-      ArrayList<ListParameter<?>> globalMinMaxEqualsize = new ArrayList<ListParameter<?>>();
+      ArrayList<ListParameter<?>> globalMinMaxEqualsize = new ArrayList<>();
       globalMinMaxEqualsize.add(minimaP);
       globalMinMaxEqualsize.add(maximaP);
       config.checkConstraint(new EqualSizeGlobalConstraint(globalMinMaxEqualsize));

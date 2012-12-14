@@ -112,7 +112,7 @@ public class Simple1DOFCamera {
     rotationZ = 0;
     cosZ = 1.0;
     sinZ = 0.0;
-    listeners = new ArrayList<CameraListener>(5);
+    listeners = new ArrayList<>(5);
   }
 
   /**
@@ -284,7 +284,7 @@ public class Simple1DOFCamera {
    */
   public void addCameraListener(CameraListener lis) {
     if (listeners == null) {
-      listeners = new ArrayList<CameraListener>(5);
+      listeners = new ArrayList<>(5);
     }
     listeners.add(lis);
   }

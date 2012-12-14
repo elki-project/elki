@@ -94,7 +94,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
     // Wrap the result in the standard containers
     // Actual min-max, theoretical min-max!
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
-    Relation<Double> rel = new MaterializedRelation<Double>(database, TypeUtil.DOUBLE, relation.getDBIDs(), "stddev-outlier", scores);
+    Relation<Double> rel = new MaterializedRelation<>(database, TypeUtil.DOUBLE, relation.getDBIDs(), "stddev-outlier", scores);
     return new OutlierResult(meta, rel);
   }
 
@@ -142,7 +142,7 @@ public class DistanceStddevOutlier<O, D extends NumberDistance<D, ?>> extends Ab
 
     @Override
     protected DistanceStddevOutlier<O, D> makeInstance() {
-      return new DistanceStddevOutlier<O, D>(distanceFunction, k);
+      return new DistanceStddevOutlier<>(distanceFunction, k);
     }
   }
 }

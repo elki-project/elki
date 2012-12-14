@@ -110,7 +110,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     // Choose initial means
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
+    List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k + 2));
     }
@@ -125,12 +125,11 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     means = refineResult(relation, means, clusters, metas, tids);
 
     // Wrap result
-    Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
+    Clustering<MeanModel<V>> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     for (int i = 0; i < clusters.size(); i++) {
       V mean = factory.newNumberVector(means.get(i).getColumnVector().getArrayRef());
-      MeanModel<V> model = new MeanModel<V>(mean);
-      result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
+      result.addCluster(new Cluster<>(clusters.get(i), new MeanModel<>(mean)));
     }
     return result;
   }
@@ -499,7 +498,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, KMeansPlusPlusInitialMeans.class);
       if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -513,7 +512,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
 
     @Override
     protected SameSizeKMeansAlgorithm<V> makeInstance() {
-      return new SameSizeKMeansAlgorithm<V>(distanceFunction, k, maxiter, initializer);
+      return new SameSizeKMeansAlgorithm<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

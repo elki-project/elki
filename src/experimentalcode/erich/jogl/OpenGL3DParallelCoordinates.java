@@ -581,7 +581,7 @@ public class OpenGL3DParallelCoordinates implements ResultHandler {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<Layouter3DPC<? super NumberVector<?>>> layoutP = new ObjectParameter<Layouter3DPC<? super NumberVector<?>>>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout.class);
+      ObjectParameter<Layouter3DPC<? super NumberVector<?>>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout.class);
       if (config.grab(layoutP)) {
         layout = layoutP.instantiateClass(config);
       }

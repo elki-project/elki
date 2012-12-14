@@ -88,7 +88,7 @@ public class MultiLPNorm extends AbstractVectorDoubleDistanceFunction {
 
   @Override
   public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, ps.length);
+    return new VectorFieldTypeInformation<>(NumberVector.class, ps.length);
   }
 
   /**
