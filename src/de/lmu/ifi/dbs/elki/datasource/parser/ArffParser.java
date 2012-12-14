@@ -146,8 +146,8 @@ public class ArffParser implements Parser {
   public MultipleObjectsBundle parse(InputStream instream) {
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(instream));
-      ArrayList<String> names = new ArrayList<String>();
-      ArrayList<String> types = new ArrayList<String>();
+      ArrayList<String> names = new ArrayList<>();
+      ArrayList<String> types = new ArrayList<>();
 
       readHeader(br);
       parseAttributeStatements(br, names, types);
@@ -205,7 +205,7 @@ public class ArffParser implements Parser {
 
   private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] targ, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
     // logger.warning("Sparse instance.");
-    TIntObjectHashMap<Object> map = new TIntObjectHashMap<Object>();
+    TIntObjectHashMap<Object> map = new TIntObjectHashMap<>();
     while(true) {
       nextToken(tokenizer);
       assert (tokenizer.ttype != StreamTokenizer.TT_EOF && tokenizer.ttype != StreamTokenizer.TT_EOL);
@@ -421,11 +421,11 @@ public class ArffParser implements Parser {
           labels[i] = names.get(out + i);
         }
         if(!sparse) {
-          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dimsize[out], labels);
+          VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dimsize[out], labels);
           bundle.appendColumn(type, new ArrayList<DoubleVector>());
         }
         else {
-          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.FACTORY, dimsize[out], labels);
+          VectorFieldTypeInformation<SparseFloatVector> type = new VectorFieldTypeInformation<>(SparseFloatVector.FACTORY, dimsize[out], labels);
           bundle.appendColumn(type, new ArrayList<SparseFloatVector>());
         }
       }
@@ -434,13 +434,13 @@ public class ArffParser implements Parser {
         for(int i = 1; i < dimsize[out]; i++) {
           label.append(' ').append(names.get(out + i));
         }
-        bundle.appendColumn(new SimpleTypeInformation<LabelList>(LabelList.class, label.toString()), new ArrayList<LabelList>());
+        bundle.appendColumn(new SimpleTypeInformation<>(LabelList.class, label.toString()), new ArrayList<LabelList>());
       }
       else if(TypeUtil.EXTERNALID.equals(etyp[out])) {
-        bundle.appendColumn(new SimpleTypeInformation<ExternalID>(ExternalID.class, names.get(out)), new ArrayList<ExternalID>());
+        bundle.appendColumn(new SimpleTypeInformation<>(ExternalID.class, names.get(out)), new ArrayList<ExternalID>());
       }
       else if(TypeUtil.CLASSLABEL.equals(etyp[out])) {
-        bundle.appendColumn(new SimpleTypeInformation<ClassLabel>(ClassLabel.class, names.get(out)), new ArrayList<ClassLabel>());
+        bundle.appendColumn(new SimpleTypeInformation<>(ClassLabel.class, names.get(out)), new ArrayList<ClassLabel>());
       }
       else {
         throw new AbortException("Unsupported type for column " + in + "->" + out + ": " + ((etyp[out] != null) ? etyp[out].toString() : "null"));

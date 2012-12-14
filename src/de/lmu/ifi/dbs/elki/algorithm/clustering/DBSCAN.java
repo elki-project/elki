@@ -140,7 +140,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
-    resultList = new ArrayList<ModifiableDBIDs>();
+    resultList = new ArrayList<>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(size);
     if(size < minpts) {
@@ -170,7 +170,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       clusprog.setCompleted(LOG);
     }
 
-    Clustering<Model> result = new Clustering<Model>("DBSCAN Clustering", "dbscan-clustering");
+    Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
     for(ModifiableDBIDs res : resultList) {
       Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
       result.addCluster(c);
@@ -289,7 +289,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DistanceParameter<D> epsilonP = new DistanceParameter<D>(EPSILON_ID, distanceFunction);
+      DistanceParameter<D> epsilonP = new DistanceParameter<>(EPSILON_ID, distanceFunction);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -303,7 +303,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
     @Override
     protected DBSCAN<O, D> makeInstance() {
-      return new DBSCAN<O, D>(distanceFunction, epsilon, minpts);
+      return new DBSCAN<>(distanceFunction, epsilon, minpts);
     }
   }
 }

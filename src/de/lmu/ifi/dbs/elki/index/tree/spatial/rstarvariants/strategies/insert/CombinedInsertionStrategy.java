@@ -108,12 +108,12 @@ public class CombinedInsertionStrategy implements InsertionStrategy {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ClassParameter<InsertionStrategy> dirP = new ClassParameter<InsertionStrategy>(DIR_STRATEGY_ID, InsertionStrategy.class, LeastEnlargementWithAreaInsertionStrategy.class);
+      ClassParameter<InsertionStrategy> dirP = new ClassParameter<>(DIR_STRATEGY_ID, InsertionStrategy.class, LeastEnlargementWithAreaInsertionStrategy.class);
       if(config.grab(dirP)) {
         dirStrategy = dirP.instantiateClass(config);
       }
 
-      ClassParameter<InsertionStrategy> leafP = new ClassParameter<InsertionStrategy>(LEAF_STRATEGY_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
+      ClassParameter<InsertionStrategy> leafP = new ClassParameter<>(LEAF_STRATEGY_ID, InsertionStrategy.class, LeastOverlapInsertionStrategy.class);
       if(config.grab(leafP)) {
         leafStrategy = leafP.instantiateClass(config);
       }

@@ -129,7 +129,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
 
   @Override
   public VectorTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, dim, Integer.MAX_VALUE);
+    return new VectorFieldTypeInformation<>(NumberVector.class, dim, Integer.MAX_VALUE);
   }
 
   @Override
@@ -139,7 +139,7 @@ public class DimensionSelectingDistanceFunction extends AbstractPrimitiveDistanc
 
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
+    return new SpatialPrimitiveDistanceQuery<>(database, this);
   }
 
   @Override

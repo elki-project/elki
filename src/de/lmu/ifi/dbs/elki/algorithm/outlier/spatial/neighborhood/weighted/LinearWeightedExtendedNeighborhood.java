@@ -89,7 +89,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
   @Override
   public Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference) {
     ModifiableDBIDs seen = DBIDUtil.newHashSet();
-    List<DoubleDBIDPair> result = new ArrayList<DoubleDBIDPair>();
+    List<DoubleDBIDPair> result = new ArrayList<>();
 
     // Add starting object
     result.add(DBIDUtil.newPair(computeWeight(0), reference));
@@ -194,7 +194,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
        * @return Inner neighborhood.
        */
       protected static <O> NeighborSetPredicate.Factory<O> getParameterInnerNeighborhood(Parameterization config) {
-        final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
+        final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
         if(config.grab(param)) {
           return param.instantiateClass(config);
         }
@@ -225,7 +225,7 @@ public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPr
 
       @Override
       protected LinearWeightedExtendedNeighborhood.Factory<O> makeInstance() {
-        return new LinearWeightedExtendedNeighborhood.Factory<O>(inner, steps);
+        return new LinearWeightedExtendedNeighborhood.Factory<>(inner, steps);
       }
     }
   }

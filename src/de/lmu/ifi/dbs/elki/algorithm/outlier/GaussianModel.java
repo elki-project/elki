@@ -136,7 +136,7 @@ public class GaussianModel<V extends NumberVector<?>> extends AbstractAlgorithm<
     else {
       meta = new InvertedOutlierScoreMeta(mm.getMin(), mm.getMax(), 0.0, Double.POSITIVE_INFINITY);
     }
-    Relation<Double> res = new MaterializedRelation<Double>("Gaussian Model Outlier Score", "gaussian-model-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
+    Relation<Double> res = new MaterializedRelation<>("Gaussian Model Outlier Score", "gaussian-model-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 
@@ -171,7 +171,7 @@ public class GaussianModel<V extends NumberVector<?>> extends AbstractAlgorithm<
 
     @Override
     protected GaussianModel<V> makeInstance() {
-      return new GaussianModel<V>(invert);
+      return new GaussianModel<>(invert);
     }
   }
 }

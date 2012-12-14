@@ -109,7 +109,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(ids.size());
+    List<KNNResult<D>> result = new ArrayList<>(ids.size());
     if(k < preprocessor.getK()) {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
         KNNResult<D> dr = preprocessor.get(iter);

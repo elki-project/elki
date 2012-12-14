@@ -111,7 +111,7 @@ public class CosineDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
+    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
   
   @Override

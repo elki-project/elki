@@ -86,7 +86,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
    */
   KNNResult<DoubleDistance> getKNNForObjectClean(O obj, int k) {
     // Optimization for double distances.
-    final TiedTopBoundedHeap<DoubleDistanceDBIDPair> heap = new TiedTopBoundedHeap<DoubleDistanceDBIDPair>(k, DoubleDistanceKNNHeap.COMPARATOR);
+    final TiedTopBoundedHeap<DoubleDistanceDBIDPair> heap = new TiedTopBoundedHeap<>(k, DoubleDistanceKNNHeap.COMPARATOR);
     final DBIDIter iter = relation.iterDBIDs();
 
     // First k elements don't need checking.
@@ -119,7 +119,7 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
    */
   KNNResult<DoubleDistance> getKNNForObjectBenchmarked(O obj, int k) {
     // THIS SHOULD BE SLOWER THAN THE VERSION ABOVE, BUT ISN'T!
-    final TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>> heap = new TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>>(k, AbstractKNNHeap.COMPARATOR);
+    final TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>> heap = new TiedTopBoundedHeap<>(k, AbstractKNNHeap.COMPARATOR);
     final DBIDIter iter = relation.iterDBIDs();
     // First k elements don't need checking.
     double max = 0.;
@@ -138,6 +138,6 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
         max = heap.peek().getDistance().doubleValue();
       }
     }
-    return new GenericKNNList<DoubleDistance>(heap, k);
+    return new GenericKNNList<>(heap, k);
   }
 }

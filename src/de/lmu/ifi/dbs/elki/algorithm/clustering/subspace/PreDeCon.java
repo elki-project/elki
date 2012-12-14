@@ -111,7 +111,7 @@ public class PreDeCon<V extends NumberVector<?>> extends AbstractProjectedDBSCAN
 
     @Override
     protected PreDeCon<V> makeInstance() {
-      return new PreDeCon<V>(epsilon, minpts, outerdist, lambda);
+      return new PreDeCon<>(epsilon, minpts, outerdist, lambda);
     }
   }
 }

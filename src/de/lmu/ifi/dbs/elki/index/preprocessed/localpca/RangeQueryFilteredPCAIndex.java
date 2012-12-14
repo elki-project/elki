@@ -142,7 +142,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abst
     public RangeQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
       RangeQuery<V, DoubleDistance> rangequery = QueryUtil.getRangeQuery(relation, pcaDistanceFunction);
-      return new RangeQueryFilteredPCAIndex<V>(relation, pca, rangequery, epsilon);
+      return new RangeQueryFilteredPCAIndex<>(relation, pca, rangequery, epsilon);
     }
 
     /**
@@ -158,7 +158,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abst
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<DoubleDistance>(EPSILON_ID, pcaDistanceFunction != null ? pcaDistanceFunction.getDistanceFactory() : null);
+        DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<>(EPSILON_ID, pcaDistanceFunction != null ? pcaDistanceFunction.getDistanceFactory() : null);
         if(config.grab(epsilonP)) {
           epsilon = epsilonP.getValue();
         }
@@ -166,7 +166,7 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abst
 
       @Override
       protected Factory<NV> makeInstance() {
-        return new Factory<NV>(pcaDistanceFunction, pca, epsilon);
+        return new Factory<>(pcaDistanceFunction, pca, epsilon);
       }
     }
   }

@@ -119,7 +119,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
    */
   public DeLiClu(DistanceFunction<? super NV, D> distanceFunction, int minpts) {
     super(distanceFunction);
-    this.knnJoin = new KNNJoin<NV, D, DeLiCluNode, DeLiCluEntry>(distanceFunction, minpts);
+    this.knnJoin = new KNNJoin<>(distanceFunction, minpts);
     this.minpts = minpts;
   }
 
@@ -146,8 +146,8 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), LOG) : null;
     final int size = relation.size();
 
-    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("DeLiClu Clustering", "deliclu-clustering");
-    heap = new UpdatableHeap<SpatialObjectPair>();
+    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<>("DeLiClu Clustering", "deliclu-clustering");
+    heap = new UpdatableHeap<>();
 
     // add start object to cluster order and (root, root) to priority queue
     DBID startID = getStartObject(relation);
@@ -503,7 +503,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
 
     @Override
     protected DeLiClu<NV, D> makeInstance() {
-      return new DeLiClu<NV, D>(distanceFunction, minpts);
+      return new DeLiClu<>(distanceFunction, minpts);
     }
   }
 }

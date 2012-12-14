@@ -108,7 +108,7 @@ public class FileListParameter extends ListParameter<File> {
     }
     if(obj instanceof String) {
       String[] values = SPLIT.split((String) obj);
-      ArrayList<File> fileValue = new ArrayList<File>(values.length);
+      ArrayList<File> fileValue = new ArrayList<>(values.length);
       for(String val : values) {
         fileValue.add(new File(val));
       }

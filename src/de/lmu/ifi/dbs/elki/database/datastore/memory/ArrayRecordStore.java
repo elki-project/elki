@@ -62,7 +62,7 @@ public class ArrayRecordStore implements WritableRecordStore {
   @Override
   public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype) {
     // TODO: add type checking safety?
-    return new StorageAccessor<T>(col);
+    return new StorageAccessor<>(col);
   }
 
   /**

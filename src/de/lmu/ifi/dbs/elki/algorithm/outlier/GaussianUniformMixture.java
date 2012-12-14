@@ -184,7 +184,7 @@ public class GaussianUniformMixture<V extends NumberVector<?>> extends AbstractA
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.0);
-    Relation<Double> res = new MaterializedRelation<Double>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
+    Relation<Double> res = new MaterializedRelation<>("Gaussian Mixture Outlier Score", "gaussian-mixture-outlier", TypeUtil.DOUBLE, oscores, relation.getDBIDs());
     return new OutlierResult(meta, res);
   }
 
@@ -267,7 +267,7 @@ public class GaussianUniformMixture<V extends NumberVector<?>> extends AbstractA
 
     @Override
     protected GaussianUniformMixture<V> makeInstance() {
-      return new GaussianUniformMixture<V>(l, c);
+      return new GaussianUniformMixture<>(l, c);
     }
   }
 }

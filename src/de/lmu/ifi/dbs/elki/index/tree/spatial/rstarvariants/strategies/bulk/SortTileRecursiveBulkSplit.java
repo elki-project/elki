@@ -49,7 +49,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
   public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
     final int dims = spatialObjects.get(0).getDimensionality();
     final int p = (int) Math.ceil(spatialObjects.size() / (double) maxEntries);
-    List<List<T>> ret = new ArrayList<List<T>>(p);
+    List<List<T>> ret = new ArrayList<>(p);
     strPartition(spatialObjects, 0, spatialObjects.size(), 0, dims, maxEntries, new Compare<T>(), ret);
     return ret;
   }

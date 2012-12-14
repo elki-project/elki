@@ -207,7 +207,7 @@ public class HiCO<V extends NumberVector<?>> extends OPTICS<V, PCACorrelationDis
 
     @Override
     protected HiCO<V> makeInstance() {
-      return new HiCO<V>(distance, mu);
+      return new HiCO<>(distance, mu);
     }
   }
 }

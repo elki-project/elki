@@ -122,7 +122,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
     // Did we get a single class?
     try {
       if (restrictionClass.isAssignableFrom((Class<?>) obj)) {
-        List<Class<? extends C>> clss = new ArrayList<Class<? extends C>>(1);
+        List<Class<? extends C>> clss = new ArrayList<>(1);
         clss.add((Class<? extends C>) obj);
         return clss;
       }
@@ -136,7 +136,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
         throw new WrongParameterValueException("Wrong parameter format! Given list of classes for parameter \"" + getName() + "\" is either empty or has the wrong format!");
       }
 
-      List<Class<? extends C>> cls = new ArrayList<Class<? extends C>>(classes.length);
+      List<Class<? extends C>> cls = new ArrayList<>(classes.length);
       for (String cl : classes) {
         cls.add(parseClassString(cl));
       }
@@ -237,7 +237,7 @@ public class ClassListParameter<C> extends ListParameter<Class<? extends C>> {
    */
   public List<C> instantiateClasses(Parameterization config) {
     config = config.descend(this);
-    List<C> instances = new ArrayList<C>();
+    List<C> instances = new ArrayList<>();
     if (getValue() == null) {
       config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));
       return instances; // empty list.

@@ -151,7 +151,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       if (stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, getDistanceFunction(), k);
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       relation.getDatabase().addIndex(preproc);
       DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
@@ -241,7 +241,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Density Factor", "ldf-outlier", TypeUtil.DOUBLE, ldfs, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Local Density Factor", "ldf-outlier", TypeUtil.DOUBLE, ldfs, ids);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, 1. / c, 1 / (1 + c));
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
@@ -319,7 +319,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         k = pK.getValue();
       }
 
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class);
+      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class);
       if (config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
@@ -337,7 +337,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
     @Override
     protected LDF<O, D> makeInstance() {
-      return new LDF<O, D>(k, distanceFunction, kernel, h, c);
+      return new LDF<>(k, distanceFunction, kernel, h, c);
     }
   }
 }

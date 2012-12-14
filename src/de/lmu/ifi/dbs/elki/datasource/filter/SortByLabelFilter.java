@@ -89,7 +89,7 @@ public class SortByLabelFilter implements ObjectFilter {
     for (int j = 0; j < objects.metaLength(); j++) {
       // Reorder column accordingly
       List<?> in = objects.getColumn(j);
-      List<Object> data = new ArrayList<Object>(size);
+      List<Object> data = new ArrayList<>(size);
       for (int i = 0; i < size; i++) {
         data.add(in.get(offsets[i]));
       }

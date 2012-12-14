@@ -87,10 +87,10 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
       Factory<V, ?> factory = FilterUtil.guessFactory(vtype);
 
       // Get the replacement type informations
-      VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<V>(factory, dims.length);
-      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<V>(factory, vtype.getDimensionality() - dims.length);
-      final List<V> col1 = new ArrayList<V>(column.size());
-      final List<V> col2 = new ArrayList<V>(column.size());
+      VectorFieldTypeInformation<V> type1 = new VectorFieldTypeInformation<>(factory, dims.length);
+      VectorFieldTypeInformation<V> type2 = new VectorFieldTypeInformation<>(factory, vtype.getDimensionality() - dims.length);
+      final List<V> col1 = new ArrayList<>(column.size());
+      final List<V> col2 = new ArrayList<>(column.size());
       bundle.appendColumn(type1, col1);
       bundle.appendColumn(type2, col2);
 
@@ -145,7 +145,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
     for (int i = 1; i < dims.length; i++) {
       m = Math.max(dims[i], m);
     }
-    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, m, Integer.MAX_VALUE);
+    return new VectorFieldTypeInformation<>(NumberVector.class, m, Integer.MAX_VALUE);
   }
 
   /**
@@ -182,7 +182,7 @@ public class SplitNumberVectorFilter<V extends NumberVector<?>> implements Objec
 
     @Override
     protected SplitNumberVectorFilter<V> makeInstance() {
-      return new SplitNumberVectorFilter<V>(dims);
+      return new SplitNumberVectorFilter<>(dims);
     }
   }
 }

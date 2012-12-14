@@ -115,7 +115,7 @@ public class FourC<V extends NumberVector<?>> extends AbstractProjectedDBSCAN<Cl
 
     @Override
     protected FourC<O> makeInstance() {
-      return new FourC<O>(epsilon, minpts, outerdist, lambda);
+      return new FourC<>(epsilon, minpts, outerdist, lambda);
     }
   }
 }

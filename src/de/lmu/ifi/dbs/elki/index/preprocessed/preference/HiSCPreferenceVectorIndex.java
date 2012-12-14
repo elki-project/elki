@@ -261,7 +261,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       } else {
         usek = k;
       }
-      return new HiSCPreferenceVectorIndex<V>(relation, alpha, usek);
+      return new HiSCPreferenceVectorIndex<>(relation, alpha, usek);
     }
 
     /**
@@ -302,7 +302,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
       @Override
       protected Factory<V> makeInstance() {
-        return new Factory<V>(alpha, k);
+        return new Factory<>(alpha, k);
       }
     }
   }

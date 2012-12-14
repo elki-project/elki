@@ -49,7 +49,7 @@ public class UpdatableHeap<O> extends Heap<O> {
   /**
    * Holds the indices in the heap of each element.
    */
-  protected final TObjectIntMap<Object> index = new TObjectIntHashMap<Object>(100, 0.5f, NO_VALUE);
+  protected final TObjectIntMap<Object> index = new TObjectIntHashMap<>(100, 0.5f, NO_VALUE);
 
   /**
    * Simple constructor with default size.

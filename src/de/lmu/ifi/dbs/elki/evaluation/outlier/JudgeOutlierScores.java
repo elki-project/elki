@@ -161,7 +161,7 @@ public class JudgeOutlierScores implements Evaluator {
 
     LOG.verbose("Scores: " + posscore + " " + negscore);
 
-    ArrayList<Vector> s = new ArrayList<Vector>(1);
+    ArrayList<Vector> s = new ArrayList<>(1);
     s.add(new Vector(new double[] { (posscore + negscore) * .5, posscore, negscore }));
     return new ScoreResult(s);
   }
@@ -226,7 +226,7 @@ public class JudgeOutlierScores implements Evaluator {
         positiveClassName = positiveClassNameP.getValue();
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
       if (config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

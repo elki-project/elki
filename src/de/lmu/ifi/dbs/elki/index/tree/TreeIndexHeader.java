@@ -250,7 +250,7 @@ public class TreeIndexHeader extends DefaultPageHeader {
   @SuppressWarnings("unchecked")
   public Stack<Integer> readEmptyPages(RandomAccessFile file) throws IOException, ClassNotFoundException {
     if(emptyPagesSize == 0) {
-      return new Stack<Integer>();
+      return new Stack<>();
     }
     byte[] bytes = new byte[emptyPagesSize];
     file.seek(file.length() - emptyPagesSize);

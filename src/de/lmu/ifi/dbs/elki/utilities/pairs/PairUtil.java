@@ -50,7 +50,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparator() {
-    return new CompareNatural<FIRST, SECOND>();
+    return new CompareNatural<>();
   }
 
   /**
@@ -63,7 +63,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST, SECOND> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparator(Comparator<? super FIRST> c1, Comparator<? super SECOND> c2) {
-    return new Compare<FIRST, SECOND>(c1, c2);
+    return new Compare<>(c1, c2);
   }
 
   /**
@@ -75,7 +75,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST extends Comparable<? super FIRST>, SECOND> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparatorFirst() {
-    return new CompareNaturalFirst<FIRST, SECOND>();
+    return new CompareNaturalFirst<>();
   }
 
   /**
@@ -88,7 +88,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST, SECOND> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparatorFirst(Comparator<? super FIRST> c1) {
-    return new CompareByFirst<FIRST, SECOND>(c1);
+    return new CompareByFirst<>(c1);
   }
 
   /**
@@ -100,7 +100,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST, SECOND extends Comparable<? super SECOND>> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparatorSecond() {
-    return new CompareNaturalSecond<FIRST, SECOND>();
+    return new CompareNaturalSecond<>();
   }
 
   /**
@@ -113,7 +113,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST, SECOND> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparatorSecond(Comparator<? super SECOND> c2) {
-    return new CompareBySecond<FIRST, SECOND>(c2);
+    return new CompareBySecond<>(c2);
   }
 
   /**
@@ -125,7 +125,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST extends Comparable<? super FIRST>, SECOND extends Comparable<? super SECOND>> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparatorSwapped() {
-    return new CompareNaturalSwapped<FIRST, SECOND>();
+    return new CompareNaturalSwapped<>();
   }
 
   /**
@@ -139,7 +139,7 @@ public final class PairUtil {
    * @return Comparator
    */
   public static <FIRST, SECOND> Comparator<Pair<? extends FIRST, ? extends SECOND>> comparatorSwapped(Comparator<? super FIRST> c1, Comparator<? super SECOND> c2) {
-    return new CompareSwapped<FIRST, SECOND>(c1, c2);
+    return new CompareSwapped<>(c1, c2);
   }
 
   /**

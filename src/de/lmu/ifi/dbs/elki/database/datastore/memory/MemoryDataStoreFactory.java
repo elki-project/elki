@@ -65,10 +65,10 @@ public class MemoryDataStoreFactory implements DataStoreFactory {
     if(ids instanceof DBIDRange) {
       DBIDRange range = (DBIDRange) ids;
       Object[] data = new Object[range.size()];
-      return new ArrayStore<T>(data, range);
+      return new ArrayStore<>(data, range);
     }
     else {
-      return new MapIntegerDBIDStore<T>(ids.size());
+      return new MapIntegerDBIDStore<>(ids.size());
     }
   }
 

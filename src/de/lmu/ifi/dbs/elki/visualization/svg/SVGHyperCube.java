@@ -125,7 +125,7 @@ public class SVGHyperCube {
    */
   private static ArrayList<double[]> getVisibleEdges(Projection2D proj, double[] s_min, double[] s_max) {
     double[] s_deltas = VMath.minus(s_max, s_min);
-    ArrayList<double[]> r_edges = new ArrayList<double[]>();
+    ArrayList<double[]> r_edges = new ArrayList<>();
     for(int i = 0; i < s_min.length; i++) {
       double[] delta = new double[s_min.length];
       delta[i] = s_deltas[i];

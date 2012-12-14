@@ -87,8 +87,8 @@ public class ExternalIDFilter implements ObjectFilter {
       done = true;
 
       // We split the label column into two parts
-      List<ExternalID> eidcol = new ArrayList<ExternalID>(objects.dataLength());
-      List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
+      List<ExternalID> eidcol = new ArrayList<>(objects.dataLength());
+      List<LabelList> lblcol = new ArrayList<>(objects.dataLength());
 
       // Split the column
       for (Object obj : objects.getColumn(i)) {

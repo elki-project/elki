@@ -63,7 +63,7 @@ public class InternalParameterizationErrors extends ParameterException {
    */
   public InternalParameterizationErrors(String message, Exception internalError) {
     super(message);
-    final ArrayList<Exception> errors = new ArrayList<Exception>(1);
+    final ArrayList<Exception> errors = new ArrayList<>(1);
     errors.add(internalError);
     this.internalErrors = errors;
   }

@@ -223,7 +223,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
           stepprog.beginStep(1, "Not materializing neighborhoods w.r.t. reference neighborhood distance function, but materializing neighborhoods w.r.t. reachability distance function.", LOG);
         }
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, reachabilityDistanceFunction, k);
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, reachabilityDistanceFunction, k);
       relation.getDatabase().addIndex(preproc);
       DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, reachabilityDistanceFunction);
       knnReach = preproc.getKNNQuery(rdq, k);
@@ -238,7 +238,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       knnRefer = QueryUtil.getKNNQuery(relation, neighborhoodDistanceFunction, k);
     }
 
-    return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnRefer, knnReach);
+    return new Pair<>(knnRefer, knnReach);
   }
 
   /**
@@ -282,11 +282,11 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Outlier Factor", "lof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Local Outlier Factor", "lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
-    return new LOFResult<O, D>(result, kNNRefer, kNNReach, lrds, lofs);
+    return new LOFResult<>(result, kNNRefer, kNNReach, lrds, lofs);
   }
 
   /**
@@ -385,7 +385,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     if (progressLOFs != null) {
       progressLOFs.ensureCompleted(LOG);
     }
-    return new Pair<WritableDoubleDataStore, DoubleMinMax>(lofs, lofminmax);
+    return new Pair<>(lofs, lofminmax);
   }
 
   @Override
@@ -577,7 +577,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
         k = pK.getValue();
       }
 
-      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
       if (config.grab(reachDistP)) {
         reachabilityDistanceFunction = reachDistP.instantiateClass(config);
       }
@@ -587,7 +587,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     protected LOF<O, D> makeInstance() {
       // Default is to re-use the same distance
       DistanceFunction<O, D> rdist = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : distanceFunction;
-      return new LOF<O, D>(k, distanceFunction, rdist);
+      return new LOF<>(k, distanceFunction, rdist);
     }
   }
 }

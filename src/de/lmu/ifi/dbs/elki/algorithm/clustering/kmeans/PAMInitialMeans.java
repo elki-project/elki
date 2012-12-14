@@ -78,7 +78,7 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
     final PrimitiveDistanceFunction<? super V, D> distF = (PrimitiveDistanceFunction<? super V, D>) distanceFunction;
     final DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
     DBIDs medids = chooseInitialMedoids(k, distQ);
-    List<V> medoids = new ArrayList<V>(k);
+    List<V> medoids = new ArrayList<>(k);
     for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
       medoids.add(relation.get(iter));
     }
@@ -179,7 +179,7 @@ public class PAMInitialMeans<V, D extends NumberDistance<D, ?>> implements KMean
   public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractParameterizer {
     @Override
     protected PAMInitialMeans<V, D> makeInstance() {
-      return new PAMInitialMeans<V, D>();
+      return new PAMInitialMeans<>();
     }
   }
 }

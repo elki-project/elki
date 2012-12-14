@@ -164,7 +164,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
       }
     }
 
-    List<ALOCIQuadTree> qts = new ArrayList<ALOCIQuadTree>(g);
+    List<ALOCIQuadTree> qts = new ArrayList<>(g);
 
     double[] nshift = new double[dim];
     ALOCIQuadTree qt = new ALOCIQuadTree(min, max, nshift, nmin, relation);
@@ -252,7 +252,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(LOG);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("aLOCI normalized MDEF", "aloci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("aLOCI normalized MDEF", "aloci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;
@@ -371,7 +371,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
       }
       this.relation = relation;
       ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
-      List<Node> children = new ArrayList<Node>();
+      List<Node> children = new ArrayList<>();
       bulkLoad(min.clone(), max.clone(), children, ids, 0, ids.size(), 0, 0, 0);
       this.root = new Node(0, new Vector(center), ids.size(), -1, children);
     }
@@ -433,7 +433,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
           return;
         }
         else {
-          List<Node> newchildren = new ArrayList<Node>();
+          List<Node> newchildren = new ArrayList<>();
           bulkLoad(lmin, lmax, newchildren, ids, start, end, 0, level + 1, 0);
           children.add(new Node(code, new Vector(center), end - start, level, newchildren));
           return;
@@ -731,7 +731,7 @@ public class ALOCI<O extends NumberVector<?>, D extends NumberDistance<D, ?>> ex
 
     @Override
     protected ALOCI<O, D> makeInstance() {
-      return new ALOCI<O, D>(distanceFunction, nmin, alpha, g, rnd);
+      return new ALOCI<>(distanceFunction, nmin, alpha, g, rnd);
     }
   }
 }

@@ -249,7 +249,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     // database for apriori
     UpdatableDatabase apriori_db = new HashmapDatabase();
-    SimpleTypeInformation<?> bitmeta = new VectorFieldTypeInformation<BitVector>(BitVector.class, dimensionality);
+    SimpleTypeInformation<?> bitmeta = new VectorFieldTypeInformation<>(BitVector.class, dimensionality);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       Bit[] bits = new Bit[dimensionality];
       boolean allFalse = true;
@@ -311,7 +311,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     int dimensionality = neighborIDs.length;
     BitSet preferenceVector = new BitSet(dimensionality);
 
-    Map<Integer, ModifiableDBIDs> candidates = new HashMap<Integer, ModifiableDBIDs>(dimensionality);
+    Map<Integer, ModifiableDBIDs> candidates = new HashMap<>(dimensionality);
     for(int i = 0; i < dimensionality; i++) {
       ModifiableDBIDs s_i = neighborIDs[i];
       if(s_i.size() > minpts) {
@@ -409,7 +409,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     Class<RangeQuery<V, DoubleDistance>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
     RangeQuery<V, DoubleDistance>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
     for(int d = 0; d < dimensionality; d++) {
-      rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<V, DoubleDistance>(relation, new DimensionSelectingDistanceFunction(d)));
+      rangeQueries[d] = relation.getDatabase().getRangeQuery(new PrimitiveDistanceQuery<>(relation, new DimensionSelectingDistanceFunction(d)));
     }
     return rangeQueries;
   }
@@ -532,7 +532,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
     @Override
     public DiSHPreferenceVectorIndex<V> instantiate(Relation<V> relation) {
-      return new DiSHPreferenceVectorIndex<V>(relation, epsilon, minpts, strategy);
+      return new DiSHPreferenceVectorIndex<>(relation, epsilon, minpts, strategy);
     }
 
     /**
@@ -578,7 +578,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
         // parameter epsilon
         // todo: constraint auf positive werte
-        List<Double> defaultEps = new ArrayList<Double>();
+        List<Double> defaultEps = new ArrayList<>();
         defaultEps.add(DEFAULT_EPSILON.doubleValue());
         final DoubleListParameter epsilonP = new DoubleListParameter(EPSILON_ID, true);
         epsilonP.setDefaultValue(defaultEps);
@@ -595,7 +595,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
         }
 
         // parameter strategy
-        final EnumParameter<Strategy> strategyP = new EnumParameter<Strategy>(STRATEGY_ID, Strategy.class, DEFAULT_STRATEGY);
+        final EnumParameter<Strategy> strategyP = new EnumParameter<>(STRATEGY_ID, Strategy.class, DEFAULT_STRATEGY);
         if(config.grab(strategyP)) {
           strategy = strategyP.getValue();
         }
@@ -603,7 +603,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
 
       @Override
       protected Factory<V> makeInstance() {
-        return new Factory<V>(epsilon, minpts, strategy);
+        return new Factory<>(epsilon, minpts, strategy);
       }
     }
   }

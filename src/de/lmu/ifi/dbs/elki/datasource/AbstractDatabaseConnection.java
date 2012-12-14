@@ -199,7 +199,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
      * @param config Parameterization
      */
     protected void configFilters(Parameterization config) {
-      final ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<ObjectFilter>(FILTERS_ID, ObjectFilter.class, true);
+      final ObjectListParameter<ObjectFilter> filterParam = new ObjectListParameter<>(FILTERS_ID, ObjectFilter.class, true);
       if(config.grab(filterParam)) {
         filters = filterParam.instantiateClasses(config);
       }
@@ -213,7 +213,7 @@ public abstract class AbstractDatabaseConnection implements DatabaseConnection {
      * @param parserDefaultValueClass Default value
      */
     protected void configParser(Parameterization config, Class<?> parserRestrictionClass, Class<?> parserDefaultValueClass) {
-      ObjectParameter<Parser> parserParam = new ObjectParameter<Parser>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
+      ObjectParameter<Parser> parserParam = new ObjectParameter<>(PARSER_ID, parserRestrictionClass, parserDefaultValueClass);
       if(config.grab(parserParam)) {
         parser = parserParam.instantiateClass(config);
       }

@@ -348,7 +348,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
     final StylingPolicy policy = context.getStyleResult().getStylingPolicy();
     final OPTICSColorAdapter opcolor = new OPTICSColorFromStylingPolicy(policy);
 
-    OPTICSPlot<D> opticsplot = new OPTICSPlot<D>(co, opcolor);
+    OPTICSPlot<D> opticsplot = new OPTICSPlot<>(co, opcolor);
     // co.addChildResult(opticsplot);
     return opticsplot;
   }

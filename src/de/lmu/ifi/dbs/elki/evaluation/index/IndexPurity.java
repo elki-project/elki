@@ -76,7 +76,7 @@ public class IndexPurity implements Evaluator {
         Node<?> n = index.getNode(leaf.getEntryID());
 
         final int total = n.getNumEntries();
-        HashMap<String, Integer> map = new HashMap<String, Integer>(total);
+        HashMap<String, Integer> map = new HashMap<>(total);
         for(int i = 0; i < total; i++) {
           DBID id = ((SpatialPointLeafEntry) n.getEntry(i)).getDBID();
           String label = lblrel.get(id);
@@ -96,9 +96,9 @@ public class IndexPurity implements Evaluator {
         }
         mv.put(gini);
       }
-      Collection<DoubleVector> col = new ArrayList<DoubleVector>();
+      Collection<DoubleVector> col = new ArrayList<>();
       col.add(new DoubleVector(new double[] { mv.getMean(), mv.getSampleStddev() }));
-      database.getHierarchy().add((Result) index, new CollectionResult<DoubleVector>("Gini coefficient of index", "index-gini", col));
+      database.getHierarchy().add((Result) index, new CollectionResult<>("Gini coefficient of index", "index-gini", col));
     }
   }
 }

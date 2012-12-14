@@ -55,8 +55,8 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
    */
   public HierarchyHashmapList() {
     super();
-    this.pmap = new HashMap<O, List<O>>();
-    this.cmap = new HashMap<O, List<O>>();
+    this.pmap = new HashMap<>();
+    this.cmap = new HashMap<>();
   }
 
   @Override
@@ -64,27 +64,27 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     // Add child to parent.
     {
       List<O> pchi = this.cmap.get(parent);
-      if(pchi == null) {
-        pchi = new LinkedList<O>();
+      if (pchi == null) {
+        pchi = new LinkedList<>();
         this.cmap.put(parent, pchi);
       }
-      if(!pchi.contains(child)) {
+      if (!pchi.contains(child)) {
         pchi.add(child);
       } else {
-        LoggingUtil.warning("Result added twice: "+parent+" -> "+child, new Throwable());
+        LoggingUtil.warning("Result added twice: " + parent + " -> " + child, new Throwable());
       }
     }
     // Add child to parent
     {
       List<O> cpar = this.pmap.get(child);
-      if(cpar == null) {
-        cpar = new LinkedList<O>();
+      if (cpar == null) {
+        cpar = new LinkedList<>();
         this.pmap.put(child, cpar);
       }
-      if(!cpar.contains(parent)) {
+      if (!cpar.contains(parent)) {
         cpar.add(parent);
       } else {
-        LoggingUtil.warning("Result added twice: "+parent+" <- "+child, new Throwable());
+        LoggingUtil.warning("Result added twice: " + parent + " <- " + child, new Throwable());
       }
     }
   }
@@ -94,11 +94,11 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     // Remove child from parent.
     {
       List<O> pchi = this.cmap.get(parent);
-      if(pchi != null) {
-        while(pchi.remove(child)) {
+      if (pchi != null) {
+        while (pchi.remove(child)) {
           // repeat - remove all instances
         }
-        if(pchi.size() == 0) {
+        if (pchi.size() == 0) {
           this.cmap.remove(parent);
         }
       }
@@ -106,11 +106,11 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     // Remove parent from child
     {
       List<O> cpar = this.pmap.get(child);
-      if(cpar != null) {
-        while(cpar.remove(parent)) {
+      if (cpar != null) {
+        while (cpar.remove(parent)) {
           // repeat - remove all instances
         }
-        if(cpar.size() == 0) {
+        if (cpar.size() == 0) {
           this.pmap.remove(child);
         }
       }
@@ -132,7 +132,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   @Override
   public int numChildren(O obj) {
     List<O> children = this.cmap.get(obj);
-    if(children == null) {
+    if (children == null) {
       return 0;
     }
     return children.size();
@@ -141,7 +141,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   @Override
   public List<O> getChildren(O obj) {
     List<O> children = this.cmap.get(obj);
-    if(children == null) {
+    if (children == null) {
       return Collections.emptyList();
     }
     return children;
@@ -155,7 +155,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   @Override
   public int numParents(O obj) {
     List<O> parents = this.pmap.get(obj);
-    if(parents == null) {
+    if (parents == null) {
       return 0;
     }
     return parents.size();
@@ -164,7 +164,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
   @Override
   public List<O> getParents(O obj) {
     List<O> parents = this.pmap.get(obj);
-    if(parents == null) {
+    if (parents == null) {
       return Collections.emptyList();
     }
     return parents;
@@ -184,11 +184,6 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
    */
   private class ItrDesc implements Iterator<O> {
     /**
-     * Starting object (for cloning);
-     */
-    final O start;
-
-    /**
      * Iterator over children
      */
     final Iterator<O> childiter;
@@ -198,13 +193,16 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
      */
     Iterator<O> subiter;
 
-    public ItrDesc(O start) {
-      this.start = start;
+    /**
+     * Starting element.
+     * 
+     * @param start
+     */
+    ItrDesc(O start) {
       List<O> children = getChildren(start);
-      if(children != null) {
+      if (children != null) {
         this.childiter = children.iterator();
-      }
-      else {
+      } else {
         this.childiter = EmptyIterator.STATIC();
       }
       this.subiter = null;
@@ -212,7 +210,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
 
     @Override
     public boolean hasNext() {
-      if(subiter != null && subiter.hasNext()) {
+      if (subiter != null && subiter.hasNext()) {
         return true;
       }
       return childiter.hasNext();
@@ -221,7 +219,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     @Override
     public O next() {
       // Try nested iterator first ...
-      if(subiter != null && subiter.hasNext()) {
+      if (subiter != null && subiter.hasNext()) {
         return subiter.next();
       }
       // Next direct child, update subiter.
@@ -245,11 +243,6 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
    */
   private class ItrAnc implements Iterator<O> {
     /**
-     * Starting object (for cloning);
-     */
-    final O start;
-
-    /**
      * Iterator over parents
      */
     final Iterator<O> parentiter;
@@ -259,13 +252,16 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
      */
     Iterator<O> subiter;
 
-    public ItrAnc(O start) {
-      this.start = start;
+    /**
+     * Constructor.
+     * 
+     * @param start Starting element
+     */
+    ItrAnc(O start) {
       List<O> parents = getParents(start);
-      if(parents != null) {
+      if (parents != null) {
         this.parentiter = parents.iterator();
-      }
-      else {
+      } else {
         this.parentiter = EmptyIterator.STATIC();
       }
       this.subiter = null;
@@ -273,7 +269,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
 
     @Override
     public boolean hasNext() {
-      if(subiter != null && subiter.hasNext()) {
+      if (subiter != null && subiter.hasNext()) {
         return true;
       }
       return parentiter.hasNext();
@@ -282,7 +278,7 @@ public class HierarchyHashmapList<O> implements ModifiableHierarchy<O> {
     @Override
     public O next() {
       // Try nested iterator first ...
-      if(subiter != null && subiter.hasNext()) {
+      if (subiter != null && subiter.hasNext()) {
         return subiter.next();
       }
       // Next direct parent, update subiter.

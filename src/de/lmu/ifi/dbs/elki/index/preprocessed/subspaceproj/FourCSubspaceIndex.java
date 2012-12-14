@@ -161,7 +161,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
 
     @Override
     public FourCSubspaceIndex<V, D> instantiate(Relation<V> relation) {
-      return new FourCSubspaceIndex<V, D>(relation, epsilon, rangeQueryDistanceFunction, minpts, pca);
+      return new FourCSubspaceIndex<>(relation, epsilon, rangeQueryDistanceFunction, minpts, pca);
     }
 
     /**
@@ -236,20 +236,20 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
           LoggingUtil.warning("Error in internal parameterization: " + e.getMessage());
         }
 
-        final ArrayList<ParameterConstraint<? super Double>> deltaCons = new ArrayList<ParameterConstraint<? super Double>>();
+        final ArrayList<ParameterConstraint<? super Double>> deltaCons = new ArrayList<>();
         // TODO: this constraint is already set in the parameter itself, since
         // it
         // also applies to the relative case, right? -- erich
         // deltaCons.add(new GreaterEqualConstraint(0));
         deltaCons.add(new LessEqualConstraint(1));
 
-        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Double>(deltaP, deltaCons, absoluteF, false);
+        GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<>(deltaP, deltaCons, absoluteF, false);
         config.checkConstraint(gpc);
       }
 
       @Override
       protected Factory<V, D> makeInstance() {
-        return new Factory<V, D>(epsilon, rangeQueryDistanceFunction, minpts, pca);
+        return new Factory<>(epsilon, rangeQueryDistanceFunction, minpts, pca);
       }
     }
   }

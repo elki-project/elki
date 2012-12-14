@@ -871,7 +871,7 @@ public final class FormatUtil {
    * @return string fragments
    */
   public static List<String> splitAtLastBlank(String s, int width) {
-    List<String> chunks = new ArrayList<String>();
+    List<String> chunks = new ArrayList<>();
 
     String tmp = s;
     while (tmp.length() > 0) {

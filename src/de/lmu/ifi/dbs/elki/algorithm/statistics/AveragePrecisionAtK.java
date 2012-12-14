@@ -151,12 +151,12 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(k);
+    Collection<DoubleVector> res = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       DoubleVector row = new DoubleVector(new double[] { mvs[i].getMean(), mvs[i].getSampleStddev() });
       res.add(row);
     }
-    return new HistogramResult<DoubleVector>("Average Precision", "average-precision", res);
+    return new HistogramResult<>("Average Precision", "average-precision", res);
   }
 
   @Override
@@ -231,7 +231,7 @@ public class AveragePrecisionAtK<V extends Object, D extends NumberDistance<D, ?
 
     @Override
     protected AveragePrecisionAtK<V, D> makeInstance() {
-      return new AveragePrecisionAtK<V, D>(distanceFunction, k, sampling, seed);
+      return new AveragePrecisionAtK<>(distanceFunction, k, sampling, seed);
     }
   }
 }

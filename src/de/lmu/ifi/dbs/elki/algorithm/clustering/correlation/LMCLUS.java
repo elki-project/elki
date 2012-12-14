@@ -159,7 +159,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * @return Clustering result
    */
   public Clustering<Model> run(Database database, Relation<NumberVector<?>> relation) {
-    Clustering<Model> ret = new Clustering<Model>("LMCLUS Clustering", "lmclus-clustering");
+    Clustering<Model> ret = new Clustering<>("LMCLUS Clustering", "lmclus-clustering");
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Clustered objects", relation.size(), LOG) : null;
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Clusters found", LOG) : null;
     ModifiableDBIDs unclustered = DBIDUtil.newHashSet(relation.getDBIDs());
@@ -204,7 +204,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       }
       // New cluster found
       // TODO: annotate cluster with dimensionality
-      final Cluster<Model> cluster = new Cluster<Model>(current);
+      final Cluster<Model> cluster = new Cluster<>(current);
       cluster.setName("Cluster_" + lmDim + "d_" + cnum);
       cnum++;
       ret.addCluster(cluster);
@@ -219,7 +219,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     }
     // Remaining objects are noise
     if (unclustered.size() > 0) {
-      ret.addCluster(new Cluster<Model>(unclustered, true));
+      ret.addCluster(new Cluster<>(unclustered, true));
     }
     if (progress != null) {
       progress.setProcessed(relation.size(), LOG);
@@ -281,7 +281,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       // Build orthogonal basis from remainder
       Matrix basis;
       {
-        List<Vector> vectors = new ArrayList<Vector>(sample.size() - 1);
+        List<Vector> vectors = new ArrayList<>(sample.size() - 1);
         for (; iter.valid(); iter.advance()) {
           Vector vec = relation.get(iter).getColumnVector();
           vectors.add(vec.minusEquals(originV));

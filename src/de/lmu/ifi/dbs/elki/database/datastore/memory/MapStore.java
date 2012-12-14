@@ -60,7 +60,7 @@ public class MapStore<T> implements WritableDataStore<T> {
    */
   public MapStore() {
     super();
-    this.data = new HashMap<DBID, T>();
+    this.data = new HashMap<>();
   }
 
   @Override

@@ -334,7 +334,7 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
   @Override
   public void addConstraint(ParameterConstraint<? super T> constraint) {
     if (constraints == null) {
-      this.constraints = new ArrayList<ParameterConstraint<? super T>>(1);
+      this.constraints = new ArrayList<>(1);
     }
     constraints.add(constraint);
   }
@@ -346,7 +346,7 @@ public abstract class AbstractParameter<T> implements Parameter<T> {
    */
   public void addConstraints(Collection<? extends ParameterConstraint<? super T>> cs) {
     if (constraints == null) {
-      this.constraints = new ArrayList<ParameterConstraint<? super T>>(cs.size());
+      this.constraints = new ArrayList<>(cs.size());
     }
     constraints.addAll(cs);
   }

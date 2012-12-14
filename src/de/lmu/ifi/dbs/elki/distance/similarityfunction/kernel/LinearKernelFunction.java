@@ -92,6 +92,6 @@ public class LinearKernelFunction<O extends NumberVector<?>> extends AbstractPri
 
   @Override
   public <T extends O> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
+    return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
   }
 }

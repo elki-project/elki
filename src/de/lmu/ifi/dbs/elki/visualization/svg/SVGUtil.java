@@ -87,7 +87,7 @@ public final class SVGUtil {
 
   static {
     // Build a reasonably sized hashmap. Use 0
-    SVG_COLOR_NAMES = new TObjectIntHashMap<String>(90, .8f, NO_VALUE);
+    SVG_COLOR_NAMES = new TObjectIntHashMap<>(90, .8f, NO_VALUE);
     // List taken from SVG specification:
     // http://www.w3.org/TR/SVG/types.html#ColorKeywords
     SVG_COLOR_NAMES.put("aliceblue", 0xFFF0F8FF);

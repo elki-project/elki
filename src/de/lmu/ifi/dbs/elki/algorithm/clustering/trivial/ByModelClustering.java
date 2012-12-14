@@ -101,7 +101,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    */
   public Clustering<Model> run(Relation<Model> relation) {
     // Build model mapping
-    HashMap<Model, ModifiableDBIDs> modelMap = new HashMap<Model, ModifiableDBIDs>();
+    HashMap<Model, ModifiableDBIDs> modelMap = new HashMap<>();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       Model model = relation.get(iditer);
       ModifiableDBIDs modelids = modelMap.get(model);
@@ -112,12 +112,12 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
       modelids.add(iditer);
     }
 
-    Clustering<Model> result = new Clustering<Model>("By Model Clustering", "bymodel-clustering");
+    Clustering<Model> result = new Clustering<>("By Model Clustering", "bymodel-clustering");
     for(Entry<Model, ModifiableDBIDs> entry : modelMap.entrySet()) {
       final Model model = entry.getKey();
       final ModifiableDBIDs ids = entry.getValue();
       final String name = (model instanceof GeneratorInterface) ? ((GeneratorInterface) model).getName() : model.toString();
-      Cluster<Model> c = new Cluster<Model>(name, ids, model);
+      Cluster<Model> c = new Cluster<>(name, ids, model);
       if(noisepattern != null && noisepattern.matcher(name).find()) {
         c.setNoise(true);
       }

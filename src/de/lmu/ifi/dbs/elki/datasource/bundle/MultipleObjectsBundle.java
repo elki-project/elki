@@ -55,7 +55,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
    */
   public MultipleObjectsBundle() {
     this.meta = new BundleMeta();
-    this.columns = new ArrayList<List<?>>();
+    this.columns = new ArrayList<>();
   }
 
   /**
@@ -232,7 +232,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
           bundle.meta.add(smeta.get(i));
         }
         for(int i = bundle.metaLength(); i < smeta.size(); i++) {
-          List<Object> data = new ArrayList<Object>(bundle.dataLength() + 1);
+          List<Object> data = new ArrayList<>(bundle.dataLength() + 1);
           bundle.appendColumn(smeta.get(i), data);
         }
         continue;

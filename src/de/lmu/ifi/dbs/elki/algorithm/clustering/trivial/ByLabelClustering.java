@@ -144,7 +144,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
     HashMap<String, DBIDs> labelMap = multiple ? multipleAssignment(relation) : singleAssignment(relation);
 
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
-    Clustering<Model> result = new Clustering<Model>("By Label Clustering", "bylabel-clustering");
+    Clustering<Model> result = new Clustering<>("By Label Clustering", "bylabel-clustering");
     for(Entry<String, DBIDs> entry : labelMap.entrySet()) {
       DBIDs ids = entry.getValue();
       if(ids.size() <= 1) {
@@ -175,7 +175,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @return a mapping of labels to ids
    */
   private HashMap<String, DBIDs> singleAssignment(Relation<?> data) {
-    HashMap<String, DBIDs> labelMap = new HashMap<String, DBIDs>();
+    HashMap<String, DBIDs> labelMap = new HashMap<>();
 
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final Object val = data.get(iditer);
@@ -193,7 +193,7 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @return a mapping of labels to ids
    */
   private HashMap<String, DBIDs> multipleAssignment(Relation<?> data) {
-    HashMap<String, DBIDs> labelMap = new HashMap<String, DBIDs>();
+    HashMap<String, DBIDs> labelMap = new HashMap<>();
 
     for(DBIDIter iditer = data.iterDBIDs(); iditer.valid(); iditer.advance()) {
       String[] labels = data.get(iditer).toString().split(" ");

@@ -100,7 +100,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     int num = algorithms.size();
     // Run inner outlier algorithms
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
-    ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
+    ArrayList<OutlierResult> results = new ArrayList<>(num);
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Inner outlier algorithms", num, LOG) : null;
       for (Algorithm alg : algorithms) {
@@ -155,7 +155,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    Relation<Double> scores = new MaterializedRelation<Double>("Simple Outlier Ensemble", "ensemble-outlier", TypeUtil.DOUBLE, sumscore, ids);
+    Relation<Double> scores = new MaterializedRelation<>("Simple Outlier Ensemble", "ensemble-outlier", TypeUtil.DOUBLE, sumscore, ids);
     return new OutlierResult(meta, scores);
   }
 
@@ -200,7 +200,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<OutlierAlgorithm>(OptionID.ALGORITHM, OutlierAlgorithm.class);
+      ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<>(OptionID.ALGORITHM, OutlierAlgorithm.class);
       if (config.grab(algP)) {
         ListParameterization subconfig = new ListParameterization();
         ChainedParameterization chain = new ChainedParameterization(subconfig, config);
@@ -208,7 +208,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
         algorithms = algP.instantiateClasses(chain);
         subconfig.logAndClearReportedErrors();
       }
-      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<EnsembleVoting>(VOTING_ID, EnsembleVoting.class);
+      ObjectParameter<EnsembleVoting> votingP = new ObjectParameter<>(VOTING_ID, EnsembleVoting.class);
       if (config.grab(votingP)) {
         voting = votingP.instantiateClass(config);
       }

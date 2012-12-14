@@ -33,28 +33,28 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunct
 
 /**
  * Adapter from a normalized similarity function to a distance function using
- * <code>arccos(sim)</code>.
+ * <code>-log(sim)</code>.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has Instance
  * 
- * @param <O> Object class to process.
+ * @param <O> object class to process.
  */
-public class SimilarityAdapterArccos<O> extends AbstractSimilarityAdapter<O> {
+public class LnSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
   /**
    * Constructor.
    * 
    * @param similarityFunction Similarity function
    */
-  public SimilarityAdapterArccos(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
+  public LnSimilarityAdapter(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
     super(similarityFunction);
   }
 
   @Override
   public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
     SimilarityQuery<T, ? extends NumberDistance<?, ?>> similarityQuery = similarityFunction.instantiate(database);
-    return new Instance<T>(database, this, similarityQuery);
+    return new Instance<>(database, this, similarityQuery);
   }
 
   /**
@@ -78,7 +78,7 @@ public class SimilarityAdapterArccos<O> extends AbstractSimilarityAdapter<O> {
 
     @Override
     public double transform(double similarity) {
-      return Math.acos(similarity);
+      return -Math.log(similarity);
     }
   }
 
@@ -91,8 +91,8 @@ public class SimilarityAdapterArccos<O> extends AbstractSimilarityAdapter<O> {
    */
   public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O> {
     @Override
-    protected SimilarityAdapterArccos<O> makeInstance() {
-      return new SimilarityAdapterArccos<O>(similarityFunction);
+    protected LnSimilarityAdapter<O> makeInstance() {
+      return new LnSimilarityAdapter<>(similarityFunction);
     }
   }
 }

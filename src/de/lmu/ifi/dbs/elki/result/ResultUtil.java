@@ -55,7 +55,7 @@ public class ResultUtil {
    */
   public static List<Relation<?>> getRelations(Result r) {
     if(r instanceof Relation<?>) {
-      List<Relation<?>> anns = new ArrayList<Relation<?>>(1);
+      List<Relation<?>> anns = new ArrayList<>(1);
       anns.add((Relation<?>) r);
       return anns;
     }
@@ -73,7 +73,7 @@ public class ResultUtil {
    */
   public static List<OrderingResult> getOrderingResults(Result r) {
     if(r instanceof OrderingResult) {
-      List<OrderingResult> ors = new ArrayList<OrderingResult>(1);
+      List<OrderingResult> ors = new ArrayList<>(1);
       ors.add((OrderingResult) r);
       return ors;
     }
@@ -91,7 +91,7 @@ public class ResultUtil {
    */
   public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
     if(r instanceof Clustering<?>) {
-      List<Clustering<?>> crs = new ArrayList<Clustering<?>>(1);
+      List<Clustering<?>> crs = new ArrayList<>(1);
       crs.add((Clustering<?>) r);
       return crs;
     }
@@ -109,7 +109,7 @@ public class ResultUtil {
    */
   public static List<CollectionResult<?>> getCollectionResults(Result r) {
     if(r instanceof CollectionResult<?>) {
-      List<CollectionResult<?>> crs = new ArrayList<CollectionResult<?>>(1);
+      List<CollectionResult<?>> crs = new ArrayList<>(1);
       crs.add((CollectionResult<?>) r);
       return crs;
     }
@@ -127,7 +127,7 @@ public class ResultUtil {
    */
   public static List<IterableResult<?>> getIterableResults(Result r) {
     if(r instanceof IterableResult<?>) {
-      List<IterableResult<?>> irs = new ArrayList<IterableResult<?>>(1);
+      List<IterableResult<?>> irs = new ArrayList<>(1);
       irs.add((IterableResult<?>) r);
       return irs;
     }
@@ -145,7 +145,7 @@ public class ResultUtil {
    */
   public static List<OutlierResult> getOutlierResults(Result r) {
     if(r instanceof OutlierResult) {
-      List<OutlierResult> ors = new ArrayList<OutlierResult>(1);
+      List<OutlierResult> ors = new ArrayList<>(1);
       ors.add((OutlierResult) r);
       return ors;
     }
@@ -163,7 +163,7 @@ public class ResultUtil {
    */
   public static List<SettingsResult> getSettingsResults(Result r) {
     if(r instanceof SettingsResult) {
-      List<SettingsResult> ors = new ArrayList<SettingsResult>(1);
+      List<SettingsResult> ors = new ArrayList<>(1);
       ors.add((SettingsResult) r);
       return ors;
     }
@@ -183,7 +183,7 @@ public class ResultUtil {
   // We can't ensure that restrictionClass matches C.
   @SuppressWarnings("unchecked")
   public static <C> ArrayList<C> filterResults(Result r, Class<?> restrictionClass) {
-    ArrayList<C> res = new ArrayList<C>();
+    ArrayList<C> res = new ArrayList<>();
     if(restrictionClass.isInstance(r)) {
       res.add((C) restrictionClass.cast(r));
     }

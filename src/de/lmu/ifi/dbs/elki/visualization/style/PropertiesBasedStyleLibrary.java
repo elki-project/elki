@@ -99,7 +99,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   /**
    * Cache
    */
-  private AnyMap<String> cache = new AnyMap<String>();
+  private AnyMap<String> cache = new AnyMap<>();
 
   /**
    * Line style library to use

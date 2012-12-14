@@ -293,7 +293,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     writeNode(leaf);
 
     // condense the tree
-    Stack<N> stack = new Stack<N>();
+    Stack<N> stack = new Stack<>();
     condenseTree(deletionPath.getParentPath(), stack);
 
     // reinsert underflow nodes
@@ -426,7 +426,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int minEntries = leafMinimum;
     int maxEntries = leafCapacity - 1;
 
-    ArrayList<E> result = new ArrayList<E>();
+    ArrayList<E> result = new ArrayList<>();
     List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
 
     for(List<E> partition : partitions) {
@@ -631,7 +631,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     N childNode = getNode(node.getEntry(0));
     int num = insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, subtree.getPathCount());
-    TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<E>(node.getEntry(num), num);
+    TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<>(node.getEntry(num), num);
     // children are leafs
     if(childNode.isLeaf()) {
       if(height - subtree.getPathCount() == level) {
@@ -712,7 +712,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     final int level = height - (path.getPathCount() - 1);
 
     BitSet remove = new BitSet();
-    List<E> reInsertEntries = new ArrayList<E>(offs.length);
+    List<E> reInsertEntries = new ArrayList<>(offs.length);
     for(int i = 0; i < offs.length; i++) {
       reInsertEntries.add(node.getEntry(offs[i]));
       remove.set(offs[i]);
@@ -881,7 +881,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   @Override
   public final List<E> getLeaves() {
-    List<E> result = new ArrayList<E>();
+    List<E> result = new ArrayList<>();
 
     if(height == 1) {
       result.add(getRootEntry());
@@ -948,7 +948,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         }
       }
 
-      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
+      BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
       while(enumeration.hasMoreElements()) {
         IndexTreePath<E> indexPath = enumeration.nextElement();
         E entry = indexPath.getLastPathComponent().getEntry();

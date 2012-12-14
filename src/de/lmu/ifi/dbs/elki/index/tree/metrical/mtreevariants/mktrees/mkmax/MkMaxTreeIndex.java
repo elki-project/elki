@@ -95,7 +95,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
 
   @Override
   public void insertAll(DBIDs ids) {
-    List<MkMaxEntry<D>> objs = new ArrayList<MkMaxEntry<D>>(ids.size());
+    List<MkMaxEntry<D>> objs = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);

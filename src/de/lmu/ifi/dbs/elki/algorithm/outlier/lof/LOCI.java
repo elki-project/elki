@@ -155,7 +155,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
       // build list of critical distances
-      ArrayList<DoubleIntPair> cdist = new ArrayList<DoubleIntPair>(neighbors.size() << 1);
+      ArrayList<DoubleIntPair> cdist = new ArrayList<>(neighbors.size() << 1);
       {
         for(int i = 0; i < neighbors.size(); i++) {
           DistanceDBIDPair<D> r = neighbors.get(i);
@@ -259,10 +259,10 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     if(progressLOCI != null) {
       progressLOCI.ensureCompleted(LOG);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("LOCI normalized MDEF", "loci-mdef-outlier", TypeUtil.DOUBLE, mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new MaterializedRelation<Double>("LOCI MDEF Radius", "loci-critical-radius", TypeUtil.DOUBLE, mdef_radius, relation.getDBIDs()));
+    result.addChildResult(new MaterializedRelation<>("LOCI MDEF Radius", "loci-critical-radius", TypeUtil.DOUBLE, mdef_radius, relation.getDBIDs()));
     return result;
   }
 
@@ -316,7 +316,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
-      final DistanceParameter<D> rmaxP = new DistanceParameter<D>(RMAX_ID, distanceFactory);
+      final DistanceParameter<D> rmaxP = new DistanceParameter<>(RMAX_ID, distanceFactory);
       if(config.grab(rmaxP)) {
         rmax = rmaxP.getValue();
       }
@@ -334,7 +334,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
     @Override
     protected LOCI<O, D> makeInstance() {
-      return new LOCI<O, D>(distanceFunction, rmax, nmin, alpha);
+      return new LOCI<>(distanceFunction, rmax, nmin, alpha);
     }
   }
 }

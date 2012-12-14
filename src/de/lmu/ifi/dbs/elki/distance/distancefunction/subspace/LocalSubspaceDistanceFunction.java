@@ -68,7 +68,7 @@ public class LocalSubspaceDistanceFunction extends AbstractIndexBasedDistanceFun
     // We can't really avoid these warnings, due to a limitation in Java Generics (AFAICT)
     @SuppressWarnings("unchecked")
     FilteredLocalPCAIndex<V> indexinst = (FilteredLocalPCAIndex<V>) indexFactory.instantiate((Relation<NumberVector<?>>)database);
-    return new Instance<V>(database, indexinst, this);
+    return new Instance<>(database, indexinst, this);
   }
 
   /**

@@ -123,7 +123,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
       }
       else {
         DistanceDBIDPair<D> firstQR = neighbors.iter().getDistancePair();
-        GenericDistanceDBIDList<D> newne = new GenericDistanceDBIDList<D>();
+        GenericDistanceDBIDList<D> newne = new GenericDistanceDBIDList<>();
         newne.add(firstQR);
         pres = computeProjection(iditer, newne, relation);
       }
@@ -247,7 +247,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
       }
 
       protected void configRangeQueryDistanceFunction(Parameterization config) {
-        ObjectParameter<DistanceFunction<NV, D>> rangeQueryDistanceP = new ObjectParameter<DistanceFunction<NV, D>>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        ObjectParameter<DistanceFunction<NV, D>> rangeQueryDistanceP = new ObjectParameter<>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
         if(config.grab(rangeQueryDistanceP)) {
           rangeQueryDistanceFunction = rangeQueryDistanceP.instantiateClass(config);
         }
@@ -255,7 +255,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
 
       protected void configEpsilon(Parameterization config, DistanceFunction<NV, D> rangeQueryDistanceFunction) {
         D distanceParser = rangeQueryDistanceFunction != null ? rangeQueryDistanceFunction.getDistanceFactory() : null;
-        DistanceParameter<D> epsilonP = new DistanceParameter<D>(AbstractProjectedDBSCAN.EPSILON_ID, distanceParser);
+        DistanceParameter<D> epsilonP = new DistanceParameter<>(AbstractProjectedDBSCAN.EPSILON_ID, distanceParser);
         // parameter epsilon
         if(config.grab(epsilonP)) {
           epsilon = epsilonP.getValue();

@@ -131,7 +131,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
 
-    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
+    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while (enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();
@@ -253,7 +253,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     {
       E entry = node.getEntry(0);
       D distance = distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
-      bestCandidate = new DistanceEntry<D, E>(entry, distance, 0);
+      bestCandidate = new DistanceEntry<>(entry, distance, 0);
       if (distance.compareTo(entry.getCoveringRadius()) <= 0) {
         enlarge = null;
       } else {
@@ -274,7 +274,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       } else if (enlarge != null) {
         D enlrg = distance.minus(entry.getCoveringRadius());
         if (enlrg.compareTo(enlarge) < 0) {
-          bestCandidate = new DistanceEntry<D, E>(entry, distance, i);
+          bestCandidate = new DistanceEntry<>(entry, distance, i);
           enlarge = enlrg;
         }
       }
@@ -297,7 +297,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @return a list of the sorted entries
    */
   protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q) {
-    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
+    List<DistanceEntry<D, E>> result = new ArrayList<>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
@@ -321,7 +321,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @return a list of the sorted entries
    */
   protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
-    List<DistanceEntry<D, E>> result = new ArrayList<DistanceEntry<D, E>>();
+    List<DistanceEntry<D, E>> result = new ArrayList<>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
@@ -374,7 +374,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   private SplitResult split(N node) {
     // do the split
     // todo split stratgey
-    MTreeSplit<O, D, N, E> split = new MLBDistSplit<O, D, N, E>(node, distanceQuery);
+    MTreeSplit<O, D, N, E> split = new MLBDistSplit<>(node, distanceQuery);
     Assignments<D, E> assignments = split.getAssignments();
     final N newNode;
     if (node.isLeaf()) {
@@ -569,8 +569,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
   @Override
   public List<E> getLeaves() {
-    List<E> result = new ArrayList<E>();
-    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
+    List<E> result = new ArrayList<>();
+    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while (enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();

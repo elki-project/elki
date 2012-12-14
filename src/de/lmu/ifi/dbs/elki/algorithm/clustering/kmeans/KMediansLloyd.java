@@ -92,12 +92,12 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
    */
   public Clustering<MeanModel<V>> run(Database database, Relation<V> relation) {
     if (relation.size() <= 0) {
-      return new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
+      return new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     }
     // Choose initial medians
     List<? extends NumberVector<?>> medians = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
+    List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
@@ -116,10 +116,10 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     }
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<MeanModel<V>> result = new Clustering<MeanModel<V>>("k-Medians Clustering", "kmedians-clustering");
+    Clustering<MeanModel<V>> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for (int i = 0; i < clusters.size(); i++) {
-      MeanModel<V> model = new MeanModel<V>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
-      result.addCluster(new Cluster<MeanModel<V>>(clusters.get(i), model));
+      MeanModel<V> model = new MeanModel<>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
+      result.addCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
   }
@@ -161,7 +161,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
         k = kP.intValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
       if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -175,7 +175,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
 
     @Override
     protected KMediansLloyd<V, D> makeInstance() {
-      return new KMediansLloyd<V, D>(distanceFunction, k, maxiter, initializer);
+      return new KMediansLloyd<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

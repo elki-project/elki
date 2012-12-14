@@ -226,7 +226,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
       scores.putDouble(id, score);
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("randomwalkec", "RandomWalkEC", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("randomwalkec", "RandomWalkEC", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -329,7 +329,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
     @Override
     protected CTLuRandomWalkEC<N, D> makeInstance() {
-      return new CTLuRandomWalkEC<N, D>(distanceFunction, alpha, c, k);
+      return new CTLuRandomWalkEC<>(distanceFunction, alpha, c, k);
     }
   }
 }

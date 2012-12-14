@@ -83,14 +83,14 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
     if(samplesize >= db.size()) {
       LoggingUtil.warning("Sample size is larger than database size!");
 
-      ArrayList<V> selection = new ArrayList<V>(db.size());
+      ArrayList<V> selection = new ArrayList<>(db.size());
       for(DBIDIter iditer = db.iterDBIDs(); iditer.valid(); iditer.advance()) {
         selection.add(db.get(iditer));
       }
       return selection;
     }
 
-    ArrayList<V> result = new ArrayList<V>(samplesize);
+    ArrayList<V> result = new ArrayList<>(samplesize);
     int dbsize = db.size();
 
     // Guess the memory requirements of a hashmap.
@@ -119,7 +119,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
       ids = null; // dirty!
     }
     else {
-      HashSet<Integer> selected = new HashSet<Integer>();
+      HashSet<Integer> selected = new HashSet<>();
       for(int i = 0; i < samplesize; i++) {
         int j = (int) Math.floor(Math.random() * dbsize);
         // Redraw from pool.
@@ -159,7 +159,7 @@ public class RandomSampleReferencePoints<V extends NumberVector<?>> implements R
 
     @Override
     protected RandomSampleReferencePoints<V> makeInstance() {
-      return new RandomSampleReferencePoints<V>(samplesize);
+      return new RandomSampleReferencePoints<>(samplesize);
     }
   }
 }

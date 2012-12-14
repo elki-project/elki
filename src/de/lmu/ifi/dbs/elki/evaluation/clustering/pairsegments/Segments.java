@@ -131,10 +131,10 @@ public class Segments extends BasicResult implements Iterable<Segment> {
     super("cluster pair segments", "pair-segments");
     this.clusterings = clusterings;
     this.clusteringsCount = clusterings.size();
-    segments = new TreeMap<Segment, Segment>(); // TODO: replace with array list
+    segments = new TreeMap<>(); // TODO: replace with array list
 
     numclusters = new int[clusteringsCount];
-    clusters = new ArrayList<List<? extends Cluster<?>>>(clusteringsCount);
+    clusters = new ArrayList<>(clusteringsCount);
 
     // save count of clusters
     int clusteringIndex = 0;
@@ -289,7 +289,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    *         segment
    */
   public List<Segment> getPairedSegments(Segment unpairedSegment) {
-    ArrayList<Segment> pairedSegments = new ArrayList<Segment>();
+    ArrayList<Segment> pairedSegments = new ArrayList<>();
     // search the segments. Index at "unpairedClustering" being the wildcard.
     segments: for(Segment segment : this) {
       // if mismatch except at unpaired Clustering index => exclude.

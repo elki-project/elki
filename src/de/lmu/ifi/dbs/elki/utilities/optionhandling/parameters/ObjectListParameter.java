@@ -81,8 +81,8 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
     }
     if (List.class.isInstance(obj)) {
       List<?> l = (List<?>) obj;
-      ArrayList<C> inst = new ArrayList<C>(l.size());
-      ArrayList<Class<? extends C>> classes = new ArrayList<Class<? extends C>>(l.size());
+      ArrayList<C> inst = new ArrayList<>(l.size());
+      ArrayList<Class<? extends C>> classes = new ArrayList<>(l.size());
       for (Object o : l) {
         // does the given objects class fit?
         if (restrictionClass.isInstance(o)) {
@@ -105,7 +105,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
     // Did we get a single instance?
     try {
       C inst = restrictionClass.cast(obj);
-      this.instances = new ArrayList<C>(1);
+      this.instances = new ArrayList<>(1);
       this.instances.add(inst);
       return super.parseValue(inst.getClass());
     } catch (ClassCastException e) {
@@ -118,7 +118,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   public List<C> instantiateClasses(Parameterization config) {
     if (instances == null) {
       // instantiateClasses will descend itself.
-      instances = new ArrayList<C>(super.instantiateClasses(config));
+      instances = new ArrayList<>(super.instantiateClasses(config));
     } else {
       Parameterization cfg = null;
       for (int i = 0; i < instances.size(); i++) {
@@ -138,6 +138,6 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
         }
       }
     }
-    return new ArrayList<C>(instances);
+    return new ArrayList<>(instances);
   } 
 }

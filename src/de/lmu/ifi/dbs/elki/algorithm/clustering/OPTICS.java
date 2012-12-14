@@ -139,7 +139,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     final FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("OPTICS", size, LOG) : null;
 
     processedIDs = DBIDUtil.newHashSet(size);
-    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<D>("OPTICS Clusterorder", "optics-clusterorder");
+    ClusterOrderResult<D> clusterOrder = new ClusterOrderResult<>("OPTICS Clusterorder", "optics-clusterorder");
 
     if(getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction && DoubleDistance.class.isInstance(epsilon)) {
       // Optimized codepath for double-based distances. Avoids Java
@@ -182,8 +182,8 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    *        the algorithm
    */
   protected void expandClusterOrder(ClusterOrderResult<D> clusterOrder, Database database, RangeQuery<O, D> rangeQuery, DBID objectID, D epsilon, FiniteProgress progress) {
-    UpdatableHeap<ClusterOrderEntry<D>> heap = new UpdatableHeap<ClusterOrderEntry<D>>();
-    heap.add(new GenericClusterOrderEntry<D>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
+    UpdatableHeap<ClusterOrderEntry<D>> heap = new UpdatableHeap<>();
+    heap.add(new GenericClusterOrderEntry<>(objectID, null, getDistanceFunction().getDistanceFactory().infiniteDistance()));
 
     while(!heap.isEmpty()) {
       final ClusterOrderEntry<D> current = heap.poll();
@@ -200,7 +200,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
             continue;
           }
           D reachability = DistanceUtil.max(neighbor.getDistance(), coreDistance);
-          heap.add(new GenericClusterOrderEntry<D>(DBIDUtil.deref(neighbor), current.getID(), reachability));
+          heap.add(new GenericClusterOrderEntry<>(DBIDUtil.deref(neighbor), current.getID(), reachability));
         }
       }
       if(progress != null) {
@@ -221,7 +221,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    *        the algorithm
    */
   protected void expandClusterOrderDouble(ClusterOrderResult<DoubleDistance> clusterOrder, Database database, RangeQuery<O, DoubleDistance> rangeQuery, DBID objectID, DoubleDistance epsilon, FiniteProgress progress) {
-    UpdatableHeap<DoubleDistanceClusterOrderEntry> heap = new UpdatableHeap<DoubleDistanceClusterOrderEntry>();
+    UpdatableHeap<DoubleDistanceClusterOrderEntry> heap = new UpdatableHeap<>();
     heap.add(new DoubleDistanceClusterOrderEntry(objectID, null, Double.POSITIVE_INFINITY));
 
     while(!heap.isEmpty()) {
@@ -298,7 +298,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DistanceParameter<D> epsilonP = new DistanceParameter<D>(EPSILON_ID, distanceFunction, true);
+      DistanceParameter<D> epsilonP = new DistanceParameter<>(EPSILON_ID, distanceFunction, true);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -312,7 +312,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
     @Override
     protected OPTICS<O, D> makeInstance() {
-      return new OPTICS<O, D>(distanceFunction, epsilon, minpts);
+      return new OPTICS<>(distanceFunction, epsilon, minpts);
     }
   }
 }

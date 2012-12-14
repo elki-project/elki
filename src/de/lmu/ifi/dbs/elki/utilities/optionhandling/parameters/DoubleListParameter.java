@@ -81,7 +81,7 @@ public class DoubleListParameter extends ListParameter<Double> {
     }
     if(obj instanceof String) {
       String[] values = SPLIT.split((String) obj);
-      ArrayList<Double> doubleValue = new ArrayList<Double>(values.length);
+      ArrayList<Double> doubleValue = new ArrayList<>(values.length);
       for(String val : values) {
         doubleValue.add(Double.valueOf(val));
       }

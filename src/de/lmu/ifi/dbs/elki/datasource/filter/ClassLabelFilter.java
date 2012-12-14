@@ -104,8 +104,8 @@ public class ClassLabelFilter implements ObjectFilter {
       done = true;
 
       // We split the label column into two parts
-      List<ClassLabel> clscol = new ArrayList<ClassLabel>(objects.dataLength());
-      List<LabelList> lblcol = new ArrayList<LabelList>(objects.dataLength());
+      List<ClassLabel> clscol = new ArrayList<>(objects.dataLength());
+      List<LabelList> lblcol = new ArrayList<>(objects.dataLength());
 
       // Split the column
       for (Object obj : objects.getColumn(i)) {
@@ -160,7 +160,7 @@ public class ClassLabelFilter implements ObjectFilter {
       // parameter class label index
       final IntParameter classLabelIndexParam = new IntParameter(CLASS_LABEL_INDEX_ID);
       classLabelIndexParam.addConstraint(new GreaterEqualConstraint(0));
-      final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<ClassLabel.Factory<?>>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
+      final ObjectParameter<ClassLabel.Factory<?>> classlabelClassParam = new ObjectParameter<>(CLASS_LABEL_CLASS_ID, ClassLabel.Factory.class, SimpleClassLabel.Factory.class);
 
       config.grab(classLabelIndexParam);
       config.grab(classlabelClassParam);

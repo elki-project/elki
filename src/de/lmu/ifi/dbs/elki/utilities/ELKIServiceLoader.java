@@ -134,7 +134,7 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
   }
 
   private Iterator<Class<?>> parseFile(URL nextElement) {
-    ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
+    ArrayList<Class<?>> classes = new ArrayList<>();
     try {
       BufferedReader r = new BufferedReader(new InputStreamReader(nextElement.openStream(), "utf-8"));
       while (parseLine(r.readLine(), classes, nextElement)) {

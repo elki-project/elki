@@ -106,13 +106,13 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   @Override
   public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     final int size = ids.size();
-    final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(size);
+    final List<KNNHeap<D>> heaps = new ArrayList<>(size);
     for(int i = 0; i < size; i++) {
       heaps.add(KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k));
     }
     linearScanBatchKNN(ids, heaps);
     // Serialize heaps
-    List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(size);
+    List<KNNResult<D>> result = new ArrayList<>(size);
     for(KNNHeap<D> heap : heaps) {
       result.add(heap.toKNNList());
     }

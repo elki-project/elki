@@ -66,15 +66,15 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    *         specified node
    */
   Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceQuery<O, D> distanceFunction) {
-    HashSet<E> assigned1 = new HashSet<E>();
-    HashSet<E> assigned2 = new HashSet<E>();
+    HashSet<E> assigned1 = new HashSet<>();
+    HashSet<E> assigned2 = new HashSet<>();
 
     D currentCR1 = distanceFunction.nullDistance();
     D currentCR2 = distanceFunction.nullDistance();
 
     // determine the nearest neighbors
-    List<DistanceEntry<D, E>> list1 = new ArrayList<DistanceEntry<D, E>>();
-    List<DistanceEntry<D, E>> list2 = new ArrayList<DistanceEntry<D, E>>();
+    List<DistanceEntry<D, E>> list1 = new ArrayList<>();
+    List<DistanceEntry<D, E>> list2 = new ArrayList<>();
     for(int i = 0; i < node.getNumEntries(); i++) {
       DBID id = node.getEntry(i).getRoutingObjectID();
       // determine the distance of o to o1 / o2

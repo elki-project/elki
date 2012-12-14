@@ -151,10 +151,10 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
   @Override
   protected SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
     if (dimensionality > 0) {
-      return new VectorFieldTypeInformation<V>(factory, dimensionality);
+      return new VectorFieldTypeInformation<>(factory, dimensionality);
     }
     if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<V>(factory.getRestrictionClass(), factory.getDefaultSerializer());
+      return new SimpleTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
@@ -174,7 +174,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
   public static class Parameterizer<V extends SparseNumberVector<?>> extends NumberVectorLabelParser.Parameterizer<V> {
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<SparseNumberVector.Factory<V, ?>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
+      ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
       if (config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -182,7 +182,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector<?>> exte
 
     @Override
     protected SparseNumberVectorLabelParser<V> makeInstance() {
-      return new SparseNumberVectorLabelParser<V>(colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
+      return new SparseNumberVectorLabelParser<>(colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
     }
   }
 }

@@ -172,7 +172,7 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
         if(config.grab(kP)) {
           k = kP.getValue();
         }
-        final ObjectParameter<DistanceFunction<? super O, D>> distP = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCEFUNCTION_ID, DistanceFunction.class);
+        final ObjectParameter<DistanceFunction<? super O, D>> distP = new ObjectParameter<>(DISTANCEFUNCTION_ID, DistanceFunction.class);
         if(config.grab(distP)) {
           distFunc = distP.instantiateClass(config);
         }
@@ -180,7 +180,7 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
 
       @Override
       protected PrecomputedKNearestNeighborNeighborhood.Factory<O, D> makeInstance() {
-        return new PrecomputedKNearestNeighborNeighborhood.Factory<O, D>(k, distFunc);
+        return new PrecomputedKNearestNeighborNeighborhood.Factory<>(k, distFunc);
       }
     }
   }

@@ -58,7 +58,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
    */
   public MapIntegerDBIDStore() {
     super();
-    this.data = new TIntObjectHashMap<T>();
+    this.data = new TIntObjectHashMap<>();
   }
 
   /**
@@ -67,7 +67,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
    * @param size Expected size
    */
   public MapIntegerDBIDStore(int size) {
-    this.data = new TIntObjectHashMap<T>(size);
+    this.data = new TIntObjectHashMap<>(size);
   }
 
   @Override

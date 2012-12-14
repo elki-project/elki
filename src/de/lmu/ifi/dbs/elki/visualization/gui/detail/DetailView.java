@@ -76,7 +76,7 @@ public class DetailView extends SVGPlot implements ResultListener {
   /**
    * Map from visualizers to layers
    */
-  Map<VisualizationTask, Visualization> layermap = new HashMap<VisualizationTask, Visualization>();
+  Map<VisualizationTask, Visualization> layermap = new HashMap<>();
 
   /**
    * The created width
@@ -141,7 +141,7 @@ public class DetailView extends SVGPlot implements ResultListener {
     width = Math.sqrt(getRatio());
     height = 1.0 / width;
 
-    ArrayList<Visualization> layers = new ArrayList<Visualization>();
+    ArrayList<Visualization> layers = new ArrayList<>();
     // TODO: center/arrange visualizations?
     for(Iterator<VisualizationTask> tit = visi.tasks.iterator(); tit.hasNext();) {
       VisualizationTask task = tit.next();

@@ -78,7 +78,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
     LocalProjectionIndex<T, ?> indexinst = (LocalProjectionIndex<T, ?>) indexFactory.instantiate((Relation<V>) database);
-    return new Instance<T>(database, indexinst, this);
+    return new Instance<>(database, indexinst, this);
   }
 
   @Override
@@ -254,7 +254,7 @@ public class LocallyWeightedDistanceFunction<V extends NumberVector<?>> extends 
 
     @Override
     protected LocallyWeightedDistanceFunction<V> makeInstance() {
-      return new LocallyWeightedDistanceFunction<V>(factory);
+      return new LocallyWeightedDistanceFunction<>(factory);
     }
   }
 }

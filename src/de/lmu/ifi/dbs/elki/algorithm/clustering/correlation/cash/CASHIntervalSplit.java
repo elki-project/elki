@@ -81,8 +81,8 @@ public class CASHIntervalSplit {
 
     this.database = database;
     this.minPts = minPts;
-    this.f_minima = new HashMap<HyperBoundingBox, Map<DBID, Double>>();
-    this.f_maxima = new HashMap<HyperBoundingBox, Map<DBID, Double>>();
+    this.f_minima = new HashMap<>();
+    this.f_maxima = new HashMap<>();
   }
 
   /**
@@ -108,9 +108,9 @@ public class CASHIntervalSplit {
     Map<DBID, Double> minima = f_minima.get(interval);
     Map<DBID, Double> maxima = f_maxima.get(interval);
     if(minima == null || maxima == null) {
-      minima = new HashMap<DBID, Double>();
+      minima = new HashMap<>();
       f_minima.put(interval, minima);
-      maxima = new HashMap<DBID, Double>();
+      maxima = new HashMap<>();
       f_maxima.put(interval, maxima);
     }
 

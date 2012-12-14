@@ -58,7 +58,7 @@ public class OPTICSCut {
   public static <D extends Distance<D>> Clustering<Model> makeOPTICSCut(ClusterOrderResult<D> co, OPTICSDistanceAdapter<D> adapter, double epsilon) {
     List<ClusterOrderEntry<D>> order = co.getClusterOrder();
     // Clustering model we are building
-    Clustering<Model> clustering = new Clustering<Model>("OPTICS Cut Clustering", "optics-cut");
+    Clustering<Model> clustering = new Clustering<>("OPTICS Cut Clustering", "optics-cut");
     // Collects noise elements
     ModifiableDBIDs noise = DBIDUtil.newHashSet();
 

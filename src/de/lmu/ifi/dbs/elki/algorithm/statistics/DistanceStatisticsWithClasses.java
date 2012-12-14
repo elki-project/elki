@@ -284,7 +284,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     }
     long bnum = inum + onum;
 
-    Collection<DoubleVector> binstat = new ArrayList<DoubleVector>(numbin);
+    Collection<DoubleVector> binstat = new ArrayList<>(numbin);
     for (ObjHistogram.Iter<long[]> iter = histogram.iter(); iter.valid(); iter.advance()) {
       final long[] value = iter.getValue();
       final double icof = (inum == 0) ? 0 : ((double) value[0]) / inum / histogram.getBinsize();
@@ -294,7 +294,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
       DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), icof, icaf, ocof, ocaf });
       binstat.add(row);
     }
-    HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Distance Histogram", "distance-histogram", binstat);
+    HistogramResult<DoubleVector> result = new HistogramResult<>("Distance Histogram", "distance-histogram", binstat);
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());
@@ -319,8 +319,8 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     Random rnd = new Random();
     // estimate minimum and maximum.
     int k = (int) Math.max(25, Math.pow(relation.size(), 0.2));
-    TreeSet<DoubleDBIDPair> minhotset = new TreeSet<DoubleDBIDPair>();
-    TreeSet<DoubleDBIDPair> maxhotset = new TreeSet<DoubleDBIDPair>(Collections.reverseOrder());
+    TreeSet<DoubleDBIDPair> minhotset = new TreeSet<>();
+    TreeSet<DoubleDBIDPair> maxhotset = new TreeSet<>(Collections.reverseOrder());
 
     int randomsize = (int) Math.max(25, Math.pow(relation.size(), 0.2));
     double rprob = ((double) randomsize) / size;
@@ -336,7 +336,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
     maxhotset.add(DBIDUtil.newPair(Double.MIN_VALUE, firstid));
     for (; iter.valid(); iter.advance()) {
       // generate candidates for min distance.
-      ArrayList<DoubleDBIDPair> np = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
+      ArrayList<DoubleDBIDPair> np = new ArrayList<>(k * 2 + randomsize * 2);
       for (DoubleDBIDPair pair : minhotset) {
         // skip the object itself
         if (DBIDUtil.equal(iter, pair)) {
@@ -355,7 +355,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
       shrinkHeap(minhotset, k);
 
       // generate candidates for max distance.
-      ArrayList<DoubleDBIDPair> np2 = new ArrayList<DoubleDBIDPair>(k * 2 + randomsize * 2);
+      ArrayList<DoubleDBIDPair> np2 = new ArrayList<>(k * 2 + randomsize * 2);
       for (DoubleDBIDPair pair : minhotset) {
         // skip the object itself
         if (DBIDUtil.equal(iter, pair)) {
@@ -479,7 +479,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
         sampling = samplingF.getValue();
       }
 
-      ArrayList<Parameter<?>> exclusive = new ArrayList<Parameter<?>>();
+      ArrayList<Parameter<?>> exclusive = new ArrayList<>();
       exclusive.add(exactF);
       exclusive.add(samplingF);
       config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(exclusive));
@@ -487,7 +487,7 @@ public class DistanceStatisticsWithClasses<O, D extends NumberDistance<D, ?>> ex
 
     @Override
     protected DistanceStatisticsWithClasses<O, D> makeInstance() {
-      return new DistanceStatisticsWithClasses<O, D>(distanceFunction, numbin, exact, sampling);
+      return new DistanceStatisticsWithClasses<>(distanceFunction, numbin, exact, sampling);
     }
   }
 }

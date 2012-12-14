@@ -115,8 +115,8 @@ public class BundleReader implements BundleStreamSource {
     final int nummeta = buffer.getInt();
     assert (nummeta > 0);
     meta = new BundleMeta(nummeta);
-    sers = new ArrayList<ByteBufferSerializer<?>>(nummeta);
-    data = new ArrayList<Object>(nummeta);
+    sers = new ArrayList<>(nummeta);
+    data = new ArrayList<>(nummeta);
     for (int i = 0; i < nummeta; i++) {
       try {
         @SuppressWarnings("unchecked")

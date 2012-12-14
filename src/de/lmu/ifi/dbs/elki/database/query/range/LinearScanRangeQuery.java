@@ -54,7 +54,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
 
   @Override
   public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       D currentDistance = distanceQuery.distance(id, iter);
       if(currentDistance.compareTo(range) <= 0) {
@@ -67,7 +67,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
 
   @Override
   public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       D currentDistance = distanceQuery.distance(obj, iter);
       if(currentDistance.compareTo(range) <= 0) {

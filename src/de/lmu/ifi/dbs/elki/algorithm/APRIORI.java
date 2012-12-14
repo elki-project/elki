@@ -128,8 +128,8 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    * @return the AprioriResult learned by this APRIORI
    */
   public AprioriResult run(Database database, Relation<BitVector> relation) {
-    Map<BitSet, Integer> support = new HashMap<BitSet, Integer>();
-    List<BitSet> solution = new ArrayList<BitSet>();
+    Map<BitSet, Integer> support = new HashMap<>();
+    List<BitSet> solution = new ArrayList<>();
     final int size = relation.size();
     if(size > 0) {
       int dim;
@@ -176,7 +176,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    *         frequent already
    */
   protected BitSet[] prune(Map<BitSet, Integer> support, BitSet[] candidates, int size) {
-    List<BitSet> candidateList = new ArrayList<BitSet>();
+    List<BitSet> candidateList = new ArrayList<>();
     // MinFreq pruning
     if(minfreq >= 0) {
       for(BitSet bitSet : candidates) {
@@ -229,7 +229,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
    *         increasing the length by 1
    */
   protected BitSet[] join(BitSet[] frequentItemsets) {
-    List<BitSet> joined = new ArrayList<BitSet>();
+    List<BitSet> joined = new ArrayList<>();
     for(int i = 0; i < frequentItemsets.length; i++) {
       for(int j = i + 1; j < frequentItemsets.length; j++) {
         BitSet b1 = (BitSet) frequentItemsets[i].clone();
@@ -272,7 +272,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
         }
       }
     }
-    List<BitSet> frequentItemsets = new ArrayList<BitSet>();
+    List<BitSet> frequentItemsets = new ArrayList<>();
     if(minfreq >= 0.0) {
       // TODO: work with integers?
       double critsupp = minfreq * database.size();
@@ -340,7 +340,7 @@ public class APRIORI extends AbstractAlgorithm<AprioriResult> {
       }
 
       // global parameter constraints
-      ArrayList<Parameter<?>> globalConstraints = new ArrayList<Parameter<?>>();
+      ArrayList<Parameter<?>> globalConstraints = new ArrayList<>();
       globalConstraints.add(minfreqP);
       globalConstraints.add(minsuppP);
       config.checkConstraint(new OnlyOneIsAllowedToBeSetGlobalConstraint(globalConstraints));

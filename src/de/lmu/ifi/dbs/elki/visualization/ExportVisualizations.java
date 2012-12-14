@@ -193,7 +193,7 @@ public class ExportVisualizations implements ResultHandler {
     svgp.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
     svgp.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
-    ArrayList<Visualization> layers = new ArrayList<Visualization>();
+    ArrayList<Visualization> layers = new ArrayList<>();
     for (Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
       VisualizationTask task = iter.next();
       if (task.nodetail || task.noexport || !task.visible) {

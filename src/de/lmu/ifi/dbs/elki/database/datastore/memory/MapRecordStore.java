@@ -76,7 +76,7 @@ public class MapRecordStore implements WritableRecordStore {
   @Override
   public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype) {
     // TODO: add type checking?
-    return new StorageAccessor<T>(col);
+    return new StorageAccessor<>(col);
   }
 
   /**

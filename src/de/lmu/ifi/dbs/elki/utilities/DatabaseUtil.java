@@ -130,7 +130,7 @@ public final class DatabaseUtil {
     NumberVector.Factory<NV, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     NV min = factory.newNumberVector(mins);
     NV max = factory.newNumberVector(maxs);
-    return new Pair<NV, NV>(min, max);
+    return new Pair<>(min, max);
   }
 
   /**
@@ -261,7 +261,7 @@ public final class DatabaseUtil {
    *         database
    */
   public static SortedSet<ClassLabel> getClassLabels(Relation<? extends ClassLabel> database) {
-    SortedSet<ClassLabel> labels = new TreeSet<ClassLabel>();
+    SortedSet<ClassLabel> labels = new TreeSet<>();
     for (DBIDIter it = database.iterDBIDs(); it.valid(); it.advance()) {
       labels.add(database.get(it));
     }
@@ -305,7 +305,7 @@ public final class DatabaseUtil {
    * @return Superclass of all objects in the database
    */
   public static <O> Class<?> getBaseObjectClassExpensive(Relation<O> database) {
-    List<Class<?>> candidates = new ArrayList<Class<?>>();
+    List<Class<?>> candidates = new ArrayList<>();
     DBIDIter iditer = database.iterDBIDs();
     // empty database?!
     if (!iditer.valid()) {
@@ -471,7 +471,7 @@ public final class DatabaseUtil {
 
     @Override
     public Iterator<O> iterator() {
-      return new DatabaseUtil.RelationObjectIterator<O>(db);
+      return new DatabaseUtil.RelationObjectIterator<>(db);
     }
 
     @Override

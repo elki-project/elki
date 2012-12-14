@@ -358,7 +358,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, true);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, true);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
@@ -371,7 +371,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
 
     @Override
     protected ComputeSimilarityMatrixImage<O> makeInstance() {
-      return new ComputeSimilarityMatrixImage<O>(distanceFunction, scaling, skipzero);
+      return new ComputeSimilarityMatrixImage<>(distanceFunction, scaling, skipzero);
     }
   }
 }

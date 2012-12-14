@@ -93,7 +93,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
   @Override
   public Instance<DoubleVector> makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleVector>(task);
+    return new Instance<>(task);
   }
 
   @Override
@@ -346,7 +346,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
       for(int i = 1; i <= times; i++) {
         SVGPath path = new SVGPath();
 
-        ArrayList<Vector> delta = new ArrayList<Vector>(chres.size());
+        ArrayList<Vector> delta = new ArrayList<>(chres.size());
         for(int p = 0; p < chres.size(); p++) {
           Vector prev = chres.get((p - 1 + chres.size()) % chres.size());
           Vector curr = chres.get(p);

@@ -135,13 +135,13 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     double mib = 0.0;
     // TODO: make it configurable to keep this list; this is mostly useful for
     // visualization
-    List<SteepArea> salist = new ArrayList<SteepArea>();
-    List<SteepDownArea> sdaset = new ArrayList<SteepDownArea>();
-    ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<Cluster<OPTICSModel>>();
-    HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<Cluster<OPTICSModel>>();
+    List<SteepArea> salist = new ArrayList<>();
+    List<SteepDownArea> sdaset = new ArrayList<>();
+    ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<>();
+    HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 
-    SteepScanPosition<N> scan = new SteepScanPosition<N>(clusterOrder);
+    SteepScanPosition<N> scan = new SteepScanPosition<>(clusterOrder);
     while(scan.hasNext()) {
       final int curpos = scan.index;
       // Update maximum-inbetween
@@ -285,7 +285,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
               LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
             }
             OPTICSModel model = new OPTICSModel(cstart, cend);
-            Cluster<OPTICSModel> cluster = new Cluster<OPTICSModel>("Cluster_" + cstart + "_" + cend, dbids, model, hier);
+            Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model, hier);
             // Build the hierarchy
             {
               Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
@@ -308,14 +308,14 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
       }
     }
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
-      final Clustering<OPTICSModel> clustering = new Clustering<OPTICSModel>("OPTICS Xi-Clusters", "optics");
+      final Clustering<OPTICSModel> clustering = new Clustering<>("OPTICS Xi-Clusters", "optics");
       if(unclaimedids.size() > 0) {
         final Cluster<OPTICSModel> allcluster;
         if(clusterOrder.get(clusterOrder.size() - 1).getReachability().isInfiniteDistance()) {
-          allcluster = new Cluster<OPTICSModel>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1), hier);
+          allcluster = new Cluster<>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1), hier);
         }
         else {
-          allcluster = new Cluster<OPTICSModel>("Cluster", unclaimedids, new OPTICSModel(0, clusterOrder.size() - 1), hier);
+          allcluster = new Cluster<>("Cluster", unclaimedids, new OPTICSModel(0, clusterOrder.size() - 1), hier);
         }
         for(Cluster<OPTICSModel> cluster : curclusters) {
           hier.add(allcluster, cluster);
@@ -663,7 +663,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
         xi = xiP.doubleValue();
       }
 
-      ClassParameter<OPTICSTypeAlgorithm<D>> opticsP = new ClassParameter<OPTICSTypeAlgorithm<D>>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);
+      ClassParameter<OPTICSTypeAlgorithm<D>> opticsP = new ClassParameter<>(XIALG_ID, OPTICSTypeAlgorithm.class, OPTICS.class);
       if(config.grab(opticsP)) {
         optics = opticsP.instantiateClass(config);
       }
@@ -671,7 +671,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
 
     @Override
     protected OPTICSXi<D> makeInstance() {
-      return new OPTICSXi<D>(optics, xi);
+      return new OPTICSXi<>(optics, xi);
     }
   }
 }

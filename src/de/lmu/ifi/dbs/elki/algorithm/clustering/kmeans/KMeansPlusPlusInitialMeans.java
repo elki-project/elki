@@ -80,7 +80,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
     DistanceQuery<V, D> distQ = relation.getDatabase().getDistanceQuery(relation, distF);
 
     // Chose first mean
-    List<V> means = new ArrayList<V>(k);
+    List<V> means = new ArrayList<>(k);
 
     Random random = rnd.getRandom();
     DBID first = DBIDUtil.deref(DBIDUtil.randomSample(relation.getDBIDs(), 1, new Random(random.nextLong())).iter());
@@ -244,7 +244,7 @@ public class KMeansPlusPlusInitialMeans<V, D extends NumberDistance<D, ?>> exten
   public static class Parameterizer<V, D extends NumberDistance<D, ?>> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
     protected KMeansPlusPlusInitialMeans<V, D> makeInstance() {
-      return new KMeansPlusPlusInitialMeans<V, D>(rnd);
+      return new KMeansPlusPlusInitialMeans<>(rnd);
     }
   }
 }

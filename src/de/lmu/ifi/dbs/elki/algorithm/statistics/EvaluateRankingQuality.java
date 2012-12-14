@@ -51,12 +51,14 @@ import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.MeanVarianceStaticHistogram;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -126,8 +128,8 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
     Collection<Cluster<Model>> split = (new ByLabelOrAllInOneClustering()).run(database).getAllClusters();
 
     // Compute cluster averages and covariance matrix
-    HashMap<Cluster<?>, Vector> averages = new HashMap<Cluster<?>, Vector>(split.size());
-    HashMap<Cluster<?>, Matrix> covmats = new HashMap<Cluster<?>, Matrix>(split.size());
+    HashMap<Cluster<?>, Vector> averages = new HashMap<>(split.size());
+    HashMap<Cluster<?>, Matrix> covmats = new HashMap<>(split.size());
     for (Cluster<?> clus : split) {
       CovarianceMatrix covmat = CovarianceMatrix.make(relation, clus.getIDs());
       averages.put(clus, covmat.getMeanVector());
@@ -143,7 +145,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
 
     // sort neighbors
     for (Cluster<?> clus : split) {
-      ArrayList<DoubleDBIDPair> cmem = new ArrayList<DoubleDBIDPair>(clus.size());
+      ArrayList<DoubleDBIDPair> cmem = new ArrayList<>(clus.size());
       Vector av = averages.get(clus);
       Matrix covm = covmats.get(clus);
 
@@ -170,12 +172,12 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
-    for (MeanVarianceStaticHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
+    Collection<DoubleVector> res = new ArrayList<>(relation.size());
+    for (ObjHistogram.Iter<MeanVariance> iter = hist.iter(); iter.valid(); iter.advance()) {
       DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
       res.add(row);
     }
-    return new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
+    return new HistogramResult<>("Ranking Quality Histogram", "ranking-histogram", res);
   }
 
   @Override
@@ -213,7 +215,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
 
     @Override
     protected EvaluateRankingQuality<V, D> makeInstance() {
-      return new EvaluateRankingQuality<V, D>(distanceFunction, numbins);
+      return new EvaluateRankingQuality<>(distanceFunction, numbins);
     }
   }
 }

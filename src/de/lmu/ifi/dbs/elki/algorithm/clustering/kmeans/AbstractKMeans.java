@@ -174,7 +174,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
    * @return the mean vectors of the given clusters in the given database
    */
   protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?>> means, Relation<V> database) {
-    List<Vector> newMeans = new ArrayList<Vector>(k);
+    List<Vector> newMeans = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       ModifiableDBIDs list = clusters.get(i);
       Vector mean = null;
@@ -207,7 +207,7 @@ public abstract class AbstractKMeans<V extends NumberVector<?>, D extends Distan
   protected List<NumberVector<?>> medians(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector<?>> medians, Relation<V> database) {
     final int dim = medians.get(0).getDimensionality();
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
-    List<NumberVector<?>> newMedians = new ArrayList<NumberVector<?>>(k);
+    List<NumberVector<?>> newMedians = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       ArrayModifiableDBIDs list = DBIDUtil.newArray(clusters.get(i));
       if(list.size() > 0) {

@@ -68,7 +68,7 @@ public class DBIDRangeDatabaseConnection implements DatabaseConnection {
   @Override
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle b = new MultipleObjectsBundle();
-    List<DBID> ids = new ArrayList<DBID>(count);
+    List<DBID> ids = new ArrayList<>(count);
     for(int i = 0; i < count; i++) {
       ids.add(DBIDUtil.importInteger(start + i));
     }

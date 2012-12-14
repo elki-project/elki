@@ -101,7 +101,7 @@ public class InspectionUtil {
   /**
    * Weak hash map for class lookups
    */
-  private static WeakHashMap<Class<?>, List<Class<?>>> CLASS_CACHE = new WeakHashMap<Class<?>, List<Class<?>>>();
+  private static WeakHashMap<Class<?>, List<Class<?>>> CLASS_CACHE = new WeakHashMap<>();
 
   /**
    * (Non-weak) cache for all "frequently scanned" classes.
@@ -137,7 +137,7 @@ public class InspectionUtil {
    * @return List of found classes.
    */
   public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything) {
-    ArrayList<Class<?>> list = new ArrayList<Class<?>>();
+    ArrayList<Class<?>> list = new ArrayList<>();
     // Add all from service files (i.e. jars)
     {
       Iterator<Class<?>> iter = new ELKIServiceLoader(c);
@@ -152,7 +152,7 @@ public class InspectionUtil {
     }
     else {
       // Duplicate checking
-      THashSet<Class<?>> dupes = new THashSet<Class<?>>(list);
+      THashSet<Class<?>> dupes = new THashSet<>(list);
       // Scan for additional ones in class path
       Iterator<Class<?>> iter;
       // If possible, reuse an existing scan result
@@ -196,7 +196,7 @@ public class InspectionUtil {
    * @return List with the scan result
    */
   private static List<Class<?>> slowScan(Class<?> cond) {
-    ArrayList<Class<?>> res = new ArrayList<Class<?>>();
+    ArrayList<Class<?>> res = new ArrayList<>();
     try {
       ClassLoader cl = ClassLoader.getSystemClassLoader();
       Enumeration<URL> cps = cl.getResources("");
@@ -338,9 +338,9 @@ public class InspectionUtil {
 
     private String prefix;
 
-    private ArrayList<String> files = new ArrayList<String>(100);
+    private ArrayList<String> files = new ArrayList<>(100);
 
-    private ArrayList<Pair<File, String>> folders = new ArrayList<Pair<File, String>>(100);
+    private ArrayList<Pair<File, String>> folders = new ArrayList<>(100);
 
     private String[] ignorepackages;
 
@@ -356,7 +356,7 @@ public class InspectionUtil {
         prefix = prefix + File.separatorChar;
       }
 
-      this.folders.add(new Pair<File, String>(path, ""));
+      this.folders.add(new Pair<>(path, ""));
     }
 
     @Override
@@ -399,7 +399,7 @@ public class InspectionUtil {
                   continue nextfile;
                 }
               }
-              folders.add(new Pair<File, String>(newf, newpref));
+              folders.add(new Pair<>(newf, newpref));
             }
           }
         }

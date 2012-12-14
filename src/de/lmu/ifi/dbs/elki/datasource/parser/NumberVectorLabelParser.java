@@ -350,11 +350,11 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
           }
         }
       }
-      return new VectorFieldTypeInformation<V>(factory, dimensionality, colnames);
+      return new VectorFieldTypeInformation<>(factory, dimensionality, colnames);
     }
     // Variable dimensionality - return non-vector field type
     if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<V>(factory.getRestrictionClass(), factory.getDefaultSerializer());
+      return new SimpleTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
@@ -395,7 +395,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
      * @param config Parameterization
      */
     protected void getFactory(Parameterization config) {
-      ObjectParameter<NumberVector.Factory<V, ?>> factoryP = new ObjectParameter<NumberVector.Factory<V, ?>>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
+      ObjectParameter<NumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
       if (config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -420,7 +420,7 @@ public class NumberVectorLabelParser<V extends NumberVector<?>> extends Abstract
 
     @Override
     protected NumberVectorLabelParser<V> makeInstance() {
-      return new NumberVectorLabelParser<V>(colSep, quoteChar, labelIndices, factory);
+      return new NumberVectorLabelParser<>(colSep, quoteChar, labelIndices, factory);
     }
   }
 }

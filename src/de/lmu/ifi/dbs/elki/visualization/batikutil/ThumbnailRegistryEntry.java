@@ -80,7 +80,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   /**
    * The image cache.
    */
-  private static final TIntObjectMap<SoftReference<RenderedImage>> images = new TIntObjectHashMap<SoftReference<RenderedImage>>();
+  private static final TIntObjectMap<SoftReference<RenderedImage>> images = new TIntObjectHashMap<>();
 
   /**
    * Object counter
@@ -112,7 +112,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
       int key = counter;
       counter++;
       assert (images.get(key) == null);
-      images.put(key, new SoftReference<RenderedImage>(img));
+      images.put(key, new SoftReference<>(img));
       // Reorganize map, purge old entries
       if(counter % 50 == 49) {
         for(TIntObjectIterator<SoftReference<RenderedImage>> iter = images.iterator(); iter.hasNext();) {

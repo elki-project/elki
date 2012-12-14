@@ -82,17 +82,17 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   /**
    * The relations we manage.
    */
-  protected final List<Relation<?>> relations = new java.util.Vector<Relation<?>>();
+  protected final List<Relation<?>> relations = new ArrayList<>();
 
   /**
    * Indexes.
    */
-  protected final List<Index> indexes = new java.util.Vector<Index>();
+  protected final List<Index> indexes = new ArrayList<>();
 
   /**
    * Index factories.
    */
-  protected final Collection<IndexFactory<?, ?>> indexFactories = new java.util.Vector<IndexFactory<?, ?>>();
+  protected final Collection<IndexFactory<?, ?>> indexFactories = new ArrayList<>();
 
   /**
    * Constructor.
@@ -154,7 +154,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
         return (Relation<O>) relation;
       }
     }
-    List<TypeInformation> types = new ArrayList<TypeInformation>(relations.size());
+    List<TypeInformation> types = new ArrayList<>(relations.size());
     for(Relation<?> relation : relations) {
       types.add(relation.getDataTypeInformation());
     }
@@ -269,7 +269,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
       }
     }
     KNNQuery<O, D> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
-    return new LinearScanRKNNQuery<O, D>(distanceQuery, knnQuery, maxk);
+    return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
   }
 
   @Override

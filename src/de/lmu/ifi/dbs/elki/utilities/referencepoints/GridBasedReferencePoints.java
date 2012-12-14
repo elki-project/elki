@@ -102,7 +102,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
     }
 
     int gridpoints = Math.max(1, (int) Math.pow(gridres + 1, dim));
-    ArrayList<V> result = new ArrayList<V>(gridpoints);
+    ArrayList<V> result = new ArrayList<>(gridpoints);
     double[] delta = new double[dim];
     if (gridres > 0) {
       double halfgrid = gridres / 2.0;
@@ -166,7 +166,7 @@ public class GridBasedReferencePoints<V extends NumberVector<?>> implements Refe
 
     @Override
     protected GridBasedReferencePoints<V> makeInstance() {
-      return new GridBasedReferencePoints<V>(gridres, gridscale);
+      return new GridBasedReferencePoints<>(gridres, gridscale);
     }
   }
 }

@@ -64,7 +64,7 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**
    * Returned range allocations
    */
-  ArrayList<IntegerDBIDRange> returnedAllocations = new ArrayList<IntegerDBIDRange>();
+  ArrayList<IntegerDBIDRange> returnedAllocations = new ArrayList<>();
 
   /**
    * Constructor

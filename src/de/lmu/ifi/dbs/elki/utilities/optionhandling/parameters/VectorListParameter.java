@@ -29,7 +29,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 
@@ -178,11 +177,11 @@ public class VectorListParameter extends ListParameter<List<Double>> {
       if(vectors.length == 0) {
         throw new WrongParameterValueException("Wrong parameter format! Given list of vectors for parameter \"" + getName() + "\" is empty!");
       }
-      ArrayList<List<Double>> vecs = new ArrayList<List<Double>>();
+      ArrayList<List<Double>> vecs = new ArrayList<>();
 
       for(String vector : vectors) {
         String[] coordinates = SPLIT.split(vector);
-        ArrayList<Double> vectorCoord = new ArrayList<Double>();
+        ArrayList<Double> vectorCoord = new ArrayList<>();
         for(String coordinate : coordinates) {
           try {
             vectorCoord.add(Double.valueOf(coordinate));

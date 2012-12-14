@@ -227,7 +227,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     /**
      * Map to connect segments to their visual elements
      */
-    public Map<Segment, List<Element>> segmentToElements = new HashMap<Segment, List<Element>>();
+    public Map<Segment, List<Element>> segmentToElements = new HashMap<>();
 
     /**
      * Show unclustered Pairs in CircleSegments
@@ -412,7 +412,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
         // ITERATE OVER ALL SEGMENT-CLUSTERS
 
-        ArrayList<Element> elems = new ArrayList<Element>(clusterings);
+        ArrayList<Element> elems = new ArrayList<>(clusterings);
         segmentToElements.put(segment, elems);
         // draw segment for every clustering
 

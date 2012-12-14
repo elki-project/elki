@@ -186,7 +186,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
           }
         }
         else {
-          ArrayList<Vector> ps = new ArrayList<Vector>(ids.size());
+          ArrayList<Vector> ps = new ArrayList<>(ids.size());
           for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
             double[] projP = proj.fastProjectDataToRenderSpace(rel.get(iter));
             ps.add(new Vector(projP));

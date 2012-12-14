@@ -117,7 +117,7 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
       max[d] = (max[d] - centroid[d]) * scale + centroid[d];
     }
 
-    ArrayList<V> result = new ArrayList<V>(2 * dim + 1);
+    ArrayList<V> result = new ArrayList<>(2 * dim + 1);
     if (!nocenter) {
       result.add(factory.newNumberVector(centroid));
     }
@@ -173,7 +173,7 @@ public class StarBasedReferencePoints<V extends NumberVector<?>> implements Refe
 
     @Override
     protected StarBasedReferencePoints<V> makeInstance() {
-      return new StarBasedReferencePoints<V>(nocenter, scale);
+      return new StarBasedReferencePoints<>(nocenter, scale);
     }
   }
 }

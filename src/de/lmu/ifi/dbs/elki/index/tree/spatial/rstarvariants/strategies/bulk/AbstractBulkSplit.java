@@ -75,7 +75,7 @@ public abstract class AbstractBulkSplit implements BulkSplit {
     // build partitions
     final int size = objects.size();
     final int numberPartitions = (int) Math.ceil(((double) size) / maxEntries);
-    List<List<T>> partitions = new ArrayList<List<T>>(numberPartitions);
+    List<List<T>> partitions = new ArrayList<>(numberPartitions);
     int start = 0;
     for(int pnum = 0; pnum < numberPartitions; pnum++) {
       int end = (int) ((pnum + 1.) * size / numberPartitions);

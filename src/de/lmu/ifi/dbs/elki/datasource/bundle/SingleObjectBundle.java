@@ -50,7 +50,7 @@ public class SingleObjectBundle implements ObjectBundle {
    * Constructor.
    */
   public SingleObjectBundle() {
-    this(new BundleMeta(), new ArrayList<Object>(5));
+    this(new BundleMeta(), new ArrayList<>(5));
   }
 
   /**

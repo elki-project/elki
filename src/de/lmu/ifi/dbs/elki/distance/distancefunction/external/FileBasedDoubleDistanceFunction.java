@@ -170,7 +170,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDDistanceFunctio
         matrixfile = MATRIX_PARAM.getValue();
       }
 
-      final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<DoubleDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      final ObjectParameter<DistanceParser<DoubleDistance>> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         ListParameterization parserConfig = new ListParameterization();
         parserConfig.addParameter(DistanceParser.DISTANCE_ID, DoubleDistance.class);

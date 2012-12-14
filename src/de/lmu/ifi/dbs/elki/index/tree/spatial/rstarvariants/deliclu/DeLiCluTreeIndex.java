@@ -152,7 +152,7 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
 
     // Make an example leaf
     if (canBulkLoad()) {
-      List<DeLiCluEntry> leafs = new ArrayList<DeLiCluEntry>(ids.size());
+      List<DeLiCluEntry> leafs = new ArrayList<>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }

@@ -64,7 +64,7 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
   @Override
   public Collection<DoubleDBIDPair> getWeightedNeighbors(DBIDRef reference) {
     DBIDs neighbors = inner.getNeighborDBIDs(reference);
-    ArrayList<DoubleDBIDPair> adapted = new ArrayList<DoubleDBIDPair>(neighbors.size());
+    ArrayList<DoubleDBIDPair> adapted = new ArrayList<>(neighbors.size());
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
       adapted.add(DBIDUtil.newPair(1.0, iter));
     }
@@ -130,7 +130,7 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<NeighborSetPredicate.Factory<O>> innerP = new ObjectParameter<NeighborSetPredicate.Factory<O>>(INNER_ID, NeighborSetPredicate.Factory.class);
+        ObjectParameter<NeighborSetPredicate.Factory<O>> innerP = new ObjectParameter<>(INNER_ID, NeighborSetPredicate.Factory.class);
         if(config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }
@@ -138,7 +138,7 @@ public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredica
 
       @Override
       protected UnweightedNeighborhoodAdapter.Factory<O> makeInstance() {
-        return new UnweightedNeighborhoodAdapter.Factory<O>(inner);
+        return new UnweightedNeighborhoodAdapter.Factory<>(inner);
       }
     }
   }

@@ -249,7 +249,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
   private Relation<?> addNewRelation(SimpleTypeInformation<?> meta) {
     @SuppressWarnings("unchecked")
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
-    Relation<?> relation = new MaterializedRelation<Object>(this, ometa, ids);
+    Relation<?> relation = new MaterializedRelation<>(this, ometa, ids);
     relations.add(relation);
     getHierarchy().add(this, relation);
     return relation;
@@ -282,12 +282,12 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get database connection.
-      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if(config.grab(dbcP)) {
         databaseConnection = dbcP.instantiateClass(config);
       }
       // Get indexes.
-      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<?, ?>>(INDEX_ID, IndexFactory.class, true);
+      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<>(INDEX_ID, IndexFactory.class, true);
       if(config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }

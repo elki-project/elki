@@ -115,7 +115,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
     // FIXME: move this into subclasses!
-    this.result = new Clustering<M>("Biclustering", "biclustering");
+    this.result = new Clustering<>("Biclustering", "biclustering");
     colIDs = new int[RelationUtil.dimensionality(this.relation)];
     for(int i = 0; i < colIDs.length; i++) {
       colIDs[i] = i + 1;
@@ -183,7 +183,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
   protected Bicluster<V> defineBicluster(BitSet rows, BitSet cols) {
     ArrayDBIDs rowIDs = rowsBitsetToIDs(rows);
     int[] colIDs = colsBitsetToIDs(cols);
-    return new Bicluster<V>(rowIDs, colIDs, relation);
+    return new Bicluster<>(rowIDs, colIDs, relation);
   }
 
   /**
@@ -192,7 +192,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @param bicluster the bicluster to add to the result
    */
   protected void addBiclusterToResult(M bicluster) {
-    result.addCluster(new Cluster<M>(bicluster.getDatabaseObjectGroup(), bicluster));
+    result.addCluster(new Cluster<>(bicluster.getDatabaseObjectGroup(), bicluster));
   }
 
   /**
@@ -225,9 +225,9 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
     if(properties.size() != to - from) {
       throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
     }
-    List<Pair<DBID, P>> pairs = new ArrayList<Pair<DBID, P>>(to - from);
+    List<Pair<DBID, P>> pairs = new ArrayList<>(to - from);
     for(int i = 0; i < properties.size(); i++) {
-      pairs.add(new Pair<DBID, P>(rowIDs.get(i + from), properties.get(i)));
+      pairs.add(new Pair<>(rowIDs.get(i + from), properties.get(i)));
     }
     Collections.sort(pairs, new PairUtil.CompareBySecond<DBID, P>(comp));
 
@@ -267,9 +267,9 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
     if(properties.size() != to - from) {
       throw new IllegalArgumentException("Length of properties (=" + properties.size() + ") does not conform specified length (=" + (to - from) + ")");
     }
-    List<Pair<Integer, P>> pairs = new ArrayList<Pair<Integer, P>>(to - from);
+    List<Pair<Integer, P>> pairs = new ArrayList<>(to - from);
     for(int i = 0; i < properties.size(); i++) {
-      pairs.add(new Pair<Integer, P>(colIDs[i + from], properties.get(i)));
+      pairs.add(new Pair<>(colIDs[i + from], properties.get(i)));
     }
     Collections.sort(pairs, new PairUtil.CompareBySecond<Integer, P>(comp));
 

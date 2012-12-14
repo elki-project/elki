@@ -54,7 +54,7 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
   @Override
   public List<V> chooseInitialMeans(Relation<V> relation, int k, PrimitiveDistanceFunction<? super V, ?> distanceFunction) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
-    List<V> means = new ArrayList<V>(k);
+    List<V> means = new ArrayList<>(k);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       means.add(relation.get(iter));
     }
@@ -74,10 +74,9 @@ public class RandomlyChosenInitialMeans<V> extends AbstractKMeansInitialization<
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer<V> {
-
     @Override
     protected RandomlyChosenInitialMeans<V> makeInstance() {
-      return new RandomlyChosenInitialMeans<V>(rnd);
+      return new RandomlyChosenInitialMeans<>(rnd);
     }
   }
 }

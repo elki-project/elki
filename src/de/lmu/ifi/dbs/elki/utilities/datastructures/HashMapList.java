@@ -69,7 +69,7 @@ public class HashMapList<K, V> extends HashMap<K, List<V>> {
   public synchronized void add(K key, V value) {
     List<V> list = super.get(key);
     if (list == null) {
-      list = new ArrayList<V>(1);
+      list = new ArrayList<>(1);
       super.put(key, list);
     }
     list.add(value);

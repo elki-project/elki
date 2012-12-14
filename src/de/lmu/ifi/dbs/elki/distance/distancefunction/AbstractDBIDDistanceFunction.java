@@ -73,6 +73,6 @@ public abstract class AbstractDBIDDistanceFunction<D extends Distance<D>> implem
   @SuppressWarnings("unchecked")
   @Override
   final public <O extends DBID> DistanceQuery<O, D> instantiate(Relation<O> database) {
-    return (DistanceQuery<O, D>) new DBIDDistanceQuery<D>((Relation<DBID>) database, this);
+    return (DistanceQuery<O, D>) new DBIDDistanceQuery<>((Relation<DBID>) database, this);
   }
 }

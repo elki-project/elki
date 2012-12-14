@@ -64,7 +64,7 @@ class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBID
    */
   @Override
   public GenericKNNList<D> toKNNList() {
-    return new GenericKNNList<D>(this);
+    return new GenericKNNList<>(this);
   }
 
   @Override

@@ -101,7 +101,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
    * @param relation The data input to use
    */
   public Clustering<Model> run(Relation<?> relation) {
-    HashMap<String, DBIDs> labelmap = new HashMap<String, DBIDs>();
+    HashMap<String, DBIDs> labelmap = new HashMap<>();
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -115,14 +115,14 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
       assign(labelmap, label, iditer);
     }
 
-    ArrayList<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>(labelmap.size());
+    ArrayList<Cluster<Model>> clusters = new ArrayList<>(labelmap.size());
     for(Entry<String, DBIDs> entry : labelmap.entrySet()) {
       DBIDs ids = entry.getValue();
       if(ids instanceof DBID) {
         noiseids.add((DBID) ids);
         continue;
       }
-      Cluster<Model> clus = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
+      Cluster<Model> clus = new Cluster<>(entry.getKey(), ids, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
       clusters.add(clus);
     }
 
@@ -138,7 +138,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
         }
       }
     }
-    ArrayList<Cluster<Model>> rootclusters = new ArrayList<Cluster<Model>>();
+    ArrayList<Cluster<Model>> rootclusters = new ArrayList<>();
     for(Cluster<Model> cur : clusters) {
       if(cur.getParents().size() == 0) {
         rootclusters.add(cur);
@@ -152,7 +152,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     }
     assert (rootclusters.size() > 0) : "No clusters found by bylabel clustering. Empty database?";
 
-    return new Clustering<Model>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
+    return new Clustering<>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
   }
 
   /**

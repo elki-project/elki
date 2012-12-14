@@ -114,7 +114,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
     final KNNQuery<O, D> knnQuery = database.getKNNQuery(distanceQuery, k);
 
     final Random random = new Random();
-    List<D> knnDistances = new ArrayList<D>(relation.size());
+    List<D> knnDistances = new ArrayList<>(relation.size());
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(random.nextDouble() < percentage) {
         final KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
@@ -122,7 +122,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
       }
     }
     Collections.sort(knnDistances, Collections.reverseOrder());
-    return new KNNDistanceOrderResult<D>("kNN distance order", "knn-order", knnDistances);
+    return new KNNDistanceOrderResult<>("kNN distance order", "knn-order", knnDistances);
   }
 
   @Override
@@ -179,7 +179,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
 
     @Override
     protected KNNDistanceOrder<O, D> makeInstance() {
-      return new KNNDistanceOrder<O, D>(distanceFunction, k, percentage);
+      return new KNNDistanceOrder<>(distanceFunction, k, percentage);
     }
   }
 }

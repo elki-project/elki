@@ -62,7 +62,7 @@ public class TrivialAllNoise extends AbstractAlgorithm<Clustering<Model>> implem
 
   public Clustering<Model> run(Relation<?> relation) {
     final DBIDs ids = relation.getDBIDs();
-    Clustering<Model> result = new Clustering<Model>("All-in-noise trivial Clustering", "allinnoise-clustering");
+    Clustering<Model> result = new Clustering<>("All-in-noise trivial Clustering", "allinnoise-clustering");
     Cluster<Model> c = new Cluster<Model>(ids, true, ClusterModel.CLUSTER);
     result.addCluster(c);
     return result;

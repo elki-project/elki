@@ -82,7 +82,7 @@ public class ProxyView<O> extends AbstractHierarchicalResult implements Relation
    * @return Instance
    */
   public static <O> ProxyView<O> wrap(Database database, DBIDs idview, Relation<O> inner) {
-    return new ProxyView<O>(database, idview, inner);
+    return new ProxyView<>(database, idview, inner);
   }
 
   @Override

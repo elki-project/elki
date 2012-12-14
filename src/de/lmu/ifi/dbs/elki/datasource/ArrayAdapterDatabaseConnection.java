@@ -97,7 +97,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle b = new MultipleObjectsBundle();
     if(startid != null) {
-      List<DBID> ids = new ArrayList<DBID>(data.length);
+      List<DBID> ids = new ArrayList<>(data.length);
       for(int i = 0; i < data.length; i++) {
         ids.add(DBIDUtil.importInteger(startid.intValue() + i));
       }
@@ -106,7 +106,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
 
     int mind = Integer.MAX_VALUE;
     int maxd = 0;
-    List<DoubleVector> vecs = new ArrayList<DoubleVector>(data.length);
+    List<DoubleVector> vecs = new ArrayList<>(data.length);
     for(int i = 0; i < data.length; i++) {
       mind = Math.min(mind, data[i].length);
       maxd = Math.max(maxd, data[i].length);
@@ -114,10 +114,10 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
     }
     SimpleTypeInformation<DoubleVector> type;
     if(mind == maxd) {
-      type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, mind);
+      type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, mind);
     }
     else {
-      type = new SimpleTypeInformation<DoubleVector>(DoubleVector.class);
+      type = new SimpleTypeInformation<>(DoubleVector.class);
     }
     b.appendColumn(type, vecs);
     if(labels != null) {

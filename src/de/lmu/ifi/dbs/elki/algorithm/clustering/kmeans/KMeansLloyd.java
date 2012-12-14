@@ -99,12 +99,12 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
    */
   public Clustering<KMeansModel<V>> run(Database database, Relation<V> relation) {
     if (relation.size() <= 0) {
-      return new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
+      return new Clustering<>("k-Means Clustering", "kmeans-clustering");
     }
     // Choose initial means
     List<? extends NumberVector<?>> means = initializer.chooseInitialMeans(relation, k, getDistanceFunction());
     // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
+    List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
@@ -123,10 +123,10 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     }
     // Wrap result
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<KMeansModel<V>> result = new Clustering<KMeansModel<V>>("k-Means Clustering", "kmeans-clustering");
+    Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
-      KMeansModel<V> model = new KMeansModel<V>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
-      result.addCluster(new Cluster<KMeansModel<V>>(clusters.get(i), model));
+      KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
+      result.addCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
   }
@@ -175,7 +175,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
       if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -189,7 +189,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
 
     @Override
     protected KMeansLloyd<V, D> makeInstance() {
-      return new KMeansLloyd<V, D>(distanceFunction, k, maxiter, initializer);
+      return new KMeansLloyd<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

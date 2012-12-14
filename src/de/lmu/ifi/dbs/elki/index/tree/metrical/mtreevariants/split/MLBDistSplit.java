@@ -88,8 +88,8 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
     }
 
     // partition the entries
-    List<DistanceEntry<D, E>> list1 = new ArrayList<DistanceEntry<D, E>>();
-    List<DistanceEntry<D, E>> list2 = new ArrayList<DistanceEntry<D, E>>();
+    List<DistanceEntry<D, E>> list1 = new ArrayList<>();
+    List<DistanceEntry<D, E>> list2 = new ArrayList<>();
     for(int i = 0; i < node.getNumEntries(); i++) {
       DBID id = node.getEntry(i).getRoutingObjectID();
       D d1 = distanceFunction.distance(firstPromoted, id);

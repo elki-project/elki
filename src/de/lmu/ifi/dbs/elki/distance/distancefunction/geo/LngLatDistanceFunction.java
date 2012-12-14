@@ -85,7 +85,7 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, 2);
+    return new VectorFieldTypeInformation<>(NumberVector.class, 2);
   }
 
   @Override
@@ -104,7 +104,7 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
 
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
+    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
   
   /**

@@ -113,7 +113,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
 
   @Override
   public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
-    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
 
     doRangeQuery(null, index.getRoot(), obj, range, result);
 

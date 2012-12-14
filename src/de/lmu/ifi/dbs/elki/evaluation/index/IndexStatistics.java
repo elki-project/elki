@@ -61,10 +61,10 @@ public class IndexStatistics implements Evaluator {
       return;
     }
     for(IndexTree<?, ?> index : indexes) {
-      header = new ArrayList<String>();
+      header = new ArrayList<>();
       header.add(index.toString());
     }
-    Collection<Pair<String, String>> col = new ArrayList<Pair<String, String>>();
+    Collection<Pair<String, String>> col = new ArrayList<>();
     IndexMetaResult analysis = new IndexMetaResult(col, header);
     db.getHierarchy().add(db, analysis);
   }

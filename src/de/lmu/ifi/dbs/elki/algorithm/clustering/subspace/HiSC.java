@@ -119,7 +119,7 @@ public class HiSC<V extends NumberVector<?>> extends OPTICS<V, PreferenceVectorB
 
     @Override
     protected HiSC<V> makeInstance() {
-      return new HiSC<V>(distanceFunction);
+      return new HiSC<>(distanceFunction);
     }
   }
 }

@@ -110,7 +110,7 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
 
     // Make an example leaf
     if(canBulkLoad()) {
-      List<SpatialEntry> leafs = new ArrayList<SpatialEntry>(ids.size());
+      List<SpatialEntry> leafs = new ArrayList<>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(iter));
       }

@@ -68,7 +68,7 @@ public class HistogramFactory implements ProjectorFactory {
         @SuppressWarnings("unchecked")
         Relation<NumberVector<?>> vrel = (Relation<NumberVector<?>>) rel;
         final int dim = RelationUtil.dimensionality(vrel);
-        HistogramProjector<NumberVector<?>> proj = new HistogramProjector<NumberVector<?>>(vrel, Math.min(dim, maxdim));
+        HistogramProjector<NumberVector<?>> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
         baseResult.getHierarchy().add(vrel, proj);
       }
     }

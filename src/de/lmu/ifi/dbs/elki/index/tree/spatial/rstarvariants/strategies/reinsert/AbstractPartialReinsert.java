@@ -99,7 +99,7 @@ public abstract class AbstractPartialReinsert implements ReinsertStrategy {
       if (config.grab(reinsertAmountP)) {
         reinsertAmount = reinsertAmountP.getValue();
       }
-      ObjectParameter<SpatialPrimitiveDoubleDistanceFunction<?>> distanceP = new ObjectParameter<SpatialPrimitiveDoubleDistanceFunction<?>>(REINSERT_DISTANCE_ID, SpatialPrimitiveDoubleDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<SpatialPrimitiveDoubleDistanceFunction<?>> distanceP = new ObjectParameter<>(REINSERT_DISTANCE_ID, SpatialPrimitiveDoubleDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if (config.grab(distanceP)) {
         distanceFunction = distanceP.instantiateClass(config);
       }

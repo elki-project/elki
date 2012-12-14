@@ -88,7 +88,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
       delta[d] = spacescale * (minmax.second.doubleValue(d) - mean[d]);
     }
 
-    ArrayList<V> result = new ArrayList<V>(2 + dim);
+    ArrayList<V> result = new ArrayList<>(2 + dim);
 
     double[] vec = new double[dim];
     // Use min and max
@@ -141,7 +141,7 @@ public class AxisBasedReferencePoints<V extends NumberVector<?>> implements Refe
 
     @Override
     protected AxisBasedReferencePoints<V> makeInstance() {
-      return new AxisBasedReferencePoints<V>(spacescale);
+      return new AxisBasedReferencePoints<>(spacescale);
     }
   }
 }

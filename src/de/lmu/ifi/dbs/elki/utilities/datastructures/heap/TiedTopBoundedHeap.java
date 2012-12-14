@@ -43,7 +43,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
   /**
    * List to keep ties in.
    */
-  private List<E> ties = new ArrayList<E>();
+  private List<E> ties = new ArrayList<>();
 
   /**
    * Constructor with comparator.
@@ -78,7 +78,7 @@ public class TiedTopBoundedHeap<E> extends TopBoundedHeap<E> {
   @SuppressWarnings("unchecked")
   @Override
   public Iterator<E> iterator() {
-    return new MergedIterator<E>(ties.iterator(), super.iterator());
+    return new MergedIterator<>(ties.iterator(), super.iterator());
   }
 
   @Override

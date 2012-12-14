@@ -67,7 +67,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
 
   @Override
   public MultipleObjectsBundle loadData() {
-    List<MultipleObjectsBundle> bundles = new ArrayList<MultipleObjectsBundle>(sources.size());
+    List<MultipleObjectsBundle> bundles = new ArrayList<>(sources.size());
     for(DatabaseConnection dbc : sources) {
       bundles.add(dbc.loadData());
     }
@@ -114,7 +114,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       super.configFilters(config);
-      final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class);
+      final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<>(SOURCES_ID, DatabaseConnection.class);
       if(config.grab(sourcesParam)) {
         sources = sourcesParam.instantiateClasses(config);
       }

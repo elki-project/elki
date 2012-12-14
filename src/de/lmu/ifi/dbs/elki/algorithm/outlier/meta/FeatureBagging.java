@@ -136,13 +136,13 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     final int maxdim = dbdim - 1;
     final Random rand = rnd.getRandom();
 
-    ArrayList<OutlierResult> results = new ArrayList<OutlierResult>(num);
+    ArrayList<OutlierResult> results = new ArrayList<>(num);
     {
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("LOF iterations", num, LOG) : null;
       for (int i = 0; i < num; i++) {
         BitSet dimset = randomSubspace(dbdim, mindim, maxdim, rand);
         SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(dimset);
-        LOF<NumberVector<?>, DoubleDistance> lof = new LOF<NumberVector<?>, DoubleDistance>(k, df);
+        LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, df);
 
         // run LOF and collect the result
         OutlierResult result = lof.run(relation);
@@ -219,7 +219,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
       }
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    Relation<Double> scoreres = new MaterializedRelation<Double>("Feature bagging", "fb-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("Feature bagging", "fb-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     return new OutlierResult(meta, scoreres);
   }
 

@@ -100,7 +100,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
 
   @Override
   public void insertAll(DBIDs ids) {
-    List<MkAppEntry<D>> objs = new ArrayList<MkAppEntry<D>>(ids.size());
+    List<MkAppEntry<D>> objs = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);

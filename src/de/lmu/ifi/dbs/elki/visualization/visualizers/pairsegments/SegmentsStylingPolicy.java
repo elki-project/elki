@@ -56,12 +56,12 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   /**
    * Selected segments
    */
-  protected ArrayList<Segment> selectedSegments = new ArrayList<Segment>();
+  protected ArrayList<Segment> selectedSegments = new ArrayList<>();
 
   /**
    * Segments indirectly selected
    */
-  protected TreeMap<Segment, Segment> indirectSelections = new TreeMap<Segment, Segment>();
+  protected TreeMap<Segment, Segment> indirectSelections = new TreeMap<>();
 
   /**
    * Not selected IDs that will be drawn in default colors.
@@ -239,7 +239,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
    */
   protected void deselectSegment(Segment segment) {
     if(segment.isUnpaired()) {
-      ArrayList<Segment> remove = new ArrayList<Segment>();
+      ArrayList<Segment> remove = new ArrayList<>();
       // remove all object segments associated with unpaired segment from
       // selection list
       for(Entry<Segment, Segment> entry : indirectSelections.entrySet()) {

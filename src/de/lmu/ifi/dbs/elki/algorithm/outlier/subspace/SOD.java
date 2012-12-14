@@ -164,7 +164,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
         progress.incrementProcessed(LOG);
       }
       DBIDs knnList = getNearestNeighbors(relation, snnInstance, iter);
-      SODModel<V> model = new SODModel<V>(relation, knnList, alpha, relation.get(iter));
+      SODModel<V> model = new SODModel<>(relation, knnList, alpha, relation.get(iter));
       sod_models.put(iter, model);
       minmax.put(model.getSod());
     }
@@ -172,7 +172,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       progress.ensureCompleted(LOG);
     }
     // combine results.
-    Relation<SODModel<?>> models = new MaterializedRelation<SODModel<?>>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<SODModel<?>>(SODModel.class), sod_models, relation.getDBIDs());
+    Relation<SODModel<?>> models = new MaterializedRelation<>("Subspace Outlier Model", "sod-outlier", new SimpleTypeInformation<SODModel<?>>(SODModel.class), sod_models, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     OutlierResult sodResult = new OutlierResult(meta, new SODProxyScoreResult(models, relation.getDBIDs()));
     // also add the models.
@@ -194,7 +194,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    */
   private DBIDs getNearestNeighbors(Relation<V> relation, SimilarityQuery<V, D> simQ, DBIDRef queryObject) {
     // similarityFunction.getPreprocessor().getParameters();
-    Heap<DoubleDBIDPair> nearestNeighbors = new TiedTopBoundedHeap<DoubleDBIDPair>(knn);
+    Heap<DoubleDBIDPair> nearestNeighbors = new TiedTopBoundedHeap<>(knn);
     for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if (!DBIDUtil.equal(iter, queryObject)) {
         double sim = simQ.similarity(queryObject, iter).doubleValue();
@@ -454,7 +454,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<SimilarityFunction<V, D>> simP = new ObjectParameter<SimilarityFunction<V, D>>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
+      final ObjectParameter<SimilarityFunction<V, D>> simP = new ObjectParameter<>(SIM_ID, SimilarityFunction.class, SharedNearestNeighborSimilarityFunction.class);
       if (config.grab(simP)) {
         similarityFunction = simP.instantiateClass(config);
       }
@@ -474,7 +474,7 @@ public class SOD<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
     @Override
     protected SOD<V, D> makeInstance() {
-      return new SOD<V, D>(knn, alpha, similarityFunction);
+      return new SOD<>(knn, alpha, similarityFunction);
     }
   }
 }

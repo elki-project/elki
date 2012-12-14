@@ -107,7 +107,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
   public Clustering<Model> run(Database database) {
     for (SimpleTypeInformation<?> t : npred.getOutputType()) {
       if (corepred.acceptsType(t)) {
-        return new Instance<Object>(npred.instantiate(database, t), corepred.instantiate(database, t)).run();
+        return new Instance<>(npred.instantiate(database, t), corepred.instantiate(database, t)).run();
       }
     }
     throw new AbortException("No compatible types found.");
@@ -228,7 +228,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       }
 
       // Transform cluster ID mapping into a clustering result:
-      ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<ArrayModifiableDBIDs>(clusterid + 1);
+      ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid + 1);
       // add noise cluster storage
       clusterlists.add(DBIDUtil.newArray(noisesize));
       // add storage containers for clusters
@@ -242,7 +242,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       }
       clusterids.destroy();
 
-      Clustering<Model> result = new Clustering<Model>("GDBSCAN", "gdbscan-clustering");
+      Clustering<Model> result = new Clustering<>("GDBSCAN", "gdbscan-clustering");
       int cid = 0;
       for(ArrayModifiableDBIDs res : clusterlists) {
         boolean isNoise = (cid == 0);
@@ -324,13 +324,13 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     @Override
     protected void makeOptions(Parameterization config) {
       // Neighborhood predicate
-      ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<NeighborPredicate>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
+      ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
       if(config.grab(npredOpt)) {
         npred = npredOpt.instantiateClass(config);
       }
 
       // Core point predicate
-      ObjectParameter<CorePredicate> corepredOpt = new ObjectParameter<CorePredicate>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
+      ObjectParameter<CorePredicate> corepredOpt = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
       if(config.grab(corepredOpt)) {
         corepred = corepredOpt.instantiateClass(config);
       }

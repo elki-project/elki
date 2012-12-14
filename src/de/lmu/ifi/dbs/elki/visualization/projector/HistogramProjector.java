@@ -76,7 +76,7 @@ public class HistogramProjector<V extends NumberVector<?>> extends AbstractHiera
 
   @Override
   public Collection<PlotItem> arrange() {
-    List<PlotItem> layout = new ArrayList<PlotItem>(1 + dmax);
+    List<PlotItem> layout = new ArrayList<>(1 + dmax);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if (tasks.size() > 0){
       final double xoff = (dmax > 1) ? .1 : 0.;

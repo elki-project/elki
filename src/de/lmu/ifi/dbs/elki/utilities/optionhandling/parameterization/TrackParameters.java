@@ -54,18 +54,18 @@ public class TrackParameters implements Parameterization {
   /**
    * Tracking storage
    */
-  List<Pair<Object, Parameter<?>>> options = new ArrayList<Pair<Object, Parameter<?>>>();
+  List<Pair<Object, Parameter<?>>> options = new ArrayList<>();
 
   /**
    * Tree information: parent links
    */
-  Map<Object, Object> parents = new HashMap<Object, Object>();
+  Map<Object, Object> parents = new HashMap<>();
 
   /**
    * Tree information: child links
    */
   // Implementation note: we need the map to support "null" keys!
-  Map<Object, List<Object>> children = new HashMap<Object, List<Object>>();
+  Map<Object, List<Object>> children = new HashMap<>();
 
   /**
    * Current parent for nested parameterization
@@ -149,10 +149,10 @@ public class TrackParameters implements Parameterization {
    * @return Parameters given
    */
   public Collection<Pair<OptionID, Object>> getGivenParameters() {
-    ArrayList<Pair<OptionID, Object>> ret = new ArrayList<Pair<OptionID, Object>>();
+    ArrayList<Pair<OptionID, Object>> ret = new ArrayList<>();
     for(Pair<Object, Parameter<?>> pair : options) {
       if(pair.second.isDefined() && pair.second.getGivenValue() != null) {
-        ret.add(new Pair<OptionID, Object>(pair.second.getOptionID(), pair.second.getGivenValue()));
+        ret.add(new Pair<>(pair.second.getOptionID(), pair.second.getGivenValue()));
       }
     }
     return ret;
@@ -180,7 +180,7 @@ public class TrackParameters implements Parameterization {
     parents.put(opt, cur);
     List<Object> c = children.get(cur);
     if(c == null) {
-      c = new ArrayList<Object>();
+      c = new ArrayList<>();
       children.put(cur, c);
     }
     if(!c.contains(opt)) {

@@ -96,13 +96,13 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD, new SimpleTypeInformation<Model>(Model.class), TypeUtil.GUESSED_LABEL);
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD, new SimpleTypeInformation<>(Model.class), TypeUtil.GUESSED_LABEL);
   }
 
   @Override
   public OutlierResult run(Database database) {
     Relation<NumberVector<?>> vecs = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    Relation<Model> models = database.getRelation(new SimpleTypeInformation<Model>(Model.class));
+    Relation<Model> models = database.getRelation(new SimpleTypeInformation<>(Model.class));
     // Prefer a true class label
     try {
       Relation<?> relation = database.getRelation(TypeUtil.CLASSLABEL);
@@ -128,7 +128,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     // Adjustment constant
     final double minscore = expect / (expect + 1);
     
-    HashSet<GeneratorSingleCluster> generators = new HashSet<GeneratorSingleCluster>();
+    HashSet<GeneratorSingleCluster> generators = new HashSet<>();
     for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       Model model = models.get(iditer);
       if(model instanceof GeneratorSingleCluster) {
@@ -172,7 +172,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
       score = (score - minscore) / (1 - minscore);
       scores.putDouble(iditer, score);
     }
-    Relation<Double> scoreres = new MaterializedRelation<Double>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0., 1.);
     return new OutlierResult(meta, scoreres);
   }

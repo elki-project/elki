@@ -81,15 +81,15 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
   @Override
   public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     final int size = ids.size();
-    final List<KNNHeap<D>> heaps = new ArrayList<KNNHeap<D>>(size);
-    List<O> objs = new ArrayList<O>(size);
+    final List<KNNHeap<D>> heaps = new ArrayList<>(size);
+    List<O> objs = new ArrayList<>(size);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       heaps.add(KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k));
       objs.add(relation.get(iter));
     }
     linearScanBatchKNN(objs, heaps);
 
-    List<KNNResult<D>> result = new ArrayList<KNNResult<D>>(heaps.size());
+    List<KNNResult<D>> result = new ArrayList<>(heaps.size());
     for(KNNHeap<D> heap : heaps) {
       result.add(heap.toKNNList());
     }

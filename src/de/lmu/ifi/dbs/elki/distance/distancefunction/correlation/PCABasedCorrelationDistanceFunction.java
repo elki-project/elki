@@ -88,7 +88,7 @@ public class PCABasedCorrelationDistanceFunction extends AbstractIndexBasedDista
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
     FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
-    return new Instance<T>(database, indexinst, delta, this);
+    return new Instance<>(database, indexinst, delta, this);
   }
 
   @Override

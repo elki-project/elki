@@ -86,7 +86,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
     DoubleDataStore dbodscore = computeOutlierScores(database, relation, d);
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Density-Based Outlier Detection", "db-outlier", TypeUtil.DOUBLE, dbodscore, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("Density-Based Outlier Detection", "db-outlier", TypeUtil.DOUBLE, dbodscore, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -132,7 +132,7 @@ public abstract class AbstractDBOutlier<O, D extends Distance<D>> extends Abstra
      */
     protected void configD(Parameterization config, DistanceFunction<?, D> distanceFunction) {
       final D distanceFactory = (distanceFunction != null) ? distanceFunction.getDistanceFactory() : null;
-      final DistanceParameter<D> param = new DistanceParameter<D>(D_ID, distanceFactory);
+      final DistanceParameter<D> param = new DistanceParameter<>(D_ID, distanceFactory);
       if(config.grab(param)) {
         d = param.getValue();
       }

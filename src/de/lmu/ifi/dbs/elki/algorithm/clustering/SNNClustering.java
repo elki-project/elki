@@ -151,7 +151,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("SNNClustering", relation.size(), LOG) : null;
     IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
-    resultList = new ArrayList<ModifiableDBIDs>();
+    resultList = new ArrayList<>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(relation.size());
     if(relation.size() >= minpts) {
@@ -183,7 +183,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       clusprog.setCompleted(LOG);
     }
 
-    Clustering<Model> result = new Clustering<Model>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
+    Clustering<Model> result = new Clustering<>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       result.addCluster(new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER));
     }
@@ -322,7 +322,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       Class<SharedNearestNeighborSimilarityFunction<O>> cls = ClassGenericsUtil.uglyCastIntoSubclass(SharedNearestNeighborSimilarityFunction.class);
       similarityFunction = config.tryInstantiate(cls);
 
-      DistanceParameter<IntegerDistance> epsilonP = new DistanceParameter<IntegerDistance>(EPSILON_ID, IntegerDistance.FACTORY);
+      DistanceParameter<IntegerDistance> epsilonP = new DistanceParameter<>(EPSILON_ID, IntegerDistance.FACTORY);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -336,7 +336,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
     @Override
     protected SNNClustering<O> makeInstance() {
-      return new SNNClustering<O>(similarityFunction, epsilon, minpts);
+      return new SNNClustering<>(similarityFunction, epsilon, minpts);
     }
   }
 }

@@ -133,7 +133,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
       }
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("OutRank-S1", "OUTRANK_S1", TypeUtil.DOUBLE, score, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("OutRank-S1", "OUTRANK_S1", TypeUtil.DOUBLE, score, ids);
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
     OutlierResult res = new OutlierResult(meta, scoreResult);
     res.addChildResult(clustering);
@@ -181,7 +181,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel<?>>> algP = new ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel<?>>>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class);
+      ObjectParameter<SubspaceClusteringAlgorithm<? extends SubspaceModel<?>>> algP = new ObjectParameter<>(ALGORITHM_ID, SubspaceClusteringAlgorithm.class);
       if (config.grab(algP)) {
         algorithm = algP.instantiateClass(config);
       }

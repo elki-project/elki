@@ -94,7 +94,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     initializeRandomAttributes(in);
     initializeOutputType(in);
-    return new VectorFieldTypeInformation<V>(factory, k);
+    return new VectorFieldTypeInformation<>(factory, k);
   }
 
   /**
@@ -168,7 +168,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector<?>>
 
     @Override
     protected NumberVectorRandomFeatureSelectionFilter<DoubleVector> makeInstance() {
-      return new NumberVectorRandomFeatureSelectionFilter<DoubleVector>(k, rnd);
+      return new NumberVectorRandomFeatureSelectionFilter<>(k, rnd);
     }
   }
 }

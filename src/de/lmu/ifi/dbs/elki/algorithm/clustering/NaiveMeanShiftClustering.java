@@ -135,7 +135,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
     final double threshold = bandwidth * 1E-10;
 
     // Result store:
-    ArrayList<Pair<V, ModifiableDBIDs>> clusters = new ArrayList<Pair<V, ModifiableDBIDs>>();
+    ArrayList<Pair<V, ModifiableDBIDs>> clusters = new ArrayList<>();
 
     ModifiableDBIDs noise = DBIDUtil.newArray();
 
@@ -206,14 +206,14 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
       prog.ensureCompleted(LOG);
     }
 
-    ArrayList<Cluster<MeanModel<V>>> cs = new ArrayList<Cluster<MeanModel<V>>>(clusters.size());
+    ArrayList<Cluster<MeanModel<V>>> cs = new ArrayList<>(clusters.size());
     for (Pair<V, ModifiableDBIDs> pair : clusters) {
-      cs.add(new Cluster<MeanModel<V>>(pair.second, new MeanModel<V>(pair.first)));
+      cs.add(new Cluster<>(pair.second, new MeanModel<>(pair.first)));
     }
     if (noise.size() > 0) {
       cs.add(new Cluster<MeanModel<V>>(noise, true));
     }
-    Clustering<MeanModel<V>> c = new Clustering<MeanModel<V>>("Mean-shift Clustering", "mean-shift-clustering", cs);
+    Clustering<MeanModel<V>> c = new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
     return c;
   }
 
@@ -261,11 +261,11 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
+      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
       if (config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
-      DistanceParameter<D> rangeP = new DistanceParameter<D>(RANGE_ID, distanceFunction);
+      DistanceParameter<D> rangeP = new DistanceParameter<>(RANGE_ID, distanceFunction);
       if (config.grab(rangeP)) {
         range = rangeP.getValue();
       }
@@ -273,7 +273,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
 
     @Override
     protected NaiveMeanShiftClustering<V, D> makeInstance() {
-      return new NaiveMeanShiftClustering<V, D>(distanceFunction, kernel, range);
+      return new NaiveMeanShiftClustering<>(distanceFunction, kernel, range);
     }
   }
 }

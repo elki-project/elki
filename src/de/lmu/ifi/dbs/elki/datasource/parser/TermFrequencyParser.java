@@ -24,10 +24,11 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -69,7 +70,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   /**
    * Map.
    */
-  HashMap<String, Integer> keymap;
+  TObjectIntMap<String> keymap;
 
   /**
    * Normalize.
@@ -93,7 +94,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
     super(colSep, quoteChar, labelIndices, factory);
     this.normalize = normalize;
     this.maxdim = 0;
-    this.keymap = new HashMap<String, Integer>();
+    this.keymap = new TObjectIntHashMap<>();
     this.sparsefactory = factory;
   }
 
@@ -154,10 +155,10 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
   @Override
   protected SimpleTypeInformation<V> getTypeInformation(int dimensionality) {
     if (dimensionality > 0) {
-      return new VectorFieldTypeInformation<V>(factory, dimensionality);
+      return new VectorFieldTypeInformation<>(factory, dimensionality);
     }
     if (dimensionality == DIMENSIONALITY_VARIABLE) {
-      return new SimpleTypeInformation<V>(factory.getRestrictionClass(), factory.getDefaultSerializer());
+      return new SimpleTypeInformation<>(factory.getRestrictionClass(), factory.getDefaultSerializer());
     }
     throw new AbortException("No vectors were read from the input file - cannot determine vector data type.");
   }
@@ -196,7 +197,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
     @Override
     protected void getFactory(Parameterization config) {
-      ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<SparseNumberVector.Factory<V, ?>>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
+      ObjectParameter<SparseNumberVector.Factory<V, ?>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, SparseNumberVector.Factory.class, SparseFloatVector.Factory.class);
       if (config.grab(factoryP)) {
         factory = factoryP.instantiateClass(config);
       }
@@ -204,7 +205,7 @@ public class TermFrequencyParser<V extends SparseNumberVector<?>> extends Number
 
     @Override
     protected TermFrequencyParser<V> makeInstance() {
-      return new TermFrequencyParser<V>(normalize, colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
+      return new TermFrequencyParser<>(normalize, colSep, quoteChar, labelIndices, (SparseNumberVector.Factory<V, ?>) factory);
     }
   }
 }

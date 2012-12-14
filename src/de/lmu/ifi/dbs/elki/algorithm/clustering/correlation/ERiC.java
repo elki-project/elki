@@ -186,7 +186,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       stepprog.setCompleted(LOG);
     }
 
-    Clustering<CorrelationModel<V>> result = new Clustering<CorrelationModel<V>>("ERiC clustering", "eric-clustering");
+    Clustering<CorrelationModel<V>> result = new Clustering<>("ERiC clustering", "eric-clustering");
     for(Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.lastKey())) {
       result.addCluster(rc);
     }
@@ -207,7 +207,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    */
   private SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> copacResult, Relation<V> database, int dimensionality) {
     // result
-    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<Integer, List<Cluster<CorrelationModel<V>>>>();
+    SortedMap<Integer, List<Cluster<CorrelationModel<V>>>> clusterMap = new TreeMap<>();
 
     // noise cluster containing all noise objects over all partitions
     Cluster<Model> noise = null;
@@ -228,14 +228,14 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         // get cluster list for this dimension.
         List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(correlationDimension);
         if(correlationClusters == null) {
-          correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
+          correlationClusters = new ArrayList<>();
           clusterMap.put(correlationDimension, correlationClusters);
         }
 
         PCAFilteredResult pcares = pca.processIds(group, database);
 
         V centroid = Centroid.make(database, group).toVector(database);
-        Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[" + correlationDimension + "_" + correlationClusters.size() + "]", group, new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
+        Cluster<CorrelationModel<V>> correlationCluster = new Cluster<>("[" + correlationDimension + "_" + correlationClusters.size() + "]", group, new CorrelationModel<>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
         correlationClusters.add(correlationCluster);
       }
       // partition containing noise
@@ -258,7 +258,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       // get cluster list for this dimension.
       List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dimensionality);
       if(correlationClusters == null) {
-        correlationClusters = new ArrayList<Cluster<CorrelationModel<V>>>();
+        correlationClusters = new ArrayList<>();
         clusterMap.put(dimensionality, correlationClusters);
       }
       ListParameterization parameters = pcaParameters(dimensionality);
@@ -270,7 +270,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       PCAFilteredResult pcares = pca.processIds(noise.getIDs(), database);
 
       V centroid = Centroid.make(database, noise.getIDs()).toVector(database);
-      Cluster<CorrelationModel<V>> correlationCluster = new Cluster<CorrelationModel<V>>("[noise]", noise.getIDs(), new CorrelationModel<V>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
+      Cluster<CorrelationModel<V>> correlationCluster = new Cluster<>("[noise]", noise.getIDs(), new CorrelationModel<>(pcares, centroid), new ArrayList<Cluster<CorrelationModel<V>>>(), new ArrayList<Cluster<CorrelationModel<V>>>());
       correlationClusters.add(correlationCluster);
     }
 
@@ -418,7 +418,7 @@ public class ERiC<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     @Override
     protected ERiC<V> makeInstance() {
-      return new ERiC<V>(copac);
+      return new ERiC<>(copac);
     }
   }
 }

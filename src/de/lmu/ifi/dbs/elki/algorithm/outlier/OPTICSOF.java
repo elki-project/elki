@@ -134,7 +134,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     WritableDataStore<List<Double>> reachDistance = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, List.class);
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      List<Double> core = new ArrayList<Double>();
+      List<Double> core = new ArrayList<>();
       double lrd = 0;
       // TODO: optimize for double distances
       for (DistanceDBIDResultIter<D> neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
@@ -165,7 +165,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       ofminmax.put(of);
     }
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("OPTICS Outlier Scores", "optics-outlier", TypeUtil.DOUBLE, ofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("OPTICS Outlier Scores", "optics-outlier", TypeUtil.DOUBLE, ofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ofminmax.getMin(), ofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -202,7 +202,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
 
     @Override
     protected OPTICSOF<O, D> makeInstance() {
-      return new OPTICSOF<O, D>(distanceFunction, minpts);
+      return new OPTICSOF<>(distanceFunction, minpts);
     }
   }
 }

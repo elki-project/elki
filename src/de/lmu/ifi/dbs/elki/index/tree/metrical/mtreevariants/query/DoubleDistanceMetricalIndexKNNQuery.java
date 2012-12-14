@@ -84,7 +84,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
     DoubleDistanceKNNHeap knnList = new DoubleDistanceKNNHeap(k);
     double d_k = Double.POSITIVE_INFINITY;
 
-    final Heap<DoubleMTreeDistanceSearchCandidate> pq = new Heap<DoubleMTreeDistanceSearchCandidate>();
+    final Heap<DoubleMTreeDistanceSearchCandidate> pq = new Heap<>();
 
     // Push the root node
     pq.add(new DoubleMTreeDistanceSearchCandidate(0, index.getRootID(), null, 0));

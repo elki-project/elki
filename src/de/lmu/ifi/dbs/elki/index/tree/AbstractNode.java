@@ -98,7 +98,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       public IndexTreePath<E> nextElement() {
         synchronized(AbstractNode.this) {
           if(count < numEntries) {
-            return parentPath.pathByAddingChild(new TreeIndexPathComponent<E>(entries[count], count++));
+            return parentPath.pathByAddingChild(new TreeIndexPathComponent<>(entries[count], count++));
           }
         }
         throw new NoSuchElementException();
@@ -284,7 +284,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    */
   @Deprecated
   public final List<E> getEntries() {
-    List<E> result = new ArrayList<E>(numEntries);
+    List<E> result = new ArrayList<>(numEntries);
     for(E entry : entries) {
       if(entry != null) {
         result.add(entry);

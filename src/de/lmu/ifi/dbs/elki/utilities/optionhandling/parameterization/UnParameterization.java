@@ -45,7 +45,7 @@ public class UnParameterization implements Parameterization {
   /**
    * Errors
    */
-  List<ParameterException> errors = new ArrayList<ParameterException>();
+  List<ParameterException> errors = new ArrayList<>();
 
   @Override
   public boolean hasUnusedParameters() {

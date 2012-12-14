@@ -210,7 +210,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
 
     // TODO: what if we don't have any weak eigenvectors?
     if(weakEigenvectors.getColumnDimensionality() == 0) {
-      sol = new CorrelationAnalysisSolution<V>(null, db, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid);
+      sol = new CorrelationAnalysisSolution<>(null, db, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid);
     }
     else {
       Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
@@ -249,7 +249,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
       LinearEquationSystem lq = new LinearEquationSystem(a, b.getArrayRef());
       lq.solveByTotalPivotSearch();
 
-      sol = new CorrelationAnalysisSolution<V>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
+      sol = new CorrelationAnalysisSolution<>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);
 
       if(LOG.isDebuggingFine()) {
         StringBuilder log = new StringBuilder();
@@ -331,7 +331,7 @@ public class DependencyDerivator<V extends NumberVector<?>, D extends Distance<D
       nf.setMaximumFractionDigits(outputAccuracy);
       nf.setMinimumFractionDigits(outputAccuracy);
 
-      return new DependencyDerivator<V, D>(distanceFunction, nf, pca, sampleSize, randomSample);
+      return new DependencyDerivator<>(distanceFunction, nf, pca, sampleSize, randomSample);
     }
   }
 }

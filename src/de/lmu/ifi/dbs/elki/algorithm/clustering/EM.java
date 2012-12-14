@@ -179,13 +179,13 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     if (LOG.isVerbose()) {
       LOG.verbose("initializing " + k + " models");
     }
-    List<Vector> means = new ArrayList<Vector>();
+    List<Vector> means = new ArrayList<>();
     for (NumberVector<?> nv : initializer.chooseInitialMeans(relation, k, EuclideanDistanceFunction.STATIC)) {
       means.add(nv.getColumnVector());
     }
-    List<Matrix> covarianceMatrices = new ArrayList<Matrix>(k);
+    List<Matrix> covarianceMatrices = new ArrayList<>(k);
     double[] normDistrFactor = new double[k];
-    List<Matrix> invCovMatr = new ArrayList<Matrix>(k);
+    List<Matrix> invCovMatr = new ArrayList<>(k);
     double[] clusterWeights = new double[k];
     probClusterIGivenX = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_SORTED, double[].class);
 
@@ -222,7 +222,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       em = emNew;
 
       // recompute models
-      List<Vector> meanSums = new ArrayList<Vector>(k);
+      List<Vector> meanSums = new ArrayList<>(k);
       double[] sumOfClusterProbabilities = new double[k];
 
       for (int i = 0; i < k; i++) {
@@ -279,7 +279,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
     }
 
     // fill result with clusters and models
-    List<ModifiableDBIDs> hardClusters = new ArrayList<ModifiableDBIDs>(k);
+    List<ModifiableDBIDs> hardClusters = new ArrayList<>(k);
     for (int i = 0; i < k; i++) {
       hardClusters.add(DBIDUtil.newHashSet());
     }
@@ -298,13 +298,13 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       hardClusters.get(maxIndex).add(iditer);
     }
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
-    Clustering<EMModel<V>> result = new Clustering<EMModel<V>>("EM Clustering", "em-clustering");
+    Clustering<EMModel<V>> result = new Clustering<>("EM Clustering", "em-clustering");
     // provide models within the result
     for (int i = 0; i < k; i++) {
       // TODO: re-do labeling.
       // SimpleClassLabel label = new SimpleClassLabel();
       // label.init(result.canonicalClusterLabel(i));
-      Cluster<EMModel<V>> model = new Cluster<EMModel<V>>(hardClusters.get(i), new EMModel<V>(factory.newNumberVector(means.get(i).getArrayRef()), covarianceMatrices.get(i)));
+      Cluster<EMModel<V>> model = new Cluster<>(hardClusters.get(i), new EMModel<>(factory.newNumberVector(means.get(i).getArrayRef()), covarianceMatrices.get(i)));
       result.addCluster(model);
     }
     return result;
@@ -412,7 +412,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
         k = kP.getValue();
       }
 
-      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<KMeansInitialization<V>>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
+      ObjectParameter<KMeansInitialization<V>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyGeneratedInitialMeans.class);
       if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -433,7 +433,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
 
     @Override
     protected EM<V> makeInstance() {
-      return new EM<V>(k, delta, initializer, maxiter);
+      return new EM<>(k, delta, initializer, maxiter);
     }
   }
 }

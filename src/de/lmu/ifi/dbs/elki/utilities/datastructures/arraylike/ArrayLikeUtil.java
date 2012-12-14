@@ -42,17 +42,17 @@ public final class ArrayLikeUtil {
   /**
    * Static instance for lists.
    */
-  private static final ListArrayAdapter<Object> LISTADAPTER = new ListArrayAdapter<Object>();
+  private static final ListArrayAdapter<Object> LISTADAPTER = new ListArrayAdapter<>();
 
   /**
    * Static instance for lists of numbers.
    */
-  private static final NumberListArrayAdapter<Number> NUMBERLISTADAPTER = new NumberListArrayAdapter<Number>();
+  private static final NumberListArrayAdapter<Number> NUMBERLISTADAPTER = new NumberListArrayAdapter<>();
 
   /**
    * Static instance.
    */
-  private static final IdentityArrayAdapter<?> IDENTITYADAPTER = new IdentityArrayAdapter<Object>();
+  private static final IdentityArrayAdapter<?> IDENTITYADAPTER = new IdentityArrayAdapter<>();
 
   /**
    * Static instance.

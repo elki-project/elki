@@ -100,7 +100,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
   @Override
   public RdKNNTree<O, D> instantiate(Relation<O> relation) {
     PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
-    RdKNNTree<O, D> index = new RdKNNTree<O, D>(relation, pagefile, k_max, distanceFunction, distanceFunction.instantiate(relation));
+    RdKNNTree<O, D> index = new RdKNNTree<>(relation, pagefile, k_max, distanceFunction, distanceFunction.instantiate(relation));
     index.setBulkStrategy(bulkSplitter);
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);
@@ -140,7 +140,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
         k_max = k_maxP.intValue();
       }
 
-      ObjectParameter<SpatialPrimitiveDistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<SpatialPrimitiveDistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      ObjectParameter<SpatialPrimitiveDistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
