@@ -81,15 +81,15 @@ public class SpacefillingKNNExperiment2 {
     DBIDs ids = rel.getDBIDs();
     Random rnd = new Random(0);
 
-    List<SpatialRef> zs = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> ps = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> hs = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> zs2 = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> ps2 = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> hs2 = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> zs3 = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> ps3 = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> hs3 = new ArrayList<SpatialRef>(ids.size());
+    List<SpatialRef> zs = new ArrayList<>(ids.size());
+    List<SpatialRef> ps = new ArrayList<>(ids.size());
+    List<SpatialRef> hs = new ArrayList<>(ids.size());
+    List<SpatialRef> zs2 = new ArrayList<>(ids.size());
+    List<SpatialRef> ps2 = new ArrayList<>(ids.size());
+    List<SpatialRef> hs2 = new ArrayList<>(ids.size());
+    List<SpatialRef> zs3 = new ArrayList<>(ids.size());
+    List<SpatialRef> ps3 = new ArrayList<>(ids.size());
+    List<SpatialRef> hs3 = new ArrayList<>(ids.size());
     {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?> v = rel.get(id);
@@ -208,20 +208,20 @@ public class SpacefillingKNNExperiment2 {
     DistanceQuery<NumberVector<?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
     KNNQuery<NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
-    ArrayList<MeanVariance[]> mrec = new ArrayList<MeanVariance[]>();
-    ArrayList<MeanVariance[]> mdic = new ArrayList<MeanVariance[]>();
-    ArrayList<MeanVariance[]> merr = new ArrayList<MeanVariance[]>();
+    ArrayList<MeanVariance[]> mrec = new ArrayList<>();
+    ArrayList<MeanVariance[]> mdic = new ArrayList<>();
+    ArrayList<MeanVariance[]> merr = new ArrayList<>();
     for(int i = 0; i < maxoff; i++) {
       mrec.add(MeanVariance.newArray(numcurves));
       mdic.add(MeanVariance.newArray(numcurves));
       merr.add(MeanVariance.newArray(numcurves));
     }
 
-    ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> rec = new ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>>();
+    ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> rec = new ArrayList<>();
     for(int i = 0; i < numcurves; i++) {
       ModifiableDBIDs cand = DBIDUtil.newHashSet(maxoff * 2);
       DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
-      rec.add(new Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>(cand, heap));
+      rec.add(new Pair<>(cand, heap));
     }
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {

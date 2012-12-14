@@ -114,7 +114,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
 
     final int numgen = curvegen.size();
     final int numcurves = numgen * variants;
-    List<List<SpatialRef>> curves = new ArrayList<List<SpatialRef>>(numcurves);
+    List<List<SpatialRef>> curves = new ArrayList<>(numcurves);
     for(int i = 0; i < numcurves; i++) {
       curves.add(new ArrayList<SpatialRef>(size));
     }
@@ -348,7 +348,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
 
     @Override
     public SpacefillingMaterializeKNNPreprocessor<V, D> instantiate(Relation<V> relation) {
-      return new SpacefillingMaterializeKNNPreprocessor<V, D>(relation, distanceFunction, k, curvegen, window, variants);
+      return new SpacefillingMaterializeKNNPreprocessor<>(relation, distanceFunction, k, curvegen, window, variants);
     }
 
     @Override
@@ -400,7 +400,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<SpatialSorter>(CURVES_ID, SpatialSorter.class);
+        ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
         if(config.grab(curveP)) {
           curvegen = curveP.instantiateClasses(config);
         }
@@ -418,7 +418,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
 
       @Override
       protected Factory<V, D> makeInstance() {
-        return new Factory<V, D>(k, distanceFunction, curvegen, window, variants);
+        return new Factory<>(k, distanceFunction, curvegen, window, variants);
       }
     }
   }

@@ -73,9 +73,9 @@ public class SpacefillingKNNExperiment {
     Relation<NumberVector<?>> rel = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     DBIDs ids = rel.getDBIDs();
 
-    List<SpatialRef> zs = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> ps = new ArrayList<SpatialRef>(ids.size());
-    List<SpatialRef> hs = new ArrayList<SpatialRef>(ids.size());
+    List<SpatialRef> zs = new ArrayList<>(ids.size());
+    List<SpatialRef> ps = new ArrayList<>(ids.size());
+    List<SpatialRef> hs = new ArrayList<>(ids.size());
     {
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         final NumberVector<?> v = rel.get(id);
@@ -124,7 +124,7 @@ public class SpacefillingKNNExperiment {
     DistanceQuery<NumberVector<?>, DoubleDistance> distq = database.getDistanceQuery(rel, distanceFunction);
     KNNQuery<NumberVector<?>, DoubleDistance> knnq = database.getKNNQuery(distq, k);
 
-    ArrayList<MeanVariance[]> mvs = new ArrayList<MeanVariance[]>();
+    ArrayList<MeanVariance[]> mvs = new ArrayList<>();
     for(int i = 0; i < maxoff; i++) {
       mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance(), new MeanVariance() });
     }

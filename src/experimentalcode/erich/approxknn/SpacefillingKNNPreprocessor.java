@@ -145,7 +145,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
     final int numgen = curvegen.size();
     final int numcurves = numgen * variants;
-    curves = new ArrayList<List<SpatialRef>>(numcurves);
+    curves = new ArrayList<>(numcurves);
     for(int i = 0; i < numcurves; i++) {
       curves.add(new ArrayList<SpatialRef>(size));
     }
@@ -236,7 +236,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
         return null;
       }
     }
-    return new SpaceFillingKNNQuery<D>(distanceQuery);
+    return new SpaceFillingKNNQuery<>(distanceQuery);
   }
 
   /**
@@ -377,7 +377,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
     @Override
     public SpacefillingKNNPreprocessor<V> instantiate(Relation<V> relation) {
-      return new SpacefillingKNNPreprocessor<V>(relation, curvegen, window, variants);
+      return new SpacefillingKNNPreprocessor<>(relation, curvegen, window, variants);
     }
 
     @Override
@@ -426,7 +426,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<SpatialSorter>(CURVES_ID, SpatialSorter.class);
+        ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
         if(config.grab(curveP)) {
           curvegen = curveP.instantiateClasses(config);
         }
