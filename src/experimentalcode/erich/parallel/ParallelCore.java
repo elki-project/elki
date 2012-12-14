@@ -57,11 +57,16 @@ public class ParallelCore {
   private AtomicInteger connected = new AtomicInteger(0);
 
   /**
+   * Maximum number of processors to use.
+   */
+  private int processors;
+
+  /**
    * Constructor.
    */
   protected ParallelCore(int processors) {
     super();
-    executor = new ThreadPoolExecutor(0, processors, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+    this.processors = processors;
   }
 
   /**
@@ -97,6 +102,14 @@ public class ParallelCore {
    * Connect to the executor.
    */
   public void connect() {
+    if (executor == null) {
+      synchronized (this) {
+        if (executor == null) {
+          executor = new ThreadPoolExecutor(0, processors, 10, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+          executor.allowCoreThreadTimeOut(true);
+        }
+      }
+    }
     int c = this.connected.incrementAndGet();
     if (c == 1) {
       executor.allowCoreThreadTimeOut(false);

@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * A preprocessor for annotation of the k nearest neighbors (and their
  * distances) to each database object.
  * 
- * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF}.
+ * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
  * 
  * @author Erich Schubert
  * 

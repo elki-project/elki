@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The Spatial Outlier Factor (SOF) is a spatial
- * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.LOF LOF} variation.
+ * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF LOF} variation.
  * 
  * Since the "reachability distance" of LOF cannot be used canonically in the
  * bichromatic case, this part of LOF is dropped and the exact distance is used
