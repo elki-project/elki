@@ -161,7 +161,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
   @Override
   protected MkTabTreeNode<O, D> createNewLeafNode() {
-    return new MkTabTreeNode<O, D>(leafCapacity, true);
+    return new MkTabTreeNode<>(leafCapacity, true);
   }
 
   /**
@@ -171,7 +171,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkTabTreeNode<O, D> createNewDirectoryNode() {
-    return new MkTabTreeNode<O, D>(dirCapacity, false);
+    return new MkTabTreeNode<>(dirCapacity, false);
   }
 
   /**
@@ -184,7 +184,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkTabDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceQuery()));
+    return new MkTabDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceQuery()));
   }
 
   /**
@@ -194,7 +194,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkTabEntry<D> createRootEntry() {
-    return new MkTabDirectoryEntry<D>(null, null, 0, null, initKnnDistanceList());
+    return new MkTabDirectoryEntry<>(null, null, 0, null, initKnnDistanceList());
   }
 
   /**

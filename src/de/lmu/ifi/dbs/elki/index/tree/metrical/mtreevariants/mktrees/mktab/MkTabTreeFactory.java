@@ -58,7 +58,7 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   @Override
   public MkTabTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkTabTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkTabTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
+    return new MkTabTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
   }
 
   protected Class<MkTabTreeNode<O, D>> getNodeClass() {
@@ -75,7 +75,7 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D> {
     @Override
     protected MkTabTreeFactory<O, D> makeInstance() {
-      return new MkTabTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction, k_max);
+      return new MkTabTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, k_max);
     }
   }
 }

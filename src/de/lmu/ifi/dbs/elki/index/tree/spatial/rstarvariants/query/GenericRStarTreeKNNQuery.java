@@ -107,7 +107,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<>(Math.min(knnList.getK() << 1, 20));
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
+    pq.add(new GenericDistanceSearchCandidate<>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
     D maxDist = distanceFunction.getDistanceFactory().infiniteDistance();
 
     // search in tree
@@ -147,7 +147,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
         }
         else {
           if(distance.compareTo(maxDist) <= 0) {
-            pq.add(new GenericDistanceSearchCandidate<D>(distance, ((DirectoryEntry) entry).getPageID()));
+            pq.add(new GenericDistanceSearchCandidate<>(distance, ((DirectoryEntry) entry).getPageID()));
           }
         }
       }
@@ -220,7 +220,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
         D minDist = distanceFunction.minDist(entry, relation.get(iter));
         minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
-      result.add(new DistanceEntry<D, SpatialEntry>(entry, minMinDist, i));
+      result.add(new DistanceEntry<>(entry, minMinDist, i));
     }
 
     Collections.sort(result);

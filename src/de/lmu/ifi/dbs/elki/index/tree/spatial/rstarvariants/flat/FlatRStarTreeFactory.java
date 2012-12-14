@@ -86,7 +86,7 @@ public class FlatRStarTreeFactory<O extends NumberVector<?>> extends AbstractRSt
   public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected FlatRStarTreeFactory<O> makeInstance() {
-      return new FlatRStarTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+      return new FlatRStarTreeFactory<>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

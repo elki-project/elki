@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.set.TIntSet;
+
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.KNNJoin;
@@ -332,7 +333,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
       }
     }
     else {
-      Set<Integer> expanded = index.getExpanded(entry2);
+      TIntSet expanded = index.getExpanded(entry2);
       for(int i = 0; i < parentNode.getNumEntries(); i++) {
         SpatialDirectoryEntry entry1 = (SpatialDirectoryEntry) parentNode.getEntry(i);
 

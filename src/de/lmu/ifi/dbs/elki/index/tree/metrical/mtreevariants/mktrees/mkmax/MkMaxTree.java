@@ -331,7 +331,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxTreeNode<O, D> createNewLeafNode() {
-    return new MkMaxTreeNode<O, D>(leafCapacity, true);
+    return new MkMaxTreeNode<>(leafCapacity, true);
   }
 
   /**
@@ -339,7 +339,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxTreeNode<O, D> createNewDirectoryNode() {
-    return new MkMaxTreeNode<O, D>(dirCapacity, false);
+    return new MkMaxTreeNode<>(dirCapacity, false);
   }
 
   /**
@@ -347,7 +347,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxEntry<D> createNewDirectoryEntry(MkMaxTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkMaxDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistance(getDistanceQuery()));
+    return new MkMaxDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistance(getDistanceQuery()));
   }
 
   /**
@@ -356,7 +356,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxEntry<D> createRootEntry() {
-    return new MkMaxDirectoryEntry<D>(null, null, 0, null, null);
+    return new MkMaxDirectoryEntry<>(null, null, 0, null, null);
   }
 
   @Override

@@ -90,7 +90,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    *        the parent node
    */
   protected MkAppEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MkAppLeafEntry<D>(id, parentDistance, null);
+    return new MkAppLeafEntry<>(id, parentDistance, null);
   }
 
   @Override
@@ -201,7 +201,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
     }
     AbstractMkTree<O, S, ?, ?> idx = (AbstractMkTree<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<O, S>(idx, dq);
+    return new MkTreeRKNNQuery<>(idx, dq);
   }
 
   @Override

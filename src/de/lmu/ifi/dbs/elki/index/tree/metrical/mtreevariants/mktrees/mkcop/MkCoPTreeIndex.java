@@ -200,7 +200,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
     }
     AbstractMkTree<O, S, ?, ?> idx = (AbstractMkTree<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<O, S>(idx, dq);
+    return new MkTreeRKNNQuery<>(idx, dq);
   }
 
   @Override

@@ -69,10 +69,10 @@ public final class RStarTreeUtil {
     if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) DistanceQuery.class.cast(distanceQuery);
       SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<O>(tree, dqc, dfc);
+      RangeQuery<O, ?> q = new DoubleDistanceRStarTreeRangeQuery<>(tree, dqc, dfc);
       return (RangeQuery<O, D>) q;
     }
-    return new GenericRStarTreeRangeQuery<O, D>(tree, distanceQuery);
+    return new GenericRStarTreeRangeQuery<>(tree, distanceQuery);
   }
 
   /**
@@ -94,9 +94,9 @@ public final class RStarTreeUtil {
     if(df instanceof SpatialPrimitiveDoubleDistanceFunction) {
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) DistanceQuery.class.cast(distanceQuery);
       SpatialPrimitiveDoubleDistanceFunction<? super O> dfc = (SpatialPrimitiveDoubleDistanceFunction<? super O>) SpatialPrimitiveDoubleDistanceFunction.class.cast(df);
-      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<O>(tree, dqc, dfc);
+      KNNQuery<O, ?> q = new DoubleDistanceRStarTreeKNNQuery<>(tree, dqc, dfc);
       return (KNNQuery<O, D>) q;
     }
-    return new GenericRStarTreeKNNQuery<O, D>(tree, distanceQuery);
+    return new GenericRStarTreeKNNQuery<>(tree, distanceQuery);
   }
 }

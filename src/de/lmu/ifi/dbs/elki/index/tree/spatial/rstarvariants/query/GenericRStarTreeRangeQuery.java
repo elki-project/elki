@@ -91,7 +91,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
     final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<>();
 
     // push root
-    pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
+    pq.add(new GenericDistanceSearchCandidate<>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -112,7 +112,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
           }
           else {
             DirectoryEntry entry = (DirectoryEntry) node.getEntry(i);
-            pq.add(new GenericDistanceSearchCandidate<D>(distance, entry.getEntryID()));
+            pq.add(new GenericDistanceSearchCandidate<>(distance, entry.getEntryID()));
           }
         }
       }

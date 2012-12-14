@@ -131,7 +131,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    */
   @Override
   protected MTreeEntry<D> createNewDirectoryEntry(MTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MTreeDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
+    return new MTreeDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
   }
 
   /**
@@ -140,7 +140,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    */
   @Override
   protected MTreeEntry<D> createRootEntry() {
-    return new MTreeDirectoryEntry<D>(null, null, 0, null);
+    return new MTreeDirectoryEntry<>(null, null, 0, null);
   }
 
   /**
@@ -148,7 +148,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    */
   @Override
   protected MTreeNode<O, D> createNewLeafNode() {
-    return new MTreeNode<O, D>(leafCapacity, true);
+    return new MTreeNode<>(leafCapacity, true);
   }
 
   /**
@@ -156,7 +156,7 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    */
   @Override
   protected MTreeNode<O, D> createNewDirectoryNode() {
-    return new MTreeNode<O, D>(dirCapacity, false);
+    return new MTreeNode<>(dirCapacity, false);
   }
 
   @Override

@@ -201,7 +201,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     if(node.isLeaf()) {
       for(int i = 0; i < node.getNumEntries(); i++) {
         if(DBIDUtil.equal(((LeafEntry) node.getEntry(i)).getDBID(), id)) {
-          return subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
+          return subtree.pathByAddingChild(new TreeIndexPathComponent<>(node.getEntry(i), i));
         }
       }
     }
@@ -209,7 +209,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     else {
       for(int i = 0; i < node.getNumEntries(); i++) {
         if(SpatialUtil.intersects(node.getEntry(i), mbr)) {
-          IndexTreePath<E> childSubtree = subtree.pathByAddingChild(new TreeIndexPathComponent<E>(node.getEntry(i), i));
+          IndexTreePath<E> childSubtree = subtree.pathByAddingChild(new TreeIndexPathComponent<>(node.getEntry(i), i));
           IndexTreePath<E> path = findPathToObject(childSubtree, mbr, id);
           if(path != null) {
             return path;
@@ -552,7 +552,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       getLogger().debugFine(msg);
     }
 
-    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+    return new IndexTreePath<>(new TreeIndexPathComponent<>(getRootEntry(), null));
   }
 
   /**
@@ -592,7 +592,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         }
       }
     }
-    return (containingEntry == null ? null : new TreeIndexPathComponent<E>(containingEntry, index));
+    return (containingEntry == null ? null : new TreeIndexPathComponent<>(containingEntry, index));
   }
 
   /**

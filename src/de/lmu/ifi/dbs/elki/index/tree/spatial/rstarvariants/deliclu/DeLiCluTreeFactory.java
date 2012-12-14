@@ -85,7 +85,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<?>> extends AbstractRStar
   public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected DeLiCluTreeFactory<O> makeInstance() {
-      return new DeLiCluTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+      return new DeLiCluTreeFactory<>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

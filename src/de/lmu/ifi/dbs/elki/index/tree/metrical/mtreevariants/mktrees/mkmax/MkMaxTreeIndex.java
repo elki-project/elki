@@ -85,7 +85,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
     KNNResult<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
     D knnDistance = knns.getKNNDistance();
-    return new MkMaxLeafEntry<D>(id, parentDistance, knnDistance);
+    return new MkMaxLeafEntry<>(id, parentDistance, knnDistance);
   }
 
   @Override
@@ -196,7 +196,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
     }
     AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<O, S>(idx, dq);
+    return new MkTreeRKNNQuery<>(idx, dq);
   }
 
   @Override
