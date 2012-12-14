@@ -126,7 +126,7 @@ public class CheckELKIServices {
       cls = Class.forName(prop);
     }
     catch(ClassNotFoundException e) {
-      LOG.warning("Property is not a class name: " + prop);
+      LOG.warning("Service file name is not a class name: " + prop);
       return;
     }
     List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false);
