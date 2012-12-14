@@ -57,10 +57,10 @@ public final class MTreeQueryUtil {
       PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
       AbstractMTree<O, DoubleDistance, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?>) tree;
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
-      KNNQuery<O, ?> q = new DoubleDistanceMetricalIndexKNNQuery<O>(treec, dqc, dfc);
+      KNNQuery<O, ?> q = new DoubleDistanceMetricalIndexKNNQuery<>(treec, dqc, dfc);
       return (KNNQuery<O, D>) q;
     }
-    return new MetricalIndexKNNQuery<O, D>(tree, distanceQuery);
+    return new MetricalIndexKNNQuery<>(tree, distanceQuery);
   }
 
   /**
@@ -82,9 +82,9 @@ public final class MTreeQueryUtil {
       PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
       AbstractMTree<O, DoubleDistance, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?>) tree;
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
-      RangeQuery<O, ?> q = new DoubleDistanceMetricalIndexRangeQuery<O>(treec, dqc, dfc);
+      RangeQuery<O, ?> q = new DoubleDistanceMetricalIndexRangeQuery<>(treec, dqc, dfc);
       return (RangeQuery<O, D>) q;
     }
-    return new MetricalIndexRangeQuery<O, D>(tree, distanceQuery);
+    return new MetricalIndexRangeQuery<>(tree, distanceQuery);
   }
 }

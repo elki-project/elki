@@ -95,7 +95,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    *        the parent node
    */
   protected MkTabEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MkTabLeafEntry<D>(id, parentDistance, knnDistances(object));
+    return new MkTabLeafEntry<>(id, parentDistance, knnDistances(object));
   }
 
   /**
@@ -217,7 +217,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
     }
     AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<O, S>(idx, dq);
+    return new MkTreeRKNNQuery<>(idx, dq);
   }
 
   @Override

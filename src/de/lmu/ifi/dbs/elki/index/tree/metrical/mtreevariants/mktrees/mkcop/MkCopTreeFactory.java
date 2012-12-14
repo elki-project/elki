@@ -73,7 +73,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
   @Override
   public MkCoPTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkCoPTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkCoPTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
+    return new MkCoPTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
   }
 
   protected Class<MkCoPTreeNode<O, D>> getNodeClass() {
@@ -102,7 +102,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
 
     @Override
     protected MkCopTreeFactory<O, D> makeInstance() {
-      return new MkCopTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction, k_max);
+      return new MkCopTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, k_max);
     }
   }
 }

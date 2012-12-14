@@ -58,7 +58,7 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
   @Override
   public MTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction);
+    return new MTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction);
   }
 
   protected Class<MTreeNode<O, D>> getNodeClass() {
@@ -75,7 +75,7 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
     @Override
     protected MTreeFactory<O, D> makeInstance() {
-      return new MTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction);
+      return new MTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction);
     }
   }
 }

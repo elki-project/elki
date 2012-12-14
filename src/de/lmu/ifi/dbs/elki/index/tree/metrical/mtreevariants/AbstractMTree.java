@@ -268,7 +268,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
       if (distance.compareTo(entry.getCoveringRadius()) <= 0) {
         if (enlarge != null || distance.compareTo(bestCandidate.getDistance()) < 0) {
-          bestCandidate = new DistanceEntry<D, E>(entry, distance, i);
+          bestCandidate = new DistanceEntry<>(entry, distance, i);
           enlarge = null;
         }
       } else if (enlarge != null) {
@@ -285,7 +285,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       bestCandidate.getEntry().setCoveringRadius(enlarge);
     }
 
-    return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<E>(bestCandidate.getEntry(), bestCandidate.getIndex())));
+    return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<>(bestCandidate.getEntry(), bestCandidate.getIndex())));
   }
 
   /**
@@ -305,7 +305,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       D radius = entry.getCoveringRadius();
       D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
 
-      result.add(new DistanceEntry<D, E>(entry, minDist, i));
+      result.add(new DistanceEntry<>(entry, minDist, i));
     }
 
     Collections.sort(result);
@@ -333,7 +333,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
         minMinDist = DistanceUtil.min(minMinDist, minDist);
       }
-      result.add(new DistanceEntry<D, E>(entry, minMinDist, i));
+      result.add(new DistanceEntry<>(entry, minMinDist, i));
     }
 
     Collections.sort(result);
@@ -536,7 +536,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       getLogger().debugFine(msg);
     }
 
-    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(getRootEntry(), null));
+    return new IndexTreePath<>(new TreeIndexPathComponent<>(getRootEntry(), null));
   }
 
   /**

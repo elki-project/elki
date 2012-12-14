@@ -132,7 +132,7 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     k_max = in.readInt();
-    knnDistances = new ArrayList<D>();
+    knnDistances = new ArrayList<>();
     for(int i = 0; i < k_max; i++) {
       knnDistances.add((D) in.readObject());
     }

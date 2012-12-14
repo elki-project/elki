@@ -81,8 +81,8 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
       D d1 = distanceFunction.distance(routingObject1, id);
       D d2 = distanceFunction.distance(routingObject2, id);
 
-      list1.add(new DistanceEntry<D, E>(node.getEntry(i), d1, i));
-      list2.add(new DistanceEntry<D, E>(node.getEntry(i), d2, i));
+      list1.add(new DistanceEntry<>(node.getEntry(i), d1, i));
+      list2.add(new DistanceEntry<>(node.getEntry(i), d2, i));
     }
     Collections.sort(list1);
     Collections.sort(list2);
@@ -95,7 +95,7 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
         currentCR2 = assignNN(assigned2, assigned1, list2, currentCR2, node.isLeaf());
       }
     }
-    return new Assignments<D, E>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
+    return new Assignments<>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
   }
 
   /**

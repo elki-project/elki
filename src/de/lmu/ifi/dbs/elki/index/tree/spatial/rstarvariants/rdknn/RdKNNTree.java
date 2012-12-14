@@ -352,7 +352,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
       @SuppressWarnings("unchecked")
       RdKNNEntry<D> entry = (RdKNNEntry<D>) node.getEntry(i);
       D minDist = distanceFunction.minDist(entry, q);
-      result.add(new DistanceEntry<D, RdKNNEntry<D>>(entry, minDist, i));
+      result.add(new DistanceEntry<>(entry, minDist, i));
     }
 
     Collections.sort(result);
@@ -528,7 +528,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   protected RdKNNNode<D> createNewLeafNode() {
-    return new RdKNNNode<D>(leafCapacity, true);
+    return new RdKNNNode<>(leafCapacity, true);
   }
 
   /**
@@ -538,7 +538,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   protected RdKNNNode<D> createNewDirectoryNode() {
-    return new RdKNNNode<D>(dirCapacity, false);
+    return new RdKNNNode<>(dirCapacity, false);
   }
 
   /**
@@ -548,7 +548,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   protected RdKNNEntry<D> createNewDirectoryEntry(RdKNNNode<D> node) {
-    return new RdKNNDirectoryEntry<D>(node.getPageID(), node.computeMBR(), node.kNNDistance());
+    return new RdKNNDirectoryEntry<>(node.getPageID(), node.computeMBR(), node.kNNDistance());
   }
 
   /**
@@ -558,7 +558,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   protected RdKNNEntry<D> createRootEntry() {
-    return new RdKNNDirectoryEntry<D>(0, null, null);
+    return new RdKNNDirectoryEntry<>(0, null, null);
   }
 
   /**
@@ -578,7 +578,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   }
 
   protected RdKNNLeafEntry<D> createNewLeafEntry(DBID id) {
-    return new RdKNNLeafEntry<D>(id, relation.get(id), null);
+    return new RdKNNLeafEntry<>(id, relation.get(id), null);
   }
 
   /**

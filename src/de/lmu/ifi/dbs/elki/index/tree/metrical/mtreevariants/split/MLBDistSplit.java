@@ -95,8 +95,8 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
       D d1 = distanceFunction.distance(firstPromoted, id);
       D d2 = distanceFunction.distance(secondPromoted, id);
 
-      list1.add(new DistanceEntry<D, E>(node.getEntry(i), d1, i));
-      list2.add(new DistanceEntry<D, E>(node.getEntry(i), d2, i));
+      list1.add(new DistanceEntry<>(node.getEntry(i), d1, i));
+      list2.add(new DistanceEntry<>(node.getEntry(i), d2, i));
     }
     Collections.sort(list1);
     Collections.sort(list2);

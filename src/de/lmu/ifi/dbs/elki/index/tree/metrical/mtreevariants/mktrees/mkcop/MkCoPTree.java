@@ -275,7 +275,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null, null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceQuery().nullDistance(), getRootID(), null, null));
 
     // search in tree
     while(!pq.isEmpty()) {
@@ -293,7 +293,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());
 
           if(minDist.compareTo(approximatedKnnDist_cons) <= 0) {
-            pq.add(new GenericMTreeDistanceSearchCandidate<D>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
+            pq.add(new GenericMTreeDistanceSearchCandidate<>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
           }
         }
       }
@@ -737,7 +737,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   protected MkCoPTreeNode<O, D> createNewLeafNode() {
-    return new MkCoPTreeNode<O, D>(leafCapacity, true);
+    return new MkCoPTreeNode<>(leafCapacity, true);
   }
 
   /**
@@ -747,7 +747,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   protected MkCoPTreeNode<O, D> createNewDirectoryNode() {
-    return new MkCoPTreeNode<O, D>(dirCapacity, false);
+    return new MkCoPTreeNode<>(dirCapacity, false);
   }
 
   /**
@@ -760,7 +760,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   protected MkCoPEntry<D> createNewDirectoryEntry(MkCoPTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkCoPDirectoryEntry<D>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
+    return new MkCoPDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
     // node.conservativeKnnDistanceApproximation(k_max));
   }
 
@@ -771,7 +771,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   protected MkCoPEntry<D> createRootEntry() {
-    return new MkCoPDirectoryEntry<D>(null, null, 0, null, null);
+    return new MkCoPDirectoryEntry<>(null, null, 0, null, null);
   }
 
   @Override

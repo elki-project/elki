@@ -85,7 +85,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
     this.firstCoveringRadius = firstCoveringRadius;
     this.secondCoveringRadius = secondCoveringRadius;
     this.firstAssignments = new ArrayList<>(firstAssignments);
-    this.secondAssignments = new ArrayList<E>(secondAssignments);
+    this.secondAssignments = new ArrayList<>(secondAssignments);
   }
 
   /**

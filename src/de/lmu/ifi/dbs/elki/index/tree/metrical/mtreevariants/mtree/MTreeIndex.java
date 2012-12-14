@@ -79,7 +79,7 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
    * @return a new MTreeLeafEntry representing the specified data object
    */
   protected MTreeEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MTreeLeafEntry<D>(id, parentDistance);
+    return new MTreeLeafEntry<>(id, parentDistance);
   }
 
   @Override

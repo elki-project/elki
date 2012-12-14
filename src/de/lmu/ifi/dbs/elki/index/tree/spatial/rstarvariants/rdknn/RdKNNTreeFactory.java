@@ -148,7 +148,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
 
     @Override
     protected RdKNNTreeFactory<O, D> makeInstance() {
-      return new RdKNNTreeFactory<O, D>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment, minimumFill);
+      return new RdKNNTreeFactory<>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

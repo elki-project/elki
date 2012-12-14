@@ -58,7 +58,7 @@ public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   @Override
   public MkMaxTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkMaxTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkMaxTreeIndex<O, D>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
+    return new MkMaxTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
   }
 
   protected Class<MkMaxTreeNode<O, D>> getNodeClass() {
@@ -75,7 +75,7 @@ public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D> {
     @Override
     protected MkMaxTreeFactory<O, D> makeInstance() {
-      return new MkMaxTreeFactory<O, D>(fileName, pageSize, cacheSize, distanceFunction, k_max);
+      return new MkMaxTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, k_max);
     }
   }
 }

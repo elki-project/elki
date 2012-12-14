@@ -83,7 +83,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<D>(nullDistance, index.getRootID(), null, nullDistance));
+    pq.add(new GenericMTreeDistanceSearchCandidate<>(nullDistance, index.getRootID(), null, nullDistance));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -113,7 +113,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
             D d3 = distanceQuery.distance(o_r, q);
             D d_min = DistanceUtil.max(d3.minus(r_or), index.getDistanceFactory().nullDistance());
             if (d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericMTreeDistanceSearchCandidate<D>(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
+              pq.add(new GenericMTreeDistanceSearchCandidate<>(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
             }
           }
         }
