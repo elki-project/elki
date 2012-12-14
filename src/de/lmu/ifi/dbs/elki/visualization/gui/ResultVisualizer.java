@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.uses ResultWindow oneway
  */
+@Alias({ "visualizer", "vis", "ResultVisualizer" })
 public class ResultVisualizer implements ResultHandler {
   /**
    * Get a logger for this class.
@@ -73,7 +75,7 @@ public class ResultVisualizer implements ResultHandler {
    * </p>
    */
   public static final OptionID SINGLE_ID = new OptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
-  
+
   /**
    * Stores the set title.
    */
@@ -113,11 +115,11 @@ public class ResultVisualizer implements ResultHandler {
     // FIXME: not really re-entrant to generate new contexts...
     final VisualizerContext context = manager.newContext(top);
 
-    if(title == null) {
+    if (title == null) {
       title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(top), result);
     }
 
-    if(title == null) {
+    if (title == null) {
       title = DEFAULT_TITLE;
     }
 
@@ -130,8 +132,7 @@ public class ResultVisualizer implements ResultHandler {
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
           window.showOverview();
-        }
-        catch(Throwable e) {
+        } catch (Throwable e) {
           LOG.exception("Error in starting visualizer window.", e);
         }
       }
@@ -155,7 +156,7 @@ public class ResultVisualizer implements ResultHandler {
      * Visualization manager.
      */
     VisualizerParameterizer manager;
-    
+
     /**
      * Single view mode.
      */
@@ -166,7 +167,7 @@ public class ResultVisualizer implements ResultHandler {
       super.makeOptions(config);
       StringParameter titleP = new StringParameter(WINDOW_TITLE_ID);
       titleP.setOptional(true);
-      if(config.grab(titleP)) {
+      if (config.grab(titleP)) {
         title = titleP.getValue();
       }
       Flag singleF = new Flag(SINGLE_ID);

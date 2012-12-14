@@ -1,0 +1,5 @@
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
