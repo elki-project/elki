@@ -202,7 +202,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
     else {
       meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
     }
-    Relation<Double> scoresult = new MaterializedRelation<Double>("External Outlier", "external-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoresult = new MaterializedRelation<>("External Outlier", "external-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierResult or = new OutlierResult(meta, scoresult);
 
     // Apply scaling
@@ -327,7 +327,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
         inverted = inverstedF.getValue();
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

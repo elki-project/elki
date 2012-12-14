@@ -113,7 +113,7 @@ public class ERiCDistanceFunction extends AbstractIndexBasedDistanceFunction<Num
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
     FilteredLocalPCAIndex<T> indexinst = (FilteredLocalPCAIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
-    return new Instance<T>(database, indexinst, this, delta, tau);
+    return new Instance<>(database, indexinst, this, delta, tau);
   }
 
   /**

@@ -50,7 +50,7 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
    */
   public GenericDistanceDBIDList() {
     super();
-    storage = new ArrayList<DistanceDBIDPair<D>>();
+    storage = new ArrayList<>();
   }
 
   /**
@@ -60,7 +60,7 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
    */
   public GenericDistanceDBIDList(int initialCapacity) {
     super();
-    storage = new ArrayList<DistanceDBIDPair<D>>(initialCapacity);
+    storage = new ArrayList<>(initialCapacity);
   }
 
   @Override

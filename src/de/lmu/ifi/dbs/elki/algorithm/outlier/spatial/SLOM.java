@@ -187,7 +187,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
       slomminmax.put(slom);
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("SLOM", "slom-outlier", TypeUtil.DOUBLE, sloms, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("SLOM", "slom-outlier", TypeUtil.DOUBLE, sloms, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(slomminmax.getMin(), slomminmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     or.addChildResult(npred);
@@ -218,7 +218,7 @@ public class SLOM<N, O, D extends NumberDistance<D, ?>> extends AbstractDistance
   public static class Parameterizer<N, O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedSpatialOutlier.Parameterizer<N, O, D> {
     @Override
     protected SLOM<N, O, D> makeInstance() {
-      return new SLOM<N, O, D>(npredf, distanceFunction);
+      return new SLOM<>(npredf, distanceFunction);
     }
   }
 }

@@ -89,9 +89,9 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 1;
 
-    List<PolygonsObject> polys = new ArrayList<PolygonsObject>();
+    List<PolygonsObject> polys = new ArrayList<>();
     List<LabelList> labels = null;
-    List<ExternalID> eids = new ArrayList<ExternalID>();
+    List<ExternalID> eids = new ArrayList<>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
@@ -99,7 +99,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
           polys.add((PolygonsObject) objs[0]);
           if(objs[1] != null) {
             if(labels == null) {
-              labels = new ArrayList<LabelList>();
+              labels = new ArrayList<>();
               for(int i = 0; i < polys.size() - 1; i++) {
                 labels.add(null);
               }
@@ -135,9 +135,9 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
 
     ExternalID eid = null;
     LabelList labels = null;
-    List<Polygon> polys = new ArrayList<Polygon>(1);
+    List<Polygon> polys = new ArrayList<>(1);
 
-    List<Vector> coords = new ArrayList<Vector>();
+    List<Vector> coords = new ArrayList<>();
     while(iter.hasNext()) {
       String cur = iter.next();
       Matcher m = COORD.matcher(cur);
@@ -162,7 +162,7 @@ public class SimplePolygonParser extends AbstractParser implements Parser {
       if(cur.equals(POLYGON_SEPARATOR)) {
         if(coords.size() > 0) {
           polys.add(new Polygon(coords));
-          coords = new ArrayList<Vector>();
+          coords = new ArrayList<>();
         }
         continue;
       }

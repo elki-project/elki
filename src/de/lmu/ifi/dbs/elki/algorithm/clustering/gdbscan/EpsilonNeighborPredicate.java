@@ -91,7 +91,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
   public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
     DistanceQuery<O, D> dq = QueryUtil.getDistanceQuery(database, distFunc);
     RangeQuery<O, D> rq = database.getRangeQuery(dq);
-    return (NeighborPredicate.Instance<T>) new Instance<D>(epsilon, rq, dq.getRelation().getDBIDs());
+    return (NeighborPredicate.Instance<T>) new Instance<>(epsilon, rq, dq.getRelation().getDBIDs());
   }
 
   @Override
@@ -177,14 +177,14 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get a distance function.
-      ObjectParameter<DistanceFunction<O, D>> distanceP = new ObjectParameter<DistanceFunction<O, D>>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<O, D>> distanceP = new ObjectParameter<>(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       D distanceFactory = null;
       if(config.grab(distanceP)) {
         distfun = distanceP.instantiateClass(config);
         distanceFactory = distfun.getDistanceFactory();
       }
       // Get the epsilon parameter
-      DistanceParameter<D> epsilonP = new DistanceParameter<D>(de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN.EPSILON_ID, distanceFactory);
+      DistanceParameter<D> epsilonP = new DistanceParameter<>(de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN.EPSILON_ID, distanceFactory);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -192,7 +192,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
 
     @Override
     protected EpsilonNeighborPredicate<O, D> makeInstance() {
-      return new EpsilonNeighborPredicate<O, D>(epsilon, distfun);
+      return new EpsilonNeighborPredicate<>(epsilon, distfun);
     }
   }
 }

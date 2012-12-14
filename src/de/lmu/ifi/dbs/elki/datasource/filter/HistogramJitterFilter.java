@@ -158,7 +158,7 @@ public class HistogramJitterFilter<V extends NumberVector<?>> extends AbstractVe
 
     @Override
     protected HistogramJitterFilter<DoubleVector> makeInstance() {
-      return new HistogramJitterFilter<DoubleVector>(jitter, rnd);
+      return new HistogramJitterFilter<>(jitter, rnd);
     }
   }
 }

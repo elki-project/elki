@@ -279,7 +279,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       if (config.grab(kP)) {
         k = kP.intValue();
       }
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class);
+      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
       queryP.setOptional(true);
       if (config.grab(queryP)) {
         queries = queryP.instantiateClass(config);
@@ -297,7 +297,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
 
     @Override
     protected KNNBenchmarkAlgorithm<O, D> makeInstance() {
-      return new KNNBenchmarkAlgorithm<O, D>(distanceFunction, k, queries, sampling, random);
+      return new KNNBenchmarkAlgorithm<>(distanceFunction, k, queries, sampling, random);
     }
   }
 }

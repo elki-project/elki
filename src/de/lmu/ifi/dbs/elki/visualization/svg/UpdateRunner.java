@@ -46,7 +46,7 @@ public class UpdateRunner {
   /**
    * The queue of pending updates
    */
-  final private Queue<Runnable> queue = new ConcurrentLinkedQueue<Runnable>();
+  final private Queue<Runnable> queue = new ConcurrentLinkedQueue<>();
 
   /**
    * Synchronizer that can block events from being executed right away.

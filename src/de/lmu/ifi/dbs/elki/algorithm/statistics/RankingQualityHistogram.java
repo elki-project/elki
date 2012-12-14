@@ -142,12 +142,12 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     }
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<DoubleVector>(relation.size());
+    Collection<DoubleVector> res = new ArrayList<>(relation.size());
     for (DoubleStaticHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
       DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), iter.getValue() });
       res.add(row);
     }
-    HistogramResult<DoubleVector> result = new HistogramResult<DoubleVector>("Ranking Quality Histogram", "ranking-histogram", res);
+    HistogramResult<DoubleVector> result = new HistogramResult<>("Ranking Quality Histogram", "ranking-histogram", res);
     result.addHeader("Mean: " + mv.getMean() + " Variance: " + mv.getSampleVariance());
     return result;
   }
@@ -187,7 +187,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
 
     @Override
     protected RankingQualityHistogram<O, D> makeInstance() {
-      return new RankingQualityHistogram<O, D>(distanceFunction, numbins);
+      return new RankingQualityHistogram<>(distanceFunction, numbins);
     }
   }
 }

@@ -74,7 +74,7 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
    */
   public BreadthFirstEnumeration(final IndexTree<N, E> index, final IndexTreePath<E> rootPath) {
     super();
-    this.queue = new LinkedList<Enumeration<IndexTreePath<E>>>();
+    this.queue = new LinkedList<>();
     this.index = index;
 
     Enumeration<IndexTreePath<E>> root_enum = new Enumeration<IndexTreePath<E>>() {

@@ -59,6 +59,6 @@ public abstract class AbstractPrimitiveSimilarityFunction<O, D extends Distance<
 
   @Override
   public <T extends O> SimilarityQuery<T, D> instantiate(Relation<T> relation) {
-    return new PrimitiveSimilarityQuery<T, D>(relation, this);
+    return new PrimitiveSimilarityQuery<>(relation, this);
   }
 }

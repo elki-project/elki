@@ -127,14 +127,14 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
   protected <N extends ExternalizablePage> PageFile<N> makePageFile(Class<N> cls) {
     final PageFile<N> inner;
     if (fileName == null) {
-      inner = new MemoryPageFile<N>(pageSize);
+      inner = new MemoryPageFile<>(pageSize);
     } else {
-      inner = new PersistentPageFile<N>(pageSize, fileName, cls);
+      inner = new PersistentPageFile<>(pageSize, fileName, cls);
     }
     if (cacheSize >= Integer.MAX_VALUE) {
       return inner;
     }
-    return new LRUCache<N>(cacheSize, inner);
+    return new LRUCache<>(cacheSize, inner);
   }
 
   @Override

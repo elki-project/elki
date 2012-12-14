@@ -92,7 +92,7 @@ public class PreprocessorRKNNQuery<O, D extends Distance<D>> extends AbstractDat
     if(!warned && k != preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<DistanceDBIDResult<D>> result = new ArrayList<DistanceDBIDResult<D>>(ids.size());
+    List<DistanceDBIDResult<D>> result = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
       result.add(preprocessor.getRKNN(iter));
     }

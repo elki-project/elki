@@ -61,7 +61,7 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
   @Override
   public <T extends O> Instance<T> instantiate(Relation<T> database) {
     SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
-    return (Instance<T>) new Instance<O>((Relation<O>) database, indexi, this);
+    return (Instance<T>) new Instance<>((Relation<O>) database, indexi, this);
   }
 
   /**
@@ -157,7 +157,7 @@ public class SharedNearestNeighborJaccardDistanceFunction<O> extends AbstractInd
 
     @Override
     protected SharedNearestNeighborJaccardDistanceFunction<O> makeInstance() {
-      return new SharedNearestNeighborJaccardDistanceFunction<O>(factory);
+      return new SharedNearestNeighborJaccardDistanceFunction<>(factory);
     }
   }
 }

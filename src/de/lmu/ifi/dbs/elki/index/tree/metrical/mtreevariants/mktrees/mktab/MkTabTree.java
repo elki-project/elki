@@ -96,7 +96,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
 
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     doReverseKNNQuery(k, id, null, getRoot(), result);
 
     result.sort();
@@ -252,7 +252,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
       throw new RuntimeException("different lengths!");
     }
 
-    List<D> result = new ArrayList<D>();
+    List<D> result = new ArrayList<>();
 
     for(int i = 0; i < distances1.size(); i++) {
       D d1 = distances1.get(i);
@@ -268,7 +268,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * @return a knn distance list with all distances set to null distance
    */
   private List<D> initKnnDistanceList() {
-    List<D> knnDistances = new ArrayList<D>(getKmax());
+    List<D> knnDistances = new ArrayList<>(getKmax());
     for(int i = 0; i < getKmax(); i++) {
       knnDistances.add(getDistanceQuery().nullDistance());
     }

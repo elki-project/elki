@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDistanceDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -183,9 +182,9 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       result = extractClusters(relation.getDBIDs(), pi, lambda, minclusters);
     }
 
-    result.addChildResult(new MaterializedRelation<DBID>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
-    result.addChildResult(new MaterializedRelation<D>("SLINK lambda", "slink-order", new SimpleTypeInformation<D>(distCls), lambda, processedIDs));
-    result.addChildResult(new OrderingFromDataStore<D>("SLINK order", "slink-order", processedIDs, lambda));
+    result.addChildResult(new MaterializedRelation<>("SLINK pi", "slink-order", TypeUtil.DBID, pi, processedIDs));
+    result.addChildResult(new MaterializedRelation<>("SLINK lambda", "slink-order", new SimpleTypeInformation<>(distCls), lambda, processedIDs));
+    result.addChildResult(new OrderingFromDataStore<>("SLINK order", "slink-order", processedIDs, lambda));
     return result;
   }
 
@@ -394,7 +393,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     // a) to determine the stop distance from "minclusters" parameter
     // b) to process arrows in decreasing / increasing order
     ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-    order.sort(new CompareByLambda<D>(lambda));
+    order.sort(new CompareByLambda<>(lambda));
 
     // Stop distance:
     final D stopdist = (minclusters > 0) ? lambda.get(order.get(ids.size() - minclusters)) : null;
@@ -419,8 +418,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     int cnum = 0;
     int expcnum = Math.max(0, minclusters);
     WritableIntegerDataStore cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
-    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<ModifiableDBIDs>(expcnum);
-    ArrayList<D> cluster_dist = new ArrayList<D>(expcnum);
+    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<>(expcnum);
+    ArrayList<D> cluster_dist = new ArrayList<>(expcnum);
     ArrayModifiableDBIDs cluster_leads = DBIDUtil.newArray(expcnum);
 
     DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
@@ -460,8 +459,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     }
     // Build a hierarchy out of these clusters.
     Cluster<DendrogramModel<D>> root = null;
-    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<Cluster<DendrogramModel<D>>>();
-    ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<Cluster<DendrogramModel<D>>>(ids.size() + expcnum - split);
+    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<>();
+    ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<>(ids.size() + expcnum - split);
     // Convert initial clusters to cluster objects
     {
       int i = 0;
@@ -524,7 +523,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       progress.ensureCompleted(LOG);
     }
     // build hierarchy
-    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<DendrogramModel<D>>("Single-Link-Dendrogram", "slink-dendrogram");
+    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Single-Link-Dendrogram", "slink-dendrogram");
     dendrogram.addCluster(root);
 
     return dendrogram;
@@ -573,7 +572,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     int cnum = 0;
     int expcnum = Math.max(0, minclusters);
     WritableIntegerDataStore cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
-    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<ModifiableDBIDs>(expcnum);
+    ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<>(expcnum);
     TDoubleArrayList cluster_dist = new TDoubleArrayList(expcnum);
     ArrayModifiableDBIDs cluster_leads = DBIDUtil.newArray(expcnum);
 
@@ -614,8 +613,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     }
     // Build a hierarchy out of these clusters.
     Cluster<DendrogramModel<D>> root = null;
-    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<Cluster<DendrogramModel<D>>>();
-    ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<Cluster<DendrogramModel<D>>>(ids.size() + expcnum - split);
+    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<>();
+    ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<>(ids.size() + expcnum - split);
     // Convert initial clusters to cluster objects
     {
       int i = 0;
@@ -681,7 +680,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       progress.ensureCompleted(LOG);
     }
     // build hierarchy
-    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<DendrogramModel<D>>("Single-Link-Dendrogram", "slink-dendrogram");
+    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Single-Link-Dendrogram", "slink-dendrogram");
     dendrogram.addCluster(root);
 
     return dendrogram;
@@ -706,7 +705,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     } else {
       name = "cluster_" + lead + "_" + depth;
     }
-    Cluster<DendrogramModel<D>> cluster = new Cluster<DendrogramModel<D>>(name, members, new DendrogramModel<D>(depth), hier);
+    Cluster<DendrogramModel<D>> cluster = new Cluster<>(name, members, new DendrogramModel<>(depth), hier);
     return cluster;
   }
 
@@ -812,7 +811,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
 
     @Override
     protected SLINK<O, D> makeInstance() {
-      return new SLINK<O, D>(distanceFunction, minclusters);
+      return new SLINK<>(distanceFunction, minclusters);
     }
   }
 }

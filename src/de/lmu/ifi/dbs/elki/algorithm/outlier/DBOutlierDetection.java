@@ -184,7 +184,7 @@ public class DBOutlierDetection<O, D extends Distance<D>> extends AbstractDBOutl
 
     @Override
     protected DBOutlierDetection<O, D> makeInstance() {
-      return new DBOutlierDetection<O, D>(distanceFunction, d, p);
+      return new DBOutlierDetection<>(distanceFunction, d, p);
     }
   }
 }

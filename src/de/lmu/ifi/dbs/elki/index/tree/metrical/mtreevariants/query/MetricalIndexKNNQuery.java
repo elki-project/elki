@@ -80,7 +80,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     KNNHeap<D> knnList = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     D d_k = knnList.getKNNDistance();
 
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<GenericMTreeDistanceSearchCandidate<D>>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<>();
 
     // push root
     pq.add(new GenericMTreeDistanceSearchCandidate<D>(nullDistance, index.getRootID(), null, nullDistance));

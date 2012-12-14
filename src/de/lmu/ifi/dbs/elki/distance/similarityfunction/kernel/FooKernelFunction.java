@@ -107,7 +107,7 @@ public class FooKernelFunction extends AbstractPrimitiveDistanceFunction<NumberV
 
   @Override
   public <T extends NumberVector<?>> DistanceSimilarityQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new PrimitiveDistanceSimilarityQuery<T, DoubleDistance>(database, this, this);
+    return new PrimitiveDistanceSimilarityQuery<>(database, this, this);
   }
 
   /**

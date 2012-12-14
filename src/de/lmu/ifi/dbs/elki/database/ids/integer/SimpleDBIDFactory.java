@@ -190,7 +190,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
     if (val instanceof DoubleDistance) {
       return (DistanceDBIDPair<D>) new DoubleDistanceIntegerDBIDPair(((DoubleDistance) val).doubleValue(), id.internalGetIndex());
     }
-    return new DistanceIntegerDBIDPair<D>(val, id.internalGetIndex());
+    return new DistanceIntegerDBIDPair<>(val, id.internalGetIndex());
   }
 
   @Override

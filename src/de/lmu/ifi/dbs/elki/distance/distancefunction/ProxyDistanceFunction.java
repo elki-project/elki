@@ -61,7 +61,7 @@ public class ProxyDistanceFunction<O, D extends Distance<D>> extends AbstractDBI
    * @return Proxy object
    */
   public static <O, D extends Distance<D>> ProxyDistanceFunction<O, D> proxy(DistanceQuery<O, D> inner) {
-    return new ProxyDistanceFunction<O, D>(inner);
+    return new ProxyDistanceFunction<>(inner);
   }
 
   @Override

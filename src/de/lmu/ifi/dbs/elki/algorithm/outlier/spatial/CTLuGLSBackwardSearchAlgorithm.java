@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -127,12 +127,12 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
     // Outlier detection loop
     {
       ModifiableDBIDs idview = DBIDUtil.newHashSet(relationx.getDBIDs());
-      ProxyView<V> proxy = new ProxyView<V>(relationx.getDatabase(), idview, relationx);
+      ProxyView<V> proxy = new ProxyView<>(relationx.getDatabase(), idview, relationx);
 
       double phialpha = NormalDistribution.standardNormalQuantile(1.0 - alpha *.5);
       // Detect outliers while significant.
       while(true) {
-        Pair<DBID, Double> candidate = singleIteration(proxy, relationy);
+        Pair<DBIDVar, Double> candidate = singleIteration(proxy, relationy);
         if(candidate.second < phialpha) {
           break;
         }
@@ -149,7 +149,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
       }
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relationx.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("GLSSODBackward", "GLSSODbackward-outlier", TypeUtil.DOUBLE, scores, relationx.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -161,7 +161,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
    * @param relationy Attribute relation
    * @return Top outlier and associated score
    */
-  private Pair<DBID, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
+  private Pair<DBIDVar, Double> singleIteration(Relation<V> relationx, Relation<? extends NumberVector<?>> relationy) {
     final int dim = RelationUtil.dimensionality(relationx);
     final int dimy = RelationUtil.dimensionality(relationy);
     assert (dim == 2);
@@ -237,7 +237,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
     // calculate the absolute values of standard residuals
     Matrix E = F.times(Y.minus(X.times(b))).timesEquals(norm);
 
-    DBID worstid = null;
+    DBIDVar worstid = DBIDUtil.newVar();
     double worstscore = Double.NEGATIVE_INFINITY;
     int i = 0;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
@@ -245,11 +245,11 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
       // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;
-        worstid = DBIDUtil.deref(id);
+        worstid.set(id);
       }
     }
 
-    return new Pair<DBID, Double>(worstid, worstscore);
+    return new Pair<>(worstid, worstscore);
   }
 
   @Override
@@ -302,7 +302,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
 
     @Override
     protected CTLuGLSBackwardSearchAlgorithm<V, D> makeInstance() {
-      return new CTLuGLSBackwardSearchAlgorithm<V, D>(distanceFunction, k, alpha);
+      return new CTLuGLSBackwardSearchAlgorithm<>(distanceFunction, k, alpha);
     }
 
     /**

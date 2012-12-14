@@ -64,7 +64,7 @@ public class DiSHDistanceFunction extends AbstractPreferenceVectorBasedCorrelati
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
     DiSHPreferenceVectorIndex<T> indexinst = (DiSHPreferenceVectorIndex<T>) indexFactory.instantiate((Relation<NumberVector<?>>) database);
-    return new Instance<T>(database, indexinst, getEpsilon(), this);
+    return new Instance<>(database, indexinst, getEpsilon(), this);
   }
 
   /**

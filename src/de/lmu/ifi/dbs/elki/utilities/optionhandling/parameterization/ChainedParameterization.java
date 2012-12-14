@@ -44,7 +44,7 @@ public class ChainedParameterization extends AbstractParameterization {
   /**
    * Keep the list of parameterizations.
    */
-  private List<Parameterization> chain = new ArrayList<Parameterization>();
+  private List<Parameterization> chain = new ArrayList<>();
   
   /**
    * Error target

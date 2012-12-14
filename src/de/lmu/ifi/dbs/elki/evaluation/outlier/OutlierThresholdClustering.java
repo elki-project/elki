@@ -92,7 +92,7 @@ public class OutlierThresholdClustering implements Evaluator {
     if(scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) scaling).prepare(or);
     }
-    ArrayList<ModifiableDBIDs> idlists = new ArrayList<ModifiableDBIDs>(threshold.length + 1);
+    ArrayList<ModifiableDBIDs> idlists = new ArrayList<>(threshold.length + 1);
     for(int i = 0; i <= threshold.length; i++) {
       idlists.add(DBIDUtil.newHashSet());
     }
@@ -109,10 +109,10 @@ public class OutlierThresholdClustering implements Evaluator {
       }
       idlists.get(i).add(iter);
     }
-    Clustering<Model> c = new Clustering<Model>("Outlier threshold clustering", "threshold-clustering");
+    Clustering<Model> c = new Clustering<>("Outlier threshold clustering", "threshold-clustering");
     for(int i = 0; i <= threshold.length; i++) {
       String name = (i == 0) ? "Inlier" : "Outlier_" + threshold[i - 1];
-      c.addCluster(new Cluster<Model>(name, idlists.get(i), (i > 0)));
+      c.addCluster(new Cluster<>(name, idlists.get(i), (i > 0)));
     }
     return c;
   }
@@ -154,7 +154,7 @@ public class OutlierThresholdClustering implements Evaluator {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

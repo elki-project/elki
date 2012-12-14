@@ -46,7 +46,7 @@ public class ListEachConstraint<T> implements ParameterConstraint<List<T>> {
    */
   public ListEachConstraint() {
     super();
-    this.constraints = new ArrayList<ParameterConstraint<? super T>>();
+    this.constraints = new ArrayList<>();
   }
 
   /**
@@ -56,7 +56,7 @@ public class ListEachConstraint<T> implements ParameterConstraint<List<T>> {
    */
   public ListEachConstraint(ParameterConstraint<? super T> constraint) {
     super();
-    this.constraints = new ArrayList<ParameterConstraint<? super T>>(1);
+    this.constraints = new ArrayList<>(1);
     this.constraints.add(constraint);
   }
 

@@ -90,7 +90,7 @@ public class IntListParameter extends ListParameter<Integer> {
     }
     if(obj instanceof String) {
       String[] values = SPLIT.split((String) obj);
-      ArrayList<Integer> intValue = new ArrayList<Integer>(values.length);
+      ArrayList<Integer> intValue = new ArrayList<>(values.length);
       for(String val : values) {
         intValue.add(Integer.valueOf(val));
       }

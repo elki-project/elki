@@ -119,7 +119,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>((size * size * 3) >> 3);
+      HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 3);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
@@ -200,7 +200,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
     @Override
     public SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instantiate(Relation<NumberVector<?>> relation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E>(relation, distanceFunction, k);
+      SpatialApproximationMaterializeKNNPreprocessor<NumberVector<?>, D, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -214,7 +214,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     public static class Parameterizer<D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<NumberVector<?>, D> {
       @Override
       protected Factory<D, N, E> makeInstance() {
-        return new Factory<D, N, E>(k, distanceFunction);
+        return new Factory<>(k, distanceFunction);
       }
     }
   }

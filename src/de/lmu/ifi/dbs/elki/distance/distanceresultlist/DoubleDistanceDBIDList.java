@@ -52,7 +52,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    */
   public DoubleDistanceDBIDList() {
     super();
-    storage = new ArrayList<DoubleDistanceDBIDPair>();
+    storage = new ArrayList<>();
   }
 
   /**
@@ -62,7 +62,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    */
   public DoubleDistanceDBIDList(int initialCapacity) {
     super();
-    storage = new ArrayList<DoubleDistanceDBIDPair>(initialCapacity);
+    storage = new ArrayList<>(initialCapacity);
   }
   
   /**

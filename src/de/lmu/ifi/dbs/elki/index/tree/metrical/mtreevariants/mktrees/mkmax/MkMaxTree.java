@@ -97,7 +97,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
 
     // get the candidates
-    GenericDistanceDBIDList<D> candidates = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> candidates = new GenericDistanceDBIDList<>();
     doReverseKNNQuery(id, getRoot(), null, candidates);
 
     if(k == this.getKmax()) {
@@ -114,7 +114,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     }
     Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), candidateIDs, k);
 
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance()) {
       DBID cid = DBIDUtil.deref(iter);
       KNNResult<D> cands = knnLists.get(cid);

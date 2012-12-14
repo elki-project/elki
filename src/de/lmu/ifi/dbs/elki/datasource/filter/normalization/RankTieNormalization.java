@@ -68,7 +68,7 @@ public class RankTieNormalization implements ObjectFilter {
       final List<? extends NumberVector<?>> castColumn = (List<? extends NumberVector<?>>) column;
       // Get the replacement type information
       final int dim = ((VectorFieldTypeInformation<?>) type).getDimensionality();
-      final VectorFieldTypeInformation<IntegerVector> outType = new VectorFieldTypeInformation<IntegerVector>(IntegerVector.STATIC, dim);
+      final VectorFieldTypeInformation<IntegerVector> outType = new VectorFieldTypeInformation<>(IntegerVector.STATIC, dim);
 
       // Output vectors
       int[][] posvecs = new int[len][dim];
@@ -102,7 +102,7 @@ public class RankTieNormalization implements ObjectFilter {
       }
 
       // Prepare output data
-      final List<IntegerVector> outColumn = new ArrayList<IntegerVector>(len);
+      final List<IntegerVector> outColumn = new ArrayList<>(len);
       for(int i = 0; i < len; i++) {
         outColumn.add(new IntegerVector(posvecs[i]));
       }

@@ -160,7 +160,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
       }
     }
     // build representation
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("SPO", "Scatterplot-Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("SPO", "Scatterplot-Outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     or.addChildResult(npred);
@@ -189,7 +189,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
   public static class Parameterizer<N> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
     protected CTLuScatterplotOutlier<N> makeInstance() {
-      return new CTLuScatterplotOutlier<N>(npredf);
+      return new CTLuScatterplotOutlier<>(npredf);
     }
   }
 }

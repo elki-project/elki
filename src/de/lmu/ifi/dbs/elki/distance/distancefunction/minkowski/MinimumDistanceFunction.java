@@ -120,7 +120,7 @@ public class MinimumDistanceFunction extends AbstractVectorDoubleDistanceNorm im
 
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
+    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
   @Override

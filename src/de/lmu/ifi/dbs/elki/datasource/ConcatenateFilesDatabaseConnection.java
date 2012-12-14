@@ -85,7 +85,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
   @Override
   public MultipleObjectsBundle loadData() {
     MultipleObjectsBundle objects = new MultipleObjectsBundle();
-    objects.appendColumn(TypeUtil.STRING, new ArrayList<Object>());
+    objects.appendColumn(TypeUtil.STRING, new ArrayList<>());
     for (File file : files) {
       String filestr = file.getPath();
       try {
@@ -111,7 +111,7 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
             meta = source.getMeta();
             for (int i = 0; i < meta.size(); i++) {
               if (i + 1 >= objects.metaLength()) {
-                objects.appendColumn(meta.get(i), new ArrayList<Object>());
+                objects.appendColumn(meta.get(i), new ArrayList<>());
               } else {
                 // Ensure compatibility:
                 if (!objects.meta(i + 1).isAssignableFromType(meta.get(i))) {

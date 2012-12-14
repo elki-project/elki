@@ -94,7 +94,7 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
    */
   @Deprecated
   protected final Map<DBID, KNNResult<D>> batchNN(N node, DBIDs ids, int kmax) {
-    Map<DBID, KNNResult<D>> res = new HashMap<DBID, KNNResult<D>>(ids.size());
+    Map<DBID, KNNResult<D>> res = new HashMap<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       res.put(id, knnq.getKNNForDBID(id, kmax));

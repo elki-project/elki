@@ -76,11 +76,11 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<BitVector> vectors = new ArrayList<BitVector>();
-    List<LabelList> lblc = new ArrayList<LabelList>();
+    List<BitVector> vectors = new ArrayList<>();
+    List<LabelList> lblc = new ArrayList<>();
     try {
-      List<BitSet> bitSets = new ArrayList<BitSet>();
-      List<LabelList> allLabels = new ArrayList<LabelList>();
+      List<BitSet> bitSets = new ArrayList<>();
+      List<LabelList> allLabels = new ArrayList<>();
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
@@ -121,7 +121,7 @@ public class SparseBitVectorLabelParser extends AbstractParser implements Parser
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<BitVector>(BitVector.FACTORY, dimensionality);
+    return new VectorFieldTypeInformation<>(BitVector.FACTORY, dimensionality);
   }
   
   @Override

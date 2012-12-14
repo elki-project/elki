@@ -89,7 +89,7 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
 
   @Override
   public void insertAll(DBIDs ids) {
-    List<MTreeEntry<D>> objs = new ArrayList<MTreeEntry<D>>(ids.size());
+    List<MTreeEntry<D>> objs = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);

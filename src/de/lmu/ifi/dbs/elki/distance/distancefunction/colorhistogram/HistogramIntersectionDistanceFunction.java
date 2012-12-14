@@ -113,7 +113,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractVectorDoubleD
 
   @Override
   public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
+    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
   @Override

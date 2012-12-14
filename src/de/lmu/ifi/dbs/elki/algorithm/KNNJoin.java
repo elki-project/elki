@@ -134,10 +134,10 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
     DBIDs ids = relation.getDBIDs();
 
     // data pages
-    List<E> ps_candidates = new ArrayList<E>(index.getLeaves());
+    List<E> ps_candidates = new ArrayList<>(index.getLeaves());
     // knn heaps
-    List<List<KNNHeap<D>>> heaps = new ArrayList<List<KNNHeap<D>>>(ps_candidates.size());
-    Heap<Task> pq = new Heap<Task>(ps_candidates.size() * ps_candidates.size() / 10);
+    List<List<KNNHeap<D>>> heaps = new ArrayList<>(ps_candidates.size());
+    Heap<Task> pq = new Heap<>(ps_candidates.size() * ps_candidates.size() / 10);
 
     // Initialize with the page self-pairing
     for (int i = 0; i < ps_candidates.size(); i++) {
@@ -259,7 +259,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
    * @return List of heaps
    */
   private List<KNNHeap<D>> initHeaps(SpatialPrimitiveDistanceFunction<V, D> distFunction, N pr) {
-    List<KNNHeap<D>> pr_heaps = new ArrayList<KNNHeap<D>>(pr.getNumEntries());
+    List<KNNHeap<D>> pr_heaps = new ArrayList<>(pr.getNumEntries());
     // Create for each data object a knn heap
     for (int j = 0; j < pr.getNumEntries(); j++) {
       pr_heaps.add(KNNUtil.newHeap(distFunction, k));
@@ -429,7 +429,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
 
     @Override
     protected KNNJoin<V, D, N, E> makeInstance() {
-      return new KNNJoin<V, D, N, E>(distanceFunction, k);
+      return new KNNJoin<>(distanceFunction, k);
     }
   }
 }

@@ -125,7 +125,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
       if (stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, getDistanceFunction(), k);
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       relation.getDatabase().addIndex(preproc);
       DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
@@ -218,7 +218,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Kernel Density Local Outlier Factor", "kernel-density-slof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Kernel Density Local Outlier Factor", "kernel-density-slof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
@@ -271,7 +271,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
         k = pK.getValue();
       }
 
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
+      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
       if (config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
       }
@@ -279,7 +279,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
 
     @Override
     protected SimpleKernelDensityLOF<O, D> makeInstance() {
-      return new SimpleKernelDensityLOF<O, D>(k, distanceFunction, kernel);
+      return new SimpleKernelDensityLOF<>(k, distanceFunction, kernel);
     }
   }
 }

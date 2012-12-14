@@ -37,7 +37,7 @@ public class ThumbnailThread extends Thread {
   /**
    * Queue of thumbnails to generate.
    */
-  private Queue<Task> queue = new ConcurrentLinkedQueue<Task>();
+  private Queue<Task> queue = new ConcurrentLinkedQueue<>();
 
   /**
    * Flag to signal shutdown.

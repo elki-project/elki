@@ -228,7 +228,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
 
     @Override
     public SharedNearestNeighborPreprocessor<O, D> instantiate(Relation<O> relation) {
-      return new SharedNearestNeighborPreprocessor<O, D>(relation, numberOfNeighbors, distanceFunction);
+      return new SharedNearestNeighborPreprocessor<>(relation, numberOfNeighbors, distanceFunction);
     }
 
     /**
@@ -273,7 +273,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
           numberOfNeighbors = numberOfNeighborsP.getValue();
         }
 
-        final ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
         }
@@ -281,7 +281,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
 
       @Override
       protected Factory<O, D> makeInstance() {
-        return new Factory<O, D>(numberOfNeighbors, distanceFunction);
+        return new Factory<>(numberOfNeighbors, distanceFunction);
       }
     }
   }

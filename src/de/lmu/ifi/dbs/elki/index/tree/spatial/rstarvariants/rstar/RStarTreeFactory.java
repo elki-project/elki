@@ -63,7 +63,7 @@ public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTr
   @Override
   public RStarTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<RStarTreeNode> pagefile = makePageFile(getNodeClass());
-    RStarTreeIndex<O> index = new RStarTreeIndex<O>(relation, pagefile);
+    RStarTreeIndex<O> index = new RStarTreeIndex<>(relation, pagefile);
     index.setBulkStrategy(bulkSplitter);
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);

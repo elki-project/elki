@@ -55,7 +55,7 @@ public class ParallelPlotFactory implements ProjectorFactory {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<NumberVector<?>> vrel = (Relation<NumberVector<?>>) rel;
-        ParallelPlotProjector<NumberVector<?>> proj = new ParallelPlotProjector<NumberVector<?>>(vrel);
+        ParallelPlotProjector<NumberVector<?>> proj = new ParallelPlotProjector<>(vrel);
         baseResult.getHierarchy().add(vrel, proj);
       }
     }

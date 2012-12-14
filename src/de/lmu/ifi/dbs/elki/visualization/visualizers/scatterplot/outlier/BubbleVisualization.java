@@ -320,7 +320,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         fill = fillF.isTrue();
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, OutlierScalingFunction.class, true);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class, true);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

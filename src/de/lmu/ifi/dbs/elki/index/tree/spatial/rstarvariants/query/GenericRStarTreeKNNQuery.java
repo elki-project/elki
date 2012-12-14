@@ -104,7 +104,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, KNNHeap<D> knnList) {
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>(Math.min(knnList.getK() << 1, 20));
+    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<>(Math.min(knnList.getK() << 1, 20));
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
@@ -211,7 +211,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @return a list of the sorted entries
    */
   protected List<DistanceEntry<D, SpatialEntry>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids) {
-    List<DistanceEntry<D, SpatialEntry>> result = new ArrayList<DistanceEntry<D, SpatialEntry>>();
+    List<DistanceEntry<D, SpatialEntry>> result = new ArrayList<>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
@@ -249,14 +249,14 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
     // While this works, it seems to be slow at least for large sets!
-    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<DBID, KNNHeap<D>>(ids.size());
+    final Map<DBID, KNNHeap<D>> knnLists = new HashMap<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       knnLists.put(DBIDUtil.deref(iter), KNNUtil.newHeap(distanceFunction, k));
     }
 
     batchNN(tree.getRoot(), knnLists);
 
-    List<KNNResult<D>> result = new ArrayList<KNNResult<D>>();
+    List<KNNResult<D>> result = new ArrayList<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       result.add(knnLists.get(DBIDUtil.deref(iter)).toKNNList());
     }

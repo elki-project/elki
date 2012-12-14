@@ -73,7 +73,7 @@ public final class KNNUtil {
     if (DistanceUtil.isDoubleDistanceFunction(df)) {
       return (KNNHeap<D>) new DoubleDistanceKNNHeap(k);
     }
-    return new GenericKNNHeap<D>(k);
+    return new GenericKNNHeap<>(k);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class KNNUtil {
     if (DistanceUtil.isDoubleDistanceFunction(df)) {
       return (KNNHeap<D>) new DoubleDistanceKNNHeap(k);
     }
-    return new GenericKNNHeap<D>(k);
+    return new GenericKNNHeap<>(k);
   }
 
   /**
@@ -109,7 +109,7 @@ public final class KNNUtil {
     if (factory instanceof DoubleDistance) {
       return (KNNHeap<D>) new DoubleDistanceKNNHeap(k);
     }
-    return new GenericKNNHeap<D>(k);
+    return new GenericKNNHeap<>(k);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class KNNUtil {
       }
       return (KNNHeap<D>) heap;
     } else {
-      GenericKNNHeap<D> heap = new GenericKNNHeap<D>(exist.getK());
+      GenericKNNHeap<D> heap = new GenericKNNHeap<>(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
         heap.add(exist.get(i));
@@ -335,7 +335,7 @@ public final class KNNUtil {
 
     @Override
     public Iterator<D> iterator() {
-      return new DistanceItr<D>(parent.iter());
+      return new DistanceItr<>(parent.iter());
     }
 
     @Override
@@ -352,7 +352,7 @@ public final class KNNUtil {
    * @return List of distances view
    */
   public static <D extends Distance<D>> List<D> asDistanceList(KNNResult<D> list) {
-    return new DistanceView<D>(list);
+    return new DistanceView<>(list);
   }
 
   /**
@@ -367,6 +367,6 @@ public final class KNNUtil {
     if (k >= list.size()) {
       return list;
     }
-    return new KNNSubList<D>(list, k);
+    return new KNNSubList<>(list, k);
   }
 }

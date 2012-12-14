@@ -150,7 +150,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?>> extends 
       scores.putDouble(iditer, score);
     }
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Median multiple attributes outlier", "median-outlier", TypeUtil.DOUBLE, scores, attributes.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("Median multiple attributes outlier", "median-outlier", TypeUtil.DOUBLE, scores, attributes.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
     or.addChildResult(npred);
@@ -175,7 +175,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector<?>> extends 
   public static class Parameterizer<N, O extends NumberVector<?>> extends AbstractNeighborhoodOutlier.Parameterizer<N> {
     @Override
     protected CTLuMedianMultipleAttributes<N, O> makeInstance() {
-      return new CTLuMedianMultipleAttributes<N, O>(npredf);
+      return new CTLuMedianMultipleAttributes<>(npredf);
     }
   }
 }

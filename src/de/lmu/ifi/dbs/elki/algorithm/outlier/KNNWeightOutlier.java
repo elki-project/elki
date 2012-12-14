@@ -147,7 +147,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
       progressKNNWeight.ensureCompleted(LOG);
     }
 
-    Relation<Double> res = new MaterializedRelation<Double>("Weighted kNN Outlier Score", "knnw-outlier", TypeUtil.DOUBLE, knnw_score, relation.getDBIDs());
+    Relation<Double> res = new MaterializedRelation<>("Weighted kNN Outlier Score", "knnw-outlier", TypeUtil.DOUBLE, knnw_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, res);
   }
@@ -183,7 +183,7 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
 
     @Override
     protected KNNWeightOutlier<O, D> makeInstance() {
-      return new KNNWeightOutlier<O, D>(distanceFunction, k);
+      return new KNNWeightOutlier<>(distanceFunction, k);
     }
   }
 }

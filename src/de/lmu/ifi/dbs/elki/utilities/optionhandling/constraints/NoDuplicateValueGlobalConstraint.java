@@ -76,7 +76,7 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
    */
   @Override
   public void test() throws ParameterException {
-    Set<Object> numbers = new HashSet<Object>();
+    Set<Object> numbers = new HashSet<>();
 
     for(Parameter<?> param : parameters) {
       if(param.isDefined()) {

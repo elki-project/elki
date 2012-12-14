@@ -43,7 +43,7 @@ public class CSSClassManager {
   /**
    * Store the contained CSS classes.
    */
-  private HashMap<String, CSSClass> store = new HashMap<String, CSSClass>();
+  private HashMap<String, CSSClass> store = new HashMap<>();
   
   /**
    * Add a single class to the map.

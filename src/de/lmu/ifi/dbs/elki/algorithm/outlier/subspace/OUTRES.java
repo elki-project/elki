@@ -145,7 +145,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
     }
 
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0., 1., 1.);
-    OutlierResult outresResult = new OutlierResult(meta, new MaterializedRelation<Double>("OUTRES", "outres-score", TypeUtil.DOUBLE, ranks, relation.getDBIDs()));
+    OutlierResult outresResult = new OutlierResult(meta, new MaterializedRelation<>("OUTRES", "outres-score", TypeUtil.DOUBLE, ranks, relation.getDBIDs()));
     return outresResult;
   }
 
@@ -426,7 +426,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
 
     @Override
     protected OUTRES<O> makeInstance() {
-      return new OUTRES<O>(eps);
+      return new OUTRES<>(eps);
     }
   }
 }

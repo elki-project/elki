@@ -325,7 +325,7 @@ public final class ClassGenericsUtil {
   public static <T> ArrayList<T>[] newArrayOfEmptyArrayList(int len) {
     ArrayList[] result = new ArrayList[len];
     for (int i = 0; i < len; i++) {
-      result[i] = new ArrayList<T>();
+      result[i] = new ArrayList<>();
     }
     return result;
   }
@@ -344,7 +344,7 @@ public final class ClassGenericsUtil {
   public static <T> HashSet<T>[] newArrayOfEmptyHashSet(int len) {
     HashSet[] result = new HashSet[len];
     for (int i = 0; i < len; i++) {
-      result[i] = new HashSet<T>();
+      result[i] = new HashSet<>();
     }
     return result;
   }

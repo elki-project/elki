@@ -263,8 +263,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    */
   private Relation<ParameterizationFunction> preprocess(Database db, Relation<V> vrel) {
     DBIDs ids = vrel.getDBIDs();
-    SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<ParameterizationFunction>(ParameterizationFunction.class);
-    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(db, type, ids);
+    SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
+    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<>(db, type, ids);
 
     // Project
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -284,12 +284,12 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @return a mapping of subspace dimensionalities to clusters
    */
   private Clustering<Model> doRun(Relation<ParameterizationFunction> relation, FiniteProgress progress) {
-    Clustering<Model> res = new Clustering<Model>("CASH clustering", "cash-clustering");
+    Clustering<Model> res = new Clustering<>("CASH clustering", "cash-clustering");
 
     final int dim = dimensionality(relation);
 
     // init heap
-    Heap<IntegerPriorityObject<CASHInterval>> heap = new Heap<IntegerPriorityObject<CASHInterval>>();
+    Heap<IntegerPriorityObject<CASHInterval>> heap = new Heap<>();
     ModifiableDBIDs noiseIDs = DBIDUtil.newHashSet(relation.getDBIDs());
     initHeap(heap, relation, dim, noiseIDs);
 
@@ -356,7 +356,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       }
 
       // Rebuild heap
-      ArrayList<IntegerPriorityObject<CASHInterval>> heapVector = new ArrayList<IntegerPriorityObject<CASHInterval>>(heap.size());
+      ArrayList<IntegerPriorityObject<CASHInterval>> heapVector = new ArrayList<>(heap.size());
       for (IntegerPriorityObject<CASHInterval> obj : heap) {
         heapVector.add(obj);
       }
@@ -365,7 +365,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         CASHInterval currentInterval = pair.getObject();
         currentInterval.removeIDs(clusterIDs);
         if (currentInterval.getIDs().size() >= minPts) {
-          heap.add(new IntegerPriorityObject<CASHInterval>(currentInterval.priority(), currentInterval));
+          heap.add(new IntegerPriorityObject<>(currentInterval.priority(), currentInterval));
         }
       }
 
@@ -479,7 +479,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       ModifiableDBIDs intervalIDs = split.determineIDs(ids, alphaInterval, d_mins[i], d_maxs[i]);
       if (intervalIDs != null && intervalIDs.size() >= minPts) {
         CASHInterval rootInterval = new CASHInterval(alphaMin, alphaMax, split, intervalIDs, -1, 0, d_mins[i], d_maxs[i]);
-        heap.add(new IntegerPriorityObject<CASHInterval>(rootInterval.priority(), rootInterval));
+        heap.add(new IntegerPriorityObject<>(rootInterval.priority(), rootInterval));
       }
     }
 
@@ -503,8 +503,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    */
   private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> relation) {
     ProxyDatabase proxy = new ProxyDatabase(ids);
-    SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<ParameterizationFunction>(ParameterizationFunction.class);
-    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<ParameterizationFunction>(proxy, type, ids);
+    SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
+    MaterializedRelation<ParameterizationFunction> prep = new MaterializedRelation<>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
@@ -632,10 +632,10 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         int comp = interval.getLeftChild().compareTo(interval.getRightChild());
         if (comp < 0) {
           bestInterval = interval.getRightChild();
-          heap.add(new IntegerPriorityObject<CASHInterval>(interval.getLeftChild().priority(), interval.getLeftChild()));
+          heap.add(new IntegerPriorityObject<>(interval.getLeftChild().priority(), interval.getLeftChild()));
         } else {
           bestInterval = interval.getLeftChild();
-          heap.add(new IntegerPriorityObject<CASHInterval>(interval.getRightChild().priority(), interval.getRightChild()));
+          heap.add(new IntegerPriorityObject<>(interval.getRightChild().priority(), interval.getRightChild()));
         }
       } else if (interval.getLeftChild() == null) {
         bestInterval = interval.getRightChild();
@@ -733,8 +733,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     DBIDs ids = interval.getIDs();
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
-    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
-    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
@@ -792,8 +792,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   private Database buildDerivatorDB(Relation<ParameterizationFunction> relation, DBIDs ids) {
     ProxyDatabase proxy = new ProxyDatabase(ids);
     int dim = dimensionality(relation);
-    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
-    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<DoubleVector>(proxy, type, ids);
+    SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    MaterializedRelation<DoubleVector> prep = new MaterializedRelation<>(proxy, type, ids);
     proxy.addRelation(prep);
 
     // Project
@@ -864,7 +864,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     @Override
     protected CASH<NumberVector<?>> makeInstance() {
-      return new CASH<NumberVector<?>>(minpts, maxlevel, mindim, jitter, adjust);
+      return new CASH<>(minpts, maxlevel, mindim, jitter, adjust);
     }
   }
 }

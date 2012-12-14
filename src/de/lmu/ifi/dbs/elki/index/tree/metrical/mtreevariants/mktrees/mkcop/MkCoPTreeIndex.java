@@ -88,7 +88,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
    *        the parent node
    */
   protected MkCoPEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    MkCoPLeafEntry<D> leafEntry = new MkCoPLeafEntry<D>(id, parentDistance, null, null);
+    MkCoPLeafEntry<D> leafEntry = new MkCoPLeafEntry<>(id, parentDistance, null, null);
     return leafEntry;
   }
 
@@ -99,7 +99,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
 
   @Override
   public void insertAll(DBIDs ids) {
-    List<MkCoPEntry<D>> objs = new ArrayList<MkCoPEntry<D>>(ids.size());
+    List<MkCoPEntry<D>> objs = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);

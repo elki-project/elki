@@ -102,7 +102,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, DoubleDistanceKNNHeap knnList) {
-    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>(Math.min(knnList.getK() << 1, 20));
+    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<>(Math.min(knnList.getK() << 1, 20));
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
@@ -210,7 +210,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @return a list of the sorted entries
    */
   protected List<DoubleDistanceEntry> getSortedEntries(AbstractRStarTreeNode<?, ?> node, DBIDs ids) {
-    List<DoubleDistanceEntry> result = new ArrayList<DoubleDistanceEntry>();
+    List<DoubleDistanceEntry> result = new ArrayList<>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
@@ -285,7 +285,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
 
     // While this works, it seems to be slow at least for large sets!
-    final Map<DBID, DoubleDistanceKNNHeap> knnLists = new HashMap<DBID, DoubleDistanceKNNHeap>(ids.size());
+    final Map<DBID, DoubleDistanceKNNHeap> knnLists = new HashMap<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       knnLists.put(id, new DoubleDistanceKNNHeap(k));
@@ -293,7 +293,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
 
     batchNN(tree.getRoot(), knnLists);
 
-    List<DoubleDistanceKNNList> result = new ArrayList<DoubleDistanceKNNList>();
+    List<DoubleDistanceKNNList> result = new ArrayList<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       result.add(knnLists.get(id).toKNNList());

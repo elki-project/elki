@@ -171,7 +171,7 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(database, this);
+    return new SpatialPrimitiveDistanceQuery<>(database, this);
   }
 
   @Override

@@ -203,7 +203,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
 
       // Collect cluster means
       if (clusters.size() == 2) {
-        ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
+        ArrayList<double[]> means = new ArrayList<>(clusters.size());
         {
           for (Cluster<Model> clus : clusters) {
             Model model = clus.getModel();
@@ -232,8 +232,8 @@ public class VoronoiVisualization extends AbstractVisFactory {
           layer.appendChild(path);
         }
       } else {
-        ArrayList<Vector> vmeans = new ArrayList<Vector>(clusters.size());
-        ArrayList<double[]> means = new ArrayList<double[]>(clusters.size());
+        ArrayList<Vector> vmeans = new ArrayList<>(clusters.size());
+        ArrayList<double[]> means = new ArrayList<>(clusters.size());
         {
           for (Cluster<Model> clus : clusters) {
             Model model = clus.getModel();
@@ -313,7 +313,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<Mode> modeP = new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.VORONOI);
+      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.VORONOI);
       if (config.grab(modeP)) {
         mode = modeP.getValue();
       }

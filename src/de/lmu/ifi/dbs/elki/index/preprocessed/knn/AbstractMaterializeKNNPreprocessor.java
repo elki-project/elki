@@ -171,7 +171,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
     }
     // To make compilers happy:
     AbstractMaterializeKNNPreprocessor<?, ?, ?> tmp = this;
-    return new PreprocessorKNNQuery<O, S, KNNResult<S>>(relation, (AbstractMaterializeKNNPreprocessor<O, S, KNNResult<S>>) tmp);
+    return new PreprocessorKNNQuery<>(relation, (AbstractMaterializeKNNPreprocessor<O, S, KNNResult<S>>) tmp);
   }
 
   /**
@@ -287,7 +287,7 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
         }
 
         // distance function
-        final ObjectParameter<DistanceFunction<? super O, D>> distanceFunctionP = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<DistanceFunction<? super O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
         if(config.grab(distanceFunctionP)) {
           distanceFunction = distanceFunctionP.instantiateClass(config);
         }

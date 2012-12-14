@@ -60,8 +60,8 @@ public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstr
   @Override
   public void test() throws ParameterException {
 
-    ArrayList<String> set = new ArrayList<String>();
-    ArrayList<String> notSet = new ArrayList<String>();
+    ArrayList<String> set = new ArrayList<>();
+    ArrayList<String> notSet = new ArrayList<>();
 
     for(Parameter<?> p : parameterList) {
       if(p.isDefined()) {

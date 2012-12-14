@@ -265,7 +265,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return the path to the root of this tree
    */
   public final IndexTreePath<E> getRootPath() {
-    return new IndexTreePath<E>(new TreeIndexPathComponent<E>(rootEntry, null));
+    return new IndexTreePath<>(new TreeIndexPathComponent<>(rootEntry, null));
   }
 
   /**

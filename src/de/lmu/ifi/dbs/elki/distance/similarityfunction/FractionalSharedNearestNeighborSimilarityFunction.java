@@ -62,7 +62,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
   @Override
   public <T extends O> Instance<T> instantiate(Relation<T> database) {
     SharedNearestNeighborIndex<O> indexi = indexFactory.instantiate((Relation<O>) database);
-    return (Instance<T>) new Instance<O>((Relation<O>) database, indexi);
+    return (Instance<T>) new Instance<>((Relation<O>) database, indexi);
   }
 
   /**
@@ -151,7 +151,7 @@ public class FractionalSharedNearestNeighborSimilarityFunction<O> extends Abstra
 
     @Override
     protected FractionalSharedNearestNeighborSimilarityFunction<O> makeInstance() {
-      return new FractionalSharedNearestNeighborSimilarityFunction<O>(factory);
+      return new FractionalSharedNearestNeighborSimilarityFunction<>(factory);
     }
   }
 }

@@ -191,7 +191,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         if (stepprog != null) {
           stepprog.beginStep(1, "Materializing neighborhoods with respect to reference neighborhood distance function.", LOG);
         }
-        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, comparisonDistanceFunction, kcomp);
+        MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, comparisonDistanceFunction, kcomp);
         database.addIndex(preproc);
         DistanceQuery<O, D> cdq = database.getDistanceQuery(relation, comparisonDistanceFunction);
         knnComp = preproc.getKNNQuery(cdq, kreach, DatabaseQuery.HINT_HEAVY_USE);
@@ -208,7 +208,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
       knnComp = QueryUtil.getKNNQuery(relation, comparisonDistanceFunction, kreach);
       knnReach = QueryUtil.getKNNQuery(relation, reachabilityDistanceFunction, kcomp);
     }
-    return new Pair<KNNQuery<O, D>, KNNQuery<O, D>>(knnComp, knnReach);
+    return new Pair<>(knnComp, knnReach);
   }
 
   /**
@@ -343,7 +343,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Outlier Probabilities", "loop-outlier", TypeUtil.DOUBLE, loops, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("Local Outlier Probabilities", "loop-outlier", TypeUtil.DOUBLE, loops, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -406,7 +406,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         kcomp = kcompP.intValue();
       }
 
-      final ObjectParameter<DistanceFunction<O, D>> compDistP = new ObjectParameter<DistanceFunction<O, D>>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      final ObjectParameter<DistanceFunction<O, D>> compDistP = new ObjectParameter<>(COMPARISON_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if (config.grab(compDistP)) {
         comparisonDistanceFunction = compDistP.instantiateClass(config);
       }
@@ -420,7 +420,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         kreach = kcomp;
       }
 
-      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<DistanceFunction<O, D>>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
+      final ObjectParameter<DistanceFunction<O, D>> reachDistP = new ObjectParameter<>(REACHABILITY_DISTANCE_FUNCTION_ID, DistanceFunction.class, true);
       if (config.grab(reachDistP)) {
         reachabilityDistanceFunction = reachDistP.instantiateClass(config);
       }
@@ -436,7 +436,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
     @Override
     protected LoOP<O, D> makeInstance() {
       DistanceFunction<O, D> realreach = (reachabilityDistanceFunction != null) ? reachabilityDistanceFunction : comparisonDistanceFunction;
-      return new LoOP<O, D>(kreach, kcomp, realreach, comparisonDistanceFunction, lambda);
+      return new LoOP<>(kreach, kcomp, realreach, comparisonDistanceFunction, lambda);
     }
   }
 }

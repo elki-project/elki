@@ -233,13 +233,13 @@ public class ComputeOutlierHistogram implements Evaluator {
       result = scaling.getScaled(result);
       hist.putData(result, positive);
     }
-    Collection<DoubleVector> collHist = new ArrayList<DoubleVector>(hist.getNumBins());
+    Collection<DoubleVector> collHist = new ArrayList<>(hist.getNumBins());
     for (ObjHistogram.Iter<DoubleDoublePair> iter = hist.iter(); iter.valid(); iter.advance()) {
       DoubleDoublePair data = iter.getValue();
       DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), data.first, data.second });
       collHist.add(row);
     }
-    return new HistogramResult<DoubleVector>("Outlier Score Histogram", "outlier-histogram", collHist);
+    return new HistogramResult<>("Outlier Score Histogram", "outlier-histogram", collHist);
   }
 
   @Override
@@ -299,7 +299,7 @@ public class ComputeOutlierHistogram implements Evaluator {
         bins = binsP.getValue();
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, IdentityScaling.class);
       if (config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

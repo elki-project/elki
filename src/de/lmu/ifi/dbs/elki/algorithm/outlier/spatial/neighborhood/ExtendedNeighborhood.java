@@ -202,7 +202,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
        * @return Inner neighborhood.
        */
       protected static <O> NeighborSetPredicate.Factory<O> getParameterInnerNeighborhood(Parameterization config) {
-        final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<NeighborSetPredicate.Factory<O>>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
+        final ObjectParameter<NeighborSetPredicate.Factory<O>> param = new ObjectParameter<>(NEIGHBORHOOD_ID, NeighborSetPredicate.Factory.class);
         if(config.grab(param)) {
           return param.instantiateClass(config);
         }
@@ -233,7 +233,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
 
       @Override
       protected ExtendedNeighborhood.Factory<O> makeInstance() {
-        return new ExtendedNeighborhood.Factory<O>(inner, steps);
+        return new ExtendedNeighborhood.Factory<>(inner, steps);
       }
     }
   }

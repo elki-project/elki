@@ -75,14 +75,14 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
     int lineNumber = 0;
     int dimensionality = -1;
-    List<BitVector> vectors = new ArrayList<BitVector>();
-    List<LabelList> labels = new ArrayList<LabelList>();
+    List<BitVector> vectors = new ArrayList<>();
+    List<LabelList> labels = new ArrayList<>();
     try {
       for(String line; (line = reader.readLine()) != null; lineNumber++) {
         if(!line.startsWith(COMMENT) && line.length() > 0) {
           List<String> entries = tokenize(line);
           // FIXME: use more efficient storage right away?
-          List<Bit> attributes = new ArrayList<Bit>();
+          List<Bit> attributes = new ArrayList<>();
           LabelList ll = null;
           for(String entry : entries) {
             try {
@@ -116,7 +116,7 @@ public class BitVectorLabelParser extends AbstractParser implements Parser {
   }
 
   protected VectorFieldTypeInformation<BitVector> getTypeInformation(int dimensionality) {
-    return new VectorFieldTypeInformation<BitVector>(BitVector.FACTORY, dimensionality);
+    return new VectorFieldTypeInformation<>(BitVector.FACTORY, dimensionality);
   }
 
   @Override

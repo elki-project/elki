@@ -119,7 +119,7 @@ public class SVGPlot {
   /**
    * Manage objects with an id.
    */
-  private HashMap<String, WeakReference<Element>> objWithId = new HashMap<String, WeakReference<Element>>();
+  private HashMap<String, WeakReference<Element>> objWithId = new HashMap<>();
 
   /**
    * Registers changes of this SVGPlot.
@@ -581,7 +581,7 @@ public class SVGPlot {
    * @param obj Element
    */
   public void putIdElement(String id, Element obj) {
-    objWithId.put(id, new WeakReference<Element>(obj));
+    objWithId.put(id, new WeakReference<>(obj));
   }
 
   /**

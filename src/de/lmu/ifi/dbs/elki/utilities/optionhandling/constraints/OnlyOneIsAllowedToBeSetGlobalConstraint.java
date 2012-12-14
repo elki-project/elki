@@ -60,7 +60,7 @@ public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterC
    */
   @Override
   public void test() throws ParameterException {
-    ArrayList<String> set = new ArrayList<String>();
+    ArrayList<String> set = new ArrayList<>();
     for(Parameter<?> p : parameters) {
       if(p.isDefined()) {
         // FIXME: Retire the use of this constraint for Flags!

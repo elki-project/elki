@@ -159,14 +159,14 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     final int dimensions = RelationUtil.dimensionality(relation);
 
     splitPartitions = new double[dimensions][];
-    daFiles = new ArrayList<DAFile>(dimensions);
+    daFiles = new ArrayList<>(dimensions);
     for(int d = 0; d < dimensions; d++) {
       final DAFile f = new DAFile(relation, d, partitions);
       splitPartitions[d] = f.getSplitPositions();
       daFiles.add(f);
     }
 
-    vectorApprox = new ArrayList<VectorApproximation>();
+    vectorApprox = new ArrayList<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       V dv = relation.get(id);
@@ -468,10 +468,10 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       // filter step
 
       // calculate selectivity coefficients
-      List<DoubleObjPair<DAFile>> subspaceDAFiles = new ArrayList<DoubleObjPair<DAFile>>(subspace.cardinality());
+      List<DoubleObjPair<DAFile>> subspaceDAFiles = new ArrayList<>(subspace.cardinality());
       for(int d = subspace.nextSetBit(0); d >= 0; d = subspace.nextSetBit(d + 1)) {
         DAFile daFile = daFiles.get(d);
-        subspaceDAFiles.add(new DoubleObjPair<DAFile>(-1, daFile));
+        subspaceDAFiles.add(new DoubleObjPair<>(-1, daFile));
       }
       calculateSelectivityCoeffs(subspaceDAFiles, query, range.doubleValue());
       // sort DA files by selectivity
@@ -603,7 +603,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
           if(candidates2 != null) {
             candidates1 = candidates2;
           }
-          candidates2 = new LinkedList<PartialVACandidate>();
+          candidates2 = new LinkedList<>();
 
           DoubleMaxHeap kMinMaxDists = new DoubleMaxHeap(k+1);
           for(PartialVACandidate va : candidates1) {
@@ -631,7 +631,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       stats.scannedBytes += relation.size() * VectorApproximation.byteOnDisk(addition, partitions);
 
       // refinement step
-      ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<PartialVACandidate>(candidates2);
+      ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<>(candidates2);
       // sort candidates by lower bound (minDist)
       Collections.sort(sortedCandidates);
       DoubleDistanceKNNList result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
@@ -641,7 +641,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     }
 
     private LinkedList<PartialVACandidate> filter1(int k, int reducedDims, List<DAFile> daFiles, VectorApproximation queryApprox, int subspaceDims, VALPNormDistance dist) {
-      LinkedList<PartialVACandidate> candidates1 = new LinkedList<PartialVACandidate>();
+      LinkedList<PartialVACandidate> candidates1 = new LinkedList<>();
       DoubleMaxHeap minmaxdist = new DoubleMaxHeap(k+1);
 
       for(VectorApproximation va : vectorApprox) {
@@ -704,7 +704,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
      */
     public List<DAFile> getWorstCaseDistOrder(VALPNormDistance dist, BitSet subspace) {
       int subspaceLength = subspace.cardinality();
-      List<DAFile> result = new ArrayList<DAFile>(subspaceLength);
+      List<DAFile> result = new ArrayList<>(subspaceLength);
       for(int i = subspace.nextSetBit(0); i >= 0; i = subspace.nextSetBit(i + 1)) {
         result.add(daFiles.get(i));
       }
@@ -791,7 +791,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
 
     @Override
     public PartialVAFile<V> instantiate(Relation<V> relation) {
-      return new PartialVAFile<V>(pagesize, relation, numpart);
+      return new PartialVAFile<>(pagesize, relation, numpart);
     }
 
     @Override
@@ -834,7 +834,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
 
       @Override
       protected Factory<?> makeInstance() {
-        return new Factory<NumberVector<?>>(pagesize, numpart);
+        return new Factory<>(pagesize, numpart);
       }
     }
   }

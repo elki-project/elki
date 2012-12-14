@@ -117,7 +117,7 @@ public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements 
       final double score = (pattern.matcher(label).matches()) ? 1 : 0;
       scores.putDouble(iditer, score);
     }
-    Relation<Double> scoreres = new MaterializedRelation<Double>("By label outlier scores", "label-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("By label outlier scores", "label-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
   }

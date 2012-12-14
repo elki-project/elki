@@ -194,9 +194,9 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?>, D extends
 
     // adds reference points to the result. header information for the
     // visualizer to find the reference points in the result
-    ReferencePointsResult<V> refp = new ReferencePointsResult<V>("Reference points", "reference-points", refPoints);
+    ReferencePointsResult<V> refp = new ReferencePointsResult<>("Reference points", "reference-points", refPoints);
 
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Reference-points Outlier Scores", "reference-outlier", TypeUtil.DOUBLE, rbod_score, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("Reference-points Outlier Scores", "reference-outlier", TypeUtil.DOUBLE, rbod_score, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(0.0, 1.0, 0.0, 1.0, 0.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     result.addChildResult(refp);
@@ -215,7 +215,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?>, D extends
    */
   protected DistanceDBIDResult<D> computeDistanceVector(V refPoint, Relation<V> database, DistanceQuery<V, D> distFunc) {
     // TODO: optimize for double distances?
-    GenericDistanceDBIDList<D> referenceDists = new GenericDistanceDBIDList<D>(database.size());
+    GenericDistanceDBIDList<D> referenceDists = new GenericDistanceDBIDList<>(database.size());
     for(DBIDIter iditer = database.iterDBIDs(); iditer.valid(); iditer.advance()) {
       referenceDists.add(distFunc.distance(iditer, refPoint), iditer);
     }
@@ -321,7 +321,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?>, D extends
       if(config.grab(pK)) {
         k = pK.getValue();
       }
-      final ObjectParameter<ReferencePointsHeuristic<V>> refpP = new ObjectParameter<ReferencePointsHeuristic<V>>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
+      final ObjectParameter<ReferencePointsHeuristic<V>> refpP = new ObjectParameter<>(REFP_ID, ReferencePointsHeuristic.class, GridBasedReferencePoints.class);
       if(config.grab(refpP)) {
         refp = refpP.instantiateClass(config);
       }
@@ -329,7 +329,7 @@ public class ReferenceBasedOutlierDetection<V extends NumberVector<?>, D extends
 
     @Override
     protected ReferenceBasedOutlierDetection<V, D> makeInstance() {
-      return new ReferenceBasedOutlierDetection<V, D>(k, distanceFunction, refp);
+      return new ReferenceBasedOutlierDetection<>(k, distanceFunction, refp);
     }
   }
 }

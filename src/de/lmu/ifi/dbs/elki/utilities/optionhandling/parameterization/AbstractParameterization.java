@@ -46,7 +46,7 @@ public abstract class AbstractParameterization implements Parameterization {
   /**
    * Errors
    */
-  List<ParameterException> errors = new ArrayList<ParameterException>();
+  List<ParameterException> errors = new ArrayList<>();
 
   /**
    * The logger of the class.
@@ -89,7 +89,7 @@ public abstract class AbstractParameterization implements Parameterization {
   public synchronized void clearErrors() {
     // Do NOT use errors.clear(), since we might have an error report
     // referencing the collection!
-    errors = new ArrayList<ParameterException>();
+    errors = new ArrayList<>();
   }
 
   /**

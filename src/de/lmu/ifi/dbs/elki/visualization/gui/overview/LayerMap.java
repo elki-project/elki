@@ -41,7 +41,7 @@ public class LayerMap {
   /**
    * The actual map
    */
-  private HashMap<Pair<PlotItem, VisualizationTask>, Pair<Element, Visualization>> map = new HashMap<Pair<PlotItem, VisualizationTask>, Pair<Element, Visualization>>();
+  private HashMap<Pair<PlotItem, VisualizationTask>, Pair<Element, Visualization>> map = new HashMap<>();
   
   /**
    * Helper function for building a key object
@@ -51,7 +51,7 @@ public class LayerMap {
    * @return Key
    */
   private Pair<PlotItem, VisualizationTask> key(PlotItem item, VisualizationTask task) {
-    return new Pair<PlotItem, VisualizationTask>(item, task);
+    return new Pair<>(item, task);
   }
 
   /**
@@ -62,7 +62,7 @@ public class LayerMap {
    * @return Value object
    */
   private Pair<Element, Visualization> value(Element elem, Visualization vis) {
-    return new Pair<Element, Visualization>(elem, vis);
+    return new Pair<>(elem, vis);
   }
 
   /**

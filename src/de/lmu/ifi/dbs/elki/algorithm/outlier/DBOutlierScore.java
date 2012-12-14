@@ -103,7 +103,7 @@ public class DBOutlierScore<O, D extends Distance<D>> extends AbstractDBOutlier<
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractDBOutlier.Parameterizer<O, D> {
     @Override
     protected DBOutlierScore<O, D> makeInstance() {
-      return new DBOutlierScore<O, D>(distanceFunction, d);
+      return new DBOutlierScore<>(distanceFunction, d);
     }
   }
 }

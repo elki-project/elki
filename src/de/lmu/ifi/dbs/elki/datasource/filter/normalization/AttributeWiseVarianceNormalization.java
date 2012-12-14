@@ -268,12 +268,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
         }
       }
 
-      ArrayList<Parameter<?>> global_1 = new ArrayList<Parameter<?>>();
+      ArrayList<Parameter<?>> global_1 = new ArrayList<>();
       global_1.add(meanP);
       global_1.add(stddevP);
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
-      ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
+      ArrayList<ListParameter<?>> global = new ArrayList<>();
       global.add(meanP);
       global.add(stddevP);
       config.checkConstraint(new EqualSizeGlobalConstraint(global));
@@ -281,7 +281,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
 
     @Override
     protected AttributeWiseVarianceNormalization<V> makeInstance() {
-      return new AttributeWiseVarianceNormalization<V>(mean, stddev);
+      return new AttributeWiseVarianceNormalization<>(mean, stddev);
     }
   }
 }

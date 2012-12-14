@@ -87,8 +87,8 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    * @return Objects contained in query range.
    */
   protected DistanceDBIDResult<D> doRangeQuery(O object, D epsilon) {
-    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<GenericDistanceSearchCandidate<D>>();
+    final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<>();
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<D>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));

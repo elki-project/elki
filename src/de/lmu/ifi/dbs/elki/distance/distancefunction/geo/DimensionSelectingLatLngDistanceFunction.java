@@ -99,12 +99,12 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
 
   @Override
   public SimpleTypeInformation<? super NumberVector<?>> getInputTypeRestriction() {
-    return new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
+    return new VectorFieldTypeInformation<>(NumberVector.class, Math.max(dimlat, dimlng), Integer.MAX_VALUE);
   }
 
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
-    return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
+    return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
   /**

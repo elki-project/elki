@@ -69,7 +69,7 @@ public class MergedParameterization implements Parameterization {
     super();
     this.inner = child;
     this.current = new ListParameterization();
-    this.used = new ArrayList<Pair<OptionID, Object>>();
+    this.used = new ArrayList<>();
   }
 
   /**

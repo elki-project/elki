@@ -72,12 +72,12 @@ public class PlotItem {
   /**
    * The visualization tasks at this location
    */
-  public List<VisualizationTask> tasks = new LinkedList<VisualizationTask>();
+  public List<VisualizationTask> tasks = new LinkedList<>();
 
   /**
    * Subitems to plot
    */
-  public Collection<PlotItem> subitems = new LinkedList<PlotItem>();
+  public Collection<PlotItem> subitems = new LinkedList<>();
 
   /**
    * Constructor.

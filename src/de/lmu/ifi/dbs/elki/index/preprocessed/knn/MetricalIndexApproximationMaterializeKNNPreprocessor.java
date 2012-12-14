@@ -114,7 +114,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      HashMap<DBIDPair, D> cache = new HashMap<DBIDPair, D>((size * size * 3) >> 2);
+      HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 2);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
@@ -217,7 +217,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
     @Override
     public MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instantiate(Relation<O> relation) {
-      MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E>(relation, distanceFunction, k);
+      MetricalIndexApproximationMaterializeKNNPreprocessor<O, D, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -231,7 +231,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     public static class Parameterizer<O extends NumberVector<?>, D extends Distance<D>, N extends Node<E>, E extends MTreeEntry<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected Factory<O, D, N, E> makeInstance() {
-        return new Factory<O, D, N, E>(k, distanceFunction);
+        return new Factory<>(k, distanceFunction);
       }
     }
   }

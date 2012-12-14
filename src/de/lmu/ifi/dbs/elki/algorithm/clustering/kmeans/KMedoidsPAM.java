@@ -124,14 +124,14 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
    */
   public Clustering<MedoidModel> run(Database database, Relation<V> relation) {
     if (relation.size() <= 0) {
-      return new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
+      return new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
     }
     DistanceQuery<V, D> distQ = database.getDistanceQuery(relation, getDistanceFunction());
     DBIDs ids = relation.getDBIDs();
     // Choose initial medoids
     ArrayModifiableDBIDs medoids = DBIDUtil.newArray(initializer.chooseInitialMedoids(k, distQ));
     // Setup cluster assignment store
-    List<ModifiableDBIDs> clusters = new ArrayList<ModifiableDBIDs>();
+    List<ModifiableDBIDs> clusters = new ArrayList<>();
     for (int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet(relation.size() / k));
     }
@@ -204,10 +204,10 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     }
 
     // Wrap result
-    Clustering<MedoidModel> result = new Clustering<MedoidModel>("k-Medoids Clustering", "kmedoids-clustering");
+    Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
     for (int i = 0; i < clusters.size(); i++) {
       MedoidModel model = new MedoidModel(medoids.get(i));
-      result.addCluster(new Cluster<MedoidModel>(clusters.get(i), model));
+      result.addCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
   }
@@ -293,7 +293,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
         k = kP.intValue();
       }
 
-      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<KMedoidsInitialization<V>>(KMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
+      ObjectParameter<KMedoidsInitialization<V>> initialP = new ObjectParameter<>(KMeans.INIT_ID, KMedoidsInitialization.class, PAMInitialMeans.class);
       if (config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -307,7 +307,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
 
     @Override
     protected KMedoidsPAM<V, D> makeInstance() {
-      return new KMedoidsPAM<V, D>(distanceFunction, k, maxiter, initializer);
+      return new KMedoidsPAM<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }

@@ -56,7 +56,7 @@ abstract public class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends D
    */
   public AbstractKNNHeap(int k) {
     super();
-    heap = new TiedTopBoundedHeap<P>(k, COMPARATOR);
+    heap = new TiedTopBoundedHeap<>(k, COMPARATOR);
   }
 
   /**

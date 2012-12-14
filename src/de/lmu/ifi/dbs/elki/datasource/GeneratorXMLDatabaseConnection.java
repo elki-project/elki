@@ -645,7 +645,7 @@ public class GeneratorXMLDatabaseConnection implements DatabaseConnection {
       throw new UnableToComplyException("No cluster name given in specification file.");
     }
 
-    ArrayList<Vector> points = new ArrayList<Vector>();
+    ArrayList<Vector> points = new ArrayList<>();
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
     while (iter.hasNext()) {

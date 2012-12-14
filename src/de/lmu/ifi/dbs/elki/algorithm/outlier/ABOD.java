@@ -64,7 +64,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -182,7 +181,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     staticids.sort();
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
-    Heap<DoubleDBIDPair> pq = new Heap<DoubleDBIDPair>(relation.size(), Collections.reverseOrder());
+    Heap<DoubleDBIDPair> pq = new Heap<>(relation.size(), Collections.reverseOrder());
 
     // preprocess kNN neighborhoods
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
@@ -219,7 +218,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       minmaxabod.put(pair.doubleValue());
     }
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Angle-based Outlier Degree", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("Angle-based Outlier Degree", "abod-outlier", TypeUtil.DOUBLE, abodvalues, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -239,7 +238,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
 
-    Heap<DoubleDBIDPair> pq = new Heap<DoubleDBIDPair>(relation.size(), Collections.reverseOrder());
+    Heap<DoubleDBIDPair> pq = new Heap<>(relation.size(), Collections.reverseOrder());
     // get Candidate Ranking
     for (DBIDIter aKey = relation.iterDBIDs(); aKey.valid(); aKey.advance()) {
       WritableDoubleDataStore dists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
@@ -264,7 +263,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       pq.add(DBIDUtil.newPair(var, aKey));
     }
     // refine Candidates
-    Heap<DoubleDBIDPair> resqueue = new Heap<DoubleDBIDPair>(k);
+    Heap<DoubleDBIDPair> resqueue = new Heap<>(k);
     MeanVariance s = new MeanVariance();
     while (!pq.isEmpty()) {
       if (resqueue.size() == k && pq.peek().doubleValue() > resqueue.peek().doubleValue()) {
@@ -307,7 +306,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       minmaxabod.put(pair.doubleValue());
     }
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Angle-based Outlier Detection", "abod-outlier", TypeUtil.DOUBLE, abodvalues, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Angle-based Outlier Detection", "abod-outlier", TypeUtil.DOUBLE, abodvalues, ids);
     OutlierScoreMeta scoreMeta = new InvertedOutlierScoreMeta(minmaxabod.getMin(), minmaxabod.getMax(), 0.0, Double.POSITIVE_INFINITY);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -405,7 +404,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   }
 
   private Heap<DoubleDBIDPair> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
-    Heap<DoubleDBIDPair> nn = new Heap<DoubleDBIDPair>(sampleSize);
+    Heap<DoubleDBIDPair> nn = new Heap<>(sampleSize);
     for (DBIDIter bKey = data.iterDBIDs(); bKey.valid(); bKey.advance()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.putDouble(bKey, val);
@@ -421,7 +420,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   }
 
   private Heap<DoubleDBIDPair> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
-    Heap<DoubleDBIDPair> nn = new Heap<DoubleDBIDPair>(sampleSize);
+    Heap<DoubleDBIDPair> nn = new Heap<>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
     for (DBIDIter bKey = data.iterDBIDs(); bKey.valid(); bKey.advance()) {
@@ -445,14 +444,14 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   public String getExplanations(Relation<V> data) {
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
-    Heap<DoubleDBIDPair> pq = new Heap<DoubleDBIDPair>(data.size(), Collections.reverseOrder());
-    HashMap<DBID, DBIDs> explaintab = new HashMap<DBID, DBIDs>();
+    Heap<DoubleDBIDPair> pq = new Heap<>(data.size(), Collections.reverseOrder());
+    HashMap<DBID, DBIDs> explaintab = new HashMap<>();
     // test all objects
     MeanVariance s = new MeanVariance(), s2 = new MeanVariance();
     for (DBIDIter objKey = data.iterDBIDs(); objKey.valid(); objKey.advance()) {
       s.reset();
       // Queue for the best explanation
-      Heap<DoubleDBIDPair> explain = new Heap<DoubleDBIDPair>();
+      Heap<DoubleDBIDPair> explain = new Heap<>();
       // determine Object
       // for each pair of other objects
       for (DBIDIter key1 = data.iterDBIDs(); key1.valid(); key1.advance()) {
@@ -591,7 +590,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       if (config.grab(sampleSizeP)) {
         sampleSize = sampleSizeP.getValue();
       }
-      final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
+      final ObjectParameter<PrimitiveSimilarityFunction<V, DoubleDistance>> param = new ObjectParameter<>(KERNEL_FUNCTION_ID, PrimitiveSimilarityFunction.class, PolynomialKernelFunction.class);
       if (config.grab(param)) {
         primitiveKernelFunction = param.instantiateClass(config);
       }
@@ -599,7 +598,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
 
     @Override
     protected ABOD<V> makeInstance() {
-      return new ABOD<V>(k, sampleSize, primitiveKernelFunction, distanceFunction);
+      return new ABOD<>(k, sampleSize, primitiveKernelFunction, distanceFunction);
     }
   }
 }

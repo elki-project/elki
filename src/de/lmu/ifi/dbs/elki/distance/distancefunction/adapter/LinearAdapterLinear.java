@@ -41,20 +41,20 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunct
  * 
  * @param <O> Object class to process.
  */
-public class SimilarityAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
+public class LinearAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
   /**
    * Constructor.
    * 
    * @param similarityFunction Similarity function
    */
-  public SimilarityAdapterLinear(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
+  public LinearAdapterLinear(NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>> similarityFunction) {
     super(similarityFunction);
   }
 
   @Override
   public <T extends O> DistanceQuery<T, DoubleDistance> instantiate(Relation<T> database) {
     SimilarityQuery<T, ? extends NumberDistance<?, ?>> similarityQuery = similarityFunction.instantiate(database);
-    return new Instance<T>(database, this, similarityQuery);
+    return new Instance<>(database, this, similarityQuery);
   }
 
   /**
@@ -91,8 +91,8 @@ public class SimilarityAdapterLinear<O> extends AbstractSimilarityAdapter<O> {
    */
   public static class Parameterizer<O> extends AbstractSimilarityAdapter.Parameterizer<O> {
     @Override
-    protected SimilarityAdapterLinear<O> makeInstance() {
-      return new SimilarityAdapterLinear<O>(similarityFunction);
+    protected LinearAdapterLinear<O> makeInstance() {
+      return new LinearAdapterLinear<>(similarityFunction);
     }
   }
 }

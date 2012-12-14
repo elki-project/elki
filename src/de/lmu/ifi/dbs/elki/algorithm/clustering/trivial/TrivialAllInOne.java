@@ -63,7 +63,7 @@ public class TrivialAllInOne extends AbstractAlgorithm<Clustering<Model>> implem
 
   public Clustering<Model> run(Relation<?> relation) {
     final DBIDs ids = relation.getDBIDs();
-    Clustering<Model> result = new Clustering<Model>("All-in-one trivial Clustering", "allinone-clustering");
+    Clustering<Model> result = new Clustering<>("All-in-one trivial Clustering", "allinone-clustering");
     Cluster<Model> c = new Cluster<Model>(ids, ClusterModel.CLUSTER);
     result.addCluster(c);
     return result;

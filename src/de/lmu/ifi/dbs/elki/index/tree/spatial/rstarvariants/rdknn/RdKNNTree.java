@@ -149,7 +149,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   @Override
   protected void postDelete(RdKNNEntry<D> entry) {
     // reverse knn of o
-    GenericDistanceDBIDList<D> rnns = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> rnns = new GenericDistanceDBIDList<>();
     doReverseKNN(getRoot(), ((RdKNNLeafEntry<D>) entry).getDBID(), rnns);
 
     // knn of rnn
@@ -190,7 +190,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     }
 
     // get candidates
-    GenericDistanceDBIDList<D> candidates = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> candidates = new GenericDistanceDBIDList<>();
     doReverseKNN(getRoot(), oid, candidates);
 
     if(k == k_max) {
@@ -207,7 +207,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     candidateIDs.sort();
     List<? extends KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
 
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     int i = 0;
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance(), i++) {
       for (DistanceDBIDResultIter<D> qr = knnLists.get(i).iter(); qr.valid(); qr.advance()) {
@@ -229,7 +229,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     }
 
     // get candidates
-    Map<DBID, GenericDistanceDBIDList<D>> candidateMap = new HashMap<DBID, GenericDistanceDBIDList<D>>();
+    Map<DBID, GenericDistanceDBIDList<D>> candidateMap = new HashMap<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       candidateMap.put(id, new GenericDistanceDBIDList<D>());
@@ -237,7 +237,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     doBulkReverseKNN(getRoot(), ids, candidateMap);
 
     if(k == k_max) {
-      List<GenericDistanceDBIDList<D>> resultList = new ArrayList<GenericDistanceDBIDList<D>>();
+      List<GenericDistanceDBIDList<D>> resultList = new ArrayList<>();
       for(GenericDistanceDBIDList<D> candidates : candidateMap.values()) {
         candidates.sort();
         resultList.add(candidates);
@@ -258,10 +258,10 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     List<? extends KNNResult<D>> knnLists = knnQuery.getKNNForBulkDBIDs(candidateIDs, k);
 
     // and add candidate c to the result if o is a knn of c
-    List<GenericDistanceDBIDList<D>> resultList = new ArrayList<GenericDistanceDBIDList<D>>();
+    List<GenericDistanceDBIDList<D>> resultList = new ArrayList<>();
     for(DBID id : candidateMap.keySet()) {
       GenericDistanceDBIDList<D> candidates = candidateMap.get(id);
-      GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+      GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
       for (DistanceDBIDResultIter<D> candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
         int pos = candidateIDs.binarySearch(candidate);
         assert(pos >= 0);
@@ -346,7 +346,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   // TODO: move somewhere else?
   protected List<DistanceEntry<D, RdKNNEntry<D>>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
-    List<DistanceEntry<D, RdKNNEntry<D>>> result = new ArrayList<DistanceEntry<D, RdKNNEntry<D>>>();
+    List<DistanceEntry<D, RdKNNEntry<D>>> result = new ArrayList<>();
 
     for(int i = 0; i < node.getNumEntries(); i++) {
       @SuppressWarnings("unchecked")
@@ -605,7 +605,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
     // Make an example leaf
     if(canBulkLoad()) {
-      List<RdKNNEntry<D>> leafs = new ArrayList<RdKNNEntry<D>>(ids.size());
+      List<RdKNNEntry<D>> leafs = new ArrayList<>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }

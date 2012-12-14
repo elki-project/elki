@@ -222,7 +222,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   private Relation<?> addNewRelation(SimpleTypeInformation<?> meta) {
     @SuppressWarnings("unchecked")
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
-    Relation<?> relation = new MaterializedRelation<Object>(this, ometa, ids);
+    Relation<?> relation = new MaterializedRelation<>(this, ometa, ids);
     relations.add(relation);
     getHierarchy().add(this, relation);
     // Try to add indexes where appropriate
@@ -249,7 +249,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     // Prepare bundle to return
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for (Relation<?> relation : relations) {
-      ArrayList<Object> data = new ArrayList<Object>(ids.size());
+      ArrayList<Object> data = new ArrayList<>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         data.add(relation.get(iter));
       }
@@ -338,12 +338,12 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get database connection.
-      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if (config.grab(dbcP)) {
         databaseConnection = dbcP.instantiateClass(config);
       }
       // Get indexes.
-      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<IndexFactory<?, ?>>(INDEX_ID, IndexFactory.class, true);
+      final ObjectListParameter<IndexFactory<?, ?>> indexFactoryP = new ObjectListParameter<>(INDEX_ID, IndexFactory.class, true);
       if (config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }

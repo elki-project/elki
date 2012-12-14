@@ -108,7 +108,7 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
       if (stepprog != null) {
         stepprog.beginStep(1, "Materializing neighborhoods w.r.t. distance function.", LOG);
       }
-      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, getDistanceFunction(), k);
+      MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, getDistanceFunction(), k);
       relation.getDatabase().addIndex(preproc);
       DistanceQuery<O, D> rdq = relation.getDatabase().getDistanceQuery(relation, getDistanceFunction());
       knnq = preproc.getKNNQuery(rdq, k);
@@ -198,7 +198,7 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Simple Local Outlier Factor", "simple-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Simple Local Outlier Factor", "simple-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
@@ -244,7 +244,7 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
 
     @Override
     protected SimpleLOF<O, D> makeInstance() {
-      return new SimpleLOF<O, D>(k, distanceFunction);
+      return new SimpleLOF<>(k, distanceFunction);
     }
   }
 }

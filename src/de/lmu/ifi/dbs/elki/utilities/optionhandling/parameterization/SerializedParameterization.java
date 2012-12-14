@@ -59,7 +59,7 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public SerializedParameterization() {
     super();
-    parameters = new LinkedList<String>();
+    parameters = new LinkedList<>();
   }
 
   /**

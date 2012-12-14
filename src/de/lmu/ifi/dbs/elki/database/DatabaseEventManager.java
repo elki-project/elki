@@ -88,7 +88,7 @@ public class DatabaseEventManager {
   public void flushDataStoreEvents() {
     // inform listeners
     Object[] listeners = listenerList.getListenerList();
-    Map<Type, DBIDs> objects = new HashMap<Type, DBIDs>();
+    Map<Type, DBIDs> objects = new HashMap<>();
     objects.put(currentDataStoreEventType, DBIDUtil.makeUnmodifiable(dataStoreObjects));
     DataStoreEvent e = new DataStoreEvent(this, objects);
 

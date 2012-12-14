@@ -65,7 +65,7 @@ public class ParallelPlotProjector<V extends NumberVector<?>> extends AbstractHi
 
   @Override
   public Collection<PlotItem> arrange() {
-    List<PlotItem> col = new ArrayList<PlotItem>(1);
+    List<PlotItem> col = new ArrayList<>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);

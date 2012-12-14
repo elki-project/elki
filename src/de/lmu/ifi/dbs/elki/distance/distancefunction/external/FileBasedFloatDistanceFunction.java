@@ -168,7 +168,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
       if(config.grab(MATRIX_PARAM)) {
         matrixfile = MATRIX_PARAM.getValue();
       }
-      final ObjectParameter<DistanceParser<FloatDistance>> PARSER_PARAM = new ObjectParameter<DistanceParser<FloatDistance>>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
+      final ObjectParameter<DistanceParser<FloatDistance>> PARSER_PARAM = new ObjectParameter<>(PARSER_ID, DistanceParser.class, NumberDistanceParser.class);
       if(config.grab(PARSER_PARAM)) {
         ListParameterization parserConfig = new ListParameterization();
         parserConfig.addParameter(DistanceParser.DISTANCE_ID, FloatDistance.class);

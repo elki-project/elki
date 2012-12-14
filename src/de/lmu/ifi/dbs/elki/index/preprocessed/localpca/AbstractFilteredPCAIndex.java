@@ -207,7 +207,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> exten
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        final ObjectParameter<DistanceFunction<NV, DoubleDistance>> pcaDistanceFunctionP = new ObjectParameter<DistanceFunction<NV, DoubleDistance>>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+        final ObjectParameter<DistanceFunction<NV, DoubleDistance>> pcaDistanceFunctionP = new ObjectParameter<>(PCA_DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
 
         if(config.grab(pcaDistanceFunctionP)) {
           pcaDistanceFunction = pcaDistanceFunctionP.instantiateClass(config);

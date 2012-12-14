@@ -254,7 +254,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     // build result
-    Clustering<SubspaceModel<V>> result = new Clustering<SubspaceModel<V>>("DiSH clustering", "dish-clustering");
+    Clustering<SubspaceModel<V>> result = new Clustering<>("DiSH clustering", "dish-clustering");
     for (Cluster<SubspaceModel<V>> c : clusters) {
       if (c.getParents() == null || c.getParents().isEmpty()) {
         result.addCluster(c);
@@ -274,9 +274,9 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   private Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> extractClusters(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, ClusterOrderResult<PreferenceVectorBasedCorrelationDistance> clusterOrder) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extract Clusters", database.size(), LOG) : null;
     int processed = 0;
-    Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
-    Map<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>>();
-    Map<DBID, Pair<BitSet, ArrayModifiableDBIDs>> entryToClusterMap = new HashMap<DBID, Pair<BitSet, ArrayModifiableDBIDs>>();
+    Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap = new HashMap<>();
+    Map<DBID, ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> entryMap = new HashMap<>();
+    Map<DBID, Pair<BitSet, ArrayModifiableDBIDs>> entryToClusterMap = new HashMap<>();
     for (Iterator<ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance>> it = clusterOrder.iterator(); it.hasNext();) {
       ClusterOrderEntry<PreferenceVectorBasedCorrelationDistance> entry = it.next();
       entryMap.put(entry.getID(), entry);
@@ -287,7 +287,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       // get the list of (parallel) clusters for the preference vector
       List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(preferenceVector);
       if (parallelClusters == null) {
-        parallelClusters = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
+        parallelClusters = new ArrayList<>();
         clustersMap.put(preferenceVector, parallelClusters);
       }
 
@@ -305,7 +305,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         }
       }
       if (cluster == null) {
-        cluster = new Pair<BitSet, ArrayModifiableDBIDs>(preferenceVector, DBIDUtil.newArray());
+        cluster = new Pair<>(preferenceVector, DBIDUtil.newArray());
         parallelClusters.add(cluster);
       }
       cluster.second.add(entry.getID());
@@ -373,14 +373,14 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   private List<Cluster<SubspaceModel<V>>> sortClusters(Relation<V> database, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap) {
     final int db_dim = RelationUtil.dimensionality(database);
     // int num = 1;
-    List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<Cluster<SubspaceModel<V>>>();
+    List<Cluster<SubspaceModel<V>>> clusters = new ArrayList<>();
     for (BitSet pv : clustersMap.keySet()) {
       List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
       for (int i = 0; i < parallelClusters.size(); i++) {
         Pair<BitSet, ArrayModifiableDBIDs> c = parallelClusters.get(i);
-        Cluster<SubspaceModel<V>> cluster = new Cluster<SubspaceModel<V>>(c.second);
-        cluster.setModel(new SubspaceModel<V>(new Subspace(c.first), Centroid.make(database, c.second).toVector(database)));
-        cluster.setHierarchy(new HierarchyReferenceLists<Cluster<SubspaceModel<V>>>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
+        Cluster<SubspaceModel<V>> cluster = new Cluster<>(c.second);
+        cluster.setModel(new SubspaceModel<>(new Subspace(c.first), Centroid.make(database, c.second).toVector(database)));
+        cluster.setHierarchy(new HierarchyReferenceLists<>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
         // cluster.setName("Cluster_" + num++);
         String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");
         if (parallelClusters.size() > 1) {
@@ -415,9 +415,9 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   private void checkClusters(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> clustersMap, int minpts) {
     // check if there are clusters < minpts
     // and add them to not assigned
-    List<Pair<BitSet, ArrayModifiableDBIDs>> notAssigned = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>();
-    Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> newClustersMap = new HashMap<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>>();
-    Pair<BitSet, ArrayModifiableDBIDs> noise = new Pair<BitSet, ArrayModifiableDBIDs>(new BitSet(), DBIDUtil.newArray());
+    List<Pair<BitSet, ArrayModifiableDBIDs>> notAssigned = new ArrayList<>();
+    Map<BitSet, List<Pair<BitSet, ArrayModifiableDBIDs>>> newClustersMap = new HashMap<>();
+    Pair<BitSet, ArrayModifiableDBIDs> noise = new Pair<>(new BitSet(), DBIDUtil.newArray());
     for (BitSet pv : clustersMap.keySet()) {
       // noise
       if (pv.cardinality() == 0) {
@@ -429,7 +429,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       // clusters
       else {
         List<Pair<BitSet, ArrayModifiableDBIDs>> parallelClusters = clustersMap.get(pv);
-        List<Pair<BitSet, ArrayModifiableDBIDs>> newParallelClusters = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>(parallelClusters.size());
+        List<Pair<BitSet, ArrayModifiableDBIDs>> newParallelClusters = new ArrayList<>(parallelClusters.size());
         for (Pair<BitSet, ArrayModifiableDBIDs> c : parallelClusters) {
           if (!pv.equals(new BitSet()) && c.second.size() < minpts) {
             notAssigned.add(c);
@@ -456,7 +456,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       }
     }
 
-    List<Pair<BitSet, ArrayModifiableDBIDs>> noiseList = new ArrayList<Pair<BitSet, ArrayModifiableDBIDs>>(1);
+    List<Pair<BitSet, ArrayModifiableDBIDs>> noiseList = new ArrayList<>(1);
     noiseList.add(noise);
     clustersMap.put(noise.first, noiseList);
   }
@@ -699,7 +699,7 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
     @Override
     protected DiSH<V> makeInstance() {
-      return new DiSH<V>(epsilon, dishDistance, opticsO);
+      return new DiSH<>(epsilon, dishDistance, opticsO);
     }
   }
 }

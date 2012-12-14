@@ -77,7 +77,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
   public CLIQUEUnit(SortedSet<Interval> intervals, ModifiableDBIDs ids) {
     this.intervals = intervals;
 
-    dimensionToInterval = new TIntObjectHashMap<Interval>();
+    dimensionToInterval = new TIntObjectHashMap<>();
     for(Interval interval : intervals) {
       dimensionToInterval.put(interval.getDimension(), interval);
     }
@@ -93,10 +93,10 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
    * @param interval the interval belonging to this unit
    */
   public CLIQUEUnit(Interval interval) {
-    intervals = new TreeSet<Interval>();
+    intervals = new TreeSet<>();
     intervals.add(interval);
 
-    dimensionToInterval = new TIntObjectHashMap<Interval>();
+    dimensionToInterval = new TIntObjectHashMap<>();
     dimensionToInterval.put(interval.getDimension(), interval);
 
     ids = DBIDUtil.newHashSet();
@@ -254,7 +254,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
 
     Iterator<Interval> it1 = this.intervals.iterator();
     Iterator<Interval> it2 = other.intervals.iterator();
-    SortedSet<Interval> resultIntervals = new TreeSet<Interval>();
+    SortedSet<Interval> resultIntervals = new TreeSet<>();
     for(int i = 0; i < this.intervals.size() - 1; i++) {
       i1 = it1.next();
       i2 = it2.next();
@@ -270,7 +270,7 @@ public class CLIQUEUnit<V extends NumberVector<?>> {
     resultIDs.retainAll(other.ids);
 
     if(resultIDs.size() / all >= tau) {
-      return new CLIQUEUnit<V>(resultIntervals, resultIDs);
+      return new CLIQUEUnit<>(resultIntervals, resultIDs);
     }
 
     return null;

@@ -77,7 +77,7 @@ public class ApproximativeLeastOverlapInsertionStrategy extends LeastOverlapInse
     }
 
     // Heap of candidates
-    TopBoundedHeap<DoubleIntPair> candidates = new TopBoundedHeap<DoubleIntPair>(numCandidates, Collections.reverseOrder());
+    TopBoundedHeap<DoubleIntPair> candidates = new TopBoundedHeap<>(numCandidates, Collections.reverseOrder());
     for(int i = 0; i < size; i++) {
       // Existing object and extended rectangle:
       SpatialComparable entry = getter.get(options, i);

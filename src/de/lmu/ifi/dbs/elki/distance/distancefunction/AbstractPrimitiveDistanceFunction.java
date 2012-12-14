@@ -70,6 +70,6 @@ public abstract class AbstractPrimitiveDistanceFunction<O, D extends Distance<D>
    */
   @Override
   public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> relation) {
-    return new PrimitiveDistanceQuery<T, D>(relation, this);
+    return new PrimitiveDistanceQuery<>(relation, this);
   }
 }

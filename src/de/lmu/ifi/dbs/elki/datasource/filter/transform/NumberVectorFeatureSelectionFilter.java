@@ -81,7 +81,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     initializeOutputType(in);
-    return new VectorFieldTypeInformation<V>(factory, getDimensionality());
+    return new VectorFieldTypeInformation<>(factory, getDimensionality());
   }
 
   /**
@@ -162,7 +162,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector<?>> exten
 
     @Override
     protected NumberVectorFeatureSelectionFilter<DoubleVector> makeInstance() {
-      return new NumberVectorFeatureSelectionFilter<DoubleVector>(selectedAttributes);
+      return new NumberVectorFeatureSelectionFilter<>(selectedAttributes);
     }
   }
 }

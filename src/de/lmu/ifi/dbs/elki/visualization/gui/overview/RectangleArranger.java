@@ -79,12 +79,12 @@ public class RectangleArranger<T> {
   /**
    * Map indicating which cells are used.
    */
-  private ArrayList<ArrayList<Object>> usage = new ArrayList<ArrayList<Object>>();
+  private ArrayList<ArrayList<Object>> usage = new ArrayList<>();
 
   /**
    * Data
    */
-  private Map<T, double[]> map = new HashMap<T, double[]>();
+  private Map<T, double[]> map = new HashMap<>();
 
   /**
    * Constructor.
@@ -108,7 +108,7 @@ public class RectangleArranger<T> {
     this.widths.add(width);
     this.heights.add(height);
     // setup usage matrix
-    ArrayList<Object> u = new ArrayList<Object>();
+    ArrayList<Object> u = new ArrayList<>();
     u.add(null);
     this.usage.add(u);
     assertConsistent();
@@ -320,7 +320,7 @@ public class RectangleArranger<T> {
     heights.insert(bestey + 1, besthi);
     heights.set(bestey, heights.get(bestey) - besthi);
     // Update used map
-    usage.add(bestey + 1, new ArrayList<Object>(usage.get(bestey)));
+    usage.add(bestey + 1, new ArrayList<>(usage.get(bestey)));
   }
 
   protected void splitCol(int bestex, double bestwi) {
@@ -361,7 +361,7 @@ public class RectangleArranger<T> {
     }
     // Add row:
     {
-      ArrayList<Object> row = new ArrayList<Object>();
+      ArrayList<Object> row = new ArrayList<>();
       for(int x = 0; x <= cols; x++) {
         row.add(null);
       }
@@ -522,7 +522,7 @@ public class RectangleArranger<T> {
    */
   public static void main(String[] args) {
     LOG.getWrappedLogger().setLevel(Level.FINEST);
-    RectangleArranger<String> r = new RectangleArranger<String>(1.3);
+    RectangleArranger<String> r = new RectangleArranger<>(1.3);
     r.put(4., 1., "Histogram");
     r.put(4., 4., "3D view");
     r.put(1., 1., "Meta 1");
@@ -531,14 +531,14 @@ public class RectangleArranger<T> {
     r.put(2., 2., "Meta 4");
     r.put(2., 2., "Meta 5");
 
-    r = new RectangleArranger<String>(3., 3.);
+    r = new RectangleArranger<>(3., 3.);
     r.put(1., 2., "A");
     r.put(2., 1., "B");
     r.put(1., 2., "C");
     r.put(2., 1., "D");
     r.put(2., 2., "E");
 
-    r = new RectangleArranger<String>(4 - 2.6521739130434785);
+    r = new RectangleArranger<>(4 - 2.6521739130434785);
     r.put(4., .5, "A");
     r.put(4., 3., "B");
     r.put(4., 1., "C");

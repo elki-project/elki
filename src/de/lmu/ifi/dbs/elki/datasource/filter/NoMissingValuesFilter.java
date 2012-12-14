@@ -97,7 +97,7 @@ public class NoMissingValuesFilter extends AbstractStreamFilter {
 
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
     for(int j = 0; j < objects.metaLength(); j++) {
-      bundle.appendColumn(objects.meta(j), new ArrayList<Object>());
+      bundle.appendColumn(objects.meta(j), new ArrayList<>());
     }
     for(int i = 0; i < objects.dataLength(); i++) {
       boolean good = true;

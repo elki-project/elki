@@ -262,7 +262,7 @@ public class OutlierLinearScaling implements OutlierScalingFunction {
       }
 
       // Use-Mean and Minimum value must not be set at the same time!
-      ArrayList<Parameter<?>> minmean = new ArrayList<Parameter<?>>();
+      ArrayList<Parameter<?>> minmean = new ArrayList<>();
       minmean.add(minP);
       minmean.add(meanF);
       GlobalParameterConstraint gpc = new OnlyOneIsAllowedToBeSetGlobalConstraint(minmean);

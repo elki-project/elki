@@ -116,7 +116,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
 
   @Override
   public <T extends O> DistanceQuery<T, D> instantiate(Relation<T> relation) {
-    return new Instance<T>(relation, k, parentDistance);
+    return new Instance<>(relation, k, parentDistance);
   }
 
   /**
@@ -244,7 +244,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
         k = kP.getValue();
       }
       
-      final ObjectParameter<DistanceFunction<? super O, D>> parentDistanceP = new ObjectParameter<DistanceFunction<? super O, D>>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      final ObjectParameter<DistanceFunction<? super O, D>> parentDistanceP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if (config.grab(parentDistanceP)) {
         parentDistance = parentDistanceP.instantiateClass(config);
       }
@@ -252,7 +252,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
 
     @Override
     protected MinKDistance<O, D> makeInstance() {
-      return new MinKDistance<O, D>(parentDistance, k + (objectIsInKNN ? 0 : 1));
+      return new MinKDistance<>(parentDistance, k + (objectIsInKNN ? 0 : 1));
     }
   }
 }

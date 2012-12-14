@@ -53,7 +53,7 @@ public class OPTICSProjectorFactory implements ProjectorFactory {
     for(ClusterOrderResult<?> co : cos) {
       if(OPTICSPlot.canPlot(co)) {
         @SuppressWarnings("unchecked")
-        OPTICSProjector<?> proj = new OPTICSProjector<DoubleDistance>((ClusterOrderResult<DoubleDistance>) co);
+        OPTICSProjector<?> proj = new OPTICSProjector<>((ClusterOrderResult<DoubleDistance>) co);
         baseResult.getHierarchy().add(co, proj);
       }
     }

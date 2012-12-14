@@ -170,7 +170,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("LDOF Outlier Score", "ldof-outlier", TypeUtil.DOUBLE, ldofs, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("LDOF Outlier Score", "ldof-outlier", TypeUtil.DOUBLE, ldofs, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(ldofminmax.getMin(), ldofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, LDOF_BASELINE);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -207,7 +207,7 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
     @Override
     protected LDOF<O, D> makeInstance() {
-      return new LDOF<O, D>(distanceFunction, k);
+      return new LDOF<>(distanceFunction, k);
     }
   }
 }

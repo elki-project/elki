@@ -53,10 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p>
  * Outlier Detection based on the distance of an object to its k nearest
  * neighbor.
- * </p>
  * 
  * <p>
  * Reference:<br>
@@ -138,7 +136,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
     if(progressKNNDistance != null) {
       progressKNNDistance.ensureCompleted(LOG);
     }
-    Relation<Double> scoreres = new MaterializedRelation<Double>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, knno_score, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("kNN Outlier Score", "knn-outlier", TypeUtil.DOUBLE, knno_score, relation.getDBIDs());
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreres);
   }
@@ -174,7 +172,7 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
 
     @Override
     protected KNNOutlier<O, D> makeInstance() {
-      return new KNNOutlier<O, D>(distanceFunction, k);
+      return new KNNOutlier<>(distanceFunction, k);
     }
   }
 }

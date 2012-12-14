@@ -185,7 +185,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
     LocalProjectionIndex<V, ?> preprocin = partitionDistanceQuery.getIndex();
 
     // partitioning
-    Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<Integer, ModifiableDBIDs>();
+    Map<Integer, ModifiableDBIDs> partitionMap = new HashMap<>();
     FiniteProgress partitionProgress = LOG.isVerbose() ? new FiniteProgress("Partitioning", relation.size(), LOG) : null;
     int processed = 1;
 
@@ -214,7 +214,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
 
     // convert for partition algorithm.
     // TODO: do this with DynamicDBIDs instead
-    Map<Integer, DBIDs> pmap = new HashMap<Integer, DBIDs>();
+    Map<Integer, DBIDs> pmap = new HashMap<>();
     for(Entry<Integer, ModifiableDBIDs> ent : partitionMap.entrySet()) {
       pmap.put(ent.getKey(), ent.getValue());
     }
@@ -230,7 +230,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
    * @param query The preprocessor based query function
    */
   private Clustering<Model> runPartitionAlgorithm(Relation<V> relation, Map<Integer, DBIDs> partitionMap, DistanceQuery<V, D> query) {
-    Clustering<Model> result = new Clustering<Model>("COPAC clustering", "copac-clustering");
+    Clustering<Model> result = new Clustering<>("COPAC clustering", "copac-clustering");
 
     // TODO: use an extra finite progress for the partitions?
     for(Entry<Integer, DBIDs> pair : partitionMap.entrySet()) {
@@ -316,12 +316,12 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ClassParameter<Factory<V, ?>> indexP = new ClassParameter<LocalProjectionIndex.Factory<V, ?>>(PREPROCESSOR_ID, LocalProjectionIndex.Factory.class);
+      ClassParameter<Factory<V, ?>> indexP = new ClassParameter<>(PREPROCESSOR_ID, LocalProjectionIndex.Factory.class);
       if(config.grab(indexP)) {
         indexI = indexP.instantiateClass(config);
       }
 
-      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, D>> pdistP = new ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, D>>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+      ObjectParameter<FilteredLocalPCABasedDistanceFunction<V, ?, D>> pdistP = new ObjectParameter<>(PARTITION_DISTANCE_ID, FilteredLocalPCABasedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
       if(config.grab(pdistP)) {
         ListParameterization predefinedDist = new ListParameterization();
         predefinedDist.addParameter(IndexBasedDistanceFunction.INDEX_ID, indexI);
@@ -332,7 +332,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
       }
 
       // Parameterize algorithm:
-      ClassParameter<ClusteringAlgorithm<Clustering<Model>>> algP = new ClassParameter<ClusteringAlgorithm<Clustering<Model>>>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
+      ClassParameter<ClusteringAlgorithm<Clustering<Model>>> algP = new ClassParameter<>(PARTITION_ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(algP)) {
         ListParameterization predefined = new ListParameterization();
         predefined.addParameter(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, pdistI);
@@ -348,7 +348,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
 
     @Override
     protected COPAC<V, D> makeInstance() {
-      return new COPAC<V, D>(pdistI, algC, algO);
+      return new COPAC<>(pdistI, algC, algO);
     }
   }
 }

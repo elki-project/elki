@@ -58,7 +58,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
     final int dim = RelationUtil.dimensionality(relation);
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     Pair<V, V> minmax = DatabaseUtil.computeMinMax(relation);
-    List<V> means = new ArrayList<V>(k);
+    List<V> means = new ArrayList<>(k);
     final Random random = rnd.getRandom();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
@@ -81,7 +81,7 @@ public class RandomlyGeneratedInitialMeans<V extends NumberVector<?>> extends Ab
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractKMeansInitialization.Parameterizer<V> {
     @Override
     protected RandomlyGeneratedInitialMeans<V> makeInstance() {
-      return new RandomlyGeneratedInitialMeans<V>(rnd);
+      return new RandomlyGeneratedInitialMeans<>(rnd);
     }
   }
 }

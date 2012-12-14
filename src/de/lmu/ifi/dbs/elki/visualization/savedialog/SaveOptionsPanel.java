@@ -114,7 +114,7 @@ public class SaveOptionsPanel extends JPanel {
 
   protected JButton resetSizeButton;
 
-  protected JComboBox formatSelector;
+  protected JComboBox<String> formatSelector;
 
   // Not particularly useful for most - hide it for now.
   private final boolean hasResetButton = false;
@@ -142,7 +142,7 @@ public class SaveOptionsPanel extends JPanel {
     // *** Format panel
     mainPanel.add(new JLabel(STR_CHOOSE_FORMAT));
 
-    formatSelector = new JComboBox(SVGSaveDialog.getVisibleFormats());
+    formatSelector = new JComboBox<>(SVGSaveDialog.getVisibleFormats());
     formatSelector.setSelectedIndex(0);
     formatSelector.addItemListener(new ItemListener() {
       @Override

@@ -104,7 +104,7 @@ public class EMOutlier<V extends NumberVector<?>> extends AbstractAlgorithm<Outl
       emo_score.putDouble(iditer, maxProb);
       globmax = Math.max(maxProb, globmax);
     }
-    Relation<Double> scoreres = new MaterializedRelation<Double>("EM outlier scores", "em-outlier", TypeUtil.DOUBLE, emo_score, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("EM outlier scores", "em-outlier", TypeUtil.DOUBLE, emo_score, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(0.0, globmax);
     // combine results.
     OutlierResult result = new OutlierResult(meta, scoreres);
@@ -142,7 +142,7 @@ public class EMOutlier<V extends NumberVector<?>> extends AbstractAlgorithm<Outl
 
     @Override
     protected EMOutlier<V> makeInstance() {
-      return new EMOutlier<V>(em);
+      return new EMOutlier<>(em);
     }
   }
 }

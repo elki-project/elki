@@ -168,7 +168,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
     @Override
     public RandomSampleKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
-      return new RandomSampleKNNPreprocessor<O, D>(relation, distanceFunction, k, share, rnd);
+      return new RandomSampleKNNPreprocessor<>(relation, distanceFunction, k, share, rnd);
     }
 
     /**
@@ -228,7 +228,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
 
       @Override
       protected RandomSampleKNNPreprocessor.Factory<O, D> makeInstance() {
-        return new RandomSampleKNNPreprocessor.Factory<O, D>(k, distanceFunction, share, rnd);
+        return new RandomSampleKNNPreprocessor.Factory<>(k, distanceFunction, share, rnd);
       }
     }
   }

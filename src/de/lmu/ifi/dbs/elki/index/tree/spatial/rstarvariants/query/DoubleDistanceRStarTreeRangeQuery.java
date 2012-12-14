@@ -89,7 +89,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    */
   protected DoubleDistanceDBIDList doRangeQuery(O object, double epsilon) {
     final DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
-    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<DoubleDistanceSearchCandidate>();
+    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<>();
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));

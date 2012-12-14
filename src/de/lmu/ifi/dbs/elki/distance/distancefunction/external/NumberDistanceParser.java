@@ -93,7 +93,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("Parsing distance matrix", LOG) : null;
     ModifiableDBIDs ids = DBIDUtil.newHashSet();
-    Map<DBIDPair, D> distanceCache = new HashMap<DBIDPair, D>();
+    Map<DBIDPair, D> distanceCache = new HashMap<>();
     try {
       for (String line; (line = reader.readLine()) != null; lineNumber++) {
         if (prog != null) {
@@ -147,7 +147,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
         }
       }
     }
-    return new DistanceParsingResult<D>(distanceCache);
+    return new DistanceParsingResult<>(distanceCache);
   }
 
   /**
@@ -211,7 +211,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<D> distFuncP = new ObjectParameter<D>(DISTANCE_ID, Distance.class);
+      ObjectParameter<D> distFuncP = new ObjectParameter<>(DISTANCE_ID, Distance.class);
       if (config.grab(distFuncP)) {
         distanceFactory = distFuncP.instantiateClass(config);
       }
@@ -219,7 +219,7 @@ public class NumberDistanceParser<D extends NumberDistance<D, ?>> extends Abstra
 
     @Override
     protected NumberDistanceParser<D> makeInstance() {
-      return new NumberDistanceParser<D>(colSep, quoteChar, distanceFactory);
+      return new NumberDistanceParser<>(colSep, quoteChar, distanceFactory);
     }
   }
 }

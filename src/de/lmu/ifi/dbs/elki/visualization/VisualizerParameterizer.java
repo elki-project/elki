@@ -190,7 +190,7 @@ public class VisualizerParameterizer implements Parameterizable {
    * @return generated title
    */
   public static String getTitle(Database db, Result result) {
-    List<Pair<Object, Parameter<?>>> settings = new ArrayList<Pair<Object, Parameter<?>>>();
+    List<Pair<Object, Parameter<?>>> settings = new ArrayList<>();
     for (SettingsResult sr : ResultUtil.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
@@ -297,7 +297,7 @@ public class VisualizerParameterizer implements Parameterizable {
      * @return List of all adapters found.
      */
     private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
-      ArrayList<ProjectorFactory> factories = new ArrayList<ProjectorFactory>();
+      ArrayList<ProjectorFactory> factories = new ArrayList<>();
       for (Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
         if (filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
@@ -325,7 +325,7 @@ public class VisualizerParameterizer implements Parameterizable {
      * @return List of all adapters found.
      */
     private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
-      ArrayList<VisFactory> factories = new ArrayList<VisFactory>();
+      ArrayList<VisFactory> factories = new ArrayList<>();
       for (Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
         if (filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;

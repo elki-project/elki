@@ -70,8 +70,8 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
    */
   @Override
   public <N extends SpatialComparable> List<List<N>> partition(List<N> spatialObjects, int minEntries, int maxEntries) {
-    List<List<N>> partitions = new ArrayList<List<N>>();
-    List<N> objects = new ArrayList<N>(spatialObjects);
+    List<List<N>> partitions = new ArrayList<>();
+    List<N> objects = new ArrayList<>(spatialObjects);
 
     while(objects.size() > 0) {
       StringBuilder msg = new StringBuilder();
@@ -88,7 +88,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
       Collections.sort(objects, new SpatialComparator(splitAxis, SpatialComparator.MIN));
 
       // insert into partition
-      List<N> partition1 = new ArrayList<N>();
+      List<N> partition1 = new ArrayList<>();
       for(int i = 0; i < splitPoint; i++) {
         N o = objects.remove(0);
         partition1.add(o);

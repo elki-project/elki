@@ -212,7 +212,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
 
     @Override
     public PreDeConSubspaceIndex<V, D> instantiate(Relation<V> relation) {
-      return new PreDeConSubspaceIndex<V, D>(relation, epsilon, rangeQueryDistanceFunction, minpts, delta);
+      return new PreDeConSubspaceIndex<>(relation, epsilon, rangeQueryDistanceFunction, minpts, delta);
     }
 
     /**
@@ -241,7 +241,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
 
       @Override
       protected Factory<V, D> makeInstance() {
-        return new Factory<V, D>(epsilon, rangeQueryDistanceFunction, minpts, delta);
+        return new Factory<>(epsilon, rangeQueryDistanceFunction, minpts, delta);
       }
     }
   }

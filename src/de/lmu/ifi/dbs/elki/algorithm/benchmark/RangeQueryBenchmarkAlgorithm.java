@@ -333,7 +333,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<DatabaseConnection>(QUERY_ID, DatabaseConnection.class);
+      ObjectParameter<DatabaseConnection> queryP = new ObjectParameter<>(QUERY_ID, DatabaseConnection.class);
       queryP.setOptional(true);
       if (config.grab(queryP)) {
         queries = queryP.instantiateClass(config);
@@ -351,7 +351,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
 
     @Override
     protected RangeQueryBenchmarkAlgorithm<O, D> makeInstance() {
-      return new RangeQueryBenchmarkAlgorithm<O, D>(distanceFunction, queries, sampling, random);
+      return new RangeQueryBenchmarkAlgorithm<>(distanceFunction, queries, sampling, random);
     }
   }
 }

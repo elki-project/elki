@@ -403,7 +403,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
 
     @Override
     public MaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
-      MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<O, D>(relation, distanceFunction, k);
+      MaterializeKNNPreprocessor<O, D> instance = new MaterializeKNNPreprocessor<>(relation, distanceFunction, k);
       return instance;
     }
 
@@ -417,7 +417,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
     public static class Parameterizer<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected Factory<O, D> makeInstance() {
-        return new Factory<O, D>(k, distanceFunction);
+        return new Factory<>(k, distanceFunction);
       }
     }
   }

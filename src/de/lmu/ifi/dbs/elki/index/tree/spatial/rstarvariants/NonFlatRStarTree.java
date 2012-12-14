@@ -180,7 +180,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     int minEntries = dirMinimum;
     int maxEntries = dirCapacity - 1;
 
-    ArrayList<E> result = new ArrayList<E>();
+    ArrayList<E> result = new ArrayList<>();
     List<List<E>> partitions = bulkSplitter.partition(nodes, minEntries, maxEntries);
 
     for(List<E> partition : partitions) {

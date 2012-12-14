@@ -169,11 +169,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<InsertionStrategy> insertionStrategyP = new ObjectParameter<InsertionStrategy>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
+      ObjectParameter<InsertionStrategy> insertionStrategyP = new ObjectParameter<>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
       if (config.grab(insertionStrategyP)) {
         insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
-      ObjectParameter<SplitStrategy> splitStrategyP = new ObjectParameter<SplitStrategy>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
+      ObjectParameter<SplitStrategy> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
       if (config.grab(splitStrategyP)) {
         nodeSplitter = splitStrategyP.instantiateClass(config);
       }
@@ -183,7 +183,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
       if (config.grab(minimumFillP)) {
         minimumFill = minimumFillP.getValue();
       }
-      ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<OverflowTreatment>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
+      ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
       if (config.grab(overflowP)) {
         overflowTreatment = overflowP.instantiateClass(config);
       }
@@ -196,7 +196,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
      * @param config Parameterization
      */
     protected void configBulkLoad(Parameterization config) {
-      ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<BulkSplit>(BULK_SPLIT_ID, BulkSplit.class, true);
+      ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<>(BULK_SPLIT_ID, BulkSplit.class, true);
       if (config.grab(bulkSplitP)) {
         bulkSplitter = bulkSplitP.instantiateClass(config);
       }

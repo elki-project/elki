@@ -53,7 +53,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
   /**
    * Holds the ids of the expanded nodes.
    */
-  private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<Integer, HashSet<Integer>>();
+  private HashMap<Integer, HashSet<Integer>> expanded = new HashMap<>();
 
   /**
    * Constructor.
@@ -73,7 +73,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
   public void setExpanded(SpatialEntry entry1, SpatialEntry entry2) {
     HashSet<Integer> exp1 = expanded.get(getPageID(entry1));
     if(exp1 == null) {
-      exp1 = new HashSet<Integer>();
+      exp1 = new HashSet<>();
       expanded.put(getPageID(entry1), exp1);
     }
     exp1.add(getPageID(entry2));
@@ -115,7 +115,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
   public int numNodes() {
     int numNodes = 0;
 
-    BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry>(this, getRootPath());
+    BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<>(this, getRootPath());
     while(bfs.hasMoreElements()) {
       Entry entry = bfs.nextElement().getLastPathComponent().getEntry();
       if(!entry.isLeafEntry()) {

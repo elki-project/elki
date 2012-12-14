@@ -102,15 +102,15 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
     // Build a list of all subspaces
     {
       // R1 initial one-dimensional subspaces.
-      Rk = new ArrayList<ArrayList<IntIntPair>>();
+      Rk = new ArrayList<>();
       // Set of all dim*phi ranges
-      ArrayList<IntIntPair> q = new ArrayList<IntIntPair>();
+      ArrayList<IntIntPair> q = new ArrayList<>();
       for(int i = 0; i < dimensionality; i++) {
         for(int j = 1; j <= phi; j++) {
           IntIntPair s = new IntIntPair(i, j);
           q.add(s);
           // Add to first Rk
-          ArrayList<IntIntPair> v = new ArrayList<IntIntPair>();
+          ArrayList<IntIntPair> v = new ArrayList<>();
           v.add(s);
           Rk.add(v);
         }
@@ -118,7 +118,7 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
 
       // build Ri
       for(int i = 2; i <= k; i++) {
-        ArrayList<ArrayList<IntIntPair>> Rnew = new ArrayList<ArrayList<IntIntPair>>();
+        ArrayList<ArrayList<IntIntPair>> Rnew = new ArrayList<>();
 
         for(int j = 0; j < Rk.size(); j++) {
           ArrayList<IntIntPair> c = Rk.get(j);
@@ -131,7 +131,7 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
               }
             }
             if(!invalid) {
-              ArrayList<IntIntPair> neu = new ArrayList<IntIntPair>(c);
+              ArrayList<IntIntPair> neu = new ArrayList<>(c);
               neu.add(pair);
               Rnew.add(neu);
             }
@@ -165,7 +165,7 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
       }
       minmax.put(val);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("AggarwalYuNaive", "aggarwal-yu-outlier", TypeUtil.DOUBLE, sparsity, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("AggarwalYuNaive", "aggarwal-yu-outlier", TypeUtil.DOUBLE, sparsity, relation.getDBIDs());
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }
@@ -185,7 +185,7 @@ public class AggarwalYuNaive<V extends NumberVector<?>> extends AbstractAggarwal
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractAggarwalYuOutlier.Parameterizer {
     @Override
     protected AggarwalYuNaive<V> makeInstance() {
-      return new AggarwalYuNaive<V>(k, phi);
+      return new AggarwalYuNaive<>(k, phi);
     }
   }
 }

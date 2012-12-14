@@ -210,7 +210,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Influence Outlier Score", "inflo-outlier", TypeUtil.DOUBLE, inflos, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("Influence Outlier Score", "inflo-outlier", TypeUtil.DOUBLE, inflos, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(inflominmax.getMin(), inflominmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(scoreMeta, scoreResult);
   }
@@ -255,7 +255,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
 
     @Override
     protected INFLO<O, D> makeInstance() {
-      return new INFLO<O, D>(distanceFunction, m, k);
+      return new INFLO<>(distanceFunction, m, k);
     }
   }
 }

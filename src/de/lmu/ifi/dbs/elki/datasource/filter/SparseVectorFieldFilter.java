@@ -74,6 +74,6 @@ public class SparseVectorFieldFilter<V extends SparseNumberVector<?>> extends Ab
   @Override
   protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
     SparseNumberVector.Factory<V, ?> factory = (SparseNumberVector.Factory<V, ?>) FilterUtil.guessFactory(in);
-    return new VectorFieldTypeInformation<V>(factory, maxdim);
+    return new VectorFieldTypeInformation<>(factory, maxdim);
   }
 }

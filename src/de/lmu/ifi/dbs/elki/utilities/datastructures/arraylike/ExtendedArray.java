@@ -91,6 +91,6 @@ public class ExtendedArray<T> implements ArrayAdapter<T, ExtendedArray<T>> {
    */
   @SuppressWarnings("unchecked")
   public static <T, A> ExtendedArray<T> extend(A array, ArrayAdapter<T, A> getter, T extra) {
-    return new ExtendedArray<T>(array, (ArrayAdapter<T, Object>) getter, extra);
+    return new ExtendedArray<>(array, (ArrayAdapter<T, Object>) getter, extra);
   }
 }

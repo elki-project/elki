@@ -168,7 +168,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
       addCSSClasses();
 
       ColorLibrary colors = context.getStyleResult().getStyleLibrary().getColorSet(StyleLibrary.PLOT);
-      HashMap<Cluster<?>, String> colormap = new HashMap<Cluster<?>, String>();
+      HashMap<Cluster<?>, String> colormap = new HashMap<>();
       int cnum = 0;
       for(Cluster<?> c : clus.getAllClusters()) {
         colormap.put(c, colors.getColor(cnum));

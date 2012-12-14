@@ -65,7 +65,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    */
   public CLIQUESubspace(int dimension) {
     super(dimension);
-    denseUnits = new ArrayList<CLIQUEUnit<V>>();
+    denseUnits = new ArrayList<>();
     coverage = 0;
   }
 
@@ -76,7 +76,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    */
   public CLIQUESubspace(BitSet dimensions) {
     super(dimensions);
-    denseUnits = new ArrayList<CLIQUEUnit<V>>();
+    denseUnits = new ArrayList<>();
     coverage = 0;
   }
 
@@ -104,12 +104,12 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
    * @return the clusters in this subspace and the corresponding cluster models
    */
   public List<Pair<Subspace, ModifiableDBIDs>> determineClusters() {
-    List<Pair<Subspace, ModifiableDBIDs>> clusters = new ArrayList<Pair<Subspace, ModifiableDBIDs>>();
+    List<Pair<Subspace, ModifiableDBIDs>> clusters = new ArrayList<>();
 
     for(CLIQUEUnit<V> unit : getDenseUnits()) {
       if(!unit.isAssigned()) {
         ModifiableDBIDs cluster = DBIDUtil.newHashSet();
-        CLIQUESubspace<V> model = new CLIQUESubspace<V>(getDimensions());
+        CLIQUESubspace<V> model = new CLIQUESubspace<>(getDimensions());
         clusters.add(new Pair<Subspace, ModifiableDBIDs>(model, cluster));
         dfs(unit, cluster, model);
       }
@@ -217,7 +217,7 @@ public class CLIQUESubspace<V extends NumberVector<?>> extends Subspace {
       return null;
     }
 
-    CLIQUESubspace<V> s = new CLIQUESubspace<V>(dimensions);
+    CLIQUESubspace<V> s = new CLIQUESubspace<>(dimensions);
     for(CLIQUEUnit<V> u1 : this.getDenseUnits()) {
       for(CLIQUEUnit<V> u2 : other.getDenseUnits()) {
         CLIQUEUnit<V> u = u1.join(u2, all, tau);

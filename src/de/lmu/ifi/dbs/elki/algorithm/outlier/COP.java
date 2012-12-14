@@ -271,11 +271,11 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     // combine results.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Correlation Outlier Probabilities", COP_SCORES, TypeUtil.DOUBLE, cop_score, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Correlation Outlier Probabilities", COP_SCORES, TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+    result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
     return result;
   }
 
@@ -361,7 +361,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       if (config.grab(kP)) {
         k = kP.intValue();
       }
-      EnumParameter<DistanceDist> distP = new EnumParameter<DistanceDist>(DIST_ID, DistanceDist.class, DistanceDist.GAMMA);
+      EnumParameter<DistanceDist> distP = new EnumParameter<>(DIST_ID, DistanceDist.class, DistanceDist.GAMMA);
       if (config.grab(distP)) {
         dist = distP.getValue();
       }
@@ -371,7 +371,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       if (config.grab(expectP)) {
         expect = expectP.doubleValue();
       }
-      ObjectParameter<PCARunner<V>> pcaP = new ObjectParameter<PCARunner<V>>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
+      ObjectParameter<PCARunner<V>> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
       if (config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }
@@ -379,7 +379,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
     @Override
     protected COP<V, D> makeInstance() {
-      return new COP<V, D>(distanceFunction, k, pca, expect, dist);
+      return new COP<>(distanceFunction, k, pca, expect, dist);
     }
   }
 }

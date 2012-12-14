@@ -105,7 +105,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D exte
 
     @Override
     public KNNJoinMaterializeKNNPreprocessor<O, D> instantiate(Relation<O> relation) {
-      return new KNNJoinMaterializeKNNPreprocessor<O, D>(relation, distanceFunction, k);
+      return new KNNJoinMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
     }
 
     /**
@@ -121,7 +121,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D exte
     public static class Parameterizer<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O, D> {
       @Override
       protected KNNJoinMaterializeKNNPreprocessor.Factory<O, D> makeInstance() {
-        return new KNNJoinMaterializeKNNPreprocessor.Factory<O, D>(k, distanceFunction);
+        return new KNNJoinMaterializeKNNPreprocessor.Factory<>(k, distanceFunction);
       }
     }
   }

@@ -222,12 +222,12 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
         maxima = ArrayLikeUtil.toPrimitiveDoubleArray(maximaP.getValue());
       }
 
-      ArrayList<Parameter<?>> global_1 = new ArrayList<Parameter<?>>();
+      ArrayList<Parameter<?>> global_1 = new ArrayList<>();
       global_1.add(minimaP);
       global_1.add(maximaP);
       config.checkConstraint(new AllOrNoneMustBeSetGlobalConstraint(global_1));
 
-      ArrayList<ListParameter<?>> global = new ArrayList<ListParameter<?>>();
+      ArrayList<ListParameter<?>> global = new ArrayList<>();
       global.add(minimaP);
       global.add(maximaP);
       config.checkConstraint(new EqualSizeGlobalConstraint(global));
@@ -235,7 +235,7 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector<?>> extends
 
     @Override
     protected AttributeWiseMinMaxNormalization<V> makeInstance() {
-      return new AttributeWiseMinMaxNormalization<V>(minima, maxima);
+      return new AttributeWiseMinMaxNormalization<>(minima, maxima);
     }
   }
 }

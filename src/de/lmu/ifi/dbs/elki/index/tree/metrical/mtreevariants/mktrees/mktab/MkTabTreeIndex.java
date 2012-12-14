@@ -116,7 +116,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
 
   @Override
   public void insertAll(DBIDs ids) {
-    List<MkTabEntry<D>> objs = new ArrayList<MkTabEntry<D>>(ids.size());
+    List<MkTabEntry<D>> objs = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);

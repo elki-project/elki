@@ -163,7 +163,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MCop-Tree!");
     }
 
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     ModifiableDBIDs candidates = DBIDUtil.newArray();
     doReverseKNNQuery(k, id, result, candidates);
 
@@ -272,7 +272,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        refinement)
    */
   private void doReverseKNNQuery(int k, DBIDRef q, GenericDistanceDBIDList<D> result, ModifiableDBIDs candidates) {
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<GenericMTreeDistanceSearchCandidate<D>>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<>();
 
     // push root
     pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null, null));
@@ -594,7 +594,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
 
-    List<Integer> marked = new ArrayList<Integer>();
+    List<Integer> marked = new ArrayList<>();
 
     int k_0 = k_max - upperHull.length + 1;
 

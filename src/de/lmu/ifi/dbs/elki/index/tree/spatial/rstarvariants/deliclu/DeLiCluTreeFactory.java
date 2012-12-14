@@ -62,7 +62,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<?>> extends AbstractRStar
   @Override
   public DeLiCluTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<DeLiCluNode> pagefile = makePageFile(getNodeClass());
-    DeLiCluTreeIndex<O> index = new DeLiCluTreeIndex<O>(relation, pagefile);
+    DeLiCluTreeIndex<O> index = new DeLiCluTreeIndex<>(relation, pagefile);
     index.setBulkStrategy(bulkSplitter);
     index.setInsertionStrategy(insertionStrategy);
     index.setNodeSplitStrategy(nodeSplitter);

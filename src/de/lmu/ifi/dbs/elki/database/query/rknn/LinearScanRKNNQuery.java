@@ -71,7 +71,7 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
 
   @Override
   public DistanceDBIDResult<D> getRKNNForObject(O obj, int k) {
-    GenericDistanceDBIDList<D> rNNlist = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> rNNlist = new GenericDistanceDBIDList<>();
 
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
     List<? extends KNNResult<D>> kNNLists = knnQuery.getKNNForBulkDBIDs(allIDs, k);
@@ -92,7 +92,7 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
 
   @Override
   public DistanceDBIDResult<D> getRKNNForDBID(DBIDRef id, int k) {
-    GenericDistanceDBIDList<D> rNNList = new GenericDistanceDBIDList<D>();
+    GenericDistanceDBIDList<D> rNNList = new GenericDistanceDBIDList<>();
     
     ArrayDBIDs allIDs = DBIDUtil.ensureArray(relation.getDBIDs());
     List<? extends KNNResult<D>> kNNList = knnQuery.getKNNForBulkDBIDs(allIDs, k);
@@ -113,7 +113,7 @@ public class LinearScanRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQ
 
   @Override
   public List<GenericDistanceDBIDList<D>> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    List<GenericDistanceDBIDList<D>> rNNList = new ArrayList<GenericDistanceDBIDList<D>>(ids.size());
+    List<GenericDistanceDBIDList<D>> rNNList = new ArrayList<>(ids.size());
     for(int i = 0; i < ids.size(); i++) {
       rNNList.add(new GenericDistanceDBIDList<D>());
     }

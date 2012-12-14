@@ -66,7 +66,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?>> extends AbstractPre
     // Generics (AFAICT)
     @SuppressWarnings("unchecked")
     HiSCPreferenceVectorIndex<T> indexinst = (HiSCPreferenceVectorIndex<T>) indexFactory.instantiate((Relation<V>) database);
-    return new Instance<T>(database, indexinst, getEpsilon(), this);
+    return new Instance<>(database, indexinst, getEpsilon(), this);
   }
 
   /**
@@ -152,7 +152,7 @@ public class HiSCDistanceFunction<V extends NumberVector<?>> extends AbstractPre
 
     @Override
     protected HiSCDistanceFunction<V> makeInstance() {
-      return new HiSCDistanceFunction<V>(factory, epsilon);
+      return new HiSCDistanceFunction<>(factory, epsilon);
     }
   }
 }

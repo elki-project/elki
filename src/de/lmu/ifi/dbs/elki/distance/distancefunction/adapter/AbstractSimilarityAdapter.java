@@ -175,7 +175,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>>> param = new ObjectParameter<NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>>>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
+      final ObjectParameter<NormalizedSimilarityFunction<? super O, ? extends NumberDistance<?, ?>>> param = new ObjectParameter<>(SIMILARITY_FUNCTION_ID, NormalizedSimilarityFunction.class, FractionalSharedNearestNeighborSimilarityFunction.class);
       if(config.grab(param)) {
         similarityFunction = param.instantiateClass(config);
       }

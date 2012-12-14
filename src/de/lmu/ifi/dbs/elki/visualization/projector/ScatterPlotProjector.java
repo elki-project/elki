@@ -78,7 +78,7 @@ public class ScatterPlotProjector<V extends NumberVector<?>> extends AbstractHie
 
   @Override
   public Collection<PlotItem> arrange() {
-    List<PlotItem> layout = new ArrayList<PlotItem>(1);
+    List<PlotItem> layout = new ArrayList<>(1);
     List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);

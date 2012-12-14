@@ -138,7 +138,7 @@ public class EnumParameter<E extends Enum<E>> extends AbstractParameter<E> {
   public Collection<String> getPossibleValues() {
     // Convert to string array
     final E[] enums = enumClass.getEnumConstants();
-    ArrayList<String> values = new ArrayList<String>(enums.length);
+    ArrayList<String> values = new ArrayList<>(enums.length);
     for(E t : enums) {
       values.add(t.name());
     }

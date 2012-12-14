@@ -107,7 +107,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
   public SimpleCOP(DistanceFunction<? super V, D> distanceFunction, int k, PCAFilteredRunner<V> pca) {
     super(distanceFunction);
     this.k = k;
-    this.dependencyDerivator = new DependencyDerivator<V, D>(null, FormatUtil.NF8, pca, 0, false);
+    this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF8, pca, 0, false);
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
@@ -156,14 +156,14 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
       }
     }
     // combine results.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Original Correlation Outlier Probabilities", "origcop-outlier", TypeUtil.DOUBLE, cop_score, ids);
+    Relation<Double> scoreResult = new MaterializedRelation<>("Original Correlation Outlier Probabilities", "origcop-outlier", TypeUtil.DOUBLE, cop_score, ids);
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    result.addChildResult(new MaterializedRelation<Integer>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<Vector>("Error vectors", COP.COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
-    result.addChildResult(new MaterializedRelation<Matrix>("Data vectors", "cop-datavec", TypeUtil.MATRIX, cop_datav, ids));
-    result.addChildResult(new MaterializedRelation<CorrelationAnalysisSolution<?>>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
+    result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+    result.addChildResult(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.MATRIX, cop_datav, ids));
+    result.addChildResult(new MaterializedRelation<>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
   }
 
@@ -222,7 +222,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
       if (config.grab(kP)) {
         k = kP.intValue();
       }
-      ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<PCAFilteredRunner<V>>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
+      ObjectParameter<PCAFilteredRunner<V>> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
       if (config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
       }
@@ -230,7 +230,7 @@ public class SimpleCOP<V extends NumberVector<?>, D extends NumberDistance<D, ?>
 
     @Override
     protected SimpleCOP<V, D> makeInstance() {
-      return new SimpleCOP<V, D>(distanceFunction, k, pca);
+      return new SimpleCOP<>(distanceFunction, k, pca);
     }
   }
 }

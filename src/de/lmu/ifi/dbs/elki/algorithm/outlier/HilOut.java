@@ -269,7 +269,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
         hilout_weight.putDouble(ent.id, ent.ubound);
       }
     }
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("HilOut weight", "hilout-weight", TypeUtil.DOUBLE, hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     return result;
@@ -486,19 +486,19 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new Heap<DoubleDistanceDBIDPair>(k, Collections.reverseOrder()));
       }
-      this.out = new Heap<HilFeature>(n, new Comparator<HilFeature>() {
+      this.out = new Heap<>(n, new Comparator<HilFeature>() {
         @Override
         public int compare(HilFeature o1, HilFeature o2) {
           return Double.compare(o1.ubound, o2.ubound);
         }
       });
-      this.wlb = new Heap<HilFeature>(n, new Comparator<HilFeature>() {
+      this.wlb = new Heap<>(n, new Comparator<HilFeature>() {
         @Override
         public int compare(HilFeature o1, HilFeature o2) {
           return Double.compare(o1.lbound, o2.lbound);
         }
       });
-      this.top = new HashSet<HilFeature>(2 * n);
+      this.top = new HashSet<>(2 * n);
     }
 
     /**
@@ -971,7 +971,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
         distfunc = distP.instantiateClass(config);
       }
 
-      final EnumParameter<ScoreType> tnP = new EnumParameter<ScoreType>(TN_ID, ScoreType.class, ScoreType.TopN);
+      final EnumParameter<ScoreType> tnP = new EnumParameter<>(TN_ID, ScoreType.class, ScoreType.TopN);
       if(config.grab(tnP)) {
         tn = tnP.getValue();
       }
@@ -979,7 +979,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
 
     @Override
     protected HilOut<O> makeInstance() {
-      return new HilOut<O>(distfunc, k, n, h, tn);
+      return new HilOut<>(distfunc, k, n, h, tn);
     }
   }
 }

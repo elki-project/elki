@@ -51,7 +51,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   /**
    * The UpdateRunner we are put into
    */
-  private List<WeakReference<UpdateRunner>> updaterunner = new ArrayList<WeakReference<UpdateRunner>>();
+  private List<WeakReference<UpdateRunner>> updaterunner = new ArrayList<>();
 
   /**
    * Adapter to track component changes
@@ -71,7 +71,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   protected JSVGUpdateSynchronizer(JSVGComponent component) {
     assert (component != null);
 
-    this.cref = new WeakReference<JSVGComponent>(component);
+    this.cref = new WeakReference<>(component);
     // Hook into UpdateManager creation.
     component.addUpdateManagerListener(umadapter);
     // makeRunnerIfNeeded();
@@ -130,7 +130,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
 
   @Override
   public void addUpdateRunner(UpdateRunner updateRunner) {
-    updaterunner.add(new WeakReference<UpdateRunner>(updateRunner));
+    updaterunner.add(new WeakReference<>(updateRunner));
   }
 
   /**
@@ -140,7 +140,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    */
   // Not synchronized - private
   private void setSynchronizedRunner(JSVGSynchronizedRunner newrunner) {
-    syncrunner = new WeakReference<JSVGSynchronizedRunner>(newrunner);
+    syncrunner = new WeakReference<>(newrunner);
   }
 
   /**

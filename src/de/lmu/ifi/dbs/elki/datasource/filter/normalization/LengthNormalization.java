@@ -101,7 +101,7 @@ public class LengthNormalization<V extends NumberVector<?>> extends AbstractStre
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DoubleNorm<? super V>> normP = new ObjectParameter<DoubleNorm<? super V>>(NORM_ID, DoubleNorm.class, EuclideanDistanceFunction.class);
+      ObjectParameter<DoubleNorm<? super V>> normP = new ObjectParameter<>(NORM_ID, DoubleNorm.class, EuclideanDistanceFunction.class);
       if(config.grab(normP)) {
         norm = normP.instantiateClass(config);
       }
@@ -109,7 +109,7 @@ public class LengthNormalization<V extends NumberVector<?>> extends AbstractStre
 
     @Override
     protected LengthNormalization<V> makeInstance() {
-      return new LengthNormalization<V>(norm);
+      return new LengthNormalization<>(norm);
     }
   }
 }

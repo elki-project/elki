@@ -59,7 +59,7 @@ public class CSSClass {
    * @param statements Collection of CSS statements
    */
   public CSSClass(Object owner, String name, Collection<Pair<String, String>> statements) {
-    this.owner = new WeakReference<Object>(owner);
+    this.owner = new WeakReference<>(owner);
     this.name = name;
     this.statements = statements;
     if (!checkName(name)) {
@@ -71,7 +71,7 @@ public class CSSClass {
       }
     } else {
       // if needed, use an array list.
-      this.statements = new ArrayList<Pair<String,String>>();
+      this.statements = new ArrayList<>();
     }
   }
   
@@ -93,7 +93,7 @@ public class CSSClass {
    * @param other Class to clone
    */
   public CSSClass(Object owner, String name, CSSClass other) {
-    this(owner, name, new ArrayList<Pair<String,String>>(other.statements));
+    this(owner, name, new ArrayList<>(other.statements));
   }
   
   /**
@@ -227,7 +227,7 @@ public class CSSClass {
       }
     }
     if (value != null) {
-      statements.add(new Pair<String, String>(key, value));
+      statements.add(new Pair<>(key, value));
     }
   }
 

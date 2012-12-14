@@ -82,7 +82,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
     DistanceQuery<O, D> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
-    Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<CTriple<DBID, DBID, Double>>(size * (size + 1) >> 1);
+    Collection<CTriple<DBID, DBID, Double>> r = new ArrayList<>(size * (size + 1) >> 1);
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       for(DBIDIter iditer2 = relation.iterDBIDs(); iditer2.valid(); iditer2.advance()) {
@@ -91,10 +91,10 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
           continue;
         }
         double d = distFunc.distance(iditer, iditer2).doubleValue();
-        r.add(new CTriple<DBID, DBID, Double>(DBIDUtil.deref(iditer), DBIDUtil.deref(iditer2), d));
+        r.add(new CTriple<>(DBIDUtil.deref(iditer), DBIDUtil.deref(iditer2), d));
       }
     }
-    return new CollectionResult<CTriple<DBID, DBID, Double>>("Distance Matrix", "distance-matrix", r);
+    return new CollectionResult<>("Distance Matrix", "distance-matrix", r);
   }
 
   @Override
@@ -117,7 +117,7 @@ public class MaterializeDistances<O, D extends NumberDistance<D, ?>> extends Abs
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     @Override
     protected MaterializeDistances<O, D> makeInstance() {
-      return new MaterializeDistances<O, D>(distanceFunction);
+      return new MaterializeDistances<>(distanceFunction);
     }
   }
 }

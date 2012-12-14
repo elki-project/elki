@@ -179,7 +179,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
   public Clustering<Model> run(Database database, Relation<V> relation) {
     FiniteProgress objprog = getLogger().isVerbose() ? new FiniteProgress("Processing objects", relation.size(), getLogger()) : null;
     IndefiniteProgress clusprog = getLogger().isVerbose() ? new IndefiniteProgress("Number of clusters", getLogger()) : null;
-    resultList = new ArrayList<ModifiableDBIDs>();
+    resultList = new ArrayList<>();
     noise = DBIDUtil.newHashSet();
     processedIDs = DBIDUtil.newHashSet(relation.size());
 
@@ -215,7 +215,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
       clusprog.setProcessed(resultList.size(), getLogger());
     }
 
-    Clustering<Model> result = new Clustering<Model>(getLongResultName(), getShortResultName());
+    Clustering<Model> result = new Clustering<>(getLongResultName(), getShortResultName());
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       Cluster<Model> c = new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER);
       result.addCluster(c);
@@ -395,7 +395,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     protected Integer lambda;
 
     protected void configInnerDistance(Parameterization config) {
-      ObjectParameter<DistanceFunction<V, D>> innerdistP = new ObjectParameter<DistanceFunction<V, D>>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<V, D>> innerdistP = new ObjectParameter<>(AbstractProjectedDBSCAN.INNER_DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(innerdistP)) {
         innerdist = innerdistP.instantiateClass(config);
       }
@@ -403,7 +403,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
 
     protected void configEpsilon(Parameterization config, DistanceFunction<V, D> innerdist) {
       D distanceParser = innerdist != null ? innerdist.getDistanceFactory() : null;
-      DistanceParameter<D> epsilonP = new DistanceParameter<D>(EPSILON_ID, distanceParser);
+      DistanceParameter<D> epsilonP = new DistanceParameter<>(EPSILON_ID, distanceParser);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -418,7 +418,7 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     }
 
     protected void configOuterDistance(Parameterization config, D epsilon, int minpts, Class<?> preprocessorClass, DistanceFunction<V, D> innerdist) {
-      ObjectParameter<LocallyWeightedDistanceFunction<V>> outerdistP = new ObjectParameter<LocallyWeightedDistanceFunction<V>>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
+      ObjectParameter<LocallyWeightedDistanceFunction<V>> outerdistP = new ObjectParameter<>(OUTER_DISTANCE_FUNCTION_ID, LocallyWeightedDistanceFunction.class, LocallyWeightedDistanceFunction.class);
       if(config.grab(outerdistP)) {
         // parameters for the distance function
         ListParameterization distanceFunctionParameters = new ListParameterization();

@@ -165,8 +165,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
-    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<D>();
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<GenericMTreeDistanceSearchCandidate<D>>();
+    GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
+    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<>();
 
     // push root
     pq.add(new GenericMTreeDistanceSearchCandidate<D>(getDistanceQuery().nullDistance(), getRootID(), null, null));
@@ -281,7 +281,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       }
     }
 
-    List<D> result = new ArrayList<D>();
+    List<D> result = new ArrayList<>();
     for(int k = 0; k < k_max; k++) {
       means[k] /= ids.size();
       result.add(getDistanceQuery().getDistanceFactory().fromDouble(means[k]));

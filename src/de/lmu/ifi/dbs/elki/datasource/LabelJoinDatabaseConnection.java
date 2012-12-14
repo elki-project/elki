@@ -72,13 +72,13 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
 
   @Override
   public MultipleObjectsBundle loadData() {
-    List<MultipleObjectsBundle> bundles = new ArrayList<MultipleObjectsBundle>(sources.size());
+    List<MultipleObjectsBundle> bundles = new ArrayList<>(sources.size());
     for (DatabaseConnection dbc : sources) {
       bundles.add(dbc.loadData());
     }
 
     MultipleObjectsBundle first = bundles.get(0);
-    TObjectIntHashMap<String> labelmap = new TObjectIntHashMap<String>(first.dataLength(), Constants.DEFAULT_LOAD_FACTOR, -1);
+    TObjectIntHashMap<String> labelmap = new TObjectIntHashMap<>(first.dataLength(), Constants.DEFAULT_LOAD_FACTOR, -1);
     // Process first bundle
     {
       // Identify a label column
@@ -141,14 +141,14 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
         throw new AbortException("No label column found in source " + (c + 1) + ", cannot join (do you want to use " + ExternalIDJoinDatabaseConnection.class.getSimpleName() + " instead?)");
       }
       // Destination columns
-      List<ArrayList<Object>> dcol = new ArrayList<ArrayList<Object>>(cur.metaLength());
+      List<ArrayList<Object>> dcol = new ArrayList<>(cur.metaLength());
       for (int i = 0; i < cur.metaLength(); i++) {
         // Skip the label columns
         if (i == lblcol) {
           dcol.add(null);
           continue;
         }
-        ArrayList<Object> newcol = new ArrayList<Object>(first.dataLength());
+        ArrayList<Object> newcol = new ArrayList<>(first.dataLength());
         // Pre-fill with nulls.
         for (int j = 0; j < first.dataLength(); j++) {
           newcol.add(null);
@@ -239,7 +239,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection impl
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       super.configFilters(config);
-      final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<DatabaseConnection>(SOURCES_ID, DatabaseConnection.class);
+      final ObjectListParameter<DatabaseConnection> sourcesParam = new ObjectListParameter<>(SOURCES_ID, DatabaseConnection.class);
       if (config.grab(sourcesParam)) {
         sources = sourcesParam.instantiateClasses(config);
       }

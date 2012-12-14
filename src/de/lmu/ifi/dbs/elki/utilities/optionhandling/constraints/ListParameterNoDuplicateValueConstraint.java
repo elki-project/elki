@@ -57,7 +57,7 @@ public class ListParameterNoDuplicateValueConstraint<T extends Object> implement
    */
   @Override
   public void test(List<T> list) throws ParameterException {
-    Set<T> values = new HashSet<T>();
+    Set<T> values = new HashSet<>();
 
     for(T pv : list) {
       if(!values.add(pv)) {

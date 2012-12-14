@@ -74,7 +74,7 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   protected List<D> kNNDistances(DistanceQuery<O, D> distanceFunction) {
     int k = getEntry(0).getK_max();
 
-    List<D> result = new ArrayList<D>();
+    List<D> result = new ArrayList<>();
     for(int i = 0; i < k; i++) {
       result.add(distanceFunction.nullDistance());
     }

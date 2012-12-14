@@ -63,7 +63,7 @@ public class IndexTreePath<E extends Entry> {
     }
     lastPathComponent = path.get(path.size() - 1);
     if(path.size() > 1) {
-      parentPath = new IndexTreePath<E>(path, path.size() - 1);
+      parentPath = new IndexTreePath<>(path, path.size() - 1);
     }
   }
 
@@ -106,7 +106,7 @@ public class IndexTreePath<E extends Entry> {
   protected IndexTreePath(List<TreeIndexPathComponent<E>> path, int length) {
     lastPathComponent = path.get(length - 1);
     if(length > 1) {
-      parentPath = new IndexTreePath<E>(path, length - 1);
+      parentPath = new IndexTreePath<>(path, length - 1);
     }
   }
 
@@ -117,7 +117,7 @@ public class IndexTreePath<E extends Entry> {
    * @return an array of IndexPathComponent representing the IndexPath
    */
   public List<TreeIndexPathComponent<E>> getPath() {
-    List<TreeIndexPathComponent<E>> result = new ArrayList<TreeIndexPathComponent<E>>();
+    List<TreeIndexPathComponent<E>> result = new ArrayList<>();
 
     for(IndexTreePath<E> path = this; path != null; path = path.parentPath) {
       result.add(path.lastPathComponent);
@@ -262,8 +262,7 @@ public class IndexTreePath<E extends Entry> {
     if(child == null) {
       throw new NullPointerException("Null child not allowed");
     }
-
-    return new IndexTreePath<E>(this, child);
+    return new IndexTreePath<>(this, child);
   }
 
   /**

@@ -116,7 +116,7 @@ public class EnsembleVotingRestrictedBayes implements EnsembleVoting {
       if (config.grab(maxvoteP)) {
         maxvote = maxvoteP.doubleValue();
       }
-      config.checkConstraint(new LessGlobalConstraint<Double>(minvoteP, maxvoteP));
+      config.checkConstraint(new LessGlobalConstraint<>(minvoteP, maxvoteP));
     }
 
     @Override

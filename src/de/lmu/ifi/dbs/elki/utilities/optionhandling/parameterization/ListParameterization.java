@@ -44,7 +44,7 @@ public class ListParameterization extends AbstractParameterization {
   /**
    * The actual parameters, for storage
    */
-  LinkedList<Pair<OptionID, Object>> parameters = new LinkedList<Pair<OptionID, Object>>();
+  LinkedList<Pair<OptionID, Object>> parameters = new LinkedList<>();
 
   /**
    * Default constructor.
@@ -81,7 +81,7 @@ public class ListParameterization extends AbstractParameterization {
    * @param value Value
    */
   public void addParameter(OptionID optionid, Object value) {
-    parameters.add(new Pair<OptionID, Object>(optionid, value));
+    parameters.add(new Pair<>(optionid, value));
   }
   
   /**
@@ -158,7 +158,7 @@ public class ListParameterization extends AbstractParameterization {
    * @return Array list of parameters
    */
   public ArrayList<String> serialize() {
-    ArrayList<String> params = new ArrayList<String>();
+    ArrayList<String> params = new ArrayList<>();
     for (Pair<OptionID, Object> pair : parameters) {
       params.add("-" + pair.getFirst().toString());
       params.add(pair.getSecond().toString());

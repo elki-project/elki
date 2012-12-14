@@ -73,7 +73,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     this.clustering = clustering;
     ColorLibrary colorset = style.getColorSet(StyleLibrary.PLOT);
     List<? extends Cluster<?>> clusters = clustering.getAllClusters();
-    ids = new ArrayList<DBIDs>(clusters.size());
+    ids = new ArrayList<>(clusters.size());
     colors = new TIntArrayList(clusters.size());
 
     Iterator<? extends Cluster<?>> ci = clusters.iterator();

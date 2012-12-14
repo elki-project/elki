@@ -159,7 +159,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       double scale = StyleLibrary.SCALE;
       deleteChildren(container);
 
-      ArrayList<VisualizationTask> vis = new ArrayList<VisualizationTask>();
+      ArrayList<VisualizationTask> vis = new ArrayList<>();
       Collection<VisualizationTask> visualizers = ResultUtil.filterResults(task.getResult(), VisualizationTask.class);
       for(VisualizationTask task : visualizers) {
         if(task.tool && !vis.contains(task)) {

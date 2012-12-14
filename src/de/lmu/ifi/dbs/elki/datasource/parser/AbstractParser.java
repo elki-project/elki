@@ -113,7 +113,7 @@ public abstract class AbstractParser {
    * @return Tokenized string
    */
   protected List<String> tokenize(String input) {
-    ArrayList<String> matchList = new ArrayList<String>();
+    ArrayList<String> matchList = new ArrayList<>();
     Matcher m = colSep.matcher(input);
 
     int index = 0;

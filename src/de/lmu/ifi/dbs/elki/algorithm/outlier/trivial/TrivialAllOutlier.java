@@ -73,7 +73,7 @@ public class TrivialAllOutlier extends AbstractAlgorithm<OutlierResult> implemen
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       scores.putDouble(iditer, 1.0);
     }
-    Relation<Double> scoreres = new MaterializedRelation<Double>("Trivial all-outlier score", "all-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("Trivial all-outlier score", "all-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore();
     return new OutlierResult(meta, scoreres);
   }

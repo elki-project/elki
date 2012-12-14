@@ -42,7 +42,7 @@ public final class HandlerList<H> {
    * List with registered Handlers. The list is kept in backwards order, that is
    * the later entrys take precedence.
    */
-  private ArrayList<Pair<Class<?>, H>> handlers = new ArrayList<Pair<Class<?>, H>>();
+  private ArrayList<Pair<Class<?>, H>> handlers = new ArrayList<>();
 
   /**
    * Insert a handler to the beginning of the stack.

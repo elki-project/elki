@@ -175,7 +175,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
       return in;
     }
     else {
-      return new VectorFieldTypeInformation<O>(factory, proj.length);
+      return new VectorFieldTypeInformation<>(factory, proj.length);
     }
   }
 
@@ -201,7 +201,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector<?>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(FILTER_ID, EigenPairFilter.class, true);
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(FILTER_ID, EigenPairFilter.class, true);
       if(config.grab(filterP)) {
         filter = filterP.instantiateClass(config);
       }

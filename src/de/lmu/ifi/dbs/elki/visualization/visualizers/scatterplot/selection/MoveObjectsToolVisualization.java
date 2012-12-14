@@ -30,7 +30,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -159,9 +158,9 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
      */
     // TODO: move to DatabaseUtil?
     private void updateDB(DBIDs dbids, Vector movingVector) {
-      NumberVector<?> nv = null;
       throw new AbortException("FIXME: INCOMPLETE TRANSITION");
       /*
+       * NumberVector<?> nv = null;
        * database.accumulateDataStoreEvents();
        * Representation<DatabaseObjectMetadata> mrep =
        * database.getMetadataQuery(); for(DBID dbid : dbids) { NV obj =
