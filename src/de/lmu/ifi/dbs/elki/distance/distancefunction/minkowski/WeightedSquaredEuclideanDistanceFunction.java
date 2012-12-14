@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 /*
  This file is part of ELKI:
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 
 /**
  * Provides the squared Euclidean distance for FeatureVectors. This results in
