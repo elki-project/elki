@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 /*
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures

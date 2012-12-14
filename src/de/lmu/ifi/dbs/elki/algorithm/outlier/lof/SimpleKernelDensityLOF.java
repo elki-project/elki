@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.outlier;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 /*
  This file is part of ELKI:
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -53,31 +54,20 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.statistics.GaussianKernelDensityFunction;
+import de.lmu.ifi.dbs.elki.math.statistics.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction;
-import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Outlier Detection with Kernel Density Functions.
- * 
- * A variation of LOF which uses kernel density estimation, but in contrast to
- * {@link SimpleKernelDensityLOF} also uses the reachability concept of LOF.
- * 
- * Reference:
- * <p>
- * Outlier Detection with Kernel Density Functions.<br/>
- * L. J. Latecki, A. Lazarevic, D. Pokrajac<br />
- * Machine Learning and Data Mining in Pattern Recognition 2007
- * </p>
+ * A simple variant of the LOF algorithm, which uses a simple kernel density
+ * estimation instead of the local reachability density.
  * 
  * @author Erich Schubert
  * 
@@ -87,27 +77,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> the type of objects handled by this Algorithm
  * @param <D> Distance type
  */
-@Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", title = "Outlier Detection with Kernel Density Functions", booktitle = "Machine Learning and Data Mining in Pattern Recognition", url = "http://dx.doi.org/10.1007/978-3-540-73499-4_6")
-public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(LDF.class);
+  private static final Logging LOG = Logging.getLogger(SimpleKernelDensityLOF.class);
 
   /**
    * Parameter k.
    */
   protected int k;
-
-  /**
-   * Bandwidth scaling factor.
-   */
-  protected double h = 1;
-
-  /**
-   * Scaling constant, to limit value range to 1/c
-   */
-  protected double c = 0.1;
 
   /**
    * Kernel density function
@@ -119,15 +98,11 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * 
    * @param k the value of k
    * @param kernel Kernel function
-   * @param h Kernel bandwidth scaling
-   * @param c Score scaling parameter
    */
-  public LDF(int k, DistanceFunction<? super O, D> distance, KernelDensityFunction kernel, double h, double c) {
+  public SimpleKernelDensityLOF(int k, DistanceFunction<? super O, D> distance, KernelDensityFunction kernel) {
     super(distance);
     this.k = k + 1;
     this.kernel = kernel;
-    this.h = h;
-    this.c = c;
   }
 
   /**
@@ -137,7 +112,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * @return LOF outlier result
    */
   public OutlierResult run(Relation<O> relation) {
-    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LDF", 3) : null;
+    StepProgress stepprog = LOG.isVerbose() ? new StepProgress("KernelDensityLOF", 3) : null;
 
     final int dim = RelationUtil.dimensionality(relation);
 
@@ -158,24 +133,23 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
 
     // Compute LRDs
     if (stepprog != null) {
-      stepprog.beginStep(2, "Computing LDEs.", LOG);
+      stepprog.beginStep(2, "Computing densities.", LOG);
     }
-    WritableDoubleDataStore ldes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    WritableDoubleDataStore dens = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
-      double sum = 0.0;
       int count = 0;
+      double sum = 0.0;
       if (neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
         for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
-
-          final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
-          sum += kernel.density(v) / Math.pow(h * nkdist, dim);
+          double max = ((DoubleDistanceKNNList)knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
+          final double v = neighbor.doubleDistance() / max;
+          sum += kernel.density(v) / Math.pow(max, dim);
           count++;
         }
       } else {
@@ -183,13 +157,14 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
-          final double v = Math.max(nkdist, neighbor.getDistance().doubleValue()) / (h * nkdist);
-          sum += kernel.density(v) / Math.pow(h * nkdist, dim);
+          double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance().doubleValue();
+          final double v = neighbor.getDistance().doubleValue() / max;
+          sum += kernel.density(v) / Math.pow(max, dim);
           count++;
         }
       }
-      ldes.putDouble(it, sum / count);
+      final double density = sum / count;
+      dens.putDouble(it, density);
       if (densProgress != null) {
         densProgress.incrementProcessed(LOG);
       }
@@ -198,34 +173,37 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       densProgress.ensureCompleted(LOG);
     }
 
-    // Compute local density factors.
+    // compute LOF_SCORE of each db object
     if (stepprog != null) {
-      stepprog.beginStep(3, "Computing LDFs.", LOG);
+      stepprog.beginStep(3, "Computing KLOFs.", LOG);
     }
-    WritableDoubleDataStore ldfs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
+    WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
 
-    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Local Density Factors", ids.size(), LOG) : null;
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("KLOF_SCORE for objects", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final double lrdp = ldes.doubleValue(it);
-      final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
-      double sum = 0.0;
-      int count = 0;
-      for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-        // skip the point itself
-        if (DBIDUtil.equal(neighbor, it)) {
-          continue;
+      final double lrdp = dens.doubleValue(it);
+      final double lof;
+      if (lrdp > 0) {
+        final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
+        double sum = 0.0;
+        int count = 0;
+        for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          // skip the point itself
+          if (DBIDUtil.equal(neighbor, it)) {
+            continue;
+          }
+          sum += dens.doubleValue(neighbor);
+          count++;
         }
-        sum += ldes.doubleValue(neighbor);
-        count++;
+        lof = sum / (count * lrdp);
+      } else {
+        lof = 1.0;
       }
-      sum /= count;
-      final double div = lrdp + c * sum;
-      double ldf = (div > 0) ? sum / div : 0;
-      ldfs.putDouble(it, ldf);
+      lofs.putDouble(it, lof);
       // update minimum and maximum
-      lofminmax.put(ldf);
+      lofminmax.put(lof);
 
       if (progressLOFs != null) {
         progressLOFs.incrementProcessed(LOG);
@@ -240,8 +218,8 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     }
 
     // Build result representation.
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("Local Density Factor", "ldf-outlier", TypeUtil.DOUBLE, ldfs, ids);
-    OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, 1. / c, 1 / (1 + c));
+    Relation<Double> scoreResult = new MaterializedRelation<Double>("Kernel Density Local Outlier Factor", "kernel-density-slof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
 
     return result;
@@ -269,24 +247,9 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    */
   public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm.Parameterizer<O, D> {
     /**
-     * Option ID for kernel.
+     * Option ID for kernel density LOF kernel.
      */
-    public static final OptionID KERNEL_ID = new OptionID("ldf.kernel", "Kernel to use for LDF.");
-
-    /**
-     * Option ID for k
-     */
-    public static final OptionID K_ID = new OptionID("ldf.k", "Number of neighbors to use for LDF.");
-
-    /**
-     * Option ID for h - kernel bandwidth scaling
-     */
-    public static final OptionID H_ID = new OptionID("ldf.h", "Kernel bandwidth multiplier for LDF.");
-
-    /**
-     * Option ID for c
-     */
-    public static final OptionID C_ID = new OptionID("ldf.c", "Score scaling parameter for LDF.");
+    public static final OptionID KERNEL_ID = new OptionID("kernellof.kernel", "Kernel to use for kernel density LOF.");
 
     /**
      * The neighborhood size to use.
@@ -298,45 +261,25 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
      */
     KernelDensityFunction kernel;
 
-    /**
-     * Bandwidth scaling factor.
-     */
-    protected double h = 1;
-
-    /**
-     * Scaling constant, to limit value range to 1/c
-     */
-    protected double c = 0.1;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(K_ID);
+      final IntParameter pK = new IntParameter(LOF.K_ID);
       pK.addConstraint(new GreaterConstraint(1));
       if (config.grab(pK)) {
         k = pK.getValue();
       }
 
-      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, GaussianKernelDensityFunction.class);
+      ObjectParameter<KernelDensityFunction> kernelP = new ObjectParameter<KernelDensityFunction>(KERNEL_ID, KernelDensityFunction.class, EpanechnikovKernelDensityFunction.class);
       if (config.grab(kernelP)) {
         kernel = kernelP.instantiateClass(config);
-      }
-
-      DoubleParameter hP = new DoubleParameter(H_ID);
-      if (config.grab(hP)) {
-        h = hP.doubleValue();
-      }
-
-      DoubleParameter cP = new DoubleParameter(C_ID, 0.1);
-      if (config.grab(cP)) {
-        c = cP.doubleValue();
       }
     }
 
     @Override
-    protected LDF<O, D> makeInstance() {
-      return new LDF<O, D>(k, distanceFunction, kernel, h, c);
+    protected SimpleKernelDensityLOF<O, D> makeInstance() {
+      return new SimpleKernelDensityLOF<O, D>(k, distanceFunction, kernel);
     }
   }
 }
