@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import java.util.BitSet;
 

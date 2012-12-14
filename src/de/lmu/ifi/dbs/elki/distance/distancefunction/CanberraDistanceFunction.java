@@ -107,6 +107,13 @@ public class CanberraDistanceFunction extends AbstractVectorDoubleDistanceFuncti
   }
 
   @Override
+  public boolean isMetric() {
+    // As this is also reffered to as "canberra metric", it is probably a metric
+    // But *maybe* only for positive numbers only?
+    return true;
+  }
+
+  @Override
   public <T extends NumberVector<?>> SpatialDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<T, DoubleDistance>(relation, this);
   }

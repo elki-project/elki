@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distancefunction;
+package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 /*
  This file is part of ELKI:
@@ -25,79 +25,68 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Manhattan distance function to compute the Manhattan distance for a pair of
- * FeatureVectors.
+ * Provides the Euclidean distance for FeatureVectors.
  * 
  * @author Arthur Zimek
  */
-@Alias({ "taxicab", "cityblock", "l1", "ManhattanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction" })
-public class ManhattanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
+@Alias({ "euclidean", "euclid", "l2", "EuclideanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
+public class EuclideanDistanceFunction extends LPNormDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
-   * The static instance to use.
+   * Static instance. Use this!
    */
-  public static final ManhattanDistanceFunction STATIC = new ManhattanDistanceFunction();
+  public static final EuclideanDistanceFunction STATIC = new EuclideanDistanceFunction();
 
   /**
-   * Provides a Manhattan distance function that can compute the Manhattan
+   * Provides a Euclidean distance function that can compute the Euclidean
    * distance (that is a DoubleDistance) for FeatureVectors.
    * 
    * @deprecated Use static instance!
    */
   @Deprecated
-  public ManhattanDistanceFunction() {
-    super(1.0);
+  public EuclideanDistanceFunction() {
+    super(2.0);
   }
 
-  /**
-   * Compute the Manhattan distance.
-   * 
-   * @param v1 first vector
-   * @param v2 second vector
-   * @return Manhattan distance value
-   */
   @Override
   public double doubleDistance(NumberVector<?> v1, NumberVector<?> v2) {
-    final int dim = v1.getDimensionality();
-    if (dim != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString());
+    final int dim1 = v1.getDimensionality();
+    if (dim1 != v2.getDimensionality()) {
+      throw new IllegalArgumentException("Different dimensionality of FeatureVectors" + "\n  first argument: " + v1.toString() + "\n  second argument: " + v2.toString() + "\n" + v1.getDimensionality() + "!=" + v2.getDimensionality());
     }
-    double sum = 0;
-    for (int i = 0; i < dim; i++) {
-      sum += Math.abs(v1.doubleValue(i) - v2.doubleValue(i));
+    double sqrDist = 0;
+    for (int i = 0; i < dim1; i++) {
+      final double delta = v1.doubleValue(i) - v2.doubleValue(i);
+      sqrDist += delta * delta;
     }
-    return sum;
+    return Math.sqrt(sqrDist);
   }
 
-  /**
-   * Returns the Manhattan norm of the given vector.
-   * 
-   * @param v the vector to compute the norm of
-   * @return the Manhattan norm of the given vector
-   */
   @Override
   public double doubleNorm(NumberVector<?> v) {
     final int dim = v.getDimensionality();
-    double sum = 0;
+    double sqrDist = 0;
     for (int i = 0; i < dim; i++) {
-      sum += Math.abs(v.doubleValue(i));
+      final double delta = v.doubleValue(i);
+      sqrDist += delta * delta;
     }
-    return sum;
+    return Math.sqrt(sqrDist);
   }
 
-  private double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
+  protected double doubleMinDistObject(SpatialComparable mbr, NumberVector<?> v) {
     final int dim = mbr.getDimensionality();
     if (dim != v.getDimensionality()) {
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString() + "\n" + dim + "!=" + v.getDimensionality());
     }
 
-    double sumDist = 0;
+    double sqrDist = 0;
     for (int d = 0; d < dim; d++) {
-      final double value = v.doubleValue(d);
-      final double r;
+      double value = v.doubleValue(d);
+      double r;
       if (value < mbr.getMin(d)) {
         r = mbr.getMin(d);
       } else if (value > mbr.getMax(d)) {
@@ -106,10 +95,10 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
         r = value;
       }
 
-      final double manhattanI = Math.abs(value - r);
-      sumDist += manhattanI;
+      final double manhattanI = value - r;
+      sqrDist += manhattanI * manhattanI;
     }
-    return sumDist;
+    return Math.sqrt(sqrDist);
   }
 
   @Override
@@ -129,7 +118,7 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
       throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr1.toString() + "\n  " + "second argument: " + mbr2.toString());
     }
 
-    double sumDist = 0;
+    double sqrDist = 0;
     for (int d = 0; d < dim1; d++) {
       final double m1, m2;
       if (mbr1.getMax(d) < mbr2.getMin(d)) {
@@ -142,9 +131,9 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
         continue;
       }
       final double manhattanI = m1 - m2;
-      sumDist += manhattanI;
+      sqrDist += manhattanI * manhattanI;
     }
-    return sumDist;
+    return Math.sqrt(sqrDist);
   }
 
   @Override
@@ -154,7 +143,7 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
 
   @Override
   public String toString() {
-    return "ManhattanDistance";
+    return "EuclideanDistance";
   }
 
   @Override
@@ -180,8 +169,8 @@ public class ManhattanDistanceFunction extends LPNormDistanceFunction implements
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected ManhattanDistanceFunction makeInstance() {
-      return ManhattanDistanceFunction.STATIC;
+    protected EuclideanDistanceFunction makeInstance() {
+      return EuclideanDistanceFunction.STATIC;
     }
   }
 }
