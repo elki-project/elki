@@ -231,7 +231,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<WeightFunction> weightfunctionP = new ObjectParameter<WeightFunction>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class);
+      ObjectParameter<WeightFunction> weightfunctionP = new ObjectParameter<>(WEIGHT_ID, WeightFunction.class, ConstantWeight.class);
       if(config.grab(weightfunctionP)) {
         weightfunction = weightfunctionP.instantiateClass(config);
       }
@@ -239,7 +239,7 @@ public class WeightedCovarianceMatrixBuilder<V extends NumberVector<?>> extends 
 
     @Override
     protected WeightedCovarianceMatrixBuilder<V> makeInstance() {
-      return new WeightedCovarianceMatrixBuilder<V>(weightfunction);
+      return new WeightedCovarianceMatrixBuilder<>(weightfunction);
     }
   }
 }

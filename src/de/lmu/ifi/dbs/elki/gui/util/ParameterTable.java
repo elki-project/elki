@@ -206,14 +206,14 @@ public class ParameterTable extends JTable {
     /**
      * Combo box to use
      */
-    private final JComboBox comboBox;
+    private final JComboBox<String> comboBox;
 
     /**
      * Constructor.
      * 
      * @param comboBox Combo box we're going to use
      */
-    public DropdownEditor(JComboBox comboBox) {
+    public DropdownEditor(JComboBox<String> comboBox) {
       super(comboBox);
       this.comboBox = comboBox;
     }
@@ -225,8 +225,8 @@ public class ParameterTable extends JTable {
       comboBox.removeAllItems();
       // Put the current value in first.
       Object val = table.getValueAt(row, column);
-      if(val != null) {
-        comboBox.addItem(val);
+      if(val != null && val instanceof String) {
+        comboBox.addItem((String)val);
         comboBox.setSelectedIndex(0);
       }
       if(row < parameters.size()) {
@@ -396,7 +396,7 @@ public class ParameterTable extends JTable {
     /**
      * The combobox we are abusing to produce the popup
      */
-    final JComboBox combo = new JComboBox();
+    final JComboBox<String> combo = new JComboBox<>();
 
     /**
      * The popup menu.
@@ -470,7 +470,7 @@ public class ParameterTable extends JTable {
        * 
        * @param combo Combo box used for data storage.
        */
-      public SuperPopup(JComboBox combo) {
+      public SuperPopup(JComboBox<String> combo) {
         super(combo);
       }
 
@@ -593,7 +593,7 @@ public class ParameterTable extends JTable {
      * Constructor.
      */
     public AdjustingEditor() {
-      final JComboBox combobox = new JComboBox();
+      final JComboBox<String> combobox = new JComboBox<>();
       combobox.setEditable(true);
       this.dropdownEditor = new DropdownEditor(combobox);
       this.plaintextEditor = new DefaultCellEditor(new JTextField());

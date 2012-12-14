@@ -174,7 +174,7 @@ public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<CovarianceMatrixBuilder<V>> covarianceP = new ObjectParameter<CovarianceMatrixBuilder<V>>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
+      ObjectParameter<CovarianceMatrixBuilder<V>> covarianceP = new ObjectParameter<>(PCA_COVARIANCE_MATRIX, CovarianceMatrixBuilder.class, StandardCovarianceMatrixBuilder.class);
       if(config.grab(covarianceP)) {
         covarianceMatrixBuilder = covarianceP.instantiateClass(config);
       }
@@ -182,7 +182,7 @@ public class PCARunner<V extends NumberVector<?>> implements Parameterizable {
 
     @Override
     protected PCARunner<V> makeInstance() {
-      return new PCARunner<V>(covarianceMatrixBuilder);
+      return new PCARunner<>(covarianceMatrixBuilder);
     }
   }
 }

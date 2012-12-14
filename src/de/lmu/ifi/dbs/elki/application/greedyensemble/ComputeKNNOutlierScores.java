@@ -163,7 +163,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
     LOG.verbose("Running preprocessor ...");
-    MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<O, D>(relation, distf, maxk + 2);
+    MaterializeKNNPreprocessor<O, D> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
     database.addIndex(preproc);
 
     // Test that we did get a proper index query
@@ -216,7 +216,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        KNNOutlier<O, D> knn = new KNNOutlier<O, D>(distf, k);
+        KNNOutlier<O, D> knn = new KNNOutlier<>(distf, k);
         OutlierResult knnresult = knn.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling();
@@ -230,7 +230,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<O, D>(distf, k);
+        KNNWeightOutlier<O, D> knnw = new KNNWeightOutlier<>(distf, k);
         OutlierResult knnresult = knnw.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling();
@@ -244,7 +244,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LOF<O, D> lof = new LOF<O, D>(k, distf, distf);
+        LOF<O, D> lof = new LOF<>(k, distf, distf);
         OutlierResult lofresult = lof.run(relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
@@ -258,7 +258,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LoOP<O, D> loop = new LoOP<O, D>(k, k, distf, distf, 1.0);
+        LoOP<O, D> loop = new LoOP<>(k, k, distf, distf, 1.0);
         OutlierResult loopresult = loop.run(database, relation);
         writeResult(fout, ids, loopresult, new IdentityScaling(), "LOOP-" + kstr);
         detachResult(database, loopresult);
@@ -269,7 +269,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     runForEachK(new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LDOF<O, D> ldof = new LDOF<O, D>(distf, k);
+        LDOF<O, D> ldof = new LDOF<>(distf, k);
         OutlierResult ldofresult = ldof.run(database, relation);
         // Setup scaling
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
@@ -288,7 +288,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         runForEachK(new AlgRunner() {
           @Override
           public void run(int k, String kstr) {
-            ABOD<DoubleVector> abod = new ABOD<DoubleVector>(k, poly, df);
+            ABOD<DoubleVector> abod = new ABOD<>(k, poly, df);
             OutlierResult abodresult = abod.run(database);
             // Setup scaling
             StandardDeviationScaling scaling = new MinusLogStandardDeviationScaling(null, 1.0);
@@ -456,7 +456,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
 
     @Override
     protected AbstractApplication makeInstance() {
-      return new ComputeKNNOutlierScores<O, D>(inputstep, distf, startk, stepk, maxk, bylabel, outfile);
+      return new ComputeKNNOutlierScores<>(inputstep, distf, startk, stepk, maxk, bylabel, outfile);
     }
   }
 

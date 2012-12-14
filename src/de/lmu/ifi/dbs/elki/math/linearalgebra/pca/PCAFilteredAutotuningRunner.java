@@ -121,7 +121,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     assertSortedByDistance(results);
     final int dim = RelationUtil.dimensionality(database);
 
-    List<Matrix> best = new LinkedList<Matrix>();
+    List<Matrix> best = new LinkedList<>();
     for (int i = 0; i < dim; i++) {
       best.add(null);
     }
@@ -131,7 +131,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
     }
     int[] bestk = new int[dim];
     // 'history'
-    LinkedList<Cand> prev = new LinkedList<Cand>();
+    LinkedList<Cand> prev = new LinkedList<>();
     // TODO: starting parameter shouldn't be hardcoded...
     int smooth = 3;
     int startk = 4;
@@ -259,7 +259,7 @@ public class PCAFilteredAutotuningRunner<V extends NumberVector<?>> extends PCAF
   public static class Parameterizer<V extends NumberVector<?>> extends PCAFilteredRunner.Parameterizer<V> {
     @Override
     protected PCAFilteredAutotuningRunner<V> makeInstance() {
-      return new PCAFilteredAutotuningRunner<V>(covarianceMatrixBuilder, eigenPairFilter, big, small);
+      return new PCAFilteredAutotuningRunner<>(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

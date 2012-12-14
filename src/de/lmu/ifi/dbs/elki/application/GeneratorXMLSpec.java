@@ -143,8 +143,8 @@ public class GeneratorXMLSpec extends AbstractApplication {
     if(modelcol < 0) {
       throw new AbortException("No model column found in bundle.");
     }
-    ArrayList<Model> models = new ArrayList<Model>();
-    Map<Model, TIntList> modelMap = new HashMap<Model, TIntList>();
+    ArrayList<Model> models = new ArrayList<>();
+    Map<Model, TIntList> modelMap = new HashMap<>();
     { // Build a map from model to the actual objects
       for(int i = 0; i < data.dataLength(); i++) {
         Model model = (Model) data.data(i, modelcol);

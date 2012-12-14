@@ -96,8 +96,8 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
     }
 
     // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
-    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> strongEigenPairs = new ArrayList<>();
+    List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // determine sum of eigenvalues
     double totalSum = 0;

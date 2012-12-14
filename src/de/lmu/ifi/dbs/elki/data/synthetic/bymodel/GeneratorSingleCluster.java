@@ -47,7 +47,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
   /**
    * The distribution generators for each axis
    */
-  private List<DistributionWithRandom> axes = new ArrayList<DistributionWithRandom>();
+  private List<DistributionWithRandom> axes = new ArrayList<>();
 
   /**
    * The transformation matrix
@@ -231,7 +231,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    */
   @Override
   public List<Vector> generate(int count) throws UnableToComplyException {
-    ArrayList<Vector> result = new ArrayList<Vector>(count);
+    ArrayList<Vector> result = new ArrayList<>(count);
     while(result.size() < count) {
       double[] d = new double[dim];
       int i = 0;

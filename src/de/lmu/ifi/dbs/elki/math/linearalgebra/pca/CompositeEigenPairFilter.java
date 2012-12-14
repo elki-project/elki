@@ -93,7 +93,7 @@ public class CompositeEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectListParameter<EigenPairFilter> filtersP = new ObjectListParameter<EigenPairFilter>(EIGENPAIR_FILTER_COMPOSITE_LIST, EigenPairFilter.class);
+      ObjectListParameter<EigenPairFilter> filtersP = new ObjectListParameter<>(EIGENPAIR_FILTER_COMPOSITE_LIST, EigenPairFilter.class);
 
       if(config.grab(filtersP)) {
         filters = filtersP.instantiateClasses(config);

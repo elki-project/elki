@@ -62,7 +62,7 @@ public class MultipleFilesOutput implements StreamFactory {
   /**
    * HashMap of open print streams.
    */
-  private HashMap<String, PrintStream> map = new HashMap<String, PrintStream>();
+  private HashMap<String, PrintStream> map = new HashMap<>();
 
   /**
    * Control gzip compression of output.

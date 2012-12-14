@@ -109,12 +109,12 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
     final int dim = RelationUtil.dimensionality(relation);
     final int size = relation.size();
     final DBIDs allids = relation.getDBIDs();
-    final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<ArrayList<DBIDs>>();
+    final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<>();
 
     // Temporary projection storage of the database
-    final ArrayList<ArrayList<DoubleDBIDPair>> dbAxis = new ArrayList<ArrayList<DoubleDBIDPair>>(dim);
+    final ArrayList<ArrayList<DoubleDBIDPair>> dbAxis = new ArrayList<>(dim);
     for(int i = 0; i < dim; i++) {
-      ArrayList<DoubleDBIDPair> axis = new ArrayList<DoubleDBIDPair>(size);
+      ArrayList<DoubleDBIDPair> axis = new ArrayList<>(size);
       dbAxis.add(i, axis);
     }
     // Project
@@ -129,7 +129,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector<?>> exten
     for(int d = 0; d < dim; d++) {
       ArrayList<DoubleDBIDPair> axis = dbAxis.get(d);
       Collections.sort(axis);
-      ArrayList<DBIDs> dimranges = new ArrayList<DBIDs>(phi + 1);
+      ArrayList<DBIDs> dimranges = new ArrayList<>(phi + 1);
       dimranges.add(allids);
       int start = 0;
       for(int r = 0; r < phi; r++) {

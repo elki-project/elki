@@ -44,14 +44,14 @@ public class JSONBuffer {
    * 
    * @apiviz.exclude
    */
-  enum ops {
+  enum Operand {
     HASH, ARRAY
   }
 
   /**
    * Operations stack for detecting errors
    */
-  final Stack<ops> stack = new Stack<ops>();
+  final Stack<Operand> stack = new Stack<>();
 
   /**
    * Constructor.
@@ -79,7 +79,7 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer appendString(Object cont) {
-    if(stack.empty() || stack.peek() != ops.ARRAY) {
+    if(stack.empty() || stack.peek() != Operand.ARRAY) {
       throw new JSONException("Appending string outside of array context.");
     }
     addQuotedString(cont);
@@ -94,7 +94,7 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer append(double cont) {
-    if(stack.empty() || stack.peek() != ops.ARRAY) {
+    if(stack.empty() || stack.peek() != Operand.ARRAY) {
       throw new JSONException("Appending double outside of array context.");
     }
     buffer.append(Double.toString(cont));
@@ -109,7 +109,7 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer append(int cont) {
-    if(stack.empty() || stack.peek() != ops.ARRAY) {
+    if(stack.empty() || stack.peek() != Operand.ARRAY) {
       throw new JSONException("Appending double outside of array context.");
     }
     buffer.append(Integer.toString(cont));
@@ -180,7 +180,7 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer appendKeyValue(Object key, Object val) {
-    if(stack.empty() || stack.peek() != ops.HASH) {
+    if(stack.empty() || stack.peek() != Operand.HASH) {
       throw new JSONException("Appending key-value outside of hash context.");
     }
     addQuotedString(key);
@@ -205,13 +205,13 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer appendKeyHash(Object key) {
-    if(stack.empty() || stack.peek() != ops.HASH) {
+    if(stack.empty() || stack.peek() != Operand.HASH) {
       throw new JSONException("Appending key-value outside of hash context.");
     }
     addQuotedString(key);
     buffer.append(":");
     buffer.append("{");
-    stack.push(ops.HASH);
+    stack.push(Operand.HASH);
     return this;
   }
 
@@ -222,13 +222,13 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer appendKeyArray(Object key) {
-    if(stack.empty() || stack.peek() != ops.HASH) {
+    if(stack.empty() || stack.peek() != Operand.HASH) {
       throw new JSONException("Appending key-value outside of hash context.");
     }
     addQuotedString(key);
     buffer.append(":");
     buffer.append("[");
-    stack.push(ops.ARRAY);
+    stack.push(Operand.ARRAY);
     return this;
   }
 
@@ -238,11 +238,11 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer startArray() {
-    if(!stack.empty() && stack.peek() != ops.ARRAY) {
+    if(!stack.empty() && stack.peek() != Operand.ARRAY) {
       throw new JSONException("startArray() is only allowed in an empty context.");
     }
     buffer.append("[");
-    stack.push(ops.ARRAY);
+    stack.push(Operand.ARRAY);
     return this;
   }
 
@@ -252,11 +252,11 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer startHash() {
-    if(!stack.empty() && stack.peek() != ops.ARRAY) {
+    if(!stack.empty() && stack.peek() != Operand.ARRAY) {
       throw new JSONException("startHash() is only allowed in an empty context.");
     }
     buffer.append("{");
-    stack.push(ops.HASH);
+    stack.push(Operand.HASH);
     return this;
   }
 
@@ -266,7 +266,7 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer closeArray() {
-    if(stack.empty() || stack.peek() != ops.ARRAY) {
+    if(stack.empty() || stack.peek() != Operand.ARRAY) {
       throw new JSONException("Not in array context when closing.");
     }
     removeSeparator();
@@ -282,7 +282,7 @@ public class JSONBuffer {
    * @return Buffer for chaining
    */
   public JSONBuffer closeHash() {
-    if(stack.empty() || stack.peek() != ops.HASH) {
+    if(stack.empty() || stack.peek() != Operand.HASH) {
       throw new JSONException("Not in array context when closing.");
     }
     removeSeparator();

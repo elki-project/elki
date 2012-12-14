@@ -88,7 +88,7 @@ public class StockIcon {
 
   public static final String PROCESS_STOP = "process-stop";
 
-  private static final Map<String, SoftReference<Icon>> iconcache = new HashMap<String, SoftReference<Icon>>();
+  private static final Map<String, SoftReference<Icon>> iconcache = new HashMap<>();
 
   /**
    * Get a particular stock icon.
@@ -107,7 +107,7 @@ public class StockIcon {
     java.net.URL imgURL = StockIcon.class.getResource(name + ".png");
     if(imgURL != null) {
       Icon icon = new ImageIcon(imgURL);
-      iconcache.put(name, new SoftReference<Icon>(icon));
+      iconcache.put(name, new SoftReference<>(icon));
       return icon;
     }
     else {

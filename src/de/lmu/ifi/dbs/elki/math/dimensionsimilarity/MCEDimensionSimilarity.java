@@ -186,7 +186,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
    */
   private ArrayList<ArrayList<DBIDs>> buildPartitions(Relation<? extends NumberVector<?>> relation, DBIDs ids, int depth, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
-    ArrayList<ArrayList<DBIDs>> subspaceIndex = new ArrayList<ArrayList<DBIDs>>(dim);
+    ArrayList<ArrayList<DBIDs>> subspaceIndex = new ArrayList<>(dim);
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
     double[] tmp = new double[ids.size()];
     Mean mean = new Mean();
@@ -194,7 +194,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector<
     for (int i = 0; i < dim; i++) {
       final int d = matrix.dim(i);
       // Index for a single dimension:
-      ArrayList<DBIDs> idx = new ArrayList<DBIDs>(1 << depth);
+      ArrayList<DBIDs> idx = new ArrayList<>(1 << depth);
       // First, we need a copy of the DBIDs and sort it.
       ArrayModifiableDBIDs sids = DBIDUtil.newArray(ids);
       comp.setDimension(d);

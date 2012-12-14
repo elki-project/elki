@@ -180,7 +180,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
     if (LOG.isVerbose()) {
       LOG.verbose("Number of high-contrast subspaces: " + subspaces.size());
     }
-    List<Relation<Double>> results = new ArrayList<Relation<Double>>();
+    List<Relation<Double>> results = new ArrayList<>();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Calculating Outlier scores for high Contrast subspaces", subspaces.size(), LOG) : null;
 
     // run outlier detection and collect the result
@@ -192,8 +192,8 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       }
 
       ProxyDatabase pdb = new ProxyDatabase(ids);
-      Projection<V, V> proj = new NumericalFeatureSelection<V>(dimset, factory);
-      pdb.addRelation(new ProjectedView<V, V>(relation, proj));
+      Projection<V, V> proj = new NumericalFeatureSelection<>(dimset, factory);
+      pdb.addRelation(new ProjectedView<>(relation, proj));
 
       // run LOF and collect the result
       OutlierResult result = outlierAlgorithm.run(pdb);
@@ -221,7 +221,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       minmax.put(sum);
     }
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax());
-    Relation<Double> scoreres = new MaterializedRelation<Double>("HiCS", "HiCS-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
+    Relation<Double> scoreres = new MaterializedRelation<>("HiCS", "HiCS-outlier", TypeUtil.DOUBLE, scores, relation.getDBIDs());
 
     return new OutlierResult(meta, scoreres);
   }
@@ -236,7 +236,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    */
   private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim + 1);
+    ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<>(dim + 1);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
     for (int i = 0; i < dim; i++) {
@@ -264,8 +264,8 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       dprog.setProcessed(2, LOG);
     }
 
-    TreeSet<HiCSSubspace> subspaceList = new TreeSet<HiCSSubspace>(HiCSSubspace.SORT_BY_SUBSPACE);
-    TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<HiCSSubspace>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
+    TreeSet<HiCSSubspace> subspaceList = new TreeSet<>(HiCSSubspace.SORT_BY_SUBSPACE);
+    TopBoundedHeap<HiCSSubspace> dDimensionalList = new TopBoundedHeap<>(cutoff, HiCSSubspace.SORT_BY_CONTRAST_ASC);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Generating two-element subsets", (dbdim * (dbdim - 1)) >> 1, LOG) : null;
     // compute two-element sets of subspaces
     for (int i = 0; i < dbdim; i++) {
@@ -291,7 +291,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       }
       // result now contains all d-dimensional sets of subspaces
 
-      ArrayList<HiCSSubspace> candidateList = new ArrayList<HiCSSubspace>(dDimensionalList.size());
+      ArrayList<HiCSSubspace> candidateList = new ArrayList<>(dDimensionalList.size());
       for (HiCSSubspace sub : dDimensionalList) {
         subspaceList.add(sub);
         candidateList.add(sub);
@@ -610,12 +610,12 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
         alpha = alphaP.doubleValue();
       }
 
-      final ObjectParameter<OutlierAlgorithm> algoP = new ObjectParameter<OutlierAlgorithm>(ALGO_ID, OutlierAlgorithm.class, LOF.class);
+      final ObjectParameter<OutlierAlgorithm> algoP = new ObjectParameter<>(ALGO_ID, OutlierAlgorithm.class, LOF.class);
       if (config.grab(algoP)) {
         outlierAlgorithm = algoP.instantiateClass(config);
       }
 
-      final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<GoodnessOfFitTest>(TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
+      final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<>(TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
       if (config.grab(testP)) {
         statTest = testP.instantiateClass(config);
       }
@@ -634,7 +634,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
 
     @Override
     protected HiCS<V> makeInstance() {
-      return new HiCS<V>(m, alpha, outlierAlgorithm, statTest, cutoff, rnd);
+      return new HiCS<>(m, alpha, outlierAlgorithm, statTest, cutoff, rnd);
     }
   }
 }

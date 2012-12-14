@@ -73,7 +73,7 @@ public class SavedSettingsTabPanel extends JPanel {
   /**
    * The combo box to use
    */
-  JComboBox savedCombo;
+  JComboBox<String> savedCombo;
 
   /**
    * The UI to set parameters on.
@@ -96,7 +96,7 @@ public class SavedSettingsTabPanel extends JPanel {
     // Dropdown for saved settings
     {
       savedSettingsModel = new SettingsComboboxModel(store);
-      savedCombo = new JComboBox(savedSettingsModel);
+      savedCombo = new JComboBox<>(savedSettingsModel);
       savedCombo.setEditable(true);
       savedCombo.setSelectedItem("[Saved Settings]");
       GridBagConstraints constraints = new GridBagConstraints();
@@ -182,7 +182,7 @@ public class SavedSettingsTabPanel extends JPanel {
    * 
    * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
    */
-  class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
+  class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
     /**
      * Serial version
      */
@@ -221,7 +221,7 @@ public class SavedSettingsTabPanel extends JPanel {
     }
 
     @Override
-    public Object getElementAt(int index) {
+    public String getElementAt(int index) {
       return store.getElementAt(index).first;
     }
 

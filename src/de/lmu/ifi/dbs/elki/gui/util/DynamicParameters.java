@@ -122,7 +122,7 @@ public class DynamicParameters {
    */
   public DynamicParameters() {
     super();
-    this.parameters = new ArrayList<Node>();
+    this.parameters = new ArrayList<>();
   }
 
   /**
@@ -213,7 +213,7 @@ public class DynamicParameters {
    * @return Array list of String parameters.
    */
   public synchronized ArrayList<String> serializeParameters() {
-    ArrayList<String> p = new ArrayList<String>(2 * parameters.size());
+    ArrayList<String> p = new ArrayList<>(2 * parameters.size());
     for (Node t : parameters) {
       if (t.param != null) {
         if (t.param instanceof RemainingOptions) {

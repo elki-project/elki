@@ -49,7 +49,7 @@ public class HierarchicalClassLabel extends ClassLabel {
   /**
    * Type information.
    */
-  public static final SimpleTypeInformation<HierarchicalClassLabel> TYPE = new SimpleTypeInformation<HierarchicalClassLabel>(HierarchicalClassLabel.class);
+  public static final SimpleTypeInformation<HierarchicalClassLabel> TYPE = new SimpleTypeInformation<>(HierarchicalClassLabel.class);
 
   /**
    * Holds the Pattern to separate different levels parsing input.

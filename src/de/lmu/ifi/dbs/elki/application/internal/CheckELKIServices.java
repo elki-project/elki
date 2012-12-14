@@ -130,7 +130,7 @@ public class CheckELKIServices {
       return;
     }
     List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false);
-    HashSet<String> names = new HashSet<String>();
+    HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
       boolean skip = false;
       for(String pkg : skippackages) {
@@ -176,7 +176,7 @@ public class CheckELKIServices {
     }
     if(names.size() > 0) {
       // format for copy & paste to properties file:
-      ArrayList<String> sorted = new ArrayList<String>(names);
+      ArrayList<String> sorted = new ArrayList<>(names);
       // TODO: sort by package, then classname
       Collections.sort(sorted);
       if(!update) {

@@ -133,7 +133,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
   /**
    * Observers of this panel
    */
-  protected final Observers<ParameterTabPanel> observers = new Observers<ParameterTabPanel>();
+  protected final Observers<ParameterTabPanel> observers = new Observers<>();
 
   /**
    * Input pane

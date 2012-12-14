@@ -90,7 +90,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
   /**
    * Action listeners for this plot.
    */
-  private ArrayList<ActionListener> actionListeners = new ArrayList<ActionListener>();
+  private ArrayList<ActionListener> actionListeners = new ArrayList<>();
 
   /**
    * Single view mode
@@ -191,7 +191,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
    * @return Arrangement
    */
   private RectangleArranger<PlotItem> arrangeVisualizations(double width, double height) {
-    RectangleArranger<PlotItem> plotmap = new RectangleArranger<PlotItem>(width, height);
+    RectangleArranger<PlotItem> plotmap = new RectangleArranger<>(width, height);
 
     ArrayList<Projector> projectors = ResultUtil.filterResults(context.getResult(), Projector.class);
     // Rectangle layout
@@ -276,7 +276,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
           hasDetails |= !task.nodetail;
           Pair<Element, Visualization> pair = oldlayers.remove(it, task);
           if (pair == null) {
-            pair = new Pair<Element, Visualization>(null, null);
+            pair = new Pair<>(null, null);
             pair.first = svgElement(SVGConstants.SVG_G_TAG);
           }
           if (pair.second == null) {
@@ -368,7 +368,7 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
             // New task?
             if (pair == null) {
               if (visibleInOverview(task)) {
-                pair = new Pair<Element, Visualization>(null, null);
+                pair = new Pair<>(null, null);
                 pair.first = svgElement(SVGConstants.SVG_G_TAG);
                 pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
                 vistoelem.get(it, null).first.appendChild(pair.first);

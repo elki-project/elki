@@ -122,7 +122,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
    */
   public Cluster(String name, DBIDs ids, boolean noise, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
     this(name, ids, noise, model, null);
-    this.setHierarchy(new HierarchyReferenceLists<Cluster<M>>(this, children, parents));
+    this.setHierarchy(new HierarchyReferenceLists<>(this, children, parents));
   }
 
   /**
@@ -233,7 +233,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
    */
   public Cluster(String name, DBIDs ids, M model, List<Cluster<M>> children, List<Cluster<M>> parents) {
     this(name, ids, false, model, null);
-    this.setHierarchy(new HierarchyReferenceLists<Cluster<M>>(this, children, parents));
+    this.setHierarchy(new HierarchyReferenceLists<>(this, children, parents));
   }
 
   /**
@@ -264,7 +264,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
   @Override
   public List<Cluster<M>> getChildren() {
     if(hierarchy == null) {
-      return new ArrayList<Cluster<M>>(0);
+      return new ArrayList<>(0);
     }
     return hierarchy.getChildren(this);
   }
@@ -286,7 +286,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
    * @return Set of descendants
    */
   public Set<Cluster<M>> getDescendants() {
-    HashSet<Cluster<M>> set = new HashSet<Cluster<M>>();
+    HashSet<Cluster<M>> set = new HashSet<>();
     // add all
     for(Iterator<Cluster<M>> iter = iterDescendants(); iter.hasNext();) {
       set.add(iter.next());
@@ -311,7 +311,7 @@ public class Cluster<M extends Model> implements Hierarchical<Cluster<M>>, TextW
   @Override
   public List<Cluster<M>> getParents() {
     if(hierarchy == null) {
-      return new ArrayList<Cluster<M>>(0);
+      return new ArrayList<>(0);
     }
     return hierarchy.getParents(this);
   }

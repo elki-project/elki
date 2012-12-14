@@ -159,7 +159,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         ByteBufferSerializer<Object> serializer = (ByteBufferSerializer<Object>) Class.forName(sername).newInstance();
-        return new SimpleTypeInformation<Object>(clz, label, serializer);
+        return new SimpleTypeInformation<>(clz, label, serializer);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
       } catch (InstantiationException e) {
@@ -240,7 +240,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         ByteBufferSerializer<DoubleVector> serializer = (ByteBufferSerializer<DoubleVector>) Class.forName(sername).newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
-        return new VectorTypeInformation<DoubleVector>(clz, serializer, mindim, maxdim);
+        return new VectorTypeInformation<>(clz, serializer, mindim, maxdim);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
       } catch (InstantiationException e) {
@@ -338,9 +338,9 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
           for (int i = 0; i < cols; i++) {
             labels[i] = ByteArrayUtil.readString(buffer);
           }
-          return new VectorFieldTypeInformation<DoubleVector>(factory, mindim, labels, serializer);
+          return new VectorFieldTypeInformation<>(factory, mindim, labels, serializer);
         } else {
-          return new VectorFieldTypeInformation<DoubleVector>(factory, mindim, maxdim, serializer);
+          return new VectorFieldTypeInformation<>(factory, mindim, maxdim, serializer);
         }
       } catch (UnableToComplyException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);

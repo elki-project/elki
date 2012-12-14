@@ -58,7 +58,7 @@ public class Logging {
   /**
    * HashMap to keep track of loggers.
    */
-  private static HashMap<String, Logging> loggers = new HashMap<String, Logging>();
+  private static HashMap<String, Logging> loggers = new HashMap<>();
 
   /**
    * Wrapped logger of this instance - not static!

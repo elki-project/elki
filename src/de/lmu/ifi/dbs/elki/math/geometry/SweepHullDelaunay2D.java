@@ -113,7 +113,7 @@ public class SweepHullDelaunay2D {
       throw new UnsupportedOperationException("There is no delaunay triangulation for less than three objects!");
     }
     int len = points.size() - 1;
-    hull = new LinkedList<IntIntPair>();
+    hull = new LinkedList<>();
     tris = hullonly ? null : new ArrayList<Triangle>(len);
 
     final Vector seed;
@@ -614,7 +614,7 @@ public class SweepHullDelaunay2D {
     }
     DoubleMinMax minmaxX = new DoubleMinMax();
     DoubleMinMax minmaxY = new DoubleMinMax();
-    List<Vector> hullp = new ArrayList<Vector>(hull.size());
+    List<Vector> hullp = new ArrayList<>(hull.size());
     for(IntIntPair pair : hull) {
       Vector v = points.get(pair.first);
       hullp.add(v);

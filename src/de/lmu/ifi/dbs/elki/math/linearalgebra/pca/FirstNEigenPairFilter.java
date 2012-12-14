@@ -82,8 +82,8 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
     }
 
     // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
-    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> strongEigenPairs = new ArrayList<>();
+    List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // determine strong and weak eigenpairs
     for(int i = 0; i < eigenPairs.size(); i++) {

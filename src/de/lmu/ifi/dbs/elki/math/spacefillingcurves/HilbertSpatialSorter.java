@@ -59,7 +59,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax) {
     final int dim = minmax.length >> 1;
-    List<HilbertRef<T>> tmp = new ArrayList<HilbertRef<T>>(end - start);
+    List<HilbertRef<T>> tmp = new ArrayList<>(end - start);
     int[] buf = new int[dim];
     for (int i = start; i < end; i++) {
       T v = objs.get(i);
@@ -69,7 +69,7 @@ public class HilbertSpatialSorter extends AbstractSpatialSorter {
         val = Integer.MAX_VALUE * ((val - minmax[d2]) / (minmax[d2 + 1] - minmax[d2]));
         buf[d] = (int) val;
       }
-      tmp.add(new HilbertRef<T>(v, coordinatesToHilbert(buf, Integer.SIZE - 1, 1)));
+      tmp.add(new HilbertRef<>(v, coordinatesToHilbert(buf, Integer.SIZE - 1, 1)));
     }
     // Sort and copy back
     Collections.sort(tmp);

@@ -95,7 +95,7 @@ public abstract class AbstractApplication implements Parameterizable {
   public static void runCLIApplication(Class<?> cls, String[] args) {
     final Flag helpF = new Flag(OptionID.HELP);
     final Flag helpLongF = new Flag(OptionID.HELP_LONG);
-    final ClassParameter<Object> descriptionP = new ClassParameter<Object>(OptionID.DESCRIPTION, Object.class, true);
+    final ClassParameter<Object> descriptionP = new ClassParameter<>(OptionID.DESCRIPTION, Object.class, true);
     final StringParameter debugP = new StringParameter(OptionID.DEBUG);
     debugP.setOptional(true);
 

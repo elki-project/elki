@@ -127,7 +127,7 @@ public class MiniGUI extends AbstractApplication {
   /**
    * Combo box for saved settings.
    */
-  protected JComboBox savedCombo;
+  protected JComboBox<String> savedCombo;
 
   /**
    * Model to link the combobox with.
@@ -165,7 +165,7 @@ public class MiniGUI extends AbstractApplication {
 
       // Combo box for saved settings
       savedSettingsModel = new SettingsComboboxModel(store);
-      savedCombo = new JComboBox(savedSettingsModel);
+      savedCombo = new JComboBox<>(savedSettingsModel);
       savedCombo.setEditable(true);
       savedCombo.setSelectedItem("[Saved Settings]");
       buttonPanel.add(savedCombo);
@@ -473,7 +473,7 @@ public class MiniGUI extends AbstractApplication {
    * 
    * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
    */
-  class SettingsComboboxModel extends AbstractListModel implements ComboBoxModel {
+  class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
     /**
      * Serial version.
      */
@@ -512,7 +512,7 @@ public class MiniGUI extends AbstractApplication {
     }
 
     @Override
-    public Object getElementAt(int index) {
+    public String getElementAt(int index) {
       return store.getElementAt(store.size() - 1 - index).first;
     }
 

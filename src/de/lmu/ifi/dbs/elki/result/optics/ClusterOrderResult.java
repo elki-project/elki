@@ -87,7 +87,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
    */
   public ClusterOrderResult(String name, String shortname) {
     super(name, shortname);
-    clusterOrder = new ArrayList<ClusterOrderEntry<D>>();
+    clusterOrder = new ArrayList<>();
     dbids = DBIDUtil.newHashSet();
     map = DataStoreUtil.makeStorage(dbids, DataStoreFactory.HINT_DB, ClusterOrderEntry.class);
 
@@ -121,7 +121,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
    * @param reachability Reachability distance
    */
   public void add(DBID id, DBID predecessor, D reachability) {
-    add(new GenericClusterOrderEntry<D>(id, predecessor, reachability));
+    add(new GenericClusterOrderEntry<>(id, predecessor, reachability));
     dbids.add(id);
   }
 
@@ -279,7 +279,7 @@ public class ClusterOrderResult<D extends Distance<D>> extends BasicResult imple
 
     @Override
     public SimpleTypeInformation<D> getDataTypeInformation() {
-      return new SimpleTypeInformation<D>(Distance.class);
+      return new SimpleTypeInformation<>(Distance.class);
     }
 
     @Override

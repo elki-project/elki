@@ -184,12 +184,12 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Database connection parameter
-      final ObjectParameter<Database> dbpar = new ObjectParameter<Database>(OptionID.DATABASE_CONNECTION, Database.class, StaticArrayDatabase.class);
+      final ObjectParameter<Database> dbpar = new ObjectParameter<>(OptionID.DATABASE_CONNECTION, Database.class, StaticArrayDatabase.class);
       if(config.grab(dbpar)) {
         database = dbpar.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<DistanceFunction<O, D>>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
@@ -203,7 +203,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
 
     @Override
     protected CacheDoubleDistanceInOnDiskMatrix<O, D> makeInstance() {
-      return new CacheDoubleDistanceInOnDiskMatrix<O, D>(database, distance, out);
+      return new CacheDoubleDistanceInOnDiskMatrix<>(database, distance, out);
     }
   }
 

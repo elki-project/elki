@@ -48,7 +48,7 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
    */
   public MemoryPageFile(int pageSize) {
     super(pageSize);
-    this.file = new TIntObjectHashMap<P>();
+    this.file = new TIntObjectHashMap<>();
   }
 
   @Override

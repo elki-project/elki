@@ -63,42 +63,42 @@ public final class TypeUtil {
   /**
    * Input type for algorithms that accept anything.
    */
-  public static final SimpleTypeInformation<Object> ANY = new SimpleTypeInformation<Object>(Object.class);
+  public static final SimpleTypeInformation<Object> ANY = new SimpleTypeInformation<>(Object.class);
 
   /**
    * Database IDs.
    */
-  public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<DBID>(DBID.class, DBIDFactory.FACTORY.getDBIDSerializer());
+  public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<>(DBID.class, DBIDFactory.FACTORY.getDBIDSerializer());
 
   /**
    * Database ID lists.
    */
-  public static final SimpleTypeInformation<DBIDs> DBIDS = new SimpleTypeInformation<DBIDs>(DBIDs.class);
+  public static final SimpleTypeInformation<DBIDs> DBIDS = new SimpleTypeInformation<>(DBIDs.class);
 
   /**
    * A string.
    */
-  public static final SimpleTypeInformation<String> STRING = new SimpleTypeInformation<String>(String.class, ByteArrayUtil.STRING_SERIALIZER);
+  public static final SimpleTypeInformation<String> STRING = new SimpleTypeInformation<>(String.class, ByteArrayUtil.STRING_SERIALIZER);
 
   /**
    * A class label.
    */
-  public static final SimpleTypeInformation<ClassLabel> CLASSLABEL = new SimpleTypeInformation<ClassLabel>(ClassLabel.class);
+  public static final SimpleTypeInformation<ClassLabel> CLASSLABEL = new SimpleTypeInformation<>(ClassLabel.class);
 
   /**
    * Simple class labels.
    */
-  public static final SimpleTypeInformation<SimpleClassLabel> SIMPLE_CLASSLABEL = new SimpleTypeInformation<SimpleClassLabel>(SimpleClassLabel.class, SimpleClassLabel.SERIALIZER);
+  public static final SimpleTypeInformation<SimpleClassLabel> SIMPLE_CLASSLABEL = new SimpleTypeInformation<>(SimpleClassLabel.class, SimpleClassLabel.SERIALIZER);
 
   /**
    * A list of labels.
    */
-  public static final SimpleTypeInformation<LabelList> LABELLIST = new SimpleTypeInformation<LabelList>(LabelList.class, LabelList.SERIALIZER);
+  public static final SimpleTypeInformation<LabelList> LABELLIST = new SimpleTypeInformation<>(LabelList.class, LabelList.SERIALIZER);
 
   /**
    * A list of neighbors.
    */
-  public static final SimpleTypeInformation<DistanceDBIDResult<?>> NEIGHBORLIST = new SimpleTypeInformation<DistanceDBIDResult<?>>(DistanceDBIDResult.class);
+  public static final SimpleTypeInformation<DistanceDBIDResult<?>> NEIGHBORLIST = new SimpleTypeInformation<>(DistanceDBIDResult.class);
 
   /**
    * Either class label, object labels or a string - anything that will be
@@ -110,90 +110,90 @@ public final class TypeUtil {
   /**
    * Number vectors of <em>variable</em> length.
    */
-  public static final SimpleTypeInformation<? super NumberVector<?>> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<NumberVector<?>>(NumberVector.class);
+  public static final SimpleTypeInformation<? super NumberVector<?>> NUMBER_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<NumberVector<?>> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<NumberVector<?>>(NumberVector.class);
-
-  /**
-   * Input type for algorithms that require number vector fields.
-   * 
-   * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
-   */
-  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.class);
+  public static final VectorFieldTypeInformation<NumberVector<?>> NUMBER_VECTOR_FIELD = new VectorFieldTypeInformation<>(NumberVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    * 
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
-  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = new VectorFieldTypeInformation<FloatVector>(FloatVector.class);
+  public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = new VectorFieldTypeInformation<>(DoubleVector.class);
+
+  /**
+   * Input type for algorithms that require number vector fields.
+   * 
+   * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
+   */
+  public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = new VectorFieldTypeInformation<>(FloatVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
    */
-  public static final VectorFieldTypeInformation<BitVector> BIT_VECTOR_FIELD = new VectorFieldTypeInformation<BitVector>(BitVector.class);
+  public static final VectorFieldTypeInformation<BitVector> BIT_VECTOR_FIELD = new VectorFieldTypeInformation<>(BitVector.class);
 
   /**
    * Sparse float vector field.
    */
-  public static final SimpleTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<SparseNumberVector<?>>(SparseNumberVector.class);
+  public static final SimpleTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_VARIABLE_LENGTH = new SimpleTypeInformation<>(SparseNumberVector.class);
 
   /**
    * Sparse vector field.
    */
-  public static final VectorFieldTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<SparseNumberVector<?>>(SparseNumberVector.class);
+  public static final VectorFieldTypeInformation<SparseNumberVector<?>> SPARSE_VECTOR_FIELD = new VectorFieldTypeInformation<>(SparseNumberVector.class);
 
   /**
    * Sparse float vector field.
    * 
    * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
-  public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<SparseFloatVector>(SparseFloatVector.class);
+  public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = new VectorFieldTypeInformation<>(SparseFloatVector.class);
 
   /**
    * Sparse double vector field.
    * 
    * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
-  public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = new VectorFieldTypeInformation<SparseDoubleVector>(SparseDoubleVector.class);
+  public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = new VectorFieldTypeInformation<>(SparseDoubleVector.class);
 
   /**
    * External ID type.
    */
-  public static final SimpleTypeInformation<ExternalID> EXTERNALID = new SimpleTypeInformation<ExternalID>(ExternalID.class);
+  public static final SimpleTypeInformation<ExternalID> EXTERNALID = new SimpleTypeInformation<>(ExternalID.class);
 
   /**
    * Type for polygons.
    */
-  public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = new SimpleTypeInformation<PolygonsObject>(PolygonsObject.class);
+  public static final SimpleTypeInformation<PolygonsObject> POLYGON_TYPE = new SimpleTypeInformation<>(PolygonsObject.class);
 
   /**
    * Double type, outlier scores etc.
    */
-  public static final SimpleTypeInformation<Double> DOUBLE = new SimpleTypeInformation<Double>(Double.class, ByteArrayUtil.DOUBLE_SERIALIZER);
+  public static final SimpleTypeInformation<Double> DOUBLE = new SimpleTypeInformation<>(Double.class, ByteArrayUtil.DOUBLE_SERIALIZER);
 
   /**
    * Integer type.
    */
-  public static final SimpleTypeInformation<Integer> INTEGER = new SimpleTypeInformation<Integer>(Integer.class, ByteArrayUtil.INT_SERIALIZER);
+  public static final SimpleTypeInformation<Integer> INTEGER = new SimpleTypeInformation<>(Integer.class, ByteArrayUtil.INT_SERIALIZER);
 
   /**
    * Vector type.
    */
-  public static final SimpleTypeInformation<Vector> VECTOR = new SimpleTypeInformation<Vector>(Vector.class);
+  public static final SimpleTypeInformation<Vector> VECTOR = new SimpleTypeInformation<>(Vector.class);
 
   /**
    * Matrix type.
    */
-  public static final SimpleTypeInformation<Matrix> MATRIX = new SimpleTypeInformation<Matrix>(Matrix.class);
+  public static final SimpleTypeInformation<Matrix> MATRIX = new SimpleTypeInformation<>(Matrix.class);
 
   /**
    * Cluster model type.
    */
-  public static final SimpleTypeInformation<Model> MODEL = new SimpleTypeInformation<Model>(Model.class);
+  public static final SimpleTypeInformation<Model> MODEL = new SimpleTypeInformation<>(Model.class);
 
   /**
    * Make a type array easily.

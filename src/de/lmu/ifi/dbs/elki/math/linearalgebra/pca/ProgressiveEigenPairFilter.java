@@ -128,8 +128,8 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
-    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> strongEigenPairs = new ArrayList<>();
+    List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // determine sum of eigenvalues
     double totalSum = 0;
@@ -162,7 +162,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
     if (!found) {
       assert (weakEigenPairs.size() == 0);
       weakEigenPairs = strongEigenPairs;
-      strongEigenPairs = new ArrayList<EigenPair>();
+      strongEigenPairs = new ArrayList<>();
     }
     for (; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);

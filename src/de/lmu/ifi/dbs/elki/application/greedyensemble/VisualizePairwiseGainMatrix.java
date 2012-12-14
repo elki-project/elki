@@ -132,7 +132,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final NumberVector<?> refvec = relation.get(firstid);
 
     // Build the truth vector
-    Set<Integer> pos = new TreeSet<Integer>();
+    Set<Integer> pos = new TreeSet<>();
     final DoubleIntPair[] combined = new DoubleIntPair[dim];
     {
       for(int d = 0; d < dim; d++) {

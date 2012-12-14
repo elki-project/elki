@@ -178,7 +178,7 @@ public class MinMax<T extends Comparable<? super T>> extends Pair<T, T> {
     Class<MinMax<N>> mmcls = ClassGenericsUtil.uglyCastIntoSubclass(MinMax.class);
     MinMax<N>[] mms = ClassGenericsUtil.newArrayOfNull(size, mmcls);
     for(int i = 0; i < size; i++) {
-      mms[i] = new MinMax<N>();
+      mms[i] = new MinMax<>();
     }
     return mms;
   }

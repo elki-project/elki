@@ -173,14 +173,14 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     }
 
     // mapping of dimensionality to set of subspaces
-    HashMap<Integer, List<Subspace>> subspaceMap = new HashMap<Integer, List<Subspace>>();
+    HashMap<Integer, List<Subspace>> subspaceMap = new HashMap<>();
 
     // list of 1-dimensional subspaces containing clusters
-    List<Subspace> s_1 = new ArrayList<Subspace>();
+    List<Subspace> s_1 = new ArrayList<>();
     subspaceMap.put(0, s_1);
 
     // mapping of subspaces to list of clusters
-    TreeMap<Subspace, List<Cluster<Model>>> clusterMap = new TreeMap<Subspace, List<Cluster<Model>>>(new Subspace.DimensionComparator());
+    TreeMap<Subspace, List<Cluster<Model>>> clusterMap = new TreeMap<>(new Subspace.DimensionComparator());
 
     for(int d = 0; d < dimensionality; d++) {
       Subspace currentSubspace = new Subspace(d);
@@ -218,7 +218,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
       }
 
       List<Subspace> candidates = generateSubspaceCandidates(subspaces);
-      List<Subspace> s_d = new ArrayList<Subspace>();
+      List<Subspace> s_d = new ArrayList<>();
 
       for(Subspace candidate : candidates) {
         Subspace bestSubspace = bestSubspace(subspaces, candidate, clusterMap);
@@ -227,7 +227,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
         }
 
         List<Cluster<Model>> bestSubspaceClusters = clusterMap.get(bestSubspace);
-        List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
+        List<Cluster<Model>> clusters = new ArrayList<>();
         for(Cluster<Model> cluster : bestSubspaceClusters) {
           List<Cluster<Model>> candidateClusters = runDBSCAN(relation, cluster.getIDs(), candidate);
           if(!candidateClusters.isEmpty()) {
@@ -257,12 +257,12 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
     // build result
     int numClusters = 1;
-    result = new Clustering<SubspaceModel<V>>("SUBCLU clustering", "subclu-clustering");
+    result = new Clustering<>("SUBCLU clustering", "subclu-clustering");
     for(Subspace subspace : clusterMap.descendingKeySet()) {
       List<Cluster<Model>> clusters = clusterMap.get(subspace);
       for(Cluster<Model> cluster : clusters) {
-        Cluster<SubspaceModel<V>> newCluster = new Cluster<SubspaceModel<V>>(cluster.getIDs());
-        newCluster.setModel(new SubspaceModel<V>(subspace, Centroid.make(relation, cluster.getIDs()).toVector(relation)));
+        Cluster<SubspaceModel<V>> newCluster = new Cluster<>(cluster.getIDs());
+        newCluster.setModel(new SubspaceModel<>(subspace, Centroid.make(relation, cluster.getIDs()).toVector(relation)));
         newCluster.setName("cluster_" + numClusters++);
         result.addCluster(newCluster);
       }
@@ -308,7 +308,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
     proxy = new ProxyDatabase(ids, relation);
 
-    DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<V, DoubleDistance>(distanceFunction, epsilon, minpts);
+    DBSCAN<V, DoubleDistance> dbscan = new DBSCAN<>(distanceFunction, epsilon, minpts);
     // run DBSCAN
     if(LOG.isVerbose()) {
       LOG.verbose("\nRun DBSCAN on subspace " + subspace.dimensonsToString());
@@ -317,7 +317,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
     // separate cluster and noise
     List<Cluster<Model>> clusterAndNoise = dbsres.getAllClusters();
-    List<Cluster<Model>> clusters = new ArrayList<Cluster<Model>>();
+    List<Cluster<Model>> clusters = new ArrayList<>();
     for(Cluster<Model> c : clusterAndNoise) {
       if(!c.isNoise()) {
         clusters.add(c);
@@ -334,7 +334,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
    * @return the {@code d+1}-dimensional subspace candidates
    */
   private List<Subspace> generateSubspaceCandidates(List<Subspace> subspaces) {
-    List<Subspace> candidates = new ArrayList<Subspace>();
+    List<Subspace> candidates = new ArrayList<>();
 
     if(subspaces.isEmpty()) {
       return candidates;
@@ -406,7 +406,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     }
 
     // order result according to the dimensions
-    List<Subspace> result = new ArrayList<Subspace>();
+    List<Subspace> result = new ArrayList<>();
     BitSet dimensions = subspace.getDimensions();
     for(int dim = dimensions.nextSetBit(0); dim >= 0; dim = dimensions.nextSetBit(dim + 1)) {
       BitSet newDimensions = (BitSet) dimensions.clone();
@@ -477,12 +477,12 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> param = new ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, SubspaceEuclideanDistanceFunction.class);
+      ObjectParameter<AbstractDimensionsSelectingDoubleDistanceFunction<V>> param = new ObjectParameter<>(DISTANCE_FUNCTION_ID, AbstractDimensionsSelectingDoubleDistanceFunction.class, SubspaceEuclideanDistanceFunction.class);
       if(config.grab(param)) {
         distance = param.instantiateClass(config);
       }
 
-      DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<DoubleDistance>(EPSILON_ID, distance);
+      DistanceParameter<DoubleDistance> epsilonP = new DistanceParameter<>(EPSILON_ID, distance);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -496,7 +496,7 @@ public class SUBCLU<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
 
     @Override
     protected SUBCLU<V> makeInstance() {
-      return new SUBCLU<V>(distance, epsilon, minpts);
+      return new SUBCLU<>(distance, epsilon, minpts);
     }
   }
 }
