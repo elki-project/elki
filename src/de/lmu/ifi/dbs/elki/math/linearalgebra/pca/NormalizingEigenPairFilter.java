@@ -60,8 +60,8 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
   public FilteredEigenPairs filter(final SortedEigenPairs eigenPairs) {
     // initialize strong and weak eigenpairs
     // all normalized eigenpairs are regarded as strong
-    final List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
-    final List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
+    final List<EigenPair> strongEigenPairs = new ArrayList<>();
+    final List<EigenPair> weakEigenPairs = new ArrayList<>();
     for(int i = 0; i < eigenPairs.size(); i++) {
       final EigenPair eigenPair = eigenPairs.getEigenPair(i);
       normalizeEigenPair(eigenPair);

@@ -154,7 +154,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       }
       minmax.put(val);
     }
-    Relation<Double> scoreResult = new MaterializedRelation<Double>("AggarwalYuEvolutionary", "aggarwal-yu-outlier", TypeUtil.DOUBLE, outlierScore, relation.getDBIDs());
+    Relation<Double> scoreResult = new MaterializedRelation<>("AggarwalYuEvolutionary", "aggarwal-yu-outlier", TypeUtil.DOUBLE, outlierScore, relation.getDBIDs());
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), Double.NEGATIVE_INFINITY, 0.0);
     return new OutlierResult(meta, scoreResult);
   }
@@ -217,7 +217,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     public Iterable<Individuum> run() {
       ArrayList<Individuum> pop = initialPopulation(m);
       // best Population
-      TopBoundedHeap<Individuum> bestSol = new TopBoundedHeap<Individuum>(m, Collections.reverseOrder());
+      TopBoundedHeap<Individuum> bestSol = new TopBoundedHeap<>(m, Collections.reverseOrder());
       for (Individuum ind : pop) {
         bestSol.add(ind);
       }
@@ -315,7 +315,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      */
     private ArrayList<Individuum> initialPopulation(int popsize) {
       // Initial Population
-      ArrayList<Individuum> population = new ArrayList<Individuum>(popsize);
+      ArrayList<Individuum> population = new ArrayList<>(popsize);
       // fill population
       for(int i = 0; i < popsize; i++) {
         // Random Individual
@@ -357,7 +357,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       // Relative weight := popsize - position => sum(1..popsize)
       int totalweight = (popsize * (popsize + 1)) >> 1;
       // Survivors
-      ArrayList<Individuum> survivors = new ArrayList<Individuum>(popsize);
+      ArrayList<Individuum> survivors = new ArrayList<>(popsize);
 
       // position of selection
       for(int i = 0; i < popsize; i++) {
@@ -387,11 +387,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      */
     private ArrayList<Individuum> mutation(ArrayList<Individuum> population, double perc1, double perc2) {
       // the Mutations
-      ArrayList<Individuum> mutations = new ArrayList<Individuum>();
+      ArrayList<Individuum> mutations = new ArrayList<>();
       // Set of Positions which are don't care in the String
-      TreeSet<Integer> Q = new TreeSet<Integer>();
+      TreeSet<Integer> Q = new TreeSet<>();
       // Set of Positions which are not don't care in the String
-      TreeSet<Integer> R = new TreeSet<Integer>();
+      TreeSet<Integer> R = new TreeSet<>();
 
       // for each individuum
       for(int j = 0; j < population.size(); j++) {
@@ -470,7 +470,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
      */
     private ArrayList<Individuum> crossoverOptimized(ArrayList<Individuum> population) {
       // Crossover Set of population Set
-      ArrayList<Individuum> crossover = new ArrayList<Individuum>();
+      ArrayList<Individuum> crossover = new ArrayList<>();
 
       for(int i = 0; i < population.size() - 1; i += 2) {
         Pair<Individuum, Individuum> recombine = recombineOptimized(population.get(i), population.get(i + 1));
@@ -496,9 +496,9 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
     private Pair<Individuum, Individuum> recombineOptimized(Individuum parent1, Individuum parent2) {
       Pair<Individuum, Individuum> recombinePair;
       // Set of Positions in which either s1 or s2 are don't care
-      ArrayList<Integer> Q = new ArrayList<Integer>(dim);
+      ArrayList<Integer> Q = new ArrayList<>(dim);
       // Set of Positions in which neither s1 or s2 is don't care
-      ArrayList<Integer> R = new ArrayList<Integer>(dim);
+      ArrayList<Integer> R = new ArrayList<>(dim);
 
       for(int i = 0; i < dim; i++) {
         if((parent1.getGene()[i] == DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
@@ -567,7 +567,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
       }
       final Individuum i1 = makeIndividuum(b);
       final Individuum i2 = makeIndividuum(comp);
-      recombinePair = new Pair<Individuum, Individuum>(i1, i2);
+      recombinePair = new Pair<>(i1, i2);
 
       return recombinePair;
     }
@@ -719,7 +719,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector<?>> extends AbstractA
 
     @Override
     protected AggarwalYuEvolutionary<V> makeInstance() {
-      return new AggarwalYuEvolutionary<V>(k, phi, m, rnd);
+      return new AggarwalYuEvolutionary<>(k, phi, m, rnd);
     }
   }
 }

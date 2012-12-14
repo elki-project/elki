@@ -241,7 +241,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
       return;
     }
 
-    List<Integer> keys = new ArrayList<Integer>(map.keySet());
+    List<Integer> keys = new ArrayList<>(map.keySet());
     Collections.reverse(keys);
 
     for(Integer id : keys) {

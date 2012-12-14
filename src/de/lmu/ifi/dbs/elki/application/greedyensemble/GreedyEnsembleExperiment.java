@@ -120,7 +120,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
-    if(!firstlabel.matches("bylabel")) {
+    if (!firstlabel.matches("bylabel")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
 
@@ -129,9 +129,9 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final NumberVector<?> refvec = relation.get(firstid);
 
     // Build the positive index set for ROC AUC.
-    Set<Integer> positive = new TreeSet<Integer>();
-    for(int d = 0; d < dim; d++) {
-      if(refvec.doubleValue(d) > 0) {
+    Set<Integer> positive = new TreeSet<>();
+    for (int d = 0; d < dim; d++) {
+      if (refvec.doubleValue(d) > 0) {
         positive.add(d);
       }
     }
@@ -141,25 +141,24 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final int[] outliers_seen = new int[dim];
     // Find the top-k for each ensemble member
     {
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         // Skip "by label", obviously
-        if(DBIDUtil.equal(firstid, iditer)) {
+        if (DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
         final NumberVector<?> vec = relation.get(iditer);
-        TiedTopBoundedHeap<DoubleIntPair> heap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
-        for(int i = 0; i < dim; i++) {
+        TiedTopBoundedHeap<DoubleIntPair> heap = new TiedTopBoundedHeap<>(estimated_outliers, Collections.reverseOrder());
+        for (int i = 0; i < dim; i++) {
           heap.add(new DoubleIntPair(vec.doubleValue(i), i));
         }
-        if(heap.size() >= 2 * estimated_outliers) {
+        if (heap.size() >= 2 * estimated_outliers) {
           LOG.warning("Too many ties. Expected: " + estimated_outliers + " got: " + heap.size());
         }
-        for(DoubleIntPair pair : heap) {
-          if(outliers_seen[pair.second] == 0) {
+        for (DoubleIntPair pair : heap) {
+          if (outliers_seen[pair.second] == 0) {
             outliers_seen[pair.second] = 1;
             union_outliers += 1;
-          }
-          else {
+          } else {
             outliers_seen[pair.second] += 1;
           }
         }
@@ -178,16 +177,16 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Build the naive ensemble:
     final double[] naiveensemble = new double[dim];
     {
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        if(DBIDUtil.equal(firstid, iditer)) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        if (DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
         final NumberVector<?> vec = relation.get(iditer);
-        for(int d = 0; d < dim; d++) {
+        for (int d = 0; d < dim; d++) {
           naiveensemble[d] += vec.doubleValue(d);
         }
       }
-      for(int d = 0; d < dim; d++) {
+      for (int d = 0; d < dim; d++) {
         naiveensemble[d] /= (relation.size() - 1);
       }
     }
@@ -203,8 +202,8 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     double bestest = Double.POSITIVE_INFINITY;
     {
       // Compute individual scores
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        if(DBIDUtil.equal(firstid, iditer)) {
+      for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        if (DBIDUtil.equal(firstid, iditer)) {
           continue;
         }
         // fout.append(labels.get(id));
@@ -213,15 +212,15 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         double estimated = wdist.doubleDistance(vec, estimated_truth_vec);
         double cost = tdist.doubleDistance(vec, refvec);
         LOG.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
-        if(auc > bestauc) {
+        if (auc > bestauc) {
           bestauc = auc;
           bestaucstr = labels.get(iditer);
         }
-        if(cost < bestcost) {
+        if (cost < bestcost) {
           bestcost = cost;
           bestcoststr = labels.get(iditer);
         }
-        if(estimated < bestest) {
+        if (estimated < bestest) {
           bestest = estimated;
           bestid = DBIDUtil.deref(iditer);
         }
@@ -239,13 +238,13 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final double[] greedyensemble = new double[dim];
     {
       final NumberVector<?> vec = relation.get(bestid);
-      for(int i = 0; i < dim; i++) {
+      for (int i = 0; i < dim; i++) {
         greedyensemble[i] = vec.doubleValue(i);
       }
     }
     // Greedily grow the ensemble
     final double[] testensemble = new double[dim];
-    while(enscands.size() > 0) {
+    while (enscands.size() > 0) {
       NumberVector<?> greedyvec = factory.newNumberVector(greedyensemble);
 
       // Weighting factors for combining:
@@ -253,48 +252,47 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       double s2 = 1. / (ensemble.size() + 1.);
 
       final int heapsize = enscands.size();
-      TopBoundedHeap<DoubleDBIDPair> heap = new TopBoundedHeap<DoubleDBIDPair>(heapsize, Collections.reverseOrder());
+      TopBoundedHeap<DoubleDBIDPair> heap = new TopBoundedHeap<>(heapsize, Collections.reverseOrder());
       for (DBIDIter iter = enscands.iter(); iter.valid(); iter.advance()) {
         final NumberVector<?> vec = relation.get(iter);
         double diversity = wdist.doubleDistance(vec, greedyvec);
         heap.add(DBIDUtil.newPair(diversity, iter));
       }
-      while(heap.size() > 0) {
+      while (heap.size() > 0) {
         DBIDRef bestadd = heap.poll();
         enscands.remove(bestadd);
         // Update ensemble:
         final NumberVector<?> vec = relation.get(bestadd);
-        for(int i = 0; i < dim; i++) {
+        for (int i = 0; i < dim; i++) {
           testensemble[i] = greedyensemble[i] * s1 + vec.doubleValue(i) * s2;
         }
         NumberVector<?> testvec = factory.newNumberVector(testensemble);
         double oldd = wdist.doubleDistance(estimated_truth_vec, greedyvec);
         double newd = wdist.doubleDistance(estimated_truth_vec, testvec);
         // logger.verbose("Distances: " + oldd + " vs. " + newd);
-        if(newd < oldd) {
+        if (newd < oldd) {
           System.arraycopy(testensemble, 0, greedyensemble, 0, dim);
           ensemble.add(bestadd);
           // logger.verbose("Growing ensemble with: " + labels.get(bestadd));
           break; // Recompute heap
-        }
-        else {
+        } else {
           // logger.verbose("Discarding: " + labels.get(bestadd));
-          if(refine_truth) {
+          if (refine_truth) {
             boolean refresh = false;
             // Update target vectors and weights
-            TiedTopBoundedHeap<DoubleIntPair> oheap = new TiedTopBoundedHeap<DoubleIntPair>(estimated_outliers, Collections.reverseOrder());
-            for(int i = 0; i < dim; i++) {
+            TiedTopBoundedHeap<DoubleIntPair> oheap = new TiedTopBoundedHeap<>(estimated_outliers, Collections.reverseOrder());
+            for (int i = 0; i < dim; i++) {
               oheap.add(new DoubleIntPair(vec.doubleValue(i), i));
             }
-            for(DoubleIntPair pair : oheap) {
+            for (DoubleIntPair pair : oheap) {
               assert (outliers_seen[pair.second] > 0);
               outliers_seen[pair.second] -= 1;
-              if(outliers_seen[pair.second] == 0) {
+              if (outliers_seen[pair.second] == 0) {
                 union_outliers -= 1;
                 refresh = true;
               }
             }
-            if(refresh) {
+            if (refresh) {
               updateEstimations(outliers_seen, union_outliers, estimated_weights, estimated_truth);
               estimated_truth_vec = factory.newNumberVector(estimated_truth);
             }
@@ -306,7 +304,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     StringBuilder greedylbl = new StringBuilder();
     {
       for (DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
-        if(greedylbl.length() > 0) {
+        if (greedylbl.length() > 0) {
           greedylbl.append(" ");
         }
         greedylbl.append(labels.get(iter));
@@ -339,20 +337,20 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
       MeanVariance meancost = new MeanVariance();
       HashSetModifiableDBIDs candidates = DBIDUtil.newHashSet(relation.getDBIDs());
       candidates.remove(firstid);
-      for(int i = 0; i < 5000; i++) {
+      for (int i = 0; i < 5000; i++) {
         // Build the improved ensemble:
         final double[] randomensemble = new double[dim];
         {
-          DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), (long)i);
+          DBIDs random = DBIDUtil.randomSample(candidates, ensemble.size(), (long) i);
           for (DBIDIter iter = random.iter(); iter.valid(); iter.advance()) {
             assert (!DBIDUtil.equal(firstid, iter));
             // logger.verbose("Using: "+labels.get(id));
             final NumberVector<?> vec = relation.get(iter);
-            for(int d = 0; d < dim; d++) {
+            for (int d = 0; d < dim; d++) {
               randomensemble[d] += vec.doubleValue(d);
             }
           }
-          for(int d = 0; d < dim; d++) {
+          for (int d = 0; d < dim; d++) {
             randomensemble[d] /= ensemble.size();
           }
         }
@@ -375,12 +373,11 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
   }
 
   protected void updateEstimations(final int[] outliers_seen, int union_outliers, final double[] estimated_weights, final double[] estimated_truth) {
-    for(int i = 0; i < outliers_seen.length; i++) {
-      if(outliers_seen[i] > 0) {
+    for (int i = 0; i < outliers_seen.length; i++) {
+      if (outliers_seen[i] > 0) {
         estimated_weights[i] = 0.5 / union_outliers;
         estimated_truth[i] = 1.0;
-      }
-      else {
+      } else {
         estimated_weights[i] = 0.5 / (outliers_seen.length - union_outliers);
         estimated_truth[i] = 0.0;
       }
@@ -395,7 +392,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
 
   private double computeROCAUC(NumberVector<?> vec, Set<Integer> positive, int dim) {
     final DoubleIntPair[] scores = new DoubleIntPair[dim];
-    for(int d = 0; d < dim; d++) {
+    for (int d = 0; d < dim; d++) {
       scores[d] = new DoubleIntPair(vec.doubleValue(d), d);
     }
     Arrays.sort(scores, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));

@@ -114,7 +114,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     }
 
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
-    Relation<Double> scoresult = new MaterializedRelation<Double>("Scaled Outlier", "scaled-outlier", TypeUtil.DOUBLE, scaledscores, scores.getDBIDs());
+    Relation<Double> scoresult = new MaterializedRelation<>("Scaled Outlier", "scaled-outlier", TypeUtil.DOUBLE, scaledscores, scores.getDBIDs());
     OutlierResult result = new OutlierResult(meta, scoresult);
     result.addChildResult(innerresult);
 
@@ -167,12 +167,12 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<Algorithm> algP = new ObjectParameter<Algorithm>(OptionID.ALGORITHM, OutlierAlgorithm.class);
+      ObjectParameter<Algorithm> algP = new ObjectParameter<>(OptionID.ALGORITHM, OutlierAlgorithm.class);
       if(config.grab(algP)) {
         algorithm = algP.instantiateClass(config);
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<ScalingFunction>(SCALING_ID, ScalingFunction.class);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

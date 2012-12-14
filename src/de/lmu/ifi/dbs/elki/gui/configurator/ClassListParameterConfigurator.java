@@ -76,7 +76,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
   /**
    * The combobox we are abusing to produce the popup
    */
-  final JComboBox combo;
+  final JComboBox<String> combo;
 
   /**
    * The popup menu.
@@ -96,7 +96,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
     button.setToolTipText(param.getShortDescription());
     button.addActionListener(this);
     // So the first item doesn't get automatically selected
-    combo = new JComboBox();
+    combo = new JComboBox<>();
     combo.setEditable(true);
     combo.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
     popup = new SuperPopup(combo);
@@ -193,7 +193,7 @@ public class ClassListParameterConfigurator extends AbstractSingleParameterConfi
      * 
      * @param combo Combo box used for data storage.
      */
-    public SuperPopup(JComboBox combo) {
+    public SuperPopup(JComboBox<String> combo) {
       super(combo);
     }
 

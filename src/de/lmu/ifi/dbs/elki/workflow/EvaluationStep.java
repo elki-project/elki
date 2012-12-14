@@ -156,10 +156,10 @@ public class EvaluationStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      List<Class<? extends Evaluator>> def = new ArrayList<Class<? extends Evaluator>>(1);
+      List<Class<? extends Evaluator>> def = new ArrayList<>(1);
       def.add(AutomaticEvaluation.class);
       // evaluator parameter
-      final ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<Evaluator>(OptionID.EVALUATOR, Evaluator.class);
+      final ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<>(OptionID.EVALUATOR, Evaluator.class);
       evaluatorP.setDefaultValue(def);
       if(config.grab(evaluatorP)) {
         evaluators = evaluatorP.instantiateClasses(config);

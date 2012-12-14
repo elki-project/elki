@@ -40,7 +40,7 @@ public class ProgressTracker {
   /**
    * Set of potentially active progresses.
    */
-  private ArrayList<WeakReference<Progress>> progresses = new ArrayList<WeakReference<Progress>>();
+  private ArrayList<WeakReference<Progress>> progresses = new ArrayList<>();
 
   /**
    * Get a list of progresses tracked.
@@ -48,7 +48,7 @@ public class ProgressTracker {
    * @return List of progresses.
    */
   public synchronized Collection<Progress> getProgresses() {
-    List<Progress> list = new ArrayList<Progress>(progresses.size());
+    List<Progress> list = new ArrayList<>(progresses.size());
     Iterator<WeakReference<Progress>> iter = progresses.iterator();
     while(iter.hasNext()) {
       WeakReference<Progress> ref = iter.next();
@@ -82,7 +82,7 @@ public class ProgressTracker {
         }
       }
     }
-    progresses.add(new WeakReference<Progress>(p));
+    progresses.add(new WeakReference<>(p));
   }
 
   /**
@@ -91,7 +91,7 @@ public class ProgressTracker {
    * @return List of progresses removed.
    */
   public synchronized Collection<Progress> removeCompleted() {
-    List<Progress> list = new ArrayList<Progress>(progresses.size());
+    List<Progress> list = new ArrayList<>(progresses.size());
     Iterator<WeakReference<Progress>> iter = progresses.iterator();
     while(iter.hasNext()) {
       WeakReference<Progress> ref = iter.next();

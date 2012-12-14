@@ -92,7 +92,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
 
   @Override
   public Iterator<Vector> iterator() {
-    return new UnmodifiableIterator<Vector>(points.iterator());
+    return new UnmodifiableIterator<>(points.iterator());
   }
 
   /**
@@ -101,7 +101,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
    * @return List iterator.
    */
   public ListIterator<Vector> listIterator() {
-    return new UnmodifiableListIterator<Vector>(points.listIterator());
+    return new UnmodifiableListIterator<>(points.listIterator());
   }
 
   /**
@@ -110,7 +110,7 @@ public class Polygon implements Iterable<Vector>, SpatialComparable {
    * @return Reversed iterator
    */
   public ListIterator<Vector> descendingIterator() {
-    return new UnmodifiableListIterator<Vector>(new ReverseListIterator<Vector>(points));
+    return new UnmodifiableListIterator<>(new ReverseListIterator<>(points));
   }
 
   /**

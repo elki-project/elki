@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @apiviz.uses ClassParameter
  */
 public class ClassParameterConfigurator extends AbstractSingleParameterConfigurator<ClassParameter<?>> implements ActionListener, ChangeListener {
-  final JComboBox value;
+  final JComboBox<String> value;
 
   final ConfiguratorPanel child;
 
@@ -60,7 +60,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.weightx = 1.0;
-      value = new JComboBox();
+      value = new JComboBox<>();
       value.setToolTipText(param.getShortDescription());
       value.setPrototypeDisplayValue(cp.getRestrictionClass().getSimpleName());
       parent.add(value, constraints);

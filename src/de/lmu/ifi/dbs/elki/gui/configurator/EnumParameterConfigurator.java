@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * @apiviz.uses EnumParameter
  */
 public class EnumParameterConfigurator extends AbstractSingleParameterConfigurator<EnumParameter<?>> implements ActionListener {
-  final JComboBox value;
+  final JComboBox<String> value;
 
   public EnumParameterConfigurator(EnumParameter<?> cp, JComponent parent) {
     super(cp, parent);
@@ -53,7 +53,7 @@ public class EnumParameterConfigurator extends AbstractSingleParameterConfigurat
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.weightx = 1.0;
-      value = new JComboBox();
+      value = new JComboBox<>();
       value.setToolTipText(param.getShortDescription());
       value.setPrototypeDisplayValue(cp.getPossibleValues().iterator().next());
       parent.add(value, constraints);

@@ -70,7 +70,7 @@ public class GeneratorMain {
   /**
    * List of clusters to generate.
    */
-  protected LinkedList<GeneratorInterface> generators = new LinkedList<GeneratorInterface>();
+  protected LinkedList<GeneratorInterface> generators = new LinkedList<>();
 
   /**
    * Controls whether points are tested against the model during generation.
@@ -109,9 +109,9 @@ public class GeneratorMain {
     }
     // Prepare result bundle
     MultipleObjectsBundle bundle = new MultipleObjectsBundle();
-    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<DoubleVector>(DoubleVector.FACTORY, dim);
-    bundle.appendColumn(type, new ArrayList<Object>());
-    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<Object>());
+    VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    bundle.appendColumn(type, new ArrayList<>());
+    bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<>());
     bundle.appendColumn(TypeUtil.MODEL, new ArrayList<Model>());
 
     // generate clusters

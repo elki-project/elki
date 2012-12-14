@@ -64,7 +64,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   public SavedSettingsFile(String filename) {
     super();
     this.file = new File(filename);
-    this.store = new ArrayList<Pair<String, ArrayList<String>>>();
+    this.store = new ArrayList<>();
   }
   
   /**
@@ -93,7 +93,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    */
   public void load() throws FileNotFoundException, IOException {
     BufferedReader is = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-    ArrayList<String> buf = new ArrayList<String>();
+    ArrayList<String> buf = new ArrayList<>();
     while (is.ready()) {
       String line = is.readLine();
       // skip comments
@@ -102,16 +102,16 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
       }
       if (line.length() == 0 && buf.size() > 0) {
         String title = buf.remove(0);
-        store.add(new Pair<String,ArrayList<String>>(title, buf));
-        buf = new ArrayList<String>();
+        store.add(new Pair<>(title, buf));
+        buf = new ArrayList<>();
       } else {
         buf.add(line);
       }
     }
     if (buf.size() > 0) {
       String title = buf.remove(0);
-      store.add(new Pair<String,ArrayList<String>>(title, buf));
-      buf = new ArrayList<String>();
+      store.add(new Pair<>(title, buf));
+      buf = new ArrayList<>();
     }
   }
 
@@ -175,7 +175,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
         return;
       }
     }
-    store.add(new Pair<String, ArrayList<String>>(key, value));
+    store.add(new Pair<>(key, value));
   }
 
   /**

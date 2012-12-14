@@ -206,7 +206,7 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<EigenPairFilter>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
       if (config.grab(filterP)) {
         eigenPairFilter = filterP.instantiateClass(config);
       }
@@ -225,12 +225,12 @@ public class PCAFilteredRunner<V extends NumberVector<?>> extends PCARunner<V> {
       }
 
       // global constraint small <--> big
-      config.checkConstraint(new LessGlobalConstraint<Double>(smallP, bigP));
+      config.checkConstraint(new LessGlobalConstraint<>(smallP, bigP));
     }
 
     @Override
     protected PCAFilteredRunner<V> makeInstance() {
-      return new PCAFilteredRunner<V>(covarianceMatrixBuilder, eigenPairFilter, big, small);
+      return new PCAFilteredRunner<>(covarianceMatrixBuilder, eigenPairFilter, big, small);
     }
   }
 }

@@ -47,12 +47,12 @@ public class SimpleEnumeratingScheme implements NamingScheme {
   /**
    * count how often each name occurred so far.
    */
-  private Map<String, Integer> namecount = new HashMap<String, Integer>();
+  private Map<String, Integer> namecount = new HashMap<>();
 
   /**
    * Assigned cluster names.
    */
-  private Map<Cluster<?>, String> names = new HashMap<Cluster<?>, String>();
+  private Map<Cluster<?>, String> names = new HashMap<>();
 
   /**
    * This is the postfix added to the first cluster, which will be removed when

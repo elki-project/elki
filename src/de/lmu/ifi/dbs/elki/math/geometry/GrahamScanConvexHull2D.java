@@ -76,7 +76,7 @@ public class GrahamScanConvexHull2D {
    * Constructor.
    */
   public GrahamScanConvexHull2D() {
-    this.points = new LinkedList<Vector>();
+    this.points = new LinkedList<>();
   }
 
   /**
@@ -86,7 +86,7 @@ public class GrahamScanConvexHull2D {
    */
   public void add(Vector point) {
     if(this.ok) {
-      this.points = new LinkedList<Vector>(this.points);
+      this.points = new LinkedList<>(this.points);
       this.ok = false;
     }
     this.points.add(point);
@@ -229,7 +229,7 @@ public class GrahamScanConvexHull2D {
       return;
     }
     Iterator<Vector> iter = points.iterator();
-    Stack<Vector> stack = new Stack<Vector>();
+    Stack<Vector> stack = new Stack<>();
     // Start with the first two points on the stack
     stack.add(iter.next());
     stack.add(iter.next());

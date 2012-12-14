@@ -129,7 +129,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
    */
   private ArrayList<ArrayDBIDs> buildOneDimIndexes(Relation<? extends NumberVector<?>> relation, DBIDs ids, DimensionSimilarityMatrix matrix) {
     final int dim = matrix.size();
-    ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<ArrayDBIDs>(dim);
+    ArrayList<ArrayDBIDs> subspaceIndex = new ArrayList<>(dim);
 
     SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
     for (int i = 0; i < dim; i++) {
@@ -250,7 +250,7 @@ public class HiCSDimensionSimilarity implements DimensionSimilarity<NumberVector
         alpha = alphaP.doubleValue();
       }
 
-      final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<GoodnessOfFitTest>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
+      final ObjectParameter<GoodnessOfFitTest> testP = new ObjectParameter<>(HiCS.Parameterizer.TEST_ID, GoodnessOfFitTest.class, KolmogorovSmirnovTest.class);
       if (config.grab(testP)) {
         statTest = testP.instantiateClass(config);
       }

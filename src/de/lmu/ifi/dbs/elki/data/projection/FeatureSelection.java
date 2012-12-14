@@ -69,7 +69,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    * @param factory Object factory
    */
   public FeatureSelection(int[] dims, FeatureVector.Factory<V, F> factory) {
-    this.adapter = new SubsetArrayAdapter<F, V>(getAdapter(factory), dims);
+    this.adapter = new SubsetArrayAdapter<>(getAdapter(factory), dims);
     this.factory = factory;
     this.dimensionality = dims.length;
 
@@ -103,15 +103,13 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
 
   @Override
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
-    @SuppressWarnings("unchecked")
-    final Class<V> cls = (Class<V>) factory.getClass();
-    return new VectorFieldTypeInformation<V>(cls, dimensionality);
+    return new VectorFieldTypeInformation<>(factory, dimensionality);
   }
 
   @Override
   public TypeInformation getInputDataTypeInformation() {
     @SuppressWarnings("unchecked")
-    final Class<V> cls = (Class<V>) factory.getClass();
-    return new VectorTypeInformation<V>(cls, mindim, Integer.MAX_VALUE);
+    final Class<V> cls = (Class<V>) factory.getRestrictionClass();
+    return new VectorTypeInformation<>(cls, mindim, Integer.MAX_VALUE);
   }
 }

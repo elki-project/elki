@@ -276,8 +276,8 @@ public class DocumentReferences {
   }
 
   private static List<Pair<Reference, List<Class<?>>>> sortedReferences() {
-    List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<Pair<Reference, List<Class<?>>>>();
-    Map<Reference, List<Class<?>>> map = new HashMap<Reference, List<Class<?>>>();
+    List<Pair<Reference, List<Class<?>>>> refs = new ArrayList<>();
+    Map<Reference, List<Class<?>>> map = new HashMap<>();
 
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
       inspectClass(cls, refs, map);
@@ -291,9 +291,9 @@ public class DocumentReferences {
         Reference ref = cls.getAnnotation(Reference.class);
         List<Class<?>> list = map.get(ref);
         if(list == null) {
-          list = new ArrayList<Class<?>>(5);
+          list = new ArrayList<>(5);
           map.put(ref, list);
-          refs.add(new Pair<Reference, List<Class<?>>>(ref, list));
+          refs.add(new Pair<>(ref, list));
         }
         list.add(cls);
       }
@@ -306,9 +306,9 @@ public class DocumentReferences {
           Reference ref = m.getAnnotation(Reference.class);
           List<Class<?>> list = map.get(ref);
           if(list == null) {
-            list = new ArrayList<Class<?>>(5);
+            list = new ArrayList<>(5);
             map.put(ref, list);
-            refs.add(new Pair<Reference, List<Class<?>>>(ref, list));
+            refs.add(new Pair<>(ref, list));
           }
           list.add(cls);
         }
@@ -335,7 +335,7 @@ public class DocumentReferences {
    * @return All classes with the reference annotation.
    */
   public static ArrayList<Class<?>> findAllClassesWithReferences() {
-    ArrayList<Class<?>> references = new ArrayList<Class<?>>();
+    ArrayList<Class<?>> references = new ArrayList<>();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true)) {
       if(cls.isAnnotationPresent(Reference.class)) {
         references.add(cls);

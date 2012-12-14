@@ -166,7 +166,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     Relation<PolygonsObject> polys = database.getRelation(TypeUtil.POLYGON_TYPE);
     Relation<String> labels = DatabaseUtil.guessObjectLabelRepresentation(database);
 
-    Collection<Relation<?>> otherrel = new LinkedList<Relation<?>>(database.getRelations());
+    Collection<Relation<?>> otherrel = new LinkedList<>(database.getRelations());
     otherrel.remove(scores);
     otherrel.remove(polys);
     otherrel.remove(labels);
@@ -436,7 +436,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         filename = outputP.getValue();
       }
 
-      ObjectParameter<OutlierScalingFunction> scalingP = new ObjectParameter<OutlierScalingFunction>(SCALING_ID, OutlierScalingFunction.class, OutlierLinearScaling.class);
+      ObjectParameter<OutlierScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class, OutlierLinearScaling.class);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }

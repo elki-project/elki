@@ -135,7 +135,7 @@ public class ComputeSingleColorHistogram extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<ComputeColorHistogram> colorhistP = new ObjectParameter<ComputeColorHistogram>(COLORHIST_ID, ComputeColorHistogram.class, ComputeNaiveRGBColorHistogram.class);
+      final ObjectParameter<ComputeColorHistogram> colorhistP = new ObjectParameter<>(COLORHIST_ID, ComputeColorHistogram.class, ComputeNaiveRGBColorHistogram.class);
       if(config.grab(colorhistP)) {
         histogrammaker = colorhistP.instantiateClass(config);
       }

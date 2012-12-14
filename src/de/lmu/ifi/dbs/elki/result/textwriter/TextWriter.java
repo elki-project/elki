@@ -96,7 +96,7 @@ public class TextWriter {
   /**
    * Hash map for supported classes in writer.
    */
-  public static final HandlerList<TextWriterWriterInterface<?>> writers = new HandlerList<TextWriterWriterInterface<?>>();
+  public static final HandlerList<TextWriterWriterInterface<?>> writers = new HandlerList<>();
 
   /**
    * Add some default handlers
@@ -129,7 +129,7 @@ public class TextWriter {
   /**
    * For producing unique filenames.
    */
-  protected Map<String, Object> filenames = new HashMap<String, Object>();
+  protected Map<String, Object> filenames = new HashMap<>();
 
   /**
    * Try to find a unique file name.
@@ -226,12 +226,12 @@ public class TextWriter {
    * @throws IOException on IO error
    */
   public void output(Database db, Result r, StreamFactory streamOpener) throws UnableToComplyException, IOException {
-    List<Relation<?>> ra = new LinkedList<Relation<?>>();
-    List<OrderingResult> ro = new LinkedList<OrderingResult>();
-    List<Clustering<?>> rc = new LinkedList<Clustering<?>>();
-    List<IterableResult<?>> ri = new LinkedList<IterableResult<?>>();
-    List<SettingsResult> rs = new LinkedList<SettingsResult>();
-    List<Result> otherres = new LinkedList<Result>();
+    List<Relation<?>> ra = new LinkedList<>();
+    List<OrderingResult> ro = new LinkedList<>();
+    List<Clustering<?>> rc = new LinkedList<>();
+    List<IterableResult<?>> ri = new LinkedList<>();
+    List<SettingsResult> rs = new LinkedList<>();
+    List<Result> otherres = new LinkedList<>();
 
     // collect other results
     {

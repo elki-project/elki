@@ -92,7 +92,7 @@ public abstract class ClassLabel implements Comparable<ClassLabel> {
     /**
      * Set for reusing the same objects.
      */
-    protected HashMap<String, L> existing = new HashMap<String, L>();
+    protected HashMap<String, L> existing = new HashMap<>();
 
     /**
      * Convert a string into a class label.

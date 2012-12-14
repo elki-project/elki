@@ -89,15 +89,13 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
 
   @Override
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
-    @SuppressWarnings("unchecked")
-    final Class<V> cls = (Class<V>) factory.getRestrictionClass();
-    return new VectorFieldTypeInformation<V>(cls, dimensionality);
+    return new VectorFieldTypeInformation<>(factory, dimensionality);
   }
 
   @Override
   public TypeInformation getInputDataTypeInformation() {
     @SuppressWarnings("unchecked")
     final Class<V> cls = (Class<V>) factory.getRestrictionClass();
-    return new VectorTypeInformation<V>(cls, mindim, Integer.MAX_VALUE);
+    return new VectorTypeInformation<>(cls, mindim, Integer.MAX_VALUE);
   }
 }

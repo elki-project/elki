@@ -1474,7 +1474,7 @@ public class Matrix {
 
     int n = v.size(); // Now we've got the number of columns!
     double row[] = v.toArray();
-    ArrayList<double[]> rowV = new ArrayList<double[]>();
+    ArrayList<double[]> rowV = new ArrayList<>();
     rowV.add(row); // Start storing rows instead of columns.
     while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
       // While non-empty lines

@@ -254,7 +254,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
       if (config.grab(stepsP)) {
         steps = stepsP.intValue();
       }
-      EnumParameter<Mode> modeP = new EnumParameter<Mode>(MODE_ID, Mode.class, Mode.CTD);
+      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.CTD);
       if (config.grab(modeP)) {
         mode = modeP.getValue();
       }

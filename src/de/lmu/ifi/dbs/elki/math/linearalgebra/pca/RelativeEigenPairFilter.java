@@ -85,8 +85,8 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
-    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> strongEigenPairs = new ArrayList<>();
+    List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // default value is "all strong".
     int contrastAtMax = eigenPairs.size() - 1;

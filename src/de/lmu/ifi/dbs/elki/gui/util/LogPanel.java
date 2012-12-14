@@ -67,7 +67,7 @@ public class LogPanel extends JPanel {
   /**
    * Current progress bars
    */
-  protected HashMap<Progress, JProgressBar> pbarmap = new HashMap<Progress, JProgressBar>();
+  protected HashMap<Progress, JProgressBar> pbarmap = new HashMap<>();
 
   /**
    * Constructor.

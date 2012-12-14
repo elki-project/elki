@@ -75,7 +75,7 @@ public class OutputStep implements WorkflowStep {
    * Set the default handler to the {@link ResultWriter}.
    */
   public static void setDefaultHandlerWriter() {
-    defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
+    defaultHandlers = new ArrayList<>(1);
     defaultHandlers.add(ResultWriter.class);
   }
 
@@ -83,7 +83,7 @@ public class OutputStep implements WorkflowStep {
    * Set the default handler to the {@link ResultVisualizer}.
    */
   public static void setDefaultHandlerVisualizer() {
-    defaultHandlers = new ArrayList<Class<? extends ResultHandler>>(1);
+    defaultHandlers = new ArrayList<>(1);
     defaultHandlers.add(ResultVisualizer.class);
   }
   
@@ -106,7 +106,7 @@ public class OutputStep implements WorkflowStep {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // result handlers
-      final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<ResultHandler>(OptionID.RESULT_HANDLER, ResultHandler.class);
+      final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<>(OptionID.RESULT_HANDLER, ResultHandler.class);
       if (defaultHandlers != null) {
         resultHandlerParam.setDefaultValue(defaultHandlers);
       }

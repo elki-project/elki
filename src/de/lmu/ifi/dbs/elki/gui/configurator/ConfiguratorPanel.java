@@ -61,12 +61,12 @@ public class ConfiguratorPanel extends JPanel implements ChangeListener {
   /**
    * Keep a map of parameter
    */
-  private Map<Object, ParameterConfigurator> childconfig = new HashMap<Object, ParameterConfigurator>();
+  private Map<Object, ParameterConfigurator> childconfig = new HashMap<>();
 
   /**
    * Child options
    */
-  private ArrayList<ParameterConfigurator> children = new ArrayList<ParameterConfigurator>();
+  private ArrayList<ParameterConfigurator> children = new ArrayList<>();
 
   /**
    * The event listeners for this panel.

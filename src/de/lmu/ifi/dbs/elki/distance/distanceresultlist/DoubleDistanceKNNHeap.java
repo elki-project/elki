@@ -133,7 +133,7 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
     }
   }
 
-  // @Override
+  @Override
   public void add(final DoubleDistanceDBIDPair e) {
     if (size() < getK() || knndistance >= e.doubleDistance()) {
       heap.add(e);

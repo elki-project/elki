@@ -115,7 +115,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DatabaseConnection> inputP = new ObjectParameter<DatabaseConnection>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      ObjectParameter<DatabaseConnection> inputP = new ObjectParameter<>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if (config.grab(inputP)) {
         input = inputP.instantiateClass(config);
       }

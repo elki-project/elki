@@ -327,7 +327,7 @@ public class ROC {
    */
   public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, DistanceDBIDResult<D> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<D>(nei.iter()));
+    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<>(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 

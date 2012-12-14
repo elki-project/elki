@@ -153,7 +153,7 @@ public class AlgorithmStep implements WorkflowStep {
         time = timeF.getValue();
       }
       // parameter algorithm
-      final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<Algorithm>(OptionID.ALGORITHM, Algorithm.class);
+      final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<>(OptionID.ALGORITHM, Algorithm.class);
       if(config.grab(ALGORITHM_PARAM)) {
         algorithms = ALGORITHM_PARAM.instantiateClasses(config);
       }

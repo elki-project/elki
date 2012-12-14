@@ -102,7 +102,7 @@ public class Clustering<M extends Model> extends BasicResult {
    * @return List of all clusters.
    */
   public List<Cluster<M>> getAllClusters() {
-    Set<Cluster<M>> clu = new HashSet<Cluster<M>>();
+    Set<Cluster<M>> clu = new HashSet<>();
     for(Cluster<M> rc : toplevelclusters) {
       if(!clu.contains(rc)) {
         clu.add(rc);
@@ -113,7 +113,7 @@ public class Clustering<M extends Model> extends BasicResult {
     }
     // Note: we canNOT use TreeSet above, because this comparator is only
     // partial!
-    ArrayList<Cluster<M>> res = new ArrayList<Cluster<M>>(clu);
+    ArrayList<Cluster<M>> res = new ArrayList<>(clu);
     Collections.sort(res, new Cluster.PartialComparator());
     return res;
   }

@@ -56,7 +56,7 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
    * Creates a new PageFile.
    */
   protected AbstractStoringPageFile(int pageSize) {
-    this.emptyPages = new Stack<Integer>();
+    this.emptyPages = new Stack<>();
     this.nextPageID = 0;
     this.pageSize = pageSize;
   }

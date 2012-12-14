@@ -121,8 +121,8 @@ public class DocumentParameters {
     File byclsname = new File(args[0]);
     File byoptname = new File(args[1]);
 
-    HashMapList<Class<?>, Parameter<?>> byclass = new HashMapList<Class<?>, Parameter<?>>();
-    HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?>, Class<?>>>();
+    HashMapList<Class<?>, Parameter<?>> byclass = new HashMapList<>();
+    HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt = new HashMapList<>();
     try {
       buildParameterIndex(byclass, byopt);
     }
@@ -181,7 +181,7 @@ public class DocumentParameters {
   }
 
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?>> byclass, HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
-    final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<Pair<Object, Parameter<?>>>();
+    final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       // Doesn't have a proper name?
@@ -197,7 +197,7 @@ public class DocumentParameters {
       UnParameterization config = new UnParameterization();
       final TrackParameters track = new TrackParameters(config);
       // LoggingUtil.warning("Instantiating " + cls.getName());
-      FutureTask<?> instantiator = new FutureTask<Object>(new Runnable() {
+      FutureTask<?> instantiator = new FutureTask<>(new Runnable() {
         @Override
         public void run() {
           // Try a V3 style parameterizer first.
@@ -404,7 +404,7 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    List<Class<?>> classes = new ArrayList<Class<?>>(byclass.keySet());
+    List<Class<?>> classes = new ArrayList<>(byclass.keySet());
     Collections.sort(classes, new InspectionUtil.ClassSorter());
 
     for(Class<?> cls : classes) {
@@ -518,7 +518,7 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    List<OptionID> opts = new ArrayList<OptionID>(byopt.keySet());
+    List<OptionID> opts = new ArrayList<>(byopt.keySet());
     Collections.sort(opts, new SortByOption());
 
     for(OptionID oid : opts) {

@@ -50,7 +50,7 @@ public class TopologicalSplitter implements SplitStrategy {
   public static final TopologicalSplitter STATIC = new TopologicalSplitter();
 
   /**
-   * constructor.
+   * Constructor.
    */
   public TopologicalSplitter() {
     // Nothing to do.
@@ -58,7 +58,7 @@ public class TopologicalSplitter implements SplitStrategy {
 
   @Override
   public <E extends SpatialComparable, A> BitSet split(A entries, ArrayAdapter<E, A> getter, int minEntries) {
-    Split<A, E> split = new Split<A, E>(entries, getter);
+    Split<A, E> split = new Split<>(entries, getter);
     split.chooseSplitAxis(minEntries);
     split.chooseSplitPoint(minEntries);
 

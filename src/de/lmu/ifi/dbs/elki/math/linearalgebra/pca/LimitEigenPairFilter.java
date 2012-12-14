@@ -122,8 +122,8 @@ public class LimitEigenPairFilter implements EigenPairFilter {
     }
 
     // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<EigenPair>();
-    List<EigenPair> weakEigenPairs = new ArrayList<EigenPair>();
+    List<EigenPair> strongEigenPairs = new ArrayList<>();
+    List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // determine strong and weak eigenpairs
     for (int i = 0; i < eigenPairs.size(); i++) {
@@ -184,7 +184,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       // delta must be >= 0 and <= 1 if it's a relative value
       // Since relative or absolute is dependent on the absolute flag this is a
       // global constraint!
-      List<ParameterConstraint<? super Double>> cons = new ArrayList<ParameterConstraint<? super Double>>();
+      List<ParameterConstraint<? super Double>> cons = new ArrayList<>();
       // TODO: Keep the constraint here - applies to non-conditional case as
       // well, and is set above.
       ParameterConstraint<Number> aboveNull = new GreaterEqualConstraint(0.);
@@ -192,7 +192,7 @@ public class LimitEigenPairFilter implements EigenPairFilter {
       ParameterConstraint<Number> underOne = new LessEqualConstraint(1.);
       cons.add(underOne);
 
-      GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<Double>(deltaP, cons, absoluteF, false);
+      GlobalParameterConstraint gpc = new ParameterFlagGlobalConstraint<>(deltaP, cons, absoluteF, false);
       config.checkConstraint(gpc);
     }
 

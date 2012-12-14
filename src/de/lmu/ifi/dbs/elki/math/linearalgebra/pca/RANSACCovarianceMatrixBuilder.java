@@ -184,7 +184,7 @@ public class RANSACCovarianceMatrixBuilder<V extends NumberVector<?>> extends Ab
 
     @Override
     protected RANSACCovarianceMatrixBuilder<V> makeInstance() {
-      return new RANSACCovarianceMatrixBuilder<V>(iterations, rnd);
+      return new RANSACCovarianceMatrixBuilder<>(iterations, rnd);
     }
   }
 }

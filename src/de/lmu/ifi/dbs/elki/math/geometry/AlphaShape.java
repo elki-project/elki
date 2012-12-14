@@ -64,11 +64,11 @@ public class AlphaShape {
     // Compute delaunay triangulation:
     delaunay = (new SweepHullDelaunay2D(points)).getDelaunay();
 
-    List<Polygon> polys = new ArrayList<Polygon>();
+    List<Polygon> polys = new ArrayList<>();
 
     // Working data
     BitSet used = new BitSet(delaunay.size());
-    List<Vector> cur = new ArrayList<Vector>();
+    List<Vector> cur = new ArrayList<>();
 
     for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = used.nextClearBit(i + 1)) {
       if(!used.get(i)) {
@@ -82,7 +82,7 @@ public class AlphaShape {
         }
         if(cur.size() > 0) {
           polys.add(new Polygon(cur));
-          cur = new ArrayList<Vector>();
+          cur = new ArrayList<>();
         }
       }
     }
