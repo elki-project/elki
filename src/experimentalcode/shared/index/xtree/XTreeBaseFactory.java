@@ -154,7 +154,7 @@ public abstract class XTreeBaseFactory<O extends NumberVector<?>, N extends XNod
       if (config.grab(MAX_OVERLAP_PARAMETER)) {
         max_overlap = MAX_OVERLAP_PARAMETER.getValue().floatValue();
       }
-      final EnumParameter<XTreeBase.Overlap> OVERLAP_TYPE_PARAMETER = new EnumParameter<XTreeBase.Overlap>(OVERLAP_TYPE_ID, XTreeBase.Overlap.class, XTreeBase.Overlap.VOLUME_OVERLAP);
+      final EnumParameter<XTreeBase.Overlap> OVERLAP_TYPE_PARAMETER = new EnumParameter<>(OVERLAP_TYPE_ID, XTreeBase.Overlap.class, XTreeBase.Overlap.VOLUME_OVERLAP);
       if (config.grab(OVERLAP_TYPE_PARAMETER)) {
         overlap_type = OVERLAP_TYPE_PARAMETER.getValue();
       }

@@ -146,7 +146,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     double[] pqUBFirst = new double[dim];
     Arrays.fill(pqUBFirst, Double.NEGATIVE_INFINITY);
     // maintain the second entries' upper bounds
-    List<Heap<DoubleIntPair>> pqUBSecond = new ArrayList<Heap<DoubleIntPair>>(dim);
+    List<Heap<DoubleIntPair>> pqUBSecond = new ArrayList<>(dim);
     for (int i = 0; i < dim; i++) {
       // Descending heap
       pqUBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries, Collections.reverseOrder()));
@@ -155,7 +155,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
     double[] pqLBFirst = new double[dim];
     Arrays.fill(pqLBFirst, Double.POSITIVE_INFINITY);
     // maintain the second entries' minimum lower bounds
-    List<Heap<DoubleIntPair>> pqLBSecond = new ArrayList<Heap<DoubleIntPair>>(dim);
+    List<Heap<DoubleIntPair>> pqLBSecond = new ArrayList<>(dim);
     for (int i = 0; i < dim; i++) {
       // Ascending heap
       pqLBSecond.add(new TopBoundedHeap<DoubleIntPair>(maxEntries));
@@ -388,7 +388,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return common split dimensions
    */
   private Collection<Integer> getCommonSplitDimensions(Collection<ET> entries) {
-    Collection<SplitHistory> splitHistories = new ArrayList<SplitHistory>(entries.size());
+    Collection<SplitHistory> splitHistories = new ArrayList<>(entries.size());
     for (ET entry : entries) {
       if (entry instanceof XDirectoryEntry) {
         splitHistories.add(((XDirectoryEntry) entry).getSplitHistory());
@@ -593,7 +593,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private List<ET>[] generateDistribution(SplitSorting sorting) {
     List<ET>[] distibution;
     distibution = new List[2];
-    distibution[0] = new ArrayList<ET>();
+    distibution[0] = new ArrayList<>();
     distibution[1] = new ArrayList<ET>();
     List<ET> sorted_entries = sorting.getSortedEntries();
     for (int i = 0; i < sorting.getSplitPoint(); i++) {
@@ -617,7 +617,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
    * @return the split sorting for the given sorting and split point
    */
   private SplitSorting generateSplitSorting(Integer[] entrySorting, int limit) {
-    List<ET> sorting = new ArrayList<ET>();
+    List<ET> sorting = new ArrayList<>();
     for (int i = 0; i < entries.size(); i++) {
       sorting.add(entries.get(entrySorting[i]));
     }

@@ -304,7 +304,7 @@ public abstract class XNode<E extends SpatialEntry, N extends XNode<E, N>> exten
    *         {@link #children(de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath)}.
    */
   public List<E> getChildren() {
-    List<E> children = new ArrayList<E>(getNumEntries());
+    List<E> children = new ArrayList<>(getNumEntries());
     for(int i = 0; i < getNumEntries(); i++) {
       children.add(entries[i]);
     }

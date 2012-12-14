@@ -84,7 +84,7 @@ public class XTreeIndex<O extends NumberVector<?>> extends XTree implements Rang
 
     // Make an example leaf
     if(canBulkLoad()) {
-      List<SpatialEntry> leafs = new ArrayList<SpatialEntry>(ids.size());
+      List<SpatialEntry> leafs = new ArrayList<>(ids.size());
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         leafs.add(createNewLeafEntry(DBIDUtil.deref(id)));
       }

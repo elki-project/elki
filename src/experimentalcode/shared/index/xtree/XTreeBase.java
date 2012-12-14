@@ -81,7 +81,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * Mapping id to supernode. Supernodes are appended to the end of the index
    * file when calling #commit();
    */
-  protected Map<Long, N> supernodes = new HashMap<Long, N>();
+  protected Map<Long, N> supernodes = new HashMap<>();
 
   /**
    * Relative min entries value.
