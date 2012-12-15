@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,6 +51,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -102,12 +104,18 @@ public class DocumentParameters {
   private static final String HEADER_KNOWN_IMPLEMENTATIONS = "Known implementations: ";
 
   /**
+   * Enable the full wiki output. Currently not sensible, as there is a size
+   * restriction on wiki pages, so we would need to split this somehow!
+   */
+  private static final boolean FULL_WIKI_OUTPUT = false;
+
+  /**
    * @param args Command line arguments
    */
   public static void main(String[] args) {
     LoggingConfiguration.setVerbose(true);
-    if(args.length != 2) {
-      LOG.warning("I need exactly two file names to operate!");
+    if(args.length != 2 && args.length != 4) {
+      LOG.warning("I need exactly two or four file names to operate!");
       System.exit(1);
     }
     if(!args[0].endsWith(".html")) {
@@ -118,11 +126,21 @@ public class DocumentParameters {
       LOG.warning("Second file name doesn't end with .html!");
       System.exit(1);
     }
+    if(args.length > 2 && !args[2].endsWith(".wiki")) {
+      LOG.warning("Third file name doesn't end with .wiki!");
+      System.exit(1);
+    }
+    if(args.length > 3 && !args[3].endsWith(".wiki")) {
+      LOG.warning("Fourth file name doesn't end with .wiki!");
+      System.exit(1);
+    }
     File byclsname = new File(args[0]);
     File byoptname = new File(args[1]);
+    File byclsnamew = args.length >= 3 ? new File(args[2]) : null;
+    File byoptnamew = args.length >= 4 ? new File(args[3]) : null;
 
-    HashMapList<Class<?>, Parameter<?>> byclass = new HashMapList<>();
-    HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt = new HashMapList<>();
+    HashMapList<Class<?>, Parameter<?>> byclass = new HashMapList<Class<?>, Parameter<?>>();
+    HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt = new HashMapList<OptionID, Pair<Parameter<?>, Class<?>>>();
     try {
       buildParameterIndex(byclass, byopt);
     }
@@ -141,9 +159,30 @@ public class DocumentParameters {
         throw new RuntimeException(e);
       }
       OutputStream byclassstream = new BufferedOutputStream(byclassfo);
-      Document byclassdoc = makeByClassOverview(byclass);
+      Document byclassdoc = makeByClassOverviewHTML(byclass);
       try {
         HTMLUtil.writeXHTML(byclassdoc, byclassstream);
+        byclassstream.flush();
+        byclassstream.close();
+        byclassfo.close();
+      }
+      catch(IOException e) {
+        LOG.exception("IO Exception writing output.", e);
+        throw new RuntimeException(e);
+      }
+    }
+    if(byclsnamew != null) {
+      FileOutputStream byclassfo;
+      try {
+        byclassfo = new FileOutputStream(byclsnamew);
+      }
+      catch(FileNotFoundException e) {
+        LOG.exception("Can't create output stream!", e);
+        throw new RuntimeException(e);
+      }
+      try {
+        PrintStream byclassstream = new PrintStream(new BufferedOutputStream(byclassfo));
+        makeByClassOverviewWiki(byclass, new WikiStream(byclassstream));
         byclassstream.flush();
         byclassstream.close();
         byclassfo.close();
@@ -164,9 +203,31 @@ public class DocumentParameters {
         throw new RuntimeException(e);
       }
       OutputStream byoptstream = new BufferedOutputStream(byoptfo);
-      Document byoptdoc = makeByOptOverview(byopt);
+      Document byoptdoc = makeByOptOverviewHTML(byopt);
       try {
         HTMLUtil.writeXHTML(byoptdoc, byoptfo);
+        byoptstream.flush();
+        byoptstream.close();
+        byoptfo.close();
+      }
+      catch(IOException e) {
+        LOG.exception("IO Exception writing output.", e);
+        throw new RuntimeException(e);
+      }
+    }
+
+    if(byoptnamew != null) {
+      FileOutputStream byoptfo;
+      try {
+        byoptfo = new FileOutputStream(byoptnamew);
+      }
+      catch(FileNotFoundException e) {
+        LOG.exception("Can't create output stream!", e);
+        throw new RuntimeException(e);
+      }
+      try {
+        PrintStream byoptstream = new PrintStream(new BufferedOutputStream(byoptfo));
+        makeByOptOverviewWiki(byopt, new WikiStream(byoptstream));
         byoptstream.flush();
         byoptstream.close();
         byoptfo.close();
@@ -181,7 +242,7 @@ public class DocumentParameters {
   }
 
   private static void buildParameterIndex(HashMapList<Class<?>, Parameter<?>> byclass, HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
-    final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<>();
+    final ArrayList<Pair<Object, Parameter<?>>> options = new ArrayList<Pair<Object, Parameter<?>>>();
     ExecutorService es = Executors.newSingleThreadExecutor();
     for(final Class<?> cls : InspectionUtil.findAllImplementations(Parameterizable.class, false)) {
       // Doesn't have a proper name?
@@ -197,7 +258,7 @@ public class DocumentParameters {
       UnParameterization config = new UnParameterization();
       final TrackParameters track = new TrackParameters(config);
       // LoggingUtil.warning("Instantiating " + cls.getName());
-      FutureTask<?> instantiator = new FutureTask<>(new Runnable() {
+      FutureTask<?> instantiator = new FutureTask<Object>(new Runnable() {
         @Override
         public void run() {
           // Try a V3 style parameterizer first.
@@ -348,7 +409,7 @@ public class DocumentParameters {
     return null;
   }
 
-  private static Document makeByClassOverview(HashMapList<Class<?>, Parameter<?>> byclass) {
+  private static Document makeByClassOverviewHTML(HashMapList<Class<?>, Parameter<?>> byclass) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -404,7 +465,7 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    List<Class<?>> classes = new ArrayList<>(byclass.keySet());
+    List<Class<?>> classes = new ArrayList<Class<?>>(byclass.keySet());
     Collections.sort(classes, new InspectionUtil.ClassSorter());
 
     for(Class<?> cls : classes) {
@@ -462,7 +523,122 @@ public class DocumentParameters {
     return htmldoc;
   }
 
-  private static Document makeByOptOverview(HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
+  private static class WikiStream {
+    PrintStream out;
+
+    public int indent = 0;
+
+    // Newline mode.
+    int newline = 0;
+
+    WikiStream(PrintStream out) {
+      this.out = out;
+      this.newline = -1;
+    }
+
+    void print(String p) {
+      insertNewline();
+      out.print(p);
+    }
+
+    private void insertNewline() {
+      if(newline == 2) {
+        out.print("[[br]]");
+      }
+      if(newline != 0) {
+        printIndent();
+        newline = 0;
+      }
+    }
+
+    private void printIndent() {
+      if(newline > 0) {
+        out.println();
+      }
+      for(int i = indent; i > 0; i--) {
+        out.print(' ');
+      }
+    }
+
+    void println(String p) {
+      insertNewline();
+      out.print(p);
+      newline = 2;
+    }
+
+    void println() {
+      newline = 2;
+    }
+
+    void printitem(String item) {
+      printIndent();
+      newline = 0;
+      print(item);
+    }
+
+    void javadocLink(Class<?> cls, Class<?> base) {
+      insertNewline();
+      out.print("[[javadoc(");
+      out.print(cls.getCanonicalName());
+      if(base != null) {
+        out.print(",");
+        out.print(ClassParameter.canonicalClassName(cls, base));
+      }
+      out.print(")]]");
+    }
+  }
+
+  private static void makeByClassOverviewWiki(HashMapList<Class<?>, Parameter<?>> byclass, WikiStream out) {
+    List<Class<?>> classes = new ArrayList<Class<?>>(byclass.keySet());
+    Collections.sort(classes, new InspectionUtil.ClassSorter());
+
+    for(Class<?> cls : classes) {
+      out.indent = 0;
+      out.printitem("'''");
+      out.javadocLink(cls, KDDTask.class);
+      out.println("''':");
+      out.indent = 1;
+      out.newline = 1; // No BR needed, we increase the indent.
+      for(Parameter<?> opt : byclass.get(cls)) {
+        out.printitem("* ");
+        out.print("{{{"); // typewriter
+        out.print(SerializedParameterization.OPTION_PREFIX);
+        out.print(opt.getName());
+        out.print(" ");
+        out.print(opt.getSyntax());
+        out.println("}}}");
+        if(opt.getShortDescription() != null) {
+          appendMultilineTextWiki(out, opt.getShortDescription());
+        }
+        // class restriction?
+        if(opt instanceof ClassParameter<?>) {
+          appendClassRestrictionWiki(out, ((ClassParameter<?>) opt).getRestrictionClass());
+        }
+        // default value?
+        if(opt.hasDefaultValue()) {
+          appendDefaultValueWiki(out, opt);
+        }
+        // known values?
+        if(FULL_WIKI_OUTPUT) {
+          if(opt instanceof ClassParameter<?>) {
+            if(((ClassParameter<?>) opt).getKnownImplementations().size() > 0) {
+              appendKnownImplementationsWiki(out, (ClassParameter<?>) opt);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private static int appendMultilineTextWiki(WikiStream out, String text) {
+    final String[] lines = text.split("\n");
+    for(int i = 0; i < lines.length; i++) {
+      out.println(lines[i]);
+    }
+    return lines.length;
+  }
+
+  private static Document makeByOptOverviewHTML(HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -518,7 +694,7 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    List<OptionID> opts = new ArrayList<>(byopt.keySet());
+    List<OptionID> opts = new ArrayList<OptionID>(byopt.keySet());
     Collections.sort(opts, new SortByOption());
 
     for(OptionID oid : opts) {
@@ -614,6 +790,84 @@ public class DocumentParameters {
     return htmldoc;
   }
 
+  private static void makeByOptOverviewWiki(HashMapList<OptionID, Pair<Parameter<?>, Class<?>>> byopt, WikiStream out) {
+    List<OptionID> opts = new ArrayList<OptionID>(byopt.keySet());
+    Collections.sort(opts, new SortByOption());
+
+    for(OptionID oid : opts) {
+      final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
+      out.indent = 1;
+      out.printitem("");
+      out.print("{{{");
+      out.print(SerializedParameterization.OPTION_PREFIX);
+      out.print(firstopt.getName());
+      out.print(" ");
+      out.print(firstopt.getSyntax());
+      out.println("}}}:: ");
+      out.newline = 1; // No BR needed, we increase the indent.
+      out.indent = 2;
+
+      appendMultilineTextWiki(out, firstopt.getShortDescription());
+      // class restriction?
+      Class<?> superclass = null;
+      if(firstopt instanceof ClassParameter<?>) {
+        // Find superclass heuristically
+        superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
+        for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
+          ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
+          if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+            superclass = cls.getRestrictionClass();
+          }
+        }
+        appendClassRestrictionWiki(out, superclass);
+      }
+      // default value?
+      if(firstopt.hasDefaultValue()) {
+        appendDefaultValueWiki(out, firstopt);
+      }
+      if(FULL_WIKI_OUTPUT) {
+        // known values?
+        if(firstopt instanceof ClassParameter<?>) {
+          if(((ClassParameter<?>) firstopt).getKnownImplementations().size() > 0) {
+            appendKnownImplementationsWiki(out, (ClassParameter<?>) firstopt);
+          }
+        }
+        // List of classes that use this parameter
+        out.println("Used by:");
+        for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
+          out.indent = 3;
+          out.printitem("* ");
+          out.javadocLink(clinst.getSecond(), null);
+          out.println();
+          if(clinst.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
+            ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
+            if(cls.getRestrictionClass() != null) {
+              // TODO: if it is null, it could still be different!
+              if(!cls.getRestrictionClass().equals(superclass)) {
+                appendClassRestrictionWiki(out, cls.getRestrictionClass());
+              }
+            }
+            else {
+              appendNoClassRestrictionWiki(out);
+            }
+          }
+          Parameter<?> param = clinst.getFirst();
+          if(param.getDefaultValue() != null) {
+            if(!param.getDefaultValue().equals(firstopt.getDefaultValue())) {
+              appendDefaultValueWiki(out, param);
+            }
+          }
+          else {
+            if(firstopt.getDefaultValue() != null) {
+              appendNoDefaultValueWiki(out);
+            }
+          }
+          out.println("");
+        }
+      }
+    }
+  }
+
   private static void appendDefaultClassLink(Document htmldoc, Parameter<?> opt, Element p) {
     Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
     defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(((ClassParameter<?>) opt).getDefaultValue().getCanonicalName()));
@@ -648,6 +902,28 @@ public class DocumentParameters {
     elemdd.appendChild(p);
   }
 
+  private static void appendClassRestrictionWiki(WikiStream out, Class<?> restriction) {
+    if(restriction == null) {
+      LOG.warning("No restriction class!");
+      return;
+    }
+    out.print(HEADER_CLASS_RESTRICTION);
+    if(restriction.isInterface()) {
+      out.print(HEADER_CLASS_RESTRICTION_IMPLEMENTING);
+    }
+    else {
+      out.print(HEADER_CLASS_RESTRICTION_EXTENDING);
+    }
+    out.javadocLink(restriction, null);
+    out.println();
+  }
+
+  private static void appendNoClassRestrictionWiki(WikiStream out) {
+    out.print(HEADER_CLASS_RESTRICTION);
+    out.print(NO_CLASS_RESTRICTION);
+    out.println();
+  }
+
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
     if(opt.getRestrictionClass() != Object.class) {
       List<Class<?>> iter = opt.getKnownImplementations();
@@ -672,6 +948,18 @@ public class DocumentParameters {
         LOG.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
       }
     }
+  }
+
+  private static void appendKnownImplementationsWiki(WikiStream out, ClassParameter<?> opt) {
+    out.println(HEADER_KNOWN_IMPLEMENTATIONS);
+    List<Class<?>> implementations = opt.getKnownImplementations();
+    out.indent++;
+    for(Class<?> c : implementations) {
+      out.printitem("* ");
+      out.javadocLink(c, opt.getRestrictionClass());
+      out.println();
+    }
+    out.indent--;
   }
 
   /**
@@ -707,6 +995,24 @@ public class DocumentParameters {
     p.appendChild(htmldoc.createTextNode(HEADER_DEFAULT_VALUE));
     p.appendChild(htmldoc.createTextNode(NO_DEFAULT_VALUE));
     optdd.appendChild(p);
+  }
+
+  private static void appendDefaultValueWiki(WikiStream out, Parameter<?> par) {
+    out.print(HEADER_DEFAULT_VALUE);
+    if(par instanceof ClassParameter<?>) {
+      final Class<?> name = ((ClassParameter<?>) par).getDefaultValue();
+      out.javadocLink(name, null);
+    }
+    else {
+      Object def = par.getDefaultValue();
+      out.print(def.toString());
+    }
+    out.println();
+  }
+
+  private static void appendNoDefaultValueWiki(WikiStream out) {
+    out.print(HEADER_DEFAULT_VALUE);
+    out.println(NO_DEFAULT_VALUE);
   }
 
   /**
