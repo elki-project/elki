@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
@@ -133,7 +134,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       }
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       int hash = 0;
-      MeanVariance mv = new MeanVariance();
+      MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, k);
         int ichecksum = 0;
@@ -142,6 +143,10 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         }
         hash = Util.mixHashCodes(hash, ichecksum);
         mv.put(knns.size());
+        D kdist = knns.getKNNDistance();
+        if (kdist instanceof NumberDistance) {
+          mvdist.put(((NumberDistance<?, ?>) kdist).doubleValue());
+        }
         if (prog != null) {
           prog.incrementProcessed(LOG);
         }
@@ -151,7 +156,10 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       }
       if (LOG.isVerbose()) {
         LOG.verbose("Result hashcode: " + hash);
-        LOG.verbose("Mean number of results: "+mv.toString());
+        LOG.verbose("Mean number of results: " + mv.toString());
+        if (mvdist.getCount() > 0) {
+          LOG.verbose("Mean k-distance: " + mvdist.toString());
+        }
       }
     } else {
       // Separate query set.
@@ -183,7 +191,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       }
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       int hash = 0;
-      MeanVariance mv = new MeanVariance();
+      MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
         int off = sids.binarySearch(iditer);
         assert (off >= 0);
@@ -196,12 +204,19 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         }
         hash = Util.mixHashCodes(hash, ichecksum);
         mv.put(knns.size());
+        D kdist = knns.getKNNDistance();
+        if (kdist instanceof NumberDistance) {
+          mvdist.put(((NumberDistance<?, ?>) kdist).doubleValue());
+        }
         if (prog != null) {
           prog.incrementProcessed(LOG);
         }
         if (LOG.isVerbose()) {
           LOG.verbose("Result hashcode: " + hash);
-          LOG.verbose("Mean number of results: "+mv.toString());
+          LOG.verbose("Mean number of results: " + mv.toString());
+          if (mvdist.getCount() > 0) {
+            LOG.verbose("Mean k-distance: " + mvdist.toString());
+          }
         }
       }
       if (prog != null) {
