@@ -27,7 +27,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
@@ -65,14 +64,6 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
   }
 
   /**
-   * Initialize the index.
-   * 
-   * @param relation Relation to index
-   * @param ids database ids
-   */
-  protected abstract void initialize(Relation<O> relation, DBIDs ids);
-
-  /**
    * Refine a given object (and count the refinement!).
    * 
    * @param id Object id
@@ -83,7 +74,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
     return relation.get(id);
   }
 
-  @Override
+  //@Override
   public PageFileStatistics getPageFileStatistics() {
     return this;
   }
@@ -106,11 +97,6 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
   @Override
   public PageFileStatistics getInnerStatistics() {
     return null;
-  }
-
-  @Override
-  public void insertAll(DBIDs ids) {
-    initialize(relation, ids);
   }
 
   /**

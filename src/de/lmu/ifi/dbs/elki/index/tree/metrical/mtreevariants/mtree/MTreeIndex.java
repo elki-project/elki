@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -55,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements RangeIndex<O>, KNNIndex<O> {
+public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The relation indexed.
    */
@@ -72,7 +73,6 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
   public MTreeIndex(Relation<O> relation, PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
     super(pagefile, distanceQuery, distanceFunction);
     this.relation = relation;
-    this.initialize();
   }
 
   /**
@@ -80,6 +80,12 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
    */
   protected MTreeEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
     return new MTreeLeafEntry<>(id, parentDistance);
+  }
+
+  @Override
+  public void initialize() {
+    super.initialize();
+    insertAll(relation.getDBIDs());
   }
 
   @Override

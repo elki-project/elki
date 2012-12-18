@@ -97,7 +97,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
   }
 
   @Override
-  protected void preprocess() {
+  public void initialize() {
     if (relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }

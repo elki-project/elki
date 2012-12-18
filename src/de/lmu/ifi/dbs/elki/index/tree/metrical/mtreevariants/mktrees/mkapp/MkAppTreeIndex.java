@@ -28,9 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -48,7 +46,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * MkAppTree used as database index.
@@ -78,7 +75,6 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
   public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
     super(pageFile, distanceQuery, distanceFunction, k_max, p, log);
     this.relation = relation;
-    this.initialize();
   }
 
   /**
@@ -94,43 +90,15 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
   }
 
   @Override
-  public void insert(DBIDRef id) {
-    throw new UnsupportedOperationException("Insertion of single objects is not supported!");
-  }
-
-  @Override
-  public void insertAll(DBIDs ids) {
-    List<MkAppEntry<D>> objs = new ArrayList<>(ids.size());
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+  public void initialize() {
+    super.initialize();
+    List<MkAppEntry<D>> objs = new ArrayList<>(relation.size());
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);
       objs.add(createNewLeafEntry(id, object, getDistanceFactory().undefinedDistance()));
     }
     insertAll(objs);
-  }
-
-  /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
-   * yet supported by an M-Tree.
-   * 
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
-   */
-  @Override
-  public final boolean delete(DBIDRef id) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
-  }
-
-  /**
-   * Throws an UnsupportedOperationException since deletion of objects is not
-   * yet supported by an M-Tree.
-   * 
-   * @throws UnsupportedOperationException thrown, since deletions aren't
-   *         implemented yet.
-   */
-  @Override
-  public void deleteAll(DBIDs ids) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 
   @SuppressWarnings("unchecked")

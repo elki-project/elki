@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
@@ -53,7 +54,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @param <O> Object type
  */
-public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree implements RangeIndex<O>, KNNIndex<O> {
+public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The appropriate logger for this index.
    */
@@ -73,7 +74,6 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
   public RStarTreeIndex(Relation<O> relation, PageFile<RStarTreeNode> pagefile) {
     super(pagefile);
     this.relation = relation;
-    this.initialize();
   }
 
   /**
@@ -86,6 +86,12 @@ public class RStarTreeIndex<O extends NumberVector<?>> extends RStarTree impleme
     return new SpatialPointLeafEntry(DBIDUtil.deref(id), relation.get(id));
   }
 
+  @Override
+  public void initialize() {
+    super.initialize();
+    insertAll(relation.getDBIDs()); // Will check for actual bulk load!
+  }
+  
   /**
    * Inserts the specified reel vector object into this index.
    * 

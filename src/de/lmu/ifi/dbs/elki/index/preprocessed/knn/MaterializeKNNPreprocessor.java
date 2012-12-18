@@ -42,9 +42,11 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
+import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -65,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Materialize kNN Neighborhood preprocessor")
 @Description("Materializes the k nearest neighbors of objects of a database.")
-public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
+public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> implements DynamicIndex {
   /**
    * Logger to use.
    */
@@ -138,7 +140,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
       progress.ensureCompleted(getLogger());
     }
   }
-
+  
   @Override
   public final void insert(DBIDRef id) {
     objectsInserted(DBIDUtil.deref(id));
@@ -361,6 +363,12 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
    */
   public void removeKNNListener(KNNListener l) {
     listenerList.remove(KNNListener.class, l);
+  }
+
+  @Override
+  public PageFileStatistics getPageFileStatistics() {
+    // FIXME: move this method into a separate DiskIndex interface.
+    return null;
   }
 
   @Override

@@ -78,10 +78,8 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> exten
     this.pca = pca;
   }
 
-  /**
-   * Preprocessing step.
-   */
-  protected void preprocess() {
+  @Override
+  public void initialize() {
     if(relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -123,7 +121,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> exten
   @Override
   public PCAFilteredResult getLocalProjection(DBIDRef objid) {
     if(storage == null) {
-      preprocess();
+      initialize();
     }
     return storage.get(objid);
   }

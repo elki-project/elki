@@ -102,10 +102,8 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     this.distanceFunction = distanceFunction;
   }
 
-  /**
-   * Preprocessing step.
-   */
-  protected void preprocess() {
+  @Override
+  public void initialize() {
     if(getLogger().isVerbose()) {
       getLogger().verbose("Assigning nearest neighbor lists to database objects");
     }
@@ -139,7 +137,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
   @Override
   public ArrayDBIDs getNearestNeighborSet(DBIDRef objid) {
     if(storage == null) {
-      preprocess();
+      initialize();
     }
     return storage.get(objid);
   }

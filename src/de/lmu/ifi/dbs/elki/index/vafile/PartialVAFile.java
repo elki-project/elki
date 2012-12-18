@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -147,7 +146,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
   }
 
   @Override
-  public void initialize(Relation<V> relation, DBIDs ids) throws IllegalStateException {
+  public void initialize() throws IllegalStateException {
     if(splitPartitions != null) {
       throw new IllegalStateException("Data already inserted.");
     }
@@ -167,7 +166,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     }
 
     vectorApprox = new ArrayList<>();
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       V dv = relation.get(id);
       VectorApproximation va = calculateFullApproximation(id, dv);

@@ -27,6 +27,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -86,31 +87,35 @@ public class AlgorithmStep implements WorkflowStep {
   public HierarchicalResult runAlgorithms(Database database) {
     result = new BasicResult("Algorithm Step", "main");
     result.addChildResult(database);
-    if(LOG.isVerbose() && database.getIndexes().size() > 0) {
+    if (LOG.isVerbose() && database.getIndexes().size() > 0) {
       StringBuilder buf = new StringBuilder();
       buf.append("Index statistics before running algorithms:").append(FormatUtil.NEWLINE);
-      for(Index idx : database.getIndexes()) {
-        PageFileStatistics stat = idx.getPageFileStatistics();
-        PageFileUtil.appendPageFileStatistics(buf, stat);
+      for (Index idx : database.getIndexes()) {
+        if (idx instanceof DynamicIndex) {
+          PageFileStatistics stat = ((DynamicIndex) idx).getPageFileStatistics();
+          PageFileUtil.appendPageFileStatistics(buf, stat);
+        }
       }
       LOG.verbose(buf.toString());
     }
-    for(Algorithm algorithm : algorithms) {
+    for (Algorithm algorithm : algorithms) {
       long start = System.currentTimeMillis();
       Result res = algorithm.run(database);
       long end = System.currentTimeMillis();
-      if(LOG.isVerbose()) {
+      if (LOG.isVerbose()) {
         long elapsedTime = end - start;
         StringBuilder buf = new StringBuilder();
         buf.append(algorithm.getClass().getName()).append(" runtime  : ");
         buf.append(elapsedTime).append(" milliseconds.").append(FormatUtil.NEWLINE);
-        for(Index idx : database.getIndexes()) {
-          PageFileStatistics stat = idx.getPageFileStatistics();
-          PageFileUtil.appendPageFileStatistics(buf, stat);
+        for (Index idx : database.getIndexes()) {
+          if (idx instanceof DynamicIndex) {
+            PageFileStatistics stat = ((DynamicIndex) idx).getPageFileStatistics();
+            PageFileUtil.appendPageFileStatistics(buf, stat);
+          }
         }
         LOG.verbose(buf.toString());
       }
-      if(res != null) {
+      if (res != null) {
         result.addChildResult(res);
       }
     }
@@ -149,12 +154,12 @@ public class AlgorithmStep implements WorkflowStep {
       super.makeOptions(config);
       // Time parameter
       final Flag timeF = new Flag(OptionID.TIME_FLAG);
-      if(config.grab(timeF)) {
+      if (config.grab(timeF)) {
         time = timeF.getValue();
       }
       // parameter algorithm
       final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<>(OptionID.ALGORITHM, Algorithm.class);
-      if(config.grab(ALGORITHM_PARAM)) {
+      if (config.grab(ALGORITHM_PARAM)) {
         algorithms = ALGORITHM_PARAM.instantiateClasses(config);
       }
     }

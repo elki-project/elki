@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
@@ -143,9 +142,9 @@ public abstract class AbstractMaterializeKNNPreprocessor<O, D extends Distance<D
   }
 
   @Override
-  public void insertAll(DBIDs ids) {
+  public void initialize() {
     if(storage == null) {
-      if(ids.size() > 0) {
+      if(relation.size() > 0) {
         preprocess();
       }
     }

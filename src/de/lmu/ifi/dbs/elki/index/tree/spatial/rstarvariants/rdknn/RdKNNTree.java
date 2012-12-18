@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -85,7 +86,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> Distance type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
-public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * The logger for this class.
    */
@@ -129,7 +130,6 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
     this.distanceQuery = distanceQuery;
-    this.initialize();
   }
 
   /**
@@ -579,6 +579,12 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
   protected RdKNNLeafEntry<D> createNewLeafEntry(DBID id) {
     return new RdKNNLeafEntry<>(id, relation.get(id), null);
+  }
+
+  @Override
+  public void initialize() {
+    super.initialize();
+    insertAll(relation.getDBIDs());
   }
 
   /**
