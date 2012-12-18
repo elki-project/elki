@@ -22,9 +22,6 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -32,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 
@@ -160,16 +156,6 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
      */
     public AbstractKNNQuery(DistanceQuery<O, D> distanceQuery) {
       super(distanceQuery);
-    }
-
-    @Override
-    public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      throw new UnsupportedOperationException("Not yet implemented.");
-    }
-
-    @Override
-    public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
-      return getKNNForObject(relation.get(id), k);
     }
 
     /**

@@ -23,11 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -40,7 +36,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * Instance of a KNN query for a particular spatial index.
@@ -140,16 +135,5 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
       }
     }
     return knnList.toKNNList();
-  }
-
-  @Override
-  public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
-  }
-
-  @Override
-  public List<KNNResult<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    // TODO: implement
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
   }
 }
