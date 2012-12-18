@@ -20,9 +20,9 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceF
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseMaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterArccos
-de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLn
-de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterLinear
+de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.ArccosSimilarityAdapter
+de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.LinearAdapterLinear
+de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.LnSimilarityAdapter
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HSBHistogramQuadraticDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.RGBHistogramQuadraticDistanceFunction
