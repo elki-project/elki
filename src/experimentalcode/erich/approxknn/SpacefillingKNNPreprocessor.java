@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -128,9 +127,9 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
   }
 
   @Override
-  public void insertAll(DBIDs ids) {
+  public void initialize() {
     if(curves == null) {
-      if(ids.size() > 0) {
+      if(relation.size() > 0) {
         preprocess();
       }
     }
