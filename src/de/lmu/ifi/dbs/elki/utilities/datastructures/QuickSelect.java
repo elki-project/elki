@@ -882,7 +882,7 @@ public class QuickSelect {
    * @param data Data to process
    * @param comparator Comparator to use
    * @param begin Begin of valid values
-   * @param end End of valid values (inclusive!)
+   * @param end End of valid values (exclusive)
    * @param quant Quantile to compute
    * @return Value at quantile
    */
@@ -904,7 +904,7 @@ public class QuickSelect {
    * @param data Data to process
    * @param comparator Comparator to use
    * @param start Interval start
-   * @param end Interval end (inclusive)
+   * @param end Interval end (exclusive)
    * @param rank rank position we are interested in (starting at 0)
    */
   public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end, int rank) {
