@@ -23,6 +23,11 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -51,7 +56,21 @@ public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends
   }
 
   @Override
-  abstract public KNNResult<D> getKNNForDBID(DBIDRef id, int k);
+  public List<? extends KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    // throw new
+    // UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    // TODO: optimize
+    List<KNNResult<D>> ret = new ArrayList<>(ids.size());
+    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      ret.add(getKNNForDBID(iter, k));
+    }
+    return ret;
+  }
+
+  @Override
+  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
+    return getKNNForObject(relation.get(id), k);
+  }
 
   @Override
   abstract public KNNResult<D> getKNNForObject(O obj, int k);

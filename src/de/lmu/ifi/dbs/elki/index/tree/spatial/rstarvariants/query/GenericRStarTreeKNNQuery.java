@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -236,11 +235,6 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     final KNNHeap<D> knnList = KNNUtil.newHeap(distanceFunction, k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
-  }
-
-  @Override
-  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
   }
 
   @Override
