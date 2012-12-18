@@ -237,7 +237,9 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
         final IndexFactory<Object, ?> ofact = (IndexFactory<Object, ?>) factory;
         @SuppressWarnings("unchecked")
         final Relation<Object> orep = (Relation<Object>) relation;
-        addIndex(ofact.instantiate(orep));
+        Index index = ofact.instantiate(orep);
+        addIndex(index);
+        index.initialize();
       }
     }
     return relation;
