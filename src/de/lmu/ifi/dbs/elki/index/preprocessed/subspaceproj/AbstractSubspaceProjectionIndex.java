@@ -97,10 +97,8 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
     this.minpts = minpts;
   }
 
-  /**
-   * Preprocessing step.
-   */
-  protected void preprocess() {
+  @Override
+  public void initialize() {
     if(relation == null || relation.size() <= 0) {
       throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
     }
@@ -148,7 +146,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
   @Override
   public P getLocalProjection(DBIDRef objid) {
     if(storage == null) {
-      preprocess();
+      initialize();
     }
     return storage.get(objid);
   }

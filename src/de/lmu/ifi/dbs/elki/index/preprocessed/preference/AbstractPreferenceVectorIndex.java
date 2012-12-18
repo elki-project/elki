@@ -50,15 +50,10 @@ public abstract class AbstractPreferenceVectorIndex<NV extends NumberVector<?>> 
     super(relation);
   }
 
-  /**
-   * Preprocessing step.
-   */
-  protected abstract void preprocess();
-
   @Override
   public BitSet getPreferenceVector(DBIDRef objid) {
     if(storage == null) {
-      preprocess();
+      initialize();
     }
     return storage.get(objid);
   }

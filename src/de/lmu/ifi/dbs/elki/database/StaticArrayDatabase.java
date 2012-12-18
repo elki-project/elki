@@ -172,7 +172,7 @@ public class StaticArrayDatabase extends AbstractDatabase implements Parameteriz
             final Relation<Object> orep = (Relation<Object>) relation;
             final Index index = ofact.instantiate(orep);
             addIndex(index);
-            index.insertAll(ids);
+            index.initialize();
           }
         }
       }

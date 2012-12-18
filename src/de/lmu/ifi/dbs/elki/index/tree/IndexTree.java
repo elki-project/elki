@@ -91,7 +91,6 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * Initialize the tree if the page file already existed.
    */
-  // FIXME: ensure this is called in all the appropriate places!
   public void initialize() {
     TreeIndexHeader header = createHeader();
     if(this.file.initialize(header)) {

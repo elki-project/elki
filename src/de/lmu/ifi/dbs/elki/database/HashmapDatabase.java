@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.ObjectBundle;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -172,7 +173,11 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
 
     // Notify indexes of insertions
     for (Index index : indexes) {
-      index.insertAll(newids);
+      if (index instanceof DynamicIndex) {
+        ((DynamicIndex) index).insertAll(newids);
+      } else {
+        LOG.warning("Non-dynamic indexes have been added to the database. Updates are not possible!");
+      }
     }
 
     // fire insertion event
@@ -239,10 +244,11 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   /**
-   * Removes the objects from the database (by calling {@link #doDelete(DBIDRef)}
-   * for each object) and indexes and fires a deletion event.
+   * Removes the objects from the database (by calling
+   * {@link #doDelete(DBIDRef)} for each object) and indexes and fires a
+   * deletion event.
    * 
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   @Override
   public MultipleObjectsBundle delete(DBIDs ids) {
@@ -261,7 +267,12 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     }
     // Remove from indexes
     for (Index index : indexes) {
-      index.deleteAll(ids);
+      if (index instanceof DynamicIndex) {
+        ((DynamicIndex) index).deleteAll(ids);
+      } else {
+        LOG.warning("Non-dynamic indexes have been added to the database. Updates are not possible!");
+      }
+
     }
     // fire deletion event
     eventManager.fireObjectsRemoved(ids);
@@ -270,10 +281,10 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
   }
 
   /**
-   * Removes the object from the database (by calling {@link #doDelete(DBIDRef)})
-   * and indexes and fires a deletion event.
-   *
-   * {@inheritDoc} 
+   * Removes the object from the database (by calling {@link #doDelete(DBIDRef)}
+   * ) and indexes and fires a deletion event.
+   * 
+   * {@inheritDoc}
    */
   @Override
   public SingleObjectBundle delete(DBIDRef id) {
@@ -285,7 +296,11 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     doDelete(id);
     // Remove from indexes
     for (Index index : indexes) {
-      index.delete(id);
+      if (index instanceof DynamicIndex) {
+        ((DynamicIndex) index).delete(id);
+      } else {
+        LOG.warning("Non-dynamic indexes have been added to the database. Updates are not possible!");
+      }
     }
     // fire deletion event
     eventManager.fireObjectRemoved(id);

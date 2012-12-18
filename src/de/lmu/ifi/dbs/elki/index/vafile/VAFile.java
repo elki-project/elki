@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -135,9 +134,9 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
   }
 
   @Override
-  protected void initialize(Relation<V> relation, DBIDs ids) {
+  public void initialize() {
     setPartitions(relation);
-    for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       vectorApprox.add(calculateApproximation(id, relation.get(id)));
     }

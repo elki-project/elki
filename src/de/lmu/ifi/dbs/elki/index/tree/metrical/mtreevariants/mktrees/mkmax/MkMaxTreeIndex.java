@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
@@ -58,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * Relation indexed.
    */
@@ -76,7 +77,6 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max) {
     super(pagefile, distanceQuery, distanceFunction, k_max);
     this.relation = relation;
-    this.initialize();
   }
 
   /**
@@ -86,6 +86,12 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
     KNNResult<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
     D knnDistance = knns.getKNNDistance();
     return new MkMaxLeafEntry<>(id, parentDistance, knnDistance);
+  }
+  
+  @Override
+  public void initialize() {
+    super.initialize();
+    insertAll(relation.getDBIDs());
   }
 
   @Override

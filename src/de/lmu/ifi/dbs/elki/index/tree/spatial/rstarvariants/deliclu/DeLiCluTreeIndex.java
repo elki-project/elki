@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
@@ -54,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @param <O> Object type
  */
-public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree implements KNNIndex<O>, RangeIndex<O> {
+public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree implements KNNIndex<O>, RangeIndex<O>, DynamicIndex {
   /**
    * The relation we index.
    */
@@ -69,7 +70,6 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
   public DeLiCluTreeIndex(Relation<O> relation, PageFile<DeLiCluNode> pagefile) {
     super(pagefile);
     this.relation = relation;
-    this.initialize();
   }
 
   /**
@@ -126,6 +126,12 @@ public class DeLiCluTreeIndex<O extends NumberVector<?>> extends DeLiCluTree imp
     }
 
     return pathToObject.getPath();
+  }
+
+  @Override
+  public void initialize() {
+    super.initialize();
+    insertAll(relation.getDBIDs());
   }
 
   /**
