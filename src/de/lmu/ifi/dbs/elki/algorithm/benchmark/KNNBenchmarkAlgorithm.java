@@ -156,9 +156,9 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       }
       if (LOG.isVerbose()) {
         LOG.verbose("Result hashcode: " + hash);
-        LOG.verbose("Mean number of results: " + mv.toString());
+        LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
         if (mvdist.getCount() > 0) {
-          LOG.verbose("Mean k-distance: " + mvdist.toString());
+          LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
         }
       }
     } else {
@@ -211,16 +211,16 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         if (prog != null) {
           prog.incrementProcessed(LOG);
         }
-        if (LOG.isVerbose()) {
-          LOG.verbose("Result hashcode: " + hash);
-          LOG.verbose("Mean number of results: " + mv.toString());
-          if (mvdist.getCount() > 0) {
-            LOG.verbose("Mean k-distance: " + mvdist.toString());
-          }
-        }
       }
       if (prog != null) {
         prog.ensureCompleted(LOG);
+      }
+      if (LOG.isVerbose()) {
+        LOG.verbose("Result hashcode: " + hash);
+        LOG.verbose("Mean number of results: " + mv.getMean() + " +- " + mv.getNaiveStddev());
+        if (mvdist.getCount() > 0) {
+          LOG.verbose("Mean k-distance: " + mvdist.getMean() + " +- " + mvdist.getNaiveStddev());
+        }
       }
     }
     return null;
