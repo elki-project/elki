@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -91,7 +90,10 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
   private void buildTree(int left, int right, int axis, SortDBIDsBySingleDimension comp) {
     final int middle = (left + right) >>> 1;
     comp.setDimension(axis);
-    QuickSelect.quickSelect(sorted, comp, left, right, middle);
+    
+    // A QuickSelect should be sufficient, but aparently there is a bug somewhere.
+    // QuickSelect.quickSelect(sorted, comp, left, right, middle);
+    sorted.sort(left, right, comp);
     final int next = (axis + 1) % dims;
     if (left < middle) {
       buildTree(left, middle, next, comp);
@@ -168,6 +170,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
       final int middle = (left + right) >>> 1;
       iter.seek(middle);
       O split = relation.get(iter);
+
       // Distance to axis:
       final double delta = split.doubleValue(axis) - query.doubleValue(axis);
       final boolean onleft = (delta >= 0);
@@ -175,28 +178,55 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
 
       // Next axis:
       final int next = (axis + 1) % dims;
-      if (left < middle && onleft) {
-        maxdist = kdsearch(left, middle, next, query, knns, iter, maxdist);
-      }
-      if (middle + 1 < right && onright) {
-        maxdist = kdsearch(middle + 1, right, next, query, knns, iter, maxdist);
-      }
-      // Look at splitting element:
-      if (Math.abs(delta) <= maxdist) {
+
+      // Exact match chance (delta == 0)!
+      // process first, then descend both sides.
+      if (onleft && onright) {
         double dist = norm.doubleDistance(query, split);
         if (dist <= maxdist) {
           iter.seek(middle);
           knns.add(dist, iter);
           maxdist = knns.doubleKNNDistance();
         }
-      }
-      // Pruning test:
-      if (Math.abs(delta) <= maxdist) {
-        if (left < middle && !onleft) {
+        if (left < middle) {
           maxdist = kdsearch(left, middle, next, query, knns, iter, maxdist);
         }
-        if (middle + 1 < right && !onright) {
+        if (middle + 1 < right) {
           maxdist = kdsearch(middle + 1, right, next, query, knns, iter, maxdist);
+        }
+      } else {
+        if (onleft) {
+          if (left < middle) {
+            maxdist = kdsearch(left, middle, next, query, knns, iter, maxdist);
+          }
+          // Look at splitting element (unless already above):
+          if (Math.abs(delta) <= maxdist) {
+            double dist = norm.doubleDistance(query, split);
+            if (dist <= maxdist) {
+              iter.seek(middle);
+              knns.add(dist, iter);
+              maxdist = knns.doubleKNNDistance();
+            }
+          }
+          if ((middle + 1 < right) && (Math.abs(delta) <= maxdist)) {
+            maxdist = kdsearch(middle + 1, right, next, query, knns, iter, maxdist);
+          }
+        } else { // onright
+          if (middle + 1 < right) {
+            maxdist = kdsearch(middle + 1, right, next, query, knns, iter, maxdist);
+          }
+          // Look at splitting element (unless already above):
+          if (Math.abs(delta) <= maxdist) {
+            double dist = norm.doubleDistance(query, split);
+            if (dist <= maxdist) {
+              iter.seek(middle);
+              knns.add(dist, iter);
+              maxdist = knns.doubleKNNDistance();
+            }
+          }
+          if ((left < middle) && (Math.abs(delta) <= maxdist)) {
+            maxdist = kdsearch(left, middle, next, query, knns, iter, maxdist);
+          }
         }
       }
       return maxdist;
