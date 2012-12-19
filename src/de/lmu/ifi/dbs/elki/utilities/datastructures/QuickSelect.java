@@ -49,7 +49,7 @@ public class QuickSelect {
   /**
    * For small arrays, use a simpler method:
    */
-  private static final int SMALL = 10;
+  private static final int SMALL = 12;
 
   /**
    * QuickSelect is essentially quicksort, except that we only "sort" that half
@@ -94,10 +94,9 @@ public class QuickSelect {
     // Integer division is "floor" since we are non-negative.
     final int left = begin + ((length - 1) >> 1);
     quickSelect(data, begin, end, left);
-    if(length % 2 == 1) {
+    if (length % 2 == 1) {
       return data[left];
-    }
-    else {
+    } else {
       quickSelect(data, begin, end, left + 1);
       return data[left] + .5 * (data[left + 1] - data[left]);
     }
@@ -136,10 +135,9 @@ public class QuickSelect {
     final double err = dleft - ileft;
 
     quickSelect(data, begin, end, ileft);
-    if(err <= Double.MIN_NORMAL) {
+    if (err <= Double.MIN_NORMAL) {
       return data[ileft];
-    }
-    else {
+    } else {
       quickSelect(data, begin, end, ileft + 1);
       // Mix:
       double mix = data[ileft] + (data[ileft + 1] - data[ileft]) * err;
@@ -157,10 +155,10 @@ public class QuickSelect {
    * @param rank rank position we are interested in (starting at 0)
    */
   public static void quickSelect(double[] data, int start, int end, int rank) {
-    while(true) {
+    while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
-      if(start + SMALL > end) {
+      if (start + SMALL > end) {
         insertionSort(data, start, end);
         return;
       }
@@ -168,13 +166,13 @@ public class QuickSelect {
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
       final int middle = (start + end) >> 1;
-      if(data[start] > data[middle]) {
+      if (data[start] > data[middle]) {
         swap(data, start, middle);
       }
-      if(data[start] > data[end - 1]) {
+      if (data[start] > data[end - 1]) {
         swap(data, start, end - 1);
       }
-      if(data[middle] > data[end - 1]) {
+      if (data[middle] > data[end - 1]) {
         swap(data, middle, end - 1);
       }
       // TODO: use more candidates for larger arrays?
@@ -187,14 +185,14 @@ public class QuickSelect {
       // Begin partitioning
       int i = start + 1, j = end - 3;
       // This is classic quicksort stuff
-      while(true) {
-        while(data[i] <= pivot && i <= j) {
+      while (true) {
+        while (i <= j && data[i] <= pivot) {
           i++;
         }
-        while(data[j] >= pivot && j >= i) {
+        while (j >= i && data[j] >= pivot) {
           j--;
         }
-        if(i >= j) {
+        if (i >= j) {
           break;
         }
         swap(data, i, j);
@@ -205,13 +203,11 @@ public class QuickSelect {
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
+      if (rank < i) {
         end = i;
-      }
-      else if(rank > i) {
+      } else if (rank > i) {
         start = i + 1;
-      }
-      else {
+      } else {
         break;
       }
     } // Loop until rank==i
@@ -225,8 +221,8 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static void insertionSort(double[] data, int start, int end) {
-    for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && data[j - 1] > data[j]; j--) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start && data[j - 1] > data[j]; j--) {
         swap(data, j, j - 1);
       }
     }
@@ -345,10 +341,10 @@ public class QuickSelect {
    * @param rank rank position we are interested in (starting at 0)
    */
   public static <T extends Comparable<? super T>> void quickSelect(T[] data, int start, int end, int rank) {
-    while(true) {
+    while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
-      if(start + SMALL > end) {
+      if (start + SMALL > end) {
         insertionSort(data, start, end);
         return;
       }
@@ -356,13 +352,13 @@ public class QuickSelect {
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
       final int middle = (start + end) >> 1;
-      if(data[start].compareTo(data[middle]) > 0) {
+      if (data[start].compareTo(data[middle]) > 0) {
         swap(data, start, middle);
       }
-      if(data[start].compareTo(data[end - 1]) > 0) {
+      if (data[start].compareTo(data[end - 1]) > 0) {
         swap(data, start, end - 1);
       }
-      if(data[middle].compareTo(data[end - 1]) > 0) {
+      if (data[middle].compareTo(data[end - 1]) > 0) {
         swap(data, middle, end - 1);
       }
       // TODO: use more candidates for larger arrays?
@@ -375,14 +371,14 @@ public class QuickSelect {
       // Begin partitioning
       int i = start + 1, j = end - 3;
       // This is classic quicksort stuff
-      while(true) {
-        while(data[i].compareTo(pivot) <= 0 && i <= j) {
+      while (true) {
+        while (i <= j && data[i].compareTo(pivot) <= 0) {
           i++;
         }
-        while(data[j].compareTo(pivot) >= 0 && j >= i) {
+        while (j >= i && data[j].compareTo(pivot) >= 0) {
           j--;
         }
-        if(i >= j) {
+        if (i >= j) {
           break;
         }
         swap(data, i, j);
@@ -393,13 +389,11 @@ public class QuickSelect {
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
+      if (rank < i) {
         end = i;
-      }
-      else if(rank > i) {
+      } else if (rank > i) {
         start = i + 1;
-      }
-      else {
+      } else {
         break;
       }
     } // Loop until rank==i
@@ -414,8 +408,8 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T extends Comparable<? super T>> void insertionSort(T[] data, int start, int end) {
-    for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && data[j - 1].compareTo(data[j]) > 0; j--) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start && data[j - 1].compareTo(data[j]) > 0; j--) {
         swap(data, j, j - 1);
       }
     }
@@ -536,10 +530,10 @@ public class QuickSelect {
    * @param rank rank position we are interested in (starting at 0)
    */
   public static <T extends Comparable<? super T>> void quickSelect(List<? extends T> data, int start, int end, int rank) {
-    while(true) {
+    while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
-      if(start + SMALL > end) {
+      if (start + SMALL > end) {
         insertionSort(data, start, end);
         return;
       }
@@ -547,13 +541,13 @@ public class QuickSelect {
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
       final int middle = (start + end) >> 1;
-      if(data.get(start).compareTo(data.get(middle)) > 0) {
+      if (data.get(start).compareTo(data.get(middle)) > 0) {
         swap(data, start, middle);
       }
-      if(data.get(start).compareTo(data.get(end - 1)) > 0) {
+      if (data.get(start).compareTo(data.get(end - 1)) > 0) {
         swap(data, start, end - 1);
       }
-      if(data.get(middle).compareTo(data.get(end - 1)) > 0) {
+      if (data.get(middle).compareTo(data.get(end - 1)) > 0) {
         swap(data, middle, end - 1);
       }
       // TODO: use more candidates for larger arrays?
@@ -566,14 +560,14 @@ public class QuickSelect {
       // Begin partitioning
       int i = start + 1, j = end - 3;
       // This is classic quicksort stuff
-      while(true) {
-        while(data.get(i).compareTo(pivot) <= 0 && i <= j) {
+      while (true) {
+        while (i <= j && data.get(i).compareTo(pivot) <= 0) {
           i++;
         }
-        while(data.get(j).compareTo(pivot) >= 0 && j >= i) {
+        while (j >= i && data.get(j).compareTo(pivot) >= 0) {
           j--;
         }
-        if(i >= j) {
+        if (i >= j) {
           break;
         }
         swap(data, i, j);
@@ -584,13 +578,11 @@ public class QuickSelect {
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
+      if (rank < i) {
         end = i;
-      }
-      else if(rank > i) {
+      } else if (rank > i) {
         start = i + 1;
-      }
-      else {
+      } else {
         break;
       }
     } // Loop until rank==i
@@ -605,8 +597,8 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T extends Comparable<? super T>> void insertionSort(List<T> data, int start, int end) {
-    for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && data.get(j - 1).compareTo(data.get(j)) > 0; j--) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start && data.get(j - 1).compareTo(data.get(j)) > 0; j--) {
         swap(data, j, j - 1);
       }
     }
@@ -731,10 +723,10 @@ public class QuickSelect {
    * @param rank rank position we are interested in (starting at 0)
    */
   public static <T> void quickSelect(List<? extends T> data, Comparator<? super T> comparator, int start, int end, int rank) {
-    while(true) {
+    while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
-      if(start + SMALL > end) {
+      if (start + SMALL > end) {
         insertionSort(data, comparator, start, end);
         return;
       }
@@ -742,13 +734,13 @@ public class QuickSelect {
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
       final int middle = (start + end) >> 1;
-      if(comparator.compare(data.get(start), data.get(middle)) > 0) {
+      if (comparator.compare(data.get(start), data.get(middle)) > 0) {
         swap(data, start, middle);
       }
-      if(comparator.compare(data.get(start), data.get(end - 1)) > 0) {
+      if (comparator.compare(data.get(start), data.get(end - 1)) > 0) {
         swap(data, start, end - 1);
       }
-      if(comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
+      if (comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
         swap(data, middle, end - 1);
       }
       // TODO: use more candidates for larger arrays?
@@ -761,14 +753,14 @@ public class QuickSelect {
       // Begin partitioning
       int i = start + 1, j = end - 3;
       // This is classic quicksort stuff
-      while(true) {
-        while(comparator.compare(data.get(i), pivot) <= 0 && i <= j) {
+      while (true) {
+        while (i <= j && comparator.compare(data.get(i), pivot) <= 0) {
           i++;
         }
-        while(comparator.compare(data.get(j), pivot) >= 0 && j >= i) {
+        while (j >= i && comparator.compare(data.get(j), pivot) >= 0) {
           j--;
         }
-        if(i >= j) {
+        if (i >= j) {
           break;
         }
         swap(data, i, j);
@@ -779,13 +771,11 @@ public class QuickSelect {
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
+      if (rank < i) {
         end = i;
-      }
-      else if(rank > i) {
+      } else if (rank > i) {
         start = i + 1;
-      }
-      else {
+      } else {
         break;
       }
     } // Loop until rank==i
@@ -800,8 +790,8 @@ public class QuickSelect {
    * @param end Interval end
    */
   private static <T> void insertionSort(List<T> data, Comparator<? super T> comparator, int start, int end) {
-    for(int i = start + 1; i < end; i++) {
-      for(int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start && comparator.compare(data.get(j - 1), data.get(j)) > 0; j--) {
         swap(data, j, j - 1);
       }
     }
@@ -908,10 +898,10 @@ public class QuickSelect {
    * @param rank rank position we are interested in (starting at 0)
    */
   public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end, int rank) {
-    while(true) {
+    while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
-      if(start + SMALL > end) {
+      if (start + SMALL > end) {
         insertionSort(data, comparator, start, end);
         return;
       }
@@ -919,13 +909,13 @@ public class QuickSelect {
       // Pick pivot from three candidates: start, middle, end
       // Since we compare them, we can also just "bubble sort" them.
       final int middle = (start + end) >> 1;
-      if(comparator.compare(data.get(start), data.get(middle)) > 0) {
+      if (comparator.compare(data.get(start), data.get(middle)) > 0) {
         data.swap(start, middle);
       }
-      if(comparator.compare(data.get(start), data.get(end - 1)) > 0) {
+      if (comparator.compare(data.get(start), data.get(end - 1)) > 0) {
         data.swap(start, end - 1);
       }
-      if(comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
+      if (comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
         data.swap(middle, end - 1);
       }
       // TODO: use more candidates for larger arrays?
@@ -941,16 +931,16 @@ public class QuickSelect {
       refi.seek(i);
       refj.seek(j);
       // This is classic quicksort stuff
-      while(true) {
-        while(comparator.compare(refi, pivot) <= 0 && i <= j) {
+      while (true) {
+        while (i <= j && comparator.compare(refi, pivot) <= 0) {
           i++;
           refi.advance();
         }
-        while(comparator.compare(refj, pivot) >= 0 && j >= i) {
+        while (j >= i && comparator.compare(refj, pivot) >= 0) {
           j--;
           refj.retract();
         }
-        if(i >= j) {
+        if (i >= j) {
           break;
         }
         data.swap(i, j);
@@ -961,13 +951,11 @@ public class QuickSelect {
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
-      if(rank < i) {
+      if (rank < i) {
         end = i;
-      }
-      else if(rank > i) {
+      } else if (rank > i) {
         start = i + 1;
-      }
-      else {
+      } else {
         break;
       }
     } // Loop until rank==i
@@ -982,11 +970,11 @@ public class QuickSelect {
    */
   private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end) {
     DBIDArrayIter iter1 = data.iter(), iter2 = data.iter();
-    for(int i = start + 1; i < end; i++) {
-      iter1.seek(i - 1);
-      iter2.seek(i);
-      for(int j = i; j > start; j--, iter1.retract(), iter2.retract()) {
-        if(comparator.compare(iter1, iter2) > 0) {
+    for (int i = start + 1; i < end; i++) {
+      for (int j = i; j > start; j--) {
+        iter1.seek(j - 1);
+        iter2.seek(j);
+        if (comparator.compare(iter1, iter2) <= 0) {
           break;
         }
         data.swap(j, j - 1);
