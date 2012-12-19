@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
@@ -62,6 +63,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * A simplified version of the original LOF algorithm, which does not use the
  * reachability distance, yielding less stable results on inliers.
  * 
+ * Reference:
+ * <p>
+ * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
+ * Local outlier detection reconsidered: a generalized view on locality with
+ * applications to spatial, video, and network outlier detection<br />
+ * In: Data Mining and Knowledge Discovery
+ * </p>
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.has KNNQuery
@@ -69,6 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  * @param <D> Distance type
  */
+@Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", title = "Local outlier detection reconsidered: a generalized view on locality with applications to spatial, video, and network outlier detection", booktitle = "Data Mining and Knowledge Discovery", url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
 public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
