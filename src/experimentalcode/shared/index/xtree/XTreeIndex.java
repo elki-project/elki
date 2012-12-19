@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
-public class XTreeIndex<O extends NumberVector<?>> extends XTree implements RangeIndex<O>, KNNIndex<O> {
+public class XTreeIndex<O extends NumberVector<?>> extends XTree implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   private static final Logging LOG = Logging.getLogger(XTreeIndex.class);
 
   private Relation<O> relation;
@@ -53,7 +54,6 @@ public class XTreeIndex<O extends NumberVector<?>> extends XTree implements Rang
   public XTreeIndex(Relation<O> relation, PageFile<XTreeNode> pagefile, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
     super(pagefile, relativeMinEntries, relativeMinFanout, max_overlap, overlap_type);
     this.relation = relation;
-    this.initialize();
   }
 
   protected SpatialEntry createNewLeafEntry(DBIDRef id) {
