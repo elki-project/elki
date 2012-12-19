@@ -1,4 +1,4 @@
-package experimentalcode.erich;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.kd;
 
 /*
  This file is part of ELKI:
@@ -39,6 +39,8 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -46,11 +48,14 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Simple implementation of a static in-memory K-D-tree. Does not support
- * dynamic updates or anything, but also is very simple.
+ * dynamic updates or anything, but also is very simple and memory efficient:
+ * all it uses is one {@link ArrayModifiableDBIDs} to sort the data in a
+ * serialized tree.
  * 
  * @author Erich Schubert
  * 
@@ -87,13 +92,21 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
     buildTree(0, sorted.size(), 0, comp);
   }
 
+  /**
+   * Recursively build the tree by partial sorting. O(n log n) complexity.
+   * Apparently there exists a variant in only O(n log log n)? Please
+   * contribute!
+   * 
+   * @param left Interval minimum
+   * @param right Interval maximum
+   * @param axis Current splitting axis
+   * @param comp Comparator
+   */
   private void buildTree(int left, int right, int axis, SortDBIDsBySingleDimension comp) {
     final int middle = (left + right) >>> 1;
     comp.setDimension(axis);
-    
-    // A QuickSelect should be sufficient, but aparently there is a bug somewhere.
-    // QuickSelect.quickSelect(sorted, comp, left, right, middle);
-    sorted.sort(left, right, comp);
+
+    QuickSelect.quickSelect(sorted, comp, left, right, middle);
     final int next = (axis + 1) % dims;
     if (left < middle) {
       buildTree(left, middle, next, comp);
@@ -119,6 +132,12 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
     DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
     // TODO: if we know this works for other distance functions, add them, too!
     if (df instanceof LPNormDistanceFunction) {
+      return (KNNQuery<O, D>) new KDTreeKNNQuery((DistanceQuery<O, DoubleDistance>) distanceQuery, (DoubleNorm<? super O>) df);
+    }
+    if (df instanceof SquaredEuclideanDistanceFunction) {
+      return (KNNQuery<O, D>) new KDTreeKNNQuery((DistanceQuery<O, DoubleDistance>) distanceQuery, (DoubleNorm<? super O>) df);
+    }
+    if (df instanceof SparseLPNormDistanceFunction) {
       return (KNNQuery<O, D>) new KDTreeKNNQuery((DistanceQuery<O, DoubleDistance>) distanceQuery, (DoubleNorm<? super O>) df);
     }
     return null;
