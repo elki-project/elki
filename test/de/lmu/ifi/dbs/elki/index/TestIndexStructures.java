@@ -59,7 +59,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.Ap
 import de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile;
 import de.lmu.ifi.dbs.elki.index.vafile.VAFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
