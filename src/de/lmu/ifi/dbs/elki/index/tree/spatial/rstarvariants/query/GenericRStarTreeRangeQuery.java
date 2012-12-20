@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -126,10 +125,5 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   @Override
   public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
     return doRangeQuery(obj, range);
-  }
-
-  @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
-    return getRangeForObject(relation.get(id), range);
   }
 }

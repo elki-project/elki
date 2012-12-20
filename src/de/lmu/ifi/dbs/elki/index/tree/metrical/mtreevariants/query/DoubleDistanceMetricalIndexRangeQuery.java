@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -126,10 +125,5 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
     doRangeQuery(null, index.getRoot(), obj, range.doubleValue(), result);
     result.sort();
     return result;
-  }
-
-  @Override
-  public DistanceDBIDResult<DoubleDistance> getRangeForDBID(DBIDRef id, DoubleDistance range) {
-    return getRangeForObject(relation.get(id), range);
   }
 }

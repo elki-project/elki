@@ -55,7 +55,9 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
   }
 
   @Override
-  abstract public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range);
+  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
+    return getRangeForObject(relation.get(id), range);
+  }
 
   @Override
   abstract public DistanceDBIDResult<D> getRangeForObject(O obj, D range);

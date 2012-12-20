@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
@@ -120,10 +119,5 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
     // sort the result according to the distances
     result.sort();
     return result;
-  }
-
-  @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
-    return getRangeForObject(relation.get(id), range);
   }
 }

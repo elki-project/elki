@@ -2,6 +2,7 @@ de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.flat.FlatRStarTreeFactory
 # de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTreeFactory
+de.lmu.ifi.dbs.elki.index.tree.spatial.kd.MinimalisticMemoryKDTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeFactory
 # de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCopTreeFactory
