@@ -1,14 +1,5 @@
 package de.lmu.ifi.dbs.elki.math;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Random;
-
-import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,8 +23,21 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class TestMathUtil implements JUnit4Test {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Random;
+
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+
+/**
+ * Unit test for some basic math functions.
+ * 
+ * @author Erich Schubert
+ */
+public class TestMathUtil implements JUnit4Test {
   @Test
   public void testPearsonCorrelation() {
     final int size = 1000;

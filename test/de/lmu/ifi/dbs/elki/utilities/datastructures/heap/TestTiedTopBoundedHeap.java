@@ -46,8 +46,8 @@ public class TestTiedTopBoundedHeap {
     Integer[] data = { 5, 3, 4, 2, 7, 1, 9, 8, 10, 6, 5 };
     Integer[] asc = { 5, 5, 6, 7, 8, 9, 10 };
     Integer[] desc = { 5, 5, 4, 3, 2, 1 };
-    Heap<Integer> hasc = new TiedTopBoundedHeap<Integer>(asc.length - 1);
-    Heap<Integer> hdesc = new TiedTopBoundedHeap<Integer>(desc.length - 1, Collections.reverseOrder());
+    Heap<Integer> hasc = new TiedTopBoundedHeap<>(asc.length - 1);
+    Heap<Integer> hdesc = new TiedTopBoundedHeap<>(desc.length - 1, Collections.reverseOrder());
     for(Integer i : data) {
       hasc.add(i);
       hdesc.add(i);
@@ -70,11 +70,11 @@ public class TestTiedTopBoundedHeap {
    */
   @Test
   public void testTiedTopBoundedHeapTrival() {
-    Heap<Integer> heap1 = new TiedTopBoundedHeap<Integer>(1);
-    Heap<Integer> heap2 = new TiedTopBoundedHeap<Integer>(1);
-    Heap<Integer> heap3 = new TiedTopBoundedHeap<Integer>(1);
-    Heap<Integer> heap4 = new TiedTopBoundedHeap<Integer>(1);
-    Heap<Integer> heap5 = new TiedTopBoundedHeap<Integer>(1);
+    Heap<Integer> heap1 = new TiedTopBoundedHeap<>(1);
+    Heap<Integer> heap2 = new TiedTopBoundedHeap<>(1);
+    Heap<Integer> heap3 = new TiedTopBoundedHeap<>(1);
+    Heap<Integer> heap4 = new TiedTopBoundedHeap<>(1);
+    Heap<Integer> heap5 = new TiedTopBoundedHeap<>(1);
     heap2.add(2);
     heap4.add(0);
     for(int i = 0; i < 10; i++) {

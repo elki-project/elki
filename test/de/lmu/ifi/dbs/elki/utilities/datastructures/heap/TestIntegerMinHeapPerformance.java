@@ -41,7 +41,7 @@ import org.junit.Test;
  * 
  * @author Erich Schubert
  */
-public class TestHeapPerformance {
+public class TestIntegerMinHeapPerformance {
   final private int queueSize = 100000;
 
   final private int iterations = 20;
@@ -63,7 +63,7 @@ public class TestHeapPerformance {
     // Pretest, to trigger hotspot compiler, hopefully.
     {
       for(int j = 0; j < iterations; j++) {
-        Heap<Integer> pq = new Heap<>();
+        IntegerMinHeap pq = new IntegerMinHeap();
         testHeap(elements, pq);
       }
       for(int j = 0; j < iterations; j++) {
@@ -75,7 +75,7 @@ public class TestHeapPerformance {
     long hstart = System.nanoTime();
     {
       for(int j = 0; j < iterations; j++) {
-        Heap<Integer> pq = new Heap<>();
+        IntegerMinHeap pq = new IntegerMinHeap();
         testHeap(elements, pq);
       }
     }
@@ -94,7 +94,7 @@ public class TestHeapPerformance {
     // 1.05 allows some difference in measuring
   }
 
-  private void testHeap(final List<Integer> elements, Heap<Integer> pq) {
+  private void testHeap(final List<Integer> elements, IntegerMinHeap pq) {
     // Insert all
     for(int i = 0; i < elements.size(); i++) {
       pq.add(elements.get(i));

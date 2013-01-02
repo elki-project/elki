@@ -54,16 +54,16 @@ public class TestComputeROC implements JUnit4Test {
     positive.add(DBIDUtil.importInteger(4));
     positive.add(DBIDUtil.importInteger(5));
 
-    ArrayList<Pair<Double, DBID>> distances = new ArrayList<Pair<Double, DBID>>();
-    distances.add(new Pair<Double, DBID>(0.0, DBIDUtil.importInteger(1)));
-    distances.add(new Pair<Double, DBID>(1.0, DBIDUtil.importInteger(2)));
-    distances.add(new Pair<Double, DBID>(2.0, DBIDUtil.importInteger(6)));
-    distances.add(new Pair<Double, DBID>(3.0, DBIDUtil.importInteger(7)));
-    distances.add(new Pair<Double, DBID>(3.0, DBIDUtil.importInteger(3)));
-    distances.add(new Pair<Double, DBID>(4.0, DBIDUtil.importInteger(8)));
-    distances.add(new Pair<Double, DBID>(4.0, DBIDUtil.importInteger(4)));
-    distances.add(new Pair<Double, DBID>(5.0, DBIDUtil.importInteger(9)));
-    distances.add(new Pair<Double, DBID>(6.0, DBIDUtil.importInteger(5)));
+    ArrayList<Pair<Double, DBID>> distances = new ArrayList<>();
+    distances.add(new Pair<>(0.0, DBIDUtil.importInteger(1)));
+    distances.add(new Pair<>(1.0, DBIDUtil.importInteger(2)));
+    distances.add(new Pair<>(2.0, DBIDUtil.importInteger(6)));
+    distances.add(new Pair<>(3.0, DBIDUtil.importInteger(7)));
+    distances.add(new Pair<>(3.0, DBIDUtil.importInteger(3)));
+    distances.add(new Pair<>(4.0, DBIDUtil.importInteger(8)));
+    distances.add(new Pair<>(4.0, DBIDUtil.importInteger(4)));
+    distances.add(new Pair<>(5.0, DBIDUtil.importInteger(9)));
+    distances.add(new Pair<>(6.0, DBIDUtil.importInteger(5)));
 
     XYCurve roccurve = ROC.materializeROC(9, positive, distances.iterator());
     System.out.println(roccurve);

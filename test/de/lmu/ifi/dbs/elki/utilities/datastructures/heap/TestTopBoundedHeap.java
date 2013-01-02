@@ -46,8 +46,8 @@ public class TestTopBoundedHeap {
     Integer[] data = { 5, 3, 4, 2, 7, 1, 9, 8, 10, 6 };
     Integer[] asc = { 5, 6, 7, 8, 9, 10 };
     Integer[] desc = { 6, 5, 4, 3, 2, 1 };
-    Heap<Integer> hasc = new TopBoundedHeap<Integer>(asc.length);
-    Heap<Integer> hdesc = new TopBoundedHeap<Integer>(desc.length, Collections.reverseOrder());
+    Heap<Integer> hasc = new TopBoundedHeap<>(asc.length);
+    Heap<Integer> hdesc = new TopBoundedHeap<>(desc.length, Collections.reverseOrder());
     for(Integer i : data) {
       hasc.add(i);
       hdesc.add(i);

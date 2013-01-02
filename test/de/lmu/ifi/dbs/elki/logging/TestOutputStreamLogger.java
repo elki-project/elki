@@ -57,5 +57,6 @@ public class TestOutputStreamLogger implements JUnit4Test {
     wri.write("Test.");
     String should = "Test." + OutputStreamLogger.NEWLINE + "\r123\r   \r23\r  \r3" + OutputStreamLogger.NEWLINE + "Test.";
     assertEquals("Output doesn't match requirements.", should, buf.toString());
+    wri.close();
   }
 }

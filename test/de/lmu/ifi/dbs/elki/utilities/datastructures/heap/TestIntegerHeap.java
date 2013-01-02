@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
  * 
  * @author Erich Schubert
  */
-public class TestHeap {
+public class TestIntegerHeap {
   /**
    * Puts 10 integers into both an ascending and a descending heap and verifies
    * they come out in sequence.
@@ -46,11 +46,11 @@ public class TestHeap {
   @Test
   public void testHeap() {
     int dup = 2;
-    Integer[] data = { 5, 3, 4, 2, 7, 1, 9, 8, 10, 6 };
-    Integer[] asc = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-    Integer[] desc = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
-    Heap<Integer> hasc = new Heap<>(null);
-    Heap<Integer> hdesc = new Heap<>(Collections.reverseOrder());
+    int[] data = { 5, 3, 4, 2, 7, 1, 9, 8, 10, 6 };
+    int[] asc = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    int[] desc = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+    IntegerMinHeap hasc = new IntegerMinHeap();
+    IntegerMaxHeap hdesc = new IntegerMaxHeap();
     for(Integer i : data) {
       for(int j = 0; j < dup; j++) {
         hasc.add(i);
@@ -60,14 +60,14 @@ public class TestHeap {
     // Empty
     for(int i = 0; i < asc.length; i++) {
       for(int j = 0; j < dup; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
     // Refill
-    for(Integer i : data) {
+    for(int i : data) {
       for(int j = 0; j < dup; j++) {
         hasc.add(i);
         hdesc.add(i);
@@ -76,9 +76,9 @@ public class TestHeap {
     // Empty halfway
     for(int i = 0; i < 5; i++) {
       for(int j = 0; j < dup; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
@@ -92,9 +92,9 @@ public class TestHeap {
     // Empty again
     for(int i = 0; i < asc.length; i++) {
       for(int j = 0; j < dup; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
@@ -108,9 +108,9 @@ public class TestHeap {
     // Empty halfway
     for(int i = 0; i < 5; i++) {
       for(int j = 0; j < dup; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
@@ -124,9 +124,9 @@ public class TestHeap {
     // Empty again
     for(int i = 0; i < asc.length; i++) {
       for(int j = 0; j < dup; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
@@ -141,9 +141,9 @@ public class TestHeap {
     // Empty halfway
     for(int i = 0; i < 3; i++) {
       for(int j = 0; j < dup << 1; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
@@ -159,10 +159,10 @@ public class TestHeap {
     for(int i = 3; i < asc.length; i++) {
       int f = (i < (asc.length >> 1)) ? 2 : 1;
       for(int j = 0; j < dup * f; j++) {
-        final Integer gota = hasc.poll();
+        final int gota = hasc.poll();
         //System.err.println(hasc.toString() + " " + hasc.validSize);
         assertEquals("Objects sorted incorrectly at ascending position " + i, asc[i], gota);
-        final Integer gotd = hdesc.poll();
+        final int gotd = hdesc.poll();
         assertEquals("Objects sorted incorrectly at descending position " + i, desc[i], gotd);
       }
     }
