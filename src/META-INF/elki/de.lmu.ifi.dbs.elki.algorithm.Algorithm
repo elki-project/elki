@@ -1,4 +1,5 @@
 de.lmu.ifi.dbs.elki.algorithm.NullAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.clustering.CanopyPreClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.clustering.EM
