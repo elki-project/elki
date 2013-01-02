@@ -142,7 +142,6 @@ public class ParallelMapExecutor {
 
     @Override
     public ArrayDBIDs call() {
-      System.err.println("mapper at " + start + " step=" + step + " started.");
       DBIDArrayIter iter = ids.iter();
       iter.seek(start);
       for (; iter.valid() && iter.getOffset() < end; iter.advance(step)) {
@@ -152,7 +151,9 @@ public class ParallelMapExecutor {
         // This is a good moment for multitasking
         Thread.yield();
       }
-      System.err.println("mapper at " + start + " step=" + step + " finished.");
+      for (int i = 0; i < mapper.length; i++) {
+        mapper[i].cleanup();
+      }
       return ids;
     }
 
@@ -174,7 +175,7 @@ public class ParallelMapExecutor {
   }
 
   /**
-   * Run for an array aprt, without step size.
+   * Run for an array part, without step size.
    * 
    * @author Erich Schubert
    * 
@@ -235,6 +236,9 @@ public class ParallelMapExecutor {
         }
         // This is a good moment for multitasking
         Thread.yield();
+      }
+      for (int i = 0; i < mapper.length; i++) {
+        mapper[i].cleanup();
       }
       return ids;
     }
