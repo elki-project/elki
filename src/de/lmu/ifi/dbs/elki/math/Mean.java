@@ -53,14 +53,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "B. P. Welford", title = "Note on a method for calculating corrected sums of squares and products", booktitle = "Technometrics 4(3)")
 public class Mean {
   /**
-   * Mean of values
+   * Mean of values - first moment.
    */
-  protected double mean = 0.0;
+  protected double m1 = 0.0;
 
   /**
-   * Weight sum (number of samples)
+   * Weight sum (number of samples).
    */
-  protected double wsum = 0;
+  protected double n = 0;
 
   /**
    * Empty constructor
@@ -75,8 +75,8 @@ public class Mean {
    * @param other other instance to copy data from.
    */
   public Mean(Mean other) {
-    this.mean = other.mean;
-    this.wsum = other.wsum;
+    this.m1 = other.m1;
+    this.n = other.n;
   }
 
   /**
@@ -85,9 +85,9 @@ public class Mean {
    * @param val Value
    */
   public void put(double val) {
-    wsum += 1.0;
-    final double delta = val - mean;
-    mean += delta / wsum;
+    n += 1.0;
+    final double delta = val - m1;
+    m1 += delta / n;
   }
 
   /**
@@ -100,11 +100,11 @@ public class Mean {
    * @param weight weight
    */
   public void put(double val, double weight) {
-    final double nwsum = weight + wsum;
-    final double delta = val - mean;
+    final double nwsum = weight + n;
+    final double delta = val - m1;
     final double rval = delta * weight / nwsum;
-    mean += rval;
-    wsum = nwsum;
+    m1 += rval;
+    n = nwsum;
   }
 
   /**
@@ -113,12 +113,12 @@ public class Mean {
    * @param other Data to join with
    */
   public void put(Mean other) {
-    final double nwsum = other.wsum + this.wsum;
+    final double nwsum = other.n + this.n;
 
     // this.mean += rval;
     // This supposedly is more numerically stable:
-    this.mean = (this.wsum * this.mean + other.wsum * other.mean) / nwsum;
-    this.wsum = nwsum;
+    this.m1 = (this.n * this.m1 + other.n * other.m1) / nwsum;
+    this.n = nwsum;
   }
 
   /**
@@ -127,7 +127,7 @@ public class Mean {
    * @return number of data points
    */
   public double getCount() {
-    return wsum;
+    return n;
   }
 
   /**
@@ -136,7 +136,7 @@ public class Mean {
    * @return mean
    */
   public double getMean() {
-    return mean;
+    return m1;
   }
 
   /**
@@ -162,7 +162,7 @@ public class Mean {
    * Reset the value.
    */
   public void reset() {
-    mean = 0;
-    wsum = 0;
+    m1 = 0;
+    n = 0;
   }
 }

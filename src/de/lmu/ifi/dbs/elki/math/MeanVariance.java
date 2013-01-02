@@ -62,7 +62,7 @@ public class MeanVariance extends Mean {
   /**
    * nVariance
    */
-  protected double nvar = 0.0;
+  protected double m2 = 0.0;
 
   /**
    * Empty constructor
@@ -77,9 +77,9 @@ public class MeanVariance extends Mean {
    * @param other other instance to copy data from.
    */
   public MeanVariance(MeanVariance other) {
-    this.mean = other.mean;
-    this.nvar = other.nvar;
-    this.wsum = other.wsum;
+    this.m1 = other.m1;
+    this.m2 = other.m2;
+    this.n = other.n;
   }
 
   /**
@@ -89,11 +89,11 @@ public class MeanVariance extends Mean {
    */
   @Override
   public void put(double val) {
-    wsum += 1.0;
-    final double delta = val - mean;
-    mean += delta / wsum;
+    n += 1.0;
+    final double delta = val - m1;
+    m1 += delta / n;
     // The next line needs the *new* mean!
-    nvar += delta * (val - mean);
+    m2 += delta * (val - m1);
   }
 
   /**
@@ -106,14 +106,15 @@ public class MeanVariance extends Mean {
    * @param weight weight
    */
   @Override
+  @Reference(authors = "D.H.D. West", title = "Updating Mean and Variance Estimates: An Improved Method", booktitle = "Communications of the ACM, Volume 22 Issue 9")
   public void put(double val, double weight) {
-    final double nwsum = weight + wsum;
-    final double delta = val - mean;
+    final double nwsum = weight + n;
+    final double delta = val - m1;
     final double rval = delta * weight / nwsum;
-    mean += rval;
+    m1 += rval;
     // Use old and new weight sum here:
-    nvar += wsum * delta * rval;
-    wsum = nwsum;
+    m2 += n * delta * rval;
+    n = nwsum;
   }
 
   /**
@@ -123,18 +124,17 @@ public class MeanVariance extends Mean {
    */
   @Override
   public void put(Mean other) {
-    if(other instanceof MeanVariance) {
-      final double nwsum = other.wsum + this.wsum;
-      final double delta = other.mean - this.mean;
-      final double rval = delta * other.wsum / nwsum;
+    if (other instanceof MeanVariance) {
+      final double nwsum = other.n + this.n;
+      final double delta = other.m1 - this.m1;
+      final double rval = delta * other.n / nwsum;
 
       // this.mean += rval;
       // This supposedly is more numerically stable:
-      this.mean = (this.wsum * this.mean + other.wsum * other.mean) / nwsum;
-      this.nvar += ((MeanVariance) other).nvar + delta * this.wsum * rval;
-      this.wsum = nwsum;
-    }
-    else {
+      this.m1 = (this.n * this.m1 + other.n * other.m1) / nwsum;
+      this.m2 += ((MeanVariance) other).m2 + delta * this.n * rval;
+      this.n = nwsum;
+    } else {
       throw new AbortException("I cannot combine Mean and MeanVariance to a MeanVariance.");
     }
   }
@@ -146,7 +146,7 @@ public class MeanVariance extends Mean {
    */
   @Override
   public double getCount() {
-    return wsum;
+    return n;
   }
 
   /**
@@ -156,7 +156,7 @@ public class MeanVariance extends Mean {
    */
   @Override
   public double getMean() {
-    return mean;
+    return m1;
   }
 
   /**
@@ -167,7 +167,7 @@ public class MeanVariance extends Mean {
    * @return variance
    */
   public double getNaiveVariance() {
-    return nvar / wsum;
+    return m2 / n;
   }
 
   /**
@@ -176,8 +176,8 @@ public class MeanVariance extends Mean {
    * @return sample variance
    */
   public double getSampleVariance() {
-    assert (wsum > 1) : "Cannot compute a reasonable sample variance with weight <= 1.0!";
-    return nvar / (wsum - 1);
+    assert (n > 1.) : "Cannot compute a reasonable sample variance with weight <= 1.0!";
+    return m2 / (n - 1);
   }
 
   /**
@@ -230,7 +230,7 @@ public class MeanVariance extends Mean {
    */
   public static MeanVariance[] newArray(int dimensionality) {
     MeanVariance[] arr = new MeanVariance[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
+    for (int i = 0; i < dimensionality; i++) {
       arr[i] = new MeanVariance();
     }
     return arr;
@@ -244,6 +244,6 @@ public class MeanVariance extends Mean {
   @Override
   public void reset() {
     super.reset();
-    nvar = 0;
+    m2 = 0;
   }
 }
