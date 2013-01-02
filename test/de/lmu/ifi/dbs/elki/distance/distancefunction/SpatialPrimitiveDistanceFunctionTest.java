@@ -59,7 +59,7 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     final int dim = 7;
     final int iters = 10000;
 
-    List<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>> dists = new ArrayList<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>>();
+    List<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>> dists = new ArrayList<>();
     dists.add(EuclideanDistanceFunction.STATIC);
     dists.add(ManhattanDistanceFunction.STATIC);
     dists.add(MaximumDistanceFunction.STATIC);
@@ -105,7 +105,7 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     final int dim = 7;
     final int iters = 10000;
 
-    List<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>> dists = new ArrayList<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>>();
+    List<SpatialPrimitiveDistanceFunction<? super NumberVector<?>, ?>> dists = new ArrayList<>();
     dists.add(EuclideanDistanceFunction.STATIC);
     dists.add(ManhattanDistanceFunction.STATIC);
     dists.add(MaximumDistanceFunction.STATIC);

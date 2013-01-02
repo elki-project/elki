@@ -110,14 +110,14 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     assertEquals("Data set size doesn't match parameters.", shoulds, rep.size());
 
     // get linear queries
-    LinearScanKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanKNNQuery<DoubleVector, DoubleDistance>(distanceQuery);
-    LinearScanRKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query = new LinearScanRKNNQuery<DoubleVector, DoubleDistance>(distanceQuery, lin_knn_query, k);
+    LinearScanKNNQuery<DoubleVector, DoubleDistance> lin_knn_query = new LinearScanKNNQuery<>(distanceQuery);
+    LinearScanRKNNQuery<DoubleVector, DoubleDistance> lin_rknn_query = new LinearScanRKNNQuery<>(distanceQuery, lin_knn_query, k);
 
     // get preprocessed queries
     ListParameterization config = new ListParameterization();
     config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
     config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
-    MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance> preproc = new MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance>(rep, distanceQuery.getDistanceFunction(), k);
+    MaterializeKNNAndRKNNPreprocessor<DoubleVector, DoubleDistance> preproc = new MaterializeKNNAndRKNNPreprocessor<>(rep, distanceQuery.getDistanceFunction(), k);
     KNNQuery<DoubleVector, DoubleDistance> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     RKNNQuery<DoubleVector, DoubleDistance> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
@@ -132,7 +132,7 @@ public class TestMaterializedKNNAndRKNNPreprocessor implements JUnit4Test {
     testKNNQueries(rep, lin_knn_query, preproc_knn_query, k / 2);
 
     // insert new objects
-    List<DoubleVector> insertions = new ArrayList<DoubleVector>();
+    List<DoubleVector> insertions = new ArrayList<>();
     NumberVector.Factory<DoubleVector, ?> o = RelationUtil.getNumberVectorFactory(rep);
     int dim = RelationUtil.dimensionality(rep);
     Random random = new Random(seed);

@@ -38,21 +38,21 @@ public class TestPolygon implements JUnit4Test {
   public void testPolygonContainment() {
     final Polygon p1, p2, p3;
     {
-      List<Vector> v1 = new ArrayList<Vector>();
+      List<Vector> v1 = new ArrayList<>();
       v1.add(new Vector(0, 0));
       v1.add(new Vector(.9, 0));
       v1.add(new Vector(0, .9));
       p1 = new Polygon(v1);
     }
     {
-      List<Vector> v2 = new ArrayList<Vector>();
+      List<Vector> v2 = new ArrayList<>();
       v2.add(new Vector(1, 1));
       v2.add(new Vector(1, .1));
       v2.add(new Vector(.1, 1));
       p2 = new Polygon(v2);
     }
     {
-      List<Vector> v3 = new ArrayList<Vector>();
+      List<Vector> v3 = new ArrayList<>();
       v3.add(new Vector(.1, .1));
       v3.add(new Vector(.1, .9));
       v3.add(new Vector(.9, .9));

@@ -99,7 +99,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.INPUT_ID, filename);
 
-    List<Class<?>> filterlist = new ArrayList<Class<?>>();
+    List<Class<?>> filterlist = new ArrayList<>();
     filterlist.add(FixedDBIDsFilter.class);
     if(filters != null) {
       for(Class<?> filter : filters) {
@@ -170,7 +170,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param expected Expected cluster sizes
    */
   protected void testClusterSizes(Clustering<?> clustering, int[] expected) {
-    List<Integer> sizes = new java.util.ArrayList<Integer>();
+    List<Integer> sizes = new java.util.ArrayList<>();
     for(Cluster<?> cl : clustering.getAllClusters()) {
       sizes.add(cl.size());
     }

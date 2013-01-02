@@ -40,15 +40,15 @@ public class TestUpdatableHeap implements JUnit4Test {
     final int maxid = 5000;
     final int bsize = 100;
     final Random r = new Random(1);
-    ArrayList<IntegerPriorityObject<Integer>> simulate = new ArrayList<IntegerPriorityObject<Integer>>(1000);
-    UpdatableHeap<IntegerPriorityObject<Integer>> heap = new UpdatableHeap<IntegerPriorityObject<Integer>>();
+    ArrayList<IntegerPriorityObject<Integer>> simulate = new ArrayList<>(1000);
+    UpdatableHeap<IntegerPriorityObject<Integer>> heap = new UpdatableHeap<>();
     for(int i = 0; i < iters; i++) {
       int batchsize = r.nextInt(bsize);
       for(int j = 0; j < batchsize; j++) {
         int id = r.nextInt(maxid);
         int score = r.nextInt(10000);
         // Update heap
-        heap.add(new IntegerPriorityObject<Integer>(score, id));
+        heap.add(new IntegerPriorityObject<>(score, id));
         // Update simulation
         boolean found = false;
         for(IntegerPriorityObject<Integer> ent : simulate) {
@@ -62,7 +62,7 @@ public class TestUpdatableHeap implements JUnit4Test {
           }
         }
         if(!found) {
-          simulate.add(new IntegerPriorityObject<Integer>(score, id));
+          simulate.add(new IntegerPriorityObject<>(score, id));
         }
       }
       // Keeping the simulation list reverse is a bit faster for removal

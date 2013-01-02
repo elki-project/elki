@@ -99,7 +99,7 @@ public class TestOnlineLOF implements JUnit4Test {
     UpdatableDatabase db = getDatabase();
 
     // 1. Run LOF
-    LOF<DoubleVector, DoubleDistance> lof = new LOF<DoubleVector, DoubleDistance>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+    LOF<DoubleVector, DoubleDistance> lof = new LOF<>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
     OutlierResult result1 = lof.run(db);
 
     // 2. Run OnlineLOF (with insertions and removals) on database
@@ -124,13 +124,13 @@ public class TestOnlineLOF implements JUnit4Test {
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // setup algorithm
-    OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<DoubleVector, DoubleDistance>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
+    OnlineLOF<DoubleVector, DoubleDistance> lof = new OnlineLOF<>(k, neighborhoodDistanceFunction, reachabilityDistanceFunction);
 
     // run OnlineLOF on database
     OutlierResult result = lof.run(db);
 
     // insert new objects
-    ArrayList<DoubleVector> insertions = new ArrayList<DoubleVector>();
+    ArrayList<DoubleVector> insertions = new ArrayList<>();
     NumberVector.Factory<DoubleVector, ?> o = RelationUtil.getNumberVectorFactory(rep);
     int dim = RelationUtil.dimensionality(rep);
     Random random = new Random(seed);

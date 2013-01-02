@@ -42,14 +42,14 @@ public class TestTiedTopBoundedUpdatableHeap implements JUnit4Test {
     final int bsize = 1000;
     final int limit = 200;
     final Random r = new Random(1);
-    ArrayList<IntegerPriorityObject<Integer>> simulate = new ArrayList<IntegerPriorityObject<Integer>>(1000);
-    TiedTopBoundedUpdatableHeap<IntegerPriorityObject<Integer>> heap = new TiedTopBoundedUpdatableHeap<IntegerPriorityObject<Integer>>(limit);
+    ArrayList<IntegerPriorityObject<Integer>> simulate = new ArrayList<>(1000);
+    TiedTopBoundedUpdatableHeap<IntegerPriorityObject<Integer>> heap = new TiedTopBoundedUpdatableHeap<>(limit);
     for(int i = 0; i < iters; i++) {
       int batchsize = r.nextInt(bsize);
       for(int j = 0; j < batchsize; j++) {
         int id = r.nextInt(maxid);
         int score = r.nextInt(10000);
-        IntegerPriorityObject<Integer> nobj = new IntegerPriorityObject<Integer>(score, id);
+        IntegerPriorityObject<Integer> nobj = new IntegerPriorityObject<>(score, id);
         // Update heap
         heap.add(nobj);
         // Enabling the followig assertion *hides* certain problems!
