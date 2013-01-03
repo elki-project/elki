@@ -36,11 +36,11 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  * @author Erich Schubert
  */
-public class TestDoubleObjHeaps implements JUnit4Test {
+public class TestDoubleObjectHeaps implements JUnit4Test {
   @Test
   public void testDoubleObjMinHeap() {
     Random r = new Random();
-    DoubleObjMinHeap<Double> heap = new DoubleObjMinHeap<>();
+    DoubleObjectMinHeap<Double> heap = new DoubleObjectMinHeap<>();
     for(int i = 0; i < 1000; i++) {
       double key = r.nextDouble();
       heap.add(key, key);
@@ -66,7 +66,7 @@ public class TestDoubleObjHeaps implements JUnit4Test {
   @Test
   public void testDoubleObjMaxHeap() {
     Random r = new Random();
-    DoubleObjMaxHeap<Double> heap = new DoubleObjMaxHeap<>();
+    DoubleObjectMaxHeap<Double> heap = new DoubleObjectMaxHeap<>();
     for(int i = 0; i < 1000; i++) {
       double key = r.nextDouble();
       heap.add(key, key);
