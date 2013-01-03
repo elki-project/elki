@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution$NaiveEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution$ChoiWetteEstimator

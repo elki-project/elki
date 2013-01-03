@@ -26,6 +26,9 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Gaussian distribution aka normal distribution
@@ -33,6 +36,11 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @author Erich Schubert
  */
 public class NormalDistribution implements DistributionWithRandom {
+  /**
+   * Static estimator class.
+   */
+  public static NaiveEstimator NAIVE_ESTIMATOR = new NaiveEstimator();
+
   /**
    * Coefficients for erf approximation.
    * 
@@ -194,28 +202,28 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return erfc(x)
    */
   public static double erfc(double x) {
-    if(Double.isNaN(x)) {
+    if (Double.isNaN(x)) {
       return Double.NaN;
     }
-    if(Double.isInfinite(x)) {
+    if (Double.isInfinite(x)) {
       return (x < 0.0) ? 2 : 0;
     }
 
     double result = Double.NaN;
     double absx = Math.abs(x);
     // First approximation interval
-    if(absx < 0.46875) {
+    if (absx < 0.46875) {
       double z = x * x;
       result = 1 - x * ((((ERFAPP_A[0] * z + ERFAPP_A[1]) * z + ERFAPP_A[2]) * z + ERFAPP_A[3]) * z + ERFAPP_A[4]) / ((((ERFAPP_B[0] * z + ERFAPP_B[1]) * z + ERFAPP_B[2]) * z + ERFAPP_B[3]) * z + ERFAPP_B[4]);
     }
     // Second approximation interval
-    else if(absx < 4.0) {
+    else if (absx < 4.0) {
       double z = absx;
       result = ((((((((ERFAPP_C[0] * z + ERFAPP_C[1]) * z + ERFAPP_C[2]) * z + ERFAPP_C[3]) * z + ERFAPP_C[4]) * z + ERFAPP_C[5]) * z + ERFAPP_C[6]) * z + ERFAPP_C[7]) * z + ERFAPP_C[8]) / ((((((((ERFAPP_D[0] * z + ERFAPP_D[1]) * z + ERFAPP_D[2]) * z + ERFAPP_D[3]) * z + ERFAPP_D[4]) * z + ERFAPP_D[5]) * z + ERFAPP_D[6]) * z + ERFAPP_D[7]) * z + ERFAPP_D[8]);
       double rounded = Math.round(result * 16.0) / 16.0;
       double del = (absx - rounded) * (absx + rounded);
       result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if(x < 0.0) {
+      if (x < 0.0) {
         result = 2.0 - result;
       }
     }
@@ -227,7 +235,7 @@ public class NormalDistribution implements DistributionWithRandom {
       double rounded = Math.round(result * 16.0) / 16.0;
       double del = (absx - rounded) * (absx + rounded);
       result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if(x < 0.0) {
+      if (x < 0.0) {
         result = 2.0 - result;
       }
     }
@@ -273,26 +281,21 @@ public class NormalDistribution implements DistributionWithRandom {
    * @return Inverse erf.
    */
   public static double standardNormalQuantile(double d) {
-    if(d == 0) {
+    if (d == 0) {
       return Double.NEGATIVE_INFINITY;
-    }
-    else if(d == 1) {
+    } else if (d == 1) {
       return Double.POSITIVE_INFINITY;
-    }
-    else if(Double.isNaN(d) || d < 0 || d > 1) {
+    } else if (Double.isNaN(d) || d < 0 || d > 1) {
       return Double.NaN;
-    }
-    else if(d < P_LOW) {
+    } else if (d < P_LOW) {
       // Rational approximation for lower region:
       double q = Math.sqrt(-2 * Math.log(d));
       return (((((ERFINV_C[0] * q + ERFINV_C[1]) * q + ERFINV_C[2]) * q + ERFINV_C[3]) * q + ERFINV_C[4]) * q + ERFINV_C[5]) / ((((ERFINV_D[0] * q + ERFINV_D[1]) * q + ERFINV_D[2]) * q + ERFINV_D[3]) * q + 1);
-    }
-    else if(P_HIGH < d) {
+    } else if (P_HIGH < d) {
       // Rational approximation for upper region:
       double q = Math.sqrt(-2 * Math.log(1 - d));
       return -(((((ERFINV_C[0] * q + ERFINV_C[1]) * q + ERFINV_C[2]) * q + ERFINV_C[3]) * q + ERFINV_C[4]) * q + ERFINV_C[5]) / ((((ERFINV_D[0] * q + ERFINV_D[1]) * q + ERFINV_D[2]) * q + ERFINV_D[3]) * q + 1);
-    }
-    else {
+    } else {
       // Rational approximation for central region:
       double q = d - 0.5D;
       double r = q * q;
@@ -342,4 +345,61 @@ public class NormalDistribution implements DistributionWithRandom {
   public static double quantile(double x, double mu, double sigma) {
     return mu + sigma * standardNormalQuantile(x);
   }
+
+  /**
+   * Naive distribution estimation using mean and sample variance.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has NormalDistribution - - estimates
+   */
+  public static class NaiveEstimator implements DistributionEstimator<NormalDistribution> {
+    /**
+     * Private constructor, use static instance!
+     */
+    private NaiveEstimator() {
+      // Do not instantiate
+    }
+
+    @Override
+    public <A> NormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      MeanVariance mv = new MeanVariance();
+      int size = adapter.size(data);
+      for (int i = 0; i < size; i++) {
+        mv.put(adapter.getDouble(data, i));
+      }
+      return estimate(mv);
+    }
+
+    /**
+     * Estimate parameters from a
+     * 
+     * @param mv Mean and Variance
+     * @return Distribution
+     */
+    public NormalDistribution estimate(MeanVariance mv) {
+      return new NormalDistribution(mv.getMean(), mv.getSampleStddev());
+    }
+
+    @Override
+    public Class<? super NormalDistribution> getDistributionClass() {
+      return NormalDistribution.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected NaiveEstimator makeInstance() {
+        return NAIVE_ESTIMATOR;
+      }
+    }
+  }
+
+  // TODO: add levenberg-marquard fitting.
 }

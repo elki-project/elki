@@ -29,6 +29,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
  * Unit test for the Gamma distribution in ELKI.
@@ -1297,7 +1298,7 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
     for(int i = 0; i < data.length; i++) {
       data[i] = g.nextRandom();
     }
-    GammaDistribution g2 = GammaDistribution.estimate(data);
+    GammaDistribution g2 = GammaDistribution.CHOI_WETTE_ESTIMATOR.estimate(data, ArrayLikeUtil.DOUBLEARRAYADAPTER);
     assertEquals("k does not match.", g.getK(), g2.getK(), 1E-2);
     assertEquals("theta does not match.", g.getTheta(), g2.getTheta(), 1E-5);
   }
