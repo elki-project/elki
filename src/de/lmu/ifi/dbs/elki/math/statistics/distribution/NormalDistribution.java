@@ -27,6 +27,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -35,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
+@Alias({ "GaussianDistribution", "normal", "gauss" })
 public class NormalDistribution implements DistributionWithRandom {
   /**
    * Static estimator class.
@@ -266,6 +268,75 @@ public class NormalDistribution implements DistributionWithRandom {
   }
 
   /**
+   * Probability density function of the normal distribution.
+   * 
+   * <pre>
+   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
+   * </pre>
+   * 
+   * @param x The value.
+   * @param mu The mean.
+   * @param sigma The standard deviation.
+   * @return PDF of the given normal distribution at x.
+   */
+  public static double pdf(double x, double mu, double sigma) {
+    final double x_mu = x - mu;
+    final double sigmasq = sigma * sigma;
+    return 1 / (Math.sqrt(MathUtil.TWOPI * sigmasq)) * Math.exp(-.5 * x_mu * x_mu / sigmasq);
+  }
+
+  /**
+   * Probability density function of the normal distribution.
+   * 
+   * <pre>
+   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
+   * </pre>
+   * 
+   * @param x The value.
+   * @return PDF of the given normal distribution at x.
+   */
+  public static double standardNormalPDF(double x) {
+    return Math.exp(-.5 * x * x) / MathUtil.SQRTTWOPI;
+  }
+
+  /**
+   * Cumulative probability density function (CDF) of a normal distribution.
+   * 
+   * @param x value to evaluate CDF at
+   * @param mu Mean value
+   * @param sigma Standard deviation.
+   * @return The CDF of the given normal distribution at x.
+   */
+  public static double cdf(double x, double mu, double sigma) {
+    return .5 * (1 + erf((x - mu) / (MathUtil.SQRT2 * sigma)));
+  }
+
+  /**
+   * Cumulative probability density function (CDF) of a normal distribution.
+   * 
+   * @param x value to evaluate CDF at
+   * @param mu Mean value
+   * @param sigma Standard deviation.
+   * @return The CDF of the given normal distribution at x.
+   */
+  public static double standardNormalCDF(double x) {
+    return .5 * (1 + erf(x / MathUtil.SQRT2));
+  }
+
+  /**
+   * Inverse cumulative probability density function (probit) of a normal
+   * distribution.
+   * 
+   * @param x value to evaluate probit function at
+   * @param mu Mean value
+   * @param sigma Standard deviation.
+   * @return The probit of the given normal distribution at x.
+   */
+  public static double quantile(double x, double mu, double sigma) {
+    return mu + sigma * standardNormalQuantile(x);
+  }
+
+  /**
    * Approximate the inverse error function for normal distributions.
    * 
    * Largely based on:
@@ -301,49 +372,6 @@ public class NormalDistribution implements DistributionWithRandom {
       double r = q * q;
       return (((((ERFINV_A[0] * r + ERFINV_A[1]) * r + ERFINV_A[2]) * r + ERFINV_A[3]) * r + ERFINV_A[4]) * r + ERFINV_A[5]) * q / (((((ERFINV_B[0] * r + ERFINV_B[1]) * r + ERFINV_B[2]) * r + ERFINV_B[3]) * r + ERFINV_B[4]) * r + 1);
     }
-  }
-
-  /**
-   * Probability density function of the normal distribution.
-   * 
-   * <pre>
-   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
-   * </pre>
-   * 
-   * @param x The value.
-   * @param mu The mean.
-   * @param sigma The standard deviation.
-   * @return PDF of the given normal distribution at x.
-   */
-  public static double pdf(double x, double mu, double sigma) {
-    final double x_mu = x - mu;
-    final double sigmasq = sigma * sigma;
-    return 1 / (Math.sqrt(MathUtil.TWOPI * sigmasq)) * Math.exp(-.5 * x_mu * x_mu / sigmasq);
-  }
-
-  /**
-   * Cumulative probability density function (CDF) of a normal distribution.
-   * 
-   * @param x value to evaluate CDF at
-   * @param mu Mean value
-   * @param sigma Standard deviation.
-   * @return The CDF of the normal given distribution at x.
-   */
-  public static double cdf(double x, double mu, double sigma) {
-    return .5 * (1 + erf((x - mu) / (MathUtil.SQRT2 * sigma)));
-  }
-
-  /**
-   * Inverse cumulative probability density function (probit) of a normal
-   * distribution.
-   * 
-   * @param x value to evaluate probit function at
-   * @param mu Mean value
-   * @param sigma Standard deviation.
-   * @return The probit of the normal given distribution at x.
-   */
-  public static double quantile(double x, double mu, double sigma) {
-    return mu + sigma * standardNormalQuantile(x);
   }
 
   /**
