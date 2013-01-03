@@ -55,11 +55,11 @@ public class DoubleObjectMaxHeap<V> extends DoubleObjectHeap<V> {
 
   @Override
   protected void heapifyUp(int pos, double curkey, Object curval) {
-    while(pos > 0) {
+    while (pos > 0) {
       final int parent = (pos - 1) >>> 1;
       double parkey = keys[parent];
 
-      if(curkey <= parkey) { // Compare
+      if (curkey <= parkey) { // Compare
         break;
       }
       keys[pos] = parkey;
@@ -74,23 +74,23 @@ public class DoubleObjectMaxHeap<V> extends DoubleObjectHeap<V> {
   protected boolean heapifyDown(final int ipos, double curkey, Object curval) {
     int pos = ipos;
     final int half = size >>> 1;
-    while(pos < half) {
+    while (pos < half) {
       // Get left child (must exist!)
       int cpos = (pos << 1) + 1;
       double chikey = keys[cpos];
       Object chival = values[cpos];
       // Test right child, if present
       final int rchild = cpos + 1;
-      if(rchild < size) {
+      if (rchild < size) {
         double right = keys[rchild];
-        if(chikey < right) { // Compare
+        if (chikey < right) { // Compare
           cpos = rchild;
           chikey = right;
           chival = values[rchild];
         }
       }
 
-      if(curkey >= chikey) { // Compare
+      if (curkey >= chikey) { // Compare
         break;
       }
       keys[pos] = chikey;
@@ -111,9 +111,9 @@ public class DoubleObjectMaxHeap<V> extends DoubleObjectHeap<V> {
    */
   protected String checkHeap() {
     ensureValid();
-    for(int i = 1; i < size; i++) {
+    for (int i = 1; i < size; i++) {
       final int parent = (i - 1) >>> 1;
-      if(keys[parent] < keys[i]) { // Compare
+      if (keys[parent] < keys[i]) { // Compare
         return "@" + parent + ": " + keys[parent] + " < @" + i + ": " + keys[i];
       }
     }
