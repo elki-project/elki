@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Comparator;
-
 /**
  * Basic in-memory heap structure.
  * 
@@ -33,24 +31,24 @@ import java.util.Comparator;
  * n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
- * 
- * @param <V> value type
+ *
+ * @param <V> Value type
  */
 public class DoubleObjectMaxHeap<V> extends DoubleObjectHeap<V> {
   /**
-   * Default constructor: default capacity, natural ordering.
+   * Default constructor: default capacity.
    */
   public DoubleObjectMaxHeap() {
     super();
   }
 
   /**
-   * Constructor with initial capacity and {@link Comparator}.
+   * Constructor with initial capacity.
    * 
    * @param size initial capacity
    */
   public DoubleObjectMaxHeap(int size) {
-    super();
+    super(size);
   }
 
   @Override
