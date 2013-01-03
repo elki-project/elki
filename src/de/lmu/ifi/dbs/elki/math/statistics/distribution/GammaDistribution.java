@@ -581,7 +581,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * 
    * Reference:
    * <p>
-   * Algorithm AS 91: The percentage points of the $\chi$ 2 distribution<br />
+   * Algorithm AS 91: The percentage points of the $\chi^2$ distribution<br />
    * D.J. Best, D. E. Roberts<br />
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
    * </p>
@@ -658,7 +658,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * 
    * Reference:
    * <p>
-   * Algorithm AS 91: The percentage points of the $\chi$^2 distribution<br />
+   * Algorithm AS 91: The percentage points of the $\chi^2$ distribution<br />
    * D.J. Best, D. E. Roberts<br />
    * Journal of the Royal Statistical Society. Series C (Applied Statistics)
    * </p>
@@ -668,7 +668,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
-  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi$^2 distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
+  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   public static double quantile(double p, double k, double theta) {
     final double EPS2 = 5e-7; // final precision of AS 91
     final int MAXIT = 1000;
