@@ -28,7 +28,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
- * Basic in-memory heap structure.
+ * Basic in-memory heap structure for Object values.
  * 
  * This heap is built lazily: if you first add many elements, then poll the
  * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log

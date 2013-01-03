@@ -35,10 +35,10 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V> Value type
  */
-public abstract class DoubleObjectHeap<V> {
+public abstract class DoubleObjectHeap<V> extends AbstractHeap {
   /**
    * Heap storage: keys
    */
@@ -48,26 +48,6 @@ public abstract class DoubleObjectHeap<V> {
    * Heap storage: values
    */
   protected Object[] values;
-
-  /**
-   * Current number of objects
-   */
-  protected int size = 0;
-
-  /**
-   * Indicate up to where the heap is valid
-   */
-  protected int validSize = 0;
-
-  /**
-   * (Structural) modification counter. Used to invalidate iterators.
-   */
-  protected transient int modCount = 0;
-
-  /**
-   * Default initial capacity
-   */
-  protected static final int DEFAULT_INITIAL_CAPACITY = 11;
 
   /**
    * Default constructor: default capacity.
@@ -107,8 +87,21 @@ public abstract class DoubleObjectHeap<V> {
     heapifyUp(size - 1, key, val);
     validSize += 1;
     // We have changed - return true according to {@link Collection#put}
-    modCount++;
+    heapModified();
     return true;
+  }
+
+  /**
+   * Combined operation that removes the top element, and inserts a new element
+   * instead.
+   * 
+   * @param key Key of new element
+   * @param val Value of new element
+   */
+  public void replaceTopElement(double key, V val) {
+    ensureValid();
+    heapifyDown(0, key, val);
+    heapModified();
   }
 
   /**
@@ -169,7 +162,7 @@ public abstract class DoubleObjectHeap<V> {
       keys[pos] = reinkey;
       values[pos] = reinval;
     }
-    modCount++;
+    heapModified();
   }
 
   /**
@@ -225,15 +218,6 @@ public abstract class DoubleObjectHeap<V> {
   }
 
   /**
-   * Query the size
-   * 
-   * @return Size
-   */
-  public int size() {
-    return this.size;
-  }
-
-  /**
    * Test whether we need to resize to have the requested capacity.
    * 
    * @param requiredSize required capacity
@@ -252,14 +236,11 @@ public abstract class DoubleObjectHeap<V> {
     values = Arrays.copyOf(values, newCapacity);
   }
 
-  /**
-   * Delete all elements from the heap.
-   */
+  @Override
   public void clear() {
     // clean up references in the array for memory management
+    Arrays.fill(keys, 0.0);
     Arrays.fill(values, null);
-    this.size = 0;
-    this.validSize = -1;
-    modCount++;
+    super.clear();
   }
 }

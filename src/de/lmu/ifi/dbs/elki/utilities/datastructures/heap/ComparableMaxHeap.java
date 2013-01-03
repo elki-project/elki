@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 /**
- * Basic in-memory heap structure.
+ * Basic in-memory max-heap for Object values.
  * 
  * This heap is built lazily: if you first add many elements, then poll the
  * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
