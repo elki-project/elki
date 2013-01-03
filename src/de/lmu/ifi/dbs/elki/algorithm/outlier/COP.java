@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -106,6 +107,53 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
    * Result name for the error vectors.
    */
   public static final String COP_ERRORVEC = "cop-errorvec";
+
+  /**
+   * A clone of
+   * {@link de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter}
+   * that only uses the first 85% of the array!
+   */
+  private static final NumberArrayAdapter<Double, double[]> SHORTENED_ARRAY = new NumberArrayAdapter<Double, double[]>() {
+    @Override
+    public int size(double[] array) {
+      return (int) (.85 * array.length);
+    }
+
+    @Override
+    public Double get(double[] array, int off) throws IndexOutOfBoundsException {
+      return Double.valueOf(array[off]);
+    }
+
+    @Override
+    public double getDouble(double[] array, int off) throws IndexOutOfBoundsException {
+      return array[off];
+    }
+
+    @Override
+    public float getFloat(double[] array, int off) throws IndexOutOfBoundsException {
+      return (float) array[off];
+    }
+
+    @Override
+    public int getInteger(double[] array, int off) throws IndexOutOfBoundsException {
+      return (int) array[off];
+    }
+
+    @Override
+    public short getShort(double[] array, int off) throws IndexOutOfBoundsException {
+      return (short) array[off];
+    }
+
+    @Override
+    public long getLong(double[] array, int off) throws IndexOutOfBoundsException {
+      return (long) array[off];
+    }
+
+    @Override
+    public byte getByte(double[] array, int off) throws IndexOutOfBoundsException {
+      return (byte) array[off];
+    }
+  };
 
   /**
    * Number of neighbors to be considered.
@@ -241,7 +289,7 @@ public class COP<V extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
           // Sort, so we can trim the top 15% below.
           Arrays.sort(dists[d]);
           // Evaluate
-          double score = 1 - GammaDistribution.estimate(dists[d], (int) (.85 * dists[d].length)).cdf(sqdevs);
+          double score = 1 - GammaDistribution.CHOI_WETTE_ESTIMATOR.estimate(dists[d], SHORTENED_ARRAY).cdf(sqdevs);
           if (score < min) {
             min = score;
             vdim = d + 1;
