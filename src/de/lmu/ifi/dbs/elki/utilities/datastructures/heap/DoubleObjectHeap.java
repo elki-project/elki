@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
- * 
+ *
  * @param <V> Value type
  */
 public abstract class DoubleObjectHeap<V> {
