@@ -83,7 +83,7 @@ public class AbstractHeap {
    */
   protected final int desiredSize(int requiredSize, int capacity) {
     // Double until 64, then increase by 50% each time.
-    int newCapacity = ((capacity < 64) ? ((capacity + 1) * 2) : ((capacity / 2) * 3));
+    int newCapacity = ((capacity < 64) ? ((capacity + 1) << 1) : ((capacity >> 1) * 3));
     // overflow?
     if (newCapacity < 0) {
       throw new OutOfMemoryError();

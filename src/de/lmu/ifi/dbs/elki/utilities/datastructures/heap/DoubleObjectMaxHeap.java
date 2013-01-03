@@ -31,7 +31,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <V> Value type
  */
 public class DoubleObjectMaxHeap<V> extends DoubleObjectHeap<V> {
