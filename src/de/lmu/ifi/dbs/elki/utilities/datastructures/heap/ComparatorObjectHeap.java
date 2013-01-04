@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
+import java.util.Comparator;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,40 +26,42 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 /**
- * Basic in-memory min-heap for Object values.
- * 
- * This heap is built lazily: if you first add many elements, then poll the
- * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
- * n). This is implemented via a simple validTo counter.
+ * Heap for Objects of type K, using a comparator.
  * 
  * @author Erich Schubert
+ * 
+ * @param <K> Object type
  */
-public class ComparableMinHeap<K extends Comparable<? super K>> extends ObjectHeap<K> {
+public class ComparatorObjectHeap<K> extends ObjectHeap<K> {
   /**
-   * Constructor with default capacity.
+   * Comparator in use.
    */
-  public ComparableMinHeap() {
+  protected Comparator<? super K> comparator;
+
+  /**
+   * Constructor with default size.
+   * 
+   * @param comparator Comparator
+   */
+  public ComparatorObjectHeap(Comparator<? super K> comparator) {
     super(DEFAULT_INITIAL_CAPACITY);
+    this.comparator = comparator;
   }
 
   /**
-   * Constructor with initial capacity.
+   * Constructor with initial size.
    * 
-   * @param size initial capacity
+   * @param size Initial size
+   * @param comparator Comparator
    */
-  public ComparableMinHeap(int size) {
+  public ComparatorObjectHeap(int size, Comparator<? super K> comparator) {
     super(size);
+    this.comparator = comparator;
   }
 
-  /**
-   * Compare two objects
-   * 
-   * @param o1 First object
-   * @param o2 Second object
-   */
-  @Override
   @SuppressWarnings("unchecked")
+  @Override
   protected boolean comp(Object o1, Object o2) {
-    return ((K) o1).compareTo((K) o2) > 0;
+    return comparator.compare((K) o1, (K) o2) >= 0;
   }
 }

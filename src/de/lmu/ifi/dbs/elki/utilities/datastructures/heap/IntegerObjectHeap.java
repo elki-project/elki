@@ -29,79 +29,79 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap structure for int values.
+ * Basic in-memory heap structure using int keys and V values.
  * 
  * This heap is built lazily: if you first add many elements, then poll the
  * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
  * n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
+ * 
+ * @param <V> Value type
  */
-public abstract class IntegerHeap extends AbstractHeap {
+public abstract class IntegerObjectHeap<V> extends AbstractHeap {
   /**
-   * Heap storage: queue
+   * Heap storage: keys
    */
-  protected transient int[] queue;
+  protected int[] keys;
+
+  /**
+   * Heap storage: values
+   */
+  protected Object[] values;
+
+  /**
+   * Default constructor: default capacity.
+   */
+  public IntegerObjectHeap() {
+    this(DEFAULT_INITIAL_CAPACITY);
+  }
 
   /**
    * Constructor with initial capacity.
    * 
    * @param size initial capacity
    */
-  public IntegerHeap(int size) {
+  public IntegerObjectHeap(int size) {
     super();
     this.size = 0;
-    this.queue = new int[size];
+    this.keys = new int[size];
+    this.values = new Object[size];
   }
 
   /**
    * Add a key-value pair to the heap
    * 
    * @param key Key
+   * @param val Value
    */
-  public void add(int key) {
+  public void add(int key, V val) {
     // resize when needed
-    if (size + 1 > queue.length) {
+    if (size + 1 > keys.length) {
       resize(size + 1);
     }
     // final int pos = size;
-    this.queue[size] = key;
+    this.keys[size] = key;
+    this.values[size] = val;
     this.size += 1;
     // As bulk repairs do not (yet) perform as expected
     // We will for now immediately repair the heap!
-    heapifyUp(size - 1, key);
+    heapifyUp(size - 1, key, val);
     validSize += 1;
     heapModified();
-  }
-
-  /**
-   * Add a key-value pair to the heap, except if the new element is larger than
-   * the top, and we are at design size (overflow)
-   * 
-   * @param key Key
-   * @param max Maximum size of heap
-   */
-  public void add(int key, int max) {
-    if (size < max) {
-      add(key);
-    } else if (comp(key, peek())) {
-      replaceTopElement(key);
-    }
   }
 
   /**
    * Combined operation that removes the top element, and inserts a new element
    * instead.
    * 
-   * @param e New element to insert
-   * @return Previous top element of the heap
+   * @param key Key of new element
+   * @param val Value of new element
    */
-  public int replaceTopElement(int e) {
+  public void replaceTopElement(int key, V val) {
     ensureValid();
-    int oldroot = queue[0];
-    heapifyDown(0, e);
+    heapifyDown(0, key, val);
     heapModified();
-    return oldroot;
   }
 
   /**
@@ -109,26 +109,83 @@ public abstract class IntegerHeap extends AbstractHeap {
    * 
    * @return Top key
    */
-  public int peek() {
+  public int peekKey() {
     if (size == 0) {
       throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
     }
     ensureValid();
-    return queue[0];
+    return keys[0];
+  }
+
+  /**
+   * Get the current top value
+   * 
+   * @return Value
+   */
+  @SuppressWarnings("unchecked")
+  public V peekValue() {
+    if (size == 0) {
+      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
+    }
+    ensureValid();
+    return (V) values[0];
   }
 
   /**
    * Remove the first element
-   * 
-   * @return Top element
    */
-  public int poll() {
-    ensureValid();
-    return removeAt(0);
+  public void poll() {
+    removeAt(0);
   }
 
   /**
-   * Repair the heap
+   * Remove the element at the given position.
+   * 
+   * @param pos Element position.
+   */
+  protected void removeAt(int pos) {
+    if (pos < 0 || pos >= size) {
+      return;
+    }
+    // Replacement object:
+    final int reinkey = keys[size - 1];
+    final Object reinval = values[size - 1];
+    values[size - 1] = null;
+    // Keep heap in sync
+    if (validSize == size) {
+      size -= 1;
+      validSize -= 1;
+      heapifyDown(pos, reinkey, reinval);
+    } else {
+      size -= 1;
+      validSize = Math.min(pos >>> 1, validSize);
+      keys[pos] = reinkey;
+      values[pos] = reinval;
+    }
+    heapModified();
+  }
+
+  /**
+   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * 
+   * @param pos insertion position
+   * @param curkey Current key
+   * @param curval Current value
+   */
+  abstract protected void heapifyUp(int pos, int curkey, Object curval);
+
+  /**
+   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * 
+   * @param ipos re-insertion position
+   * @param curkey Current key
+   * @param curval Current value
+   * @return true when the order was changed
+   */
+  abstract protected boolean heapifyDown(int ipos, int curkey, Object curval);
+
+  /**
+   * Repair the heap, if necessary.
    */
   protected void ensureValid() {
     if (validSize != size) {
@@ -142,7 +199,7 @@ public abstract class IntegerHeap extends AbstractHeap {
         while (pos >= nextmin) {
           // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
           while (pos >= curmin) {
-            if (!heapifyDown(pos, queue[pos])) {
+            if (!heapifyDown(pos, keys[pos], values[pos])) {
               final int parent = (pos - 1) >>> 1;
               if (parent < curmin) {
                 nextmin = Math.min(nextmin, parent);
@@ -161,110 +218,31 @@ public abstract class IntegerHeap extends AbstractHeap {
   }
 
   /**
-   * Remove the element at the given position.
-   * 
-   * @param pos Element position.
-   * @return Removed element
-   */
-  protected int removeAt(int pos) {
-    if (pos < 0 || pos >= size) {
-      return 0;
-    }
-    final int top = queue[0];
-    // Replacement object:
-    final int reinkey = queue[size - 1];
-    // Keep heap in sync
-    if (validSize == size) {
-      size -= 1;
-      validSize -= 1;
-      heapifyDown(pos, reinkey);
-    } else {
-      size -= 1;
-      validSize = Math.min(pos >>> 1, validSize);
-      queue[pos] = reinkey;
-    }
-    heapModified();
-    return top;
-  }
-
-  /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
-   * 
-   * @param pos insertion position
-   * @param curkey Current key
-   */
-  protected void heapifyUp(int pos, int curkey) {
-    while (pos > 0) {
-      final int parent = (pos - 1) >>> 1;
-      int parkey = queue[parent];
-
-      if (comp(curkey, parkey)) { // Compare
-        break;
-      }
-      queue[pos] = parkey;
-      pos = parent;
-    }
-    queue[pos] = curkey;
-  }
-
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param ipos re-insertion position
-   * @param curkey Current key
-   * @return true when the order was changed
-   */
-  protected boolean heapifyDown(final int ipos, int curkey) {
-    int pos = ipos;
-    final int half = size >>> 1;
-    while (pos < half) {
-      // Get left child (must exist!)
-      int cpos = (pos << 1) + 1;
-      int chikey = queue[cpos];
-      // Test right child, if present
-      final int rchild = cpos + 1;
-      if (rchild < size) {
-        int right = queue[rchild];
-        if (comp(chikey, right)) { // Compare
-          cpos = rchild;
-          chikey = right;
-        }
-      }
-
-      if (comp(chikey, curkey)) { // Compare
-        break;
-      }
-      queue[pos] = chikey;
-      pos = cpos;
-    }
-    queue[pos] = curkey;
-    return (pos == ipos);
-  }
-
-  /**
    * Test whether we need to resize to have the requested capacity.
    * 
    * @param requiredSize required capacity
    */
   protected final void resize(int requiredSize) {
-    queue = Arrays.copyOf(queue, desiredSize(requiredSize, queue.length));
+    // Double until 64, then increase by 50% each time.
+    int newCapacity = ((keys.length < 64) ? ((keys.length + 1) << 1) : ((keys.length >> 1) * 3));
+    // overflow?
+    if (newCapacity < 0) {
+      throw new OutOfMemoryError();
+    }
+    if (requiredSize > newCapacity) {
+      newCapacity = requiredSize;
+    }
+    keys = Arrays.copyOf(keys, newCapacity);
+    values = Arrays.copyOf(values, newCapacity);
   }
 
-  /**
-   * Delete all elements from the heap.
-   */
   @Override
   public void clear() {
+    // clean up references in the array for memory management
+    Arrays.fill(keys, 0);
+    Arrays.fill(values, null);
     super.clear();
-    for (int i = 0; i < size; i++) {
-      queue[i] = 0;
-    }
   }
-
-  /**
-   * Compare two objects
-   */
-  abstract protected boolean comp(int o1, int o2);
 
   /**
    * Get an unsorted iterator to inspect the heap.
@@ -297,12 +275,23 @@ public abstract class IntegerHeap extends AbstractHeap {
     }
 
     /**
-     * Get the iterators current object.
+     * Get the current key
      * 
-     * @return Current object
+     * @return Current key
      */
-    public int get() {
-      return queue[pos];
+    public int getKey() {
+      return keys[pos];
+    }
+
+
+    /**
+     * Get the current value
+     * 
+     * @return Current value
+     */
+    @SuppressWarnings("unchecked")
+    public V getValue() {
+      return (V) values[pos];
     }
   }
 }

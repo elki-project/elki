@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
  * Basic in-memory heap structure for Object values.
@@ -58,7 +59,7 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * 
    * @param key Key
    */
-  public void add(Object key) {
+  public void add(K key) {
     // resize when needed
     if (size + 1 > queue.length) {
       resize(size + 1);
@@ -66,6 +67,8 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
     // final int pos = size;
     this.queue[size] = key;
     this.size += 1;
+    // As bulk repairs do not (yet) perform as expected
+    // We will for now immediately repair the heap!
     heapifyUp(size - 1, key);
     validSize += 1;
     heapModified();
@@ -78,7 +81,7 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * @param key Key
    * @param max Maximum size of heap
    */
-  public void add(Object key, int max) {
+  public void add(K key, int max) {
     if (size < max) {
       add(key);
     } else if (comp(key, peek())) {
@@ -94,9 +97,9 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * @return Previous top element of the heap
    */
   @SuppressWarnings("unchecked")
-  public Object replaceTopElement(Object e) {
+  public K replaceTopElement(K e) {
     ensureValid();
-    Object oldroot = (K) queue[0];
+    K oldroot = (K) queue[0];
     heapifyDown(0, e);
     heapModified();
     return oldroot;
@@ -108,7 +111,7 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * @return Top key
    */
   @SuppressWarnings("unchecked")
-  public Object peek() {
+  public K peek() {
     if (size == 0) {
       throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
     }
@@ -121,8 +124,10 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * 
    * @return Top element
    */
-  public Object poll() {
-    return removeAt(0);
+  @SuppressWarnings("unchecked")
+  public K poll() {
+    ensureValid();
+    return (K) removeAt(0);
   }
 
   /**
@@ -164,12 +169,11 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * @param pos Element position.
    * @return Removed element
    */
-  @SuppressWarnings("unchecked")
   protected Object removeAt(int pos) {
     if (pos < 0 || pos >= size) {
       return null;
     }
-    final Object top = (K) queue[0];
+    final Object top = queue[0];
     // Replacement object:
     final Object reinkey = queue[size - 1];
     // Keep heap in sync
@@ -264,4 +268,45 @@ public abstract class ObjectHeap<K> extends AbstractHeap {
    * Compare two objects
    */
   abstract protected boolean comp(Object o1, Object o2);
+
+  /**
+   * Get an unsorted iterator to inspect the heap.
+   * 
+   * @return Iterator
+   */
+  public UnsortedIter unsortedIter() {
+    return new UnsortedIter();
+  }
+  
+  /**
+   * Unsorted iterator - in heap order. Does not poll the heap.
+   * 
+   * @author Erich Schubert
+   */
+  public class UnsortedIter implements Iter {
+    /**
+     * Iterator position.
+     */
+    int pos = 0;
+
+    @Override
+    public boolean valid() {
+      return pos < size;
+    }
+
+    @Override
+    public void advance() {
+      pos ++;
+    }
+
+    /**
+     * Get the iterators current object.
+     * 
+     * @return Current object
+     */
+    @SuppressWarnings("unchecked")
+    public K get() {
+      return (K) queue[pos];
+    }
+  }
 }

@@ -32,7 +32,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * 
  * @author Erich Schubert
  */
-public class ComparableMaxHeap<K extends Comparable<K>> extends ObjectHeap<K> {
+public class ComparableMaxHeap<K extends Comparable<? super K>> extends ObjectHeap<K> {
   /**
    * Constructor with default capacity.
    */

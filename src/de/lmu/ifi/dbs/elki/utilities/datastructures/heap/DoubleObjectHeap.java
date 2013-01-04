@@ -26,9 +26,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap structure using double keys and Object values.
+ * Basic in-memory heap structure using double keys and V values.
  * 
  * This heap is built lazily: if you first add many elements, then poll the
  * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
@@ -73,9 +74,8 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
    * 
    * @param key Key
    * @param val Value
-   * @return Success code
    */
-  public boolean add(double key, V val) {
+  public void add(double key, V val) {
     // resize when needed
     if (size + 1 > keys.length) {
       resize(size + 1);
@@ -84,11 +84,11 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
     this.keys[size] = key;
     this.values[size] = val;
     this.size += 1;
+    // As bulk repairs do not (yet) perform as expected
+    // We will for now immediately repair the heap!
     heapifyUp(size - 1, key, val);
     validSize += 1;
-    // We have changed - return true according to {@link Collection#put}
     heapModified();
-    return true;
   }
 
   /**
@@ -242,5 +242,56 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
     Arrays.fill(keys, 0.0);
     Arrays.fill(values, null);
     super.clear();
+  }
+
+  /**
+   * Get an unsorted iterator to inspect the heap.
+   * 
+   * @return Iterator
+   */
+  public UnsortedIter unsortedIter() {
+    return new UnsortedIter();
+  }
+  
+  /**
+   * Unsorted iterator - in heap order. Does not poll the heap.
+   * 
+   * @author Erich Schubert
+   */
+  public class UnsortedIter implements Iter {
+    /**
+     * Iterator position.
+     */
+    int pos = 0;
+
+    @Override
+    public boolean valid() {
+      return pos < size;
+    }
+
+    @Override
+    public void advance() {
+      pos ++;
+    }
+
+    /**
+     * Get the current key
+     * 
+     * @return Current key
+     */
+    public double getKey() {
+      return keys[pos];
+    }
+
+
+    /**
+     * Get the current value
+     * 
+     * @return Current value
+     */
+    @SuppressWarnings("unchecked")
+    public V getValue() {
+      return (V) values[pos];
+    }
   }
 }
