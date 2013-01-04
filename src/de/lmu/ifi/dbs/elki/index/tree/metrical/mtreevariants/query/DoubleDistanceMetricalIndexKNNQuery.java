@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleMTreeDistanceSearchCandidate;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 
 /**
  * Instance of a KNN query for a particular spatial index.
@@ -79,7 +79,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
     DoubleDistanceKNNHeap knnList = new DoubleDistanceKNNHeap(k);
     double d_k = Double.POSITIVE_INFINITY;
 
-    final Heap<DoubleMTreeDistanceSearchCandidate> pq = new Heap<>();
+    final ComparableMinHeap<DoubleMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
     // Push the root node
     pq.add(new DoubleMTreeDistanceSearchCandidate(0, index.getRootID(), null, 0));

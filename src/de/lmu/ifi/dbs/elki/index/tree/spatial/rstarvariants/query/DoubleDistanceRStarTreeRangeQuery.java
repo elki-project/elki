@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -88,7 +88,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    */
   protected DoubleDistanceDBIDList doRangeQuery(O object, double epsilon) {
     final DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
-    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<>();
+    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -272,7 +272,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        refinement)
    */
   private void doReverseKNNQuery(int k, DBIDRef q, GenericDistanceDBIDList<D> result, ModifiableDBIDs candidates) {
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<>();
+    final ComparableMinHeap<GenericMTreeDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
 
     // push root
     pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceQuery().nullDistance(), getRootID(), null, null));

@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -87,7 +87,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    */
   protected DistanceDBIDResult<D> doRangeQuery(O object, D epsilon) {
     final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<>();
+    final ComparableMinHeap<GenericDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
