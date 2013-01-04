@@ -64,13 +64,22 @@ public class AbstractHeap {
   public int size() {
     return this.size;
   }
+  
+  /**
+   * Is the heap empty?
+   * 
+   * @return {@code true} when the size is 0.
+   */
+  public boolean isEmpty() {
+    return (size == 0);
+  }
 
   /**
    * Delete all elements from the heap.
    */
   public void clear() {
     this.size = 0;
-    this.validSize = -1;
+    this.validSize = 0;
     heapModified();
   }
 

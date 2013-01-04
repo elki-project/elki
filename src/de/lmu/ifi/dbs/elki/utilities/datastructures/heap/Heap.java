@@ -128,6 +128,8 @@ public class Heap<E> implements Iterable<E> {
     // final int pos = size;
     this.queue[size] = e;
     this.size += 1;
+    // As bulk repairs do not (yet) perform as expected
+    // We will for now immediately repair the heap!
     heapifyUp(size - 1, e);
     validSize += 1;
     heapModified();
@@ -453,7 +455,7 @@ public class Heap<E> implements Iterable<E> {
       queue[i] = null;
     }
     this.size = 0;
-    this.validSize = -1;
+    this.validSize = 0;
     heapModified();
   }
 
