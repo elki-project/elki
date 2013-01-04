@@ -66,8 +66,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.IntegerPriorityObject;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -289,7 +290,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     final int dim = dimensionality(relation);
 
     // init heap
-    Heap<IntegerPriorityObject<CASHInterval>> heap = new Heap<>();
+    ObjectHeap<IntegerPriorityObject<CASHInterval>> heap = new ComparableMinHeap<>();
     ModifiableDBIDs noiseIDs = DBIDUtil.newHashSet(relation.getDBIDs());
     initHeap(heap, relation, dim, noiseIDs);
 
@@ -357,8 +358,8 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
       // Rebuild heap
       ArrayList<IntegerPriorityObject<CASHInterval>> heapVector = new ArrayList<>(heap.size());
-      for (IntegerPriorityObject<CASHInterval> obj : heap) {
-        heapVector.add(obj);
+      for (ObjectHeap<IntegerPriorityObject<CASHInterval>>.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.advance()) {
+        heapVector.add(iter.get());
       }
       heap.clear();
       for (IntegerPriorityObject<CASHInterval> pair : heapVector) {
@@ -427,7 +428,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param dim the dimensionality of the database
    * @param ids the ids of the database
    */
-  private void initHeap(Heap<IntegerPriorityObject<CASHInterval>> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
+  private void initHeap(ObjectHeap<IntegerPriorityObject<CASHInterval>> heap, Relation<ParameterizationFunction> relation, int dim, DBIDs ids) {
     CASHIntervalSplit split = new CASHIntervalSplit(relation, minPts);
 
     // determine minimum and maximum function value of all functions
@@ -578,7 +579,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private CASHInterval determineNextIntervalAtMaxLevel(Heap<IntegerPriorityObject<CASHInterval>> heap) {
+  private CASHInterval determineNextIntervalAtMaxLevel(ObjectHeap<IntegerPriorityObject<CASHInterval>> heap) {
     CASHInterval next = doDetermineNextIntervalAtMaxLevel(heap);
     // noise path was chosen
     while (next == null) {
@@ -598,7 +599,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param heap the heap storing the intervals
    * @return the next ''best'' interval at maximum level
    */
-  private CASHInterval doDetermineNextIntervalAtMaxLevel(Heap<IntegerPriorityObject<CASHInterval>> heap) {
+  private CASHInterval doDetermineNextIntervalAtMaxLevel(ObjectHeap<IntegerPriorityObject<CASHInterval>> heap) {
     CASHInterval interval = heap.poll().getObject();
     int dim = interval.getDimensionality();
     while (true) {

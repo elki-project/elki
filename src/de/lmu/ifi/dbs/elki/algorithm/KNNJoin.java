@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -137,7 +137,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
     List<E> ps_candidates = new ArrayList<>(index.getLeaves());
     // knn heaps
     List<List<KNNHeap<D>>> heaps = new ArrayList<>(ps_candidates.size());
-    Heap<Task> pq = new Heap<>(ps_candidates.size() * ps_candidates.size() / 10);
+    ComparableMinHeap<Task> pq = new ComparableMinHeap<>(ps_candidates.size() * ps_candidates.size() / 10);
 
     // Initialize with the page self-pairing
     for (int i = 0; i < ps_candidates.size(); i++) {

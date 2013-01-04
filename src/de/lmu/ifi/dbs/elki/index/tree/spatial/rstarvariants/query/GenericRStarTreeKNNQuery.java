@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.index.tree.query.GenericDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -103,7 +103,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, KNNHeap<D> knnList) {
-    final Heap<GenericDistanceSearchCandidate<D>> pq = new Heap<>(Math.min(knnList.getK() << 1, 20));
+    final ComparableMinHeap<GenericDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 20));
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
@@ -120,7 +120,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
     }
   }
 
-  private D expandNode(O object, KNNHeap<D> knnList, final Heap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final int nodeID) {
+  private D expandNode(O object, KNNHeap<D> knnList, final ComparableMinHeap<GenericDistanceSearchCandidate<D>> pq, D maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {

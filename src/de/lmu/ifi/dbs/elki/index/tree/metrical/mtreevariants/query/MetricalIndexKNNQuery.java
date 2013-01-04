@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 
 /**
  * Instance of a KNN query for a particular spatial index.
@@ -75,7 +75,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     KNNHeap<D> knnList = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     D d_k = knnList.getKNNDistance();
 
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new Heap<>();
+    final ComparableMinHeap<GenericMTreeDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
 
     // push root
     pq.add(new GenericMTreeDistanceSearchCandidate<>(nullDistance, index.getRootID(), null, nullDistance));

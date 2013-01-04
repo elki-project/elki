@@ -49,7 +49,8 @@ import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -101,7 +102,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, DoubleDistanceKNNHeap knnList) {
-    final Heap<DoubleDistanceSearchCandidate> pq = new Heap<>(Math.min(knnList.getK() << 1, 20));
+    final ObjectHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 20));
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
@@ -118,7 +119,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     }
   }
 
-  private double expandNode(O object, DoubleDistanceKNNHeap knnList, final Heap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
+  private double expandNode(O object, DoubleDistanceKNNHeap knnList, final ObjectHeap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {

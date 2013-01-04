@@ -26,12 +26,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.Random;
 
 import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
 /**
  * Test the in-memory heap class.
@@ -176,8 +173,8 @@ public class TestIntegerHeap {
   public void testHeapRandomInt() {
     int size = 10000;
     Random r = new Random(123L);
-    Heap<Integer> hasc = new Heap<>();
-    Heap<Integer> hdesc = new Heap<>(Collections.reverseOrder());
+    ComparableMinHeap<Integer> hasc = new ComparableMinHeap<>();
+    ComparableMaxHeap<Integer> hdesc = new ComparableMaxHeap<>();
     for(int i = 0; i < size; i++) {
       int in = r.nextInt();
       hasc.add(in);

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -58,7 +57,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -181,7 +181,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     staticids.sort();
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
-    Heap<DoubleDBIDPair> pq = new Heap<>(relation.size(), Collections.reverseOrder());
+    ComparableMaxHeap<DoubleDBIDPair> pq = new ComparableMaxHeap<>(relation.size());
 
     // preprocess kNN neighborhoods
     KNNQuery<V, DoubleDistance> knnQuery = QueryUtil.getKNNQuery(relation, getDistanceFunction(), k);
@@ -213,7 +213,8 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
 
     DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    for (DoubleDBIDPair pair : pq) {
+    while(!pq.isEmpty()) {
+      DoubleDBIDPair pair = pq.poll();
       abodvalues.putDouble(pair, pair.doubleValue());
       minmaxabod.put(pair.doubleValue());
     }
@@ -238,12 +239,12 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
 
-    Heap<DoubleDBIDPair> pq = new Heap<>(relation.size(), Collections.reverseOrder());
+    ComparableMaxHeap<DoubleDBIDPair> pq = new ComparableMaxHeap<>(relation.size());
     // get Candidate Ranking
     for (DBIDIter aKey = relation.iterDBIDs(); aKey.valid(); aKey.advance()) {
       WritableDoubleDataStore dists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
       // determine kNearestNeighbors and pairwise distances
-      Heap<DoubleDBIDPair> nn;
+      ComparableMinHeap<DoubleDBIDPair> nn;
       if (!USE_RND_SAMPLE) {
         nn = calcDistsandNN(relation, kernelMatrix, sampleSize, aKey, dists);
       } else {
@@ -263,7 +264,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
       pq.add(DBIDUtil.newPair(var, aKey));
     }
     // refine Candidates
-    Heap<DoubleDBIDPair> resqueue = new Heap<>(k);
+    ComparableMinHeap<DoubleDBIDPair> resqueue = new ComparableMinHeap<>(k);
     MeanVariance s = new MeanVariance();
     while (!pq.isEmpty()) {
       if (resqueue.size() == k && pq.peek().doubleValue() > resqueue.peek().doubleValue()) {
@@ -301,7 +302,8 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     }
     DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
-    for (DoubleDBIDPair pair : pq) {
+    while(!pq.isEmpty()) {
+      DoubleDBIDPair pair = pq.poll();
       abodvalues.putDouble(pair, pair.doubleValue());
       minmaxabod.put(pair.doubleValue());
     }
@@ -403,8 +405,8 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     return (kernelMatrix.getDistance(ai, ai) + kernelMatrix.getDistance(bi, ci) - kernelMatrix.getDistance(ai, ci) - kernelMatrix.getDistance(ai, bi));
   }
 
-  private Heap<DoubleDBIDPair> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
-    Heap<DoubleDBIDPair> nn = new Heap<>(sampleSize);
+  private ComparableMinHeap<DoubleDBIDPair> calcDistsandNN(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
+    ComparableMinHeap<DoubleDBIDPair> nn = new ComparableMinHeap<>(sampleSize);
     for (DBIDIter bKey = data.iterDBIDs(); bKey.valid(); bKey.advance()) {
       double val = calcCos(kernelMatrix, aKey, bKey);
       dists.putDouble(bKey, val);
@@ -419,8 +421,8 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     return nn;
   }
 
-  private Heap<DoubleDBIDPair> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
-    Heap<DoubleDBIDPair> nn = new Heap<>(sampleSize);
+  private ComparableMinHeap<DoubleDBIDPair> calcDistsandRNDSample(Relation<V> data, KernelMatrix kernelMatrix, int sampleSize, DBIDRef aKey, WritableDoubleDataStore dists) {
+    ComparableMinHeap<DoubleDBIDPair> nn = new ComparableMinHeap<>(sampleSize);
     int step = (int) ((double) data.size() / (double) sampleSize);
     int counter = 0;
     for (DBIDIter bKey = data.iterDBIDs(); bKey.valid(); bKey.advance()) {
@@ -444,14 +446,14 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   public String getExplanations(Relation<V> data) {
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, data, staticids);
     // PQ for Outlier Ranking
-    Heap<DoubleDBIDPair> pq = new Heap<>(data.size(), Collections.reverseOrder());
+    ComparableMaxHeap<DoubleDBIDPair> pq = new ComparableMaxHeap<>(data.size());
     HashMap<DBID, DBIDs> explaintab = new HashMap<>();
     // test all objects
     MeanVariance s = new MeanVariance(), s2 = new MeanVariance();
     for (DBIDIter objKey = data.iterDBIDs(); objKey.valid(); objKey.advance()) {
       s.reset();
       // Queue for the best explanation
-      Heap<DoubleDBIDPair> explain = new Heap<>();
+      ComparableMinHeap<DoubleDBIDPair> explain = new ComparableMinHeap<>();
       // determine Object
       // for each pair of other objects
       for (DBIDIter key1 = data.iterDBIDs(); key1.valid(); key1.advance()) {
