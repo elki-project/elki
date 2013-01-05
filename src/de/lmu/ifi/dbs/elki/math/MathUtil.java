@@ -51,6 +51,11 @@ public final class MathUtil {
   public static final double HALFPI = 0.5 * Math.PI;
 
   /**
+   * 1.5 times Pi.
+   */
+  public static final double ONEHALFPI = 1.5 * Math.PI;
+
+  /**
    * Square root of two times Pi.
    */
   public static final double SQRTTWOPI = Math.sqrt(TWOPI);
@@ -129,19 +134,21 @@ public final class MathUtil {
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
    */
   public static double fastHypot(double a, double b) {
-    if (a < 0) {
+    if(a < 0) {
       a = -a;
     }
-    if (b < 0) {
+    if(b < 0) {
       b = -b;
     }
-    if (a > b) {
+    if(a > b) {
       final double r = b / a;
       return a * Math.sqrt(1 + r * r);
-    } else if (b != 0) {
+    }
+    else if(b != 0) {
       final double r = a / b;
       return b * Math.sqrt(1 + r * r);
-    } else {
+    }
+    else {
       return 0.0;
     }
   }
@@ -159,17 +166,17 @@ public final class MathUtil {
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup> + c<sup>2</sup>)}
    */
   public static double fastHypot3(double a, double b, double c) {
-    if (a < 0) {
+    if(a < 0) {
       a = -a;
     }
-    if (b < 0) {
+    if(b < 0) {
       b = -b;
     }
-    if (c < 0) {
+    if(c < 0) {
       c = -c;
     }
     double m = (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
-    if (m <= 0) {
+    if(m <= 0) {
       return 0.0;
     }
     a = a / m;
@@ -188,7 +195,7 @@ public final class MathUtil {
   public static double mahalanobisDistance(Matrix weightMatrix, Vector o1_minus_o2) {
     double sqrDist = o1_minus_o2.transposeTimesTimes(weightMatrix, o1_minus_o2);
 
-    if (sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
+    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }
     return Math.sqrt(sqrDist);
@@ -204,7 +211,7 @@ public final class MathUtil {
   public static double mahalanobisDistance(double[][] weightMatrix, double[] o1_minus_o2) {
     double sqrDist = VMath.transposeTimesTimes(o1_minus_o2, weightMatrix, o1_minus_o2);
 
-    if (sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
+    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }
     return Math.sqrt(sqrDist);
@@ -223,14 +230,14 @@ public final class MathUtil {
   public static double pearsonCorrelationCoefficient(NumberVector<?> x, NumberVector<?> y) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
-    if (xdim != ydim) {
+    if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
-    if (xdim <= 0) {
+    if(xdim <= 0) {
       throw new IllegalArgumentException("Invalid arguments: dimensionality not positive.");
     }
     PearsonCorrelation pc = new PearsonCorrelation();
-    for (int i = 0; i < xdim; i++) {
+    for(int i = 0; i < xdim; i++) {
       pc.put(x.doubleValue(i), y.doubleValue(i), 1.0);
     }
     return pc.getCorrelation();
@@ -250,14 +257,14 @@ public final class MathUtil {
   public static double weightedPearsonCorrelationCoefficient(NumberVector<?> x, NumberVector<?> y, double[] weights) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
-    if (xdim != ydim) {
+    if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
-    if (xdim != weights.length) {
+    if(xdim != weights.length) {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
     }
     PearsonCorrelation pc = new PearsonCorrelation();
-    for (int i = 0; i < xdim; i++) {
+    for(int i = 0; i < xdim; i++) {
       pc.put(x.doubleValue(i), y.doubleValue(i), weights[i]);
     }
     return pc.getCorrelation();
@@ -277,14 +284,14 @@ public final class MathUtil {
   public static double weightedPearsonCorrelationCoefficient(NumberVector<?> x, NumberVector<?> y, NumberVector<?> weights) {
     final int xdim = x.getDimensionality();
     final int ydim = y.getDimensionality();
-    if (xdim != ydim) {
+    if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
-    if (xdim != weights.getDimensionality()) {
+    if(xdim != weights.getDimensionality()) {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
     }
     PearsonCorrelation pc = new PearsonCorrelation();
-    for (int i = 0; i < xdim; i++) {
+    for(int i = 0; i < xdim; i++) {
       pc.put(x.doubleValue(i), y.doubleValue(i), weights.doubleValue(i));
     }
     return pc.getCorrelation();
@@ -303,11 +310,11 @@ public final class MathUtil {
   public static double pearsonCorrelationCoefficient(double[] x, double[] y) {
     final int xdim = x.length;
     final int ydim = y.length;
-    if (xdim != ydim) {
+    if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
     PearsonCorrelation pc = new PearsonCorrelation();
-    for (int i = 0; i < xdim; i++) {
+    for(int i = 0; i < xdim; i++) {
       pc.put(x[i], y[i], 1.0);
     }
     return pc.getCorrelation();
@@ -327,14 +334,14 @@ public final class MathUtil {
   public static double weightedPearsonCorrelationCoefficient(double[] x, double[] y, double[] weights) {
     final int xdim = x.length;
     final int ydim = y.length;
-    if (xdim != ydim) {
+    if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
     }
-    if (xdim != weights.length) {
+    if(xdim != weights.length) {
       throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
     }
     PearsonCorrelation pc = new PearsonCorrelation();
-    for (int i = 0; i < xdim; i++) {
+    for(int i = 0; i < xdim; i++) {
       pc.put(x[i], y[i], weights[i]);
     }
     return pc.getCorrelation();
@@ -353,7 +360,7 @@ public final class MathUtil {
    */
   public static BigInteger factorial(BigInteger n) {
     BigInteger nFac = BigInteger.valueOf(1);
-    while (n.compareTo(BigInteger.valueOf(1)) > 0) {
+    while(n.compareTo(BigInteger.valueOf(1)) > 0) {
       nFac = nFac.multiply(n);
       n = n.subtract(BigInteger.valueOf(1));
     }
@@ -369,7 +376,7 @@ public final class MathUtil {
    */
   public static long factorial(int n) {
     long nFac = 1;
-    for (long i = n; i > 0; i--) {
+    for(long i = n; i > 0; i--) {
       nFac *= i;
     }
     return nFac;
@@ -388,7 +395,7 @@ public final class MathUtil {
   public static long binomialCoefficient(long n, long k) {
     final long m = Math.max(k, n - k);
     double temp = 1;
-    for (long i = n, j = 1; i > m; i--, j++) {
+    for(long i = n, j = 1; i > m; i--, j++) {
       temp = temp * i / j;
     }
     return (long) temp;
@@ -403,7 +410,7 @@ public final class MathUtil {
    */
   public static double approximateFactorial(int n) {
     double nFac = 1.0;
-    for (int i = n; i > 0; i--) {
+    for(int i = n; i > 0; i--) {
       nFac *= i;
     }
     return nFac;
@@ -420,7 +427,7 @@ public final class MathUtil {
   public static double approximateBinomialCoefficient(int n, int k) {
     final int m = Math.max(k, n - k);
     long temp = 1;
-    for (int i = n, j = 1; i > m; i--, j++) {
+    for(int i = n, j = 1; i > m; i--, j++) {
       temp = temp * i / j;
     }
     return temp;
@@ -455,7 +462,7 @@ public final class MathUtil {
    */
   public static double[] randomDoubleArray(int len, Random r) {
     final double[] ret = new double[len];
-    for (int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) {
       ret[i] = r.nextDouble();
     }
     return ret;
@@ -510,7 +517,7 @@ public final class MathUtil {
     // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
     // We can just compute all three in parallel.
     double s = 0, e1 = 0, e2 = 0;
-    for (int k = 0; k < v1.length; k++) {
+    for(int k = 0; k < v1.length; k++) {
       final double r1 = v1[k];
       final double r2 = v2[k];
       s += r1 * r2;
@@ -546,7 +553,7 @@ public final class MathUtil {
     // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
     // We can just compute all three in parallel.
     double s = 0, e1 = 0, e2 = 0;
-    for (int k = 0; k < v1.length; k++) {
+    for(int k = 0; k < v1.length; k++) {
       final double r1 = v1[k] - o[k];
       final double r2 = v2[k] - o[k];
       s += r1 * r2;
@@ -554,6 +561,56 @@ public final class MathUtil {
       e2 += r2 * r2;
     }
     return Math.sqrt((s / e1) * (s / e2));
+  }
+
+  /**
+   * Normalize an angle to [0:2pi[
+   * 
+   * @param x Input angle
+   * @return Normalized angle
+   */
+  public static double normAngle(double x) {
+    x %= TWOPI;
+    if(x > 0) {
+      return x;
+    }
+    else {
+      return x + TWOPI;
+    }
+  }
+
+  /**
+   * <b>Fast</b> way of computing cos(x) from x and sin(x).
+   * 
+   * @param angle Input angle x
+   * @param sin Sine of x.
+   * @return Cosine of x
+   */
+  public static double sinToCos(double angle, double sin) {
+    angle = normAngle(angle);
+    if(angle < Math.PI) {
+      return Math.sqrt((1 + sin) * (1 - sin));
+    }
+    else {
+      return -Math.sqrt((1 + sin) * (1 - sin));
+    }
+  }
+
+  /**
+   * <b>Fast</b> way of computing sin(x) from x and cos(x).
+   * 
+   * @param angle Input angle x
+   * @param cos Cosine of x.
+   * @return Sine of x
+   */
+  public static double cosToSin(double angle, double cos) {
+    angle = normAngle(angle);
+    if(angle < HALFPI || angle > ONEHALFPI) {
+      return Math.sqrt((1 + cos) * (1 - cos));
+    }
+    else {
+      return -Math.sqrt((1 + cos) * (1 - cos));
+    }
   }
 
   /**
@@ -640,48 +697,52 @@ public final class MathUtil {
    * @return Double value
    */
   public static double floatToDoubleUpper(float f) {
-    if (Float.isNaN(f)) {
+    if(Float.isNaN(f)) {
       return Double.NaN;
     }
-    if (Float.isInfinite(f)) {
-      if (f > 0) {
+    if(Float.isInfinite(f)) {
+      if(f > 0) {
         return Double.POSITIVE_INFINITY;
-      } else {
+      }
+      else {
         return Double.longBitsToDouble(0xc7efffffffffffffL);
       }
     }
     long bits = Double.doubleToRawLongBits((double) f);
-    if ((bits & 0x8000000000000000L) == 0) { // Positive
-      if (bits == 0L) {
+    if((bits & 0x8000000000000000L) == 0) { // Positive
+      if(bits == 0L) {
         return Double.longBitsToDouble(0x3690000000000000L);
       }
-      if (f == Float.MIN_VALUE) {
+      if(f == Float.MIN_VALUE) {
         // bits += 0x7_ffff_ffff_ffffl;
         return Double.longBitsToDouble(0x36a7ffffffffffffL);
       }
-      if (Float.MIN_NORMAL > f && f >= Double.MIN_NORMAL) {
+      if(Float.MIN_NORMAL > f && f >= Double.MIN_NORMAL) {
         // The most tricky case:
         // a denormalized float, but a normalized double
         final long bits2 = Double.doubleToRawLongBits((double) Math.nextUp(f));
         bits = (bits >>> 1) + (bits2 >>> 1) - 1L;
-      } else {
+      }
+      else {
         bits += 0xfffffffL; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
-    } else {
-      if (bits == 0x8000000000000000L) {
+    }
+    else {
+      if(bits == 0x8000000000000000L) {
         return -0.0d;
       }
-      if (f == -Float.MIN_VALUE) {
+      if(f == -Float.MIN_VALUE) {
         // bits -= 0xf_ffff_ffff_ffffl;
         return Double.longBitsToDouble(0xb690000000000001L);
       }
-      if (-Float.MIN_NORMAL < f && f <= -Double.MIN_NORMAL) {
+      if(-Float.MIN_NORMAL < f && f <= -Double.MIN_NORMAL) {
         // The most tricky case:
         // a denormalized float, but a normalized double
         final long bits2 = Double.doubleToRawLongBits((double) Math.nextUp(f));
         bits = (bits >>> 1) + (bits2 >>> 1) + 1L;
-      } else {
+      }
+      else {
         bits -= 0xfffffffL; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
@@ -698,48 +759,52 @@ public final class MathUtil {
    * @return Double value
    */
   public static double floatToDoubleLower(float f) {
-    if (Float.isNaN(f)) {
+    if(Float.isNaN(f)) {
       return Double.NaN;
     }
-    if (Float.isInfinite(f)) {
-      if (f < 0) {
+    if(Float.isInfinite(f)) {
+      if(f < 0) {
         return Double.NEGATIVE_INFINITY;
-      } else {
+      }
+      else {
         return Double.longBitsToDouble(0x47efffffffffffffL);
       }
     }
     long bits = Double.doubleToRawLongBits((double) f);
-    if ((bits & 0x8000000000000000L) == 0) { // Positive
-      if (bits == 0L) {
+    if((bits & 0x8000000000000000L) == 0) { // Positive
+      if(bits == 0L) {
         return +0.0d;
       }
-      if (f == Float.MIN_VALUE) {
+      if(f == Float.MIN_VALUE) {
         // bits -= 0xf_ffff_ffff_ffffl;
         return Double.longBitsToDouble(0x3690000000000001L);
       }
-      if (Float.MIN_NORMAL > f /* && f >= Double.MIN_NORMAL */) {
+      if(Float.MIN_NORMAL > f /* && f >= Double.MIN_NORMAL */) {
         // The most tricky case:
         // a denormalized float, but a normalized double
         final long bits2 = Double.doubleToRawLongBits((double) -Math.nextUp(-f));
         bits = (bits >>> 1) + (bits2 >>> 1) + 1L; // + (0xfff_ffffL << 18);
-      } else {
+      }
+      else {
         bits -= 0xfffffffL; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
-    } else {
-      if (bits == 0x8000000000000000L) {
+    }
+    else {
+      if(bits == 0x8000000000000000L) {
         return Double.longBitsToDouble(0xb690000000000000L);
       }
-      if (f == -Float.MIN_VALUE) {
+      if(f == -Float.MIN_VALUE) {
         // bits += 0x7_ffff_ffff_ffffl;
         return Double.longBitsToDouble(0xb6a7ffffffffffffL);
       }
-      if (-Float.MIN_NORMAL < f /* && f <= -Double.MIN_NORMAL */) {
+      if(-Float.MIN_NORMAL < f /* && f <= -Double.MIN_NORMAL */) {
         // The most tricky case:
         // a denormalized float, but a normalized double
         final long bits2 = Double.doubleToRawLongBits((double) -Math.nextUp(-f));
         bits = (bits >>> 1) + (bits2 >>> 1) - 1L;
-      } else {
+      }
+      else {
         bits += 0xfffffffL; // 28 extra bits
       }
       return Double.longBitsToDouble(bits);
