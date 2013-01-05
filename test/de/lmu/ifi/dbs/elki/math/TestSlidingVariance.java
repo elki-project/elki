@@ -9,7 +9,7 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
 /**
- * Unit test if negative weights in {@link MeanVariance} work as desired.
+ * Unit test {@link MeanVariance} with negative weights.
  * 
  * @author Erich Schubert
  */
@@ -29,11 +29,12 @@ public class TestSlidingVariance implements JUnit4Test {
     MeanVariance mv = new MeanVariance();
     MeanVariance mc = new MeanVariance();
 
-    Random r = new Random();
+    Random r = new Random(0);
     double[] data = new double[SIZE];
     for(int i = 0; i < data.length; i++) {
       data[i] = r.nextDouble();
     }
+    // Arrays.sort(data);
 
     // Pre-roll:
     for(int i = 0; i < WINDOWSIZE; i++) {
@@ -60,8 +61,8 @@ public class TestSlidingVariance implements JUnit4Test {
         var += v * v;
       }
       var /= (WINDOWSIZE - 1);
-      assertEquals("Variance does not agree.", mv.getSampleVariance(), mc.getSampleVariance(), 1e-14);
-      assertEquals("Variance does not agree.", mv.getSampleVariance(), var, 1e-14);
+      assertEquals("Variance does not agree at i=" + i, mv.getSampleVariance(), mc.getSampleVariance(), 1e-14);
+      assertEquals("Variance does not agree at i=" + i, mv.getSampleVariance(), var, 1e-14);
     }
   }
 }
