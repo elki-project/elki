@@ -1,3 +1,4 @@
 de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution$NaiveEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution$ChoiWetteEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution$NaiveEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution$OlivierNorbergEstimator

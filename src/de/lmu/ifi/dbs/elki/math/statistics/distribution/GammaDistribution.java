@@ -27,6 +27,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -41,6 +42,11 @@ public class GammaDistribution implements DistributionWithRandom {
    * Static class for parameter estimation.
    */
   public static final ChoiWetteEstimator CHOI_WETTE_ESTIMATOR = new ChoiWetteEstimator();
+
+  /**
+   * Static class for parameter estimation.
+   */
+  public static final NaiveEstimator NAIVE_ESTIMATOR = new NaiveEstimator();
 
   /**
    * Euler–Mascheroni constant
@@ -878,6 +884,67 @@ public class GammaDistribution implements DistributionWithRandom {
     } else {
       // Stirling expansion
       return trigamma(x + 1.) - 1. / (x * x);
+    }
+  }
+
+  /**
+   * Simple parameter estimation for the Gamma distribution.
+   * 
+   * This is a very naive estimation, based on the mean and variance only.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has GammaDistribution - - estimates
+   */
+  public static class NaiveEstimator implements DistributionEstimator<GammaDistribution> {
+    /**
+     * Private constructor.
+     */
+    private NaiveEstimator() {
+      // Do not instantiate - use static class
+    }
+
+    @Override
+    public <A> GammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      final int len = adapter.size(data);
+      MeanVariance mv = new MeanVariance();
+      for (int i = 0; i < len; i++) {
+        mv.put(adapter.getDouble(data, i));
+      }
+      return estimate(mv);
+    }
+
+    /**
+     * Simple parameter estimation for Gamma distribution.
+     * 
+     * @param mv Mean and Variance
+     * @return Gamma distribution
+     */
+    private GammaDistribution estimate(MeanVariance mv) {
+      final double mu = mv.getMean();
+      final double var = mv.getSampleVariance();
+      final double k = mu * mu / var;
+      final double theta = Math.sqrt(var) / (mu * mu);
+      return new GammaDistribution(k, theta);
+    }
+
+    @Override
+    public Class<? super GammaDistribution> getDistributionClass() {
+      return GammaDistribution.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected NaiveEstimator makeInstance() {
+        return NAIVE_ESTIMATOR;
+      }
     }
   }
 
