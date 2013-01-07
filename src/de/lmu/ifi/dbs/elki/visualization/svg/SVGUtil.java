@@ -43,6 +43,7 @@ import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Utility class for SVG processing.
@@ -642,10 +643,10 @@ public final class SVGUtil {
    */
   public static Element svgCircleSegment(SVGPlot svgp, double centerx, double centery, double angleStart, double angleDelta, double innerRadius, double outerRadius) {
     double sin1st = Math.sin(angleStart);
-    double cos1st = Math.cos(angleStart);
+    double cos1st = MathUtil.sinToCos(angleStart, sin1st);
 
     double sin2nd = Math.sin(angleStart + angleDelta);
-    double cos2nd = Math.cos(angleStart + angleDelta);
+    double cos2nd = MathUtil.sinToCos(angleStart + angleDelta, sin2nd);
 
     double inner1stx = centerx + (innerRadius * sin1st);
     double inner1sty = centery - (innerRadius * cos1st);

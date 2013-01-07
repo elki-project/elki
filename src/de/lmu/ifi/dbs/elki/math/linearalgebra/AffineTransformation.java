@@ -2,6 +2,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -215,10 +217,11 @@ public class AffineTransformation {
       ht[i][i] = 1.0;
     }
     // insert rotation values
-    ht[axis1][axis1] = +Math.cos(angle);
-    ht[axis1][axis2] = -Math.sin(angle);
-    ht[axis2][axis1] = +Math.sin(angle);
-    ht[axis2][axis2] = +Math.cos(angle);
+    double c = Math.cos(angle), s = MathUtil.cosToSin(angle, c);
+    ht[axis1][axis1] = +c;
+    ht[axis1][axis2] = -s;
+    ht[axis2][axis1] = +s;
+    ht[axis2][axis2] = +c;
     // Multiply from left
     trans = new Matrix(ht).times(trans);
   }

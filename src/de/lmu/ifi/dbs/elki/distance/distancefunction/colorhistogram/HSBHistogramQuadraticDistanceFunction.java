@@ -89,8 +89,14 @@ public class HSBHistogramQuadraticDistanceFunction extends WeightedDistanceFunct
         final int sy = (y / quantb) % quants;
         final int by = y % quantb;
 
-        final double cos = Math.cos((hx + .5) / quanth * MathUtil.TWOPI) * (sx + .5) / quants - Math.cos((hy + .5) / quanth * MathUtil.TWOPI) * (sy + .5) / quants;
-        final double sin = Math.sin((hx + .5) / quanth * MathUtil.TWOPI) * (sx + .5) / quants - Math.sin((hy + .5) / quanth * MathUtil.TWOPI) * (sy + .5) / quants;
+        final double chx = Math.cos((hx + .5) / quanth * MathUtil.TWOPI);
+        final double chy = Math.cos((hy + .5) / quanth * MathUtil.TWOPI);
+        // final double shx = Math.sin((hx + .5) / quanth * MathUtil.TWOPI);
+        final double shx = MathUtil.cosToSin((hx + .5) / quanth * MathUtil.TWOPI, chx);
+        // final double shy = Math.sin((hy + .5) / quanth * MathUtil.TWOPI);
+        final double shy = MathUtil.cosToSin((hy + .5) / quanth * MathUtil.TWOPI, chy);
+        final double cos = chx * (sx + .5) / quants - chy * (sy + .5) / quants;
+        final double sin = shx * (sx + .5) / quants - shy * (sy + .5) / quants;
         final double db = (bx - by) / (double) quantb;
         final double val = 1. - Math.sqrt((db * db + sin * sin + cos * cos) / 5);
         m.set(x, y, val);

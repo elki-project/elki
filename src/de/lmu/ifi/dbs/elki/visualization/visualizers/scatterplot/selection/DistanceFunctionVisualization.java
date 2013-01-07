@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -180,7 +181,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       double l1 = VMath.scalarProduct(pm, p1), l2 = VMath.scalarProduct(pm, p2);
       // Rotate projection by + and - angle
       // Using sin(-x) = -sin(x) and cos(-x)=cos(x)
-      final double cangle = Math.cos(angle), sangle = Math.sin(angle);
+      final double cangle = Math.cos(angle), sangle = MathUtil.cosToSin(angle, cangle);
       double r11 = +cangle * l1 - sangle * l2, r12 = +sangle * l1 + cangle * l2;
       double r21 = +cangle * l1 + sangle * l2, r22 = -sangle * l1 + cangle * l2;
       // Build rotated vectors - remove projected component, add rotated

@@ -567,7 +567,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
   private double sinusProduct(int start, int end, double[] alpha) {
     double result = 1;
     for (int j = start; j < end; j++) {
-      result *= StrictMath.sin(alpha[j]);
+      result *= Math.sin(alpha[j]);
     }
     return result;
   }
