@@ -97,7 +97,7 @@ public class DoubleObjectMinHeap<V> extends DoubleObjectHeap<V> {
     }
     keys[pos] = curkey;
     values[pos] = curval;
-    return (pos == ipos);
+    return (pos != ipos);
   }
 
   /**

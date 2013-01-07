@@ -32,7 +32,7 @@ public class AbstractHeap {
   /**
    * Default initial capacity
    */
-  public static final int DEFAULT_INITIAL_CAPACITY = 11;
+  public static final int DEFAULT_INITIAL_CAPACITY = 21;
 
   /**
    * Current number of objects

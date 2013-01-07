@@ -97,7 +97,7 @@ public class IntegerObjectMaxHeap<V> extends IntegerObjectHeap<V> {
     }
     keys[pos] = curkey;
     values[pos] = curval;
-    return (pos == ipos);
+    return (pos != ipos);
   }
 
   /**

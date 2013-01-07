@@ -101,7 +101,7 @@ public class TestIntegerMinHeapPerformance {
     }
     // Poll first half.
     for(int i = 0; i < elements.size() >> 1; i++) {
-      assertEquals((int) pq.poll(), i);
+      assertEquals(pq.poll(), i);
       // assertEquals((int) pq.poll(), queueSize - 1 - i);
     }
     assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
