@@ -191,9 +191,9 @@ public final class GeoUtil {
     final double slat1 = Math.sin(lat1);
     final double slat2 = Math.sin(lat2);
     final double slond = Math.sin(dlon * .5);
-    final double clat1 = Math.cos(lat1);
-    final double clat2 = Math.cos(lat2);
-    final double clond = Math.cos(dlon * .5);
+    final double clat1 = MathUtil.sinToCos(lat1, slat1);
+    final double clat2 = MathUtil.sinToCos(lat2, slat2);
+    final double clond = MathUtil.sinToCos(dlon * .5, slond);
     final double a = clat2 * slond;
     final double b = (clat1 * slat2) - (slat1 * clat2 * clond);
     final double d = Math.atan2(Math.sqrt(a * a + b * b), slat1 * slat2 + clat1 * clat2 * clond);
@@ -243,20 +243,25 @@ public final class GeoUtil {
     final double slat1 = Math.sin(lat1);
     final double slatQ = Math.sin(latQ);
     final double slat2 = Math.sin(lat2);
-    final double clat1 = Math.cos(lat1);
-    final double clatQ = Math.cos(latQ);
-    final double clat2 = Math.cos(lat2);
+    final double clat1 = MathUtil.sinToCos(lat1, slat1);
+    final double clatQ = MathUtil.sinToCos(latQ, slatQ);
+    final double clat2 = MathUtil.sinToCos(lat2, slat2);
 
     // Compute the course
     final double crs12, crs1Q;
     {
       // y = sin(dlon) * cos(lat2)
-      double yE = Math.sin(dlon12) * clat2;
-      double yQ = Math.sin(dlon1Q) * clatQ;
+      final double sdlon12 = Math.sin(dlon12);
+      final double cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
+      final double sdlon1Q = Math.sin(dlon1Q);
+      final double cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+
+      double yE = sdlon12 * clat2;
+      double yQ = sdlon1Q * clatQ;
 
       // x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
-      double xE = clat1 * slat2 - slat1 * clat2 * Math.cos(dlon12);
-      double xQ = clat1 * slatQ - slat1 * clatQ * Math.cos(dlon1Q);
+      double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
+      double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
 
       crs12 = Math.atan2(yE, xE);
       crs1Q = Math.atan2(yQ, xQ);
@@ -311,9 +316,9 @@ public final class GeoUtil {
     final double clat1 = Math.cos(lat1);
     final double clatQ = Math.cos(latQ);
     final double clat2 = Math.cos(lat2);
-    final double slat1 = Math.sin(lat1);
-    final double slatQ = Math.sin(latQ);
-    final double slat2 = Math.sin(lat2);
+    final double slat1 = MathUtil.cosToSin(lat1, clat1);
+    final double slatQ = MathUtil.cosToSin(latQ, clatQ);
+    final double slat2 = MathUtil.cosToSin(lat2, clat2);
 
     // Haversine formula, higher precision at < 1 meters but maybe issues at
     // antipodal points - we do not yet multiply with the radius!
@@ -329,12 +334,16 @@ public final class GeoUtil {
     final double crs12, crs1Q;
     {
       // y = sin(dlon) * cos(lat2)
-      double yE = Math.sin(dlon12) * clat2;
-      double yQ = Math.sin(dlon1Q) * clatQ;
+      final double sdlon12 = Math.sin(dlon12);
+      final double sdlon1Q = Math.sin(dlon1Q);
+      final double cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
+      final double cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+      double yE = sdlon12 * clat2;
+      double yQ = sdlon1Q * clatQ;
 
       // x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
-      double xE = clat1 * slat2 - slat1 * clat2 * Math.cos(dlon12);
-      double xQ = clat1 * slatQ - slat1 * clatQ * Math.cos(dlon1Q);
+      double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
+      double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
 
       crs12 = Math.atan2(yE, xE);
       crs1Q = Math.atan2(yQ, xQ);
@@ -471,16 +480,16 @@ public final class GeoUtil {
 
     // Compute sine and cosine values we will certainly need below:
     final double slatQ = Math.sin(plat);
-    final double clatQ = Math.cos(plat);
+    final double clatQ = MathUtil.sinToCos(plat, slatQ);
     final double slatN = Math.sin(rmaxlat);
-    final double clatN = Math.cos(rmaxlat);
+    final double clatN = MathUtil.sinToCos(rmaxlat, slatN);
     final double slatS = Math.sin(rminlat);
-    final double clatS = Math.cos(rminlat);
+    final double clatS = MathUtil.sinToCos(rminlat, slatS);
 
     // East, to min edge:
     if (lngE <= -lngW) {
       final double slngD = Math.sin(lngE);
-      final double clngD = Math.cos(lngE);
+      final double clngD = MathUtil.sinToCos(lngE, slngD);
 
       // Bearing to south
       // Math.atan2(slngD * clatS, clatQ * slatS - slatQ * clatS * clngD);
@@ -516,7 +525,7 @@ public final class GeoUtil {
       }
     } else { // West, to max edge
       final double slngD = Math.sin(lngW);
-      final double clngD = Math.cos(lngW);
+      final double clngD = MathUtil.sinToCos(lngW, slngD);
 
       // Bearing to south
       // Math.atan2(slngD * clatS, clatQ * slatS - slatQ * clatS * clngD);
@@ -567,9 +576,9 @@ public final class GeoUtil {
     lngS = MathUtil.deg2rad(lngS);
     lngE = MathUtil.deg2rad(lngE);
     final double slatS = Math.sin(latS);
-    final double clatS = Math.cos(latS);
+    final double clatS = MathUtil.sinToCos(latS, slatS);
     final double slatE = Math.sin(latE);
-    final double clatE = Math.cos(latE);
+    final double clatE = MathUtil.sinToCos(latE, slatE);
     return Math.atan2(-Math.sin(lngS - lngE) * clatE, clatS * slatE - slatS * clatE * Math.cos(lngS - lngE));
   }
 
@@ -589,8 +598,8 @@ public final class GeoUtil {
     lat = Math.toRadians(lat);
     lng = Math.toRadians(lng);
     // Sine and cosines:
-    final double clat = Math.cos(lat), slat = Math.sin(lat);
-    final double clng = Math.cos(lng), slng = Math.sin(lng);
+    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
 
     // Eccentricity squared
     final double v = WGS84_RADIUS / (Math.sqrt(1 - WGS84_ECCENTRICITY_SQUARED * slat * slat));
@@ -614,8 +623,8 @@ public final class GeoUtil {
     lat = MathUtil.rad2deg(lat);
     lng = MathUtil.rad2deg(lng);
     // Sine and cosines:
-    final double clat = Math.cos(lat), slat = Math.sin(lat);
-    final double clng = Math.cos(lng), slng = Math.sin(lng);
+    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
     return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
   }
 

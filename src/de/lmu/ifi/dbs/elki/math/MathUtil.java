@@ -588,7 +588,7 @@ public final class MathUtil {
    */
   public static double sinToCos(double angle, double sin) {
     angle = normAngle(angle);
-    if(angle < Math.PI) {
+    if(angle < HALFPI || angle > ONEHALFPI) {
       return Math.sqrt((1 + sin) * (1 - sin));
     }
     else {
@@ -605,7 +605,7 @@ public final class MathUtil {
    */
   public static double cosToSin(double angle, double cos) {
     angle = normAngle(angle);
-    if(angle < HALFPI || angle > ONEHALFPI) {
+    if(angle < Math.PI) {
       return Math.sqrt((1 + cos) * (1 - cos));
     }
     else {

@@ -97,7 +97,7 @@ public abstract class SinCosTable {
       double ang = 0.;
       for (int i = 0; i < steps; i++, ang += radstep) {
         this.costable[i] = Math.cos(ang);
-        this.sintable[i] = Math.sin(ang);
+        this.sintable[i] = MathUtil.cosToSin(ang, this.costable[i]);
       }
     }
 
