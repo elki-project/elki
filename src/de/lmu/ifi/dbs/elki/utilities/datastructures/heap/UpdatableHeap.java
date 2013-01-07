@@ -299,7 +299,7 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
     queue[pos] = cur;
     index.put(cur, pos);
-    return (pos == ipos);
+    return (pos != ipos);
   }
 
   @Override
@@ -333,6 +333,6 @@ public class UpdatableHeap<O> extends Heap<O> {
     }
     queue[pos] = cur;
     index.put(cur, pos);
-    return (pos == ipos);
+    return (pos != ipos);
   }
 }

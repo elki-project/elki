@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
@@ -36,6 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * n). This is implemented via a simple validTo counter.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has UnsortedIter
  */
 public abstract class DoubleHeap extends AbstractHeap {
   /**
@@ -69,8 +72,8 @@ public abstract class DoubleHeap extends AbstractHeap {
     this.size += 1;
     // As bulk repairs do not (yet) perform as expected
     // We will for now immediately repair the heap!
-    heapifyUp(size - 1, key);
-    validSize += 1;
+    // heapifyUp(size - 1, key);
+    // validSize += 1;
     heapModified();
   }
 
@@ -142,7 +145,7 @@ public abstract class DoubleHeap extends AbstractHeap {
         while (pos >= nextmin) {
           // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
           while (pos >= curmin) {
-            if (!heapifyDown(pos, queue[pos])) {
+            if (heapifyDown(pos, queue[pos])) {
               final int parent = (pos - 1) >>> 1;
               if (parent < curmin) {
                 nextmin = Math.min(nextmin, parent);
@@ -231,14 +234,14 @@ public abstract class DoubleHeap extends AbstractHeap {
         }
       }
 
-      if (comp(chikey, curkey)) { // Compare
+      if (!comp(curkey, chikey)) { // Compare
         break;
       }
       queue[pos] = chikey;
       pos = cpos;
     }
     queue[pos] = curkey;
-    return (pos == ipos);
+    return (pos != ipos);
   }
 
   /**
@@ -285,15 +288,23 @@ public abstract class DoubleHeap extends AbstractHeap {
      * Iterator position.
      */
     int pos = 0;
+    
+    /**
+     * Modification counter we were initialized at.
+     */
+    final int myModCount = modCount;
 
     @Override
     public boolean valid() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
       return pos < size;
     }
 
     @Override
     public void advance() {
-      pos ++;
+      pos++;
     }
 
     /**
@@ -302,6 +313,9 @@ public abstract class DoubleHeap extends AbstractHeap {
      * @return Current object
      */
     public double get() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
       return queue[pos];
     }
   }

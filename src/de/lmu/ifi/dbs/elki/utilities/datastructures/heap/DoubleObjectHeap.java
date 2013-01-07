@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
@@ -38,6 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * @author Erich Schubert
  * 
  * @param <V> Value type
+ * 
+ * @apiviz.has UnsortedIter
  */
 public abstract class DoubleObjectHeap<V> extends AbstractHeap {
   /**
@@ -86,8 +89,8 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
     this.size += 1;
     // As bulk repairs do not (yet) perform as expected
     // We will for now immediately repair the heap!
-    heapifyUp(size - 1, key, val);
-    validSize += 1;
+    // heapifyUp(size - 1, key, val);
+    // validSize += 1;
     heapModified();
   }
 
@@ -199,7 +202,7 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
         while (pos >= nextmin) {
           // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
           while (pos >= curmin) {
-            if (!heapifyDown(pos, keys[pos], values[pos])) {
+            if (heapifyDown(pos, keys[pos], values[pos])) {
               final int parent = (pos - 1) >>> 1;
               if (parent < curmin) {
                 nextmin = Math.min(nextmin, parent);
@@ -264,8 +267,16 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
      */
     int pos = 0;
 
+    /**
+     * Modification counter we were initialized at.
+     */
+    final int myModCount = modCount;
+
     @Override
     public boolean valid() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
       return pos < size;
     }
 
@@ -283,7 +294,6 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
       return keys[pos];
     }
 
-
     /**
      * Get the current value
      * 
@@ -291,6 +301,9 @@ public abstract class DoubleObjectHeap<V> extends AbstractHeap {
      */
     @SuppressWarnings("unchecked")
     public V getValue() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
       return (V) values[pos];
     }
   }

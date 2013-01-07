@@ -49,7 +49,7 @@ public class Heap<E> implements Iterable<E> {
   /**
    * Heap storage.
    */
-  protected transient Object[] queue;
+  protected Object[] queue;
 
   /**
    * Current number of objects.
@@ -69,7 +69,7 @@ public class Heap<E> implements Iterable<E> {
   /**
    * (Structural) modification counter. Used to invalidate iterators.
    */
-  private transient int modCount = 0;
+  private int modCount = 0;
 
   /**
    * Default initial capacity.
@@ -130,8 +130,8 @@ public class Heap<E> implements Iterable<E> {
     this.size += 1;
     // As bulk repairs do not (yet) perform as expected
     // We will for now immediately repair the heap!
-    heapifyUp(size - 1, e);
-    validSize += 1;
+    // heapifyUp(size - 1, e);
+    // validSize += 1;
     heapModified();
   }
 
@@ -192,7 +192,7 @@ public class Heap<E> implements Iterable<E> {
           while (pos >= nextmin) {
             // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
             while (pos >= curmin) {
-              if (!heapifyDownComparator(pos, queue[pos])) {
+              if (heapifyDownComparator(pos, queue[pos])) {
                 final int parent = (pos - 1) >>> 1;
                 if (parent < curmin) {
                   nextmin = Math.min(nextmin, parent);
@@ -215,7 +215,7 @@ public class Heap<E> implements Iterable<E> {
           while (pos >= nextmin) {
             // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
             while (pos >= curmin) {
-              if (!heapifyDownComparable(pos, queue[pos])) {
+              if (heapifyDownComparable(pos, queue[pos])) {
                 final int parent = (pos - 1) >>> 1;
                 if (parent < curmin) {
                   nextmin = Math.min(nextmin, parent);
@@ -369,7 +369,7 @@ public class Heap<E> implements Iterable<E> {
       pos = cpos;
     }
     queue[pos] = cur;
-    return (pos == ipos);
+    return (pos != ipos);
   }
 
   /**
@@ -407,7 +407,7 @@ public class Heap<E> implements Iterable<E> {
       pos = min;
     }
     queue[pos] = cur;
-    return (pos == ipos);
+    return (pos != ipos);
   }
 
   /**
