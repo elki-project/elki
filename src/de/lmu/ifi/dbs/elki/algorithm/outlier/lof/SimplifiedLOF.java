@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -79,11 +80,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <D> Distance type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", title = "Local outlier detection reconsidered: a generalized view on locality with applications to spatial, video, and network outlier detection", booktitle = "Data Mining and Knowledge Discovery", url = "http://dx.doi.org/10.1007/s10618-012-0300-z")
-public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+@Alias({ "SimpleLOF", "outlier.SimpleLOF", "de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleLOF" })
+public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(SimpleLOF.class);
+  private static final Logging LOG = Logging.getLogger(SimplifiedLOF.class);
 
   /**
    * Parameter k.
@@ -95,7 +97,7 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
    * 
    * @param k the value of k
    */
-  public SimpleLOF(int k, DistanceFunction<? super O, D> distance) {
+  public SimplifiedLOF(int k, DistanceFunction<? super O, D> distance) {
     super(distance);
     this.k = k + 1;
   }
@@ -253,8 +255,8 @@ public class SimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistan
     }
 
     @Override
-    protected SimpleLOF<O, D> makeInstance() {
-      return new SimpleLOF<>(k, distanceFunction);
+    protected SimplifiedLOF<O, D> makeInstance() {
+      return new SimplifiedLOF<>(k, distanceFunction);
     }
   }
 }
