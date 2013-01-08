@@ -109,7 +109,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
   @Deprecated
   public Integer getValue(int dimension) {
     try {
-      return Integer.valueOf(values[dimension - 1]);
+      return Integer.valueOf(values[dimension]);
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -129,7 +129,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
   @Override
   public double doubleValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return values[dimension];
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
@@ -149,7 +149,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
   @Override
   public long longValue(int dimension) {
     try {
-      return values[dimension - 1];
+      return values[dimension];
     } catch (IndexOutOfBoundsException e) {
       throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
     }
