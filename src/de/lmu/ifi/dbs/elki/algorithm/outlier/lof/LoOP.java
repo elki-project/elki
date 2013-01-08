@@ -87,7 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 @Title("LoOP: Local Outlier Probabilities")
 @Description("Variant of the LOF algorithm normalized using statistical values.")
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", title = "LoOP: Local Outlier Probabilities", booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", url = "http://dx.doi.org/10.1145/1645953.1646195")
-@Alias({"de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP"})
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP", "LoOP", "outlier.LoOP" })
 public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

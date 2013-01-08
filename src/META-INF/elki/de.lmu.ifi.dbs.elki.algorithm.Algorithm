@@ -56,7 +56,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleLOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.OUTRES
 de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.OutRankS1
