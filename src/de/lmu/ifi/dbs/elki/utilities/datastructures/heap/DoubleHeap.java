@@ -26,15 +26,13 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
  * Basic in-memory heap structure for double values.
  * 
- * This heap is built lazily: if you first add many elements, then poll the
- * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
- * n). This is implemented via a simple validTo counter.
+ * After extensive microbenchmarking we arrived back at this very simple heap:
+ * Bulk-loading did not improve the performance in the general case.
  * 
  * @author Erich Schubert
  * 
@@ -67,13 +65,8 @@ public abstract class DoubleHeap extends AbstractHeap {
     if (size + 1 > queue.length) {
       resize(size + 1);
     }
-    // final int pos = size;
-    this.queue[size] = key;
-    this.size += 1;
-    // As bulk repairs do not (yet) perform as expected
-    // We will for now immediately repair the heap!
-    // heapifyUp(size - 1, key);
-    // validSize += 1;
+    this.size++;
+    heapifyUp(size - 1, key);
     heapModified();
   }
 
@@ -100,7 +93,6 @@ public abstract class DoubleHeap extends AbstractHeap {
    * @return Previous top element of the heap
    */
   public double replaceTopElement(double e) {
-    ensureValid();
     double oldroot = queue[0];
     heapifyDown(0, e);
     heapModified();
@@ -116,7 +108,6 @@ public abstract class DoubleHeap extends AbstractHeap {
     if (size == 0) {
       throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
     }
-    ensureValid();
     return queue[0];
   }
 
@@ -126,41 +117,7 @@ public abstract class DoubleHeap extends AbstractHeap {
    * @return Top element
    */
   public double poll() {
-    ensureValid();
     return removeAt(0);
-  }
-
-  /**
-   * Repair the heap
-   */
-  protected void ensureValid() {
-    if (validSize != size) {
-      if (size > 1) {
-        // Parent of first invalid
-        int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
-        int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
-        int nextmax = curmin - 1; // End of valid line
-        int pos = (size - 2) >>> 1; // Parent of last element
-        // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
-        while (pos >= nextmin) {
-          // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
-          while (pos >= curmin) {
-            if (heapifyDown(pos, queue[pos])) {
-              final int parent = (pos - 1) >>> 1;
-              if (parent < curmin) {
-                nextmin = Math.min(nextmin, parent);
-                nextmax = Math.max(nextmax, parent);
-              }
-            }
-            pos--;
-          }
-          curmin = nextmin;
-          pos = Math.min(pos, nextmax);
-          nextmax = -1;
-        }
-      }
-      validSize = size;
-    }
   }
 
   /**
@@ -176,16 +133,8 @@ public abstract class DoubleHeap extends AbstractHeap {
     final double top = queue[0];
     // Replacement object:
     final double reinkey = queue[size - 1];
-    // Keep heap in sync
-    if (validSize == size) {
-      size -= 1;
-      validSize -= 1;
-      heapifyDown(pos, reinkey);
-    } else {
-      size -= 1;
-      validSize = Math.min(pos >>> 1, validSize);
-      queue[pos] = reinkey;
-    }
+    size--;
+    heapifyDown(pos, reinkey);
     heapModified();
     return top;
   }

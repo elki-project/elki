@@ -68,7 +68,6 @@ public class TopBoundedUpdatableHeap<E> extends UpdatableHeap<E> {
       super.offerAt(pos, e);
       return;
     }
-    ensureValid();
     if (compare(e, queue[0]) < 0) {
       // while we did not change, this still was "successful".
       return;

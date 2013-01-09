@@ -40,11 +40,6 @@ public class AbstractHeap {
   public int size = 0;
 
   /**
-   * Indicate up to where the heap is valid
-   */
-  public int validSize = 0;
-
-  /**
    * (Structural) modification counter. Used to invalidate iterators.
    */
   public int modCount = 0;
@@ -79,7 +74,6 @@ public class AbstractHeap {
    */
   public void clear() {
     this.size = 0;
-    this.validSize = 0;
     heapModified();
   }
 

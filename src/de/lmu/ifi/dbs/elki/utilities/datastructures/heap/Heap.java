@@ -29,8 +29,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Basic in-memory heap structure. Closely related to a
  * {@link java.util.PriorityQueue}, but here we can override methods to obtain
@@ -55,11 +53,6 @@ public class Heap<E> implements Iterable<E> {
    * Current number of objects.
    */
   protected int size = 0;
-
-  /**
-   * Indicate up to where the heap is valid.
-   */
-  protected int validSize = 0;
 
   /**
    * The comparator or {@code null}.
@@ -126,12 +119,8 @@ public class Heap<E> implements Iterable<E> {
       resize(size + 1);
     }
     // final int pos = size;
-    this.queue[size] = e;
     this.size += 1;
-    // As bulk repairs do not (yet) perform as expected
-    // We will for now immediately repair the heap!
-    // heapifyUp(size - 1, e);
-    // validSize += 1;
+    heapifyUp(size - 1, e);
     heapModified();
   }
 
@@ -144,7 +133,6 @@ public class Heap<E> implements Iterable<E> {
    */
   @SuppressWarnings("unchecked")
   public E replaceTopElement(E e) {
-    ensureValid();
     E oldroot = (E) queue[0];
     heapifyDown(0, e);
     heapModified();
@@ -161,7 +149,6 @@ public class Heap<E> implements Iterable<E> {
     if (size == 0) {
       return null;
     }
-    ensureValid();
     return (E) queue[0];
   }
 
@@ -171,67 +158,7 @@ public class Heap<E> implements Iterable<E> {
    * @return Top element.
    */
   public E poll() {
-    ensureValid();
     return removeAt(0);
-  }
-
-  /**
-   * Perform pending heap repair operations in a single bulk operation.
-   */
-  protected void ensureValid() {
-    if (validSize != size) {
-      if (size > 1) {
-        // Bottom up heap update.
-        if (comparator != null) {
-          // Parent of first invalid
-          int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
-          int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
-          int nextmax = curmin - 1; // End of valid line
-          int pos = (size - 2) >>> 1; // Parent of last element
-          // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
-          while (pos >= nextmin) {
-            // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
-            while (pos >= curmin) {
-              if (heapifyDownComparator(pos, queue[pos])) {
-                final int parent = (pos - 1) >>> 1;
-                if (parent < curmin) {
-                  nextmin = Math.min(nextmin, parent);
-                  nextmax = Math.max(nextmax, parent);
-                }
-              }
-              pos--;
-            }
-            curmin = nextmin;
-            pos = Math.min(pos, nextmax);
-            nextmax = -1;
-          }
-        } else {
-          // Parent of first invalid
-          int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
-          int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
-          int nextmax = curmin - 1; // End of valid line
-          int pos = (size - 2) >>> 1; // Parent of last element
-          // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
-          while (pos >= nextmin) {
-            // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
-            while (pos >= curmin) {
-              if (heapifyDownComparable(pos, queue[pos])) {
-                final int parent = (pos - 1) >>> 1;
-                if (parent < curmin) {
-                  nextmin = Math.min(nextmin, parent);
-                  nextmax = Math.max(nextmax, parent);
-                }
-              }
-              pos--;
-            }
-            curmin = nextmin;
-            pos = Math.min(pos, nextmax);
-            nextmax = -1;
-          }
-        }
-      }
-      validSize = size;
-    }
   }
 
   /**
@@ -249,16 +176,8 @@ public class Heap<E> implements Iterable<E> {
     // Replacement object:
     final Object reinsert = queue[size - 1];
     queue[size - 1] = null;
-    // Keep heap in sync
-    if (validSize == size) {
-      size -= 1;
-      validSize -= 1;
-      heapifyDown(pos, reinsert);
-    } else {
-      size -= 1;
-      validSize = Math.min(pos >>> 1, validSize);
-      queue[pos] = reinsert;
-    }
+    size--;
+    heapifyDown(pos, reinsert);
     heapModified();
     return ret;
   }
@@ -455,7 +374,6 @@ public class Heap<E> implements Iterable<E> {
       queue[i] = null;
     }
     this.size = 0;
-    this.validSize = 0;
     heapModified();
   }
 
@@ -528,7 +446,6 @@ public class Heap<E> implements Iterable<E> {
    * @return {@code null} when the heap is correct
    */
   protected String checkHeap() {
-    ensureValid();
     if (comparator == null) {
       for (int i = 1; i < size; i++) {
         final int parent = (i - 1) >>> 1;

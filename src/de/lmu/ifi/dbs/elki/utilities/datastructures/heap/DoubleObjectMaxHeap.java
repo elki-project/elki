@@ -24,11 +24,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 /**
- * Basic in-memory heap structure.
- * 
- * This heap is built lazily: if you first add many elements, then poll the
- * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
- * n). This is implemented via a simple validTo counter.
+ * Basic in-memory heap structure for double keys and Object values,
+ * ordered by maximum first.
  * 
  * @author Erich Schubert
  * 
@@ -108,7 +105,6 @@ public class DoubleObjectMaxHeap<V> extends DoubleObjectHeap<V> {
    * @return {@code null} when the heap is correct
    */
   protected String checkHeap() {
-    ensureValid();
     for (int i = 1; i < size; i++) {
       final int parent = (i - 1) >>> 1;
       if (keys[parent] < keys[i]) { // Compare
