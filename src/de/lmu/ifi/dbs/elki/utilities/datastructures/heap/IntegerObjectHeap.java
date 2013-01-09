@@ -26,15 +26,13 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap structure using int keys and V values.
+ * Basic in-memory heap structure using int keys and Object values.
  * 
- * This heap is built lazily: if you first add many elements, then poll the
- * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
- * n). This is implemented via a simple validTo counter.
+ * After extensive microbenchmarking we arrived back at this very simple heap:
+ * Bulk-loading did not improve the performance in the general case.
  * 
  * @author Erich Schubert
  * 
@@ -83,14 +81,8 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
     if (size + 1 > keys.length) {
       resize(size + 1);
     }
-    // final int pos = size;
-    this.keys[size] = key;
-    this.values[size] = val;
-    this.size += 1;
-    // As bulk repairs do not (yet) perform as expected
-    // We will for now immediately repair the heap!
-    // heapifyUp(size - 1, key, val);
-    // validSize += 1;
+    this.size++;
+    heapifyUp(size - 1, key, val);
     heapModified();
   }
 
@@ -102,7 +94,6 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
    * @param val Value of new element
    */
   public void replaceTopElement(int key, V val) {
-    ensureValid();
     heapifyDown(0, key, val);
     heapModified();
   }
@@ -116,7 +107,6 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
     if (size == 0) {
       throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
     }
-    ensureValid();
     return keys[0];
   }
 
@@ -130,7 +120,6 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
     if (size == 0) {
       throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
     }
-    ensureValid();
     return (V) values[0];
   }
 
@@ -154,17 +143,8 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
     final int reinkey = keys[size - 1];
     final Object reinval = values[size - 1];
     values[size - 1] = null;
-    // Keep heap in sync
-    if (validSize == size) {
-      size -= 1;
-      validSize -= 1;
-      heapifyDown(pos, reinkey, reinval);
-    } else {
-      size -= 1;
-      validSize = Math.min(pos >>> 1, validSize);
-      keys[pos] = reinkey;
-      values[pos] = reinval;
-    }
+    size--;
+    heapifyDown(pos, reinkey, reinval);
     heapModified();
   }
 
@@ -186,39 +166,6 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
    * @return true when the order was changed
    */
   abstract protected boolean heapifyDown(int ipos, int curkey, Object curval);
-
-  /**
-   * Repair the heap, if necessary.
-   */
-  protected void ensureValid() {
-    if (validSize != size) {
-      if (size > 1) {
-        // Parent of first invalid
-        int nextmin = validSize > 0 ? ((validSize - 1) >>> 1) : 0;
-        int curmin = MathUtil.nextAllOnesInt(nextmin); // Next line
-        int nextmax = curmin - 1; // End of valid line
-        int pos = (size - 2) >>> 1; // Parent of last element
-        // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin+", "+nextmin);
-        while (pos >= nextmin) {
-          // System.err.println(validSize+"<="+size+" iter:"+pos+"->"+curmin);
-          while (pos >= curmin) {
-            if (heapifyDown(pos, keys[pos], values[pos])) {
-              final int parent = (pos - 1) >>> 1;
-              if (parent < curmin) {
-                nextmin = Math.min(nextmin, parent);
-                nextmax = Math.max(nextmax, parent);
-              }
-            }
-            pos--;
-          }
-          curmin = nextmin;
-          pos = Math.min(pos, nextmax);
-          nextmax = -1;
-        }
-      }
-      validSize = size;
-    }
-  }
 
   /**
    * Test whether we need to resize to have the requested capacity.

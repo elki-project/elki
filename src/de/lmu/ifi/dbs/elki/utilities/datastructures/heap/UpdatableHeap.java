@@ -105,43 +105,32 @@ public class UpdatableHeap<O> extends Heap<O> {
    * @param e Element
    */
   protected void offerAt(final int pos, O e) {
-    if(pos == NO_VALUE) {
+    if (pos == NO_VALUE) {
       // resize when needed
-      if(size + 1 > queue.length) {
+      if (size + 1 > queue.length) {
         resize(size + 1);
       }
-      // final int pos = size;
-      this.queue[size] = e;
       index.put(e, size);
-      size += 1;
-      // We do NOT YET update the heap. This is done lazily.
+      size++;
+      heapifyUp(size - 1, e);
       heapModified();
       return;
-    }
-    else {
+    } else {
       assert (pos >= 0) : "Unexpected negative position.";
       assert (queue[pos].equals(e));
       // Did the value improve?
-      if(comparator == null) {
+      if (comparator == null) {
         @SuppressWarnings("unchecked")
         Comparable<Object> c = (Comparable<Object>) e;
-        if(c.compareTo(queue[pos]) >= 0) {
+        if (c.compareTo(queue[pos]) >= 0) {
+          return;
+        }
+      } else {
+        if (comparator.compare(e, queue[pos]) >= 0) {
           return;
         }
       }
-      else {
-        if(comparator.compare(e, queue[pos]) >= 0) {
-          return;
-        }
-      }
-      if(pos >= validSize) {
-        queue[pos] = e;
-        // validSize = Math.min(pos, validSize);
-      }
-      else {
-        // ensureValid();
-        heapifyUp(pos, e);
-      }
+      heapifyUp(pos, e);
       heapModified();
       return;
     }
@@ -149,7 +138,7 @@ public class UpdatableHeap<O> extends Heap<O> {
 
   @Override
   protected O removeAt(int pos) {
-    if(pos < 0 || pos >= size) {
+    if (pos < 0 || pos >= size) {
       return null;
     }
     @SuppressWarnings("unchecked")
@@ -158,33 +147,21 @@ public class UpdatableHeap<O> extends Heap<O> {
     final Object reinsert = queue[size - 1];
     queue[size - 1] = null;
     // Keep heap in sync?
-    if(validSize == size) {
-      size -= 1;
-      validSize -= 1;
-      if(comparator != null) {
-        if(comparator.compare(ret, reinsert) > 0) {
-          heapifyUpComparator(pos, reinsert);
-        }
-        else {
-          heapifyDownComparator(pos, reinsert);
-        }
+    size--;
+    if (comparator != null) {
+      if (comparator.compare(ret, reinsert) > 0) {
+        heapifyUpComparator(pos, reinsert);
+      } else {
+        heapifyDownComparator(pos, reinsert);
       }
-      else {
-        @SuppressWarnings("unchecked")
-        Comparable<Object> comp = (Comparable<Object>) ret;
-        if(comp.compareTo(reinsert) > 0) {
-          heapifyUpComparable(pos, reinsert);
-        }
-        else {
-          heapifyDownComparable(pos, reinsert);
-        }
+    } else {
+      @SuppressWarnings("unchecked")
+      Comparable<Object> comp = (Comparable<Object>) ret;
+      if (comp.compareTo(reinsert) > 0) {
+        heapifyUpComparable(pos, reinsert);
+      } else {
+        heapifyDownComparable(pos, reinsert);
       }
-    }
-    else {
-      size -= 1;
-      validSize = Math.min(pos >>> 1, validSize);
-      queue[pos] = reinsert;
-      index.put(reinsert, pos);
     }
     heapModified();
     // Keep index up to date
@@ -200,10 +177,9 @@ public class UpdatableHeap<O> extends Heap<O> {
    */
   public O removeObject(O e) {
     int pos = index.get(e);
-    if(pos >= 0) {
+    if (pos >= 0) {
       return removeAt(pos);
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -214,7 +190,7 @@ public class UpdatableHeap<O> extends Heap<O> {
     index.remove(node);
     return node;
   }
-  
+
   @Override
   public O replaceTopElement(O e) {
     O node = super.replaceTopElement(e);
@@ -232,11 +208,11 @@ public class UpdatableHeap<O> extends Heap<O> {
   @SuppressWarnings("unchecked")
   protected void heapifyUpComparable(int pos, Object elem) {
     final Comparable<Object> cur = (Comparable<Object>) elem; // queue[pos];
-    while(pos > 0) {
+    while (pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
 
-      if(cur.compareTo(par) >= 0) {
+      if (cur.compareTo(par) >= 0) {
         break;
       }
       queue[pos] = par;
@@ -255,11 +231,11 @@ public class UpdatableHeap<O> extends Heap<O> {
    */
   @Override
   protected void heapifyUpComparator(int pos, Object cur) {
-    while(pos > 0) {
+    while (pos > 0) {
       final int parent = (pos - 1) >>> 1;
       Object par = queue[parent];
 
-      if(comparator.compare(cur, par) >= 0) {
+      if (comparator.compare(cur, par) >= 0) {
         break;
       }
       queue[pos] = par;
@@ -276,21 +252,21 @@ public class UpdatableHeap<O> extends Heap<O> {
     Comparable<Object> cur = (Comparable<Object>) reinsert;
     int pos = ipos;
     final int half = size >>> 1;
-    while(pos < half) {
+    while (pos < half) {
       // Get left child (must exist!)
       int cpos = (pos << 1) + 1;
       Object child = queue[cpos];
       // Test right child, if present
       final int rchild = cpos + 1;
-      if(rchild < size) {
+      if (rchild < size) {
         Object right = queue[rchild];
-        if(((Comparable<Object>) child).compareTo(right) > 0) {
+        if (((Comparable<Object>) child).compareTo(right) > 0) {
           cpos = rchild;
           child = right;
         }
       }
 
-      if(cur.compareTo(child) <= 0) {
+      if (cur.compareTo(child) <= 0) {
         break;
       }
       queue[pos] = child;
@@ -306,25 +282,25 @@ public class UpdatableHeap<O> extends Heap<O> {
   protected boolean heapifyDownComparator(final int ipos, Object cur) {
     int pos = ipos;
     final int half = size >>> 1;
-    while(pos < half) {
+    while (pos < half) {
       int min = pos;
       Object best = cur;
 
       final int lchild = (pos << 1) + 1;
       Object left = queue[lchild];
-      if(comparator.compare(best, left) > 0) {
+      if (comparator.compare(best, left) > 0) {
         min = lchild;
         best = left;
       }
       final int rchild = lchild + 1;
-      if(rchild < size) {
+      if (rchild < size) {
         Object right = queue[rchild];
-        if(comparator.compare(best, right) > 0) {
+        if (comparator.compare(best, right) > 0) {
           min = rchild;
           best = right;
         }
       }
-      if(min == pos) {
+      if (min == pos) {
         break;
       }
       queue[pos] = best;

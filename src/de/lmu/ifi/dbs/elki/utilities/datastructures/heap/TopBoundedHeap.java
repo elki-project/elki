@@ -69,7 +69,6 @@ public class TopBoundedHeap<E> extends Heap<E> {
       return;
     }
     // Peek at the top element, return if we are worse.
-    ensureValid();
     final int comp;
     if (comparator == null) {
       @SuppressWarnings("unchecked")
