@@ -1,13 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
-import java.util.Comparator;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -31,6 +23,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Comparator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+
 /**
  * QuickSelect computes ("selects") the element at a given rank and can be used
  * to compute Medians and arbitrary quantiles by computing the appropriate rank.
@@ -49,7 +49,34 @@ public class QuickSelect {
   /**
    * For small arrays, use a simpler method:
    */
-  private static final int SMALL = 12;
+  private static final int SMALL = 47;
+
+  /**
+   * Choose the best pivot for the given rank.
+   * 
+   * @param rank Rank
+   * @param m1 Pivot candidate
+   * @param m2 Pivot candidate
+   * @param m3 Pivot candidate
+   * @param m4 Pivot candidate
+   * @param m5 Pivot candidate
+   * @return Best pivot candidate
+   */
+  private static final int bestPivot(int rank, int m1, int m2, int m3, int m4, int m5) {
+    if (rank < m1) {
+      return m1;
+    }
+    if (rank > m5) {
+      return m5;
+    }
+    if (rank < m2) {
+      return m2;
+    }
+    if (rank > m4) {
+      return m4;
+    }
+    return m3;
+  }
 
   /**
    * QuickSelect is essentially quicksort, except that we only "sort" that half
@@ -163,27 +190,53 @@ public class QuickSelect {
         return;
       }
 
-      // Pick pivot from three candidates: start, middle, end
-      // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) >> 1;
-      if (data[start] > data[middle]) {
-        swap(data, start, middle);
-      }
-      if (data[start] > data[end - 1]) {
-        swap(data, start, end - 1);
-      }
-      if (data[middle] > data[end - 1]) {
-        swap(data, middle, end - 1);
-      }
-      // TODO: use more candidates for larger arrays?
+      // Best of 5 pivot picking:
+      // Choose pivots by looking at five candidates.
+      final int len = end - start;
+      final int seventh = (len >> 3) + (len >> 6) + 1;
+      final int m3 = (start + end) >> 1; // middle
+      final int m2 = m3 - seventh;
+      final int m1 = m2 - seventh;
+      final int m4 = m3 + seventh;
+      final int m5 = m4 + seventh;
 
-      final double pivot = data[middle];
-      // Move middle element out of the way, just before end
-      // (Since we already know that "end" is bigger)
-      swap(data, middle, end - 2);
+      // Explicit (and optimal) sorting network for 5 elements
+      // See Knuth for details.
+      if (data[m1] > data[m2]) {
+        swap(data, m1, m2);
+      }
+      if (data[m1] > data[m3]) {
+        swap(data, m1, m3);
+      }
+      if (data[m2] > data[m3]) {
+        swap(data, m2, m3);
+      }
+      if (data[m4] > data[m5]) {
+        swap(data, m4, m5);
+      }
+      if (data[m1] > data[m4]) {
+        swap(data, m1, m4);
+      }
+      if (data[m3] > data[m4]) {
+        swap(data, m3, m4);
+      }
+      if (data[m2] > data[m5]) {
+        swap(data, m2, m5);
+      }
+      if (data[m2] > data[m3]) {
+        swap(data, m2, m3);
+      }
+      if (data[m4] > data[m5]) {
+        swap(data, m4, m5);
+      }
+
+      int best = bestPivot(rank, m1, m2, m3, m4, m5);
+      final double pivot = data[best];
+      // Move middle element out of the way.
+      swap(data, best, end - 1);
 
       // Begin partitioning
-      int i = start + 1, j = end - 3;
+      int i = start, j = end - 2;
       // This is classic quicksort stuff
       while (true) {
         while (i <= j && data[i] <= pivot) {
@@ -199,7 +252,7 @@ public class QuickSelect {
       }
 
       // Move pivot (former middle element) back into the appropriate place
-      swap(data, i, end - 2);
+      swap(data, i, end - 1);
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
@@ -349,27 +402,53 @@ public class QuickSelect {
         return;
       }
 
-      // Pick pivot from three candidates: start, middle, end
-      // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) >> 1;
-      if (data[start].compareTo(data[middle]) > 0) {
-        swap(data, start, middle);
-      }
-      if (data[start].compareTo(data[end - 1]) > 0) {
-        swap(data, start, end - 1);
-      }
-      if (data[middle].compareTo(data[end - 1]) > 0) {
-        swap(data, middle, end - 1);
-      }
-      // TODO: use more candidates for larger arrays?
+      // Best of 5 pivot picking:
+      // Choose pivots by looking at five candidates.
+      final int len = end - start;
+      final int seventh = (len >> 3) + (len >> 6) + 1;
+      final int m3 = (start + end) >> 1; // middle
+      final int m2 = m3 - seventh;
+      final int m1 = m2 - seventh;
+      final int m4 = m3 + seventh;
+      final int m5 = m4 + seventh;
 
-      final T pivot = data[middle];
-      // Move middle element out of the way, just before end
-      // (Since we already know that "end" is bigger)
-      swap(data, middle, end - 2);
+      // Explicit (and optimal) sorting network for 5 elements
+      // See Knuth for details.
+      if (data[m1].compareTo(data[m2]) > 0) {
+        swap(data, m1, m2);
+      }
+      if (data[m1].compareTo(data[m3]) > 0) {
+        swap(data, m1, m3);
+      }
+      if (data[m2].compareTo(data[m3]) > 0) {
+        swap(data, m2, m3);
+      }
+      if (data[m4].compareTo(data[m5]) > 0) {
+        swap(data, m4, m5);
+      }
+      if (data[m1].compareTo(data[m4]) > 0) {
+        swap(data, m1, m4);
+      }
+      if (data[m3].compareTo(data[m4]) > 0) {
+        swap(data, m3, m4);
+      }
+      if (data[m2].compareTo(data[m5]) > 0) {
+        swap(data, m2, m5);
+      }
+      if (data[m2].compareTo(data[m3]) > 0) {
+        swap(data, m2, m3);
+      }
+      if (data[m4].compareTo(data[m5]) > 0) {
+        swap(data, m4, m5);
+      }
+
+      int best = bestPivot(rank, m1, m2, m3, m4, m5);
+      final T pivot = data[best];
+      // Move middle element out of the way.
+      swap(data, best, end - 1);
 
       // Begin partitioning
-      int i = start + 1, j = end - 3;
+      int i = start, j = end - 2;
       // This is classic quicksort stuff
       while (true) {
         while (i <= j && data[i].compareTo(pivot) <= 0) {
@@ -385,7 +464,7 @@ public class QuickSelect {
       }
 
       // Move pivot (former middle element) back into the appropriate place
-      swap(data, i, end - 2);
+      swap(data, i, end - 1);
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
@@ -538,27 +617,54 @@ public class QuickSelect {
         return;
       }
 
-      // Pick pivot from three candidates: start, middle, end
-      // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) >> 1;
-      if (data.get(start).compareTo(data.get(middle)) > 0) {
-        swap(data, start, middle);
-      }
-      if (data.get(start).compareTo(data.get(end - 1)) > 0) {
-        swap(data, start, end - 1);
-      }
-      if (data.get(middle).compareTo(data.get(end - 1)) > 0) {
-        swap(data, middle, end - 1);
-      }
-      // TODO: use more candidates for larger arrays?
+      // Best of 5 pivot picking:
+      // Choose pivots by looking at five candidates.
+      final int len = end - start;
+      final int seventh = (len >> 3) + (len >> 6) + 1;
+      final int m3 = (start + end) >> 1; // middle
+      final int m2 = m3 - seventh;
+      final int m1 = m2 - seventh;
+      final int m4 = m3 + seventh;
+      final int m5 = m4 + seventh;
 
-      final T pivot = data.get(middle);
+      // Explicit (and optimal) sorting network for 5 elements
+      // See Knuth for details.
+      if (data.get(m1).compareTo(data.get(m2)) > 0) {
+        swap(data, m1, m2);
+      }
+      if (data.get(m1).compareTo(data.get(m3)) > 0) {
+        swap(data, m1, m3);
+      }
+      if (data.get(m2).compareTo(data.get(m3)) > 0) {
+        swap(data, m2, m3);
+      }
+      if (data.get(m4).compareTo(data.get(m5)) > 0) {
+        swap(data, m4, m5);
+      }
+      if (data.get(m1).compareTo(data.get(m4)) > 0) {
+        swap(data, m1, m4);
+      }
+      if (data.get(m3).compareTo(data.get(m4)) > 0) {
+        swap(data, m3, m4);
+      }
+      if (data.get(m2).compareTo(data.get(m5)) > 0) {
+        swap(data, m2, m5);
+      }
+      if (data.get(m2).compareTo(data.get(m3)) > 0) {
+        swap(data, m2, m3);
+      }
+      if (data.get(m4).compareTo(data.get(m5)) > 0) {
+        swap(data, m4, m5);
+      }
+
+      int best = bestPivot(rank, m1, m2, m3, m4, m5);
+      final T pivot = data.get(best);
       // Move middle element out of the way, just before end
       // (Since we already know that "end" is bigger)
-      swap(data, middle, end - 2);
+      swap(data, best, end - 1);
 
       // Begin partitioning
-      int i = start + 1, j = end - 3;
+      int i = start, j = end - 2;
       // This is classic quicksort stuff
       while (true) {
         while (i <= j && data.get(i).compareTo(pivot) <= 0) {
@@ -574,7 +680,7 @@ public class QuickSelect {
       }
 
       // Move pivot (former middle element) back into the appropriate place
-      swap(data, i, end - 2);
+      swap(data, i, end - 1);
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
@@ -731,27 +837,54 @@ public class QuickSelect {
         return;
       }
 
-      // Pick pivot from three candidates: start, middle, end
-      // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) >> 1;
-      if (comparator.compare(data.get(start), data.get(middle)) > 0) {
-        swap(data, start, middle);
-      }
-      if (comparator.compare(data.get(start), data.get(end - 1)) > 0) {
-        swap(data, start, end - 1);
-      }
-      if (comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
-        swap(data, middle, end - 1);
-      }
-      // TODO: use more candidates for larger arrays?
+      // Best of 5 pivot picking:
+      // Choose pivots by looking at five candidates.
+      final int len = end - start;
+      final int seventh = (len >> 3) + (len >> 6) + 1;
+      final int m3 = (start + end) >> 1; // middle
+      final int m2 = m3 - seventh;
+      final int m1 = m2 - seventh;
+      final int m4 = m3 + seventh;
+      final int m5 = m4 + seventh;
 
-      final T pivot = data.get(middle);
+      // Explicit (and optimal) sorting network for 5 elements
+      // See Knuth for details.
+      if (comparator.compare(data.get(m1), data.get(m2)) > 0) {
+        swap(data, m1, m2);
+      }
+      if (comparator.compare(data.get(m1), data.get(m3)) > 0) {
+        swap(data, m1, m3);
+      }
+      if (comparator.compare(data.get(m2), data.get(m3)) > 0) {
+        swap(data, m2, m3);
+      }
+      if (comparator.compare(data.get(m4), data.get(m5)) > 0) {
+        swap(data, m4, m5);
+      }
+      if (comparator.compare(data.get(m1), data.get(m4)) > 0) {
+        swap(data, m1, m4);
+      }
+      if (comparator.compare(data.get(m3), data.get(m4)) > 0) {
+        swap(data, m3, m4);
+      }
+      if (comparator.compare(data.get(m2), data.get(m5)) > 0) {
+        swap(data, m2, m5);
+      }
+      if (comparator.compare(data.get(m2), data.get(m3)) > 0) {
+        swap(data, m2, m3);
+      }
+      if (comparator.compare(data.get(m4), data.get(m5)) > 0) {
+        swap(data, m4, m5);
+      }
+
+      int best = bestPivot(rank, m1, m2, m3, m4, m5);
+      final T pivot = data.get(best);
       // Move middle element out of the way, just before end
       // (Since we already know that "end" is bigger)
-      swap(data, middle, end - 2);
+      swap(data, best, end - 1);
 
       // Begin partitioning
-      int i = start + 1, j = end - 3;
+      int i = start, j = end - 2;
       // This is classic quicksort stuff
       while (true) {
         while (i <= j && comparator.compare(data.get(i), pivot) <= 0) {
@@ -767,7 +900,7 @@ public class QuickSelect {
       }
 
       // Move pivot (former middle element) back into the appropriate place
-      swap(data, i, end - 2);
+      swap(data, i, end - 1);
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
@@ -898,36 +1031,62 @@ public class QuickSelect {
    * @param rank rank position we are interested in (starting at 0)
    */
   public static void quickSelect(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end, int rank) {
+    DBIDArrayIter refi = data.iter(), refj = data.iter(), pivot = data.iter();
     while (true) {
       // Optimization for small arrays
       // This also ensures a minimum size below
       if (start + SMALL > end) {
-        insertionSort(data, comparator, start, end);
+        insertionSort(data, comparator, start, end, refi, refj);
         return;
       }
 
-      // Pick pivot from three candidates: start, middle, end
-      // Since we compare them, we can also just "bubble sort" them.
-      final int middle = (start + end) >> 1;
-      if (comparator.compare(data.get(start), data.get(middle)) > 0) {
-        data.swap(start, middle);
-      }
-      if (comparator.compare(data.get(start), data.get(end - 1)) > 0) {
-        data.swap(start, end - 1);
-      }
-      if (comparator.compare(data.get(middle), data.get(end - 1)) > 0) {
-        data.swap(middle, end - 1);
-      }
-      // TODO: use more candidates for larger arrays?
+      // Best of 5 pivot picking:
+      // Choose pivots by looking at five candidates.
+      final int len = end - start;
+      final int seventh = (len >> 3) + (len >> 6) + 1;
+      final int m3 = (start + end) >> 1; // middle
+      final int m2 = m3 - seventh;
+      final int m1 = m2 - seventh;
+      final int m4 = m3 + seventh;
+      final int m5 = m4 + seventh;
 
-      final DBID pivot = data.get(middle);
-      // Move middle element out of the way, just before end
-      // (Since we already know that "end" is bigger)
-      data.swap(middle, end - 2);
+      // Explicit (and optimal) sorting network for 5 elements
+      // See Knuth for details.
+      if (compare(refi, m1, refj, m2, comparator) > 0) {
+        data.swap(m1, m2);
+      }
+      if (compare(refi, m1, refj, m3, comparator) > 0) {
+        data.swap(m1, m3);
+      }
+      if (compare(refi, m2, refj, m3, comparator) > 0) {
+        data.swap(m2, m3);
+      }
+      if (compare(refi, m4, refj, m5, comparator) > 0) {
+        data.swap(m4, m5);
+      }
+      if (compare(refi, m1, refj, m4, comparator) > 0) {
+        data.swap(m1, m4);
+      }
+      if (compare(refi, m3, refj, m4, comparator) > 0) {
+        data.swap(m3, m4);
+      }
+      if (compare(refi, m2, refj, m5, comparator) > 0) {
+        data.swap(m2, m5);
+      }
+      if (compare(refi, m2, refj, m3, comparator) > 0) {
+        data.swap(m2, m3);
+      }
+      if (compare(refi, m4, refj, m5, comparator) > 0) {
+        data.swap(m4, m5);
+      }
+
+      int best = bestPivot(rank, m1, m2, m3, m4, m5);
+      // Move middle element out of the way.
+      data.swap(best, end - 1);
+      pivot.seek(end - 1);
 
       // Begin partitioning
-      int i = start + 1, j = end - 3;
-      DBIDArrayIter refi = data.iter(), refj = data.iter();
+      int i = start, j = end - 3;
       refi.seek(i);
       refj.seek(j);
       // This is classic quicksort stuff
@@ -947,7 +1106,7 @@ public class QuickSelect {
       }
 
       // Move pivot (former middle element) back into the appropriate place
-      data.swap(i, end - 2);
+      data.swap(i, end - 1);
 
       // In contrast to quicksort, we only need to recurse into the half we are
       // interested in. Instead of recursion we now use iteration.
@@ -962,14 +1121,29 @@ public class QuickSelect {
   }
 
   /**
+   * Compare two elements.
+   * 
+   * @param i1 First scratch variable
+   * @param p1 Value for first
+   * @param i2 Second scratch variable
+   * @param p2 Value for second
+   * @param comp Comparator
+   * @return Comparison result
+   */
+  private static int compare(DBIDArrayIter i1, int p1, DBIDArrayIter i2, int p2, Comparator<? super DBIDRef> comp) {
+    i1.seek(p1);
+    i2.seek(p2);
+    return comp.compare(i1, i2);
+  }
+
+  /**
    * Sort a small array using repetitive insertion sort.
    * 
    * @param data Data to sort
    * @param start Interval start
    * @param end Interval end
    */
-  private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end) {
-    DBIDArrayIter iter1 = data.iter(), iter2 = data.iter();
+  private static void insertionSort(ArrayModifiableDBIDs data, Comparator<? super DBIDRef> comparator, int start, int end, DBIDArrayIter iter1, DBIDArrayIter iter2) {
     for (int i = start + 1; i < end; i++) {
       for (int j = i; j > start; j--) {
         iter1.seek(j - 1);
