@@ -49,7 +49,7 @@ public class ParameterFlagGlobalConstraint<S> implements GlobalParameterConstrai
   /**
    * Parameter possibly to be checked.
    */
-  private Parameter<S> param;
+  private Parameter<? extends S> param;
 
   /**
    * Flag the checking of the parameter constraints is dependent on.
@@ -64,7 +64,7 @@ public class ParameterFlagGlobalConstraint<S> implements GlobalParameterConstrai
   /**
    * List of parameter constraints.
    */
-  private List<ParameterConstraint<? super S>> cons;
+  private List<? extends ParameterConstraint<? super S>> cons;
 
   /**
    * Constructs a global parameter constraint specifying that the testing of the
@@ -78,7 +78,7 @@ public class ParameterFlagGlobalConstraint<S> implements GlobalParameterConstrai
    * @param flagConstraint indicates at which status of the flag the parameter
    *        is to be checked
    */
-  public ParameterFlagGlobalConstraint(Parameter<S> p, List<ParameterConstraint<? super S>> c, Flag f, boolean flagConstraint) {
+  public ParameterFlagGlobalConstraint(Parameter<? extends S> p, List<? extends ParameterConstraint<? super S>> c, Flag f, boolean flagConstraint) {
     param = p;
     flag = f;
     this.flagConstraint = flagConstraint;
