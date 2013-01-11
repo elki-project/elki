@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Simple outlier ensemble method.
@@ -200,7 +201,7 @@ public class SimpleOutlierEnsemble extends AbstractAlgorithm<OutlierResult> impl
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<>(OptionID.ALGORITHM, OutlierAlgorithm.class);
+      ObjectListParameter<OutlierAlgorithm> algP = new ObjectListParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, OutlierAlgorithm.class);
       if (config.grab(algP)) {
         ListParameterization subconfig = new ListParameterization();
         ChainedParameterization chain = new ChainedParameterization(subconfig, config);

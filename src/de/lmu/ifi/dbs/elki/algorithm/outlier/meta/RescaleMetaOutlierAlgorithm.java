@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Scale another outlier score using the given scaling function.
@@ -167,7 +168,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<Algorithm> algP = new ObjectParameter<>(OptionID.ALGORITHM, OutlierAlgorithm.class);
+      ObjectParameter<Algorithm> algP = new ObjectParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, OutlierAlgorithm.class);
       if(config.grab(algP)) {
         algorithm = algP.instantiateClass(config);
       }

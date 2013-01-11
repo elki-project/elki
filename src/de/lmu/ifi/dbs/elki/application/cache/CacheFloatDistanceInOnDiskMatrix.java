@@ -188,7 +188,7 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Database connection parameter
-      final ObjectParameter<Database> dbpar = new ObjectParameter<>(OptionID.DATABASE_CONNECTION, Database.class, StaticArrayDatabase.class);
+      final ObjectParameter<Database> dbpar = new ObjectParameter<>(Database.DATABASE_CONNECTION_ID, Database.class, StaticArrayDatabase.class);
       if(config.grab(dbpar)) {
         database = dbpar.instantiateClass(config);
       }

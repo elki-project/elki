@@ -149,16 +149,32 @@ public class AlgorithmStep implements WorkflowStep {
      */
     protected List<Algorithm> algorithms;
 
+    /**
+     * Flag to allow verbose messages while running the application.
+     * <p>
+     * Key: {@code -time}
+     * </p>
+     */
+    public static final OptionID TIME_ID = new OptionID("time", "Enable logging of runtime data. Do not combine with more verbose logging, since verbose logging can significantly impact performance.");
+
+    /**
+     * Parameter to specify the algorithm to run.
+     * <p>
+     * Key: {@code -algorithm}
+     * </p>
+     */
+    public static final OptionID ALGORITHM_ID = new OptionID("algorithm", "Algorithm to run.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Time parameter
-      final Flag timeF = new Flag(OptionID.TIME_FLAG);
+      final Flag timeF = new Flag(TIME_ID);
       if (config.grab(timeF)) {
         time = timeF.getValue();
       }
       // parameter algorithm
-      final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<>(OptionID.ALGORITHM, Algorithm.class);
+      final ObjectListParameter<Algorithm> ALGORITHM_PARAM = new ObjectListParameter<>(ALGORITHM_ID, Algorithm.class);
       if (config.grab(ALGORITHM_PARAM)) {
         algorithms = ALGORITHM_PARAM.instantiateClasses(config);
       }

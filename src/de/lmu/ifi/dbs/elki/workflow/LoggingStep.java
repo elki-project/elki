@@ -25,11 +25,11 @@ package de.lmu.ifi.dbs.elki.workflow;
 
 import java.util.logging.Level;
 
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -57,27 +57,23 @@ public class LoggingStep implements WorkflowStep {
   public LoggingStep(boolean verbose, String[][] levels) {
     super();
     LoggingConfiguration.setVerbose(verbose);
-    if(levels != null) {
-      for(String[] pair : levels) {
+    if (levels != null) {
+      for (String[] pair : levels) {
         try {
-          if(pair.length == 1) {
+          if (pair.length == 1) {
             // Try to parse as level:
             try {
               Level level = Level.parse(pair[0]);
               LoggingConfiguration.setDefaultLevel(level);
-            }
-            catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
               LoggingConfiguration.setLevelFor(pair[0], Level.FINEST.getName());
             }
-          }
-          else if(pair.length == 2) {
+          } else if (pair.length == 2) {
             LoggingConfiguration.setLevelFor(pair[0], pair[1]);
-          }
-          else {
+          } else {
             throw new AbortException("Invalid logging settings");
           }
-        }
-        catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
           LOG.warning("Invalid logging statement for package " + pair[0] + ": " + e.getMessage());
         }
       }
@@ -96,7 +92,7 @@ public class LoggingStep implements WorkflowStep {
      * Verbose mode
      */
     protected boolean verbose = false;
-    
+
     /**
      * Enable logging levels manually
      */
@@ -105,19 +101,19 @@ public class LoggingStep implements WorkflowStep {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final Flag verboseF = new Flag(OptionID.VERBOSE_FLAG);
-      if(config.grab(verboseF)) {
+      final Flag verboseF = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
+      if (config.grab(verboseF)) {
         verbose = verboseF.getValue();
       }
-      final StringParameter debugP = new StringParameter(OptionID.DEBUG);
+      final StringParameter debugP = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID);
       debugP.setOptional(true);
-      if(config.grab(debugP)) {
+      if (config.grab(debugP)) {
         String[] opts = debugP.getValue().split(",");
         levels = new String[opts.length][];
         int i = 0;
-        for(String opt : opts) {
+        for (String opt : opts) {
           String[] chunks = opt.split("=");
-          if(chunks.length != 1 && chunks.length != 2) {
+          if (chunks.length != 1 && chunks.length != 2) {
             config.reportError(new WrongParameterValueException(debugP, debugP.getValue(), "Invalid debug option."));
             break;
           }

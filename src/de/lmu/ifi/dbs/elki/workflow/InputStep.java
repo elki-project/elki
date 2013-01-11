@@ -45,7 +45,7 @@ public class InputStep implements WorkflowStep {
 
   /**
    * Constructor.
-   *
+   * 
    * @param database Database to use
    */
   public InputStep(Database database) {
@@ -62,7 +62,7 @@ public class InputStep implements WorkflowStep {
     database.initialize();
     return database;
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -76,13 +76,23 @@ public class InputStep implements WorkflowStep {
      */
     protected Database database = null;
 
+    /**
+     * Option ID to specify the database type
+     * 
+     * Key:
+     * <p>
+     * {@code -db}
+     * </p>
+     */
+    public static final OptionID DATABASE_ID = new OptionID("db", "Database class.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<Database> dbP = new ObjectParameter<>(OptionID.DATABASE, Database.class, StaticArrayDatabase.class);
-      if(config.grab(dbP)) {
+      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
+      if (config.grab(dbP)) {
         database = dbP.instantiateClass(config);
-      }      
+      }
     }
 
     @Override
