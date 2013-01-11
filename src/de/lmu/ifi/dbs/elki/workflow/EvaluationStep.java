@@ -68,7 +68,7 @@ public class EvaluationStep implements WorkflowStep {
 
   public void runEvaluators(HierarchicalResult r, Database db) {
     // Run evaluation helpers
-    if(evaluators != null) {
+    if (evaluators != null) {
       new Evaluation(r, evaluators).update(r);
     }
     this.result = r;
@@ -111,7 +111,7 @@ public class EvaluationStep implements WorkflowStep {
      * @param r Result
      */
     public void update(Result r) {
-      for(Evaluator evaluator : evaluators) {
+      for (Evaluator evaluator : evaluators) {
         /*
          * if(normalizationUndo) { evaluator.setNormalization(normalization); }
          */
@@ -153,15 +153,25 @@ public class EvaluationStep implements WorkflowStep {
      */
     private List<Evaluator> evaluators = null;
 
+    /**
+     * Parameter ID to specify the evaluators to run.
+     * 
+     * Key:
+     * <p>
+     * {@code -evaluator}
+     * </p>
+     */
+    public static final OptionID EVALUATOR_ID = new OptionID("evaluator", "Class to evaluate the results with.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       List<Class<? extends Evaluator>> def = new ArrayList<>(1);
       def.add(AutomaticEvaluation.class);
       // evaluator parameter
-      final ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<>(OptionID.EVALUATOR, Evaluator.class);
+      final ObjectListParameter<Evaluator> evaluatorP = new ObjectListParameter<>(EVALUATOR_ID, Evaluator.class);
       evaluatorP.setDefaultValue(def);
-      if(config.grab(evaluatorP)) {
+      if (config.grab(evaluatorP)) {
         evaluators = evaluatorP.instantiateClasses(config);
       }
     }

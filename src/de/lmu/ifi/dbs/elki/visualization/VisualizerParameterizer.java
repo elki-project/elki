@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
+import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Utility class to determine the visualizers for a result class.
@@ -199,7 +200,7 @@ public class VisualizerParameterizer implements Parameterizable {
     String dataset = null;
 
     for (Pair<Object, Parameter<?>> setting : settings) {
-      if (setting.second.equals(OptionID.ALGORITHM)) {
+      if (setting.second.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
         algorithm = setting.second.getValue().toString();
       }
       if (setting.second.equals(AbstractDistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {

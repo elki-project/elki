@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -355,7 +354,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Get database connection.
-      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(OptionID.DATABASE_CONNECTION, DatabaseConnection.class, FileBasedDatabaseConnection.class);
+      final ObjectParameter<DatabaseConnection> dbcP = new ObjectParameter<>(Database.DATABASE_CONNECTION_ID, DatabaseConnection.class, FileBasedDatabaseConnection.class);
       if (config.grab(dbcP)) {
         databaseConnection = dbcP.instantiateClass(config);
       }

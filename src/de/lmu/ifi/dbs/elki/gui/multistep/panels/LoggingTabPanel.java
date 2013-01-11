@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -51,9 +52,9 @@ public class LoggingTabPanel extends ParameterTabPanel {
 
   @Override
   protected synchronized void configureStep(Parameterization config) {
-    StringParameter debugParam = new StringParameter(OptionID.DEBUG);
+    StringParameter debugParam = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID);
     debugParam.setOptional(true);
-    Flag verboseFlag = new Flag(OptionID.VERBOSE_FLAG);
+    Flag verboseFlag = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
     // Verbose mode is a lot simpler
     if (config.grab(verboseFlag) && verboseFlag.isTrue()) {
       LoggingConfiguration.setVerbose(true);

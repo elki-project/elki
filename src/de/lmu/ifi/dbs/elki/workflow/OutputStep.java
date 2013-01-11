@@ -66,7 +66,7 @@ public class OutputStep implements WorkflowStep {
    */
   public void runResultHandlers(HierarchicalResult result) {
     // Run result handlers
-    for(ResultHandler resulthandler : resulthandlers) {
+    for (ResultHandler resulthandler : resulthandlers) {
       resulthandler.processNewResult(result, result);
     }
   }
@@ -86,7 +86,7 @@ public class OutputStep implements WorkflowStep {
     defaultHandlers = new ArrayList<>(1);
     defaultHandlers.add(ResultVisualizer.class);
   }
-  
+
   protected static ArrayList<Class<? extends ResultHandler>> defaultHandlers = null;
 
   /**
@@ -102,15 +102,37 @@ public class OutputStep implements WorkflowStep {
      */
     private List<ResultHandler> resulthandlers = null;
 
+    /**
+     * Parameter to specify the result handler classes.
+     * 
+     * Key:
+     * <p>
+     * {@code -resulthandler}
+     * </p>
+     */
+    public static final OptionID RESULT_HANDLER_ID = new OptionID("resulthandler", "Result handler class.");
+
+    /**
+     * OptionID for the application output file/folder.
+     * 
+     * Key:
+     * <p>
+     * {@code -out}
+     * </p>
+     */
+    public static final OptionID OUTPUT_ID = new OptionID("out", //
+    "Directory name (or name of an existing file) to write the obtained results in. " + //
+    "If this parameter is omitted, per default the output will sequentially be given to STDOUT.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // result handlers
-      final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<>(OptionID.RESULT_HANDLER, ResultHandler.class);
+      final ObjectListParameter<ResultHandler> resultHandlerParam = new ObjectListParameter<>(RESULT_HANDLER_ID, ResultHandler.class);
       if (defaultHandlers != null) {
         resultHandlerParam.setDefaultValue(defaultHandlers);
       }
-      if(config.grab(resultHandlerParam)) {
+      if (config.grab(resultHandlerParam)) {
         resulthandlers = resultHandlerParam.instantiateClasses(config);
       }
     }

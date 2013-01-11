@@ -93,10 +93,11 @@ public abstract class AbstractApplication implements Parameterizable {
    * @param args the arguments to run this application with
    */
   public static void runCLIApplication(Class<?> cls, String[] args) {
-    final Flag helpF = new Flag(OptionID.HELP);
-    final Flag helpLongF = new Flag(OptionID.HELP_LONG);
-    final ClassParameter<Object> descriptionP = new ClassParameter<>(OptionID.DESCRIPTION, Object.class, true);
-    final StringParameter debugP = new StringParameter(OptionID.DEBUG);
+    final Flag helpF = new Flag(Parameterizer.HELP_ID);
+    final Flag helpLongF = new Flag(Parameterizer.HELP_LONG_ID);
+    final ClassParameter<Object> descriptionP = new ClassParameter<>(Parameterizer.DESCRIPTION_ID, Object.class, true);
+    final StringParameter debugP = new StringParameter(Parameterizer.DEBUG_ID);
+    final Flag verboseF = new Flag(Parameterizer.VERBOSE_ID);
     debugP.setOptional(true);
 
     SerializedParameterization params = new SerializedParameterization(args);
@@ -124,6 +125,9 @@ public abstract class AbstractApplication implements Parameterizable {
     }
     try {
       TrackParameters config = new TrackParameters(params);
+      if (params.grab(verboseF)) {
+        LoggingConfiguration.setVerbose(verboseF.isTrue());
+      }
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
       if ((helpF.isDefined() && helpF.getValue()) || (helpLongF.isDefined() && helpLongF.getValue())) {
@@ -227,25 +231,45 @@ public abstract class AbstractApplication implements Parameterizable {
      */
     public static final OptionID INPUT_ID = new OptionID("app.in", "");
 
-    @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      configVerbose(config);
-      // Note: we do not run the other methods by default.
-      // Only verbose will always be present!
-    }
+    /**
+     * Flag to obtain help-message.
+     * <p>
+     * Key: {@code -h}
+     * </p>
+     */
+    public static final OptionID HELP_ID = new OptionID("h", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
 
     /**
-     * Get the verbose parameter.
-     * 
-     * @param config Parameterization
+     * Flag to obtain help-message.
+     * <p>
+     * Key: {@code -help}
+     * </p>
      */
-    protected void configVerbose(Parameterization config) {
-      final Flag verboseF = new Flag(OptionID.VERBOSE_FLAG);
-      if (config.grab(verboseF)) {
-        LoggingConfiguration.setVerbose(verboseF.isTrue());
-      }
-    }
+    public static final OptionID HELP_LONG_ID = new OptionID("help", "Request a help-message, either for the main-routine or for any specified algorithm. " + "Causes immediate stop of the program.");
+
+    /**
+     * Optional Parameter to specify a class to obtain a description for.
+     * <p>
+     * Key: {@code -description}
+     * </p>
+     */
+    public static final OptionID DESCRIPTION_ID = new OptionID("description", "Class to obtain a description of. " + "Causes immediate stop of the program.");
+
+    /**
+     * Optional Parameter to specify a class to enable debugging for.
+     * <p>
+     * Key: {@code -enableDebug}
+     * </p>
+     */
+    public static final OptionID DEBUG_ID = new OptionID("enableDebug", "Parameter to enable debugging for particular packages.");
+
+    /**
+     * Flag to allow verbose messages while running the application.
+     * <p>
+     * Key: {@code -verbose}
+     * </p>
+     */
+    public static final OptionID VERBOSE_ID = new OptionID("verbose", "Enable verbose messages.");
 
     /**
      * Get the output file parameter.

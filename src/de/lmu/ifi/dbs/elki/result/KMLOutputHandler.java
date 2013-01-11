@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
+import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Class to handle KML output.
@@ -430,7 +431,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      FileParameter outputP = new FileParameter(OptionID.OUTPUT, FileParameter.FileType.OUTPUT_FILE);
+      FileParameter outputP = new FileParameter(OutputStep.Parameterizer.OUTPUT_ID, FileParameter.FileType.OUTPUT_FILE);
       outputP.setShortDescription("Filename the KMZ file (compressed KML) is written to.");
       if(config.grab(outputP)) {
         filename = outputP.getValue();
