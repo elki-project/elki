@@ -1,6 +1,7 @@
 de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFromPatternFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ExternalIDFilter
 de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter
 de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter
