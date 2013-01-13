@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
- * DeLiCluTree is a spatial index structure based on an R-TRee. DeLiCluTree is
+ * DeLiCluTree is a spatial index structure based on an R-Tree. DeLiCluTree is
  * designed for the DeLiClu algorithm, having in each node a boolean array which
  * indicates whether the child nodes are already handled by the DeLiClu
  * algorithm.
