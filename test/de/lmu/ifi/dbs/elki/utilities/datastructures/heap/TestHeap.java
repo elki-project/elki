@@ -46,8 +46,8 @@ public class TestHeap {
     Integer[] data = { 5, 3, 4, 2, 7, 1, 9, 8, 10, 6 };
     Integer[] asc = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
     Integer[] desc = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
-    ObjectHeap<Integer> hasc = new ComparableMinHeap<>();
-    ObjectHeap<Integer> hdesc = new ComparableMaxHeap<>();
+    ComparableMinHeap<Integer> hasc = new ComparableMinHeap<>();
+    ComparableMaxHeap<Integer> hdesc = new ComparableMaxHeap<>();
     for(Integer i : data) {
       for(int j = 0; j < dup; j++) {
         hasc.add(i);
@@ -173,8 +173,8 @@ public class TestHeap {
   public void testHeapRandomInt() {
     int size = 10000;
     Random r = new Random(123L);
-    ObjectHeap<Integer> hasc = new ComparableMinHeap<>();
-    ObjectHeap<Integer> hdesc = new ComparableMaxHeap<>();
+    ComparableMinHeap<Integer> hasc = new ComparableMinHeap<>();
+    ComparableMaxHeap<Integer> hdesc = new ComparableMaxHeap<>();
     for(int i = 0; i < size; i++) {
       int in = r.nextInt();
       hasc.add(in);

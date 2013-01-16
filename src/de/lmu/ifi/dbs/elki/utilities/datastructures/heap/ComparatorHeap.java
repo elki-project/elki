@@ -24,10 +24,11 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 
 /**
- * Basic in-memory max-heap for K values.
+ * Basic in-memory min-heap for K values.
  * 
  * Basic 4-ary heap implementation.
  * 
@@ -35,28 +36,38 @@ import java.util.ConcurrentModificationException;
  * 
  * @author Erich Schubert
  */
-public class ComparableMaxHeap<K extends Comparable<? super K>> extends AbstractHeap implements ObjectHeap<K> {
+public class ComparatorHeap<K> extends AbstractHeap implements ObjectHeap<K> {
   /**
    * Heap storage: queue
    */
   protected Object[] queue;
 
   /**
-   * Constructor with default capacity.
+   * Comparator class.
    */
-  public ComparableMaxHeap() {
-    this(DEFAULT_INITIAL_CAPACITY);
+  protected Comparator<Object> comparator;
+
+  /**
+   * Constructor with default capacity.
+   * 
+   * @param comparator Comparator
+   */
+  public ComparatorHeap(Comparator<? super K> comparator) {
+    this(DEFAULT_INITIAL_CAPACITY, comparator);
   }
 
   /**
    * Constructor with initial capacity.
    * 
    * @param size initial capacity
+   * @param comparator Comparator
    */
-  public ComparableMaxHeap(int size) {
+  @SuppressWarnings("unchecked")
+  public ComparatorHeap(int size, Comparator<? super K> comparator) {
     super();
     this.size = 0;
     this.queue = new Object[size];
+    this.comparator = (Comparator<Object>) comparator;
   }
 
   @Override
@@ -71,11 +82,10 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void add(K key, int max) {
     if (size < max) {
       add(key);
-    } else if (((Comparable<Object>) key).compareTo(peek()) < 0) {
+    } else if (comparator.compare(key, peek()) > 0) {
       replaceTopElement(key);
     }
   }
@@ -129,13 +139,12 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * @param pos insertion position
    * @param curkey Current key
    */
-  @SuppressWarnings("unchecked")
   protected void heapifyUp(int pos, Object curkey) {
     while (pos > 0) {
       final int parent = (pos - 1) >>> 2;
       Object parkey = queue[parent];
 
-      if (((Comparable<Object>) curkey).compareTo(parkey) < 0) { // Compare
+      if (comparator.compare(curkey, parkey) > 0) { // Compare
         break;
       }
       queue[pos] = parkey;
@@ -151,7 +160,6 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * @param curkey Current key
    * @return true when the order was changed
    */
-  @SuppressWarnings("unchecked")
   protected boolean heapifyDown(final int ipos, Object curkey) {
     int pos = ipos;
     final int half = (size + 2) >>> 2;
@@ -164,7 +172,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
       final int schild = cpos + 1;
       if (schild < size) {
         Object secondc = queue[schild];
-        if (((Comparable<Object>) bestkey).compareTo(secondc) < 0) { // Compare
+        if (comparator.compare(bestkey, secondc) > 0) { // Compare
           bestpos = schild;
           bestkey = secondc;
         }
@@ -173,7 +181,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
         final int tchild = cpos + 2;
         if (tchild < size) {
           Object thirdc = queue[tchild];
-          if (((Comparable<Object>) bestkey).compareTo(thirdc) < 0) { // Compare
+          if (comparator.compare(bestkey, thirdc) > 0) { // Compare
             bestpos = tchild;
             bestkey = thirdc;
           }
@@ -182,7 +190,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
           final int fchild = cpos + 3;
           if (fchild < size) {
             Object fourthc = queue[fchild];
-            if (((Comparable<Object>) bestkey).compareTo(fourthc) < 0) { // Compare
+            if (comparator.compare(bestkey, fourthc) > 0) { // Compare
               bestpos = fchild;
               bestkey = fourthc;
             }
@@ -190,7 +198,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
         }
       }
 
-      if (((Comparable<Object>) bestkey).compareTo(curkey) < 0) { // Compare
+      if (comparator.compare(bestkey, curkey) > 0) { // Compare
         break;
       }
       queue[pos] = bestkey;

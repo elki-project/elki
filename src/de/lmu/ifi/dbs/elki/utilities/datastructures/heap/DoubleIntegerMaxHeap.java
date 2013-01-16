@@ -27,7 +27,8 @@ import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 
 /**
- * Basic in-memory max-heap for K values.
+ * Basic in-memory heap structure for double keys and int values,
+ * ordered by maximum first.
  * 
  * Basic 4-ary heap implementation.
  * 
@@ -35,16 +36,21 @@ import java.util.ConcurrentModificationException;
  * 
  * @author Erich Schubert
  */
-public class ComparableMaxHeap<K extends Comparable<? super K>> extends AbstractHeap implements ObjectHeap<K> {
+public class DoubleIntegerMaxHeap extends AbstractHeap implements DoubleIntegerHeap {
   /**
-   * Heap storage: queue
+   * Heap storage: keys
    */
-  protected Object[] queue;
+  private double[] keys;
 
   /**
-   * Constructor with default capacity.
+   * Heap storage: values
    */
-  public ComparableMaxHeap() {
+  private int[] values;
+
+  /**
+   * Default constructor: default capacity.
+   */
+  public DoubleIntegerMaxHeap() {
     this(DEFAULT_INITIAL_CAPACITY);
   }
 
@@ -53,74 +59,68 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * 
    * @param size initial capacity
    */
-  public ComparableMaxHeap(int size) {
+  public DoubleIntegerMaxHeap(int size) {
     super();
     this.size = 0;
-    this.queue = new Object[size];
+    this.keys = new double[size];
+    this.values = new int[size];
   }
 
   @Override
-  public void add(K key) {
+  public void add(double key, int val) {
     this.size++;
     // resize when needed
-    if (size > queue.length) {
+    if (size > keys.length) {
       resize(size);
     }
-    heapifyUp(size - 1, key);
+    heapifyUp(size - 1, key, val);
     heapModified();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void add(K key, int max) {
-    if (size < max) {
-      add(key);
-    } else if (((Comparable<Object>) key).compareTo(peek()) < 0) {
-      replaceTopElement(key);
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public K replaceTopElement(K e) {
-    final Object oldroot = queue[0];
-    heapifyDown(0, e);
+  public void replaceTopElement(double key, int val) {
+    heapifyDown(0, key, val);
     heapModified();
-    return (K) oldroot;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K peek() {
+  public double peekKey() {
     if (size == 0) {
       throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
     }
-    return (K) queue[0];
+    return keys[0];
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K poll() {
-    return (K) removeAt(0);
+  public int peekValue() {
+    if (size == 0) {
+      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
+    }
+    return values[0];
+  }
+
+  @Override
+  public void poll() {
+    removeAt(0);
   }
 
   /**
    * Remove the element at the given position.
    * 
    * @param pos Element position.
-   * @return Removed element
    */
-  protected Object removeAt(int pos) {
+  protected void removeAt(int pos) {
     if (pos < 0 || pos >= size) {
-      return null;
+      return;
     }
-    final Object top = queue[pos];
     size--;
     // Replacement object:
-    final Object reinkey = queue[size];
-    heapifyDown(pos, reinkey);
+    final double reinkey = keys[size];
+    final int reinval = values[size];
+    keys[size] = 0.0;
+    values[size] = 0;
+    heapifyDown(pos, reinkey, reinval);
     heapModified();
-    return top;
   }
 
   /**
@@ -128,20 +128,22 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * 
    * @param pos insertion position
    * @param curkey Current key
+   * @param curval Current value
    */
-  @SuppressWarnings("unchecked")
-  protected void heapifyUp(int pos, Object curkey) {
+  protected void heapifyUp(int pos, double curkey, int curval) {
     while (pos > 0) {
       final int parent = (pos - 1) >>> 2;
-      Object parkey = queue[parent];
+      double parkey = keys[parent];
 
-      if (((Comparable<Object>) curkey).compareTo(parkey) < 0) { // Compare
+      if (curkey <= parkey) { // Compare
         break;
       }
-      queue[pos] = parkey;
+      keys[pos] = parkey;
+      values[pos] = values[parent];
       pos = parent;
     }
-    queue[pos] = curkey;
+    keys[pos] = curkey;
+    values[pos] = curval;
   }
 
   /**
@@ -149,54 +151,58 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * 
    * @param ipos re-insertion position
    * @param curkey Current key
+   * @param curval Current value
    * @return true when the order was changed
    */
-  @SuppressWarnings("unchecked")
-  protected boolean heapifyDown(final int ipos, Object curkey) {
+  protected boolean heapifyDown(final int ipos, double curkey, int curval) {
     int pos = ipos;
     final int half = (size + 2) >>> 2;
     while (pos < half) {
       // Get left child (must exist!)
       final int cpos = (pos << 2) + 1;
       int bestpos = cpos;
-      Object bestkey = queue[cpos];
+      double bestkey = keys[cpos];
+      int bestval = values[cpos];
       // Test second child, if present
       final int schild = cpos + 1;
       if (schild < size) {
-        Object secondc = queue[schild];
-        if (((Comparable<Object>) bestkey).compareTo(secondc) < 0) { // Compare
+        double secondc = keys[schild];
+        if (bestkey < secondc) { // Compare
           bestpos = schild;
           bestkey = secondc;
+          bestval = values[schild];
         }
-
         // Test third child, if present
         final int tchild = cpos + 2;
         if (tchild < size) {
-          Object thirdc = queue[tchild];
-          if (((Comparable<Object>) bestkey).compareTo(thirdc) < 0) { // Compare
+          double thirdc = keys[tchild];
+          if (bestkey < thirdc) { // Compare
             bestpos = tchild;
             bestkey = thirdc;
+            bestval = values[tchild];
           }
-
           // Test fourth child, if present
           final int fchild = cpos + 3;
           if (fchild < size) {
-            Object fourthc = queue[fchild];
-            if (((Comparable<Object>) bestkey).compareTo(fourthc) < 0) { // Compare
+            double firstc = keys[fchild];
+            if (bestkey < firstc) { // Compare
               bestpos = fchild;
-              bestkey = fourthc;
+              bestkey = firstc;
+              bestval = values[fchild];
             }
           }
         }
       }
 
-      if (((Comparable<Object>) bestkey).compareTo(curkey) < 0) { // Compare
+      if (bestkey < curkey) { // Compare
         break;
       }
-      queue[pos] = bestkey;
+      keys[pos] = bestkey;
+      values[pos] = bestval;
       pos = bestpos;
     }
-    queue[pos] = curkey;
+    keys[pos] = curkey;
+    values[pos] = curval;
     return (pos != ipos);
   }
 
@@ -205,16 +211,26 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * 
    * @param requiredSize required capacity
    */
-  protected final void resize(int requiredSize) {
-    queue = Arrays.copyOf(queue, desiredSize(requiredSize, queue.length));
+  private final void resize(int requiredSize) {
+    // Double until 64, then increase by 50% each time.
+    int newCapacity = ((keys.length < 64) ? ((keys.length + 1) << 1) : ((keys.length >> 1) * 3));
+    // overflow?
+    if (newCapacity < 0) {
+      throw new OutOfMemoryError();
+    }
+    if (requiredSize > newCapacity) {
+      newCapacity = requiredSize;
+    }
+    keys = Arrays.copyOf(keys, newCapacity);
+    values = Arrays.copyOf(values, newCapacity);
   }
 
   @Override
   public void clear() {
+    // clean up references in the array for memory management
+    Arrays.fill(keys, 0.0);
+    Arrays.fill(values, 0);
     super.clear();
-    for (int i = 0; i < size; i++) {
-      queue[i] = null;
-    }
   }
 
   @Override
@@ -226,15 +242,38 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
    * @author Erich Schubert
+   * 
+   * @apiviz.exclude
    */
-  protected class UnsortedIter extends AbstractHeap.UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+  protected class UnsortedIter extends AbstractHeap.UnsortedIter implements DoubleIntegerHeap.UnsortedIter {
     @Override
-    @SuppressWarnings("unchecked")
-    public K get() {
+    public double getKey() {
+      return keys[pos];
+    }
+
+    @Override
+    public int getValue() {
       if (modCount != myModCount) {
         throw new ConcurrentModificationException();
       }
-      return (K) queue[pos];
+      return values[pos];
     }
+  }
+
+  /**
+   * Test whether the heap is still valid.
+   * 
+   * Debug method.
+   * 
+   * @return {@code null} when the heap is correct
+   */
+  protected String checkHeap() {
+    for (int i = 1; i < size; i++) {
+      final int parent = (i - 1) >>> 2;
+      if (keys[parent] < keys[i]) { // Compare
+        return "@" + parent + ": " + keys[parent] + " < @" + i + ": " + keys[i];
+      }
+    }
+    return null;
   }
 }

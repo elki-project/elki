@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -59,7 +60,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorObjectHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -141,6 +142,13 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
    * Outlier threshold
    */
   private double omega_star;
+
+  // public int distcomp = 1;
+  
+  /**
+   * Comparator for sorting the heaps.
+   */
+  private static final Comparator<DistanceDBIDPair<?>> COMPARATOR = Collections.reverseOrder(DistanceDBIDResultUtil.distanceComparator());
 
   /**
    * Type of output: all scores (upper bounds) or top n only
@@ -224,12 +232,12 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       // Build the top Set as out + wlb
       h.top.clear();
       HashSetModifiableDBIDs top_keys = DBIDUtil.newHashSet(h.out.size());
-      for (ObjectHeap<HilFeature>.UnsortedIter iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
+      for (ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
         HilFeature entry = iter.get();
         top_keys.add(entry.id);
         h.top.add(entry);
       }
-      for (ObjectHeap<HilFeature>.UnsortedIter iter = h.wlb.unsortedIter(); iter.valid(); iter.advance()) {
+      for (ObjectHeap.UnsortedIter<HilFeature> iter = h.wlb.unsortedIter(); iter.valid(); iter.advance()) {
         HilFeature entry = iter.get();
         if (!top_keys.contains(entry.id)) {
           // No need to update top_keys - discarded
@@ -262,7 +270,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
       for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         hilout_weight.putDouble(iditer, 0.0);
       }
-      for (ObjectHeap<HilFeature>.UnsortedIter iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
+      for (ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
         HilFeature ent = iter.get();
         minmax.put(ent.ubound);
         hilout_weight.putDouble(ent.id, ent.ubound);
@@ -379,7 +387,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
     double br = hf.boxRadius(i, a - 1, b + 1);
     double newlb = 0.0;
     double newub = 0.0;
-    for (ObjectHeap<DoubleDistanceDBIDPair>.UnsortedIter iter = hf.pf[i].nn.unsortedIter(); iter.valid(); iter.advance()) {
+    for (ObjectHeap.UnsortedIter<DoubleDistanceDBIDPair> iter = hf.pf[i].nn.unsortedIter(); iter.valid(); iter.advance()) {
       DoubleDistanceDBIDPair entry = iter.get();
       newub += entry.doubleDistance();
       if (entry.doubleDistance() <= br) {
@@ -403,7 +411,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
 
   private void trueOutliers(HilbertFeatures h) {
     n_star = 0;
-    for (ObjectHeap<HilFeature>.UnsortedIter iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
+    for (ObjectHeap.UnsortedIter<HilFeature> iter = h.out.unsortedIter(); iter.valid(); iter.advance()) {
       HilFeature entry = iter.get();
       if (entry.ubound >= omega_star && (entry.ubound - entry.lbound < 1E-10)) {
         n_star++;
@@ -487,15 +495,15 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
 
       int pos = 0;
       for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new ComparatorObjectHeap<DoubleDistanceDBIDPair>(k, Collections.reverseOrder(DistanceDBIDResultUtil.distanceComparator())));
+        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new ComparatorHeap<DoubleDistanceDBIDPair>(k, COMPARATOR));
       }
-      this.out = new ComparatorObjectHeap<>(n, new Comparator<HilFeature>() {
+      this.out = new ComparatorHeap<>(n, new Comparator<HilFeature>() {
         @Override
         public int compare(HilFeature o1, HilFeature o2) {
           return Double.compare(o1.ubound, o2.ubound);
         }
       });
-      this.wlb = new ComparatorObjectHeap<>(n, new Comparator<HilFeature>() {
+      this.wlb = new ComparatorHeap<>(n, new Comparator<HilFeature>() {
         @Override
         public int compare(HilFeature o1, HilFeature o2) {
           return Double.compare(o1.lbound, o2.lbound);
