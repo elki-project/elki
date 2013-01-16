@@ -358,7 +358,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
 
       // Rebuild heap
       ArrayList<IntegerPriorityObject<CASHInterval>> heapVector = new ArrayList<>(heap.size());
-      for (ObjectHeap<IntegerPriorityObject<CASHInterval>>.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.advance()) {
+      for (ObjectHeap.UnsortedIter<IntegerPriorityObject<CASHInterval>> iter = heap.unsortedIter(); iter.valid(); iter.advance()) {
         heapVector.add(iter.get());
       }
       heap.clear();

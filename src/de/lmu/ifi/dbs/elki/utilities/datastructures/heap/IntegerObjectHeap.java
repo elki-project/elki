@@ -23,16 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap structure using int keys and Object values.
- * 
- * After extensive microbenchmarking we arrived back at this very simple heap:
- * Bulk-loading did not improve the performance in the general case.
+ * Basic in-memory heap interface, for int keys and Object values.
  * 
  * @author Erich Schubert
  * 
@@ -40,51 +34,14 @@ import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
  * 
  * @apiviz.has UnsortedIter
  */
-public abstract class IntegerObjectHeap<V> extends AbstractHeap {
-  /**
-   * Heap storage: keys
-   */
-  protected int[] keys;
-
-  /**
-   * Heap storage: values
-   */
-  protected Object[] values;
-
-  /**
-   * Default constructor: default capacity.
-   */
-  public IntegerObjectHeap() {
-    this(DEFAULT_INITIAL_CAPACITY);
-  }
-
-  /**
-   * Constructor with initial capacity.
-   * 
-   * @param size initial capacity
-   */
-  public IntegerObjectHeap(int size) {
-    super();
-    this.size = 0;
-    this.keys = new int[size];
-    this.values = new Object[size];
-  }
-
+public interface IntegerObjectHeap<V> {
   /**
    * Add a key-value pair to the heap
    * 
    * @param key Key
    * @param val Value
    */
-  public void add(int key, V val) {
-    // resize when needed
-    if (size + 1 > keys.length) {
-      resize(size + 1);
-    }
-    this.size++;
-    heapifyUp(size - 1, key, val);
-    heapModified();
-  }
+  void add(int key, V val);
 
   /**
    * Combined operation that removes the top element, and inserts a new element
@@ -93,165 +50,73 @@ public abstract class IntegerObjectHeap<V> extends AbstractHeap {
    * @param key Key of new element
    * @param val Value of new element
    */
-  public void replaceTopElement(int key, V val) {
-    heapifyDown(0, key, val);
-    heapModified();
-  }
+  void replaceTopElement(int key, V val);
 
   /**
    * Get the current top key
    * 
    * @return Top key
    */
-  public int peekKey() {
-    if (size == 0) {
-      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
-    }
-    return keys[0];
-  }
+  int peekKey();
 
   /**
    * Get the current top value
    * 
    * @return Value
    */
-  @SuppressWarnings("unchecked")
-  public V peekValue() {
-    if (size == 0) {
-      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
-    }
-    return (V) values[0];
-  }
+  V peekValue();
 
   /**
    * Remove the first element
    */
-  public void poll() {
-    removeAt(0);
-  }
+  void poll();
 
   /**
-   * Remove the element at the given position.
-   * 
-   * @param pos Element position.
+   * Clear the heap contents.
    */
-  protected void removeAt(int pos) {
-    if (pos < 0 || pos >= size) {
-      return;
-    }
-    // Replacement object:
-    final int reinkey = keys[size - 1];
-    final Object reinval = values[size - 1];
-    values[size - 1] = null;
-    size--;
-    heapifyDown(pos, reinkey, reinval);
-    heapModified();
-  }
+  void clear();
 
   /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * Query the size
    * 
-   * @param pos insertion position
-   * @param curkey Current key
-   * @param curval Current value
+   * @return Size
    */
-  abstract protected void heapifyUp(int pos, int curkey, Object curval);
-
+  public int size();
+  
   /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * Is the heap empty?
    * 
-   * @param ipos re-insertion position
-   * @param curkey Current key
-   * @param curval Current value
-   * @return true when the order was changed
+   * @return {@code true} when the size is 0.
    */
-  abstract protected boolean heapifyDown(int ipos, int curkey, Object curval);
-
-  /**
-   * Test whether we need to resize to have the requested capacity.
-   * 
-   * @param requiredSize required capacity
-   */
-  protected final void resize(int requiredSize) {
-    // Double until 64, then increase by 50% each time.
-    int newCapacity = ((keys.length < 64) ? ((keys.length + 1) << 1) : ((keys.length >> 1) * 3));
-    // overflow?
-    if (newCapacity < 0) {
-      throw new OutOfMemoryError();
-    }
-    if (requiredSize > newCapacity) {
-      newCapacity = requiredSize;
-    }
-    keys = Arrays.copyOf(keys, newCapacity);
-    values = Arrays.copyOf(values, newCapacity);
-  }
-
-  @Override
-  public void clear() {
-    // clean up references in the array for memory management
-    Arrays.fill(keys, 0);
-    Arrays.fill(values, null);
-    super.clear();
-  }
+  public boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
    * 
    * @return Iterator
    */
-  public UnsortedIter unsortedIter() {
-    return new UnsortedIter();
-  }
-  
+  UnsortedIter<V> unsortedIter();
+
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
    * @author Erich Schubert
+ * 
+ * @param <V> Value type
    */
-  public class UnsortedIter implements Iter {
-    /**
-     * Iterator position.
-     */
-    int pos = 0;
-
-    /**
-     * Modification counter we were initialized at.
-     */
-    final int myModCount = modCount;
-
-    @Override
-    public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
-      return pos < size;
-    }
-
-    @Override
-    public void advance() {
-      pos ++;
-    }
-
+  public static interface UnsortedIter<V> extends Iter {
     /**
      * Get the current key
      * 
      * @return Current key
      */
-    public int getKey() {
-      return keys[pos];
-    }
+    int getKey();
 
     /**
      * Get the current value
      * 
      * @return Current value
      */
-    @SuppressWarnings("unchecked")
-    public V getValue() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
-      return (V) values[pos];
-    }
+    V getValue();
   }
 }

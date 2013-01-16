@@ -23,6 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ConcurrentModificationException;
+
+import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
+
 /**
  * Abstract base class for heaps.
  * 
@@ -59,7 +63,7 @@ public class AbstractHeap {
   public int size() {
     return this.size;
   }
-  
+
   /**
    * Is the heap empty?
    * 
@@ -102,5 +106,35 @@ public class AbstractHeap {
    */
   protected void heapModified() {
     modCount++;
+  }
+
+  /**
+   * Unsorted iterator - in heap order. Does not poll the heap.
+   * 
+   * @author Erich Schubert
+   */
+  protected abstract class UnsortedIter implements Iter {
+    /**
+     * Iterator position.
+     */
+    protected int pos = 0;
+
+    /**
+     * Modification counter we were initialized at.
+     */
+    protected final int myModCount = modCount;
+
+    @Override
+    public boolean valid() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
+      return pos < size;
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
   }
 }

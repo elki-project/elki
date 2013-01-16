@@ -23,21 +23,29 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+
 /**
  * Basic in-memory max-heap for double values.
  * 
- * This heap is built lazily: if you first add many elements, then poll the
- * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
- * n). This is implemented via a simple validTo counter.
+ * Basic 4-ary heap implementation.
+ * 
+ * No bulk load, because it did not perform better in our benchmarks!
  * 
  * @author Erich Schubert
  */
-public class DoubleMaxHeap extends DoubleHeap {
+public class DoubleMaxHeap extends AbstractHeap implements DoubleHeap {
+  /**
+   * Heap storage: queue
+   */
+  protected double[] queue;
+
   /**
    * Constructor with default capacity.
    */
   public DoubleMaxHeap() {
-    super(DEFAULT_INITIAL_CAPACITY);
+    this(DEFAULT_INITIAL_CAPACITY);
   }
 
   /**
@@ -46,17 +54,180 @@ public class DoubleMaxHeap extends DoubleHeap {
    * @param size initial capacity
    */
   public DoubleMaxHeap(int size) {
-    super(size);
+    super();
+    this.size = 0;
+    this.queue = new double[size];
+  }
+
+  @Override
+  public void add(double key) {
+    this.size++;
+    // resize when needed
+    if (size > queue.length) {
+      resize(size);
+    }
+    heapifyUp(size - 1, key);
+    heapModified();
+  }
+
+  @Override
+  public void add(double key, int max) {
+    if (size < max) {
+      add(key);
+    } else if (key < peek()) {
+      replaceTopElement(key);
+    }
+  }
+
+  @Override
+  public double replaceTopElement(double e) {
+    final double oldroot = queue[0];
+    heapifyDown(0, e);
+    heapModified();
+    return oldroot;
+  }
+
+  @Override
+  public double peek() {
+    if (size == 0) {
+      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
+    }
+    return queue[0];
+  }
+
+  @Override
+  public double poll() {
+    return removeAt(0);
   }
 
   /**
-   * Compare two objects
+   * Remove the element at the given position.
    * 
-   * @param o1 First object
-   * @param o2 Second object
+   * @param pos Element position.
+   * @return Removed element
    */
+  protected double removeAt(int pos) {
+    if (pos < 0 || pos >= size) {
+      return 0.0;
+    }
+    final double top = queue[pos];
+    size--;
+    // Replacement object:
+    final double reinkey = queue[size];
+    heapifyDown(pos, reinkey);
+    heapModified();
+    return top;
+  }
+
+  /**
+   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * 
+   * @param pos insertion position
+   * @param curkey Current key
+   */
+  protected void heapifyUp(int pos, double curkey) {
+    while (pos > 0) {
+      final int parent = (pos - 1) >>> 2;
+      double parkey = queue[parent];
+
+      if (curkey < parkey) { // Compare
+        break;
+      }
+      queue[pos] = parkey;
+      pos = parent;
+    }
+    queue[pos] = curkey;
+  }
+
+  /**
+   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * 
+   * @param ipos re-insertion position
+   * @param curkey Current key
+   * @return true when the order was changed
+   */
+  protected boolean heapifyDown(final int ipos, double curkey) {
+    int pos = ipos;
+    final int half = (size + 2) >>> 2;
+    while (pos < half) {
+      // Get left child (must exist!)
+      final int cpos = (pos << 2) + 1;
+      int bestpos = cpos;
+      double bestkey = queue[cpos];
+      // Test second child, if present
+      final int schild = cpos + 1;
+      if (schild < size) {
+        double secondc = queue[schild];
+        if (bestkey < secondc) { // Compare
+          bestpos = schild;
+          bestkey = secondc;
+        }
+
+        // Test third child, if present
+        final int tchild = cpos + 2;
+        if (tchild < size) {
+          double thirdc = queue[tchild];
+          if (bestkey < thirdc) { // Compare
+            bestpos = tchild;
+            bestkey = thirdc;
+          }
+
+          // Test fourth child, if present
+          final int fchild = cpos + 3;
+          if (fchild < size) {
+            double fourthc = queue[fchild];
+            if (bestkey < fourthc) { // Compare
+              bestpos = fchild;
+              bestkey = fourthc;
+            }
+          }
+        }
+      }
+
+      if (bestkey < curkey) { // Compare
+        break;
+      }
+      queue[pos] = bestkey;
+      pos = bestpos;
+    }
+    queue[pos] = curkey;
+    return (pos != ipos);
+  }
+
+  /**
+   * Test whether we need to resize to have the requested capacity.
+   * 
+   * @param requiredSize required capacity
+   */
+  protected final void resize(int requiredSize) {
+    queue = Arrays.copyOf(queue, desiredSize(requiredSize, queue.length));
+  }
+
   @Override
-  protected boolean comp(double o1, double o2) {
-    return o1 < o2;
+  public void clear() {
+    super.clear();
+    for (int i = 0; i < size; i++) {
+      queue[i] = 0.0;
+    }
+  }
+
+  @Override
+  public UnsortedIter unsortedIter() {
+    return new UnsortedIter();
+  }
+
+  /**
+   * Unsorted iterator - in heap order. Does not poll the heap.
+   * 
+   * @author Erich Schubert
+   */
+  protected class UnsortedIter extends AbstractHeap.UnsortedIter implements DoubleHeap.UnsortedIter {
+    @Override
+    public double get() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
+      return queue[pos];
+    }
   }
 }

@@ -23,52 +23,22 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-import java.util.ConcurrentModificationException;
-
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap structure for double values.
- * 
- * After extensive microbenchmarking we arrived back at this very simple heap:
- * Bulk-loading did not improve the performance in the general case.
+ * Basic in-memory heap for double values.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has UnsortedIter
  */
-public abstract class DoubleHeap extends AbstractHeap {
-  /**
-   * Heap storage: queue
-   */
-  protected transient double[] queue;
-
-  /**
-   * Constructor with initial capacity.
-   * 
-   * @param size initial capacity
-   */
-  public DoubleHeap(int size) {
-    super();
-    this.size = 0;
-    this.queue = new double[size];
-  }
-
+public interface DoubleHeap {
   /**
    * Add a key-value pair to the heap
    * 
    * @param key Key
    */
-  public void add(double key) {
-    // resize when needed
-    if (size + 1 > queue.length) {
-      resize(size + 1);
-    }
-    this.size++;
-    heapifyUp(size - 1, key);
-    heapModified();
-  }
+  void add(double key);
 
   /**
    * Add a key-value pair to the heap, except if the new element is larger than
@@ -77,13 +47,7 @@ public abstract class DoubleHeap extends AbstractHeap {
    * @param key Key
    * @param max Maximum size of heap
    */
-  public void add(double key, int max) {
-    if (size < max) {
-      add(key);
-    } else if (comp(key, peek())) {
-      replaceTopElement(key);
-    }
-  }
+  void add(double key, int max);
 
   /**
    * Combined operation that removes the top element, and inserts a new element
@@ -92,180 +56,67 @@ public abstract class DoubleHeap extends AbstractHeap {
    * @param e New element to insert
    * @return Previous top element of the heap
    */
-  public double replaceTopElement(double e) {
-    double oldroot = queue[0];
-    heapifyDown(0, e);
-    heapModified();
-    return oldroot;
-  }
+  double replaceTopElement(double e);
 
   /**
    * Get the current top key
    * 
    * @return Top key
    */
-  public double peek() {
-    if (size == 0) {
-      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
-    }
-    return queue[0];
-  }
+  double peek();
 
   /**
    * Remove the first element
    * 
    * @return Top element
    */
-  public double poll() {
-    return removeAt(0);
-  }
-
-  /**
-   * Remove the element at the given position.
-   * 
-   * @param pos Element position.
-   * @return Removed element
-   */
-  protected double removeAt(int pos) {
-    if (pos < 0 || pos >= size) {
-      return 0.0;
-    }
-    final double top = queue[0];
-    // Replacement object:
-    final double reinkey = queue[size - 1];
-    size--;
-    heapifyDown(pos, reinkey);
-    heapModified();
-    return top;
-  }
-
-  /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
-   * 
-   * @param pos insertion position
-   * @param curkey Current key
-   */
-  protected void heapifyUp(int pos, double curkey) {
-    while (pos > 0) {
-      final int parent = (pos - 1) >>> 1;
-      double parkey = queue[parent];
-
-      if (comp(curkey, parkey)) { // Compare
-        break;
-      }
-      queue[pos] = parkey;
-      pos = parent;
-    }
-    queue[pos] = curkey;
-  }
-
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param ipos re-insertion position
-   * @param curkey Current key
-   * @return true when the order was changed
-   */
-  protected boolean heapifyDown(final int ipos, double curkey) {
-    int pos = ipos;
-    final int half = size >>> 1;
-    while (pos < half) {
-      // Get left child (must exist!)
-      int cpos = (pos << 1) + 1;
-      double chikey = queue[cpos];
-      // Test right child, if present
-      final int rchild = cpos + 1;
-      if (rchild < size) {
-        double right = queue[rchild];
-        if (comp(chikey, right)) { // Compare
-          cpos = rchild;
-          chikey = right;
-        }
-      }
-
-      if (!comp(curkey, chikey)) { // Compare
-        break;
-      }
-      queue[pos] = chikey;
-      pos = cpos;
-    }
-    queue[pos] = curkey;
-    return (pos != ipos);
-  }
-
-  /**
-   * Test whether we need to resize to have the requested capacity.
-   * 
-   * @param requiredSize required capacity
-   */
-  protected final void resize(int requiredSize) {
-    queue = Arrays.copyOf(queue, desiredSize(requiredSize, queue.length));
-  }
+  double poll();
 
   /**
    * Delete all elements from the heap.
    */
-  @Override
-  public void clear() {
-    super.clear();
-    for (int i = 0; i < size; i++) {
-      queue[i] = 0.0;
-    }
-  }
+  void clear();
 
   /**
-   * Compare two objects
+   * Query the size
+   * 
+   * @return Size
    */
-  abstract protected boolean comp(double o1, double o2);
+  public int size();
+  
+  /**
+   * Is the heap empty?
+   * 
+   * @return {@code true} when the size is 0.
+   */
+  public boolean isEmpty();
 
   /**
    * Get an unsorted iterator to inspect the heap.
    * 
    * @return Iterator
    */
-  public UnsortedIter unsortedIter() {
-    return new UnsortedIter();
-  }
-  
+  UnsortedIter unsortedIter();
+
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
+   * <pre>
+   * {@code
+   * for (DoubleHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   *   doSomething(iter.get());
+   * }
+   * }
+   * </pre>
+   * 
    * @author Erich Schubert
    */
-  public class UnsortedIter implements Iter {
-    /**
-     * Iterator position.
-     */
-    int pos = 0;
-    
-    /**
-     * Modification counter we were initialized at.
-     */
-    final int myModCount = modCount;
-
-    @Override
-    public boolean valid() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
-      return pos < size;
-    }
-
-    @Override
-    public void advance() {
-      pos++;
-    }
-
+  public static interface UnsortedIter extends Iter {
     /**
      * Get the iterators current object.
      * 
      * @return Current object
      */
-    public double get() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
-      return queue[pos];
-    }
+    double get();
   }
 }

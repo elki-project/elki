@@ -26,54 +26,51 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap for int values.
+ * Basic in-memory heap interface, for double keys and int values.
  * 
  * @author Erich Schubert
  * 
  * @apiviz.has UnsortedIter
  */
-public interface IntegerHeap {
+public interface DoubleIntegerHeap {
   /**
    * Add a key-value pair to the heap
    * 
    * @param key Key
+   * @param val Value
    */
-  void add(int key);
-
-  /**
-   * Add a key-value pair to the heap, except if the new element is larger than
-   * the top, and we are at design size (overflow)
-   * 
-   * @param key Key
-   * @param max Maximum size of heap
-   */
-  void add(int key, int max);
+  void add(double key, int val);
 
   /**
    * Combined operation that removes the top element, and inserts a new element
    * instead.
    * 
-   * @param e New element to insert
-   * @return Previous top element of the heap
+   * @param key Key of new element
+   * @param val Value of new element
    */
-  int replaceTopElement(int e);
+  void replaceTopElement(double key, int val);
 
   /**
    * Get the current top key
    * 
    * @return Top key
    */
-  int peek();
+  double peekKey();
+
+  /**
+   * Get the current top value
+   * 
+   * @return Value
+   */
+  int peekValue();
 
   /**
    * Remove the first element
-   * 
-   * @return Top element
    */
-  int poll();
+  void poll();
 
   /**
-   * Delete all elements from the heap.
+   * Clear the heap contents.
    */
   void clear();
 
@@ -101,22 +98,21 @@ public interface IntegerHeap {
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
-   * <pre>
-   * {@code
-   * for (IntegerHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
-   *   doSomething(iter.get());
-   * }
-   * }
-   * </pre>
-   * 
    * @author Erich Schubert
    */
   public static interface UnsortedIter extends Iter {
     /**
-     * Get the iterators current object.
+     * Get the current key
      * 
-     * @return Current object
+     * @return Current key
      */
-    int get();
+    double getKey();
+
+    /**
+     * Get the current value
+     * 
+     * @return Current value
+     */
+    int getValue();
   }
 }

@@ -23,21 +23,29 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+
 /**
- * Basic in-memory min-heap for Object values.
+ * Basic in-memory min-heap for K values.
  * 
- * This heap is built lazily: if you first add many elements, then poll the
- * heap, it will be bulk-loaded in O(n) instead of iteratively built in O(n log
- * n). This is implemented via a simple validTo counter.
+ * Basic 4-ary heap implementation.
+ * 
+ * No bulk load, because it did not perform better in our benchmarks!
  * 
  * @author Erich Schubert
  */
-public class ComparableMinHeap<K extends Comparable<? super K>> extends ObjectHeap<K> {
+public class ComparableMinHeap<K extends Comparable<? super K>> extends AbstractHeap implements ObjectHeap<K> {
+  /**
+   * Heap storage: queue
+   */
+  protected Object[] queue;
+
   /**
    * Constructor with default capacity.
    */
   public ComparableMinHeap() {
-    super(DEFAULT_INITIAL_CAPACITY);
+    this(DEFAULT_INITIAL_CAPACITY);
   }
 
   /**
@@ -46,18 +54,188 @@ public class ComparableMinHeap<K extends Comparable<? super K>> extends ObjectHe
    * @param size initial capacity
    */
   public ComparableMinHeap(int size) {
-    super(size);
+    super();
+    this.size = 0;
+    this.queue = new Object[size];
+  }
+
+  @Override
+  public void add(K key) {
+    this.size++;
+    // resize when needed
+    if (size > queue.length) {
+      resize(size);
+    }
+    heapifyUp(size - 1, key);
+    heapModified();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void add(K key, int max) {
+    if (size < max) {
+      add(key);
+    } else if (((Comparable<Object>) key).compareTo(peek()) > 0) {
+      replaceTopElement(key);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public K replaceTopElement(K e) {
+    final Object oldroot = queue[0];
+    heapifyDown(0, e);
+    heapModified();
+    return (K) oldroot;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public K peek() {
+    if (size == 0) {
+      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
+    }
+    return (K) queue[0];
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public K poll() {
+    return (K) removeAt(0);
   }
 
   /**
-   * Compare two objects
+   * Remove the element at the given position.
    * 
-   * @param o1 First object
-   * @param o2 Second object
+   * @param pos Element position.
+   * @return Removed element
    */
-  @Override
+  protected Object removeAt(int pos) {
+    if (pos < 0 || pos >= size) {
+      return null;
+    }
+    final Object top = queue[pos];
+    size--;
+    // Replacement object:
+    final Object reinkey = queue[size];
+    heapifyDown(pos, reinkey);
+    heapModified();
+    return top;
+  }
+
+  /**
+   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * 
+   * @param pos insertion position
+   * @param curkey Current key
+   */
   @SuppressWarnings("unchecked")
-  protected boolean comp(Object o1, Object o2) {
-    return ((K) o1).compareTo((K) o2) > 0;
+  protected void heapifyUp(int pos, Object cur) {
+    Comparable<Object> curkey = (Comparable<Object>) cur;
+    while (pos > 0) {
+      final int parent = (pos - 1) >>> 2;
+      Object parkey = queue[parent];
+
+      if (curkey.compareTo(parkey) > 0) { // Compare
+        break;
+      }
+      queue[pos] = parkey;
+      pos = parent;
+    }
+    queue[pos] = curkey;
+  }
+
+  /**
+   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * 
+   * @param ipos re-insertion position
+   * @param curkey Current key
+   * @return true when the order was changed
+   */
+  @SuppressWarnings("unchecked")
+  protected boolean heapifyDown(final int ipos, Object curkey) {
+    int pos = ipos;
+    final int half = (size + 2) >>> 2;
+    while (pos < half) {
+      // Get left child (must exist!)
+      final int cpos = (pos << 2) + 1;
+      int bestpos = cpos;
+      Comparable<Object> bestkey = (Comparable<Object>) queue[cpos];
+      // Test second child, if present
+      final int schild = cpos + 1;
+      if (schild < size) {
+        Object secondc = queue[schild];
+        if (bestkey.compareTo(secondc) > 0) { // Compare
+          bestpos = schild;
+          bestkey = (Comparable<Object>) secondc;
+        }
+
+        // Test third child, if present
+        final int tchild = cpos + 2;
+        if (tchild < size) {
+          Object thirdc = queue[tchild];
+          if (bestkey.compareTo(thirdc) > 0) { // Compare
+            bestpos = tchild;
+            bestkey = (Comparable<Object>)thirdc;
+          }
+
+          // Test fourth child, if present
+          final int fchild = cpos + 3;
+          if (fchild < size) {
+            Object fourthc = queue[fchild];
+            if (bestkey.compareTo(fourthc) > 0) { // Compare
+              bestpos = fchild;
+              bestkey = (Comparable<Object>)fourthc;
+            }
+          }
+        }
+      }
+
+      if (bestkey.compareTo(curkey) > 0) { // Compare
+        break;
+      }
+      queue[pos] = bestkey;
+      pos = bestpos;
+    }
+    queue[pos] = curkey;
+    return (pos != ipos);
+  }
+
+  /**
+   * Test whether we need to resize to have the requested capacity.
+   * 
+   * @param requiredSize required capacity
+   */
+  protected final void resize(int requiredSize) {
+    queue = Arrays.copyOf(queue, desiredSize(requiredSize, queue.length));
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    for (int i = 0; i < size; i++) {
+      queue[i] = null;
+    }
+  }
+
+  @Override
+  public UnsortedIter unsortedIter() {
+    return new UnsortedIter();
+  }
+
+  /**
+   * Unsorted iterator - in heap order. Does not poll the heap.
+   * 
+   * @author Erich Schubert
+   */
+  protected class UnsortedIter extends AbstractHeap.UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+    @Override
+    @SuppressWarnings("unchecked")
+    public K get() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
+      return (K) queue[pos];
+    }
   }
 }
