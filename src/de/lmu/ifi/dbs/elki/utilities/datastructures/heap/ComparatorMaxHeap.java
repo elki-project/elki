@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * which will for larger heaps be accompanied by a 4-ary heap (attached below
  * the root of the two-ary heap, making the root actually 3-ary).
  * 
- * This code was automatically instantiated for the type: Comparable
+ * This code was automatically instantiated for the type: Comparator
  * 
  * This combination was found to work quite well in benchmarks, but YMMV.
  * 
@@ -56,16 +56,16 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @apiviz.has UnsortedIter
  * @param <K> Key type
  */
-public class ComparableMaxHeap<K extends Comparable<? super K>> implements ObjectHeap<K> {
+public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   /**
    * Base heap.
    */
-  protected Comparable<Object>[] twoheap;
+  protected Object[] twoheap;
 
   /**
    * Extension heap.
    */
-  protected Comparable<Object>[] fourheap;
+  protected Object[] fourheap;
 
   /**
    * Current size of heap.
@@ -100,13 +100,21 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    */
   private final static int FOUR_HEAP_INITIAL_SIZE = 341;
 
+
+  /** 
+   * Comparator
+   */
+  protected java.util.Comparator<Object> comparator;
+
   /**
    * Constructor, with default size.
+   * @param comparator Comparator
    */
   @SuppressWarnings("unchecked")
-  public ComparableMaxHeap() {
+  public ComparatorMaxHeap(java.util.Comparator<? super K> comparator) {
     super();
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
+    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
+    Object[] twoheap = new Object[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
     this.fourheap = null;
@@ -118,19 +126,21 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * Constructor, with given minimum size.
    * 
    * @param minsize Minimum size
+   * @param comparator Comparator
    */
   @SuppressWarnings("unchecked")
-  public ComparableMaxHeap(int minsize) {
+  public ComparatorMaxHeap(int minsize, java.util.Comparator<? super K> comparator) {
     super();
+    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
     if (minsize < TWO_HEAP_MAX_SIZE) {
       final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-      Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, size);
+      Object[] twoheap = new Object[size];
       
       this.twoheap = twoheap;
       this.fourheap = null;
     } else {
-      Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
-      Comparable<Object>[] fourheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, minsize - TWO_HEAP_MAX_SIZE);
+      Object[] twoheap = new Object[TWO_HEAP_INITIAL_SIZE];
+      Object[] fourheap = new Object[minsize - TWO_HEAP_MAX_SIZE];
       this.twoheap = twoheap;
       this.fourheap = fourheap;
     }
@@ -159,7 +169,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   @Override
   @SuppressWarnings("unchecked")
   public void add(K o) {
-    final Comparable<Object> co = (Comparable<Object>)o;
+    final Object co = o;
     // System.err.println("Add: " + o);
     if (size < TWO_HEAP_MAX_SIZE) {
       if (size >= twoheap.length) {
@@ -174,7 +184,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
     } else {
       final int fourpos = size - TWO_HEAP_MAX_SIZE;
       if (fourheap == null) {
-        fourheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, FOUR_HEAP_INITIAL_SIZE);
+        fourheap = new Object[FOUR_HEAP_INITIAL_SIZE];
       } else if (fourpos >= fourheap.length) {
         // Grow extension heap by half.
         fourheap = Arrays.copyOf(fourheap, fourheap.length + (fourheap.length >> 1));
@@ -190,7 +200,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   public void add(K key, int max) {
     if (size < max) {
       add(key);
-    } else if (twoheap[0].compareTo(key) >= 0) {
+    } else if (comparator.compare(twoheap[0], key) >= 0) {
       replaceTopElement(key);
     }
   }
@@ -198,8 +208,8 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   @Override
   @SuppressWarnings("unchecked")
   public K replaceTopElement(K reinsert) {
-    final Comparable<Object> ret = twoheap[0];
-    heapifyDown((Comparable<Object>) reinsert);
+    final Object ret = twoheap[0];
+    heapifyDown( reinsert);
     ++modCount;
     return (K)ret;
   }
@@ -210,11 +220,11 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp2(int twopos, Comparable<Object> cur) {
+  private void heapifyUp2(int twopos, Object cur) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      Comparable<Object> par = twoheap[parent];
-      if (cur.compareTo(par) <= 0) {
+      Object par = twoheap[parent];
+      if (comparator.compare(cur, par) <= 0) {
         break;
       }
       twoheap[twopos] = par;
@@ -229,17 +239,17 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * @param fourpos Position in 4-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp4(int fourpos, Comparable<Object> cur) {
+  private void heapifyUp4(int fourpos, Object cur) {
     while (fourpos > 0) {
       final int parent = (fourpos - 1) >> 2;
-      Comparable<Object> par = fourheap[parent];
-      if (cur.compareTo(par) <= 0) {
+      Object par = fourheap[parent];
+      if (comparator.compare(cur, par) <= 0) {
         break;
       }
       fourheap[fourpos] = par;
       fourpos = parent;
     }
-    if (fourpos == 0 && twoheap[0].compareTo(cur) < 0) {
+    if (fourpos == 0 && comparator.compare(twoheap[0], cur) < 0) {
       fourheap[0] = twoheap[0];
       twoheap[0] = cur;
     } else {
@@ -250,16 +260,16 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   @Override
   @SuppressWarnings("unchecked")
   public K poll() {
-    final Comparable<Object> ret = twoheap[0];
+    final Object ret = twoheap[0];
     --size;
     // Replacement object:
     if (size >= TWO_HEAP_MAX_SIZE) {
       final int last = size - TWO_HEAP_MAX_SIZE;
-      final Comparable<Object> reinsert = fourheap[last];
+      final Object reinsert = fourheap[last];
       fourheap[last] = null;
       heapifyDown(reinsert);
     } else if (size > 0) {
-      final Comparable<Object> reinsert = twoheap[size];
+      final Object reinsert = twoheap[size];
       twoheap[size] = null;
       heapifyDown(reinsert);
     } else {
@@ -274,11 +284,11 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * 
    * @param reinsert Object to insert.
    */
-  private void heapifyDown(Comparable<Object> reinsert) {
+  private void heapifyDown(Object reinsert) {
     if (size > TWO_HEAP_MAX_SIZE) {
       // Special case: 3-ary situation.
-      final int best = (twoheap[1].compareTo(twoheap[2]) >= 0) ? 1 : 2;
-      if (fourheap[0].compareTo(twoheap[best]) > 0) {
+      final int best = (comparator.compare(twoheap[1], twoheap[2]) >= 0) ? 1 : 2;
+      if (comparator.compare(fourheap[0], twoheap[best]) > 0) {
         twoheap[0] = fourheap[0];
         heapifyDown4(0, reinsert);
       } else {
@@ -296,17 +306,17 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyDown2(int twopos, Comparable<Object> cur) {
+  private void heapifyDown2(int twopos, Object cur) {
     final int stop = Math.min(size, TWO_HEAP_MAX_SIZE) >>> 1;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      Comparable<Object> best = twoheap[bestchild];
+      Object best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best.compareTo(twoheap[right]) < 0) {
+      if (right < size && comparator.compare(best, twoheap[right]) < 0) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur.compareTo(best) >= 0) {
+      if (comparator.compare(cur, best) >= 0) {
         break;
       }
       twoheap[twopos] = best;
@@ -321,15 +331,15 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * @param fourpos Position in 4-ary heap.
    * @param cur Current object
    */
-  private void heapifyDown4(int fourpos, Comparable<Object> cur) {
+  private void heapifyDown4(int fourpos, Object cur) {
     final int stop = (size - TWO_HEAP_MAX_SIZE + 2) >>> 2;
     while (fourpos < stop) {
       final int child = (fourpos << 2) + 1;
-      Comparable<Object> best = fourheap[child];
+      Object best = fourheap[child];
       int bestchild = child, candidate = child + 1, minsize = candidate + TWO_HEAP_MAX_SIZE;
       if (size > minsize) {
-        Comparable<Object> nextchild = fourheap[candidate];
-        if (best.compareTo(nextchild) < 0) {
+        Object nextchild = fourheap[candidate];
+        if (comparator.compare(best, nextchild) < 0) {
           bestchild = candidate;
           best = nextchild;
         }
@@ -337,21 +347,21 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
         minsize += 2;
         if (size >= minsize) {
           nextchild = fourheap[++candidate];
-          if (best.compareTo(nextchild) < 0) {
+          if (comparator.compare(best, nextchild) < 0) {
             bestchild = candidate;
             best = nextchild;
           }
 
           if (size > minsize) {
             nextchild = fourheap[++candidate];
-            if (best.compareTo(nextchild) < 0) {
+            if (comparator.compare(best, nextchild) < 0) {
               bestchild = candidate;
               best = nextchild;
             }
           }
         }
       }
-      if (cur.compareTo(best) >= 0) {
+      if (comparator.compare(cur, best) >= 0) {
         break;
       }
       fourheap[fourpos] = best;
@@ -369,7 +379,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(ComparableMaxHeap.class.getSimpleName()).append(" [");
+    buf.append(ComparatorMaxHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.get()).append(',');
     }

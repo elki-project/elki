@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,7 +59,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMaxHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -148,7 +148,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
   /**
    * Comparator for sorting the heaps.
    */
-  private static final Comparator<DistanceDBIDPair<?>> COMPARATOR = Collections.reverseOrder(DistanceDBIDResultUtil.distanceComparator());
+  private static final Comparator<DistanceDBIDPair<?>> COMPARATOR = DistanceDBIDResultUtil.distanceComparator();
 
   /**
    * Type of output: all scores (upper bounds) or top n only
@@ -495,15 +495,15 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
 
       int pos = 0;
       for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new ComparatorHeap<DoubleDistanceDBIDPair>(k, COMPARATOR));
+        pf[pos++] = new HilFeature(DBIDUtil.deref(iditer), new ComparatorMaxHeap<DoubleDistanceDBIDPair>(k, COMPARATOR));
       }
-      this.out = new ComparatorHeap<>(n, new Comparator<HilFeature>() {
+      this.out = new ComparatorMinHeap<>(n, new Comparator<HilFeature>() {
         @Override
         public int compare(HilFeature o1, HilFeature o2) {
           return Double.compare(o1.ubound, o2.ubound);
         }
       });
-      this.wlb = new ComparatorHeap<>(n, new Comparator<HilFeature>() {
+      this.wlb = new ComparatorMinHeap<>(n, new Comparator<HilFeature>() {
         @Override
         public int compare(HilFeature o1, HilFeature o2) {
           return Double.compare(o1.lbound, o2.lbound);
