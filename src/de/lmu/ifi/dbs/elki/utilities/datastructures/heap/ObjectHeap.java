@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap for Object values.
+ * Basic in-memory heap for K values.
  * 
  * @author Erich Schubert
  * 

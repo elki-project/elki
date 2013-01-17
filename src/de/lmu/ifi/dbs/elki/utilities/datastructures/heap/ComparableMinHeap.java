@@ -103,9 +103,9 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   /**
    * Constructor, with default size.
    */
+  @SuppressWarnings("unchecked")
   public ComparableMinHeap() {
     super();
-    @SuppressWarnings("unchecked")
     Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
 
     this.twoheap = twoheap;
@@ -119,19 +119,17 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
    * 
    * @param minsize Minimum size
    */
+  @SuppressWarnings("unchecked")
   public ComparableMinHeap(int minsize) {
     super();
     if (minsize < TWO_HEAP_MAX_SIZE) {
       final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-      @SuppressWarnings("unchecked")
       Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, size);
       
       this.twoheap = twoheap;
       this.fourheap = null;
     } else {
-      @SuppressWarnings("unchecked")
       Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
-      @SuppressWarnings("unchecked")
       Comparable<Object>[] fourheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, minsize - TWO_HEAP_MAX_SIZE);
       this.twoheap = twoheap;
       this.fourheap = fourheap;
