@@ -167,7 +167,6 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void add(K o) {
     final Object co = o;
     // System.err.println("Add: " + o);
