@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2013
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,195 +26,357 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
- * Basic in-memory max-heap for K values.
+ * Advanced priority queue class, based on a binary heap (for small sizes),
+ * which will for larger heaps be accompanied by a 4-ary heap (attached below
+ * the root of the two-ary heap, making the root actually 3-ary).
  * 
- * Basic 4-ary heap implementation.
+ * This code was automatically instantiated for the type: Comparable
  * 
- * No bulk load, because it did not perform better in our benchmarks!
+ * This combination was found to work quite well in benchmarks, but YMMV.
+ * 
+ * Some other observations from benchmarking:
+ * <ul>
+ * <li>Bulk loading did not improve things</li>
+ * <li>Primitive heaps are substantially faster.</li>
+ * <li>Since an array in Java has an overhead of 12 bytes, odd-sized object and
+ * integer arrays are actually well aligned both for 2-ary and 4-ary heaps.</li>
+ * <li>Workload makes a huge difference. A load-once, poll-until-empty priority
+ * queue is something different than e.g. a top-k heap, which will see a lot of
+ * top element replacements.</li>
+ * <li>Random vs. increasing vs. decreasing vs. sawtooth insertion patterns for
+ * top-k make a difference.</li>
+ * <li>Different day, different benchmark results ...</li>
+ * </ul>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has UnsortedIter
+ * @param <K> Key type
  */
-public class ComparableMaxHeap<K extends Comparable<? super K>> extends AbstractHeap implements ObjectHeap<K> {
+public class ComparableMaxHeap<K extends Comparable<? super K>> implements ObjectHeap<K> {
   /**
-   * Heap storage: queue
+   * Base heap.
    */
-  protected Object[] queue;
+  protected Comparable<Object>[] twoheap;
 
   /**
-   * Constructor with default capacity.
+   * Extension heap.
+   */
+  protected Comparable<Object>[] fourheap;
+
+  /**
+   * Current size of heap.
+   */
+  protected int size;
+
+  /**
+   * (Structural) modification counter. Used to invalidate iterators.
+   */
+  protected int modCount = 0;
+
+  /**
+   * Maximum size of the 2-ary heap. A complete 2-ary heap has (2^k-1) elements.
+   */
+  private final static int TWO_HEAP_MAX_SIZE = (1 << 9) - 1;
+
+  /**
+   * Initial size of the 2-ary heap.
+   */
+  private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
+
+  /**
+   * Initial size of 4-ary heap when initialized.
+   * 
+   * 21 = 4-ary heap of height 2: 1 + 4 + 4*4
+   * 
+   * 85 = 4-ary heap of height 3: 21 + 4*4*4
+   * 
+   * 341 = 4-ary heap of height 4: 85 + 4*4*4*4
+   * 
+   * Since we last grew by 255 (to 511), let's use 341.
+   */
+  private final static int FOUR_HEAP_INITIAL_SIZE = 341;
+
+  /**
+   * Constructor, with default size.
    */
   public ComparableMaxHeap() {
-    this(DEFAULT_INITIAL_CAPACITY);
+    super();
+    @SuppressWarnings("unchecked")
+    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
+
+    this.twoheap = twoheap;
+    this.fourheap = null;
+    this.size = 0;
+    this.modCount = 0;
   }
 
   /**
-   * Constructor with initial capacity.
+   * Constructor, with given minimum size.
    * 
-   * @param size initial capacity
+   * @param minsize Minimum size
    */
-  public ComparableMaxHeap(int size) {
+  public ComparableMaxHeap(int minsize) {
     super();
+    if (minsize < TWO_HEAP_MAX_SIZE) {
+      final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+      @SuppressWarnings("unchecked")
+      Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, size);
+      
+      this.twoheap = twoheap;
+      this.fourheap = null;
+    } else {
+      @SuppressWarnings("unchecked")
+      Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
+      @SuppressWarnings("unchecked")
+      Comparable<Object>[] fourheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, minsize - TWO_HEAP_MAX_SIZE);
+      this.twoheap = twoheap;
+      this.fourheap = fourheap;
+    }
     this.size = 0;
-    this.queue = new Object[size];
+    this.modCount = 0;
   }
 
   @Override
-  public void add(K key) {
-    this.size++;
-    // resize when needed
-    if (size > queue.length) {
-      resize(size);
-    }
-    heapifyUp(size - 1, key);
-    heapModified();
+  public void clear() {
+    size = 0;
+    ++modCount;
+    fourheap = null;
+    Arrays.fill(twoheap, null);
+  }
+
+  @Override
+  public int size() {
+    return size;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return (size == 0);
   }
 
   @Override
   @SuppressWarnings("unchecked")
+  public void add(K o) {
+    final Comparable<Object> co = (Comparable<Object>)o;
+    // System.err.println("Add: " + o);
+    if (size < TWO_HEAP_MAX_SIZE) {
+      if (size >= twoheap.length) {
+        // Grow by one layer.
+        twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
+      }
+      final int twopos = size;
+      twoheap[twopos] = co;
+      ++size;
+      heapifyUp2(twopos, co);
+      ++modCount;
+    } else {
+      final int fourpos = size - TWO_HEAP_MAX_SIZE;
+      if (fourheap == null) {
+        fourheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, FOUR_HEAP_INITIAL_SIZE);
+      } else if (fourpos >= fourheap.length) {
+        // Grow extension heap by half.
+        fourheap = Arrays.copyOf(fourheap, fourheap.length + (fourheap.length >> 1));
+      }
+      fourheap[fourpos] = co;
+      ++size;
+      heapifyUp4(fourpos, co);
+      ++modCount;
+    }
+  }
+
+  @Override
   public void add(K key, int max) {
     if (size < max) {
       add(key);
-    } else if (((Comparable<Object>) key).compareTo(peek()) < 0) {
+    } else if (twoheap[0].compareTo(key) >= 0) {
       replaceTopElement(key);
     }
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public K replaceTopElement(K e) {
-    final Object oldroot = queue[0];
-    heapifyDown(0, e);
-    heapModified();
-    return (K) oldroot;
+  public K replaceTopElement(K reinsert) {
+    final Comparable<Object> ret = twoheap[0];
+    heapifyDown((Comparable<Object>) reinsert);
+    ++modCount;
+    return (K)ret;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public K peek() {
-    if (size == 0) {
-      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
+  /**
+   * Heapify-Up method for 2-ary heap.
+   * 
+   * @param twopos Position in 2-ary heap.
+   * @param cur Current object
+   */
+  private void heapifyUp2(int twopos, Comparable<Object> cur) {
+    while (twopos > 0) {
+      final int parent = (twopos - 1) >>> 1;
+      Comparable<Object> par = twoheap[parent];
+      if (cur.compareTo(par) <= 0) {
+        break;
+      }
+      twoheap[twopos] = par;
+      twopos = parent;
     }
-    return (K) queue[0];
+    twoheap[twopos] = cur;
+  }
+
+  /**
+   * Heapify-Up method for 4-ary heap.
+   * 
+   * @param fourpos Position in 4-ary heap.
+   * @param cur Current object
+   */
+  private void heapifyUp4(int fourpos, Comparable<Object> cur) {
+    while (fourpos > 0) {
+      final int parent = (fourpos - 1) >> 2;
+      Comparable<Object> par = fourheap[parent];
+      if (cur.compareTo(par) <= 0) {
+        break;
+      }
+      fourheap[fourpos] = par;
+      fourpos = parent;
+    }
+    if (fourpos == 0 && twoheap[0].compareTo(cur) < 0) {
+      fourheap[0] = twoheap[0];
+      twoheap[0] = cur;
+    } else {
+      fourheap[fourpos] = cur;
+    }
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public K poll() {
-    return (K) removeAt(0);
-  }
-
-  /**
-   * Remove the element at the given position.
-   * 
-   * @param pos Element position.
-   * @return Removed element
-   */
-  protected Object removeAt(int pos) {
-    if (pos < 0 || pos >= size) {
-      return null;
-    }
-    final Object top = queue[pos];
-    size--;
+    final Comparable<Object> ret = twoheap[0];
+    --size;
     // Replacement object:
-    final Object reinkey = queue[size];
-    heapifyDown(pos, reinkey);
-    heapModified();
-    return top;
+    if (size >= TWO_HEAP_MAX_SIZE) {
+      final int last = size - TWO_HEAP_MAX_SIZE;
+      final Comparable<Object> reinsert = fourheap[last];
+      fourheap[last] = null;
+      heapifyDown(reinsert);
+    } else if (size > 0) {
+      final Comparable<Object> reinsert = twoheap[size];
+      twoheap[size] = null;
+      heapifyDown(reinsert);
+    } else {
+      twoheap[0] = null;
+    }
+    ++modCount;
+    return (K)ret;
   }
 
   /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
+   * Invoke heapify-down for the root object.
    * 
-   * @param pos insertion position
-   * @param curkey Current key
+   * @param reinsert Object to insert.
    */
-  @SuppressWarnings("unchecked")
-  protected void heapifyUp(int pos, Object curkey) {
-    while (pos > 0) {
-      final int parent = (pos - 1) >>> 2;
-      Object parkey = queue[parent];
+  private void heapifyDown(Comparable<Object> reinsert) {
+    if (size > TWO_HEAP_MAX_SIZE) {
+      // Special case: 3-ary situation.
+      final int best = (twoheap[1].compareTo(twoheap[2]) >= 0) ? 1 : 2;
+      if (fourheap[0].compareTo(twoheap[best]) > 0) {
+        twoheap[0] = fourheap[0];
+        heapifyDown4(0, reinsert);
+      } else {
+        twoheap[0] = twoheap[best];
+        heapifyDown2(best, reinsert);
+      }
+      return;
+    }
+    heapifyDown2(0, reinsert);
+  }
 
-      if (((Comparable<Object>) curkey).compareTo(parkey) < 0) { // Compare
+  /**
+   * Heapify-Down for 2-ary heap.
+   * 
+   * @param twopos Position in 2-ary heap.
+   * @param cur Current object
+   */
+  private void heapifyDown2(int twopos, Comparable<Object> cur) {
+    final int stop = Math.min(size, TWO_HEAP_MAX_SIZE) >>> 1;
+    while (twopos < stop) {
+      int bestchild = (twopos << 1) + 1;
+      Comparable<Object> best = twoheap[bestchild];
+      final int right = bestchild + 1;
+      if (right < size && best.compareTo(twoheap[right]) < 0) {
+        bestchild = right;
+        best = twoheap[right];
+      }
+      if (cur.compareTo(best) >= 0) {
         break;
       }
-      queue[pos] = parkey;
-      pos = parent;
+      twoheap[twopos] = best;
+      twopos = bestchild;
     }
-    queue[pos] = curkey;
+    twoheap[twopos] = cur;
   }
 
   /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
+   * Heapify-Down for 4-ary heap.
    * 
-   * @param ipos re-insertion position
-   * @param curkey Current key
-   * @return true when the order was changed
+   * @param fourpos Position in 4-ary heap.
+   * @param cur Current object
    */
-  @SuppressWarnings("unchecked")
-  protected boolean heapifyDown(final int ipos, Object curkey) {
-    int pos = ipos;
-    final int half = (size + 2) >>> 2;
-    while (pos < half) {
-      // Get left child (must exist!)
-      final int cpos = (pos << 2) + 1;
-      int bestpos = cpos;
-      Object bestkey = queue[cpos];
-      // Test second child, if present
-      final int schild = cpos + 1;
-      if (schild < size) {
-        Object secondc = queue[schild];
-        if (((Comparable<Object>) bestkey).compareTo(secondc) < 0) { // Compare
-          bestpos = schild;
-          bestkey = secondc;
+  private void heapifyDown4(int fourpos, Comparable<Object> cur) {
+    final int stop = (size - TWO_HEAP_MAX_SIZE + 2) >>> 2;
+    while (fourpos < stop) {
+      final int child = (fourpos << 2) + 1;
+      Comparable<Object> best = fourheap[child];
+      int bestchild = child, candidate = child + 1, minsize = candidate + TWO_HEAP_MAX_SIZE;
+      if (size > minsize) {
+        Comparable<Object> nextchild = fourheap[candidate];
+        if (best.compareTo(nextchild) < 0) {
+          bestchild = candidate;
+          best = nextchild;
         }
 
-        // Test third child, if present
-        final int tchild = cpos + 2;
-        if (tchild < size) {
-          Object thirdc = queue[tchild];
-          if (((Comparable<Object>) bestkey).compareTo(thirdc) < 0) { // Compare
-            bestpos = tchild;
-            bestkey = thirdc;
+        minsize += 2;
+        if (size >= minsize) {
+          nextchild = fourheap[++candidate];
+          if (best.compareTo(nextchild) < 0) {
+            bestchild = candidate;
+            best = nextchild;
           }
 
-          // Test fourth child, if present
-          final int fchild = cpos + 3;
-          if (fchild < size) {
-            Object fourthc = queue[fchild];
-            if (((Comparable<Object>) bestkey).compareTo(fourthc) < 0) { // Compare
-              bestpos = fchild;
-              bestkey = fourthc;
+          if (size > minsize) {
+            nextchild = fourheap[++candidate];
+            if (best.compareTo(nextchild) < 0) {
+              bestchild = candidate;
+              best = nextchild;
             }
           }
         }
       }
-
-      if (((Comparable<Object>) bestkey).compareTo(curkey) < 0) { // Compare
+      if (cur.compareTo(best) >= 0) {
         break;
       }
-      queue[pos] = bestkey;
-      pos = bestpos;
+      fourheap[fourpos] = best;
+      fourpos = bestchild;
     }
-    queue[pos] = curkey;
-    return (pos != ipos);
-  }
-
-  /**
-   * Test whether we need to resize to have the requested capacity.
-   * 
-   * @param requiredSize required capacity
-   */
-  protected final void resize(int requiredSize) {
-    queue = Arrays.copyOf(queue, desiredSize(requiredSize, queue.length));
+    fourheap[fourpos] = cur;
   }
 
   @Override
-  public void clear() {
-    super.clear();
-    for (int i = 0; i < size; i++) {
-      queue[i] = null;
+  @SuppressWarnings("unchecked")
+  public K peek() {
+    return (K)twoheap[0];
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    buf.append(ComparableMaxHeap.class.getSimpleName()).append(" [");
+    for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
+      buf.append(iter.get()).append(',');
     }
+    buf.append(']');
+    return buf.toString();
   }
 
   @Override
@@ -225,16 +387,47 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> extends Abstract
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
+   * Use this class as follows:
+   * 
+   * <pre>
+   * {@code
+   * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   *   doSomething(iter.get());
+   * }
+   * }
+   * </pre>
+   * 
    * @author Erich Schubert
    */
-  protected class UnsortedIter extends AbstractHeap.UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+  private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+    /**
+     * Iterator position.
+     */
+    protected int pos = 0;
+
+    /**
+     * Modification counter we were initialized at.
+     */
+    protected final int myModCount = modCount;
+
     @Override
-    @SuppressWarnings("unchecked")
-    public K get() {
+    public boolean valid() {
       if (modCount != myModCount) {
         throw new ConcurrentModificationException();
       }
-      return (K) queue[pos];
+      return pos < size;
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
+    @SuppressWarnings("unchecked")
+
+    @Override
+    public K get() {
+      return (K)((pos < TWO_HEAP_MAX_SIZE) ? twoheap[pos] : fourheap[pos - TWO_HEAP_MAX_SIZE]);
     }
   }
 }

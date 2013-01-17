@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2013
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,211 +26,399 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
- * Basic in-memory heap structure for double keys and int values,
- * ordered by maximum first.
+ * Advanced priority queue class, based on a binary heap (for small sizes),
+ * which will for larger heaps be accompanied by a 4-ary heap (attached below
+ * the root of the two-ary heap, making the root actually 3-ary).
  * 
- * Basic 4-ary heap implementation.
+ * This code was automatically instantiated for the types: Double and Integer
  * 
- * No bulk load, because it did not perform better in our benchmarks!
+ * This combination was found to work quite well in benchmarks, but YMMV.
+ * 
+ * Some other observations from benchmarking:
+ * <ul>
+ * <li>Bulk loading did not improve things</li>
+ * <li>Primitive heaps are substantially faster.</li>
+ * <li>Since an array in Java has an overhead of 12 bytes, odd-sized object and
+ * integer arrays are actually well aligned both for 2-ary and 4-ary heaps.</li>
+ * <li>Workload makes a huge difference. A load-once, poll-until-empty priority
+ * queue is something different than e.g. a top-k heap, which will see a lot of
+ * top element replacements.</li>
+ * <li>Random vs. increasing vs. decreasing vs. sawtooth insertion patterns for
+ * top-k make a difference.</li>
+ * <li>Different day, different benchmark results ...</li>
+ * </ul>
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.has UnsortedIter
  */
-public class DoubleIntegerMinHeap extends AbstractHeap implements DoubleIntegerHeap {
+public class DoubleIntegerMinHeap implements DoubleIntegerHeap {
   /**
-   * Heap storage: keys
+   * Base heap.
    */
-  private double[] keys;
+  protected double[] twoheap;
 
   /**
-   * Heap storage: values
+   * Base heap values.
    */
-  private int[] values;
+  protected int[] twovals;
 
   /**
-   * Default constructor: default capacity.
+   * Extension heap.
+   */
+  protected double[] fourheap;
+
+  /**
+   * Extension heapvalues.
+   */
+  protected int[] fourvals;
+
+  /**
+   * Current size of heap.
+   */
+  protected int size;
+
+  /**
+   * (Structural) modification counter. Used to invalidate iterators.
+   */
+  protected int modCount = 0;
+
+  /**
+   * Maximum size of the 2-ary heap. A complete 2-ary heap has (2^k-1) elements.
+   */
+  private final static int TWO_HEAP_MAX_SIZE = (1 << 9) - 1;
+
+  /**
+   * Initial size of the 2-ary heap.
+   */
+  private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
+
+  /**
+   * Initial size of 4-ary heap when initialized.
+   * 
+   * 21 = 4-ary heap of height 2: 1 + 4 + 4*4
+   * 
+   * 85 = 4-ary heap of height 3: 21 + 4*4*4
+   * 
+   * 341 = 4-ary heap of height 4: 85 + 4*4*4*4
+   * 
+   * Since we last grew by 255 (to 511), let's use 341.
+   */
+  private final static int FOUR_HEAP_INITIAL_SIZE = 341;
+
+  /**
+   * Constructor, with default size.
    */
   public DoubleIntegerMinHeap() {
-    this(DEFAULT_INITIAL_CAPACITY);
-  }
-
-  /**
-   * Constructor with initial capacity.
-   * 
-   * @param size initial capacity
-   */
-  public DoubleIntegerMinHeap(int size) {
     super();
+    double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
+    int[] twovals = new int[TWO_HEAP_INITIAL_SIZE];
+
+    this.twoheap = twoheap;
+    this.twovals = twovals;
+    this.fourheap = null;
+    this.fourvals = null;
     this.size = 0;
-    this.keys = new double[size];
-    this.values = new int[size];
-  }
-
-  @Override
-  public void add(double key, int val) {
-    this.size++;
-    // resize when needed
-    if (size > keys.length) {
-      resize(size);
-    }
-    heapifyUp(size - 1, key, val);
-    heapModified();
-  }
-
-  @Override
-  public void replaceTopElement(double key, int val) {
-    heapifyDown(0, key, val);
-    heapModified();
-  }
-
-  @Override
-  public double peekKey() {
-    if (size == 0) {
-      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
-    }
-    return keys[0];
-  }
-
-  @Override
-  public int peekValue() {
-    if (size == 0) {
-      throw new ArrayIndexOutOfBoundsException("Peek() on an empty heap!");
-    }
-    return values[0];
-  }
-
-  @Override
-  public void poll() {
-    removeAt(0);
+    this.modCount = 0;
   }
 
   /**
-   * Remove the element at the given position.
+   * Constructor, with given minimum size.
    * 
-   * @param pos Element position.
+   * @param minsize Minimum size
    */
-  protected void removeAt(int pos) {
-    if (pos < 0 || pos >= size) {
-      return;
+  public DoubleIntegerMinHeap(int minsize) {
+    super();
+    if (minsize < TWO_HEAP_MAX_SIZE) {
+      final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+      double[] twoheap = new double[size];
+      int[] twovals = new int[size];
+      
+      this.twoheap = twoheap;
+      this.twovals = twovals;
+      this.fourheap = null;
+      this.fourvals = null;
+    } else {
+      double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
+      int[] twovals = new int[TWO_HEAP_INITIAL_SIZE];
+      double[] fourheap = new double[minsize - TWO_HEAP_MAX_SIZE];
+      int[] fourvals = new int[minsize - TWO_HEAP_MAX_SIZE];
+      this.twoheap = twoheap;
+      this.twovals = twovals;
+      this.fourheap = fourheap;
+      this.fourvals = fourvals;
     }
-    size--;
-    // Replacement object:
-    final double reinkey = keys[size];
-    final int reinval = values[size];
-    keys[size] = 0.0;
-    values[size] = 0;
-    heapifyDown(pos, reinkey, reinval);
-    heapModified();
-  }
-
-  /**
-   * Execute a "Heapify Upwards" aka "SiftUp". Used in insertions.
-   * 
-   * @param pos insertion position
-   * @param curkey Current key
-   * @param curval Current value
-   */
-  protected void heapifyUp(int pos, double curkey, int curval) {
-    while (pos > 0) {
-      final int parent = (pos - 1) >>> 2;
-      double parkey = keys[parent];
-
-      if (curkey >= parkey) { // Compare
-        break;
-      }
-      keys[pos] = parkey;
-      values[pos] = values[parent];
-      pos = parent;
-    }
-    keys[pos] = curkey;
-    values[pos] = curval;
-  }
-
-  /**
-   * Execute a "Heapify Downwards" aka "SiftDown". Used in deletions.
-   * 
-   * @param ipos re-insertion position
-   * @param curkey Current key
-   * @param curval Current value
-   * @return true when the order was changed
-   */
-  protected boolean heapifyDown(final int ipos, double curkey, int curval) {
-    int pos = ipos;
-    final int half = (size + 2) >>> 2;
-    while (pos < half) {
-      // Get left child (must exist!)
-      final int cpos = (pos << 2) + 1;
-      int bestpos = cpos;
-      double bestkey = keys[cpos];
-      int bestval = values[cpos];
-      // Test second child, if present
-      final int schild = cpos + 1;
-      if (schild < size) {
-        double secondc = keys[schild];
-        if (bestkey > secondc) { // Compare
-          bestpos = schild;
-          bestkey = secondc;
-          bestval = values[schild];
-        }
-        // Test third child, if present
-        final int tchild = cpos + 2;
-        if (tchild < size) {
-          double thirdc = keys[tchild];
-          if (bestkey > thirdc) { // Compare
-            bestpos = tchild;
-            bestkey = thirdc;
-            bestval = values[tchild];
-          }
-          // Test fourth child, if present
-          final int fchild = cpos + 3;
-          if (fchild < size) {
-            double firstc = keys[fchild];
-            if (bestkey > firstc) { // Compare
-              bestpos = fchild;
-              bestkey = firstc;
-              bestval = values[fchild];
-            }
-          }
-        }
-      }
-
-      if (bestkey > curkey) { // Compare
-        break;
-      }
-      keys[pos] = bestkey;
-      values[pos] = bestval;
-      pos = bestpos;
-    }
-    keys[pos] = curkey;
-    values[pos] = curval;
-    return (pos != ipos);
-  }
-
-  /**
-   * Test whether we need to resize to have the requested capacity.
-   * 
-   * @param requiredSize required capacity
-   */
-  private final void resize(int requiredSize) {
-    // Double until 64, then increase by 50% each time.
-    int newCapacity = ((keys.length < 64) ? ((keys.length + 1) << 1) : ((keys.length >> 1) * 3));
-    // overflow?
-    if (newCapacity < 0) {
-      throw new OutOfMemoryError();
-    }
-    if (requiredSize > newCapacity) {
-      newCapacity = requiredSize;
-    }
-    keys = Arrays.copyOf(keys, newCapacity);
-    values = Arrays.copyOf(values, newCapacity);
+    this.size = 0;
+    this.modCount = 0;
   }
 
   @Override
   public void clear() {
-    // clean up references in the array for memory management
-    Arrays.fill(keys, 0.0);
-    Arrays.fill(values, 0);
-    super.clear();
+    size = 0;
+    ++modCount;
+    fourheap = null;
+    fourvals = null;
+    Arrays.fill(twoheap, 0.0);
+    Arrays.fill(twovals, 0);
+  }
+
+  @Override
+  public int size() {
+    return size;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return (size == 0);
+  }
+
+  @Override
+  public void add(double o, int v) {
+    final double co = o;
+    final int cv = v;
+    // System.err.println("Add: " + o);
+    if (size < TWO_HEAP_MAX_SIZE) {
+      if (size >= twoheap.length) {
+        // Grow by one layer.
+        twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
+        twovals = Arrays.copyOf(twovals, twovals.length + twovals.length + 1);
+      }
+      final int twopos = size;
+      twoheap[twopos] = co;
+      twovals[twopos] = cv;
+      ++size;
+      heapifyUp2(twopos, co, cv);
+      ++modCount;
+    } else {
+      final int fourpos = size - TWO_HEAP_MAX_SIZE;
+      if (fourheap == null) {
+        fourheap = new double[FOUR_HEAP_INITIAL_SIZE];
+        fourvals = new int[FOUR_HEAP_INITIAL_SIZE];
+      } else if (fourpos >= fourheap.length) {
+        // Grow extension heap by half.
+        fourheap = Arrays.copyOf(fourheap, fourheap.length + (fourheap.length >> 1));
+        fourvals = Arrays.copyOf(fourvals, fourvals.length + (fourvals.length >> 1));
+      }
+      fourheap[fourpos] = co;
+      fourvals[fourpos] = cv;
+      ++size;
+      heapifyUp4(fourpos, co, cv);
+      ++modCount;
+    }
+  }
+
+  @Override
+  public void add(double key, int val, int max) {
+    if (size < max) {
+      add(key, val);
+    } else if (twoheap[0] <= key) {
+      replaceTopElement(key, val);
+    }
+  }
+
+  @Override
+  public void replaceTopElement(double reinsert, int val) {
+    heapifyDown(reinsert, val);
+    ++modCount;
+  }
+
+  /**
+   * Heapify-Up method for 2-ary heap.
+   * 
+   * @param twopos Position in 2-ary heap.
+   * @param cur Current object
+   * @param val Current value
+   */
+  private void heapifyUp2(int twopos, double cur, int val) {
+    while (twopos > 0) {
+      final int parent = (twopos - 1) >>> 1;
+      double par = twoheap[parent];
+      if (cur >= par) {
+        break;
+      }
+      twoheap[twopos] = par;
+      twovals[twopos] = twovals[parent];
+      twopos = parent;
+    }
+    twoheap[twopos] = cur;
+    twovals[twopos] = val;
+  }
+
+  /**
+   * Heapify-Up method for 4-ary heap.
+   * 
+   * @param fourpos Position in 4-ary heap.
+   * @param cur Current object
+   * @param val Current value
+   */
+  private void heapifyUp4(int fourpos, double cur, int val) {
+    while (fourpos > 0) {
+      final int parent = (fourpos - 1) >> 2;
+      double par = fourheap[parent];
+      if (cur >= par) {
+        break;
+      }
+      fourheap[fourpos] = par;
+      fourvals[fourpos] = fourvals[parent];
+      fourpos = parent;
+    }
+    if (fourpos == 0 && twoheap[0] > cur) {
+      fourheap[0] = twoheap[0];
+      fourvals[0] = twovals[0];
+      twoheap[0] = cur;
+      twovals[0] = val;
+    } else {
+      fourheap[fourpos] = cur;
+      fourvals[fourpos] = val;
+    }
+  }
+
+  @Override
+  public void poll() {
+    --size;
+    // Replacement object:
+    if (size >= TWO_HEAP_MAX_SIZE) {
+      final int last = size - TWO_HEAP_MAX_SIZE;
+      final double reinsert = fourheap[last];
+      final int reinsertv = fourvals[last];
+      fourheap[last] = 0.0;
+      fourvals[last] = 0;
+      heapifyDown(reinsert, reinsertv);
+    } else if (size > 0) {
+      final double reinsert = twoheap[size];
+      final int reinsertv = twovals[size];
+      twoheap[size] = 0.0;
+      twovals[size] = 0;
+      heapifyDown(reinsert, reinsertv);
+    } else {
+      twoheap[0] = 0.0;
+      twovals[0] = 0;
+    }
+    ++modCount;
+  }
+
+  /**
+   * Invoke heapify-down for the root object.
+   * 
+   * @param reinsert Object to insert.
+   * @param val Value to reinsert.
+   */
+  private void heapifyDown(double reinsert, int val) {
+    if (size > TWO_HEAP_MAX_SIZE) {
+      // Special case: 3-ary situation.
+      final int best = (twoheap[1] <= twoheap[2]) ? 1 : 2;
+      if (fourheap[0] < twoheap[best]) {
+        twoheap[0] = fourheap[0];
+        twovals[0] = fourvals[0];
+        heapifyDown4(0, reinsert, val);
+      } else {
+        twoheap[0] = twoheap[best];
+        twovals[0] = twovals[best];
+        heapifyDown2(best, reinsert, val);
+      }
+      return;
+    }
+    heapifyDown2(0, reinsert, val);
+  }
+
+  /**
+   * Heapify-Down for 2-ary heap.
+   * 
+   * @param twopos Position in 2-ary heap.
+   * @param cur Current object
+   * @param val Value to reinsert.
+   */
+  private void heapifyDown2(int twopos, double cur, int val) {
+    final int stop = Math.min(size, TWO_HEAP_MAX_SIZE) >>> 1;
+    while (twopos < stop) {
+      int bestchild = (twopos << 1) + 1;
+      double best = twoheap[bestchild];
+      final int right = bestchild + 1;
+      if (right < size && best > twoheap[right]) {
+        bestchild = right;
+        best = twoheap[right];
+      }
+      if (cur <= best) {
+        break;
+      }
+      twoheap[twopos] = best;
+      twovals[twopos] = twovals[bestchild];
+      twopos = bestchild;
+    }
+    twoheap[twopos] = cur;
+    twovals[twopos] = val;
+  }
+
+  /**
+   * Heapify-Down for 4-ary heap.
+   * 
+   * @param fourpos Position in 4-ary heap.
+   * @param cur Current object
+   * @param val Value to reinsert.
+   */
+  private void heapifyDown4(int fourpos, double cur, int val) {
+    final int stop = (size - TWO_HEAP_MAX_SIZE + 2) >>> 2;
+    while (fourpos < stop) {
+      final int child = (fourpos << 2) + 1;
+      double best = fourheap[child];
+      int bestchild = child, candidate = child + 1, minsize = candidate + TWO_HEAP_MAX_SIZE;
+      if (size > minsize) {
+        double nextchild = fourheap[candidate];
+        if (best > nextchild) {
+          bestchild = candidate;
+          best = nextchild;
+        }
+
+        minsize += 2;
+        if (size >= minsize) {
+          nextchild = fourheap[++candidate];
+          if (best > nextchild) {
+            bestchild = candidate;
+            best = nextchild;
+          }
+
+          if (size > minsize) {
+            nextchild = fourheap[++candidate];
+            if (best > nextchild) {
+              bestchild = candidate;
+              best = nextchild;
+            }
+          }
+        }
+      }
+      if (cur <= best) {
+        break;
+      }
+      fourheap[fourpos] = best;
+      fourvals[fourpos] = fourvals[bestchild];
+      fourpos = bestchild;
+    }
+    fourheap[fourpos] = cur;
+    fourvals[fourpos] = val;
+  }
+
+  @Override
+  public double peekKey() {
+    return twoheap[0];
+  }
+
+  @Override
+  public int peekValue() {
+    return twovals[0];
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    buf.append(DoubleIntegerMinHeap.class.getSimpleName()).append(" [");
+    for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
+      buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
+    }
+    buf.append(']');
+    return buf.toString();
   }
 
   @Override
@@ -241,39 +429,50 @@ public class DoubleIntegerMinHeap extends AbstractHeap implements DoubleIntegerH
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
-   * @author Erich Schubert
+   * Use this class as follows:
    * 
-   * @apiviz.exclude
+   * <pre>
+   * {@code
+   * for (DoubleIntegerHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   *   doSomething(iter.get());
+   * }
+   * }
+   * </pre>
+   * 
+   * @author Erich Schubert
    */
-  protected class UnsortedIter extends AbstractHeap.UnsortedIter implements DoubleIntegerHeap.UnsortedIter {
+  private class UnsortedIter implements DoubleIntegerHeap.UnsortedIter {
+    /**
+     * Iterator position.
+     */
+    protected int pos = 0;
+
+    /**
+     * Modification counter we were initialized at.
+     */
+    protected final int myModCount = modCount;
+
+    @Override
+    public boolean valid() {
+      if (modCount != myModCount) {
+        throw new ConcurrentModificationException();
+      }
+      return pos < size;
+    }
+
+    @Override
+    public void advance() {
+      pos++;
+    }
+
     @Override
     public double getKey() {
-      return keys[pos];
+      return ((pos < TWO_HEAP_MAX_SIZE) ? twoheap[pos] : fourheap[pos - TWO_HEAP_MAX_SIZE]);
     }
 
     @Override
     public int getValue() {
-      if (modCount != myModCount) {
-        throw new ConcurrentModificationException();
-      }
-      return values[pos];
+      return ((pos < TWO_HEAP_MAX_SIZE) ? twovals[pos] : fourvals[pos - TWO_HEAP_MAX_SIZE]);
     }
-  }
-
-  /**
-   * Test whether the heap is still valid.
-   * 
-   * Debug method.
-   * 
-   * @return {@code null} when the heap is correct
-   */
-  protected String checkHeap() {
-    for (int i = 1; i < size; i++) {
-      final int parent = (i - 1) >>> 2;
-      if (keys[parent] > keys[i]) { // Compare
-        return "@" + parent + ": " + keys[parent] + " < @" + i + ": " + keys[i];
-      }
-    }
-    return null;
   }
 }

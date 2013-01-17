@@ -42,6 +42,15 @@ public interface DoubleIntegerHeap {
   void add(double key, int val);
 
   /**
+   * Add a key-value pair to the heap if it improves the top.
+   * 
+   * @param key Key
+   * @param val Value
+   * @param k Desired maximum size
+   */
+  void add(double key, int val, int k);
+
+  /**
    * Combined operation that removes the top element, and inserts a new element
    * instead.
    * 

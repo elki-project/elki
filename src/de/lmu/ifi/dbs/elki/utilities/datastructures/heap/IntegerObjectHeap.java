@@ -26,13 +26,12 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
- * Basic in-memory heap interface, for int keys and Object values.
+ * Basic in-memory heap interface, for int keys and V values.
  * 
  * @author Erich Schubert
  * 
- * @param <V> Value type
- * 
  * @apiviz.has UnsortedIter
+ * @param <V> Value type
  */
 public interface IntegerObjectHeap<V> {
   /**
@@ -42,6 +41,15 @@ public interface IntegerObjectHeap<V> {
    * @param val Value
    */
   void add(int key, V val);
+
+  /**
+   * Add a key-value pair to the heap if it improves the top.
+   * 
+   * @param key Key
+   * @param val Value
+   * @param k Desired maximum size
+   */
+  void add(int key, V val, int k);
 
   /**
    * Combined operation that removes the top element, and inserts a new element
@@ -101,7 +109,6 @@ public interface IntegerObjectHeap<V> {
    * Unsorted iterator - in heap order. Does not poll the heap.
    * 
    * @author Erich Schubert
- * 
  * @param <V> Value type
    */
   public static interface UnsortedIter<V> extends Iter {
