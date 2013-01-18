@@ -142,29 +142,17 @@ public class DoubleVector extends AbstractNumberVector<Double> {
   @Override
   @Deprecated
   public Double getValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public double doubleValue(int dimension) {
-    try {
-      return values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return values[dimension];
   }
 
   @Override
   public long longValue(int dimension) {
-    try {
-      return (long) values[dimension];
-    } catch (IndexOutOfBoundsException e) {
-      throw new IllegalArgumentException("Dimension " + dimension + " out of range.");
-    }
+    return (long) values[dimension];
   }
 
   /**
