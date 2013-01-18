@@ -433,9 +433,9 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       config.reportError(new WrongParameterValueException(BEGIN_PARAM, "The minimum value for missing values is larger than the maximum value", "Minimum value: " + minMissingValue + "  maximum value: " + maxMissingValue));
     }
 
-    this.maskedVals = new HashMap<IntIntPair, Double>();
+    this.maskedVals = new HashMap<>();
     this.missingValues = new HashMap<>();
-    this.rowMeans = new HashMap<Integer, Double>();
+    this.rowMeans = new HashMap<>();
     this.columnMeans = new HashMap<>();
   }
 
@@ -493,7 +493,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
       // logger.verbose("\tmaskMatrix() finished. (" +
       // (System.currentTimeMillis() - t) + ")");
       // t = System.currentTimeMillis();
-      BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<V>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getRelation());
+      BiclusterWithInverted<V> bicluster = new BiclusterWithInverted<>(rowsBitsetToIDs(currentRows), colsBitsetToIDs(currentCols), getRelation());
       bicluster.setInvertedRows(rowsBitsetToIDs(invertedRows));
       addBiclusterToResult(bicluster);
 
@@ -526,13 +526,11 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     // If something has been removed:
     boolean removed = false;
 
-    int c = 0;
     while(this.currentResidue > this.delta) {
       removed = false;
       // TODO: Proposal in paper: use an adaptive alpha based on the new scores
       // of the current bicluster.
       double alphaResidue = alpha * currentResidue;
-      c++;
       // TODO: Maybe use the row dim of the current cluster instead of the dim
       // of the database?
 
@@ -570,6 +568,9 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
           updateValues();
         }
       }
+
+      //CARINA: alpharesidue updaten
+      alphaResidue = alpha * this.currentResidue;
 
       if(getColDim() > MIN_COLUMN_REMOE_THRESHOLD) {
         // Compute row mean for each column j
@@ -706,7 +707,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     currentResidue = 0.0;
     currentMean = 0.0;
 
-    rowMeans = new HashMap<Integer, Double>();
+    rowMeans = new HashMap<>();
     columnMeans = new HashMap<>();
 
     invertedRows.clear();
@@ -734,7 +735,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    */
   private void fillMissingValues() {
     if(this.missingValues == null) {
-      this.missingValues = new HashMap<IntIntPair, Double>();
+      this.missingValues = new HashMap<>();
     }
     if(!MISSING_PARAM.isDefined()) {
       return;
@@ -804,7 +805,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     unionRows.or(currentRows);
     unionRows.or(invertedRows);
 
-    this.rowMeans = new HashMap<Integer, Double>();
+    this.rowMeans = new HashMap<>();
     for(int i = unionRows.nextSetBit(0); i >= 0; i = unionRows.nextSetBit(i + 1)) {
       rowMeans.put(i, meanOfRow(i, currentCols));
     }
@@ -821,7 +822,7 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
    *         column in <code>currentCols</code>. -->
    */
   private void updateAllColMeans() {
-    this.columnMeans = new HashMap<Integer, Double>();
+    this.columnMeans = new HashMap<>();
 
     BitSet unionRows = new BitSet();
     unionRows.or(currentRows);
@@ -845,10 +846,8 @@ public class ChengAndChurch<V extends NumberVector<?>> extends AbstractBicluster
     double msr = 0.0;
     for(int i = rows.nextSetBit(0); i >= 0; i = rows.nextSetBit(i + 1)) {
       for(int j = cols.nextSetBit(0); j >= 0; j = cols.nextSetBit(j + 1)) {
-        // TODO: inverted Rows computed with different equation?
-        // double val = valueAt(i, j) - meanOfRow(i, cols, addition) +
-        // meanOfCols(j, rows, addition) - currentMean;
-        double val = valueAt(i, j) - rowMeans.get(i) + columnMeans.get(j) - currentMean;
+        // TODO: Handling of inverted rows?
+        double val = valueAt(i, j) - rowMeans.get(i) - columnMeans.get(j) + currentMean;
         msr += (val * val);
       }
     }
