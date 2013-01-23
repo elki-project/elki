@@ -40,14 +40,14 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   /**
    * The DBIDs we wrap.
    */
-  private final TroveArrayDBIDs inner;
+  private final IntegerArrayDBIDs inner;
 
   /**
    * Constructor.
    * 
    * @param inner Inner DBID collection.
    */
-  public UnmodifiableIntegerArrayDBIDs(TroveArrayDBIDs inner) {
+  public UnmodifiableIntegerArrayDBIDs(IntegerArrayDBIDs inner) {
     super();
     this.inner = inner;
   }

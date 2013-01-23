@@ -144,7 +144,7 @@ final public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray() {
-    return new TroveArrayModifiableDBIDs();
+    return new ArrayModifiableIntegerDBIDs();
   }
 
   @Override
@@ -154,7 +154,7 @@ final public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray(int size) {
-    return new TroveArrayModifiableDBIDs(size);
+    return new ArrayModifiableIntegerDBIDs(size);
   }
 
   @Override
@@ -164,7 +164,7 @@ final public class TrivialDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray(DBIDs existing) {
-    return new TroveArrayModifiableDBIDs(existing);
+    return new ArrayModifiableIntegerDBIDs(existing);
   }
 
   @Override

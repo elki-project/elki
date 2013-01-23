@@ -146,7 +146,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray() {
-    return new TroveArrayModifiableDBIDs();
+    return new ArrayModifiableIntegerDBIDs();
   }
 
   @Override
@@ -156,7 +156,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray(int size) {
-    return new TroveArrayModifiableDBIDs(size);
+    return new ArrayModifiableIntegerDBIDs(size);
   }
 
   @Override
@@ -166,7 +166,7 @@ public class SimpleDBIDFactory implements DBIDFactory {
 
   @Override
   public ArrayModifiableDBIDs newArray(DBIDs existing) {
-    return new TroveArrayModifiableDBIDs(existing);
+    return new ArrayModifiableIntegerDBIDs(existing);
   }
 
   @Override

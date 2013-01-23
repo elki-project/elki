@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * 
  * @apiviz.has IntegerDBID
  */
-public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
+public class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   /**
    * The actual storage.
    */
@@ -50,7 +50,7 @@ public class IntArrayStaticDBIDs implements IntegerArrayStaticDBIDs {
    * 
    * @param ids Array of ids.
    */
-  public IntArrayStaticDBIDs(int... ids) {
+  public ArrayStaticIntegerDBIDs(int... ids) {
     super();
     this.ids = ids;
   }
