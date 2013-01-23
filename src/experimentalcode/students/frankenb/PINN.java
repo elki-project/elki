@@ -12,7 +12,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.HashmapDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
@@ -33,11 +32,7 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
   /**
    * The logger
    */
-  private static final Logging logger = Logging.getLogger(PINN.class);
-
-  public static final OptionID K_ID = new OptionID("k", "k for kNN search");
-
-  public static final OptionID K_FACTOR_ID = new OptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
+  private static final Logging LOG = Logging.getLogger(PINN.class);
 
   private final Database database;
 
@@ -73,25 +68,25 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
 
   @Override
   public void run() throws UnableToComplyException {
-    logger.verbose("Reading database ...");
+    LOG.verbose("Reading database ...");
     database.initialize();
     Relation<V> dataset = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
-    logger.verbose("Projecting ...");
+    LOG.verbose("Projecting ...");
     Relation<V> dataSet = randomProjection.project(dataset);
 
-    logger.verbose("Creating KD-Tree ...");
-    KDTree<V> tree = new KDTree<V>(dataSet);
+    LOG.verbose("Creating KD-Tree ...");
+    KDTree<V> tree = new KDTree<>(dataSet);
 
-    PINNKnnIndex<V> index = new PINNKnnIndex<V>(dataset, tree, kFactor);
+    PINNKnnIndex<V> index = new PINNKnnIndex<>(dataset, tree, kFactor);
     database.addIndex(index);
 
-    logger.verbose("Running LOF ...");
+    LOG.verbose("Running LOF ...");
 
-    OutlierAlgorithm algorithm = new LOF<NumberVector<?>, DoubleDistance>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
+    OutlierAlgorithm algorithm = new LOF<>(this.k, EuclideanDistanceFunction.STATIC, EuclideanDistanceFunction.STATIC);
     OutlierResult result = algorithm.run(database);
 
-    logger.verbose("Calculating ROC ...");
+    LOG.verbose("Calculating ROC ...");
 
     BasicResult totalResult = new BasicResult("ROC Result", "rocresult");
     rocComputer.processNewResult(database, result);
@@ -104,9 +99,9 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
       Result aResult = iter.next();
       resultWriter.processNewResult(database, aResult);
     }
-    logger.verbose("Writing results to dir " + this.outputFile);
+    LOG.verbose("Writing results to dir " + this.outputFile);
 
-    logger.verbose("Done.");
+    LOG.verbose("Done.");
   }
 
   private static ResultWriter getResultWriter(File targetFile) {
@@ -125,6 +120,10 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector<?>> extends AbstractApplication.Parameterizer {
+    public static final OptionID K_ID = new OptionID("k", "k for kNN search");
+
+    public static final OptionID K_FACTOR_ID = new OptionID("kfactor", "factor to multiply with k when searching for the neighborhood in the projected space");
+
     private Database database;
 
     private RandomProjection<V> randomProjection;
@@ -152,7 +151,7 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
         this.kFactor = kFactorP.getValue();
       }
 
-      randomProjection = new RandomProjection<V>(config);
+      randomProjection = new RandomProjection<>(config);
 
       database = config.tryInstantiate(HashmapDatabase.class);
       rocComputer = config.tryInstantiate(OutlierROCCurve.class);
@@ -160,7 +159,7 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
 
     @Override
     protected PINN<V> makeInstance() {
-      return new PINN<V>(database, randomProjection, rocComputer, k, kFactor, outputFile);
+      return new PINN<>(database, randomProjection, rocComputer, k, kFactor, outputFile);
     }
   }
 }

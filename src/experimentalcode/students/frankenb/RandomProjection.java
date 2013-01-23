@@ -53,8 +53,8 @@ public class RandomProjection<V extends NumberVector<?>> {
     if(RelationUtil.dimensionality(dataSet) <= this.newDimensionality) {
       throw new UnableToComplyException("New dimension is higher or equal to the old one!");
     }
-    SimpleTypeInformation<V> type = new VectorFieldTypeInformation<V>(dataSet.getDataTypeInformation().getRestrictionClass(), this.newDimensionality);
-    Relation<V> projectedDataSet = new MaterializedRelation<V>(dataSet.getDatabase(), type, dataSet.getDBIDs());
+    SimpleTypeInformation<V> type = new VectorFieldTypeInformation<>(dataSet.getDataTypeInformation().getRestrictionClass(), this.newDimensionality);
+    Relation<V> projectedDataSet = new MaterializedRelation<>(dataSet.getDatabase(), type, dataSet.getDBIDs());
 
     Matrix projectionMatrix = new Matrix(this.newDimensionality, RelationUtil.dimensionality(dataSet));
 

@@ -1,14 +1,11 @@
 package experimentalcode.students.frankenb;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 
 /**
  * No description given.
@@ -33,35 +30,8 @@ public class PINNKnnIndex<V extends NumberVector<?>> implements KNNIndex<V> {
   }
   
   @Override
-  public PageFileStatistics getPageFileStatistics() {
+  public void initialize() {
     // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void insert(DBIDRef id) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public boolean delete(DBIDRef id) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-  
-  
-
-  @Override
-  public void insertAll(DBIDs ids) {
-    // TODO Auto-generated method stub
-    
-  }
-
-  @Override
-  public void deleteAll(DBIDs ids) {
-    // TODO Auto-generated method stub
-    
   }
 
   @Override

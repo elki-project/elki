@@ -59,18 +59,18 @@ public class KDTree<V extends NumberVector<?>> {
    * @param distanceFunction
    * @return
    */
-  public KNNResult<DoubleDistance> findNearestNeighbors(DBIDRef id, int k, PrimitiveDoubleDistanceFunction<V> distanceFunction) {
+  public KNNResult<DoubleDistance> findNearestNeighbors(DBIDRef id, int k, PrimitiveDoubleDistanceFunction<? super V> distanceFunction) {
     V vector = this.relation.get(id);
     KDTreeNode node = searchNodeFor(vector, this.root);
 
     DoubleDistanceKNNHeap distanceList = new DoubleDistanceKNNHeap(k);
-    Set<KDTreeNode> alreadyVisited = new HashSet<KDTreeNode>();
+    Set<KDTreeNode> alreadyVisited = new HashSet<>();
 
     findNeighbors(k, distanceFunction, vector, node, distanceList, alreadyVisited);
     return distanceList.toKNNList();
   }
 
-  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<V> distanceFunction, V queryVector, KDTreeNode currentNode, DoubleDistanceKNNHeap distanceList, Set<KDTreeNode> alreadyVisited) {
+  private void findNeighbors(int k, PrimitiveDoubleDistanceFunction<? super V> distanceFunction, V queryVector, KDTreeNode currentNode, DoubleDistanceKNNHeap distanceList, Set<KDTreeNode> alreadyVisited) {
     double maxdist = distanceList.doubleKNNDistance();
     for(DBIDIter id = currentNode.ids.iter(); id.valid(); id.advance()) {
       double distanceToId = distanceFunction.doubleDistance(queryVector, relation.get(id));
