@@ -33,9 +33,11 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -138,7 +140,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
   /**
    * Static DBID map.
    */
-  private ArrayModifiableDBIDs staticids = null;
+  private ArrayDBIDs staticids = null;
 
   /**
    * Actual constructor, with parameters. Fast mode (sampling).
@@ -177,8 +179,12 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
    */
   public OutlierResult getRanking(Relation<V> relation) {
     // Fix a static set of IDs
-    staticids = DBIDUtil.newArray(relation.getDBIDs());
-    staticids.sort();
+    if (relation.getDBIDs() instanceof DBIDRange) {
+      staticids = (DBIDRange) relation.getDBIDs();
+    } else {
+      staticids = DBIDUtil.newArray(relation.getDBIDs());
+      ((ArrayModifiableDBIDs) staticids).sort();
+    }
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
     ComparableMaxHeap<DoubleDBIDPair> pq = new ComparableMaxHeap<>(relation.size());
@@ -213,7 +219,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
 
     DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    while(!pq.isEmpty()) {
+    while (!pq.isEmpty()) {
       DoubleDBIDPair pair = pq.poll();
       abodvalues.putDouble(pair, pair.doubleValue());
       minmaxabod.put(pair.doubleValue());
@@ -234,8 +240,12 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     final DBIDs ids = relation.getDBIDs();
     // Fix a static set of IDs
     // TODO: add a DBIDUtil.ensureSorted?
-    staticids = DBIDUtil.newArray(ids);
-    staticids.sort();
+    if (relation.getDBIDs() instanceof DBIDRange) {
+      staticids = (DBIDRange) relation.getDBIDs();
+    } else {
+      staticids = DBIDUtil.newArray(relation.getDBIDs());
+      ((ArrayModifiableDBIDs) staticids).sort();
+    }
 
     KernelMatrix kernelMatrix = new KernelMatrix(primitiveKernelFunction, relation, staticids);
 
@@ -302,7 +312,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     }
     DoubleMinMax minmaxabod = new DoubleMinMax();
     WritableDoubleDataStore abodvalues = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_STATIC);
-    while(!pq.isEmpty()) {
+    while (!pq.isEmpty()) {
       DoubleDBIDPair pair = pq.poll();
       abodvalues.putDouble(pair, pair.doubleValue());
       minmaxabod.put(pair.doubleValue());
