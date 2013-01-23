@@ -27,8 +27,8 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.TroveArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -398,8 +398,8 @@ public final class DBIDUtil {
     if (existing instanceof StaticDBIDs) {
       return (StaticDBIDs) existing;
     }
-    if (existing instanceof TroveArrayDBIDs) {
-      return new UnmodifiableIntegerArrayDBIDs((TroveArrayDBIDs) existing);
+    if (existing instanceof IntegerArrayDBIDs) {
+      return new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing);
     }
     if (existing instanceof IntegerDBIDs) {
       return new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);

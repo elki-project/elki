@@ -29,9 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayStaticDBIDs;
  * Combination of {@link ArrayStaticDBIDs} and {@link IntegerDBIDs}.
  * 
  * @author Erich Schubert
- *
  */
-public interface IntegerArrayStaticDBIDs extends ArrayStaticDBIDs, IntegerDBIDs {
+public interface IntegerArrayStaticDBIDs extends ArrayStaticDBIDs, IntegerArrayDBIDs {
   @Override
   IntegerDBIDArrayIter iter();
 }

@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,31 +23,14 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.list.TIntList;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 
 /**
- * Class accessing a trove int array.
+ * Trivial combination interface.
  * 
  * @author Erich Schubert
  */
-class TroveArrayStaticDBIDs extends TroveArrayDBIDs implements IntegerArrayStaticDBIDs {
-  /**
-   * Actual trove store.
-   */
-  private final TIntList store;
-
-  /**
-   * Constructor.
-   * 
-   * @param store Actual trove store.
-   */
-  protected TroveArrayStaticDBIDs(TIntList store) {
-    super();
-    this.store = store;
-  }
-
+public interface IntegerArrayDBIDs extends IntegerDBIDs, ArrayDBIDs {
   @Override
-  protected TIntList getStore() {
-    return store;
-  }
+  IntegerDBIDArrayIter iter();
 }
