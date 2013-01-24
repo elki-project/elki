@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.utilities.Util;
 
 /**
  * Class storing a double distance a DBID.
@@ -90,14 +91,20 @@ class DoubleDistanceIntegerDBIDPair implements DoubleDistanceDBIDPair, IntegerDB
     }
     if (o instanceof DoubleDistanceIntegerDBIDPair) {
       DoubleDistanceIntegerDBIDPair p = (DoubleDistanceIntegerDBIDPair) o;
-      return (this.id == p.id) && (this.distance == p.distance);
+      return (this.id == p.id) && (Double.compare(this.distance, p.distance) == 0);
     }
     if (o instanceof DistanceIntegerDBIDPair) {
       DistanceIntegerDBIDPair<?> p = (DistanceIntegerDBIDPair<?>) o;
       if (p.distance instanceof DoubleDistance) {
-        return (this.id == p.id) && (this.distance == ((DoubleDistance) p.distance).doubleValue());
+        return (this.id == p.id) && (Double.compare(this.distance, ((DoubleDistance) p.distance).doubleValue()) == 0);
       }
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    long bits = Double.doubleToLongBits(distance);
+    return Util.mixHashCodes((int) (bits ^ (bits >>> 32)), id);
   }
 }

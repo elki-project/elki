@@ -33,14 +33,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
- * Slightly more advanced DBID management, that allows reuse of DBIDs.
+ * Slightly more complex DBID management, that allows reuse of DBIDs.
+ * 
+ * NOT tested a lot yet. Not reusing is much simpler!
+ * 
+ * TODO: manage fragmentation of ranges?
  * 
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses IntegerDBID oneway - - «create»
- * @apiviz.uses IntegerDBIDPair oneway - - «create»
- * @apiviz.uses IntegerDBIDRange oneway - - «create»
  */
 public class ReusingDBIDFactory extends SimpleDBIDFactory {
   /**
@@ -115,7 +116,6 @@ public class ReusingDBIDFactory extends SimpleDBIDFactory {
 
   @Override
   public synchronized void deallocateDBIDRange(DBIDRange range) {
-    // TODO: catch an eventual cast exception?
     returnedAllocations.add((IntegerDBIDRange) range);
   }
 }

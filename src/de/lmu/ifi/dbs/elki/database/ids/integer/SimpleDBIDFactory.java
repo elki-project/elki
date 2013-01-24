@@ -23,22 +23,9 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.persistent.FixedSizeByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -50,13 +37,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory
- * @apiviz.uses IntegerDBID oneway - - «create»
- * @apiviz.uses IntegerDBIDPair oneway - - «create»
- * @apiviz.uses IntegerDBIDRange oneway - - «create»
- * @apiviz.uses TroveArrayModifiableDBIDs oneway - - «create»
- * @apiviz.uses TroveHashSetModifiableDBIDs oneway - - «create»
  */
-public class SimpleDBIDFactory implements DBIDFactory {
+public class SimpleDBIDFactory extends AbstractIntegerDBIDFactory {
   /**
    * Keep track of the smallest dynamic DBID offset not used.
    */
@@ -68,11 +50,6 @@ public class SimpleDBIDFactory implements DBIDFactory {
   int rangestart = 0;
   
   /**
-   * Invalid ID.
-   */
-  DBID invalid = new IntegerDBID(Integer.MIN_VALUE);
-
-  /**
    * Constructor.
    */
   public SimpleDBIDFactory() {
@@ -81,10 +58,10 @@ public class SimpleDBIDFactory implements DBIDFactory {
 
   @Override
   public synchronized DBID generateSingleDBID() {
+    dynamicids--;
     if(dynamicids == Integer.MIN_VALUE) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
-    dynamicids--;
     return new IntegerDBID(dynamicids);
   }
 
@@ -106,115 +83,5 @@ public class SimpleDBIDFactory implements DBIDFactory {
   @Override
   public void deallocateDBIDRange(DBIDRange range) {
     // ignore.
-  }
-
-  @Override
-  public DBID importInteger(int id) {
-    return new IntegerDBID(id);
-  }
-
-  @Override
-  public void assignVar(DBIDVar var, int val) {
-    if (var instanceof IntegerDBIDVar) {
-      ((IntegerDBIDVar)var).internalSetIndex(val);
-    } else {
-      var.set(new IntegerDBID(val));
-    }
-  }
-
-  @Override
-  public int compare(DBIDRef a, DBIDRef b) {
-    final int inta = a.internalGetIndex();
-    final int intb = b.internalGetIndex();
-    return (inta < intb ? -1 : (inta == intb ? 0 : 1));
-  }
-
-  @Override
-  public boolean equal(DBIDRef a, DBIDRef b) {
-    return a.internalGetIndex() == b.internalGetIndex();
-  }
-
-  @Override
-  public String toString(DBIDRef id) {
-    return Integer.toString(id.internalGetIndex());
-  }
-
-  @Override
-  public DBIDVar newVar(DBIDRef val) {
-    return new IntegerDBIDVar(val);
-  }
-
-  @Override
-  public ArrayModifiableDBIDs newArray() {
-    return new ArrayModifiableIntegerDBIDs();
-  }
-
-  @Override
-  public HashSetModifiableDBIDs newHashSet() {
-    return new TroveHashSetModifiableDBIDs();
-  }
-
-  @Override
-  public ArrayModifiableDBIDs newArray(int size) {
-    return new ArrayModifiableIntegerDBIDs(size);
-  }
-
-  @Override
-  public HashSetModifiableDBIDs newHashSet(int size) {
-    return new TroveHashSetModifiableDBIDs(size);
-  }
-
-  @Override
-  public ArrayModifiableDBIDs newArray(DBIDs existing) {
-    return new ArrayModifiableIntegerDBIDs(existing);
-  }
-
-  @Override
-  public HashSetModifiableDBIDs newHashSet(DBIDs existing) {
-    return new TroveHashSetModifiableDBIDs(existing);
-  }
-
-  @Override
-  public DBIDPair newPair(DBIDRef first, DBIDRef second) {
-    return new IntegerDBIDPair(first.internalGetIndex(), second.internalGetIndex());
-  }
-
-  @Override
-  public DoubleDBIDPair newPair(double val, DBIDRef id) {
-    return new IntegerDoubleDBIDPair(val, id.internalGetIndex());
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <D extends Distance<D>> DistanceDBIDPair<D> newDistancePair(D val, DBIDRef id) {
-    if (val instanceof DoubleDistance) {
-      return (DistanceDBIDPair<D>) new DoubleDistanceIntegerDBIDPair(((DoubleDistance) val).doubleValue(), id.internalGetIndex());
-    }
-    return new DistanceIntegerDBIDPair<>(val, id.internalGetIndex());
-  }
-
-  @Override
-  public DoubleDistanceDBIDPair newDistancePair(double val, DBIDRef id) {
-    return new DoubleDistanceIntegerDBIDPair(val, id.internalGetIndex());
-  }
-
-  @Override
-  public ByteBufferSerializer<DBID> getDBIDSerializer() {
-    return IntegerDBID.DYNAMIC_SERIALIZER;
-  }
-
-  @Override
-  public FixedSizeByteBufferSerializer<DBID> getDBIDSerializerStatic() {
-    return IntegerDBID.STATIC_SERIALIZER;
-  }
-
-  @Override
-  public Class<? extends DBID> getTypeRestriction() {
-    return IntegerDBID.class;
-  }
-
-  @Override
-  public DBIDRef invalid() {
-    return invalid;
   }
 }
