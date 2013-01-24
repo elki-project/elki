@@ -10,11 +10,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -59,11 +60,11 @@ public class KDTree<V extends NumberVector<?>> {
    * @param distanceFunction
    * @return
    */
-  public KNNResult<DoubleDistance> findNearestNeighbors(DBIDRef id, int k, PrimitiveDoubleDistanceFunction<? super V> distanceFunction) {
+  public KNNList<DoubleDistance> findNearestNeighbors(DBIDRef id, int k, PrimitiveDoubleDistanceFunction<? super V> distanceFunction) {
     V vector = this.relation.get(id);
     KDTreeNode node = searchNodeFor(vector, this.root);
 
-    DoubleDistanceKNNHeap distanceList = new DoubleDistanceKNNHeap(k);
+    DoubleDistanceKNNHeap distanceList = new DoubleDistanceDBIDPairKNNHeap(k);
     Set<KDTreeNode> alreadyVisited = new HashSet<>();
 
     findNeighbors(k, distanceFunction, vector, node, distanceList, alreadyVisited);

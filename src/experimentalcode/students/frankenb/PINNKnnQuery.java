@@ -10,12 +10,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
@@ -49,10 +50,10 @@ public class PINNKnnQuery<V extends NumberVector<?>> implements KNNQuery<V, Doub
   private HashSetModifiableDBIDs alreadyRequestedIDs = DBIDUtil.newHashSet();
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList<DoubleDistance> getKNNForDBID(DBIDRef id, int k) {
     V vector = dataBase.get(id);
 
-    KNNResult<DoubleDistance> projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor * k, EuclideanDistanceFunction.STATIC);
+    KNNList<DoubleDistance> projectedDistanceList = tree.findNearestNeighbors(id, this.kFactor * k, EuclideanDistanceFunction.STATIC);
 
     if (!alreadyRequestedIDs.contains(id)) {
       // calculations += tree.getLastMeasure().getCalculations();
@@ -62,8 +63,8 @@ public class PINNKnnQuery<V extends NumberVector<?>> implements KNNQuery<V, Doub
       }
     }
 
-    DoubleDistanceKNNHeap newDistanceList = new DoubleDistanceKNNHeap(k);
-    for (DistanceDBIDResultIter<DoubleDistance> distance = projectedDistanceList.iter(); distance.valid(); distance.advance()) {
+    DoubleDistanceKNNHeap newDistanceList = new DoubleDistanceDBIDPairKNNHeap(k);
+    for (DistanceDBIDListIter<DoubleDistance> distance = projectedDistanceList.iter(); distance.valid(); distance.advance()) {
       V otherVector = dataBase.get(distance);
       newDistanceList.add(DBIDFactory.FACTORY.newDistancePair(EuclideanDistanceFunction.STATIC.doubleDistance(vector, otherVector), distance));
     }
@@ -76,8 +77,8 @@ public class PINNKnnQuery<V extends NumberVector<?>> implements KNNQuery<V, Doub
   }
 
   @Override
-  public List<KNNResult<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    List<KNNResult<DoubleDistance>> results = new ArrayList<>();
+  public List<KNNList<DoubleDistance>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    List<KNNList<DoubleDistance>> results = new ArrayList<>();
     for (DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       results.add(getKNNForDBID(id, k));
     }
@@ -85,7 +86,7 @@ public class PINNKnnQuery<V extends NumberVector<?>> implements KNNQuery<V, Doub
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForObject(V obj, int k) {
+  public KNNList<DoubleDistance> getKNNForObject(V obj, int k) {
     // TODO Auto-generated method stub
     return null;
   }

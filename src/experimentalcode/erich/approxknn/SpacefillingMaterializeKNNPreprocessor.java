@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * 
  * @author Erich Schubert
  */
-public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNResult<D>> {
+public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor<O, D, KNNList<D>> {
   /**
    * Class logger
    */
@@ -158,7 +158,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     Mean mean = new Mean();
 
     // Convert to final storage
-    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNResult.class);
+    storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     KNNHeap<D> heap = KNNUtil.newHeap(distanceQuery, k);
     HashSetModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * numcurves * 2);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -316,7 +316,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
    * @param <V> Vector type
    * @param <D> Distance type
    */
-  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<V, D, KNNResult<D>> {
+  public static class Factory<V extends NumberVector<?>, D extends Distance<D>> extends AbstractMaterializeKNNPreprocessor.Factory<V, D, KNNList<D>> {
     /**
      * Spatial curve generators
      */

@@ -43,14 +43,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
@@ -220,13 +221,13 @@ public class SpacefillingKNNExperiment2 {
     ArrayList<Pair<ModifiableDBIDs, DoubleDistanceKNNHeap>> rec = new ArrayList<>();
     for(int i = 0; i < numcurves; i++) {
       ModifiableDBIDs cand = DBIDUtil.newHashSet(maxoff * 2);
-      DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
+      DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
       rec.add(new Pair<>(cand, heap));
     }
 
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
       final NumberVector<?> vec = rel.get(id);
-      final KNNResult<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
+      final KNNList<DoubleDistance> trueNN = knnq.getKNNForObject(vec, k);
       final DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       final int[] posi = positions.get(id);
 

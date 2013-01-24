@@ -39,13 +39,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
@@ -129,7 +129,7 @@ public class SpacefillingKNNExperiment {
       mvs.add(new MeanVariance[] { new MeanVariance(), new MeanVariance(), new MeanVariance(), new MeanVariance() });
     }
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-      final KNNResult<DoubleDistance> trueNN = knnq.getKNNForDBID(id, k);
+      final KNNList<DoubleDistance> trueNN = knnq.getKNNForDBID(id, k);
       DBIDs trueIds = DBIDUtil.ensureSet(trueNN);
       int[] posi = positions.get(id);
       // Approximate NN in Z curve only

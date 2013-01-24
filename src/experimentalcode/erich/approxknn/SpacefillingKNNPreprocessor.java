@@ -41,12 +41,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
@@ -262,7 +262,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     }
 
     @Override
-    public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
+    public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
       final int wsize = (int) (window * k);
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * curves.size());
@@ -288,12 +288,12 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     }
 
     @Override
-    public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
       throw new AbortException("Not yet implemented");
     }
 
     @Override
-    public KNNResult<D> getKNNForObject(O obj, int k) {
+    public KNNList<D> getKNNForObject(O obj, int k) {
       throw new AbortException("Not yet implemented");
     }
   }
