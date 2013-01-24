@@ -24,10 +24,10 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -111,7 +111,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
+  public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
     final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
 
     doRangeQuery(null, index.getRoot(), obj, range, result);

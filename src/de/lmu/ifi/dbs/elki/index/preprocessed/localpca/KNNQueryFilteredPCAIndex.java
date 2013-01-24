@@ -26,10 +26,10 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -86,7 +86,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
   }
 
   @Override
-  protected KNNResult<DoubleDistance> objectsForPCA(DBIDRef id) {
+  protected KNNList<DoubleDistance> objectsForPCA(DBIDRef id) {
     return knnQuery.getKNNForDBID(id, k);
   }
 

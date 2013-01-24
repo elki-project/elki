@@ -29,9 +29,9 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -98,7 +98,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
     }
 
     // do batch nn
-    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), ids, k_max);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, k_max);
 
     // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
@@ -114,7 +114,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNResult<D>> knnLists);
+  protected abstract void kNNdistanceAdjustment(E entry, Map<DBID, KNNList<D>> knnLists);
 
   /**
    * Get the value of k_max.

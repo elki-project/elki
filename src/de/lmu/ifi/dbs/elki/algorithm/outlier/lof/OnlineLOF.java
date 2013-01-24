@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -40,8 +42,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNChangeEvent;
@@ -107,8 +107,8 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
 
     // add listener
     KNNListener l = new LOFKNNListener(lofResult);
-    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, ? extends KNNResult<D>>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
-    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, ? extends KNNResult<D>>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, ? extends KNNList<D>>) lofResult.getKNNRefer()).getPreprocessor()).addKNNListener(l);
+    ((MaterializeKNNPreprocessor<O, D>)((PreprocessorKNNQuery<O, D, ? extends KNNList<D>>) lofResult.getKNNReach()).getPreprocessor()).addKNNListener(l);
 
     return lofResult.getResult();
   }
@@ -268,7 +268,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(1, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(DBIDUtil.union(insertions, updates2));
-      List<? extends DistanceDBIDResult<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -285,7 +285,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       if(stepprog != null) {
         stepprog.beginStep(2, "Recompute LOFS.", LOG);
       }
-      List<? extends DistanceDBIDResult<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, insertions, updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -327,7 +327,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
         stepprog.beginStep(2, "Recompute LRDs.", LOG);
       }
       ArrayDBIDs lrd_ids = DBIDUtil.ensureArray(updates2);
-      List<? extends DistanceDBIDResult<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> reachDistRKNNs = lofResult.getRkNNReach().getRKNNForBulkDBIDs(lrd_ids, k);
       ArrayDBIDs affected_lrd_id_candidates = mergeIDs(reachDistRKNNs, lrd_ids);
       ArrayModifiableDBIDs affected_lrd_ids = DBIDUtil.newArray(affected_lrd_id_candidates.size());
       WritableDoubleDataStore new_lrds = computeLRDs(affected_lrd_id_candidates, lofResult.getKNNReach());
@@ -344,7 +344,7 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
       if(stepprog != null) {
         stepprog.beginStep(3, "Recompute LOFS.", LOG);
       }
-      List<? extends DistanceDBIDResult<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
+      List<? extends DistanceDBIDList<D>> primDistRKNNs = lofResult.getRkNNRefer().getRKNNForBulkDBIDs(affected_lrd_ids, k);
       ArrayDBIDs affected_lof_ids = mergeIDs(primDistRKNNs, affected_lrd_ids, updates1);
       recomputeLOFs(affected_lof_ids, lofResult);
 
@@ -367,12 +367,12 @@ public class OnlineLOF<O, D extends NumberDistance<D, ?>> extends LOF<O, D> {
      * @return a set containing the ids of the query result and the specified
      *         ids
      */
-    private ArrayModifiableDBIDs mergeIDs(List<? extends DistanceDBIDResult<D>> queryResults, DBIDs... ids) {
+    private ArrayModifiableDBIDs mergeIDs(List<? extends DistanceDBIDList<D>> queryResults, DBIDs... ids) {
       ModifiableDBIDs result = DBIDUtil.newHashSet();
       for(DBIDs dbids : ids) {
         result.addDBIDs(dbids);
       }
-      for(DistanceDBIDResult<D> queryResult : queryResults) {
+      for(DistanceDBIDList<D> queryResult : queryResults) {
         result.addDBIDs(queryResult);
       }
       return DBIDUtil.newArray(result);

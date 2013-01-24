@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -36,19 +36,18 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @apiviz.landmark
  * 
- * @apiviz.uses GenericKNNList - - «serializes to»
- * @apiviz.uses DoubleDistanceKNNList - - «serializes to»
+ * @apiviz.uses KNNList - - «serializes to»
  * @apiviz.composedOf DistanceDBIDPair
  * 
  * @param <D> Distance function
  */
 public interface KNNHeap<D extends Distance<D>> {
   /**
-   * Serialize to a {@link GenericKNNList}. This empties the heap!
+   * Serialize to a {@link KNNList}. This empties the heap!
    * 
    * @return KNNList with the heaps contents.
    */
-  KNNResult<D> toKNNList();
+  KNNList<D> toKNNList();
 
   /**
    * Get the K parameter ("maxsize" internally).

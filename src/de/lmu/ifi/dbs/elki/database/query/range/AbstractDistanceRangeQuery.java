@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -55,10 +55,10 @@ public abstract class AbstractDistanceRangeQuery<O, D extends Distance<D>> exten
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
+  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
     return getRangeForObject(relation.get(id), range);
   }
 
   @Override
-  abstract public DistanceDBIDResult<D> getRangeForObject(O obj, D range);
+  abstract public DistanceDBIDList<D> getRangeForObject(O obj, D range);
 }

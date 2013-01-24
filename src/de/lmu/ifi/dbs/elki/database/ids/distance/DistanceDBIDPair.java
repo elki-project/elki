@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.rknn;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -24,32 +24,30 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Instance for the query on a particular database.
+ * Pair containing a distance an an object ID
+ * 
+ * Note: there is no getter for the object, as this is a {@link DBIDRef}.
  * 
  * @author Erich Schubert
+ *
+ * @param <D> Distance
  */
-public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
+public interface DistanceDBIDPair<D extends Distance<D>> extends DBIDRef {
   /**
-   * Hold the distance function to be used.
-   */
-  protected final DistanceQuery<O, D> distanceQuery;
-
-  /**
-   * Constructor.
+   * Get the distance.
    * 
-   * @param distanceQuery distance query
+   * @return Distance
    */
-  public AbstractRKNNQuery(DistanceQuery<O, D> distanceQuery) {
-    super(distanceQuery.getRelation());
-    this.distanceQuery = distanceQuery;
-  }
-
-  @Override
-  abstract public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k);
+  public D getDistance();
+  
+  /**
+   * Compare to another result, by distance, smaller first.
+   * 
+   * @param other Other result
+   * @return Comparison result
+   */
+  public int compareByDistance(DistanceDBIDPair<D> other);
 }

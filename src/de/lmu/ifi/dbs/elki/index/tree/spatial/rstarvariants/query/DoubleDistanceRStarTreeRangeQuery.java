@@ -24,11 +24,12 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -87,7 +88,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    * @return Objects contained in query range.
    */
   protected DoubleDistanceDBIDList doRangeQuery(O object, double epsilon) {
-    final DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
+    final DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
     final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
     // push root
@@ -125,7 +126,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   }
 
   @Override
-  public DistanceDBIDResult<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
+  public DistanceDBIDList<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
     return doRangeQuery(obj, range.doubleValue());
   }
 }

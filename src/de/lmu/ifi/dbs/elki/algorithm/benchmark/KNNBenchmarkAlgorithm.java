@@ -31,13 +31,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -136,7 +136,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
       int hash = 0;
       MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
-        KNNResult<D> knns = knnQuery.getKNNForDBID(iditer, k);
+        KNNList<D> knns = knnQuery.getKNNForDBID(iditer, k);
         int ichecksum = 0;
         for (DBIDIter it = knns.iter(); it.valid(); it.advance()) {
           ichecksum += it.internalGetIndex();
@@ -197,7 +197,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         assert (off >= 0);
         @SuppressWarnings("unchecked")
         O o = (O) bundle.data(off, col);
-        KNNResult<D> knns = knnQuery.getKNNForObject(o, k);
+        KNNList<D> knns = knnQuery.getKNNForObject(o, k);
         int ichecksum = 0;
         for (DBIDIter it = knns.iter(); it.valid(); it.advance()) {
           ichecksum += it.internalGetIndex();

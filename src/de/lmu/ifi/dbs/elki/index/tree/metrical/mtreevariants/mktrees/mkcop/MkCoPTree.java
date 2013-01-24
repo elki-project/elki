@@ -32,12 +32,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
@@ -139,7 +139,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     // perform nearest neighbor queries
-    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), ids, k_max);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, k_max);
 
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -158,7 +158,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return a List of the query results
    */
   @Override
-  public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
+  public DistanceDBIDList<D> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.k_max) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MCop-Tree!");
     }
@@ -168,7 +168,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     doReverseKNNQuery(k, id, result, candidates);
 
     // refinement of candidates
-    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), candidates, k);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), candidates, k);
 
     result.sort();
     // Collections.sort(candidates);
@@ -178,8 +178,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     for(DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
       DBID cid = DBIDUtil.deref(iter);
-      KNNResult<D> cands = knnLists.get(cid);
-      for (DistanceDBIDResultIter<D> iter2 = cands.iter(); iter2.valid(); iter2.advance()) {
+      KNNList<D> cands = knnLists.get(cid);
+      for (DistanceDBIDListIter<D> iter2 = cands.iter(); iter2.valid(); iter2.advance()) {
         if(DBIDUtil.equal(id, iter2)) {
           result.add(iter2.getDistance(), cid);
           break;
@@ -325,7 +325,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkCoPEntry<D> entry, Map<DBID, KNNResult<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkCoPEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
     MkCoPTreeNode<O, D> node = getNode(entry);
 
     if(node.isLeaf()) {
@@ -377,7 +377,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB
    *        (insbes. Distanz 0)
    */
-  private void approximateKnnDistances(MkCoPLeafEntry<D> entry, KNNResult<D> knnDistances) {
+  private void approximateKnnDistances(MkCoPLeafEntry<D> entry, KNNList<D> knnDistances) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     if(msg != null) {
       msg.append("\nknnDistances ").append(knnDistances);

@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayDBIDs;

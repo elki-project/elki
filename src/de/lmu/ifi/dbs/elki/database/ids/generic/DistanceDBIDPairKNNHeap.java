@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 /*
  This file is part of ELKI:
@@ -25,13 +25,14 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Heap for collecting kNN candiates with arbitrary distance types.
  * 
- * For double distances, see {@link DoubleDistanceKNNHeap}
+ * For double distances, see {@link DoubleDistanceDBIDPairKNNHeap}
  * 
  * <b>To instantiate, use {@link KNNUtil#newHeap} instead!</b>
  * 
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBIDPair<D>, D> {
+public class DistanceDBIDPairKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBIDPair<D>, D> {
   /**
    * Cached distance to k nearest neighbor (to avoid going through {@link #peek}
    * each time).
@@ -53,18 +54,18 @@ class GenericKNNHeap<D extends Distance<D>> extends AbstractKNNHeap<DistanceDBID
    * 
    * @param k Heap size
    */
-  protected GenericKNNHeap(int k) {
+  public DistanceDBIDPairKNNHeap(int k) {
     super(k);
   }
 
   /**
-   * Serialize to a {@link GenericKNNList}. This empties the heap!
+   * Serialize to a {@link DistanceDBIDPairKNNList}. This empties the heap!
    * 
    * @return KNNList with the heaps contents.
    */
   @Override
-  public GenericKNNList<D> toKNNList() {
-    return new GenericKNNList<>(this);
+  public DistanceDBIDPairKNNList<D> toKNNList() {
+    return new DistanceDBIDPairKNNList<>(this);
   }
 
   @Override

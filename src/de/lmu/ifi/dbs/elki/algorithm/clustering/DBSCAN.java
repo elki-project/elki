@@ -40,10 +40,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -193,7 +193,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
    * @param objprog the progress object for logging the current status
    */
   protected void expandCluster(Relation<O> relation, RangeQuery<O, D> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
-    DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+    DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
     if(neighbors.size() < minpts) {
@@ -224,7 +224,7 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
 
     while(seeds.size() > 0) {
       DBIDMIter o = seeds.iter();
-      DistanceDBIDResult<D> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
+      DistanceDBIDList<D> neighborhood = rangeQuery.getRangeForDBID(o, epsilon);
       o.remove();
 
       if(neighborhood.size() >= minpts) {

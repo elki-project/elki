@@ -23,7 +23,7 @@ package experimentalcode.erich.parallel.mapper;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedObject;
@@ -56,7 +56,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
   /**
    * KNN query object
    */
-  SharedObject<? extends KNNResult<? extends D>> input;
+  SharedObject<? extends KNNList<? extends D>> input;
 
   /**
    * Output channel to write to
@@ -68,7 +68,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
    * 
    * @param input Input channel
    */
-  public void connectKNNInput(SharedObject<? extends KNNResult<? extends D>> input) {
+  public void connectKNNInput(SharedObject<? extends KNNList<? extends D>> input) {
     this.input = input;
   }
 
@@ -100,7 +100,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
     /**
      * kNN query
      */
-    SharedObject.Instance<? extends KNNResult<? extends D>> input;
+    SharedObject.Instance<? extends KNNList<? extends D>> input;
 
     /**
      * Output data store
@@ -114,7 +114,7 @@ public class KDistanceMapper<D extends Distance<?>> implements Mapper {
      * @param knnq KNN query
      * @param store Datastore to write to
      */
-    protected Instance(int k, SharedObject.Instance<? extends KNNResult<? extends D>> input, SharedObject.Instance<D> store) {
+    protected Instance(int k, SharedObject.Instance<? extends KNNList<? extends D>> input, SharedObject.Instance<D> store) {
       super();
       this.k = k;
       this.input = input;

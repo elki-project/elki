@@ -33,12 +33,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -95,12 +95,12 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
     KNNQuery<O, D> knnq = database.getKNNQuery(distq, k + 1);
 
     // Phase one: KNN and k-dist
-    WritableDataStore<KNNResult<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNResult.class);
+    WritableDataStore<KNNList<D>> knns = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
     {
       // Compute kNN
       KNNMapper<O, D> knnm = new KNNMapper<>(k + 1, knnq);
-      SharedObject<KNNResult<D>> knnv = new SharedObject<>();
-      WriteDataStoreMapper<KNNResult<D>> storek = new WriteDataStoreMapper<>(knns);
+      SharedObject<KNNList<D>> knnv = new SharedObject<>();
+      WriteDataStoreMapper<KNNList<D>> storek = new WriteDataStoreMapper<>(knns);
       knnm.connectKNNOutput(knnv);
       storek.connectInput(knnv);
 

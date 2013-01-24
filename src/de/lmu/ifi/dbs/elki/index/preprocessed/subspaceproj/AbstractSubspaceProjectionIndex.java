@@ -32,13 +32,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -113,7 +113,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
 
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(iditer, epsilon);
+      DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(iditer, epsilon);
 
       final P pres;
       if(neighbors.size() >= minpts) {
@@ -165,7 +165,7 @@ public abstract class AbstractSubspaceProjectionIndex<NV extends NumberVector<?>
    * 
    * @return local subspace projection
    */
-  protected abstract P computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<NV> relation);
+  protected abstract P computeProjection(DBIDRef id, DistanceDBIDList<D> neighbors, Relation<NV> relation);
 
   /**
    * Factory class

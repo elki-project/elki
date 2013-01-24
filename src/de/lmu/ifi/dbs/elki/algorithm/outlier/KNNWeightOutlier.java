@@ -31,15 +31,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -124,15 +124,15 @@ public class KNNWeightOutlier<O, D extends NumberDistance<D, ?>> extends Abstrac
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       // compute sum of the distances to the k nearest neighbors
 
-      final KNNResult<D> knn = knnQuery.getKNNForDBID(iditer, k);
+      final KNNList<D> knn = knnQuery.getKNNForDBID(iditer, k);
       double skn = 0;
-      if(knn instanceof DoubleDistanceKNNList) {
-        for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) knn).iter(); neighbor.valid(); neighbor.advance()) {
+      if(knn instanceof DoubleDistanceDBIDPairKNNList) {
+        for(DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) knn).iter(); neighbor.valid(); neighbor.advance()) {
           skn += neighbor.doubleDistance();
         }
       }
       else {
-        for(DistanceDBIDResultIter<D> neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DistanceDBIDListIter<D> neighbor = knn.iter(); neighbor.valid(); neighbor.advance()) {
           skn += neighbor.getDistance().doubleValue();
         }
       }

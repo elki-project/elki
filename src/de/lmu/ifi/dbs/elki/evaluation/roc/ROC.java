@@ -32,12 +32,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -222,14 +222,14 @@ public class ROC {
     /**
      * Original Iterator
      */
-    private DistanceDBIDResultIter<D> iter;
+    private DistanceDBIDListIter<D> iter;
 
     /**
      * Constructor
      * 
      * @param iter Iterator for distance results
      */
-    public DistanceResultAdapter(DistanceDBIDResultIter<D> iter) {
+    public DistanceResultAdapter(DistanceDBIDListIter<D> iter) {
       super();
       this.iter = iter;
     }
@@ -311,7 +311,7 @@ public class ROC {
    * @param nei Query result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, DistanceDBIDResult<D> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, Cluster<?> clus, DistanceDBIDList<D> nei) {
     // TODO: ensure the collection has efficient "contains".
     return ROC.computeROCAUCDistanceResult(size, clus.getIDs(), nei);
   }
@@ -325,7 +325,7 @@ public class ROC {
    * @param nei Query Result
    * @return area under curve
    */
-  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, DistanceDBIDResult<D> nei) {
+  public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, DistanceDBIDList<D> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
     XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<>(nei.iter()));
     return XYCurve.areaUnderCurve(roc);

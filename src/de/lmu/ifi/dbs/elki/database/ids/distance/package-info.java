@@ -1,5 +1,6 @@
-package de.lmu.ifi.dbs.elki.database.ids;
-
+/**
+ * Distance-DBID pairs, lists and heaps.
+ */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,31 +23,4 @@ package de.lmu.ifi.dbs.elki.database.ids;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-
-/**
- * Pair containing a distance an an object ID
- * 
- * Note: there is no getter for the object, as this is a {@link DBIDRef}.
- * 
- * @author Erich Schubert
- *
- * @param <D> Distance
- */
-public interface DistanceDBIDPair<D extends Distance<D>> extends DBIDRef {
-  /**
-   * Get the distance.
-   * 
-   * @return Distance
-   */
-  public D getDistance();
-  
-  /**
-   * Compare to another result, by distance, smaller first.
-   * 
-   * @param other Other result
-   * @return Comparison result
-   */
-  public int compareByDistance(DistanceDBIDPair<D> other);
-}
+package de.lmu.ifi.dbs.elki.database.ids.distance;

@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -86,7 +86,7 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
   }
 
   @Override
-  protected SubspaceProjectionResult computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<V> database) {
+  protected SubspaceProjectionResult computeProjection(DBIDRef id, DistanceDBIDList<D> neighbors, Relation<V> database) {
     StringBuilder msg = null;
 
     int referenceSetSize = neighbors.size();

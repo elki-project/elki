@@ -37,13 +37,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -203,7 +203,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector<?>, D extends
 
         // Fill the neighborhood matrix F:
         {
-          KNNResult<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
+          KNNList<D> neighbors = knnQuery.getKNNForDBID(id, k + 1);
           ModifiableDBIDs neighborhood = DBIDUtil.newArray(neighbors.size());
           for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(DBIDUtil.equal(id, neighbor)) {

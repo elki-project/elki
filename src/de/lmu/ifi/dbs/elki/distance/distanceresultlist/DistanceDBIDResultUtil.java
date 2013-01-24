@@ -27,7 +27,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -70,13 +72,13 @@ public final class DistanceDBIDResultUtil {
     }
   };
 
-  public static String toString(DistanceDBIDResult<?> res) {
+  public static String toString(DistanceDBIDList<?> res) {
     StringBuilder buf = new StringBuilder();
     buf.append('[');
-    DistanceDBIDResultIter<?> iter = res.iter();
+    DistanceDBIDListIter<?> iter = res.iter();
     for(; iter.valid(); iter.advance()) {
       if(buf.length() > 1) {
-        buf.append(", ");
+        buf.append(',').append(' ');
       }
       buf.append(iter.getDistancePair().toString());
     }

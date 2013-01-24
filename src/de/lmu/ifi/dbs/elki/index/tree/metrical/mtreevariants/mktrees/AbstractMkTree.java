@@ -31,11 +31,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -80,7 +80,7 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
    * @param k the number of nearest neighbors to be returned
    * @return a List of the query results
    */
-  public abstract DistanceDBIDResult<D> reverseKNNQuery(final DBIDRef id, int k);
+  public abstract DistanceDBIDList<D> reverseKNNQuery(final DBIDRef id, int k);
 
   /**
    * Performs a batch k-nearest neighbor query for a list of query objects.
@@ -93,8 +93,8 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
    * @deprecated Change to use by-object NN lookups instead.
    */
   @Deprecated
-  protected final Map<DBID, KNNResult<D>> batchNN(N node, DBIDs ids, int kmax) {
-    Map<DBID, KNNResult<D>> res = new HashMap<>(ids.size());
+  protected final Map<DBID, KNNList<D>> batchNN(N node, DBIDs ids, int kmax) {
+    Map<DBID, KNNList<D>> res = new HashMap<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       res.put(id, knnq.getKNNForDBID(id, kmax));

@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -47,7 +47,7 @@ public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range);
+  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range);
 
   /**
    * Get the nearest neighbors for a particular object in a given query range
@@ -56,5 +56,5 @@ public interface RangeQuery<O, D extends Distance<D>> extends DatabaseQuery {
    * @param range Query range
    * @return neighbors
    */
-  public DistanceDBIDResult<D> getRangeForObject(O obj, D range);
+  public DistanceDBIDList<D> getRangeForObject(O obj, D range);
 }

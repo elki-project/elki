@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 /*
  This file is part of ELKI:
@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Comparator;
 
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 
 /**
@@ -38,12 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
  * @param <P> pair type
  * @param <D> distance type
  */
-abstract public class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> implements KNNHeap<D> {
-  /**
-   * Static comparator.
-   */
-  public static final Comparator<? super DistanceDBIDPair<?>> COMPARATOR = new Comp();
-  
+abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance<D>> implements KNNHeap<D> {
   /**
    * The actual heap.
    */
@@ -56,7 +51,7 @@ abstract public class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends D
    */
   public AbstractKNNHeap(int k) {
     super();
-    heap = new TiedTopBoundedHeap<>(k, COMPARATOR);
+    heap = new TiedTopBoundedHeap<>(k, KNNUtil.REVERSE_COMPARATOR);
   }
 
   /**
@@ -94,20 +89,5 @@ abstract public class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends D
   @Override
   public P poll() {
     return heap.poll();
-  }
-
-  /**
-   * Comparator to use.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  protected static class Comp implements Comparator<DistanceDBIDPair<?>> {
-    @SuppressWarnings("unchecked")
-    @Override
-    public int compare(DistanceDBIDPair<?> o1, DistanceDBIDPair<?> o2) {
-      return -((DistanceDBIDPair<DoubleDistance>)o1).compareByDistance((DistanceDBIDPair<DoubleDistance>)o2);
-    }
   }
 }

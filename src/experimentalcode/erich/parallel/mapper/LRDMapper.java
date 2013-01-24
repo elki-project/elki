@@ -27,8 +27,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedDouble;
@@ -44,7 +44,7 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
   /**
    * KNN store
    */
-  private DataStore<? extends KNNResult<D>> knns;
+  private DataStore<? extends KNNList<D>> knns;
 
   /**
    * k-distance store
@@ -62,7 +62,7 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
    * @param knns k nearest neighbors
    * @param kdists k distances
    */
-  public LRDMapper(DataStore<? extends KNNResult<D>> knns, DoubleDataStore kdists) {
+  public LRDMapper(DataStore<? extends KNNList<D>> knns, DoubleDataStore kdists) {
     super();
     this.knns = knns;
     this.kdists = kdists;
@@ -105,10 +105,10 @@ public class LRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
 
     @Override
     public void map(DBIDRef id) {
-      KNNResult<D> knn = knns.get(id);
+      KNNList<D> knn = knns.get(id);
       double lrd = 0.0;
       int size = 0;
-      for(DistanceDBIDResultIter<D> n = knn.iter(); n.valid(); n.advance()) {
+      for(DistanceDBIDListIter<D> n = knn.iter(); n.valid(); n.advance()) {
         // Do not include the query object
         if(DBIDUtil.equal(n, id)) {
           continue;

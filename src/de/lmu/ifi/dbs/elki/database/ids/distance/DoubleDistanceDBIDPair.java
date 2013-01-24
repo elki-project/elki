@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**

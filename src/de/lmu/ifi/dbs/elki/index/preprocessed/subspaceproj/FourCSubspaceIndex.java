@@ -30,9 +30,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -93,7 +93,7 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
   }
 
   @Override
-  protected PCAFilteredResult computeProjection(DBIDRef id, DistanceDBIDResult<D> neighbors, Relation<V> database) {
+  protected PCAFilteredResult computeProjection(DBIDRef id, DistanceDBIDList<D> neighbors, Relation<V> database) {
     ModifiableDBIDs ids = DBIDUtil.newArray(neighbors.size());
     for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
       ids.add(neighbor);

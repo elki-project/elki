@@ -26,8 +26,8 @@ package experimentalcode.erich.parallel.mapper;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedDouble;
@@ -43,7 +43,7 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
   /**
    * KNN store
    */
-  private DataStore<? extends KNNResult<D>> knns;
+  private DataStore<? extends KNNList<D>> knns;
 
   /**
    * Output variable
@@ -55,7 +55,7 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
    * 
    * @param knns k nearest neighbors
    */
-  public SimpleLRDMapper(DataStore<? extends KNNResult<D>> knns) {
+  public SimpleLRDMapper(DataStore<? extends KNNList<D>> knns) {
     super();
     this.knns = knns;
   }
@@ -97,10 +97,10 @@ public class SimpleLRDMapper<D extends NumberDistance<D, ?>> implements Mapper {
 
     @Override
     public void map(DBIDRef id) {
-      KNNResult<D> knn = knns.get(id);
+      KNNList<D> knn = knns.get(id);
       double lrd = 0.0;
       int size = 0;
-      for(DistanceDBIDResultIter<D> n = knn.iter(); n.valid(); n.advance()) {
+      for(DistanceDBIDListIter<D> n = knn.iter(); n.valid(); n.advance()) {
         // Do not include the query object
         if(DBIDUtil.equal(n, id)) {
           continue;

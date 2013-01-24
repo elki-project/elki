@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -23,35 +23,41 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
- * Iterator over distance-based query results.
- * 
- * There is no getter for the DBID, as this implements
- * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDRef}.
+ * An object containing Double-DBID-Pairs.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.landmark
- * 
- * @apiviz.has DistanceDBIDPair - - iterator for
- * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID - - iterator for
  */
-public interface DistanceDBIDResultIter<D extends Distance<D>> extends DBIDIter {
+public interface ModifiableDoubleDistanceDBIDList extends DoubleDistanceDBIDList, ModifiableDistanceDBIDList<DoubleDistance> {
   /**
-   * Get the distance
+   * Add an element.
    * 
-   * @return distance
+   * @deprecated Pass a double value instead.
+   * 
+   * @param dist Distance
+   * @param id ID
    */
-  public D getDistance();
+  @Override
+  @Deprecated
+  void add(DoubleDistance dist, DBIDRef id);
 
   /**
-   * Get an object pair.
+   * Add an element.
    * 
-   * @return object pair
+   * @param dist Distance
+   * @param id ID
    */
-  public DistanceDBIDPair<D> getDistancePair();
+  void add(double dist, DBIDRef id);
+
+  /**
+   * Add an element.
+   * 
+   * @param pair Pair to add
+   */
+  void add(DoubleDistanceDBIDPair pair);
 }

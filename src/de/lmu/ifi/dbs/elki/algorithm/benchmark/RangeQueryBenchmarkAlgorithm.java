@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -41,7 +42,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -165,7 +165,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
     MeanVariance mv = new MeanVariance();
     for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
       D r = dfactory.fromDouble(radrel.get(iditer).doubleValue(0));
-      DistanceDBIDResult<D> rres = rangeQuery.getRangeForDBID(iditer, r);
+      DistanceDBIDList<D> rres = rangeQuery.getRangeForDBID(iditer, r);
       int ichecksum = 0;
       for (DBIDIter it = rres.iter(); it.valid(); it.advance()) {
         ichecksum += it.internalGetIndex();
@@ -254,7 +254,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       }
       O v = ofactory.newNumberVector(buf);
       D r = dfactory.fromDouble(o.doubleValue(dim));
-      DistanceDBIDResult<D> rres = rangeQuery.getRangeForObject(v, r);
+      DistanceDBIDList<D> rres = rangeQuery.getRangeForObject(v, r);
       int ichecksum = 0;
       for (DBIDIter it = rres.iter(); it.valid(); it.advance()) {
         ichecksum += it.internalGetIndex();

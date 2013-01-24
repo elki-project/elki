@@ -43,11 +43,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.KernelMatrix;
@@ -196,7 +196,7 @@ public class ABOD<V extends NumberVector<?>> extends AbstractDistanceBasedAlgori
     for (DBIDIter objKey = relation.iterDBIDs(); objKey.valid(); objKey.advance()) {
       s.reset();
 
-      KNNResult<DoubleDistance> neighbors = knnQuery.getKNNForDBID(objKey, k);
+      KNNList<DoubleDistance> neighbors = knnQuery.getKNNForDBID(objKey, k);
       for (DBIDIter key1 = neighbors.iter(); key1.valid(); key1.advance()) {
         for (DBIDIter key2 = neighbors.iter(); key2.valid(); key2.advance()) {
           if (DBIDUtil.equal(key2, key1) || DBIDUtil.equal(key1, objKey) || DBIDUtil.equal(key2, objKey)) {

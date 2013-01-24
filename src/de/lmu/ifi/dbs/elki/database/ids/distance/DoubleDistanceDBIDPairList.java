@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * @apiviz.composedOf DoubleDistanceDBIDPair
  * @apiviz.has DoubleDistanceDBIDResultIter
  */
-public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<DoubleDistance> {
+public class DoubleDistanceDBIDPairList implements ModifiableDoubleDistanceDBIDList {
   /**
    * Actual storage.
    */
@@ -50,7 +50,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
   /**
    * Constructor.
    */
-  public DoubleDistanceDBIDList() {
+  public DoubleDistanceDBIDPairList() {
     super();
     storage = new ArrayList<>();
   }
@@ -60,7 +60,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    * 
    * @param initialCapacity Capacity
    */
-  public DoubleDistanceDBIDList(int initialCapacity) {
+  public DoubleDistanceDBIDPairList(int initialCapacity) {
     super();
     storage = new ArrayList<>(initialCapacity);
   }
@@ -85,6 +85,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    * @param dist Distance
    * @param id ID
    */
+  @Override
   public void add(double dist, DBIDRef id) {
     storage.add(DBIDFactory.FACTORY.newDistancePair(dist, id));
   }
@@ -94,6 +95,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    * 
    * @param pair Pair to add
    */
+  @Override
   public void add(DoubleDistanceDBIDPair pair) {
     storage.add(pair);
   }
@@ -115,7 +117,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
 
   @Override
   public DoubleDistanceDBIDResultIter iter() {
-    return new Iter();
+    return new Itr();
   }
 
   @Override
@@ -145,7 +147,7 @@ public class DoubleDistanceDBIDList implements ModifiableDistanceDBIDResult<Doub
    * 
    * @apiviz.exclude
    */
-  protected class Iter implements DoubleDistanceDBIDResultIter {
+  protected class Itr implements DoubleDistanceDBIDResultIter {
     /**
      * Iterator position.
      */

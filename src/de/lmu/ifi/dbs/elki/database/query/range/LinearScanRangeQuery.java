@@ -25,10 +25,10 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -53,7 +53,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
+  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       D currentDistance = distanceQuery.distance(id, iter);
@@ -66,7 +66,7 @@ public class LinearScanRangeQuery<O, D extends Distance<D>> extends AbstractDist
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
+  public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       D currentDistance = distanceQuery.distance(obj, iter);

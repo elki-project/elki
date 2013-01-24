@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -29,7 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * @param <D> Distance type
  */
-public class GenericDistanceDBIDList<D extends Distance<D>> implements ModifiableDistanceDBIDResult<D> {
+public class GenericDistanceDBIDList<D extends Distance<D>> implements ModifiableDistanceDBIDList<D> {
   /**
    * Actual storage.
    */
@@ -93,8 +94,8 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
   }
 
   @Override
-  public DistanceDBIDResultIter<D> iter() {
-    return new Iter();
+  public DistanceDBIDListIter<D> iter() {
+    return new Itr();
   }
 
   @Override
@@ -124,7 +125,7 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
    * 
    * @apiviz.exclude
    */
-  protected class Iter implements DistanceDBIDResultIter<D> {
+  protected class Itr implements DistanceDBIDListIter<D> {
     /**
      * Iterator position.
      */

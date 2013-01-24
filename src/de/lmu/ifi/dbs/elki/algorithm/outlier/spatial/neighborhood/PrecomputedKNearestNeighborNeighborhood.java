@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -119,7 +119,7 @@ public class PrecomputedKNearestNeighborNeighborhood<D extends Distance<D>> exte
       // TODO: use bulk?
       WritableDataStore<DBIDs> s = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, DBIDs.class);
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
+        KNNList<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
         ArrayModifiableDBIDs neighbours = DBIDUtil.newArray(neighbors.size());
         for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           neighbours.add(neighbor);

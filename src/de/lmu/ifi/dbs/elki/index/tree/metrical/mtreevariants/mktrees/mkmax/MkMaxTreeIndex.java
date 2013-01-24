@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -38,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -83,7 +83,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * @return a new MkMaxLeafEntry representing the specified data object
    */
   protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    KNNResult<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
+    KNNList<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
     D knnDistance = knns.getKNNDistance();
     return new MkMaxLeafEntry<>(id, parentDistance, knnDistance);
   }
