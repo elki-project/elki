@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 
@@ -119,7 +119,7 @@ public class DoubleOptimizedKNNQuery<O> extends LinearScanKNNQuery<O, DoubleDist
    */
   KNNList<DoubleDistance> getKNNForObjectBenchmarked(O obj, int k) {
     // THIS SHOULD BE SLOWER THAN THE VERSION ABOVE, BUT ISN'T!
-    final TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>> heap = new TiedTopBoundedHeap<>(k, KNNUtil.REVERSE_COMPARATOR);
+    final TiedTopBoundedHeap<DistanceDBIDPair<DoubleDistance>> heap = new TiedTopBoundedHeap<>(k, DistanceDBIDResultUtil.BY_REVERSE_DISTANCE);
     final DBIDIter iter = relation.iterDBIDs();
     // First k elements don't need checking.
     double max = 0.;

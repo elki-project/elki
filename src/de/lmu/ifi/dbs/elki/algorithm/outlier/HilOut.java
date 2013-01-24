@@ -148,7 +148,7 @@ public class HilOut<O extends NumberVector<?>> extends AbstractDistanceBasedAlgo
   /**
    * Comparator for sorting the heaps.
    */
-  private static final Comparator<DistanceDBIDPair<?>> COMPARATOR = DistanceDBIDResultUtil.distanceComparator();
+  private static final Comparator<? super DistanceDBIDPair<?>> COMPARATOR = DistanceDBIDResultUtil.distanceComparator();
 
   /**
    * Type of output: all scores (upper bounds) or top n only

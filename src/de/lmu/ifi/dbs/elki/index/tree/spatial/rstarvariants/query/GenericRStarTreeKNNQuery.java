@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
@@ -228,24 +227,17 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
   @Override
   public KNNList<D> getKNNForObject(O obj, int k) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
-
-    final KNNHeap<D> knnList = KNNUtil.newHeap(distanceFunction, k);
+    final KNNHeap<D> knnList = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
     doKNNQuery(obj, knnList);
     return knnList.toKNNList();
   }
 
   @Override
   public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-    if(k < 1) {
-      throw new IllegalArgumentException("At least one enumeration has to be requested!");
-    }
     // While this works, it seems to be slow at least for large sets!
     final Map<DBID, KNNHeap<D>> knnLists = new HashMap<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      knnLists.put(DBIDUtil.deref(iter), KNNUtil.newHeap(distanceFunction, k));
+      knnLists.put(DBIDUtil.deref(iter), DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k));
     }
 
     batchNN(tree.getRoot(), knnLists);

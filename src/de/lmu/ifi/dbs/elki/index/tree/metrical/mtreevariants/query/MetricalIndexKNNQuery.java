@@ -24,12 +24,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -72,7 +72,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     }
 
     final D nullDistance = index.getDistanceFactory().nullDistance();
-    KNNHeap<D> knnList = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
+    KNNHeap<D> knnList = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     D d_k = knnList.getKNNDistance();
 
     final ComparableMinHeap<GenericMTreeDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();

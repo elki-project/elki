@@ -42,8 +42,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
@@ -55,7 +55,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -119,7 +118,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
    */
   private void materializeKNNAndRKNNs(ArrayDBIDs ids, FiniteProgress progress) {
     // add an empty list to each rknn
-    Comparator<DistanceDBIDPair<D>> comp = DistanceDBIDResultUtil.distanceComparator();
+    Comparator<? super DistanceDBIDPair<D>> comp = DistanceDBIDResultUtil.distanceComparator();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       if(materialized_RkNN.get(iter) == null) {
         materialized_RkNN.put(iter, new TreeSet<>(comp));
@@ -203,7 +202,7 @@ public class MaterializeKNNAndRKNNPreprocessor<O, D extends Distance<D>> extends
         if(dist.compareTo(knnDist) <= 0) {
           // New id changes the kNNs of oldid.
           if(heap == null) {
-            heap = KNNUtil.newHeap(oldkNNs);
+            heap = DBIDUtil.newHeap(oldkNNs);
           }
           heap.add(dist, newid);
         }

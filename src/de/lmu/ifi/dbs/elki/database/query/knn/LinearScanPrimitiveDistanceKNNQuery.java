@@ -29,10 +29,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -84,7 +84,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O, D extends Distance<D>> exten
     final List<KNNHeap<D>> heaps = new ArrayList<>(size);
     List<O> objs = new ArrayList<>(size);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      heaps.add(KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k));
+      heaps.add(DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k));
       objs.add(relation.get(iter));
     }
     linearScanBatchKNN(objs, heaps);

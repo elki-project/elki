@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -95,7 +94,7 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
     final int samplesize = (int) (ids.size() * share);
 
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
+      KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
 
       DBIDs rsamp = DBIDUtil.randomSample(ids, samplesize, rnd);
       for (DBIDIter iter2 = rsamp.iter(); iter2.valid(); iter2.advance()) {

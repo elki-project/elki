@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -226,7 +225,7 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
         D dist = distanceQuery.distance(iter, iter2);
         if(dist.compareTo(knnDist) <= 0) {
           if(heap == null) {
-            heap = KNNUtil.newHeap(kNNs);
+            heap = DBIDUtil.newHeap(kNNs);
           }
           heap.add(dist, iter2);
         }
