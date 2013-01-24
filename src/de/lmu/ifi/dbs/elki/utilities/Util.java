@@ -23,11 +23,9 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.Random;
-
 
 /**
  * This class collects various static helper methods.
@@ -38,6 +36,11 @@ import java.util.Random;
  * @see de.lmu.ifi.dbs.elki.utilities
  */
 public final class Util {
+  /**
+   * Prime number used in hash code computation.
+   */
+  private static final long HASHPRIME = 2654435761L;
+
   /**
    * Fake constructor: do not instantiate.
    */
@@ -77,21 +80,55 @@ public final class Util {
   /**
    * Mix multiple hashcodes into one.
    * 
+   * @param hash Single Hashcodes to "mix"
+   * @return Original hash code
+   */
+  @Deprecated
+  public static int mixHashCodes(int hash) {
+    return hash;
+  }
+
+  /**
+   * Mix multiple hashcodes into one.
+   * 
+   * @param hash1 First hashcode to mix
+   * @param hash2 Second hashcode to mix
+   * @return Mixed hash code
+   */
+  public static int mixHashCodes(int hash1, int hash2) {
+    return (int) (hash1 * HASHPRIME + hash2);
+  }
+
+  /**
+   * Mix multiple hashcodes into one.
+   * 
+   * @param hash1 First hashcode to mix
+   * @param hash2 Second hashcode to mix
+   * @param hash3 Third hashcode to mix
+   * @return Mixed hash code
+   */
+  public static int mixHashCodes(int hash1, int hash2, int hash3) {
+    long result = hash1 * HASHPRIME + hash2;
+    return (int) (result * HASHPRIME + hash3);
+  }
+
+  /**
+   * Mix multiple hashcodes into one.
+   * 
    * @param hash Hashcodes to mix
    * @return Mixed hash code
    */
   public static int mixHashCodes(int... hash) {
-    final long prime = 2654435761L;
     if (hash.length == 0) {
       return 0;
     }
     long result = hash[0];
     for (int i = 1; i < hash.length; i++) {
-      result = result * prime + hash[i];
+      result = result * HASHPRIME + hash[i];
     }
     return (int) result;
   }
-  
+
   /**
    * Static instance.
    */
