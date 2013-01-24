@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -52,7 +52,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O, D extends Distance<D>> ext
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForDBID(DBIDRef id, D range) {
+  public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
     // Note: subtle optimization. Get "id" only once!
     return getRangeForObject(relation.get(id), range);
   }

@@ -3,16 +3,16 @@
  * 
  * <p>The classes in this package essentially form three groups:
  * <ol>
- * <li>{@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap} for <b>building kNN results</b>.
+ * <li>{@link de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap} for <b>building kNN results</b>.
  * It allows adding new candidates (and loses old candidates automatically), but it is not iterable.<br />
  * To get an instance, use {@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil#newHeap}!
  * </li>
- * <li>{@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult} is the <b>final kNN result</b>
- * obtained by serializing a heap via {@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap#toKNNList}.
+ * <li>{@link de.lmu.ifi.dbs.elki.database.ids.distance.KNNList} is the <b>final kNN result</b>
+ * obtained by serializing a heap via {@link de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap#toKNNList}.
  * It is iterable and totally ordered, but can no longer be modified (unless you call
  * {@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil#newHeap}!</li>
- * <li>{@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList} and the optimized
- * counterpart {@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList}, are
+ * <li>{@link de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList} and the optimized
+ * counterpart {@link de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList}, are
  * <b>modifiable, but not necessarily sorted</b> lists of neighbors, useful for example for range queries.</li>
  * </ol>
  * </p>

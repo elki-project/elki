@@ -29,9 +29,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Erich Schubert
  */
-public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<D>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
+public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>> extends AbstractDataBasedQuery<O> implements KNNQuery<O, D> {
   /**
    * The last preprocessor result
    */
@@ -76,12 +76,12 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
   }
 
   @Override
-  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
     if(!warned && k < preprocessor.getK()) {
-      KNNResult<D> dr = preprocessor.get(id);
+      KNNList<D> dr = preprocessor.get(id);
       int subk = k;
       D kdist = dr.get(subk - 1).getDistance();
       while(subk < dr.size()) {
@@ -105,14 +105,14 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
   }
 
   @Override
-  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k > preprocessor.getK()) {
       LoggingUtil.warning("Requested more neighbors than preprocessed!");
     }
-    List<KNNResult<D>> result = new ArrayList<>(ids.size());
+    List<KNNList<D>> result = new ArrayList<>(ids.size());
     if(k < preprocessor.getK()) {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {      
-        KNNResult<D> dr = preprocessor.get(iter);
+        KNNList<D> dr = preprocessor.get(iter);
         int subk = k;
         D kdist = dr.get(subk - 1).getDistance();
         while(subk < dr.size()) {
@@ -142,7 +142,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNResult<
   }
 
   @Override
-  public KNNResult<D> getKNNForObject(O obj, int k) {
+  public KNNList<D> getKNNForObject(O obj, int k) {
     throw new AbortException("Preprocessor KNN query only supports ID queries.");
   }
 

@@ -32,12 +32,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -93,7 +93,7 @@ public class ParallelKNNOutlier<O, D extends NumberDistance<D, ?>> extends Abstr
     KNNQuery<O, D> knnq = database.getKNNQuery(distq, k);
 
     KNNMapper<O, D> knnm = new KNNMapper<>(k, knnq);
-    SharedObject<KNNResult<D>> knnv = new SharedObject<>();
+    SharedObject<KNNList<D>> knnv = new SharedObject<>();
     KDoubleDistanceMapper kdistm = new KDoubleDistanceMapper(k);
     SharedDouble kdistv = new SharedDouble();
     WriteDoubleDataStoreMapper storem = new WriteDoubleDataStoreMapper(store);

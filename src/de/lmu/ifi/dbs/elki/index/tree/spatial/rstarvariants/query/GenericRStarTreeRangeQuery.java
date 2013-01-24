@@ -24,11 +24,11 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -85,7 +85,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    * @param epsilon Query range
    * @return Objects contained in query range.
    */
-  protected DistanceDBIDResult<D> doRangeQuery(O object, D epsilon) {
+  protected DistanceDBIDList<D> doRangeQuery(O object, D epsilon) {
     final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     final ComparableMinHeap<GenericDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
 
@@ -123,7 +123,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   }
 
   @Override
-  public DistanceDBIDResult<D> getRangeForObject(O obj, D range) {
+  public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
     return doRangeQuery(obj, range);
   }
 }

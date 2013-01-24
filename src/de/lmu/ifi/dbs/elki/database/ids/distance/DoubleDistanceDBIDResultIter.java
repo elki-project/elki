@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -23,26 +23,38 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+
 /**
- * Modifiable API for Distance-DBID results
+ * Iterator for double valued distance-based query results.
  * 
  * @author Erich Schubert
- *
- * @param <D> Distance type
  */
-public interface ModifiableDistanceDBIDResult<D extends Distance<D>> extends DistanceDBIDResult<D> {
+public interface DoubleDistanceDBIDResultIter extends DistanceDBIDListIter<DoubleDistance> {
   /**
-   * Add an object to this result.
+   * Get the distance
    * 
-   * @param distance Distance to add
-   * @param id DBID to add
+   * @return distance
    */
-  public void add(D distance, DBIDRef id);
+  public double doubleDistance();
 
   /**
-   * Sort the result in ascending order
+   * Get an object pair.
+   * 
+   * @return object pair
    */
-  public void sort();
+  @Override
+  public DoubleDistanceDBIDPair getDistancePair();
+
+  /**
+   * Get the distance
+   * 
+   * @deprecated Use {@link #doubleDistance} to avoid creating unnecessary
+   *             objects.
+   * 
+   * @return distance
+   */
+  @Deprecated
+  @Override
+  public DoubleDistance getDistance();
 }

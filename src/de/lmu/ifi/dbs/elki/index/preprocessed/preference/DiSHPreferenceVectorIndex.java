@@ -44,13 +44,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -172,7 +172,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
       // determine neighbors in each dimension
       ModifiableDBIDs[] allNeighbors = new ModifiableDBIDs[dim];
       for(int d = 0; d < dim; d++) {
-        DistanceDBIDResult<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
+        DistanceDBIDList<DoubleDistance> qrList = rangeQueries[d].getRangeForDBID(it, epsilon[d]);
         allNeighbors[d] = DBIDUtil.newHashSet(qrList);
       }
 

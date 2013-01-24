@@ -29,11 +29,11 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
@@ -74,7 +74,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   }
 
   @Override
-  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
     KNNHeap<D> heap = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     D max = distanceQuery.getDistanceFactory().infiniteDistance();
     if(PrimitiveDistanceQuery.class.isInstance(distanceQuery)) {
@@ -104,7 +104,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   }
 
   @Override
-  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     final int size = ids.size();
     final List<KNNHeap<D>> heaps = new ArrayList<>(size);
     for(int i = 0; i < size; i++) {
@@ -112,7 +112,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
     }
     linearScanBatchKNN(ids, heaps);
     // Serialize heaps
-    List<KNNResult<D>> result = new ArrayList<>(size);
+    List<KNNList<D>> result = new ArrayList<>(size);
     for(KNNHeap<D> heap : heaps) {
       result.add(heap.toKNNList());
     }
@@ -120,7 +120,7 @@ public class LinearScanKNNQuery<O, D extends Distance<D>> extends AbstractDistan
   }
 
   @Override
-  public KNNResult<D> getKNNForObject(O obj, int k) {
+  public KNNList<D> getKNNForObject(O obj, int k) {
     KNNHeap<D> heap = KNNUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       heap.add(distanceQuery.distance(obj, iter), iter);

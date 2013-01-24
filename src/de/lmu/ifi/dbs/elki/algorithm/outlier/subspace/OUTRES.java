@@ -37,18 +37,20 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -175,7 +177,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
       final DoubleDistance range = new DoubleDistance(adjustedEps * 2.);
       RangeQuery<V, DoubleDistance> rq = QueryUtil.getRangeQuery(kernel.relation, df, range);
 
-      DistanceDBIDResult<DoubleDistance> neighc = rq.getRangeForDBID(id, range);
+      DistanceDBIDList<DoubleDistance> neighc = rq.getRangeForDBID(id, range);
       DoubleDistanceDBIDList neigh = refineRange(neighc, adjustedEps);
       if(neigh.size() > 2) {
         // Relevance test
@@ -208,10 +210,10 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    * @param adjustedEps New epsilon
    * @return refined list
    */
-  private DoubleDistanceDBIDList refineRange(DistanceDBIDResult<DoubleDistance> neighc, double adjustedEps) {
-    DoubleDistanceDBIDList n = new DoubleDistanceDBIDList(neighc.size());
+  private DoubleDistanceDBIDList refineRange(DistanceDBIDList<DoubleDistance> neighc, double adjustedEps) {
+    ModifiableDoubleDistanceDBIDList n = new DoubleDistanceDBIDPairList(neighc.size());
     // We don't have a guarantee for this list to be sorted
-    for (DistanceDBIDResultIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
+    for (DistanceDBIDListIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
       DistanceDBIDPair<DoubleDistance> p = neighbor.getDistancePair();
       if(p instanceof DoubleDistanceDBIDPair) {
         if(((DoubleDistanceDBIDPair) p).doubleDistance() <= adjustedEps) {
@@ -238,10 +240,10 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
    * @param kernel Kernel
    * @return Neighbors of neighbor object
    */
-  private DoubleDistanceDBIDList subsetNeighborhoodQuery(DistanceDBIDResult<DoubleDistance> neighc, DBIDRef dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
-    DoubleDistanceDBIDList n = new DoubleDistanceDBIDList(neighc.size());
+  private DoubleDistanceDBIDList subsetNeighborhoodQuery(DistanceDBIDList<DoubleDistance> neighc, DBIDRef dbid, PrimitiveDoubleDistanceFunction<? super V> df, double adjustedEps, KernelDensityEstimator kernel) {
+    ModifiableDoubleDistanceDBIDList n = new DoubleDistanceDBIDPairList(neighc.size());
     V query = kernel.relation.get(dbid);
-    for (DistanceDBIDResultIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
+    for (DistanceDBIDListIter<DoubleDistance> neighbor = neighc.iter(); neighbor.valid(); neighbor.advance()) {
       DistanceDBIDPair<DoubleDistance> p = neighbor.getDistancePair();
       double dist = df.doubleDistance(query, kernel.relation.get(p));
       if(dist <= adjustedEps) {

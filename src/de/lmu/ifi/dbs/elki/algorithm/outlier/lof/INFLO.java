@@ -35,13 +35,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -155,7 +155,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       int count = rnns.get(id).size();
       if (!processedIDs.contains(id)) {
         // TODO: use exactly k neighbors?
-        KNNResult<D> list = knnQuery.getKNNForDBID(id, k);
+        KNNList<D> list = knnQuery.getKNNForDBID(id, k);
         knns.get(id).addDBIDs(list);
         processedIDs.add(id);
         density.putDouble(id, 1 / list.getKNNDistance().doubleValue());
@@ -165,7 +165,7 @@ public class INFLO<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBa
       for (DBIDIter q = knns.get(id).iter(); q.valid(); q.advance()) {
         if (!processedIDs.contains(q)) {
           // TODO: use exactly k neighbors?
-          KNNResult<D> listQ = knnQuery.getKNNForDBID(q, k);
+          KNNList<D> listQ = knnQuery.getKNNForDBID(q, k);
           knns.get(q).addDBIDs(listQ);
           density.putDouble(q, 1 / listQ.getKNNDistance().doubleValue());
           processedIDs.add(q);

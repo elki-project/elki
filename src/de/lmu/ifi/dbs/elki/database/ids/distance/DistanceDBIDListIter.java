@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -23,39 +23,34 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Iterator for double valued distance-based query results.
+ * Iterator over distance-based query results.
+ * 
+ * There is no getter for the DBID, as this implements
+ * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDRef}.
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.landmark
+ * 
+ * @apiviz.has DistanceDBIDPair - - iterator for
+ * @apiviz.has de.lmu.ifi.dbs.elki.database.ids.DBID - - iterator for
  */
-public interface DoubleDistanceDBIDResultIter extends DistanceDBIDResultIter<DoubleDistance> {
+public interface DistanceDBIDListIter<D extends Distance<D>> extends DBIDIter {
   /**
    * Get the distance
    * 
    * @return distance
    */
-  public double doubleDistance();
+  public D getDistance();
 
   /**
    * Get an object pair.
    * 
    * @return object pair
    */
-  @Override
-  public DoubleDistanceDBIDPair getDistancePair();
-
-  /**
-   * Get the distance
-   * 
-   * @deprecated Use {@link #doubleDistance} to avoid creating unnecessary
-   *             objects.
-   * 
-   * @return distance
-   */
-  @Deprecated
-  @Override
-  public DoubleDistance getDistance();
+  public DistanceDBIDPair<D> getDistancePair();
 }

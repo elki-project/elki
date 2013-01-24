@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Interface for kNN results.
+ * Collection of objects and their distances.
  * 
  * To iterate over the results, use the following code:
  * 
@@ -56,36 +56,32 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.landmark
  * 
  * @apiviz.composedOf DistanceDBIDPair
- * @apiviz.has DistanceDBIDResultIter
+ * @apiviz.has DistanceDBIDIter
  * 
  * @param <D> Distance type
  */
-public interface KNNResult<D extends Distance<D>> extends DistanceDBIDResult<D> {
+public interface DistanceDBIDList<D extends Distance<D>> extends DBIDs {
   /**
-   * Size
+   * Size of list.
+   * 
+   * @return Size
    */
   @Override
   public int size();
 
   /**
-   * Get the K parameter (note: this may be less than the size of the list!)
+   * Access a single pair.
    * 
-   * @return K
+   * @param off Offset
+   * @return Pair
    */
-  public int getK();
+  public DistanceDBIDPair<D> get(int off);
 
   /**
-   * Direct object access.
+   * Get an iterator
    * 
-   * @param index
+   * @return New iterator
    */
   @Override
-  public DistanceDBIDPair<D> get(int index);
-
-  /**
-   * Get the distance to the k nearest neighbor, or maxdist otherwise.
-   * 
-   * @return Maximum distance
-   */
-  public D getKNNDistance();
+  public DistanceDBIDListIter<D> iter();
 }

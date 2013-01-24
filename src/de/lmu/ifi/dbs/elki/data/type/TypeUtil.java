@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
@@ -98,7 +98,7 @@ public final class TypeUtil {
   /**
    * A list of neighbors.
    */
-  public static final SimpleTypeInformation<DistanceDBIDResult<?>> NEIGHBORLIST = new SimpleTypeInformation<>(DistanceDBIDResult.class);
+  public static final SimpleTypeInformation<DistanceDBIDList<?>> NEIGHBORLIST = new SimpleTypeInformation<>(DistanceDBIDList.class);
 
   /**
    * Either class label, object labels or a string - anything that will be

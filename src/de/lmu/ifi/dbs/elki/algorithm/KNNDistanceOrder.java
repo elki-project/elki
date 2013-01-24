@@ -32,11 +32,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.KNNDistanceOrderResult;
@@ -117,7 +117,7 @@ public class KNNDistanceOrder<O, D extends Distance<D>> extends AbstractDistance
     List<D> knnDistances = new ArrayList<>(relation.size());
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       if(random.nextDouble() < percentage) {
-        final KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
+        final KNNList<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
         knnDistances.add(neighbors.getKNNDistance());
       }
     }

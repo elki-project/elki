@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 /*
  This file is part of ELKI:
@@ -27,7 +27,9 @@ import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -62,7 +64,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Erich Schubert
  */
-public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPair, DoubleDistance> {
+public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPair, DoubleDistance> implements DoubleDistanceKNNHeap {
   /**
    * Comparator class.
    */
@@ -81,18 +83,18 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * 
    * @param k Heap size
    */
-  public DoubleDistanceKNNHeap(int k) {
+  public DoubleDistanceDBIDPairKNNHeap(int k) {
     super(k);
   }
 
   /**
-   * Serialize to a {@link DoubleDistanceKNNList}. This empties the heap!
+   * Serialize to a {@link DoubleDistanceDBIDPairKNNList}. This empties the heap!
    * 
    * @return KNNList with the heaps contents.
    */
   @Override
-  public DoubleDistanceKNNList toKNNList() {
-    return new DoubleDistanceKNNList(this);
+  public DoubleDistanceDBIDPairKNNList toKNNList() {
+    return new DoubleDistanceDBIDPairKNNList(this);
   }
 
   /**
@@ -103,6 +105,7 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * @param distance Distance value
    * @param id ID number
    */
+  @Override
   public final void add(final double distance, final DBIDRef id) {
     if (size() < getK() || knndistance >= distance) {
       heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
@@ -118,6 +121,7 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * @param distance Distance value
    * @param id ID number
    */
+  @Override
   public final void add(final Double distance, final DBIDRef id) {
     if (size() < getK() || knndistance >= distance) {
       heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
@@ -159,6 +163,7 @@ public class DoubleDistanceKNNHeap extends AbstractKNNHeap<DoubleDistanceDBIDPai
    * 
    * @return Maximum distance
    */
+  @Override
   public double doubleKNNDistance() {
     return knndistance;
   }

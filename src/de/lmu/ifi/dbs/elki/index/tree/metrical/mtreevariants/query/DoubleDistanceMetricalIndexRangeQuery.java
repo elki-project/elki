@@ -24,11 +24,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -77,7 +78,7 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
    * @param r_q the query range
    * @param result the list holding the query results
    */
-  private void doRangeQuery(DBID id_p, AbstractMTreeNode<O, DoubleDistance, ?, ?> node, O q, double r_q, DoubleDistanceDBIDList result) {
+  private void doRangeQuery(DBID id_p, AbstractMTreeNode<O, DoubleDistance, ?, ?> node, O q, double r_q, ModifiableDoubleDistanceDBIDList result) {
     final O o_p = id_p != null ? relation.get(id_p) : null;
     double d1 = id_p != null ? distf.doubleDistance(o_p, q) : 0;
     if (!node.isLeaf()) {
@@ -119,8 +120,8 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
   }
 
   @Override
-  public DistanceDBIDResult<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
-    final DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
+  public DistanceDBIDList<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
+    final DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
 
     doRangeQuery(null, index.getRoot(), obj, range.doubleValue(), result);
     result.sort();

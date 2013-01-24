@@ -34,12 +34,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
@@ -145,7 +145,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     // do batch nn
-    Map<DBID, KNNResult<D>> knnLists = batchNN(getRoot(), ids, k_max + 1);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, k_max + 1);
     
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -164,7 +164,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return a List of the query results
    */
   @Override
-  public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
+  public DistanceDBIDList<D> reverseKNNQuery(DBIDRef id, int k) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<>();
 
@@ -270,13 +270,13 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
   }
 
-  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNResult<D>> knnLists) {
+  private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNList<D>> knnLists) {
     double[] means = new double[k_max];
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
-      KNNResult<D> knns = knnLists.get(id);
+      KNNList<D> knns = knnLists.get(id);
       int k = 0;
-      for(DistanceDBIDResultIter<D> it = knns.iter(); k < k_max && it.valid(); it.advance(), k++) {
+      for(DistanceDBIDListIter<D> it = knns.iter(); k < k_max && it.valid(); it.advance(), k++) {
         means[k] += it.getDistance().doubleValue();
       }
     }
@@ -296,7 +296,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNResult<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
     MkAppTreeNode<O, D> node = getNode(entry);
 
     if(node.isLeaf()) {

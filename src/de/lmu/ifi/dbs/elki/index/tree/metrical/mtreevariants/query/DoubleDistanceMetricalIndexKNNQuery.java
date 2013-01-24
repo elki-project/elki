@@ -24,11 +24,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -71,12 +71,12 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
   }
 
   @Override
-  public KNNResult<DoubleDistance> getKNNForObject(O q, int k) {
+  public KNNList<DoubleDistance> getKNNForObject(O q, int k) {
     if (k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
 
-    DoubleDistanceKNNHeap knnList = new DoubleDistanceKNNHeap(k);
+    DoubleDistanceDBIDPairKNNHeap knnList = new DoubleDistanceDBIDPairKNNHeap(k);
     double d_k = Double.POSITIVE_INFINITY;
 
     final ComparableMinHeap<DoubleMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();

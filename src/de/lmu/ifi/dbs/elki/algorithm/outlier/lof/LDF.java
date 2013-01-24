@@ -36,6 +36,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -44,10 +48,6 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -164,23 +164,23 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     WritableDoubleDataStore ldes = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress densProgress = LOG.isVerbose() ? new FiniteProgress("Densities", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-      final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
+      final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      if (neighbors instanceof DoubleDistanceKNNList) {
+      if (neighbors instanceof DoubleDistanceDBIDPairKNNList) {
         // Fast version for double distances
-        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          double nkdist = ((DoubleDistanceKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
+          double nkdist = ((DoubleDistanceDBIDPairKNNList) knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
 
           final double v = Math.max(nkdist, neighbor.doubleDistance()) / (h * nkdist);
           sum += kernel.density(v) / Math.pow(h * nkdist, dim);
           count++;
         }
       } else {
-        for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
@@ -210,7 +210,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
     FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Local Density Factors", ids.size(), LOG) : null;
     for (DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       final double lrdp = ldes.doubleValue(it);
-      final KNNResult<D> neighbors = knnq.getKNNForDBID(it, k);
+      final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
       for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

@@ -41,11 +41,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -156,7 +156,7 @@ public class EvaluateRankingQuality<V extends NumberVector<?>, D extends NumberD
       Collections.sort(cmem);
 
       for (int ind = 0; ind < cmem.size(); ind++) {
-        KNNResult<D> knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
+        KNNList<D> knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         hist.put(((double) ind) / clus.size(), result);

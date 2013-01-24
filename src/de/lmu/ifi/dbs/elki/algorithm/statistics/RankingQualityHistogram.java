@@ -35,11 +35,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.evaluation.roc.ROC;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -126,7 +126,7 @@ public class RankingQualityHistogram<O, D extends NumberDistance<D, ?>> extends 
     // sort neighbors
     for (Cluster<?> clus : split) {
       for (DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        KNNResult<D> knn = knnQuery.getKNNForDBID(iter, relation.size());
+        KNNList<D> knn = knnQuery.getKNNForDBID(iter, relation.size());
         double result = ROC.computeROCAUCDistanceResult(relation.size(), clus, knn);
 
         mv.put(result);

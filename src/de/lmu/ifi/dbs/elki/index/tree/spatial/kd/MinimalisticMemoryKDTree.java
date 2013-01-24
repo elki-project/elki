@@ -31,6 +31,11 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -43,9 +48,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DoubleNorm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
@@ -187,8 +189,8 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
     }
 
     @Override
-    public KNNResult<DoubleDistance> getKNNForObject(O obj, int k) {
-      final DoubleDistanceKNNHeap knns = new DoubleDistanceKNNHeap(k);
+    public KNNList<DoubleDistance> getKNNForObject(O obj, int k) {
+      final DoubleDistanceKNNHeap knns = new DoubleDistanceDBIDPairKNNHeap(k);
       kdKNNSearch(0, sorted.size(), 0, obj, knns, sorted.iter(), Double.POSITIVE_INFINITY);
       return knns.toKNNList();
     }
@@ -296,8 +298,8 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
     }
 
     @Override
-    public DoubleDistanceDBIDList getRangeForObject(O obj, DoubleDistance range) {
-      final DoubleDistanceDBIDList res = new DoubleDistanceDBIDList();
+    public DoubleDistanceDBIDPairList getRangeForObject(O obj, DoubleDistance range) {
+      final DoubleDistanceDBIDPairList res = new DoubleDistanceDBIDPairList();
       kdRangeSearch(0, sorted.size(), 0, obj, res, sorted.iter(), range.doubleValue());
       res.sort();
       return res;
@@ -314,7 +316,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
      * @param iter Iterator variable (reduces memory footprint!)
      * @param radius Query radius
      */
-    private void kdRangeSearch(int left, int right, int axis, O query, DoubleDistanceDBIDList res, DBIDArrayIter iter, double radius) {
+    private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDistanceDBIDList res, DBIDArrayIter iter, double radius) {
       // Look at current node:
       final int middle = (left + right) >>> 1;
       iter.seek(middle);

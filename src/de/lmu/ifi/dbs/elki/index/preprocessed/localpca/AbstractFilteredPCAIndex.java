@@ -29,10 +29,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -97,7 +97,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> exten
 
     // TODO: use a bulk operation?
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DistanceDBIDResult<DoubleDistance> objects = objectsForPCA(iditer);
+      DistanceDBIDList<DoubleDistance> objects = objectsForPCA(iditer);
 
       PCAFilteredResult pcares = pca.processQueryResult(objects, relation);
 
@@ -134,7 +134,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector<?>> exten
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
    */
-  protected abstract DistanceDBIDResult<DoubleDistance> objectsForPCA(DBIDRef id);
+  protected abstract DistanceDBIDList<DoubleDistance> objectsForPCA(DBIDRef id);
 
   /**
    * Factory class.

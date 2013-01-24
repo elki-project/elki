@@ -29,12 +29,12 @@ import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
@@ -91,7 +91,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
 
   @Override
-  public DistanceDBIDResult<D> reverseKNNQuery(DBIDRef id, int k) {
+  public DistanceDBIDList<D> reverseKNNQuery(DBIDRef id, int k) {
     if(k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
@@ -139,7 +139,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   }
   
   @Override
-  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNResult<D>> knnLists) {
+  protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
     MkTabTreeNode<O, D> node = getNode(entry);
     List<D> knnDistances_node = initKnnDistanceList();
     if(node.isLeaf()) {

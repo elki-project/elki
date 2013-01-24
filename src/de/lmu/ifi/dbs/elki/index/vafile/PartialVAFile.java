@@ -38,6 +38,9 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -47,9 +50,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
@@ -452,7 +452,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     }
 
     @Override
-    public DoubleDistanceDBIDList getRangeForObject(V query, DoubleDistance range) {
+    public DoubleDistanceDBIDPairList getRangeForObject(V query, DoubleDistance range) {
       stats.issuedQueries++;
       long t = System.nanoTime();
 
@@ -480,7 +480,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       // create candidate list (all objects) and prune candidates w.r.t.
       // mindist (i.e. remove them from the list)
       // important: this structure contains the maxDist values for refinement!
-      DoubleDistanceDBIDList result = new DoubleDistanceDBIDList();
+      DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
       int candidates = 0;
       for(VectorApproximation va : vectorApprox) {
         DBID id = va.getId();
@@ -560,7 +560,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     }
 
     @Override
-    public DoubleDistanceKNNList getKNNForObject(V query, int k) {
+    public DoubleDistanceDBIDPairKNNList getKNNForObject(V query, int k) {
       stats.issuedQueries++;
       long t = System.nanoTime();
 
@@ -633,7 +633,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<>(candidates2);
       // sort candidates by lower bound (minDist)
       Collections.sort(sortedCandidates);
-      DoubleDistanceKNNList result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
+      DoubleDistanceDBIDPairKNNList result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
       stats.queryTime += System.nanoTime() - t;
       return result;
@@ -711,8 +711,8 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       return result;
     }
 
-    protected DoubleDistanceKNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
-      DoubleDistanceKNNHeap result = new DoubleDistanceKNNHeap(k);
+    protected DoubleDistanceDBIDPairKNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
+      DoubleDistanceDBIDPairKNNHeap result = new DoubleDistanceDBIDPairKNNHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
         double stopdist = result.doubleKNNDistance();
         DBID currentID = va.getId();

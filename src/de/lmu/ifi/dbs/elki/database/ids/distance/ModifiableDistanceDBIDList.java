@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.query.rknn;
+package de.lmu.ifi.dbs.elki.database.ids.distance;
 
 /*
  This file is part of ELKI:
@@ -24,32 +24,25 @@ package de.lmu.ifi.dbs.elki.database.query.rknn;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-
 /**
- * Instance for the query on a particular database.
+ * Modifiable API for Distance-DBID results
  * 
  * @author Erich Schubert
+ *
+ * @param <D> Distance type
  */
-public abstract class AbstractRKNNQuery<O, D extends Distance<D>> extends AbstractDataBasedQuery<O> implements RKNNQuery<O, D> {
+public interface ModifiableDistanceDBIDList<D extends Distance<D>> extends DistanceDBIDList<D> {
   /**
-   * Hold the distance function to be used.
-   */
-  protected final DistanceQuery<O, D> distanceQuery;
-
-  /**
-   * Constructor.
+   * Add an object to this result.
    * 
-   * @param distanceQuery distance query
+   * @param distance Distance to add
+   * @param id DBID to add
    */
-  public AbstractRKNNQuery(DistanceQuery<O, D> distanceQuery) {
-    super(distanceQuery.getRelation());
-    this.distanceQuery = distanceQuery;
-  }
+  public void add(D distance, DBIDRef id);
 
-  @Override
-  abstract public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k);
+  /**
+   * Sort the result in ascending order
+   */
+  public void sort();
 }

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
+package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 /*
  This file is part of ELKI:
@@ -23,14 +23,14 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
 /**
@@ -38,10 +38,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf DoubleDistanceDBIDPair
- * @apiviz.has DoubleDistanceDBIDResultIter
+ * @param <D> Distance type
  */
-public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
+public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D> {
   /**
    * The value of k this was materialized for.
    */
@@ -50,26 +49,7 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
   /**
    * The actual data array.
    */
-  private final DoubleDistanceDBIDPair[] data;
-
-  /**
-   * Constructor. This will <em>clone</em> the given collection!
-   * 
-   * @param col Existing collection
-   * @param k K parameter
-   */
-  public DoubleDistanceKNNList(Collection<DoubleDistanceDBIDPair> col, int k) {
-    super();
-    this.data = new DoubleDistanceDBIDPair[col.size()];
-    this.k = k;
-    assert (col.size() >= this.k) : "Collection doesn't contain enough objects!";
-    // Get sorted data from heap; but in reverse.
-    Iterator<DoubleDistanceDBIDPair> it = col.iterator();
-    for(int i = 0; it.hasNext(); i++) {
-      data[i] = it.next();
-    }
-    assert (data.length == 0 || data[0] != null);
-  }
+  private final Object[] data;
 
   /**
    * Constructor, to be called from KNNHeap only. Use {@link KNNHeap#toKNNList}
@@ -77,9 +57,9 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
    * 
    * @param heap Calling heap
    */
-  protected DoubleDistanceKNNList(DoubleDistanceKNNHeap heap) {
+  protected DistanceDBIDPairKNNList(KNNHeap<D> heap) {
     super();
-    this.data = new DoubleDistanceDBIDPair[heap.size()];
+    this.data = new Object[heap.size()];
     this.k = heap.getK();
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
@@ -94,20 +74,19 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
   }
 
   /**
-   * Constructor, to be called from KNNHeap only. Use {@link KNNHeap#toKNNList}
-   * instead!
+   * Constructor. With a KNNHeap, use {@link KNNHeap#toKNNList} instead!
    * 
    * @param heap Calling heap
-   * @param k Target number of neighbors (before ties)
+   * @param k K value
    */
-  public DoubleDistanceKNNList(Heap<DoubleDistanceDBIDPair> heap, int k) {
+  public DistanceDBIDPairKNNList(Heap<? extends DistanceDBIDPair<D>> heap, int k) {
     super();
-    this.data = new DoubleDistanceDBIDPair[heap.size()];
+    this.data = new Object[heap.size()];
     this.k = k;
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
-    while(heap.size() > 0) {
+    while(!heap.isEmpty()) {
       i--;
       assert (i >= 0);
       data[i] = heap.poll();
@@ -121,32 +100,17 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
     return k;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @deprecated use doubleKNNDistance()!
-   */
   @Override
-  @Deprecated
-  public DoubleDistance getKNNDistance() {
+  public D getKNNDistance() {
     return get(getK() - 1).getDistance();
-  }
-
-  /**
-   * Get the kNN distance as double value.
-   * 
-   * @return Distance
-   */
-  public double doubleKNNDistance() {
-    return get(getK() - 1).doubleDistance();
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
-    for(DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
-      buf.append(iter.doubleDistance()).append(':').append(DBIDUtil.toString(iter));
+    for(DistanceDBIDListIter<D> iter = this.iter(); iter.valid();) {
+      buf.append(iter.getDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
       if(iter.valid()) {
         buf.append(',');
@@ -156,13 +120,14 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
     return buf.toString();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public DoubleDistanceDBIDPair get(int index) {
-    return data[index];
+  public DistanceDBIDPair<D> get(int index) {
+    return (DistanceDBIDPair<D>) data[index];
   }
 
   @Override
-  public DoubleDistanceDBIDResultIter iter() {
+  public DistanceDBIDListIter<D> iter() {
     return new Itr();
   }
 
@@ -193,7 +158,7 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
    * 
    * @apiviz.exclude
    */
-  private class Itr implements DoubleDistanceDBIDResultIter {
+  private class Itr implements DistanceDBIDListIter<D> {
     /**
      * Cursor position.
      */
@@ -214,24 +179,13 @@ public class DoubleDistanceKNNList implements KNNResult<DoubleDistance> {
       pos++;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @deprecated use {@link #doubleDistance}!
-     */
     @Override
-    @Deprecated
-    public DoubleDistance getDistance() {
+    public D getDistance() {
       return get(pos).getDistance();
     }
 
     @Override
-    public double doubleDistance() {
-      return get(pos).doubleDistance();
-    }
-
-    @Override
-    public DoubleDistanceDBIDPair getDistancePair() {
+    public DistanceDBIDPair<D> getDistancePair() {
       return get(pos);
     }
   }

@@ -49,13 +49,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -358,8 +358,8 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    * @param distFunc the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private Map<DBID, DistanceDBIDResult<DoubleDistance>> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
-    Map<DBID, DistanceDBIDResult<DoubleDistance>> result = new HashMap<>();
+  private Map<DBID, DistanceDBIDList<DoubleDistance>> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
+    Map<DBID, DistanceDBIDList<DoubleDistance>> result = new HashMap<>();
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       DBID m = DBIDUtil.deref(iter);
@@ -379,7 +379,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
 
       // determine points in sphere centered at m with radius minDist
       assert minDist != null;
-      DistanceDBIDResult<DoubleDistance> qr = rangeQuery.getRangeForDBID(m, minDist);
+      DistanceDBIDList<DoubleDistance> qr = rangeQuery.getRangeForDBID(m, minDist);
       result.put(m, qr);
     }
 
@@ -398,7 +398,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
    */
   private Map<DBID, TIntSet> findDimensions(DBIDs medoids, Relation<V> database, DistanceQuery<V, DoubleDistance> distFunc, RangeQuery<V, DoubleDistance> rangeQuery) {
     // get localities
-    Map<DBID, DistanceDBIDResult<DoubleDistance>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
+    Map<DBID, DistanceDBIDList<DoubleDistance>> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
     int dim = RelationUtil.dimensionality(database);
@@ -407,7 +407,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       DBID m_i = DBIDUtil.deref(iter);
       V medoid_i = database.get(m_i);
-      DistanceDBIDResult<DoubleDistance> l_i = localities.get(m_i);
+      DistanceDBIDList<DoubleDistance> l_i = localities.get(m_i);
       double[] x_i = new double[dim];
       for(DBIDIter qr = l_i.iter(); qr.valid(); qr.advance()) {
         V o = database.get(qr);

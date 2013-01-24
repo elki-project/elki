@@ -37,6 +37,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -45,10 +49,6 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNList;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -301,17 +301,17 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNResult<D> neighbors = knnReach.getKNNForDBID(iter, k);
+      final KNNList<D> neighbors = knnReach.getKNNForDBID(iter, k);
       double sum = 0.0;
       int count = 0;
-      if (neighbors instanceof DoubleDistanceKNNList) {
+      if (neighbors instanceof DoubleDistanceDBIDPairKNNList) {
         // Fast version for double distances
-        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
+            KNNList<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
             final double nkdist;
-            if (neighborsNeighbors instanceof DoubleDistanceKNNList) {
-              nkdist = ((DoubleDistanceKNNList) neighborsNeighbors).doubleKNNDistance();
+            if (neighborsNeighbors instanceof DoubleDistanceDBIDPairKNNList) {
+              nkdist = ((DoubleDistanceDBIDPairKNNList) neighborsNeighbors).doubleKNNDistance();
             } else {
               nkdist = neighborsNeighbors.getKNNDistance().doubleValue();
             }
@@ -320,9 +320,9 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
           }
         }
       } else {
-        for (DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for (DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
-            KNNResult<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
+            KNNList<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
             sum += Math.max(neighbor.getDistance().doubleValue(), neighborsNeighbors.getKNNDistance().doubleValue());
             count++;
           }
@@ -360,7 +360,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       final double lrdp = lrds.doubleValue(iter);
       final double lof;
       if (lrdp > 0) {
-        final KNNResult<D> neighbors = knnRefer.getKNNForDBID(iter, k);
+        final KNNList<D> neighbors = knnRefer.getKNNForDBID(iter, k);
         double sum = 0.0;
         int count = 0;
         for (DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {

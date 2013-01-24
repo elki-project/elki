@@ -37,14 +37,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -115,7 +115,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     DBIDs ids = relation.getDBIDs();
 
     // FIXME: implicit preprocessor.
-    WritableDataStore<KNNResult<D>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNResult.class);
+    WritableDataStore<KNNList<D>> nMinPts = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNList.class);
     WritableDoubleDataStore coreDistance = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     WritableIntegerDataStore minPtsNeighborhoodSize = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
 
@@ -123,7 +123,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
     // N_minpts(id) and core-distance(id)
 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNResult<D> minptsNeighbours = knnQuery.getKNNForDBID(iditer, minpts);
+      KNNList<D> minptsNeighbours = knnQuery.getKNNForDBID(iditer, minpts);
       D d = minptsNeighbours.getKNNDistance();
       nMinPts.put(iditer, minptsNeighbours);
       coreDistance.putDouble(iditer, d.doubleValue());
@@ -137,7 +137,7 @@ public class OPTICSOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanc
       List<Double> core = new ArrayList<>();
       double lrd = 0;
       // TODO: optimize for double distances
-      for (DistanceDBIDResultIter<D> neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
+      for (DistanceDBIDListIter<D> neighbor = nMinPts.get(iditer).iter(); neighbor.valid(); neighbor.advance()) {
         double coreDist = coreDistance.doubleValue(neighbor);
         double dist = distQuery.distance(iditer, neighbor).doubleValue();
         double rd = Math.max(coreDist, dist);

@@ -38,11 +38,11 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
@@ -142,7 +142,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
     if(LOG.isVerbose()) {
       LOG.verbose("knnJoin...");
     }
-    DataStore<KNNResult<D>> knns = knnJoin.run(database, relation);
+    DataStore<KNNList<D>> knns = knnJoin.run(database, relation);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("DeLiClu", relation.size(), LOG) : null;
     final int size = relation.size();
@@ -218,7 +218,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
    * @param nodePair the pair of nodes to be expanded
    * @param knns the knn list
    */
-  private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNResult<D>> knns) {
+  private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV, D> distFunction, SpatialObjectPair nodePair, DataStore<KNNList<D>> knns) {
     DeLiCluNode node1 = index.getNode(((SpatialDirectoryEntry) nodePair.entry1).getPageID());
     DeLiCluNode node2 = index.getNode(((SpatialDirectoryEntry) nodePair.entry2).getPageID());
 
@@ -275,7 +275,7 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
    * @param node2 the second node
    * @param knns the knn list
    */
-  private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNResult<D>> knns) {
+  private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList<D>> knns) {
     if(LOG.isDebuggingFinest()) {
       LOG.debugFinest("ExpandLeafNodes: " + node1.getPageID() + " + " + node2.getPageID());
     }
@@ -311,12 +311,12 @@ public class DeLiClu<NV extends NumberVector<?>, D extends Distance<D>> extends 
    * @param path the path of the object inserted last
    * @param knns the knn list
    */
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNResult<D>> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, DataStore<KNNList<D>> knns) {
     SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry) path.remove(0).getEntry();
     reinsertExpanded(distFunction, index, path, 0, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialDirectoryEntry parentEntry, DataStore<KNNResult<D>> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV, D> distFunction, DeLiCluTree index, List<TreeIndexPathComponent<DeLiCluEntry>> path, int pos, SpatialDirectoryEntry parentEntry, DataStore<KNNList<D>> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry.getPageID());
     SpatialEntry entry2 = path.get(pos).getEntry();
 

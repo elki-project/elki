@@ -29,9 +29,9 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -56,11 +56,11 @@ public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends
   }
 
   @Override
-  public List<? extends KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<? extends KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // throw new
     // UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
     // TODO: optimize
-    List<KNNResult<D>> ret = new ArrayList<>(ids.size());
+    List<KNNList<D>> ret = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       ret.add(getKNNForDBID(iter, k));
     }
@@ -68,10 +68,10 @@ public abstract class AbstractDistanceKNNQuery<O, D extends Distance<D>> extends
   }
 
   @Override
-  public KNNResult<D> getKNNForDBID(DBIDRef id, int k) {
+  public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
     return getKNNForObject(relation.get(id), k);
   }
 
   @Override
-  abstract public KNNResult<D> getKNNForObject(O obj, int k);
+  abstract public KNNList<D> getKNNForObject(O obj, int k);
 }

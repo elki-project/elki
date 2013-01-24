@@ -33,13 +33,13 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -139,14 +139,14 @@ public class LDOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNResult<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
+      KNNList<D> neighbors = knnQuery.getKNNForDBID(iditer, k);
       // skip the point itself
       dxp.reset(); Dxp.reset();
       // TODO: optimize for double distances
-      for (DistanceDBIDResultIter<D> neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
+      for (DistanceDBIDListIter<D> neighbor1 = neighbors.iter(); neighbor1.valid(); neighbor1.advance()) {
         if(!DBIDUtil.equal(neighbor1, iditer)) {
           dxp.put(neighbor1.getDistance().doubleValue());
-          for (DistanceDBIDResultIter<D> neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
+          for (DistanceDBIDListIter<D> neighbor2 = neighbors.iter(); neighbor2.valid(); neighbor2.advance()) {
             if(!DBIDUtil.equal(neighbor1, neighbor2) && !DBIDUtil.equal(neighbor2, iditer)) {
               Dxp.put(distFunc.distance(neighbor1, neighbor2).doubleValue());
             }

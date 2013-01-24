@@ -32,11 +32,11 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
@@ -113,7 +113,7 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("assigning nearest neighbor lists", relation.size(), getLogger()) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       ArrayModifiableDBIDs neighbors = DBIDUtil.newArray(numberOfNeighbors);
-      KNNResult<D> kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
+      KNNList<D> kNN = knnquery.getKNNForDBID(iditer, numberOfNeighbors);
       for (DBIDIter iter = kNN.iter(); iter.valid(); iter.advance()) {
         // if(!id.equals(nid)) {
         neighbors.add(iter);

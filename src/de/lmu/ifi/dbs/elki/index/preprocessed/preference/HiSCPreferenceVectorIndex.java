@@ -34,11 +34,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -118,7 +118,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
         msg.append("\n knns: ");
       }
 
-      KNNResult<DoubleDistance> knns = knnQuery.getKNNForDBID(it, k);
+      KNNList<DoubleDistance> knns = knnQuery.getKNNForDBID(it, k);
       BitSet preferenceVector = determinePreferenceVector(relation, it, knns, msg);
       storage.put(it, preferenceVector);
 

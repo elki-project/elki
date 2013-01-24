@@ -24,14 +24,22 @@ package de.lmu.ifi.dbs.elki.distance.distanceresultlist;
  */
 
 import java.util.AbstractList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DistanceDBIDPairKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -52,6 +60,11 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 public final class KNNUtil {
   /**
+   * Static comparator for heaps.
+   */
+  public static final Comparator<? super DistanceDBIDPair<?>> REVERSE_COMPARATOR = new ReverseComparator();
+
+  /**
    * Fake constructor: do not instantiate.
    */
   private KNNUtil() {
@@ -71,9 +84,9 @@ public final class KNNUtil {
   @SuppressWarnings("unchecked")
   public static <D extends Distance<D>> KNNHeap<D> newHeap(DistanceFunction<?, D> df, int k) {
     if (DistanceUtil.isDoubleDistanceFunction(df)) {
-      return (KNNHeap<D>) new DoubleDistanceKNNHeap(k);
+      return (KNNHeap<D>) new DoubleDistanceDBIDPairKNNHeap(k);
     }
-    return new GenericKNNHeap<>(k);
+    return new DistanceDBIDPairKNNHeap<>(k);
   }
 
   /**
@@ -89,9 +102,9 @@ public final class KNNUtil {
   @SuppressWarnings("unchecked")
   public static <D extends Distance<D>> KNNHeap<D> newHeap(DistanceQuery<?, D> df, int k) {
     if (DistanceUtil.isDoubleDistanceFunction(df)) {
-      return (KNNHeap<D>) new DoubleDistanceKNNHeap(k);
+      return (KNNHeap<D>) new DoubleDistanceDBIDPairKNNHeap(k);
     }
-    return new GenericKNNHeap<>(k);
+    return new DistanceDBIDPairKNNHeap<>(k);
   }
 
   /**
@@ -107,9 +120,9 @@ public final class KNNUtil {
   @SuppressWarnings("unchecked")
   public static <D extends Distance<D>> KNNHeap<D> newHeap(D factory, int k) {
     if (factory instanceof DoubleDistance) {
-      return (KNNHeap<D>) new DoubleDistanceKNNHeap(k);
+      return (KNNHeap<D>) new DoubleDistanceDBIDPairKNNHeap(k);
     }
-    return new GenericKNNHeap<>(k);
+    return new DistanceDBIDPairKNNHeap<>(k);
   }
 
   /**
@@ -120,16 +133,16 @@ public final class KNNUtil {
    * @return New heap
    */
   @SuppressWarnings("unchecked")
-  public static <D extends Distance<D>> KNNHeap<D> newHeap(KNNResult<D> exist) {
-    if (exist instanceof DoubleDistanceKNNList) {
-      DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(exist.getK());
+  public static <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
+    if (exist instanceof DoubleDistanceDBIDPairKNNList) {
+      DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
         heap.add((DoubleDistanceDBIDPair) exist.get(i));
       }
       return (KNNHeap<D>) heap;
     } else {
-      GenericKNNHeap<D> heap = new GenericKNNHeap<>(exist.getK());
+      DistanceDBIDPairKNNHeap<D> heap = new DistanceDBIDPairKNNHeap<>(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {
         heap.add(exist.get(i));
@@ -145,7 +158,7 @@ public final class KNNUtil {
    * 
    * @param <D> Distance
    */
-  protected static class KNNSubList<D extends Distance<D>> implements KNNResult<D> {
+  protected static class KNNSubList<D extends Distance<D>> implements KNNList<D> {
     /**
      * Parameter k.
      */
@@ -159,7 +172,7 @@ public final class KNNUtil {
     /**
      * Wrapped inner result.
      */
-    private final KNNResult<D> inner;
+    private final KNNList<D> inner;
 
     /**
      * Constructor.
@@ -167,7 +180,7 @@ public final class KNNUtil {
      * @param inner Inner instance
      * @param k k value
      */
-    public KNNSubList(KNNResult<D> inner, int k) {
+    public KNNSubList(KNNList<D> inner, int k) {
       this.inner = inner;
       this.k = k;
       // Compute list size
@@ -202,7 +215,7 @@ public final class KNNUtil {
     }
 
     @Override
-    public DistanceDBIDResultIter<D> iter() {
+    public DistanceDBIDListIter<D> iter() {
       return new Itr();
     }
 
@@ -233,7 +246,7 @@ public final class KNNUtil {
      * 
      * @apiviz.exclude
      */
-    private class Itr implements DistanceDBIDResultIter<D> {
+    private class Itr implements DistanceDBIDListIter<D> {
       /**
        * Current position.
        */
@@ -275,14 +288,14 @@ public final class KNNUtil {
     /**
      * The real iterator.
      */
-    DistanceDBIDResultIter<D> itr;
+    DistanceDBIDListIter<D> itr;
 
     /**
      * Constructor.
      * 
      * @param distanceDBIDResultIter Iterator
      */
-    protected DistanceItr(DistanceDBIDResultIter<D> distanceDBIDResultIter) {
+    protected DistanceItr(DistanceDBIDListIter<D> distanceDBIDResultIter) {
       super();
       this.itr = distanceDBIDResultIter;
     }
@@ -316,14 +329,14 @@ public final class KNNUtil {
     /**
      * The true list.
      */
-    final KNNResult<D> parent;
+    final KNNList<D> parent;
 
     /**
      * Constructor.
      * 
      * @param parent Owner
      */
-    public DistanceView(KNNResult<D> parent) {
+    public DistanceView(KNNList<D> parent) {
       super();
       this.parent = parent;
     }
@@ -345,13 +358,28 @@ public final class KNNUtil {
   }
 
   /**
+   * Comparator to use for heaps.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  protected static class ReverseComparator implements Comparator<DistanceDBIDPair<?>> {
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compare(DistanceDBIDPair<?> o1, DistanceDBIDPair<?> o2) {
+      return -((DistanceDBIDPair<DoubleDistance>)o1).compareByDistance((DistanceDBIDPair<DoubleDistance>)o2);
+    }
+  }
+
+  /**
    * View as list of distances.
    * 
    * @param list Result to proxy
    * @param <D> distance type
    * @return List of distances view
    */
-  public static <D extends Distance<D>> List<D> asDistanceList(KNNResult<D> list) {
+  public static <D extends Distance<D>> List<D> asDistanceList(KNNList<D> list) {
     return new DistanceView<>(list);
   }
 
@@ -363,7 +391,7 @@ public final class KNNUtil {
    * @param <D> distance type
    * @return Subset
    */
-  public static <D extends Distance<D>> KNNResult<D> subList(KNNResult<D> list, int k) {
+  public static <D extends Distance<D>> KNNList<D> subList(KNNList<D> list, int k) {
     if (k >= list.size()) {
       return list;
     }

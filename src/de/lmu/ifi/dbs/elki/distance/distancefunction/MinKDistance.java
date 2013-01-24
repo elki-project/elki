@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -33,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -158,7 +158,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
 
     @Override
     public D distance(DBIDRef id1, DBIDRef id2) {
-      KNNResult<D> neighborhood = knnQuery.getKNNForDBID(id1, k);
+      KNNList<D> neighborhood = knnQuery.getKNNForDBID(id1, k);
       D truedist = parentDistanceQuery.distance(id1, id2);
       return computeReachdist(neighborhood, truedist);
     }
@@ -177,7 +177,7 @@ public class MinKDistance<O, D extends Distance<D>> extends AbstractDatabaseDist
    * @param truedist True distance
    * @return Reachability distance
    */
-  protected D computeReachdist(KNNResult<D> neighborhood, D truedist) {
+  protected D computeReachdist(KNNList<D> neighborhood, D truedist) {
     // TODO: need to check neighborhood size?
     // TODO: Do we need to check we actually got the object itself in the
     // neighborhood?

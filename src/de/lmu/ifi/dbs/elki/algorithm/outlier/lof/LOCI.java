@@ -37,14 +37,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -153,7 +153,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
     // LOCI preprocessing step
     WritableDataStore<ArrayList<DoubleIntPair>> interestingDistances = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_SORTED, ArrayList.class);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
+      DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(iditer, rmax);
       // build list of critical distances
       ArrayList<DoubleIntPair> cdist = new ArrayList<>(neighbors.size() << 1);
       {
@@ -206,7 +206,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
       if(maxneig >= nmin) {
         D range = distFunc.getDistanceFactory().fromDouble(maxdist);
         // Compute the largest neighborhood we will need.
-        DistanceDBIDResult<D> maxneighbors = rangeQuery.getRangeForDBID(iditer, range);
+        DistanceDBIDList<D> maxneighbors = rangeQuery.getRangeForDBID(iditer, range);
         // TODO: Ensure the set is sorted. Should be a no-op with most indexes.
         // For any critical distance, compute the normalized MDEF score.
         for(DoubleIntPair c : cdist) {
@@ -221,7 +221,7 @@ public class LOCI<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBas
           // compute \hat{n}(p_i, r, \alpha) and the corresponding \simga_{MDEF}
           MeanVariance mv_n_r_alpha = new MeanVariance();
           // TODO: optimize for double distances
-          for (DistanceDBIDResultIter<D> neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for (DistanceDBIDListIter<D> neighbor = maxneighbors.iter(); neighbor.valid(); neighbor.advance()) {
             // Stop at radius r
             if(neighbor.getDistance().doubleValue() > r) {
               break;

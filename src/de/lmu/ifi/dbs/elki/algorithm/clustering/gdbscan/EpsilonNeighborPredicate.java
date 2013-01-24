@@ -32,11 +32,11 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -109,7 +109,7 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
    * 
    * @author Erich Schubert
    */
-  public static class Instance<D extends Distance<D>> implements NeighborPredicate.Instance<DistanceDBIDResult<D>> {
+  public static class Instance<D extends Distance<D>> implements NeighborPredicate.Instance<DistanceDBIDList<D>> {
     /**
      * Range to query with
      */
@@ -145,12 +145,12 @@ public class EpsilonNeighborPredicate<O, D extends Distance<D>> implements Neigh
     }
 
     @Override
-    public DistanceDBIDResult<D> getNeighbors(DBIDRef reference) {
+    public DistanceDBIDList<D> getNeighbors(DBIDRef reference) {
       return rq.getRangeForDBID(reference, epsilon);
     }
 
     @Override
-    public void addDBIDs(ModifiableDBIDs ids, DistanceDBIDResult<D> neighbors) {
+    public void addDBIDs(ModifiableDBIDs ids, DistanceDBIDList<D> neighbors) {
       ids.addDBIDs(neighbors);
     }
   }

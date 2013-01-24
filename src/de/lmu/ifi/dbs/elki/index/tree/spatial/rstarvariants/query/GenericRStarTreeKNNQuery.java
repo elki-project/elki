@@ -37,12 +37,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
@@ -227,7 +227,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
   }
 
   @Override
-  public KNNResult<D> getKNNForObject(O obj, int k) {
+  public KNNList<D> getKNNForObject(O obj, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -238,7 +238,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
   }
 
   @Override
-  public List<KNNResult<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+  public List<KNNList<D>> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(k < 1) {
       throw new IllegalArgumentException("At least one enumeration has to be requested!");
     }
@@ -250,7 +250,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
     batchNN(tree.getRoot(), knnLists);
 
-    List<KNNResult<D>> result = new ArrayList<>();
+    List<KNNList<D>> result = new ArrayList<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       result.add(knnLists.get(DBIDUtil.deref(iter)).toKNNList());
     }

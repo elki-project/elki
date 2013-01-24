@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import experimentalcode.erich.parallel.MapExecutor;
 import experimentalcode.erich.parallel.SharedDouble;
 
@@ -43,7 +43,7 @@ public class LOFMapper implements Mapper {
   /**
    * KNN store
    */
-  private DataStore<? extends KNNResult<?>> knns;
+  private DataStore<? extends KNNList<?>> knns;
 
   /**
    * LRD store
@@ -61,7 +61,7 @@ public class LOFMapper implements Mapper {
    * @param knns k nearest neighbors
    * @param kdists k distances
    */
-  public LOFMapper(DataStore<? extends KNNResult<?>> knns, DoubleDataStore lrds) {
+  public LOFMapper(DataStore<? extends KNNList<?>> knns, DoubleDataStore lrds) {
     super();
     this.knns = knns;
     this.lrds = lrds;
@@ -104,7 +104,7 @@ public class LOFMapper implements Mapper {
 
     @Override
     public void map(DBIDRef id) {
-      KNNResult<?> knn = knns.get(id);
+      KNNList<?> knn = knns.get(id);
       double avlrd = 0.0;
       int cnt = 0;
       for (DBIDIter n = knn.iter(); n.valid(); n.advance()) {

@@ -36,13 +36,13 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -148,11 +148,11 @@ public class NaiveMeanShiftClustering<V extends NumberVector<?>, D extends Numbe
         // Compute new position:
         V newvec = null;
         {
-          DistanceDBIDResult<D> neigh = rangeq.getRangeForObject(position, range);
+          DistanceDBIDList<D> neigh = rangeq.getRangeForObject(position, range);
           boolean okay = (neigh.size() > 1) || (neigh.size() >= 1 && j > 1);
           if (okay) {
             Centroid newpos = new Centroid(dim);
-            for (DistanceDBIDResultIter<D> niter = neigh.iter(); niter.valid(); niter.advance()) {
+            for (DistanceDBIDListIter<D> niter = neigh.iter(); niter.valid(); niter.advance()) {
               final double weight = kernel.density(niter.getDistance().doubleValue() / bandwidth);
               newpos.put(relation.get(niter), weight);
             }

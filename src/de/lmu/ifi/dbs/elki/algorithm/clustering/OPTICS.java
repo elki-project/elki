@@ -31,17 +31,17 @@ import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResult;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceDBIDResultIter;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -190,12 +190,12 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      DistanceDBIDResult<D> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+      DistanceDBIDList<D> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       if(neighbors.size() >= minpts) {
         final DistanceDBIDPair<D> last = neighbors.get(minpts - 1);
         D coreDistance = last.getDistance();
 
-        for(DistanceDBIDResultIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+        for(DistanceDBIDListIter<D> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
           if(processedIDs.contains(neighbor)) {
             continue;
           }
@@ -229,13 +229,13 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
       clusterOrder.add(current);
       processedIDs.add(current.getID());
 
-      DistanceDBIDResult<DoubleDistance> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
+      DistanceDBIDList<DoubleDistance> neighbors = rangeQuery.getRangeForDBID(current.getID(), epsilon);
       if(neighbors.size() >= minpts) {
         final DistanceDBIDPair<DoubleDistance> last = neighbors.get(minpts - 1);
         if(last instanceof DoubleDistanceDBIDPair) {
           double coreDistance = ((DoubleDistanceDBIDPair) last).doubleDistance();
 
-          for(DistanceDBIDResultIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for(DistanceDBIDListIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }
@@ -248,7 +248,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
           // Only if we got an optimized result before.
           double coreDistance = last.getDistance().doubleValue();
 
-          for(DistanceDBIDResultIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+          for(DistanceDBIDListIter<DoubleDistance> neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
             if(processedIDs.contains(neighbor)) {
               continue;
             }

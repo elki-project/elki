@@ -37,14 +37,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
@@ -84,7 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
-public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNResult<D>>> {
+public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, D, DataStore<KNNList<D>>> {
   /**
    * The logger for this class.
    */
@@ -120,7 +120,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
    * @return result
    */
   @SuppressWarnings("unchecked")
-  public WritableDataStore<KNNResult<D>> run(Database database, Relation<V> relation) {
+  public WritableDataStore<KNNList<D>> run(Database database, Relation<V> relation) {
     if (!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
@@ -217,7 +217,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
       fprogress.setCompleted(LOG);
     }
 
-    WritableDataStore<KNNResult<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNResult.class);
+    WritableDataStore<KNNList<D>> knnLists = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC, KNNList.class);
     // FiniteProgress progress = logger.isVerbose() ? new
     // FiniteProgress(this.getClass().getName(), relation.size(), logger) :
     // null;
@@ -285,7 +285,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
     if (DistanceUtil.isDoubleDistanceFunction(distFunction)) {
       List<?> khp = (List<?>) pr_heaps;
       List<?> khs = (List<?>) ps_heaps;
-      processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<DoubleDistanceKNNHeap>) khp, (List<DoubleDistanceKNNHeap>) khs);
+      processDataPagesDouble((SpatialPrimitiveDoubleDistanceFunction<? super V>) distFunction, pr, ps, (List<DoubleDistanceDBIDPairKNNHeap>) khp, (List<DoubleDistanceDBIDPairKNNHeap>) khs);
     } else {
       for (int j = 0; j < ps.getNumEntries(); j++) {
         final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
@@ -312,7 +312,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
    * @param pr_heaps the knn lists for each data object
    * @param ps_heaps the knn lists for each data object in ps
    */
-  private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<DoubleDistanceKNNHeap> pr_heaps, List<DoubleDistanceKNNHeap> ps_heaps) {
+  private void processDataPagesDouble(SpatialPrimitiveDoubleDistanceFunction<? super V> df, N pr, N ps, List<DoubleDistanceDBIDPairKNNHeap> pr_heaps, List<DoubleDistanceDBIDPairKNNHeap> ps_heaps) {
     // Compare pairwise
     for (int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);

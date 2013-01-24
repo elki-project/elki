@@ -32,13 +32,13 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultIter;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNResult;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
@@ -277,8 +277,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
         DBIDs selection = selContext.getSelectedIds();
 
         for(DBIDIter i = selection.iter(); i.valid(); i.advance()) {
-          final KNNResult<D> knn = result.get(i);
-          for(DistanceDBIDResultIter<D> iter = knn.iter(); iter.valid(); iter.advance()) {
+          final KNNList<D> knn = result.get(i);
+          for(DistanceDBIDListIter<D> iter = knn.iter(); iter.valid(); iter.advance()) {
             try {
               double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
               Element dot = svgp.svgCircle(v[0], v[1], size);
