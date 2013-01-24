@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
  * 
  * @param <O> Object type
  */
-public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveDistanceKNNQuery<O, DoubleDistance> {
+public class DoubleOptimizedKNNQuery<O> extends LinearScanKNNQuery<O, DoubleDistance> {
   /**
    * Raw distance function.
    */
@@ -59,10 +59,10 @@ public class LinearScanRawDoubleDistanceKNNQuery<O> extends LinearScanPrimitiveD
    * @param distanceQuery Distance function to use
    */
   @SuppressWarnings("unchecked")
-  public LinearScanRawDoubleDistanceKNNQuery(PrimitiveDistanceQuery<O, DoubleDistance> distanceQuery) {
+  public DoubleOptimizedKNNQuery(PrimitiveDistanceQuery<O, DoubleDistance> distanceQuery) {
     super(distanceQuery);
     if (!(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction)) {
-      throw new UnsupportedOperationException("LinearScanRawDoubleDistance instantiated for non-RawDoubleDistance!");
+      throw new UnsupportedOperationException("DoubleOptimizedKNNQuery instantiated for non-PrimitiveDoubleDistanceFunction!");
     }
     rawdist = (PrimitiveDoubleDistanceFunction<O>) distanceQuery.getDistanceFunction();
   }

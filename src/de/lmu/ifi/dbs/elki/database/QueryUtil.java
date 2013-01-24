@@ -28,10 +28,10 @@ import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanRawDoubleDistanceKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.DoubleOptimizedKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRangeQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.LinearScanRawDoubleDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.DoubleOptimizedRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
@@ -233,7 +233,7 @@ public final class QueryUtil {
       if(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
         @SuppressWarnings("unchecked")
-        final KNNQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceKNNQuery<>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        final KNNQuery<O, ?> knnQuery = new DoubleOptimizedKNNQuery<>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
         @SuppressWarnings("unchecked")
         final KNNQuery<O, D> castQuery = (KNNQuery<O, D>) knnQuery;
         return castQuery;
@@ -260,7 +260,7 @@ public final class QueryUtil {
       if(distanceQuery.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         final PrimitiveDistanceQuery<O, ?> pdq = (PrimitiveDistanceQuery<O, ?>) distanceQuery;
         @SuppressWarnings("unchecked")
-        final RangeQuery<O, ?> knnQuery = new LinearScanRawDoubleDistanceRangeQuery<>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
+        final RangeQuery<O, ?> knnQuery = new DoubleOptimizedRangeQuery<>((PrimitiveDistanceQuery<O, DoubleDistance>) pdq);
         @SuppressWarnings("unchecked")
         final RangeQuery<O, D> castQuery = (RangeQuery<O, D>) knnQuery;
         return castQuery;
