@@ -27,6 +27,8 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayDBIDs;
@@ -505,6 +507,32 @@ public final class DBIDUtil {
     return DBIDFactory.FACTORY.newDistancePair(dist, id);
   }
 
+  /**
+   * Create an appropriate heap for the distance type.
+   * 
+   * This will use a double heap if appropriate.
+   * 
+   * @param distancetype distance prototype
+   * @param k K value
+   * @param <D> distance type
+   * @return New heap of size k, appropriate for this distance type.
+   */
+  public static <D extends Distance<D>> KNNHeap<D> newHeap(D distancetype, int k) {
+    return DBIDFactory.FACTORY.newHeap(distancetype, k);
+  }
+
+  /**
+   * Build a new heap from a given list.
+   * 
+   * @param exist Existing result
+   * @param <D> Distance type
+   * @return New heap
+   */
+  public static <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
+    return DBIDFactory.FACTORY.newHeap(exist);
+  }
+
+  
   /**
    * Produce a random sample of the given DBIDs.
    * 

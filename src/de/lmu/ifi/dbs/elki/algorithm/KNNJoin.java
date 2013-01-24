@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
@@ -45,7 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -262,7 +262,7 @@ public class KNNJoin<V extends NumberVector<?>, D extends Distance<D>, N extends
     List<KNNHeap<D>> pr_heaps = new ArrayList<>(pr.getNumEntries());
     // Create for each data object a knn heap
     for (int j = 0; j < pr.getNumEntries(); j++) {
-      pr_heaps.add(KNNUtil.newHeap(distFunction, k));
+      pr_heaps.add(DBIDUtil.newHeap(distFunction.getDistanceFactory(), k));
     }
     // Self-join first, as this is expected to improve most and cannot be
     // pruned.

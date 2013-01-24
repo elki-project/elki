@@ -46,7 +46,7 @@ public final class DistanceDBIDResultUtil {
    * @return comparator
    */
   @SuppressWarnings("unchecked")
-  public static <D extends DistanceDBIDPair<?>> Comparator<D> distanceComparator() {
+  public static <D extends DistanceDBIDPair<?>> Comparator<? super D> distanceComparator() {
     return (Comparator<D>) BY_DISTANCE_THEN_DBID;
   }
 
@@ -69,6 +69,17 @@ public final class DistanceDBIDResultUtil {
     public int compare(DistanceDBIDPair<?> o1, DistanceDBIDPair<?> o2) {
       final int d = ((DistanceDBIDPair<DoubleDistance>)o1).compareByDistance((DistanceDBIDPair<DoubleDistance>)o2);
       return (d == 0) ? DBIDUtil.compare(o1, o2) : d;
+    }
+  };
+
+  /**
+   * Static comparator for heaps.
+   */
+  public static final Comparator<DistanceDBIDPair<?>> BY_REVERSE_DISTANCE = new Comparator<DistanceDBIDPair<?>>() {
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compare(DistanceDBIDPair<?> o1, DistanceDBIDPair<?> o2) {
+      return -((DistanceDBIDPair<DoubleDistance>)o1).compareByDistance((DistanceDBIDPair<DoubleDistance>)o2);
     }
   };
 

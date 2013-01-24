@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
+import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 
@@ -51,7 +51,7 @@ abstract class AbstractKNNHeap<P extends DistanceDBIDPair<D>, D extends Distance
    */
   public AbstractKNNHeap(int k) {
     super();
-    heap = new TiedTopBoundedHeap<>(k, KNNUtil.REVERSE_COMPARATOR);
+    heap = new TiedTopBoundedHeap<>(k, DistanceDBIDResultUtil.BY_REVERSE_DISTANCE);
   }
 
   /**

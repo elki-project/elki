@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -121,7 +120,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       }
       HashMap<DBIDPair, D> cache = new HashMap<>((size * size * 3) >> 3);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        KNNHeap<D> kNN = KNNUtil.newHeap(distanceFunction, k);
+        KNNHeap<D> kNN = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
           D d = cache.remove(key);

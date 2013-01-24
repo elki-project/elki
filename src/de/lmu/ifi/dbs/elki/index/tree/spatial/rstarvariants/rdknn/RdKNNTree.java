@@ -40,8 +40,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
@@ -139,7 +138,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   protected void preInsert(RdKNNEntry<D> entry) {
-    KNNHeap<D> knns_o = KNNUtil.newHeap(distanceFunction, k_max);
+    KNNHeap<D> knns_o = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k_max);
     preInsert(entry, getRootEntry(), knns_o);
   }
 

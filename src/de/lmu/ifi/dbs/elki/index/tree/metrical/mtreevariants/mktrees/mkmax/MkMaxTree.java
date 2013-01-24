@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
@@ -154,7 +153,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected void preInsert(MkMaxEntry<D> entry) {
-    KNNHeap<D> knns_o = KNNUtil.newHeap(distanceFunction, getKmax());
+    KNNHeap<D> knns_o = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), getKmax());
     preInsert(entry, getRootEntry(), knns_o);
   }
 

@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
@@ -137,7 +136,7 @@ public class CTLuRandomWalkEC<N, D extends NumberDistance<D, ?>> extends Abstrac
 
     // construct the relation Matrix of the ec-graph
     Matrix E = new Matrix(ids.size(), ids.size());
-    KNNHeap<D> heap = KNNUtil.newHeap(distFunc.getDistanceFactory(), k);
+    KNNHeap<D> heap = DBIDUtil.newHeap(distFunc.getDistanceFactory(), k);
     {
       int i = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
