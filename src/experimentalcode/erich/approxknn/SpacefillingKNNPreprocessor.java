@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -277,7 +276,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       }
       // Refine:
       int distc = 0;
-      KNNHeap<D> heap = KNNUtil.newHeap(distq, k);
+      KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
       final O vec = relation.get(id);
       for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
         heap.add(distq.distance(vec, iter), iter);
