@@ -87,8 +87,8 @@ public class DoubleDistanceKNNSubList implements DoubleDistanceKNNList {
     return inner.get(index);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public DoubleDistance getKNNDistance() {
     return inner.get(k).getDistance();
   }
