@@ -121,6 +121,7 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
    * @param id ID number
    */
   @Override
+  @Deprecated
   public final void add(final Double distance, final DBIDRef id) {
     if (size() < getK() || knndistance >= distance) {
       heap.add(DBIDFactory.FACTORY.newDistancePair(distance, id));
