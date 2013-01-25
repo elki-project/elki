@@ -29,6 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -37,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
@@ -102,7 +102,11 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    */
   private List<D> knnDistances(O object) {
     KNNList<D> knns = knnQuery.getKNNForObject(object, getKmax() - 1);
-    return KNNUtil.asDistanceList(knns);
+    List<D> distances = new ArrayList<>(knns.size());
+    for (DistanceDBIDListIter<D> iter = knns.iter(); iter.valid(); iter.advance()) {
+      distances.add(iter.getDistance());
+    }
+    return distances;
   }
 
   @Override
