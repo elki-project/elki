@@ -34,8 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 /**
  * Class to efficiently manage a kNN heap.
  * 
- * TODO: postpone initialization of ties list?
- * 
  * @author Erich Schubert
  */
 public class DoubleDistanceIntegerDBIDKNNHeap implements DoubleDistanceKNNHeap {

@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -139,7 +139,7 @@ public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
-    for (DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
+    for (DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
       if (iter.valid()) {
@@ -156,7 +156,7 @@ public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
   }
 
   @Override
-  public DoubleDistanceDBIDResultIter iter() {
+  public DoubleDistanceDBIDListIter iter() {
     return new Itr();
   }
 
@@ -187,7 +187,7 @@ public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
    * 
    * @apiviz.exclude
    */
-  private class Itr implements DoubleDistanceDBIDResultIter {
+  private class Itr implements DoubleDistanceDBIDListIter {
     /**
      * Cursor position.
      */

@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -185,7 +185,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
           final double density = kernel.subspaceDensity(subspace, neigh);
           // Compute mean and standard deviation for densities of neighbors.
           meanv.reset();
-          for (DoubleDistanceDBIDResultIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
+          for (DoubleDistanceDBIDListIter neighbor = neigh.iter(); neighbor.valid(); neighbor.advance()) {
             DoubleDistanceDBIDList n2 = subsetNeighborhoodQuery(neighc, neighbor, df, adjustedEps, kernel);
             meanv.put(kernel.subspaceDensity(subspace, n2));
           }
@@ -350,7 +350,7 @@ public class OUTRES<V extends NumberVector<?>> extends AbstractAlgorithm<Outlier
       final double bandwidth = optimalBandwidth(subspace.cardinality());
 
       double density = 0;
-      for (DoubleDistanceDBIDResultIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+      for (DoubleDistanceDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
         double v = neighbor.doubleDistance() / bandwidth;
         if(v < 1) {
           density += 1 - (v * v);

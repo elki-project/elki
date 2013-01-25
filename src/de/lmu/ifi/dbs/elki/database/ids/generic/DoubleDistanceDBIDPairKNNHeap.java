@@ -29,22 +29,21 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
  * Heap for collecting double-valued KNN instances.
  * 
- * See also: {@link KNNUtil#newHeap}!
+ * See also: {@link DBIDUtil#newHeap}!
  * 
- * Experiments have shown that it can be much more performant to track the
+ * Experiments have shown that it <em>can</em> be much more performant to track the
  * knndistance <em>outside</em> of the heap, and do comparisons on the stack:
  * <blockquote>
  * 
  * <pre>
  * {@code
  * double knndist = Double.POSITIVE_INFINITY;
- * DoubleDistanceKNNHeap heap = new DoubleDistanceKNNHeap(k);
+ * DoubleDistanceDBIDPairKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
  * for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
  *   double dist = computeDistance(iditer, ...);
  *   if (dist < knndist) {

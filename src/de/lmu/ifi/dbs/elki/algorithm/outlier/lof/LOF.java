@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
@@ -307,7 +307,7 @@ public class LOF<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<Ou
       int count = 0;
       if (neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
-        for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
+        for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (objectIsInKNN || !DBIDUtil.equal(neighbor, iter)) {
             KNNList<D> neighborsNeighbors = knnReach.getKNNForDBID(neighbor, k);
             final double nkdist;

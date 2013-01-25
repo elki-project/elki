@@ -29,10 +29,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.AbstractDataBasedQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -95,7 +95,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
         }
       }
       if(subk < dr.size()) {
-        return KNNUtil.subList(dr, subk);
+        return DBIDUtil.subList(dr, subk);
       }
       else {
         return dr;
@@ -126,7 +126,7 @@ public class PreprocessorKNNQuery<O, D extends Distance<D>, T extends KNNList<D>
           }
         }
         if(subk < dr.size()) {
-          result.add(KNNUtil.subList(dr, subk));
+          result.add(DBIDUtil.subList(dr, subk));
         }
         else {
           result.add(dr);
