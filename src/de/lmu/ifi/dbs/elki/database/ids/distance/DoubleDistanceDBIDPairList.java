@@ -116,7 +116,7 @@ public class DoubleDistanceDBIDPairList implements ModifiableDoubleDistanceDBIDL
   }
 
   @Override
-  public DoubleDistanceDBIDResultIter iter() {
+  public DoubleDistanceDBIDListIter iter() {
     return new Itr();
   }
 
@@ -147,7 +147,7 @@ public class DoubleDistanceDBIDPairList implements ModifiableDoubleDistanceDBIDL
    * 
    * @apiviz.exclude
    */
-  protected class Itr implements DoubleDistanceDBIDResultIter {
+  protected class Itr implements DoubleDistanceDBIDListIter {
     /**
      * Iterator position.
      */

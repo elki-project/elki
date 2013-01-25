@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
@@ -111,7 +111,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
   }
 
   @Override
-  public DoubleDistanceDBIDResultIter iter() {
+  public DoubleDistanceDBIDListIter iter() {
     return new Itr();
   }
 
@@ -222,7 +222,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
-    for (DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
+    for (DoubleDistanceDBIDListIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(iter.internalGetIndex());
       iter.advance();
       if (iter.valid()) {
@@ -240,7 +240,7 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
    * 
    * @apiviz.exclude
    */
-  private class Itr implements DoubleDistanceDBIDResultIter {
+  private class Itr implements DoubleDistanceDBIDListIter {
     int offset = 0;
 
     @Override

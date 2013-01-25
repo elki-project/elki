@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
@@ -239,7 +239,7 @@ public class OPTICS<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
             if(processedIDs.contains(neighbor)) {
               continue;
             }
-            double reachability = Math.max(((DoubleDistanceDBIDResultIter) neighbor).doubleDistance(), coreDistance);
+            double reachability = Math.max(((DoubleDistanceDBIDListIter) neighbor).doubleDistance(), coreDistance);
             heap.add(new DoubleDistanceClusterOrderEntry(DBIDUtil.deref(neighbor), current.getID(), reachability));
           }
         }

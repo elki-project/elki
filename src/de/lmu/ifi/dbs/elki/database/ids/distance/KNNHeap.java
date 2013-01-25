@@ -24,13 +24,12 @@ package de.lmu.ifi.dbs.elki.database.ids.distance;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Interface for kNN heaps.
  * 
- * To instantiate, use: {@link KNNUtil#newHeap}!
+ * To instantiate, use: {@link DBIDUtil#newHeap}!
  * 
  * @author Erich Schubert
  * 

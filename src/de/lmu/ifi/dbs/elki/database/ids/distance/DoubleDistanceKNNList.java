@@ -48,5 +48,8 @@ public interface DoubleDistanceKNNList extends KNNList<DoubleDistance> {
   double doubleKNNDistance();
 
   @Override
-  DoubleDistanceDBIDResultIter iter();
+  DoubleDistanceDBIDListIter iter();
+  
+  @Override
+  DoubleDistanceDBIDPair get(int off);
 }

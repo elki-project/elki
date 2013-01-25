@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  * 
  * @author Erich Schubert
  */
-public interface DoubleDistanceDBIDResultIter extends DistanceDBIDListIter<DoubleDistance> {
+public interface DoubleDistanceDBIDListIter extends DistanceDBIDListIter<DoubleDistance> {
   /**
    * Get the distance
    * 

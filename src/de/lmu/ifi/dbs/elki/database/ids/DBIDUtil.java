@@ -27,8 +27,11 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceKNNSubList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.KNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayDBIDs;
@@ -643,5 +646,24 @@ public final class DBIDUtil {
       }
       return sample;
     }
+  }
+
+  /**
+   * Get a subset of the KNN result.
+   * 
+   * @param list Existing list
+   * @param k k
+   * @param <D> distance type
+   * @return Subset
+   */
+  @SuppressWarnings("unchecked")
+  public static <D extends Distance<D>> KNNList<D> subList(KNNList<D> list, int k) {
+    if (k >= list.size()) {
+      return list;
+    }
+    if (list instanceof DoubleDistanceKNNList) {
+      return (KNNList<D>) new DoubleDistanceKNNSubList((DoubleDistanceKNNList) list, k);
+    }
+    return new KNNSubList<>(list, k);
   }
 }

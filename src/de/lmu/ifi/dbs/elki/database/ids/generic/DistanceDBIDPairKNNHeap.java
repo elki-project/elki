@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * 
  * For double distances, see {@link DoubleDistanceDBIDPairKNNHeap}
  * 
- * <b>To instantiate, use {@link KNNUtil#newHeap} instead!</b>
+ * <b>To instantiate, use {@link DBIDUtil#newHeap} instead!</b>
  * 
  * @author Erich Schubert
  * 
