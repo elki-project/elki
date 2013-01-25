@@ -11,7 +11,7 @@
  * obtained by serializing a heap via {@link de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap#toKNNList}.
  * It is iterable and totally ordered, but can no longer be modified (unless you call
  * {@link de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil#newHeap}!</li>
- * <li>{@link de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList} and the optimized
+ * <li>{@link de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList} and the optimized
  * counterpart {@link de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList}, are
  * <b>modifiable, but not necessarily sorted</b> lists of neighbors, useful for example for range queries.</li>
  * </ol>

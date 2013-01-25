@@ -64,7 +64,7 @@ public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
-    while(heap.size() > 0) {
+    while (heap.size() > 0) {
       i--;
       assert (i >= 0);
       data[i] = heap.poll();
@@ -86,7 +86,7 @@ public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
-    while(!heap.isEmpty()) {
+    while (!heap.isEmpty()) {
       i--;
       assert (i >= 0);
       data[i] = heap.poll();
@@ -109,10 +109,10 @@ public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
-    for(DistanceDBIDListIter<D> iter = this.iter(); iter.valid();) {
+    for (DistanceDBIDListIter<D> iter = this.iter(); iter.valid();) {
       buf.append(iter.getDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
-      if(iter.valid()) {
+      if (iter.valid()) {
         buf.append(',');
       }
     }
@@ -138,8 +138,8 @@ public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D
 
   @Override
   public boolean contains(DBIDRef o) {
-    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if(DBIDUtil.equal(iter, o)) {
+    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if (DBIDUtil.equal(iter, o)) {
         return true;
       }
     }
@@ -187,6 +187,26 @@ public class DistanceDBIDPairKNNList<D extends Distance<D>> implements KNNList<D
     @Override
     public DistanceDBIDPair<D> getDistancePair() {
       return get(pos);
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      --pos;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos += off;
     }
   }
 }

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.database.ids.distance;
+package de.lmu.ifi.dbs.elki.database.ids.generic;
 
 /*
  This file is part of ELKI:
@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.distance.distanceresultlist.DistanceDBIDResultUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
@@ -159,6 +161,26 @@ public class GenericDistanceDBIDList<D extends Distance<D>> implements Modifiabl
     @Override
     public String toString() {
       return valid() ? getDistancePair().toString() : "null";
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      --pos;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
     }
   }
 }

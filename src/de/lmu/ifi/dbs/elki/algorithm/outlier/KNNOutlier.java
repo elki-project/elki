@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -119,8 +119,8 @@ public class KNNOutlier<O, D extends NumberDistance<D, ?>> extends AbstractDista
       // distance to the kth nearest neighbor
       final KNNList<D> knns = knnQuery.getKNNForDBID(iditer, k);
       final double dkn;
-      if(knns instanceof DoubleDistanceDBIDPairKNNList) {
-        dkn = ((DoubleDistanceDBIDPairKNNList) knns).doubleKNNDistance();
+      if(knns instanceof DoubleDistanceKNNList) {
+        dkn = ((DoubleDistanceKNNList) knns).doubleKNNDistance();
       }
       else {
         dkn = knns.getKNNDistance().doubleValue();

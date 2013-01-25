@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -154,6 +155,26 @@ public class KNNSubList<D extends Distance<D>> implements KNNList<D> {
     @Override
     public int internalGetIndex() {
       return inner.get(pos).internalGetIndex();
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos -= count;
+    }
+
+    @Override
+    public void retract() {
+      --pos;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
     }
   }
 }

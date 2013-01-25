@@ -31,8 +31,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
  * @apiviz.composedOf DoubleDistanceDBIDPair
  * @apiviz.has DoubleDistanceDBIDResultIter
  */
-public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
+public class DoubleDistanceDBIDPairKNNList implements DoubleDistanceKNNList {
   /**
    * The value of k this was materialized for.
    */
@@ -68,7 +68,7 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
     assert (col.size() >= this.k) : "Collection doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     Iterator<DoubleDistanceDBIDPair> it = col.iterator();
-    for(int i = 0; it.hasNext(); i++) {
+    for (int i = 0; it.hasNext(); i++) {
       data[i] = it.next();
     }
     assert (data.length == 0 || data[0] != null);
@@ -87,7 +87,7 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
-    while(heap.size() > 0) {
+    while (heap.size() > 0) {
       i--;
       assert (i >= 0);
       data[i] = heap.poll();
@@ -110,7 +110,7 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
     assert (heap.size() >= this.k) : "Heap doesn't contain enough objects!";
     // Get sorted data from heap; but in reverse.
     int i = heap.size();
-    while(heap.size() > 0) {
+    while (heap.size() > 0) {
       i--;
       assert (i >= 0);
       data[i] = heap.poll();
@@ -124,34 +124,25 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
     return k;
   }
 
-  /**
-   * {@inheritDoc}
-   * 
-   * @deprecated use doubleKNNDistance()!
-   */
   @Override
   @Deprecated
   public DoubleDistance getKNNDistance() {
-    return get(getK() - 1).getDistance();
+    return get(k - 1).getDistance();
   }
 
-  /**
-   * Get the kNN distance as double value.
-   * 
-   * @return Distance
-   */
+  @Override
   public double doubleKNNDistance() {
-    return get(getK() - 1).doubleDistance();
+    return get(k - 1).doubleDistance();
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("kNNList[");
-    for(DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
+    for (DoubleDistanceDBIDResultIter iter = this.iter(); iter.valid();) {
       buf.append(iter.doubleDistance()).append(':').append(DBIDUtil.toString(iter));
       iter.advance();
-      if(iter.valid()) {
+      if (iter.valid()) {
         buf.append(',');
       }
     }
@@ -176,8 +167,8 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
 
   @Override
   public boolean contains(DBIDRef o) {
-    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if(DBIDUtil.equal(iter, o)) {
+    for (DBIDIter iter = iter(); iter.valid(); iter.advance()) {
+      if (DBIDUtil.equal(iter, o)) {
         return true;
       }
     }
@@ -219,7 +210,7 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @deprecated use {@link #doubleDistance}!
      */
     @Override
@@ -236,6 +227,26 @@ public class DoubleDistanceDBIDPairKNNList implements KNNList<DoubleDistance> {
     @Override
     public DoubleDistanceDBIDPair getDistancePair() {
       return get(pos);
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      --pos;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
     }
   }
 }
