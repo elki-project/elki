@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -136,7 +137,7 @@ public class SimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDi
       final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       double sum = 0.0;
       int count = 0;
-      if (neighbors instanceof DoubleDistanceDBIDPairKNNList) {
+      if (neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
         for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {

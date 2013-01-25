@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -141,13 +142,13 @@ public class SimpleKernelDensityLOF<O extends NumberVector<?>, D extends NumberD
       final KNNList<D> neighbors = knnq.getKNNForDBID(it, k);
       int count = 0;
       double sum = 0.0;
-      if (neighbors instanceof DoubleDistanceDBIDPairKNNList) {
+      if (neighbors instanceof DoubleDistanceKNNList) {
         // Fast version for double distances
         for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
           if (DBIDUtil.equal(neighbor, it)) {
             continue;
           }
-          double max = ((DoubleDistanceDBIDPairKNNList)knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
+          double max = ((DoubleDistanceKNNList)knnq.getKNNForDBID(neighbor, k)).doubleKNNDistance();
           final double v = neighbor.doubleDistance() / max;
           sum += kernel.density(v) / Math.pow(max, dim);
           count++;

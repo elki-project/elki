@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.distance.GenericDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;

@@ -34,11 +34,11 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DistanceDBIDPairKNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.persistent.ByteBufferSerializer;
@@ -163,7 +163,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNHeap<D> newHeap(KNNList<D> exist) {
-    if (exist instanceof DoubleDistanceDBIDPairKNNList) {
+    if (exist instanceof DoubleDistanceKNNList) {
       DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(exist.getK());
       // Insert backwards, as this will produce a proper heap
       for (int i = exist.size() - 1; i >= 0; i--) {

@@ -23,34 +23,30 @@ package de.lmu.ifi.dbs.elki.database.ids.distance;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
- * Iterator over distance-based query results.
- * 
- * There is no getter for the DBID, as this implements
- * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDRef}.
+ * Double-valued KNN result.
  * 
  * @author Erich Schubert
- * 
- * @apiviz.landmark
- * 
- * @apiviz.has DistanceDBIDPair - - iterator for
- * @apiviz.has DBID - - iterator for
  */
-public interface DistanceDBIDListIter<D extends Distance<D>> extends DBIDArrayIter {
+public interface DoubleDistanceKNNList extends KNNList<DoubleDistance> {
   /**
-   * Get the distance
+   * {@inheritDoc}
    * 
-   * @return distance
+   * @deprecated use doubleKNNDistance()!
    */
-  public D getDistance();
+  @Override
+  @Deprecated
+  DoubleDistance getKNNDistance();
 
   /**
-   * Get an object pair.
+   * Get the kNN distance as double value.
    * 
-   * @return object pair
+   * @return Distance
    */
-  public DistanceDBIDPair<D> getDistancePair();
+  double doubleKNNDistance();
+
+  @Override
+  DoubleDistanceDBIDResultIter iter();
 }

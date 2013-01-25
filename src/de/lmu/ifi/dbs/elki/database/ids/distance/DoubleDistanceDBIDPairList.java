@@ -188,5 +188,25 @@ public class DoubleDistanceDBIDPairList implements ModifiableDoubleDistanceDBIDL
     public String toString() {
       return valid() ? getDistancePair().toString() : "null";
     }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      --pos;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
   }
 }

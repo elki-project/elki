@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -560,7 +560,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
     }
 
     @Override
-    public DoubleDistanceDBIDPairKNNList getKNNForObject(V query, int k) {
+    public DoubleDistanceKNNList getKNNForObject(V query, int k) {
       stats.issuedQueries++;
       long t = System.nanoTime();
 
@@ -633,7 +633,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       ArrayList<PartialVACandidate> sortedCandidates = new ArrayList<>(candidates2);
       // sort candidates by lower bound (minDist)
       Collections.sort(sortedCandidates);
-      DoubleDistanceDBIDPairKNNList result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
+      DoubleDistanceKNNList result = retrieveAccurateDistances(sortedCandidates, k, subspace, query);
 
       stats.queryTime += System.nanoTime() - t;
       return result;
@@ -711,7 +711,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       return result;
     }
 
-    protected DoubleDistanceDBIDPairKNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
+    protected DoubleDistanceKNNList retrieveAccurateDistances(List<PartialVACandidate> sortedCandidates, int k, BitSet subspace, V query) {
       DoubleDistanceDBIDPairKNNHeap result = new DoubleDistanceDBIDPairKNNHeap(k);
       for(PartialVACandidate va : sortedCandidates) {
         double stopdist = result.doubleKNNDistance();

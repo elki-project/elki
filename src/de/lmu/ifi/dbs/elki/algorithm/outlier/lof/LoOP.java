@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDResultIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -249,7 +250,7 @@ public class LoOP<O, D extends NumberDistance<D, ?>> extends AbstractAlgorithm<O
         // use first kref neighbors as reference set
         int ks = 0;
         // TODO: optimize for double distances
-        if (neighbors instanceof DoubleDistanceDBIDPairKNNList) {
+        if (neighbors instanceof DoubleDistanceKNNList) {
           for (DoubleDistanceDBIDResultIter neighbor = ((DoubleDistanceDBIDPairKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
             if (objectIsInKNN || !DBIDUtil.equal(neighbor, iditer)) {
               final double d = neighbor.doubleDistance();

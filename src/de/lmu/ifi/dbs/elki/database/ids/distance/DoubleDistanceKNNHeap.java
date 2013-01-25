@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database.ids.distance;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNList;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 
 /**
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
  */
 public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
   @Override
-  DoubleDistanceDBIDPairKNNList toKNNList();
+  DoubleDistanceKNNList toKNNList();
 
   /**
    * Add a distance-id pair to the heap unless the distance is too large.
