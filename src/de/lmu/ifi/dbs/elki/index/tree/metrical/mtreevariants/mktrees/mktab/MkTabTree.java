@@ -30,12 +30,12 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distanceresultlist.KNNUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -59,7 +59,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(MkTabTree.class);
-  
+
   /**
    * Constructor.
    * 
@@ -92,7 +92,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
   @Override
   public DistanceDBIDList<D> reverseKNNQuery(DBIDRef id, int k) {
-    if(k > this.getKmax()) {
+    if (k > this.getKmax()) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MkTab-Tree!");
     }
 
@@ -109,7 +109,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
-    if(getPageSize() - overhead < 0) {
+    if (getPageSize() - overhead < 0) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
@@ -117,11 +117,11 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     // coveringRadius + parentDistance + kmax + kmax * knnDistance) + 1
     dirCapacity = (int) (getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + 4 + getKmax() * distanceSize) + 1;
 
-    if(dirCapacity <= 1) {
+    if (dirCapacity <= 1) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
-    if(dirCapacity < 10) {
+    if (dirCapacity < 10) {
       LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
@@ -129,28 +129,32 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     // kmax + kmax * knnDistance) + 1
     leafCapacity = (int) (getPageSize() - overhead) / (4 + distanceSize + 4 + getKmax() * distanceSize) + 1;
 
-    if(leafCapacity <= 1) {
+    if (leafCapacity <= 1) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
-    if(leafCapacity < 10) {
+    if (leafCapacity < 10) {
       LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
   }
-  
+
   @Override
   protected void kNNdistanceAdjustment(MkTabEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
     MkTabTreeNode<O, D> node = getNode(entry);
     List<D> knnDistances_node = initKnnDistanceList();
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> leafEntry = node.getEntry(i);
-        leafEntry.setKnnDistances(KNNUtil.asDistanceList(knnLists.get(getPageID(leafEntry))));
+        KNNList<D> knns = knnLists.get(getPageID(leafEntry));
+        List<D> distances = new ArrayList<>(knns.size());
+        for (DistanceDBIDListIter<D> iter = knns.iter(); iter.valid(); iter.advance()) {
+          distances.add(iter.getDistance());
+        }
+        leafEntry.setKnnDistances(distances);
         knnDistances_node = max(knnDistances_node, leafEntry.getKnnDistances());
       }
-    }
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    } else {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> dirEntry = node.getEntry(i);
         kNNdistanceAdjustment(dirEntry, knnLists);
         knnDistances_node = max(knnDistances_node, dirEntry.getKnnDistances());
@@ -211,11 +215,11 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   private void doReverseKNNQuery(int k, DBIDRef q, MkTabEntry<D> node_entry, MkTabTreeNode<O, D> node, GenericDistanceDBIDList<D> result) {
     // data node
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-        if(distance.compareTo(entry.getKnnDistance(k)) <= 0) {
+        if (distance.compareTo(entry.getKnnDistance(k)) <= 0) {
           result.add(distance, entry.getRoutingObjectID());
         }
       }
@@ -223,14 +227,14 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     // directory node
     else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
         D node_knnDist = node_entry != null ? node_entry.getKnnDistance(k) : getDistanceQuery().infiniteDistance();
 
         D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
         D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
-        if(minDist.compareTo(node_knnDist) <= 0) {
+        if (minDist.compareTo(node_knnDist) <= 0) {
           MkTabTreeNode<O, D> childNode = getNode(entry);
           doReverseKNNQuery(k, q, entry, childNode, result);
         }
@@ -248,13 +252,13 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    *         in each index
    */
   private List<D> max(List<D> distances1, List<D> distances2) {
-    if(distances1.size() != distances2.size()) {
+    if (distances1.size() != distances2.size()) {
       throw new RuntimeException("different lengths!");
     }
 
     List<D> result = new ArrayList<>();
 
-    for(int i = 0; i < distances1.size(); i++) {
+    for (int i = 0; i < distances1.size(); i++) {
       D d1 = distances1.get(i);
       D d2 = distances2.get(i);
       result.add(DistanceUtil.max(d1, d2));
@@ -269,12 +273,12 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   private List<D> initKnnDistanceList() {
     List<D> knnDistances = new ArrayList<>(getKmax());
-    for(int i = 0; i < getKmax(); i++) {
+    for (int i = 0; i < getKmax(); i++) {
       knnDistances.add(getDistanceQuery().nullDistance());
     }
     return knnDistances;
   }
-  
+
   @Override
   protected Logging getLogger() {
     return LOG;
