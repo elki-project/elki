@@ -25,12 +25,26 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 /**
  * Uniform distribution.
  * 
  * @author Erich Schubert
  */
 public class UniformDistribution implements DistributionWithRandom {
+  /**
+   * The most naive estimator possible: uses minimum and maximum.
+   */
+  public static final NaiveMinMaxEstimation NAIVE_MINMAX_ESTIMATION = new NaiveMinMaxEstimation();
+
+  /**
+   * Slightly more refined estimator: takes sample size into account.
+   */
+  public static final RefinedMinMaxEstimation REFINED_MINMAX_ESTIMATION = new RefinedMinMaxEstimation();
+
   /**
    * Minimum
    */
@@ -61,7 +75,7 @@ public class UniformDistribution implements DistributionWithRandom {
   public UniformDistribution(double min, double max, Random random) {
     super();
     // Swap parameters if they were given incorrectly.
-    if(min > max) {
+    if (min > max) {
       double tmp = min;
       min = max;
       max = tmp;
@@ -84,7 +98,7 @@ public class UniformDistribution implements DistributionWithRandom {
 
   @Override
   public double pdf(double val) {
-    if(val < min || val >= max) {
+    if (val < min || val >= max) {
       return 0.0;
     }
     return 1.0 / len;
@@ -92,18 +106,18 @@ public class UniformDistribution implements DistributionWithRandom {
 
   @Override
   public double cdf(double val) {
-    if(val < min) {
+    if (val < min) {
       return 0.0;
     }
-    if(val > max) {
+    if (val > max) {
       return 1.0;
     }
     return (val - min) / len;
   }
-  
+
   @Override
   public double quantile(double val) {
-    return min + len * val; 
+    return min + len * val;
   }
 
   @Override
@@ -128,5 +142,92 @@ public class UniformDistribution implements DistributionWithRandom {
    */
   public double getMax() {
     return max;
+  }
+
+  /**
+   * Estimate the uniform distribution by computing min and max.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has UniformDistribution - - estimates
+   */
+  public static class NaiveMinMaxEstimation implements DistributionEstimator<UniformDistribution> {
+    @Override
+    public <A> UniformDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      final int len = adapter.size(data);
+      DoubleMinMax mm = new DoubleMinMax();
+      for (int i = 0; i < len; i++) {
+        mm.put(adapter.getDouble(data, i));
+      }
+      return estimate(mm);
+    }
+
+    /**
+     * Estimate parameters from minimum and maximum observed.
+     * 
+     * @param mm Minimum and Maximum
+     * @return Estimation
+     */
+    public UniformDistribution estimate(DoubleMinMax mm) {
+      return new UniformDistribution(mm.getMin(), mm.getMax());
+    }
+
+    @Override
+    public Class<? super UniformDistribution> getDistributionClass() {
+      return UniformDistribution.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected NaiveMinMaxEstimation makeInstance() {
+        return NAIVE_MINMAX_ESTIMATION;
+      }
+    }
+  }
+
+  /**
+   * Slightly improved estimation, that takes sample size into account.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has UniformDistribution - - estimates
+   */
+  public static class RefinedMinMaxEstimation implements DistributionEstimator<UniformDistribution> {
+    @Override
+    public <A> UniformDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      final int len = adapter.size(data);
+      DoubleMinMax mm = new DoubleMinMax();
+      for (int i = 0; i < len; i++) {
+        mm.put(adapter.getDouble(data, i));
+      }
+      double grow = 0.5 * mm.getDiff() / (len - 1);
+      return new UniformDistribution(mm.getMin() - grow, mm.getMax() + grow);
+    }
+
+    @Override
+    public Class<? super UniformDistribution> getDistributionClass() {
+      return UniformDistribution.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected RefinedMinMaxEstimation makeInstance() {
+        return REFINED_MINMAX_ESTIMATION;
+      }
+    }
   }
 }

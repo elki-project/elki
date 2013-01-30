@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -39,14 +40,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 public class GammaDistribution implements DistributionWithRandom {
   /**
-   * Static class for parameter estimation.
+   * Static estimation, using iterative refinement.
    */
   public static final ChoiWetteEstimator CHOI_WETTE_ESTIMATOR = new ChoiWetteEstimator();
 
   /**
-   * Static class for parameter estimation.
+   * Static estimation using just the mean and variance.
    */
   public static final NaiveEstimator NAIVE_ESTIMATOR = new NaiveEstimator();
+
+  /**
+   * Static estimator, more robust to outliers by using the median.
+   */
+  public static final MADEstimator MAD_ESTIMATOR = new MADEstimator();
 
   /**
    * Euler–Mascheroni constant
@@ -944,6 +950,73 @@ public class GammaDistribution implements DistributionWithRandom {
       @Override
       protected NaiveEstimator makeInstance() {
         return NAIVE_ESTIMATOR;
+      }
+    }
+  }
+
+  /**
+   * Robust parameter estimation for the Gamma distribution.
+   * 
+   * Based on the Median and Median absolute deviation from Median (MAD).
+   * 
+   * Reference:
+   * <p>
+   * J. Chen and H. Rubin<br />
+   * Bounds for the difference between median and mean of Gamma and Poisson
+   * distributions<br />
+   * In: Statist. Probab. Lett., 4 , 281–283.
+   * </p>
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.has GammaDistribution - - estimates
+   */
+  @Reference(authors = "J. Chen. H. Rubin", title = "Bounds for the difference between median and mean of Gamma and Poisson distributions", booktitle = "Statist. Probab. Lett., 4")
+  public static class MADEstimator implements DistributionEstimator<GammaDistribution> {
+    /**
+     * Private constructor.
+     */
+    private MADEstimator() {
+      // Do not instantiate - use static class
+    }
+
+    @Override
+    public <A> GammaDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+      // TODO: detect pre-sorted data?
+      final int len = adapter.size(data);
+      // Modifiable copy:
+      double[] x = new double[len];
+      for (int i = 0; i < len; i++) {
+        x[i] = adapter.getDouble(data, i);
+      }
+      double median = QuickSelect.median(x);
+      // Compute deviations:
+      for (int i = 0; i < len; i++) {
+        x[i] = Math.abs(x[i] - median);
+      }
+      double mad = QuickSelect.median(x);
+
+      final double theta = (mad * mad) / median;
+      final double k = median / theta;
+      return new GammaDistribution(k, 1 / theta);
+    }
+
+    @Override
+    public Class<? super GammaDistribution> getDistributionClass() {
+      return GammaDistribution.class;
+    }
+
+    /**
+     * Parameterization class.
+     * 
+     * @author Erich Schubert
+     * 
+     * @apiviz.exclude
+     */
+    public static class Parameterizer extends AbstractParameterizer {
+      @Override
+      protected MADEstimator makeInstance() {
+        return MAD_ESTIMATOR;
       }
     }
   }
