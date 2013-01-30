@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier.trivial;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -50,6 +51,8 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -66,11 +69,6 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(TrivialGeneratedOutlier.class);
-
-  /**
-   * Expected share of outliers
-   */
-  public static final OptionID EXPECT_ID = new OptionID("modeloutlier.expect", "Expected amount of outliers, for making the scores more intuitive.");
 
   /**
    * Expected share of outliers.
@@ -107,8 +105,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     try {
       Relation<?> relation = database.getRelation(TypeUtil.CLASSLABEL);
       return run(models, vecs, relation);
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.
       return run(models, vecs, database.getRelation(TypeUtil.GUESSED_LABEL));
     }
@@ -127,49 +124,51 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
 
     // Adjustment constant
     final double minscore = expect / (expect + 1);
-    
+
     HashSet<GeneratorSingleCluster> generators = new HashSet<>();
-    for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       Model model = models.get(iditer);
-      if(model instanceof GeneratorSingleCluster) {
+      if (model instanceof GeneratorSingleCluster) {
         generators.add((GeneratorSingleCluster) model);
       }
     }
-    if(generators.size() == 0) {
+    if (generators.size() == 0) {
       LOG.warning("No generator models found for dataset - all points will be considered outliers.");
     }
 
-    for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = 0.0;
       // Convert to a math vector
       Vector v = vecs.get(iditer).getColumnVector();
-      for(GeneratorSingleCluster gen : generators) {
+      for (GeneratorSingleCluster gen : generators) {
         Vector tv = v;
         // Transform backwards
-        if(gen.getTransformation() != null) {
+        if (gen.getTransformation() != null) {
           tv = gen.getTransformation().applyInverse(v);
         }
         final int dim = tv.getDimensionality();
         double lensq = 0.0;
         int norm = 0;
-        for(int i = 0; i < dim; i++) {
+        for (int i = 0; i < dim; i++) {
           Distribution dist = gen.getDistribution(i);
-          if(dist instanceof NormalDistribution) {
+          if (dist instanceof NormalDistribution) {
             NormalDistribution d = (NormalDistribution) dist;
             double delta = (tv.get(i) - d.getMean()) / d.getStddev();
             lensq += delta * delta;
             norm += 1;
           }
         }
-        if(norm > 0) {
+        if (norm > 0) {
           // The squared distances are ChiSquared distributed
           score = Math.max(score, 1 - ChiSquaredDistribution.cdf(lensq, norm));
         }
       }
-      // score inversion.
-      score = expect / (expect + score);
-      // adjust to 0 to 1 range:
-      score = (score - minscore) / (1 - minscore);
+      if (expect < 1) {
+        // score inversion.
+        score = expect / (expect + score);
+        // adjust to 0 to 1 range:
+        score = (score - minscore) / (1 - minscore);
+      }
       scores.putDouble(iditer, score);
     }
     Relation<Double> scoreres = new MaterializedRelation<>("Model outlier scores", "model-outlier", TypeUtil.DOUBLE, scores, models.getDBIDs());
@@ -193,13 +192,20 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     /**
      * Expected share of outliers
      */
+    public static final OptionID EXPECT_ID = new OptionID("modeloutlier.expect", "Expected amount of outliers, for making the scores more intuitive. When the value is 1, the CDF will be given instead.");
+
+    /**
+     * Expected share of outliers
+     */
     double expect;
-    
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter expectP = new DoubleParameter(EXPECT_ID, 0.01);
-      if(config.grab(expectP)) {
+      expectP.addConstraint(new GreaterConstraint(0.0));
+      expectP.addConstraint(new LessEqualConstraint(1.0));
+      if (config.grab(expectP)) {
         expect = expectP.getValue();
       }
     }
