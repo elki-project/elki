@@ -357,15 +357,17 @@ public class LevenbergMarquardtMethod {
    * Iterate until convergence, at most 100 times.
    */
   public void run() {
+    int maxruns = this.maxruns;
+    int maxsmall = this.maxsmall;
     while(maxruns > 0) {
       double oldchi = getChiSq();
       iterate();
-      maxruns--;
+      --maxruns;
       double newchi = getChiSq();
       // stop condition: only a small improvement in Chi.
       double deltachi = newchi - oldchi;
       if(deltachi < 0 && deltachi > -small) {
-        maxsmall--;
+        --maxsmall;
         if(maxsmall < 0) {
           break;
         }

@@ -51,12 +51,11 @@ public class TestLevenbergMarquardtGaussianFitting implements JUnit4Test {
     double[] testy = { 0.25319163934, 0.210993032783, 0.26122946916, 0.301418618261, 0.309456448082, 0.319503735357, 0.327541565177, 0.285342958621, 0.371749629189, 0.345626682273, 0.357683427004, 0.343617224818, 0.365721256824, 0.363711799369, 0.39586311865, 0.389834746285, 0.456146842302, 0.434042810296, 0.39586311865, 0.40390094847, 0.442080640117, 0.375768544099, 0.355673969549, 0.373759086644, 0.39586311865, 0.371749629189, 0.345626682273, 0.361702341914, 0.381796916465, 0.357683427004, 0.405910405925, 0.353664512093, 0.349645597183, 0.267257841525, 0.263238926615, 0.313475362992, 0.243144352064, 0.25721055425, 0.221040320058 };
     double mean = 0.122895805963;
     double stddev = 0.542856090502;
-    double stddevq = stddev * Math.sqrt(2);
     double[] s = new double[testx.length];
     for(int i = 0; i < testx.length; i++) {
       s[i] = 1.0;
     }
-    double[] params = { mean, stddevq, 1 };
+    double[] params = { mean, stddev, 1 };
     boolean[] dofit = { true, true, false };
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(GaussianFittingFunction.STATIC, params, dofit, testx, testy, s);
     for(int i = 0; i < 50; i++) {
@@ -64,7 +63,7 @@ public class TestLevenbergMarquardtGaussianFitting implements JUnit4Test {
     }
     double[] ps = fit.getParams();
     // compare results.
-    double[] should = { 0.152986763079, 1.00115077, 1 };
+    double[] should = { 0.1503920, 0.9788814, 1 };
     assertEquals("Mean doesn't match.", should[0], ps[0], 0.0001);
     assertEquals("Stddev doesn't match.", should[1], ps[1], 0.0001);
     assertEquals("Scaling doesn't match.", should[2], ps[2], 0.0001);
@@ -80,12 +79,11 @@ public class TestLevenbergMarquardtGaussianFitting implements JUnit4Test {
     double[] testy = { 0.40390094847, 0.442080640117, 0.375768544099, 0.355673969549, 0.373759086644, 0.39586311865, 0.371749629189, 0.345626682273, 0.361702341914, 0.381796916465, 0.357683427004, 0.405910405925, 0.353664512093, 0.349645597183, 0.267257841525, 0.263238926615, 0.313475362992, 0.243144352064, 0.25721055425, 0.221040320058, 0.247163266974, 0.219030862603, 0.267257841525, 0.186879543322, 0.184870085867, 0.160756596406, 0.202955202963, 0.132624192035, 0.150709309131, 0.158747138951, 0.100472872754, 0.124586362215, 0.116548532394, 0.132624192035, 0.078368840748, 0.0843972131132, 0.0582742661972, 0.0763593832929, 0.100472872754, 0.052245893832, 0.0562648087421, 0.0462175214668, 0.0321513192812, 0.0421986065566, 0.026122946916, 0.0321513192812, 0.0140662021855, 0.0120567447305, 0.0241134894609, 0.0140662021855, 0.0160756596406, 0.0140662021855, 0.00803782982031, 0.00602837236523, 0.0120567447305, 0.00803782982031, 0.00803782982031, 0.00602837236523, 0.0100472872754, 0.00200945745508 };
     double mean = 0.951868470698;
     double stddev = 0.571932920001;
-    double stddevq = stddev * Math.sqrt(2);
     double[] s = new double[testx.length];
     for(int i = 0; i < testx.length; i++) {
       s[i] = 1.0;
     }
-    double[] params = { mean, stddevq, 1 };
+    double[] params = { mean, stddev, 1 };
     boolean[] dofit = { true, true, false };
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(GaussianFittingFunction.STATIC, params, dofit, testx, testy, s);
     for(int i = 0; i < 50; i++) {
@@ -93,7 +91,7 @@ public class TestLevenbergMarquardtGaussianFitting implements JUnit4Test {
     }
     double[] ps = fit.getParams();
     // compare results.
-    double[] should = { 0.1557811515, 1.006463733, 1 };
+    double[] should = { 0.132165, 1.027699, 1 };
     assertEquals("Mean doesn't match.", should[0], ps[0], 0.0001);
     assertEquals("Stddev doesn't match.", should[1], ps[1], 0.0001);
     assertEquals("Scaling doesn't match.", should[2], ps[2], 0.0001);

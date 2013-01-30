@@ -77,7 +77,7 @@ public class KernelDensityEstimator {
     for(int current = 0; current < data.length; current++) {
       double value = 0.0;
       // TODO: is there any way we can skip through some of the data (at least if its sorted?)
-      // Since we know that all kKernels return 0 outside of [-1:1]?
+      // At least for kernels that return 0 outside of [-1:1]?
       for(int i = 0; i < data.length; i++) {
         double delta = Math.abs(data[i] - data[current]) / halfwidth;
         value += kernel.density(delta);
