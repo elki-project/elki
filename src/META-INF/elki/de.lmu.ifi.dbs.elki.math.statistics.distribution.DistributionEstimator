@@ -5,3 +5,5 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution$MADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution$ChoiWetteEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution$NaiveEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution$OlivierNorbergEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution$NaiveMinMaxEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution$RefinedMinMaxEstimator
