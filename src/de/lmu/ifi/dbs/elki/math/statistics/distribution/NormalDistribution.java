@@ -135,7 +135,7 @@ public class NormalDistribution implements DistributionWithRandom {
   /**
    * 1 / CDFINV(0.75)
    */
-  static final double ONEBYPHIINV075 = 1.48260221850560186054;
+  public static final double ONEBYPHIINV075 = 1.48260221850560186054;
 
   /**
    * Mean value for the generator

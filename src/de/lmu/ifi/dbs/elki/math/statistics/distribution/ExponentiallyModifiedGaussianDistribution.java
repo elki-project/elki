@@ -232,7 +232,7 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
       // Note: we added "abs" here, to avoid NaNs.
       double si = st * Math.sqrt(Math.abs(1 - halfsk13 * halfsk13));
       double la = st * halfsk13;
-      return new ExponentiallyModifiedGaussianDistribution(mu, si, la);
+      return new ExponentiallyModifiedGaussianDistribution(mu, si, 1. / la);
     }
 
     @Override

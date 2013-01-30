@@ -38,12 +38,12 @@ public class UniformDistribution implements DistributionWithRandom {
   /**
    * The most naive estimator possible: uses minimum and maximum.
    */
-  public static final NaiveMinMaxEstimation NAIVE_MINMAX_ESTIMATION = new NaiveMinMaxEstimation();
+  public static final NaiveMinMaxEstimator NAIVE_MINMAX_ESTIMATION = new NaiveMinMaxEstimator();
 
   /**
    * Slightly more refined estimator: takes sample size into account.
    */
-  public static final RefinedMinMaxEstimation REFINED_MINMAX_ESTIMATION = new RefinedMinMaxEstimation();
+  public static final RefinedMinMaxEstimator REFINED_MINMAX_ESTIMATION = new RefinedMinMaxEstimator();
 
   /**
    * Minimum
@@ -151,7 +151,7 @@ public class UniformDistribution implements DistributionWithRandom {
    * 
    * @apiviz.has UniformDistribution - - estimates
    */
-  public static class NaiveMinMaxEstimation implements DistributionEstimator<UniformDistribution> {
+  public static class NaiveMinMaxEstimator implements DistributionEstimator<UniformDistribution> {
     @Override
     public <A> UniformDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
       final int len = adapter.size(data);
@@ -186,7 +186,7 @@ public class UniformDistribution implements DistributionWithRandom {
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
-      protected NaiveMinMaxEstimation makeInstance() {
+      protected NaiveMinMaxEstimator makeInstance() {
         return NAIVE_MINMAX_ESTIMATION;
       }
     }
@@ -199,7 +199,7 @@ public class UniformDistribution implements DistributionWithRandom {
    * 
    * @apiviz.has UniformDistribution - - estimates
    */
-  public static class RefinedMinMaxEstimation implements DistributionEstimator<UniformDistribution> {
+  public static class RefinedMinMaxEstimator implements DistributionEstimator<UniformDistribution> {
     @Override
     public <A> UniformDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
       final int len = adapter.size(data);
@@ -225,7 +225,7 @@ public class UniformDistribution implements DistributionWithRandom {
      */
     public static class Parameterizer extends AbstractParameterizer {
       @Override
-      protected RefinedMinMaxEstimation makeInstance() {
+      protected RefinedMinMaxEstimator makeInstance() {
         return REFINED_MINMAX_ESTIMATION;
       }
     }
