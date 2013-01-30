@@ -61,6 +61,11 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  */
 public class GaussianFittingFunction implements FittingFunction {
   /**
+   * Static instance
+   */
+  public static final GaussianFittingFunction STATIC = new GaussianFittingFunction();
+
+  /**
    * compute the mixture of Gaussians at the given position
    */
   @Override
@@ -77,7 +82,7 @@ public class GaussianFittingFunction implements FittingFunction {
     // Numerical Recipes in C: The Art of Scientific Computing
     // Due to their license, we cannot use their code, but we have to implement
     // the mathematics ourselves. We hope the loss in precision is not too big.
-    for(int i = 0; i < params.length; i += 3) {
+    for (int i = 0; i < params.length; i += 3) {
       // Standardized Gaussian parameter (centered, scaled by stddev)
       double stdpar = (x - params[i]) / params[i + 1];
       double e = Math.exp(-.5 * stdpar * stdpar);
