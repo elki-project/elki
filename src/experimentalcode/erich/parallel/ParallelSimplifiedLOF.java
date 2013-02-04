@@ -55,14 +55,14 @@ import experimentalcode.erich.parallel.mapper.WriteDataStoreMapper;
 import experimentalcode.erich.parallel.mapper.WriteDoubleDataStoreMapper;
 
 /**
- * Parallel implementation of Simple-LOF Outlier detection using mappers.
+ * Parallel implementation of Simplified-LOF Outlier detection using mappers.
  * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
+public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends AbstractDistanceBasedAlgorithm<O, D, OutlierResult> implements OutlierAlgorithm {
   /**
    * Parameter k
    */
@@ -74,7 +74,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
    * @param distanceFunction Distance function
    * @param k K parameter
    */
-  public ParallelSimpleLOF(DistanceFunction<? super O, D> distanceFunction, int k) {
+  public ParallelSimplifiedLOF(DistanceFunction<? super O, D> distanceFunction, int k) {
     super(distanceFunction);
     this.k = k;
   }
@@ -82,7 +82,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(ParallelSimpleLOF.class);
+  private static final Logging LOG = Logging.getLogger(ParallelSimplifiedLOF.class);
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -107,7 +107,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
       new ParallelMapExecutor().run(ids, knnm, storek);
     }
 
-    // Phase two: lrd
+    // Phase two: simplified-lrd
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     {
       SimpleLRDMapper<D> lrdm = new SimpleLRDMapper<>(knns);
@@ -119,7 +119,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
       new ParallelMapExecutor().run(ids, lrdm, storelrd);
     }
 
-    // Phase three: LOF
+    // Phase three: Simplified-LOF
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DoubleMinMax minmax;
     {
@@ -136,7 +136,7 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
       minmax = mmm.getMinMax();
     }
 
-    Relation<Double> scoreres = new MaterializedRelation<>("Simple Local Outlier Factor", "simple-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
+    Relation<Double> scoreres = new MaterializedRelation<>("Simplified Local Outlier Factor", "simplified-lof-outlier", TypeUtil.DOUBLE, lofs, ids);
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY, 1.0);
     return new OutlierResult(meta, scoreres);
   }
@@ -173,8 +173,8 @@ public class ParallelSimpleLOF<O, D extends NumberDistance<D, ?>> extends Abstra
     }
 
     @Override
-    protected ParallelSimpleLOF<O, D> makeInstance() {
-      return new ParallelSimpleLOF<>(distanceFunction, k);
+    protected ParallelSimplifiedLOF<O, D> makeInstance() {
+      return new ParallelSimplifiedLOF<>(distanceFunction, k);
     }
   }
 }
