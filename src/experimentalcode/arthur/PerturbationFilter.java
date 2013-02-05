@@ -48,10 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
- * A filter to perturb the values by adding Gaussian micro-noise.
+ * A filter to perturb the values by adding micro-noise.
  * 
  * The added noise is generated, attribute-wise, by a Gaussian with mean=0 and a
- * standard deviation. The standard deviation can be scaled, attribute-wise, to
+ * specified standard deviation or by a uniform distribution with a specified range.
+ * The standard deviation or the range can be scaled, attribute-wise, to
  * a given percentage of the original standard deviation in the data
  * distribution (assuming a Gaussian distribution there), or to a percentage of
  * the extension in each attribute ({@code maximumValue - minimumValue}).
@@ -74,6 +75,17 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   public static enum ScalingReference {
     UNITCUBE, STDDEV, MINMAX
   }
+  
+  /**
+   * Nature of the noise distribution.
+   * 
+   * @author Arthur Zimek
+   *
+   * @apiviz.exclude
+   */
+  public static enum NoiseDistribution{
+    GAUSSIAN, UNIFORM
+  }
 
   /**
    * Which reference to use for scaling the noise.
@@ -81,12 +93,17 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   private ScalingReference scalingreference;
 
   /**
-   * Random object to generate the attribute-wise seeds for the Gaussian noise.
+   * Nature of the noise distribution.
+   */
+  private NoiseDistribution noisedistribution;
+  
+  /**
+   * Random object to generate the attribute-wise seeds for the noise.
    */
   private final Random RANDOM;
 
   /**
-   * Percentage of the variance of the random Gaussian noise generation, given
+   * Percentage of the variance of the random noise generation, given
    * the variance of the corresponding attribute in the data.
    */
   private double percentage;
@@ -102,7 +119,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
   private double[] scalingreferencevalues = new double[0];
 
   /**
-   * The random objects to generate Gaussians independently for each attribute.
+   * The random objects to generate noise distributions independently for each attribute.
    */
   private Random[] randomPerAttribute = null;
 
@@ -129,13 +146,15 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
    * @param scalingreference Scaling reference
    * @param minima Preset minimum values. May be {@code null}.
    * @param maxima Preset maximum values. May be {@code null}.
+   * @param noisedistribution Nature of the noise distribution.
    */
-  public PerturbationFilter(Long seed, double percentage, ScalingReference scalingreference, double[] minima, double[] maxima) {
+  public PerturbationFilter(Long seed, double percentage, ScalingReference scalingreference, double[] minima, double[] maxima, NoiseDistribution noisedistribution) {
     super();
     this.percentage = percentage;
     this.scalingreference = scalingreference;
     this.minima = minima;
     this.maxima = maxima;
+    this.noisedistribution = noisedistribution;
     this.RANDOM = (seed == null) ? new Random() : new Random(seed);
   }
 
@@ -233,7 +252,12 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     }
     double[] values = new double[featureVector.getDimensionality()];
     for (int d = 0; d < featureVector.getDimensionality(); d++) {
-      values[d] = featureVector.doubleValue(d) + randomPerAttribute[d].nextGaussian() * scalingreferencevalues[d];
+      if(this.noisedistribution.equals(NoiseDistribution.GAUSSIAN)){
+        values[d] = featureVector.doubleValue(d) + randomPerAttribute[d].nextGaussian() * scalingreferencevalues[d];
+      }
+      else if (this.noisedistribution.equals(NoiseDistribution.UNIFORM)){
+        values[d] = featureVector.doubleValue(d) + randomPerAttribute[d].nextDouble() * scalingreferencevalues[d];
+      }
     }
     return factory.newNumberVector(values);
   }
@@ -317,7 +341,21 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
     public static final OptionID SCALINGREFERENCE_ID = new OptionID("perturbationfilter.scalingreference", "The reference for scaling the Gaussian noise. Default is " + ScalingReference.UNITCUBE + ", parameter " + PERCENTAGE_ID.getName() + " will then directly define the standard deviation of all noise Gaussians. For options " + ScalingReference.STDDEV + " and  " + ScalingReference.MINMAX + ", the percentage of the attributewise standard deviation or extension, repectively, will define the attributewise standard deviation of the noise Gaussians.");
 
     /**
-     * Percentage of the variance of the random Gaussian noise generation, given
+     * Parameter for selecting the noise distribution.
+     * 
+     * <p>
+     * Key: {@code -perturbationfilter.noisedistribution}
+     * </p>
+     * <p>
+     * Default: <code>NoiseDistribution.UNIFORM</code>
+     * </p>
+     * 
+     */
+    public static final OptionID NOISEDISTRIBUTION_ID = new OptionID("perturbationfilter.noisedistribution", "The nature of the noise distribution, default is " + NoiseDistribution.UNIFORM);
+    
+    /**
+     * Percentage of the variance of the random Gaussian noise generation
+     * or of the range of the uniform distribution, given
      * the variance of the corresponding attribute in the data.
      */
     protected double percentage;
@@ -327,12 +365,21 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
      */
     protected ScalingReference scalingreference;
 
+    /**
+     * The option which nature of noise distribution to choose.
+     */
+    protected NoiseDistribution noisedistribution;
+    
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       EnumParameter<ScalingReference> scalingReferenceP = new EnumParameter<>(SCALINGREFERENCE_ID, ScalingReference.class, ScalingReference.UNITCUBE);
       if (config.grab(scalingReferenceP)) {
         scalingreference = scalingReferenceP.getValue();
+      }
+      EnumParameter<NoiseDistribution> noisedistributionP = new EnumParameter<>(NOISEDISTRIBUTION_ID, NoiseDistribution.class, NoiseDistribution.UNIFORM);
+      if (config.grab(noisedistributionP)){
+        noisedistribution = noisedistributionP.getValue();
       }
       DoubleParameter percentageP = new DoubleParameter(PERCENTAGE_ID, .01);
       percentageP.addConstraint(new GreaterConstraint(0));
@@ -369,7 +416,7 @@ public class PerturbationFilter<V extends NumberVector<?>> extends AbstractVecto
 
     @Override
     protected PerturbationFilter<V> makeInstance() {
-      return new PerturbationFilter<V>(seed, percentage, scalingreference, minima, maxima);
+      return new PerturbationFilter<V>(seed, percentage, scalingreference, minima, maxima, noisedistribution);
     }
   }
 }
