@@ -52,7 +52,7 @@ public class ListParameterization extends AbstractParameterization {
   public ListParameterization() {
     super();
   }
-  
+
   /**
    * Constructor with an existing collection.
    * 
@@ -83,7 +83,7 @@ public class ListParameterization extends AbstractParameterization {
   public void addParameter(OptionID optionid, Object value) {
     parameters.add(new Pair<>(optionid, value));
   }
-  
+
   /**
    * Convenience - add a Flag option directly.
    * 
@@ -94,7 +94,7 @@ public class ListParameterization extends AbstractParameterization {
       addFlag(flag.getOptionID());
     }
   }
-  
+
   /**
    * Convenience - add a Parameter for forwarding
    * 
@@ -107,11 +107,11 @@ public class ListParameterization extends AbstractParameterization {
   }
 
   @Override
-  public boolean setValueForOption(Parameter<?> opt) throws ParameterException { 
+  public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
     Iterator<Pair<OptionID, Object>> iter = parameters.iterator();
-    while(iter.hasNext()) {
+    while (iter.hasNext()) {
       Pair<OptionID, Object> pair = iter.next();
-      if(pair.first == opt.getOptionID()) {
+      if (pair.first == opt.getOptionID()) {
         iter.remove();
         opt.setValue(pair.second);
         return true;
@@ -134,8 +134,8 @@ public class ListParameterization extends AbstractParameterization {
     return (parameters.size() > 0);
   }
 
-  /** {@inheritDoc}
-   * Default implementation, for flat parameterizations. 
+  /**
+   * {@inheritDoc} Default implementation, for flat parameterizations.
    */
   @Override
   public Parameterization descend(Object option) {
@@ -161,7 +161,13 @@ public class ListParameterization extends AbstractParameterization {
     ArrayList<String> params = new ArrayList<>();
     for (Pair<OptionID, Object> pair : parameters) {
       params.add("-" + pair.getFirst().toString());
-      params.add(pair.getSecond().toString());
+      if (pair.getSecond() instanceof String) {
+        params.add((String) pair.getSecond());
+      } else if (pair.getSecond() instanceof Class) {
+        params.add(((Class<?>) pair.getSecond()).getCanonicalName());
+      } else { // Fallback:
+        params.add(pair.getSecond().toString());
+      }
     }
     return params;
   }
