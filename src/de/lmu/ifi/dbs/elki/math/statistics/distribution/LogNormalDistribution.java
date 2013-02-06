@@ -193,8 +193,8 @@ public class LogNormalDistribution implements DistributionWithRandom {
       int size = adapter.size(data);
       for (int i = 0; i < size; i++) {
         final double val = adapter.getDouble(data, i);
-        if (val <= 0) {
-          throw new ArithmeticException("Cannot fit logNormal to a data set which includes negative values.");
+        if (!(val > 0)) {
+          throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
         }
         mv.put(Math.log(val));
       }
@@ -247,8 +247,8 @@ public class LogNormalDistribution implements DistributionWithRandom {
       double[] x = new double[len];
       for (int i = 0; i < len; i++) {
         final double val = adapter.getDouble(data, i);
-        if (val <= 0) {
-          throw new ArithmeticException("Cannot fit logNormal to a data set which includes negative values.");
+        if (!(val > 0)) {
+          throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
         }
         x[i] = Math.log(val);
       }
@@ -306,8 +306,8 @@ public class LogNormalDistribution implements DistributionWithRandom {
       double[] x = new double[len];
       for (int i = 0; i < len; i++) {
         final double val = adapter.getDouble(data, i);
-        if (val <= 0) {
-          throw new ArithmeticException("Cannot fit logNormal to a data set which includes negative values.");
+        if (!(val > 0)) {
+          throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
         }
         x[i] = Math.log(val);
         mv.put(x[i]);
