@@ -4,6 +4,7 @@
 	Note: the generated jar requires the "lib" folder for dependencies, it's not standalone
 	-->
 	<property name="src" location="src" />
+	<property name="test" location="test" />
 	<property name="build" location="build" />
 	<property name="dist" location="." />
 	<property name="elki" value="de.lmu.ifi.dbs.elki" />
@@ -19,10 +20,11 @@
 
 	<target name="compile" depends="init">
 		<!-- Compile the java code from ${src} into ${build} -->
-		<javac srcdir="${src}" destdir="${build}" includes="" includeantruntime="false" deprecation="false" debug="false" optimize="true" source="1.6" target="1.6" debuglevel="">
+		<javac srcdir="${src}" destdir="${build}" includes="" includeantruntime="false" deprecation="false" debug="true" debuglevel="lines,vars,source" optimize="true" source="1.7" target="1.7">
 			<compilerarg value="-Xlint:all" />
 			<classpath>
 				<pathelement path="${src}" />
+				<pathelement path="${test}" />
 				<pathelement path="lib/batik-all-1.7.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01.jar" />
 				<pathelement path="lib/xml-commons-external-1.4.01-ext.jar" />
@@ -32,7 +34,6 @@
 			<include name="de/lmu/ifi/dbs/elki/**/*.java" />
 			<include name="tutorial/**/*.java" />
 			<!-- CUSTOMIZE THIS TO INCLUDE YOUR PACKAGE(S) ! -->
-			<include name="experimentalcode/students/USERNAME/**/*.java" />
 			<!-- <include name="experimentalcode/shared/**/*.java" /> -->
 
 			<exclude name="experimentalcode/shared/index/subspace/**" />
@@ -71,7 +72,7 @@
 		<!-- build precompiled jar -->
 		<jar jarfile="${dist}/elki-custom.jar" basedir="${build}">
 			<manifest>
-				<attribute name="Main-class" value="${elki}.gui.minigui.MiniGUI" />
+				<attribute name="Main-class" value="${elki}.application.ELKILauncher" />
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Implementation-Title" value="${title}" />
 				<attribute name="Implementation-Version" value="${version}" />
