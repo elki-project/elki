@@ -26,7 +26,8 @@ package de.lmu.ifi.dbs.elki.database.query.range;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleDistanceIntegerDBIDKNNList;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
@@ -66,7 +67,7 @@ public class DoubleOptimizedRangeQuery<O> extends LinearScanRangeQuery<O, Double
     double epsilon = range.doubleValue();
 
     O qo = relation.get(id);
-    DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
+    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDKNNList();
     for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       double doubleDistance = rawdist.doubleDistance(qo, relation.get(iter));
       if (doubleDistance <= epsilon) {
@@ -81,7 +82,7 @@ public class DoubleOptimizedRangeQuery<O> extends LinearScanRangeQuery<O, Double
   public DistanceDBIDList<DoubleDistance> getRangeForObject(O obj, DoubleDistance range) {
     double epsilon = range.doubleValue();
 
-    DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
+    ModifiableDoubleDistanceDBIDList result = new DoubleDistanceIntegerDBIDKNNList();
     for (DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       double doubleDistance = rawdist.doubleDistance(obj, relation.get(iter));
       if (doubleDistance <= epsilon) {
