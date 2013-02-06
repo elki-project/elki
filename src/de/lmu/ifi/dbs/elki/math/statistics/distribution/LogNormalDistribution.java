@@ -192,7 +192,11 @@ public class LogNormalDistribution implements DistributionWithRandom {
       MeanVariance mv = new MeanVariance();
       int size = adapter.size(data);
       for (int i = 0; i < size; i++) {
-        mv.put(Math.log(adapter.getDouble(data, i)));
+        final double val = adapter.getDouble(data, i);
+        if (val <= 0) {
+          throw new ArithmeticException("Cannot fit logNormal to a data set which includes negative values.");
+        }
+        mv.put(Math.log(val));
       }
       return new LogNormalDistribution(mv.getMean(), mv.getSampleStddev());
     }
@@ -242,7 +246,11 @@ public class LogNormalDistribution implements DistributionWithRandom {
       // Modifiable copy:
       double[] x = new double[len];
       for (int i = 0; i < len; i++) {
-        x[i] = Math.log(adapter.getDouble(data, i));
+        final double val = adapter.getDouble(data, i);
+        if (val <= 0) {
+          throw new ArithmeticException("Cannot fit logNormal to a data set which includes negative values.");
+        }
+        x[i] = Math.log(val);
       }
       double median = QuickSelect.median(x);
       // Compute absolute deviations:
@@ -297,7 +305,11 @@ public class LogNormalDistribution implements DistributionWithRandom {
       // X positions of samples
       double[] x = new double[len];
       for (int i = 0; i < len; i++) {
-        x[i] = Math.log(adapter.getDouble(data, i));
+        final double val = adapter.getDouble(data, i);
+        if (val <= 0) {
+          throw new ArithmeticException("Cannot fit logNormal to a data set which includes negative values.");
+        }
+        x[i] = Math.log(val);
         mv.put(x[i]);
       }
       // Sort our copy.
