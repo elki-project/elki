@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.statistics;
 
+import java.util.Arrays;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,12 +25,10 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Estimate density given an array of points.
  * 
- * Estimates a density using a kernel density estimator. Multiple common Kernel
- * functions are supported.
+ * Estimates a density using a variable width kernel density estimation.
  * 
  * @author Erich Schubert
  * 
@@ -48,39 +48,51 @@ public class KernelDensityEstimator {
   /**
    * Initialize and execute kernel density estimation.
    * 
-   * @param data data to use
+   * @param data data to use (must be sorted!)
    * @param min minimum value
    * @param max maximum value
    * @param kernel Kernel function to use
-   * @param windows window size
+   * @param window window size
+   * @param epsilon Precision threshold
    */
-  public KernelDensityEstimator(double[] data, double min, double max, KernelDensityFunction kernel, int windows) {
-    process(data, min, max, kernel, windows);
+  public KernelDensityEstimator(double[] data, double min, double max, KernelDensityFunction kernel, int window, double epsilon) {
+    process(data, min, max, kernel, window, epsilon);
   }
-  
+
   /**
    * Process a new array
    * 
-   * @param data data to use
+   * @param data data to use (must be sorted!)
    * @param min minimum value
    * @param max maximum value
    * @param kernel Kernel function to use
-   * @param windows window size
+   * @param window window size
+   * @param epsilon Precision threshold
    */
-  private void process(double[] data, double min, double max, KernelDensityFunction kernel, int windows) {
+  private void process(double[] data, double min, double max, KernelDensityFunction kernel, int window, double epsilon) {
     dens = new double[data.length];
     var = new double[data.length];
 
-    double halfwidth = ((max - min) / windows) * .5;
+    // This is the desired bandwidth of the kernel.
+    double halfwidth = ((max - min) / window) * .5;
 
-    // collect data points
-    for(int current = 0; current < data.length; current++) {
+    for (int current = 0; current < data.length; current++) {
       double value = 0.0;
-      // TODO: is there any way we can skip through some of the data (at least if its sorted?)
-      // At least for kernels that return 0 outside of [-1:1]?
-      for(int i = 0; i < data.length; i++) {
+      for (int i = current; i >= 0; i--) {
         double delta = Math.abs(data[i] - data[current]) / halfwidth;
-        value += kernel.density(delta);
+        final double contrib = kernel.density(delta);
+        value += contrib;
+        if (contrib < epsilon) {
+          break;
+        }
+      }
+      for (int i = current + 1; i < data.length; i++) {
+        double delta = Math.abs(data[i] - data[current]) / halfwidth;
+        final double contrib = kernel.density(delta);
+        value += contrib;
+        if (contrib < epsilon) {
+          break;
+        }
       }
       double realwidth = (Math.min(data[current] + halfwidth, max) - Math.max(min, data[current] - halfwidth));
       double weight = realwidth / (2 * halfwidth);
@@ -94,22 +106,27 @@ public class KernelDensityEstimator {
    * 
    * @param data data to process
    * @param kernel Kernel function to use.
+   * @param epsilon Precision threshold
    */
-  public KernelDensityEstimator(double[] data, KernelDensityFunction kernel) {
-    double min = Double.MAX_VALUE;
-    double max = Double.MIN_VALUE;
-    for(double d : data) {
-      if(d < min) {
-        min = d;
-      }
-      if(d > max) {
-        max = d;
+  public KernelDensityEstimator(double[] data, KernelDensityFunction kernel, double epsilon) {
+    boolean needsort = false;
+    for (int i = 1; i < data.length; i++) {
+      if (data[i - 1] > data[i]) {
+        needsort = true;
+        break;
       }
     }
-    // Heuristics.
+    // Duplicate and sort when needed:
+    if (needsort) {
+      data = data.clone();
+      Arrays.sort(data);
+    }
+    final double min = data[0];
+    final double max = data[data.length - 1];
+    // Heuristic for choosing the window size.
     int windows = 1 + (int) (Math.log(data.length));
 
-    process(data, min, max, kernel, windows);
+    process(data, min, max, kernel, windows, epsilon);
   }
 
   /**
