@@ -150,7 +150,7 @@ public class TestKernelDensityFitting implements JUnit4Test {
   private double[] run(double[] data, double[] params) {
     FittingFunction func = GaussianFittingFunction.STATIC;
     boolean[] dofit = { true, true, true };
-    KernelDensityEstimator de = new KernelDensityEstimator(data, GaussianKernelDensityFunction.KERNEL);
+    KernelDensityEstimator de = new KernelDensityEstimator(data, GaussianKernelDensityFunction.KERNEL, 1e-10);
     LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(func, params, dofit, data, de.getDensity(), de.getVariance());
     // for(int i = 0; i < 100; i++) {
     // fit.iterate();

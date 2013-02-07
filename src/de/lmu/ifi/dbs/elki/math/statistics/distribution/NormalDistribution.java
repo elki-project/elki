@@ -539,7 +539,7 @@ public class NormalDistribution implements DistributionWithRandom {
       double median = (x[len >> 1] + x[(len + 1) >> 1]) * .5;
 
       // Height = density, via KDE.
-      KernelDensityEstimator de = new KernelDensityEstimator(x, GaussianKernelDensityFunction.KERNEL);
+      KernelDensityEstimator de = new KernelDensityEstimator(x, GaussianKernelDensityFunction.KERNEL, 1e-10);
       double[] y = de.getDensity();
 
       // Weights:
