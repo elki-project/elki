@@ -226,13 +226,15 @@ public class ExponentiallyModifiedGaussianDistribution implements DistributionWi
      * @return Distribution
      */
     public ExponentiallyModifiedGaussianDistribution estimate(StatisticalMoments mv) {
-      final double halfsk13 = Math.pow(mv.getSampleExcessKurtosis() * .5, 1. / 3.);
+      // Avoid NaN by disallowing negative kurtosis.
+      final double halfsk13 = Math.pow(Math.max(0, mv.getSampleExcessKurtosis() * .5), 1. / 3.);
       final double st = mv.getSampleStddev();
-      double mu = mv.getMean() - st * halfsk13;
-      // Note: we added "abs" here, to avoid NaNs.
-      double si = st * Math.sqrt(Math.abs(1 - halfsk13 * halfsk13));
-      double la = st * halfsk13;
-      return new ExponentiallyModifiedGaussianDistribution(mu, si, 1. / la);
+      final double mu = mv.getMean() - st * halfsk13;
+      // Note: we added "abs" here, to avoid even more NaNs.
+      final double si = st * Math.sqrt(Math.abs((1 + halfsk13) * (1 - halfsk13)));
+      // One more workaround to ensure finite lambda...
+      final double la = (halfsk13 > 0) ? 1 / (st * halfsk13) : 1;
+      return new ExponentiallyModifiedGaussianDistribution(mu, si, la);
     }
 
     @Override
