@@ -455,7 +455,13 @@ public class NormalDistribution implements DistributionWithRandom {
    * Estimator using Medians. More robust to outliers, and just slightly more
    * expensive (needs to copy the data for partial sorting to find the median).
    * 
-   * Reference:
+   * References:
+   * <p>
+   * F. R. Hampel<br />
+   * The Influence Curve and Its Role in Robust Estimation<br />
+   * in: Journal of the American Statistical Association, June 1974, Vol. 69,
+   * No. 346
+   * </p>
    * <p>
    * P. J. Rousseeuw, C. Croux<br />
    * Alternatives to the Median Absolute Deviation<br />
@@ -467,7 +473,7 @@ public class NormalDistribution implements DistributionWithRandom {
    * 
    * @apiviz.has NormalDistribution - - estimates
    */
-  @Reference(authors = "P. J. Rousseeuw, C. Croux", title = "Alternatives to the Median Absolute Deviation", booktitle = "Journal of the American Statistical Association, December 1993, Vol. 88, No. 424, Theory and Methods")
+  @Reference(authors = "F. R. Hampel", title = "The Influence Curve and Its Role in Robust Estimation", booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", url = "http://www.jstor.org/stable/10.2307/2285666")
   public static class MADEstimator implements DistributionEstimator<NormalDistribution> {
     @Override
     public <A> NormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {

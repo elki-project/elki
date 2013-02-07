@@ -40,10 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Log-Normal distribution.
  * 
- * The parameterization of this class is similar to GNU R.
+ * The parameterization of this class is somewhere inbetween of GNU R and SciPy.
+ * Similar to GNU R we use the logmean and logstddev. Similar to Scipy, we also
+ * have a location parameter that shifts the distribution.
  * 
- * Scipy uses a different, more consistent normalization. Our implementation
- * matches: <tt>scipy.stats.lognorm(logstddev, 0, math.exp(logmean))</tt>
+ * Our implementation maps to SciPy's as follows:
+ * <tt>scipy.stats.lognorm(logstddev, shift, math.exp(logmean))</tt>
  * 
  * @author Erich Schubert
  */
@@ -75,6 +77,11 @@ public class LogNormalDistribution implements DistributionWithRandom {
   private double logstddev;
 
   /**
+   * Additional shift factor
+   */
+  private double shift = 0.;
+
+  /**
    * The random generator.
    */
   private Random random;
@@ -84,12 +91,14 @@ public class LogNormalDistribution implements DistributionWithRandom {
    * 
    * @param logmean Mean
    * @param logstddev Standard Deviation
+   * @param shift Shifting offset
    * @param random Random generator
    */
-  public LogNormalDistribution(double logmean, double logstddev, Random random) {
+  public LogNormalDistribution(double logmean, double logstddev, double shift, Random random) {
     super();
     this.logmean = logmean;
     this.logstddev = logstddev;
+    this.shift = shift;
     this.random = random;
   }
 
@@ -98,24 +107,25 @@ public class LogNormalDistribution implements DistributionWithRandom {
    * 
    * @param logmean Mean
    * @param logstddev Standard deviation
+   * @param shift Shifting offset
    */
-  public LogNormalDistribution(double logmean, double logstddev) {
-    this(logmean, logstddev, null);
+  public LogNormalDistribution(double logmean, double logstddev, double shift) {
+    this(logmean, logstddev, shift, null);
   }
 
   @Override
   public double pdf(double val) {
-    return pdf(val, logmean, logstddev);
+    return pdf(val - shift, logmean, logstddev);
   }
 
   @Override
   public double cdf(double val) {
-    return cdf(val, logmean, logstddev);
+    return cdf(val - shift, logmean, logstddev);
   }
 
   @Override
   public double quantile(double val) {
-    return quantile(val, logmean, logstddev);
+    return quantile(val - shift, logmean, logstddev);
   }
 
   /**
@@ -164,12 +174,12 @@ public class LogNormalDistribution implements DistributionWithRandom {
 
   @Override
   public double nextRandom() {
-    return Math.exp(logmean + random.nextGaussian() * logstddev);
+    return Math.exp(logmean + random.nextGaussian() * logstddev) + shift;
   }
 
   @Override
   public String toString() {
-    return "LogNormalDistribution(logmean=" + logmean + ", logstddev=" + logstddev + ")";
+    return "LogNormalDistribution(logmean=" + logmean + ", logstddev=" + logstddev + ", shift=" + shift + ")";
   }
 
   /**
@@ -198,7 +208,7 @@ public class LogNormalDistribution implements DistributionWithRandom {
         }
         mv.put(Math.log(val));
       }
-      return new LogNormalDistribution(mv.getMean(), mv.getSampleStddev());
+      return new LogNormalDistribution(mv.getMean(), mv.getSampleStddev(), 0.);
     }
 
     @Override
@@ -225,7 +235,13 @@ public class LogNormalDistribution implements DistributionWithRandom {
    * Estimator using Medians. More robust to outliers, and just slightly more
    * expensive (needs to copy the data for partial sorting to find the median).
    * 
-   * Reference:
+   * References:
+   * <p>
+   * F. R. Hampel<br />
+   * The Influence Curve and Its Role in Robust Estimation<br />
+   * in: Journal of the American Statistical Association, June 1974, Vol. 69,
+   * No. 346
+   * </p>
    * <p>
    * P. J. Rousseeuw, C. Croux<br />
    * Alternatives to the Median Absolute Deviation<br />
@@ -237,7 +253,7 @@ public class LogNormalDistribution implements DistributionWithRandom {
    * 
    * @apiviz.has LogNormalDistribution - - estimates
    */
-  @Reference(authors = "P. J. Rousseeuw, C. Croux", title = "Alternatives to the Median Absolute Deviation", booktitle = "Journal of the American Statistical Association, December 1993, Vol. 88, No. 424, Theory and Methods")
+  @Reference(authors = "F. R. Hampel", title = "The Influence Curve and Its Role in Robust Estimation", booktitle = "Journal of the American Statistical Association, June 1974, Vol. 69, No. 346", url = "http://www.jstor.org/stable/10.2307/2285666")
   public static class MADEstimator implements DistributionEstimator<LogNormalDistribution> {
     @Override
     public <A> LogNormalDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
@@ -259,7 +275,7 @@ public class LogNormalDistribution implements DistributionWithRandom {
       }
       double mdev = QuickSelect.median(x);
       // The scaling factor is for consistency
-      return new LogNormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mdev);
+      return new LogNormalDistribution(median, NormalDistribution.ONEBYPHIINV075 * mdev, 0.);
     }
 
     @Override
@@ -330,7 +346,7 @@ public class LogNormalDistribution implements DistributionWithRandom {
       LevenbergMarquardtMethod fit = new LevenbergMarquardtMethod(GaussianFittingFunction.STATIC, params, dofit, x, y, s);
       fit.run();
       double[] ps = fit.getParams();
-      return new LogNormalDistribution(ps[0], ps[1]);
+      return new LogNormalDistribution(ps[0], ps[1], 0.);
     }
 
     @Override
