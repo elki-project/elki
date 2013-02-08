@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -135,6 +136,14 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     if (generators.size() == 0) {
       LOG.warning("No generator models found for dataset - all points will be considered outliers.");
     }
+    for (GeneratorSingleCluster gen : generators) {
+      for (int i = 0; i < gen.getDim(); i++) {
+        Distribution dist = gen.getDistribution(i);
+        if (!(dist instanceof NormalDistribution)) {
+          throw new AbortException("TrivialGeneratedOutlier currently only supports normal distributions, got: " + dist);
+        }
+      }
+    }
 
     for (DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = 0.0;
@@ -156,6 +165,8 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
             double delta = (tv.get(i) - d.getMean()) / d.getStddev();
             lensq += delta * delta;
             norm += 1;
+          } else {
+            throw new AbortException("TrivialGeneratedOutlier currently only supports normal distributions, got: " + dist);
           }
         }
         if (norm > 0) {
