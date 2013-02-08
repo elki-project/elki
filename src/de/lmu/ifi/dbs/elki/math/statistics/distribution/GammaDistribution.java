@@ -292,7 +292,7 @@ public class GammaDistribution implements DistributionWithRandom {
    */
   public static double regularizedGammaP(final double a, final double x) {
     // Special cases
-    if (Double.isNaN(a) || Double.isNaN(x) || (a <= 0.0) || (x < 0.0)) {
+    if (Double.isNaN(a) || Double.isNaN(x) || Double.isInfinite(a) || Double.isInfinite(x) || (a <= 0.0) || (x < 0.0)) {
       return Double.NaN;
     }
     if (x == 0.0) {
