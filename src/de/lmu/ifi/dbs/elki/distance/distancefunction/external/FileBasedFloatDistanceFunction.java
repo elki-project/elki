@@ -174,7 +174,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDDistanceFunction
         parserConfig.addParameter(DistanceParser.DISTANCE_ID, FloatDistance.class);
         ChainedParameterization combinedConfig = new ChainedParameterization(parserConfig, config);
         combinedConfig.errorsTo(config);
-        parser = PARSER_PARAM.instantiateClass(config);
+        parser = PARSER_PARAM.instantiateClass(combinedConfig);
       }
     }
 
