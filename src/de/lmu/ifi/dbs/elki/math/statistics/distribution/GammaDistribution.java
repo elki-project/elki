@@ -929,6 +929,9 @@ public class GammaDistribution implements DistributionWithRandom {
     private GammaDistribution estimate(MeanVariance mv) {
       final double mu = mv.getMean();
       final double var = mv.getSampleVariance();
+      if (var < Double.MIN_NORMAL) {
+        throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero variance.");
+      }
       final double theta = var / mu;
       final double k = mu / theta;
       return new GammaDistribution(k, 1 / theta);
