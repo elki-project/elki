@@ -488,31 +488,31 @@ public class TestLogNormalDistribution extends AbstractDistributionTest implemen
 
   @Test
   public void testPDF() {
-    checkPDF(new LogNormalDistribution(0., 1.), P_CDFPDF, GNUR_LOGNORM_PDF_0_1, 1e-15);
-    checkPDF(new LogNormalDistribution(1., 3.), P_CDFPDF, GNUR_LOGNORM_PDF_1_3, 1e-15);
-    checkPDF(new LogNormalDistribution(.1, .1), P_CDFPDF, GNUR_LOGNORM_PDF_01_01, 1e-15);
-    checkPDF(new LogNormalDistribution(0., 1.), P_CDFPDF, SCIPY_LOGNORM_PDF_0_1, 1e-12);
-    checkPDF(new LogNormalDistribution(1., 3.), P_CDFPDF, SCIPY_LOGNORM_PDF_1_3, 1e-12);
-    checkPDF(new LogNormalDistribution(.1, .1), P_CDFPDF, SCIPY_LOGNORM_PDF_01_01, 1e-14);
+    checkPDF(new LogNormalDistribution(0., 1., 0), P_CDFPDF, GNUR_LOGNORM_PDF_0_1, 1e-15);
+    checkPDF(new LogNormalDistribution(1., 3., 0), P_CDFPDF, GNUR_LOGNORM_PDF_1_3, 1e-15);
+    checkPDF(new LogNormalDistribution(.1, .1, 0), P_CDFPDF, GNUR_LOGNORM_PDF_01_01, 1e-15);
+    checkPDF(new LogNormalDistribution(0., 1., 0), P_CDFPDF, SCIPY_LOGNORM_PDF_0_1, 1e-12);
+    checkPDF(new LogNormalDistribution(1., 3., 0), P_CDFPDF, SCIPY_LOGNORM_PDF_1_3, 1e-12);
+    checkPDF(new LogNormalDistribution(.1, .1, 0), P_CDFPDF, SCIPY_LOGNORM_PDF_01_01, 1e-14);
   }
 
   @Test
   public void testCDF() {
-    checkCDF(new LogNormalDistribution(0., 1.), P_CDFPDF, GNUR_LOGNORM_CDF_0_1, 1e-15);
-    checkCDF(new LogNormalDistribution(1., 3.), P_CDFPDF, GNUR_LOGNORM_CDF_1_3, 1e-15);
-    checkCDF(new LogNormalDistribution(.1, .1), P_CDFPDF, GNUR_LOGNORM_CDF_01_01, 1e-15);
-    checkCDF(new LogNormalDistribution(0., 1.), P_CDFPDF, SCIPY_LOGNORM_CDF_0_1, 1e-12);
-    checkCDF(new LogNormalDistribution(1., 3.), P_CDFPDF, SCIPY_LOGNORM_CDF_1_3, 1e-12);
-    checkCDF(new LogNormalDistribution(.1, .1), P_CDFPDF, SCIPY_LOGNORM_CDF_01_01, 1e-15);
+    checkCDF(new LogNormalDistribution(0., 1., 0), P_CDFPDF, GNUR_LOGNORM_CDF_0_1, 1e-15);
+    checkCDF(new LogNormalDistribution(1., 3., 0), P_CDFPDF, GNUR_LOGNORM_CDF_1_3, 1e-15);
+    checkCDF(new LogNormalDistribution(.1, .1, 0), P_CDFPDF, GNUR_LOGNORM_CDF_01_01, 1e-15);
+    checkCDF(new LogNormalDistribution(0., 1., 0), P_CDFPDF, SCIPY_LOGNORM_CDF_0_1, 1e-12);
+    checkCDF(new LogNormalDistribution(1., 3., 0), P_CDFPDF, SCIPY_LOGNORM_CDF_1_3, 1e-12);
+    checkCDF(new LogNormalDistribution(.1, .1, 0), P_CDFPDF, SCIPY_LOGNORM_CDF_01_01, 1e-15);
   }
 
   @Test
   public void testProbit() {
-    checkQuantile(new LogNormalDistribution(0., 1.), P_PROBIT, GNUR_LOGNORM_QUANT_0_1, 1e-8);
-    checkQuantile(new LogNormalDistribution(1., 3.), P_PROBIT, GNUR_LOGNORM_QUANT_1_3, 1e-8);
-    checkQuantile(new LogNormalDistribution(.1, .1), P_PROBIT, GNUR_LOGNORM_QUANT_01_01, 1e-9);
-    checkQuantile(new LogNormalDistribution(0., 1.), P_PROBIT, SCIPY_LOGNORM_QUANT_0_1, 1e-8);
-    checkQuantile(new LogNormalDistribution(1., 3.), P_PROBIT, SCIPY_LOGNORM_QUANT_1_3, 1e-8);
-    checkQuantile(new LogNormalDistribution(.1, .1), P_PROBIT, SCIPY_LOGNORM_QUANT_01_01, 1e-9);
+    checkQuantile(new LogNormalDistribution(0., 1., 0), P_PROBIT, GNUR_LOGNORM_QUANT_0_1, 1e-8);
+    checkQuantile(new LogNormalDistribution(1., 3., 0), P_PROBIT, GNUR_LOGNORM_QUANT_1_3, 1e-8);
+    checkQuantile(new LogNormalDistribution(.1, .1, 0), P_PROBIT, GNUR_LOGNORM_QUANT_01_01, 1e-9);
+    checkQuantile(new LogNormalDistribution(0., 1., 0), P_PROBIT, SCIPY_LOGNORM_QUANT_0_1, 1e-8);
+    checkQuantile(new LogNormalDistribution(1., 3., 0), P_PROBIT, SCIPY_LOGNORM_QUANT_1_3, 1e-8);
+    checkQuantile(new LogNormalDistribution(.1, .1, 0), P_PROBIT, SCIPY_LOGNORM_QUANT_01_01, 1e-9);
   }
 }
