@@ -123,7 +123,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
     final String firstlabel = labels.get(firstid);
-    if(!firstlabel.matches("bylabel")) {
+    if(!firstlabel.matches(".*by.?label.*")) {
       throw new AbortException("No 'by label' reference outlier found, which is needed for weighting!");
     }
 
