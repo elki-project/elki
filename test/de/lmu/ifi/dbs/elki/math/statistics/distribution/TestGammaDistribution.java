@@ -1295,11 +1295,22 @@ public class TestGammaDistribution extends AbstractDistributionTest implements J
   public void testRandomAndEstimation() {
     GammaDistribution g = new GammaDistribution(1.2345, 0.12345, new Random(0));
     double[] data = new double[10000];
-    for(int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; i++) {
       data[i] = g.nextRandom();
     }
     GammaDistribution g2 = GammaDistribution.CHOI_WETTE_ESTIMATOR.estimate(data, ArrayLikeUtil.DOUBLEARRAYADAPTER);
     assertEquals("k does not match.", g.getK(), g2.getK(), 1E-2);
     assertEquals("theta does not match.", g.getTheta(), g2.getTheta(), 1E-5);
+  }
+
+  @Test
+  public void extremeValues() {
+    // TODO: tested values
+    GammaDistribution dist = new GammaDistribution(1.1987906546993674E12, 1.1987905236089673E12);
+    assertEquals(0.0, dist.cdf(Double.MIN_VALUE), 1e-50);
+    // FIXME: NEITHER OF THESE VALUE IS NOT VERIFIED.
+    // THIS IS SOLELY A REGRESSION TEST.
+    // assertEquals(0.45430463189141745, dist.cdf(1.0), 1e-15);
+    assertEquals(3.6332619726763034E-5, dist.cdf(1.0), 1e-15);
   }
 }
