@@ -70,9 +70,20 @@ public class GammaDistribution implements DistributionWithRandom {
   static final double[] LANCZOS = { 0.99999999999999709182, 57.156235665862923517, -59.597960355475491248, 14.136097974741747174, -0.49191381609762019978, .33994649984811888699e-4, .46523628927048575665e-4, -.98374475304879564677e-4, .15808870322491248884e-3, -.21026444172410488319e-3, .21743961811521264320e-3, -.16431810653676389022e-3, .84418223983852743293e-4, -.26190838401581408670e-4, .36899182659531622704e-5, };
 
   /**
-   * Numerical precision to use
+   * Numerical precision to use (data type dependent!)
+   * 
+   * If you change this, make sure to test exhaustively!
    */
   static final double NUM_PRECISION = 1E-15;
+
+  /**
+   * Maximum number of iterations for regularizedGammaP. To prevent degeneration
+   * for extreme values.
+   * 
+   * FIXME: is this too high, too low? Can we improve behavior for extreme
+   * cases?
+   */
+  static final int MAX_ITERATIONS = 100;
 
   /**
    * Alpha == k
@@ -292,7 +303,7 @@ public class GammaDistribution implements DistributionWithRandom {
    */
   public static double regularizedGammaP(final double a, final double x) {
     // Special cases
-    if (Double.isNaN(a) || Double.isNaN(x) || Double.isInfinite(a) || Double.isInfinite(x) || (a <= 0.0) || (x < 0.0)) {
+    if (Double.isInfinite(a) || Double.isInfinite(x) || !(a > 0.0) || !(x >= 0.0)) {
       return Double.NaN;
     }
     if (x == 0.0) {
@@ -303,18 +314,18 @@ public class GammaDistribution implements DistributionWithRandom {
       return 1.0 - regularizedGammaQ(a, x);
     }
     // Loosely following "Numerical Recipes"
-    double del = 1.0 / a;
-    double sum = del;
-    for (int n = 1; n < Integer.MAX_VALUE; n++) {
+    double term = 1.0 / a;
+    double sum = term;
+    for (int n = 1; n < MAX_ITERATIONS; n++) {
       // compute next element in the series
-      del *= x / (a + n);
-      sum = sum + del;
-      if (Math.abs(del / sum) < NUM_PRECISION || sum >= Double.POSITIVE_INFINITY) {
+      term = x / (a + n) * term;
+      sum = sum + term;
+      if (sum == Double.POSITIVE_INFINITY) {
+        return 1.0;
+      }
+      if (Math.abs(term / sum) < NUM_PRECISION) {
         break;
       }
-    }
-    if (Double.isInfinite(sum)) {
-      return 1.0;
     }
     return Math.exp(-x + (a * Math.log(x)) - logGamma(a)) * sum;
   }
@@ -393,7 +404,7 @@ public class GammaDistribution implements DistributionWithRandom {
     double c = 1.0 / FPMIN;
     double d = 1.0 / b;
     double fac = d;
-    for (int i = 1; i < Integer.MAX_VALUE; i++) {
+    for (int i = 1; i < MAX_ITERATIONS; i++) {
       double an = i * (a - i);
       b += 2;
       d = an * d + b;
