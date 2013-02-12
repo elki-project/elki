@@ -157,7 +157,7 @@ public class LDF<O extends NumberVector<?>, D extends NumberDistance<D, ?>> exte
       knnq = preproc.getKNNQuery(rdq, k);
     }
 
-    // Compute LRDs
+    // Compute LDEs
     if (stepprog != null) {
       stepprog.beginStep(2, "Computing LDEs.", LOG);
     }
