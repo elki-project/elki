@@ -125,7 +125,7 @@ public class LogNormalDistribution implements DistributionWithRandom {
 
   @Override
   public double quantile(double val) {
-    return quantile(val - shift, logmean, logstddev);
+    return quantile(val, logmean, logstddev) + shift;
   }
 
   /**
@@ -333,7 +333,7 @@ public class LogNormalDistribution implements DistributionWithRandom {
       double median = (x[len >> 1] + x[(len + 1) >> 1]) * .5;
 
       // Height = density, via KDE.
-      KernelDensityEstimator de = new KernelDensityEstimator(x, GaussianKernelDensityFunction.KERNEL, 1e-10);
+      KernelDensityEstimator de = new KernelDensityEstimator(x, GaussianKernelDensityFunction.KERNEL, 1e-6);
       double[] y = de.getDensity();
 
       // Weights:

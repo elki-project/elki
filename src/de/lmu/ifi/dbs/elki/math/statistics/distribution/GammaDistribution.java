@@ -98,8 +98,8 @@ public class GammaDistribution implements DistributionWithRandom {
    */
   public GammaDistribution(double k, double theta, Random random) {
     super();
-    if (k <= 0.0 || theta <= 0.0) {
-      throw new IllegalArgumentException("Invalid parameters for Gamma distribution.");
+    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+      throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
 
     this.k = k;
@@ -1054,7 +1054,7 @@ public class GammaDistribution implements DistributionWithRandom {
       double meanx = 0, meanlogx = 0;
       for (int i = 0; i < len; i++) {
         final double val = adapter.getDouble(data, i);
-        final double logx = Math.log(val);
+        final double logx = (val > 0) ? Math.log(val) : meanlogx;
         final double deltax = val - meanx;
         final double deltalogx = logx - meanlogx;
         meanx += deltax / (i + 1.);
