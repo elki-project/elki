@@ -266,7 +266,7 @@ public class XYCurve implements Result, TextWriteable {
       data.set(i + 1, sy * data.get(i + 1));
     }
     maxx *= sx;
-    maxy *= sx;
+    maxy *= sy;
   }
 
   /**
