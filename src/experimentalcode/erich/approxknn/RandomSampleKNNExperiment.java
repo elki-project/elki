@@ -93,7 +93,8 @@ public class RandomSampleKNNExperiment {
         }
       }
     }
-
+    ROC.DBIDsTest positive = new ROC.DBIDsTest(pos);
+    
     // Collect the data for output
     double[][] data = new double[iters][6];
     // Results for full kNN:
@@ -109,7 +110,7 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           KNNOutlier<NumberVector<?>, DoubleDistance> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][0] = auc;
           if(prog != null) {
@@ -127,7 +128,7 @@ public class RandomSampleKNNExperiment {
           final int k = i * step;
           LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction, distanceFunction);
           OutlierResult res = lof.run(rel);
-          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][3] = auc;
           if(prog != null) {
@@ -165,7 +166,7 @@ public class RandomSampleKNNExperiment {
         {
           KNNOutlier<NumberVector<?>, DoubleDistance> knn = new KNNOutlier<>(distanceFunction, maxk);
           OutlierResult res = knn.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][1] = auc;
         }
@@ -173,7 +174,7 @@ public class RandomSampleKNNExperiment {
         {
           KNNOutlier<NumberVector<?>, DoubleDistance> knn = new KNNOutlier<>(distanceFunction, k);
           OutlierResult res = knn.run(database, rel);
-          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][2] = auc;
         }
@@ -181,7 +182,7 @@ public class RandomSampleKNNExperiment {
         {
           LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(maxk, distanceFunction, distanceFunction);
           OutlierResult res = lof.run(rel);
-          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][4] = auc;
         }
@@ -189,7 +190,7 @@ public class RandomSampleKNNExperiment {
         {
           LOF<NumberVector<?>, DoubleDistance> lof = new LOF<>(k, distanceFunction, distanceFunction);
           OutlierResult res = lof.run(rel);
-          XYCurve roccurve = ROC.materializeROC(ids.size(), pos, new ROC.OutlierScoreAdapter(res));
+          XYCurve roccurve = ROC.materializeROC(positive, new ROC.OutlierScoreAdapter(res));
           double auc = XYCurve.areaUnderCurve(roccurve);
           data[i - 1][5] = auc;
         }
