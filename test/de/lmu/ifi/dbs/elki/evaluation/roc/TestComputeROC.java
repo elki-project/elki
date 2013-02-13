@@ -23,18 +23,15 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Test to validate ROC curve computation.
@@ -54,19 +51,20 @@ public class TestComputeROC implements JUnit4Test {
     positive.add(DBIDUtil.importInteger(4));
     positive.add(DBIDUtil.importInteger(5));
 
-    ArrayList<Pair<Double, DBID>> distances = new ArrayList<>();
-    distances.add(new Pair<>(0.0, DBIDUtil.importInteger(1)));
-    distances.add(new Pair<>(1.0, DBIDUtil.importInteger(2)));
-    distances.add(new Pair<>(2.0, DBIDUtil.importInteger(6)));
-    distances.add(new Pair<>(3.0, DBIDUtil.importInteger(7)));
-    distances.add(new Pair<>(3.0, DBIDUtil.importInteger(3)));
-    distances.add(new Pair<>(4.0, DBIDUtil.importInteger(8)));
-    distances.add(new Pair<>(4.0, DBIDUtil.importInteger(4)));
-    distances.add(new Pair<>(5.0, DBIDUtil.importInteger(9)));
-    distances.add(new Pair<>(6.0, DBIDUtil.importInteger(5)));
+    final DoubleDistanceDBIDPairList distances = new DoubleDistanceDBIDPairList();
+    // Starting point: ................................ 0.0,0. ++
+    distances.add(0.0, DBIDUtil.importInteger(1)); // + 0.0,.2 -- redundant
+    distances.add(1.0, DBIDUtil.importInteger(2)); // + 0.0,.4 ++
+    distances.add(2.0, DBIDUtil.importInteger(6)); // - .25,.4 ++
+    distances.add(3.0, DBIDUtil.importInteger(7)); // -
+    distances.add(3.0, DBIDUtil.importInteger(3)); // + .50,.6 -- redundant
+    distances.add(4.0, DBIDUtil.importInteger(8)); // -
+    distances.add(4.0, DBIDUtil.importInteger(4)); // + .75,.8 ++
+    distances.add(5.0, DBIDUtil.importInteger(9)); // - 1.0,.8 ++
+    distances.add(6.0, DBIDUtil.importInteger(5)); // + 1.0,1. ++
 
-    XYCurve roccurve = ROC.materializeROC(9, positive, distances.iterator());
-    System.out.println(roccurve);
+    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positive), new ROC.DistanceResultAdapter<>(distances.iter()));
+    // System.err.println(roccurve);
     Assert.assertEquals("ROC curve too complex", 6, roccurve.size());
 
     double auc = XYCurve.areaUnderCurve(roccurve);

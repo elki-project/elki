@@ -23,26 +23,21 @@ package de.lmu.ifi.dbs.elki.evaluation.roc;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-import java.util.Set;
-
 import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.
@@ -71,48 +66,30 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.PairInterface;
 // materialization
 public class ROC {
   /**
-   * Compute a ROC curve given a set of positive IDs and a sorted list of
-   * (comparable, ID)s, where the comparable object is used to decided when two
-   * objects are interchangeable.
+   * Iterator for comparing scores.
    * 
-   * @param <C> Reference type
-   * @param size Database size
-   * @param ids Collection of positive IDs, should support efficient contains()
-   * @param nei List of neighbors along with some comparable object to detect
-   *        'same positions'.
-   * @return area under curve
+   * @author Erich Schubert
    */
-  public static <C extends Comparable<? super C>, T> XYCurve materializeROC(int size, Set<? super T> ids, Iterator<? extends PairInterface<C, T>> nei) {
-    final int postot = ids.size(), negtot = size - postot;
-    int poscnt = 0, negcnt = 0;
-    XYCurve curve = new XYCurve("False Positive Rate", "True Positive Rate", postot + 2);
+  public static interface ScoreIter extends Iter {
+    /**
+     * Test whether the score is the same as the previous objects score.
+     * 
+     * When there is no previous result, implementations should return false!
+     * 
+     * @return Boolean
+     */
+    boolean tiedToPrevious();
+  }
 
-    // start in bottom left
-    curve.add(0.0, 0.0);
-
-    C prevval = null;
-    while(nei.hasNext()) {
-      // Analyze next point
-      PairInterface<C, T> cur = nei.next();
-      // positive or negative match?
-      if(ids.contains(cur.getSecond())) {
-        poscnt += 1;
-      }
-      else {
-        negcnt += 1;
-      }
-      // defer calculation for ties
-      if((prevval != null) && (prevval.compareTo(cur.getFirst()) == 0)) {
-        continue;
-      }
-      // Add a new point.
-      curve.addAndSimplify(negcnt / (double) negtot, poscnt / (double) postot);
-      prevval = cur.getFirst();
-    }
-    // Ensure we end up in the top right corner.
-    // Simplification will skip this if we already were.
-    curve.addAndSimplify(1.0, 1.0);
-    return curve;
+  /**
+   * Predicate to test whether an object is a true positive or false positive.
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <T> Data type
+   */
+  public static interface Predicate<T> {
+    boolean test(T o);
   }
 
   /**
@@ -121,45 +98,35 @@ public class ROC {
    * objects are interchangeable.
    * 
    * @param <C> Reference type
-   * @param size Database size
-   * @param ids Collection of positive IDs, should support efficient contains()
-   * @param nei List of neighbors along with some comparable object to detect
-   *        'same positions'.
+   * @param predicate Predicate to test for positive objects
+   * @param iter Iterator over results, with ties.
    * @return area under curve
    */
-  public static <C extends Comparable<? super C>> XYCurve materializeROC(int size, SetDBIDs ids, Iterator<? extends PairInterface<C, ? extends DBIDRef>> nei) {
-    final int postot = ids.size(), negtot = size - postot;
+  public static <I extends ScoreIter> XYCurve materializeROC(Predicate<? super I> predicate, I iter) {
     int poscnt = 0, negcnt = 0;
-    XYCurve curve = new XYCurve("False Positive Rate", "True Positive Rate", postot + 2);
+    XYCurve curve = new XYCurve("False Positive Rate", "True Positive Rate");
 
     // start in bottom left
     curve.add(0.0, 0.0);
 
-    C prevval = null;
-    while(nei.hasNext()) {
-      // Rates at *previous* data point. Because of tie handling strategy!
-      final double trueneg = negcnt / (double) negtot;
-      final double truepos = poscnt / (double) postot;
-      // Analyze next point
-      PairInterface<C, ? extends DBIDRef> cur = nei.next();
+    while (iter.valid()) {
       // positive or negative match?
-      if(ids.contains(cur.getSecond())) {
-        poscnt += 1;
-      }
-      else {
-        negcnt += 1;
-      }
-      // defer calculation for ties
-      if((prevval != null) && (prevval.compareTo(cur.getFirst()) == 0)) {
-        continue;
-      }
-      // Add point for *previous* result (since we are no longer tied with it)
-      curve.addAndSimplify(trueneg, truepos);
-      prevval = cur.getFirst();
+      do {
+        if (predicate.test(iter)) {
+          ++poscnt;
+        } else {
+          ++negcnt;
+        }
+        iter.advance();
+      } // Loop while tied:
+      while (iter.valid() && iter.tiedToPrevious());
+      // Add a new point.
+      curve.addAndSimplify(negcnt, poscnt);
     }
     // Ensure we end up in the top right corner.
     // Simplification will skip this if we already were.
-    curve.addAndSimplify(1.0, 1.0);
+    curve.addAndSimplify(negcnt, poscnt);
+    curve.rescale(1. / negcnt, 1. / poscnt);
     return curve;
   }
 
@@ -173,7 +140,7 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class SimpleAdapter implements Iterator<DBIDPair> {
+  public static class SimpleAdapter implements ScoreIter, DBIDRef {
     /**
      * Original Iterator
      */
@@ -190,20 +157,23 @@ public class ROC {
     }
 
     @Override
-    public boolean hasNext() {
-      return this.iter.valid();
+    public boolean valid() {
+      return iter.valid();
     }
 
     @Override
-    public DBIDPair next() {
-      DBIDPair pair = DBIDUtil.newPair(iter, iter);
-      this.iter.advance();
-      return pair;
+    public void advance() {
+      iter.advance();
     }
 
     @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
+    public boolean tiedToPrevious() {
+      return false; // No information.
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return iter.internalGetIndex();
     }
   }
 
@@ -218,11 +188,16 @@ public class ROC {
    * @author Erich Schubert
    * @param <D> Distance type
    */
-  public static class DistanceResultAdapter<D extends Distance<D>> implements Iterator<Pair<D, DBIDRef>> {
+  public static class DistanceResultAdapter<D extends Distance<D>> implements ScoreIter, DBIDRef {
     /**
      * Original Iterator
      */
     private DistanceDBIDListIter<D> iter;
+
+    /**
+     * Distance of previous.
+     */
+    private D prevDist = null;
 
     /**
      * Constructor
@@ -235,20 +210,24 @@ public class ROC {
     }
 
     @Override
-    public boolean hasNext() {
-      return this.iter.valid();
+    public boolean valid() {
+      return iter.valid();
     }
 
     @Override
-    public Pair<D, DBIDRef> next() {
-      DistanceDBIDPair<D> d = this.iter.getDistancePair();
-      this.iter.advance();
-      return new Pair<D, DBIDRef>(d.getDistance(), d);
+    public void advance() {
+      prevDist = iter.getDistance();
+      iter.advance();
     }
 
     @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
+    public int internalGetIndex() {
+      return iter.internalGetIndex();
+    }
+
+    @Override
+    public boolean tiedToPrevious() {
+      return iter.getDistance().equals(prevDist);
     }
   }
 
@@ -262,16 +241,21 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class OutlierScoreAdapter implements Iterator<DoubleDBIDPair> {
+  public static class OutlierScoreAdapter implements ScoreIter, DBIDRef {
     /**
-     * Original Iterator
+     * Original iterator.
      */
     private DBIDIter iter;
 
     /**
-     * Outlier score
+     * Outlier score.
      */
     private Relation<Double> scores;
+
+    /**
+     * Previous value.
+     */
+    double prev = Double.NaN;
 
     /**
      * Constructor.
@@ -285,20 +269,138 @@ public class ROC {
     }
 
     @Override
-    public boolean hasNext() {
-      return this.iter.valid();
+    public boolean valid() {
+      return iter.valid();
     }
 
     @Override
-    public DoubleDBIDPair next() {
-      DoubleDBIDPair pair = DBIDUtil.newPair(scores.get(iter), iter);
+    public void advance() {
+      prev = scores.get(iter);
       iter.advance();
-      return pair;
     }
 
     @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
+    public boolean tiedToPrevious() {
+      return scores.get(iter) == prev;
+    }
+
+    @Override
+    public int internalGetIndex() {
+      return iter.internalGetIndex();
+    }
+  }
+
+  /**
+   * Class to iterate over a number vector in decreasing order.
+   * 
+   * @author Erich Schubert
+   */
+  public static class DecreasingVectorIter implements ScoreIter, IntegerComparator {
+    /**
+     * Order of dimensions.
+     */
+    private int[] sort;
+
+    /**
+     * Data vector.
+     */
+    private NumberVector<?> vec;
+
+    /**
+     * Current position.
+     */
+    int pos = 0;
+
+    /**
+     * Constructor.
+     * 
+     * @param vec Vector to iterate over.
+     */
+    public DecreasingVectorIter(NumberVector<?> vec) {
+      this.vec = vec;
+      final int dim = vec.getDimensionality();
+      this.sort = new int[dim];
+      for (int d = 0; d < dim; d++) {
+        sort[d] = d;
+      }
+      IntegerArrayQuickSort.sort(sort, this);
+    }
+
+    @Override
+    public int compare(int x, int y) {
+      return Double.compare(vec.doubleValue(y), vec.doubleValue(x));
+    }
+
+    public int dim() {
+      return sort[pos];
+    }
+
+    @Override
+    public boolean valid() {
+      return pos < vec.getDimensionality();
+    }
+
+    @Override
+    public void advance() {
+      ++pos;
+    }
+
+    @Override
+    public boolean tiedToPrevious() {
+      return pos > 0 && Double.compare(vec.doubleValue(sort[pos]), vec.doubleValue(sort[pos - 1])) == 0;
+    }
+  }
+
+  /**
+   * Class that uses a NumberVector as reference, and considers all non-zero
+   * values as positive entries.
+   * 
+   * @author Erich Schubert
+   */
+  public static class VectorNonZero implements Predicate<DecreasingVectorIter> {
+    /**
+     * Vector to use as reference
+     */
+    NumberVector<?> vec;
+
+    /**
+     * Constructor.
+     * 
+     * @param vec Reference vector.
+     */
+    public VectorNonZero(NumberVector<?> vec) {
+      this.vec = vec;
+    }
+
+    @Override
+    public boolean test(DecreasingVectorIter o) {
+      return Math.abs(vec.doubleValue(o.dim())) < Double.MIN_NORMAL;
+    }
+  }
+
+  /**
+   * Test predicate using a DBID set as positive elements.
+   * 
+   * @author Erich Schubert
+   */
+  public static class DBIDsTest implements Predicate<DBIDRef> {
+    /**
+     * DBID set.
+     */
+    private DBIDs set;
+
+    /**
+     * Constructor.
+     * 
+     * @param set Set of positive objects
+     */
+    public DBIDsTest(DBIDs set) {
+      this.set = set;
+    }
+
+    @Override
+    public boolean test(DBIDRef o) {
+      return set.contains(o);
     }
   }
 
@@ -327,7 +429,7 @@ public class ROC {
    */
   public static <D extends Distance<D>> double computeROCAUCDistanceResult(int size, DBIDs ids, DistanceDBIDList<D> nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new DistanceResultAdapter<>(nei.iter()));
+    XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter<>(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 
@@ -341,7 +443,7 @@ public class ROC {
    */
   public static double computeROCAUCSimple(int size, DBIDs ids, DBIDs nei) {
     // TODO: do not materialize the ROC, but introduce an iterator interface
-    XYCurve roc = materializeROC(size, DBIDUtil.ensureSet(ids), new SimpleAdapter(nei.iter()));
+    XYCurve roc = materializeROC(new DBIDsTest(DBIDUtil.ensureSet(ids)), new SimpleAdapter(nei.iter()));
     return XYCurve.areaUnderCurve(roc);
   }
 }

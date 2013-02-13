@@ -1079,7 +1079,7 @@ public class GammaDistribution implements DistributionWithRandom {
       // Refine via newton iteration, based on Choi and Wette equation
       while (true) {
         double kdelta = (Math.log(k) - digamma(k) - diff) / (1 / k - trigamma(k));
-        if (Math.abs(kdelta) < 1E-8 || Double.isNaN(kdelta)) {
+        if (Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
           break;
         }
         k += kdelta;
