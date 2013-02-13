@@ -219,7 +219,7 @@ public class OPTICSPlot<D extends Distance<D>> implements Result {
     // calculate range
     for(ClusterOrderEntry<D> coe : order) {
       double reach = distanceAdapter.getDoubleForEntry(coe);
-      if(!Double.isInfinite(reach) && !Double.isNaN(reach)) {
+      if(!distanceAdapter.isInfinite(coe) && !Double.isNaN(reach)) {
         range.put(reach);
       }
     }

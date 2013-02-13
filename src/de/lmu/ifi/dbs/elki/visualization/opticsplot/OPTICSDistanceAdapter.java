@@ -40,5 +40,13 @@ public interface OPTICSDistanceAdapter<D extends Distance<D>> {
    * @param coe Cluster Order Entry
    * @return Double value (height)
    */
-  public double getDoubleForEntry(ClusterOrderEntry<D> coe);
+  double getDoubleForEntry(ClusterOrderEntry<D> coe);
+
+  /**
+   * Test whether the reachability is infinite.
+   * 
+   * @param coe Cluster order entry
+   * @return true, when infinite
+   */
+  boolean isInfinite(ClusterOrderEntry<D> coe);
 }

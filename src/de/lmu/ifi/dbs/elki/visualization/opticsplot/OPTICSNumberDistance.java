@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
  * 
  * @author Erich Schubert
  */
-public class OPTICSNumberDistance<D extends NumberDistance<D,?>> implements OPTICSDistanceAdapter<D> {
+public class OPTICSNumberDistance<D extends NumberDistance<D, ?>> implements OPTICSDistanceAdapter<D> {
   /**
    * Default constructor.
    */
@@ -45,5 +45,10 @@ public class OPTICSNumberDistance<D extends NumberDistance<D,?>> implements OPTI
       return Double.POSITIVE_INFINITY;
     }
     return coe.getReachability().doubleValue();
+  }
+
+  @Override
+  public boolean isInfinite(ClusterOrderEntry<D> coe) {
+    return coe.getReachability().isInfiniteDistance();
   }
 }
