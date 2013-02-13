@@ -50,4 +50,9 @@ public class OPTICSCorrelationDimensionalityDistance<D extends CorrelationDistan
     }
     return reachability.getCorrelationValue();
   }
+
+  @Override
+  public boolean isInfinite(ClusterOrderEntry<D> coe) {
+    return coe.getReachability().isInfiniteDistance();
+  }
 }
