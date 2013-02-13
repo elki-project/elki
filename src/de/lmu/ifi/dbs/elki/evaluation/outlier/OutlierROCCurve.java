@@ -106,7 +106,7 @@ public class OutlierROCCurve implements Evaluator {
     if (order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
-    XYCurve roccurve = ROC.materializeROC(size, positiveids, new ROC.SimpleAdapter(order.iter()));
+    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positiveids), new ROC.SimpleAdapter(order.iter()));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
     if (LOG.isVerbose()) {
       LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
@@ -118,7 +118,7 @@ public class OutlierROCCurve implements Evaluator {
   }
 
   private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
-    XYCurve roccurve = ROC.materializeROC(size, positiveids, new ROC.OutlierScoreAdapter(or));
+    XYCurve roccurve = ROC.materializeROC(new ROC.DBIDsTest(positiveids), new ROC.OutlierScoreAdapter(or));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
     if (LOG.isVerbose()) {
       LOG.verbose(ROCAUC_LABEL + ": " + rocauc);

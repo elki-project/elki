@@ -24,15 +24,12 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  */
 
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -54,7 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -132,16 +128,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     final NumberVector<?> refvec = relation.get(firstid);
 
     // Build the truth vector
-    Set<Integer> pos = new TreeSet<>();
-    final DoubleIntPair[] combined = new DoubleIntPair[dim];
-    {
-      for(int d = 0; d < dim; d++) {
-        combined[d] = new DoubleIntPair(0, d);
-        if(refvec.doubleValue(d) > 0) {
-          pos.add(d);
-        }
-      }
-    }
+    ROC.VectorNonZero pos = new ROC.VectorNonZero(refvec);
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     ids.remove(firstid);
@@ -156,12 +143,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         final NumberVector<?> veca = relation.get(id);
         // Direct AUC score:
         {
-          for(int d = 0; d < dim; d++) {
-            combined[d].first = veca.doubleValue(d);
-            combined[d].second = d;
-          }
-          Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
-          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
+          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(veca)));
           data[a][a] = auc;
           // minmax.put(auc);
           // logger.verbose(auc + " " + labels.get(ids.get(a)));
@@ -171,12 +153,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
         id2.seek(a + 1);
         for(int b = a + 1; b < size; b++, id2.advance()) {
           final NumberVector<?> vecb = relation.get(id2);
+          double[] combined = new double[dim];
           for(int d = 0; d < dim; d++) {
-            combined[d].first = veca.doubleValue(d) + vecb.doubleValue(d);
-            combined[d].second = d;
+            combined[d] = veca.doubleValue(d) + vecb.doubleValue(d);
           }
-          Arrays.sort(combined, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
-          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(dim, pos, Arrays.asList(combined).iterator()));
+          double auc = XYCurve.areaUnderCurve(ROC.materializeROC(pos, new ROC.DecreasingVectorIter(new DoubleVector(combined))));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
           // labels.get(ids.get(b)));
           data[a][b] = auc;

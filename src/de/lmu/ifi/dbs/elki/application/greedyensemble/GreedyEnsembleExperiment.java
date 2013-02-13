@@ -23,10 +23,7 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -129,12 +126,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     final NumberVector<?> refvec = relation.get(firstid);
 
     // Build the positive index set for ROC AUC.
-    Set<Integer> positive = new TreeSet<>();
-    for (int d = 0; d < dim; d++) {
-      if (refvec.doubleValue(d) > 0) {
-        positive.add(d);
-      }
-    }
+    ROC.Predicate<ROC.DecreasingVectorIter> positive = new ROC.VectorNonZero(refvec);
 
     final int estimated_outliers = (int) (0.005 * dim);
     int union_outliers = 0;
@@ -208,7 +200,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         }
         // fout.append(labels.get(id));
         final NumberVector<?> vec = relation.get(iditer);
-        double auc = computeROCAUC(vec, positive, dim);
+        double auc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(vec)));
         double estimated = wdist.doubleDistance(vec, estimated_truth_vec);
         double cost = tdist.doubleDistance(vec, refvec);
         LOG.verbose("ROC AUC: " + auc + " estimated " + estimated + " cost " + cost + " " + labels.get(iditer));
@@ -319,14 +311,14 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // Evaluate the naive ensemble and the "shrunk" ensemble
     double naiveauc, naivecost;
     {
-      naiveauc = computeROCAUC(naivevec, positive, dim);
+      naiveauc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(naivevec)));
       naivecost = tdist.doubleDistance(naivevec, refvec);
       LOG.verbose("Naive ensemble AUC:   " + naiveauc + " cost: " + naivecost);
       LOG.verbose("Naive ensemble Gain:  " + gain(naiveauc, bestauc, 1) + " cost gain: " + gain(naivecost, bestcost, 0));
     }
     double greedyauc, greedycost;
     {
-      greedyauc = computeROCAUC(greedyvec, positive, dim);
+      greedyauc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(greedyvec)));
       greedycost = tdist.doubleDistance(greedyvec, refvec);
       LOG.verbose("Greedy ensemble AUC:  " + greedyauc + " cost: " + greedycost);
       LOG.verbose("Greedy ensemble Gain to best:  " + gain(greedyauc, bestauc, 1) + " cost gain: " + gain(greedycost, bestcost, 0));
@@ -355,7 +347,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
           }
         }
         NumberVector<?> randomvec = factory.newNumberVector(randomensemble);
-        double auc = computeROCAUC(randomvec, positive, dim);
+        double auc = XYCurve.areaUnderCurve(ROC.materializeROC(positive, new ROC.DecreasingVectorIter(randomvec)));
         meanauc.put(auc);
         double cost = tdist.doubleDistance(randomvec, refvec);
         meancost.put(cost);
@@ -388,15 +380,6 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     // return new WeightedSquaredEuclideanDistanceFunction(estimated_weights);
     // return new WeightedLPNormDistanceFunction(1.0, estimated_weights);
     return new WeightedPearsonCorrelationDistanceFunction(estimated_weights);
-  }
-
-  private double computeROCAUC(NumberVector<?> vec, Set<Integer> positive, int dim) {
-    final DoubleIntPair[] scores = new DoubleIntPair[dim];
-    for (int d = 0; d < dim; d++) {
-      scores[d] = new DoubleIntPair(vec.doubleValue(d), d);
-    }
-    Arrays.sort(scores, Collections.reverseOrder(DoubleIntPair.BYFIRST_COMPARATOR));
-    return XYCurve.areaUnderCurve(ROC.materializeROC(dim, positive, Arrays.asList(scores).iterator()));
   }
 
   /**
