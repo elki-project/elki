@@ -98,7 +98,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * Returns the value of the specified attribute.
    * 
    * @param dimension the selected attribute. Attributes are counted starting
-   *        with 1.
+   *        with 0.
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
@@ -119,7 +119,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * Returns the value of the specified attribute.
    * 
    * @param dimension the selected attribute. Attributes are counted starting
-   *        with 1.
+   *        with 0.
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
@@ -139,7 +139,7 @@ public class IntegerVector extends AbstractNumberVector<Integer> {
    * Returns the value of the specified attribute as long.
    * 
    * @param dimension the selected attribute. Attributes are counted starting
-   *        with 1.
+   *        with 0.
    * 
    * @throws IllegalArgumentException if the specified dimension is out of range
    *         of the possible attributes
