@@ -48,8 +48,8 @@ public interface FeatureVector<D> {
   /**
    * Returns the value in the specified dimension.
    * 
-   * @param dimension the desired dimension, where 1 &le; dimension &le;
-   *        <code>this.getDimensionality()</code>
+   * @param dimension the desired dimension, where 0 &le; dimension &le;
+   *        <code>this.getDimensionality()-1</code>
    * @return the value in the specified dimension
    */
   D getValue(int dimension);
