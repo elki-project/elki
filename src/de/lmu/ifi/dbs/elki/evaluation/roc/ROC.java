@@ -328,7 +328,7 @@ public class ROC {
 
     @Override
     public int compare(int x, int y) {
-      return Double.compare(vec.doubleValue(y), vec.doubleValue(x));
+      return Double.compare(vec.doubleValue(x), vec.doubleValue(y));
     }
 
     public int dim() {
