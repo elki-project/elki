@@ -208,7 +208,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    * @param args Parameters
    */
   public static void main(String[] args) {
-    VisualizeGeodesicDistances.runCLIApplication(VisualizeGeodesicDistances.class, args);
+    runCLIApplication(VisualizeGeodesicDistances.class, args);
   }
 
   /**

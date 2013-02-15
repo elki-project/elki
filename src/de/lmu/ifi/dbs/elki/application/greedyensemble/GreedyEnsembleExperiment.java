@@ -426,6 +426,6 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
-    GreedyEnsembleExperiment.runCLIApplication(GreedyEnsembleExperiment.class, args);
+    runCLIApplication(GreedyEnsembleExperiment.class, args);
   }
 }

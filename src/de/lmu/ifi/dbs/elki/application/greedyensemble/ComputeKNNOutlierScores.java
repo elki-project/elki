@@ -466,6 +466,6 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
-    ComputeKNNOutlierScores.runCLIApplication(ComputeKNNOutlierScores.class, args);
+    runCLIApplication(ComputeKNNOutlierScores.class, args);
   }
 }
