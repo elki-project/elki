@@ -33,4 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 public interface DoubleDistanceDBIDList extends DistanceDBIDList<DoubleDistance> {
   @Override
   DoubleDistanceDBIDListIter iter();
+  
+  @Override
+  DoubleDistanceDBIDPair get(int off);
 }
