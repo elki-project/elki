@@ -247,7 +247,7 @@ public class LogGammaDistribution implements DistributionWithRandom {
       MeanVariance mv = new MeanVariance();
       for (int i = 0; i < len; i++) {
         final double val = adapter.getDouble(data, i) - shift;
-        mv.put(Math.log(val));
+        mv.put(val > 1 ? Math.log(val) : 0);
       }
       return estimate(mv, shift);
     }
@@ -262,8 +262,8 @@ public class LogGammaDistribution implements DistributionWithRandom {
     private LogGammaDistribution estimate(MeanVariance mv, double shift) {
       final double mu = mv.getMean();
       final double var = mv.getSampleVariance();
-      if (var < Double.MIN_NORMAL) {
-        throw new ArithmeticException("Cannot estimate LogGamma parameters on a distribution with zero variance.");
+      if (!(mu > 0.) || !(var > 0.)) {
+        throw new ArithmeticException("Cannot estimate LogGamma parameters on a distribution with zero mean or variance: " + mv.toString());
       }
       final double theta = var / mu;
       final double k = mu / theta;
@@ -335,6 +335,9 @@ public class LogGammaDistribution implements DistributionWithRandom {
         x[i] = Math.abs(x[i] - median);
       }
       double mad = QuickSelect.median(x);
+      if (!(mad > 0)) {
+        throw new ArithmeticException("Cannot estimate LogGamma parameters on a distribution with zero MAD.");
+      }
 
       final double theta = (mad * mad) / median;
       final double k = median / theta;

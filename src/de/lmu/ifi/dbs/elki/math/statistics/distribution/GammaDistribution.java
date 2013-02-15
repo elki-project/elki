@@ -83,7 +83,7 @@ public class GammaDistribution implements DistributionWithRandom {
    * FIXME: is this too high, too low? Can we improve behavior for extreme
    * cases?
    */
-  static final int MAX_ITERATIONS = 100;
+  static final int MAX_ITERATIONS = 1000;
 
   /**
    * Alpha == k
@@ -940,8 +940,8 @@ public class GammaDistribution implements DistributionWithRandom {
     private GammaDistribution estimate(MeanVariance mv) {
       final double mu = mv.getMean();
       final double var = mv.getSampleVariance();
-      if (var < Double.MIN_NORMAL) {
-        throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero variance.");
+      if (mu < Double.MIN_NORMAL || var < Double.MIN_NORMAL) {
+        throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero mean or variance: " + mv.toString());
       }
       final double theta = var / mu;
       final double k = mu / theta;
@@ -1004,11 +1004,17 @@ public class GammaDistribution implements DistributionWithRandom {
         x[i] = adapter.getDouble(data, i);
       }
       double median = QuickSelect.median(x);
+      if (median < Double.MIN_NORMAL) {
+        throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero median.");
+      }
       // Compute deviations:
       for (int i = 0; i < len; i++) {
         x[i] = Math.abs(x[i] - median);
       }
       double mad = QuickSelect.median(x);
+      if (mad < Double.MIN_NORMAL) {
+        throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero MAD.");
+      }
 
       final double theta = (mad * mad) / median;
       final double k = median / theta;
