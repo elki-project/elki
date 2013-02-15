@@ -123,7 +123,7 @@ public class ParallelSimplifiedLOF<O, D extends NumberDistance<D, ?>> extends Ab
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB);
     DoubleMinMax minmax;
     {
-      LOFMapper lofm = new LOFMapper(knns, lrds);
+      LOFMapper lofm = new LOFMapper(knns, lrds, true);
       SharedDouble lofv = new SharedDouble();
       DoubleMinMaxMapper mmm = new DoubleMinMaxMapper();
       WriteDoubleDataStoreMapper storelof = new WriteDoubleDataStoreMapper(lofs);
