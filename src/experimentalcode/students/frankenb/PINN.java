@@ -109,7 +109,7 @@ public class PINN<V extends NumberVector<?>> extends AbstractApplication {
   }
 
   public static void main(String[] args) {
-    AbstractApplication.runCLIApplication(PINN.class, args);
+    runCLIApplication(PINN.class, args);
   }
 
   /**
