@@ -293,6 +293,6 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
-    VisualizePairwiseGainMatrix.runCLIApplication(VisualizePairwiseGainMatrix.class, args);
+    runCLIApplication(VisualizePairwiseGainMatrix.class, args);
   }
 }

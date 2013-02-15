@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,7 +35,7 @@ public final class GaussianKernelDensityFunction implements KernelDensityFunctio
   /**
    * Scaling constant for Gaussian kernel, to make it sum up to 1.
    */
-  private static final double GSCALE = 1.0 / Math.sqrt(2.0 * Math.PI);
+  public static final double GSCALE = 1.0 / MathUtil.SQRTTWOPI;
 
   @Override
   public double density(double delta) {
@@ -57,7 +58,7 @@ public final class GaussianKernelDensityFunction implements KernelDensityFunctio
    * Parameterization stub.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
