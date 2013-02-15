@@ -56,15 +56,22 @@ public class LOFMapper implements Mapper {
   private SharedDouble output;
 
   /**
+   * Exclude object itself from computation.
+   */
+  private boolean noself;
+
+  /**
    * Constructor.
    * 
    * @param knns k nearest neighbors
    * @param kdists k distances
+   * @param noself Exclude self from neighbors
    */
-  public LOFMapper(DataStore<? extends KNNList<?>> knns, DoubleDataStore lrds) {
+  public LOFMapper(DataStore<? extends KNNList<?>> knns, DoubleDataStore lrds, boolean noself) {
     super();
     this.knns = knns;
     this.lrds = lrds;
+    this.noself = noself;
   }
 
   /**
@@ -104,23 +111,25 @@ public class LOFMapper implements Mapper {
 
     @Override
     public void map(DBIDRef id) {
+      // Own density
+      final double lrdp = lrds.doubleValue(id);
+      if (!(lrdp > 0)) {
+        output.set(1.0);
+        return;
+      }
+      // Compute average neighbor density:
       KNNList<?> knn = knns.get(id);
       double avlrd = 0.0;
       int cnt = 0;
       for (DBIDIter n = knn.iter(); n.valid(); n.advance()) {
-        if (DBIDUtil.equal(n, id)) {
+        if (noself && DBIDUtil.equal(n, id)) {
           continue;
         }
         avlrd += lrds.doubleValue(n);
         cnt++;
       }
       avlrd = (cnt > 0) ? (avlrd / cnt) : 0;
-      final double lrdp = lrds.doubleValue(id);
-      if (lrdp > 0) {
-        output.set(avlrd / lrdp);
-      } else {
-        output.set(1.0);
-      }
+      output.set(avlrd / lrdp);
     }
 
     @Override
