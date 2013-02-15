@@ -67,7 +67,7 @@ public interface DistanceDBIDList<D extends Distance<D>> extends DBIDs {
    * @return Size
    */
   @Override
-  public int size();
+  int size();
 
   /**
    * Access a single pair.
@@ -75,7 +75,7 @@ public interface DistanceDBIDList<D extends Distance<D>> extends DBIDs {
    * @param off Offset
    * @return Pair
    */
-  public DistanceDBIDPair<D> get(int off);
+  DistanceDBIDPair<D> get(int off);
 
   /**
    * Get an iterator
@@ -83,5 +83,5 @@ public interface DistanceDBIDList<D extends Distance<D>> extends DBIDs {
    * @return New iterator
    */
   @Override
-  public DistanceDBIDListIter<D> iter();
+  DistanceDBIDListIter<D> iter();
 }
