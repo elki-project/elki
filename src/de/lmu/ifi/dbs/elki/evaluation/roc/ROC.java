@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
+import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayIter;
 import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
 
 /**
@@ -295,7 +296,7 @@ public class ROC {
    * 
    * @author Erich Schubert
    */
-  public static class DecreasingVectorIter implements ScoreIter, IntegerComparator {
+  public static class DecreasingVectorIter implements ScoreIter, IntegerComparator, ArrayIter {
     /**
      * Order of dimensions.
      */
@@ -328,7 +329,7 @@ public class ROC {
 
     @Override
     public int compare(int x, int y) {
-      return Double.compare(vec.doubleValue(x), vec.doubleValue(y));
+      return Double.compare(vec.doubleValue(y), vec.doubleValue(x));
     }
 
     public int dim() {
@@ -348,6 +349,107 @@ public class ROC {
     @Override
     public boolean tiedToPrevious() {
       return pos > 0 && Double.compare(vec.doubleValue(sort[pos]), vec.doubleValue(sort[pos - 1])) == 0;
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+
+    @Override
+    public void retract() {
+      pos--;
+    }
+
+    @Override
+    public void seek(int off) {
+      pos = off;
+    }
+  }
+
+  /**
+   * Class to iterate over a number vector in decreasing order.
+   * 
+   * @author Erich Schubert
+   */
+  public static class IncreasingVectorIter implements ScoreIter, IntegerComparator, ArrayIter {
+    /**
+     * Order of dimensions.
+     */
+    private int[] sort;
+  
+    /**
+     * Data vector.
+     */
+    private NumberVector<?> vec;
+  
+    /**
+     * Current position.
+     */
+    int pos = 0;
+  
+    /**
+     * Constructor.
+     * 
+     * @param vec Vector to iterate over.
+     */
+    public IncreasingVectorIter(NumberVector<?> vec) {
+      this.vec = vec;
+      final int dim = vec.getDimensionality();
+      this.sort = new int[dim];
+      for (int d = 0; d < dim; d++) {
+        sort[d] = d;
+      }
+      IntegerArrayQuickSort.sort(sort, this);
+    }
+  
+    @Override
+    public int compare(int x, int y) {
+      return Double.compare(vec.doubleValue(x), vec.doubleValue(y));
+    }
+  
+    public int dim() {
+      return sort[pos];
+    }
+  
+    @Override
+    public boolean valid() {
+      return pos < vec.getDimensionality();
+    }
+  
+    @Override
+    public void advance() {
+      ++pos;
+    }
+  
+    @Override
+    public boolean tiedToPrevious() {
+      return pos > 0 && Double.compare(vec.doubleValue(sort[pos]), vec.doubleValue(sort[pos - 1])) == 0;
+    }
+  
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+  
+    @Override
+    public void advance(int count) {
+      pos += count;
+    }
+  
+    @Override
+    public void retract() {
+      pos--;
+    }
+  
+    @Override
+    public void seek(int off) {
+      pos = off;
     }
   }
 
@@ -374,6 +476,33 @@ public class ROC {
 
     @Override
     public boolean test(DecreasingVectorIter o) {
+      return Math.abs(vec.doubleValue(o.dim())) > 0;
+    }
+  }
+
+  /**
+   * Class that uses a NumberVector as reference, and considers all zero values
+   * as positive entries.
+   * 
+   * @author Erich Schubert
+   */
+  public static class VectorZero implements Predicate<IncreasingVectorIter> {
+    /**
+     * Vector to use as reference
+     */
+    NumberVector<?> vec;
+
+    /**
+     * Constructor.
+     * 
+     * @param vec Reference vector.
+     */
+    public VectorZero(NumberVector<?> vec) {
+      this.vec = vec;
+    }
+
+    @Override
+    public boolean test(IncreasingVectorIter o) {
       return Math.abs(vec.doubleValue(o.dim())) < Double.MIN_NORMAL;
     }
   }
