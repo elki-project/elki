@@ -96,15 +96,22 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector<?>> exten
     this.stddev = stddev;
   }
 
+  /**
+   * Constructor.
+   */
+  public AttributeWiseVarianceNormalization() {
+    super();
+  }
+
   @Override
   protected boolean prepareStart(SimpleTypeInformation<V> in) {
-    return (mean.length == 0 || stddev.length == 0);
+    return (mean == null || stddev == null || mean.length == 0 || stddev.length == 0);
   }
 
   @Override
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
-    if(mvs == null) {
+    if(mvs == null || mvs.length == 0) {
       int dimensionality = featureVector.getDimensionality();
       mvs = MeanVariance.newArray(dimensionality);
     }
