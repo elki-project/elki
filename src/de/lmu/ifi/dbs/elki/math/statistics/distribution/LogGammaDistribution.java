@@ -400,12 +400,16 @@ public class LogGammaDistribution implements DistributionWithRandom {
       shift -= 1; // So no negative values arise after log
       double meanx = 0, meanlogx = 0;
       for (int i = 0; i < len; i++) {
-        final double val = Math.log(adapter.getDouble(data, i) - shift);
+        final double shifted = adapter.getDouble(data, i) - shift;
+        final double val = shifted > 1 ? Math.log(shifted) : 1.;
         final double logx = (val > 0) ? Math.log(val) : meanlogx;
         final double deltax = val - meanx;
         final double deltalogx = logx - meanlogx;
         meanx += deltax / (i + 1.);
         meanlogx += deltalogx / (i + 1.);
+      }
+      if (!(meanx > 0)) {
+        throw new ArithmeticException("Cannot estimate LogGamma distribution with mean ");
       }
       // Initial approximation
       final double logmeanx = Math.log(meanx);
@@ -419,6 +423,9 @@ public class LogGammaDistribution implements DistributionWithRandom {
           break;
         }
         k += kdelta;
+      }
+      if (!(k > 0)) {
+        throw new ArithmeticException("LogGamma estimation failed: k <= 0.");
       }
       // Estimate theta:
       final double theta = k / meanx;
