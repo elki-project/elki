@@ -162,7 +162,7 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
     }
   }
 
-  private void writeKMLData(XMLStreamWriter out, OutlierResult outlierResult, Database database) throws XMLStreamException {
+  private void writeKMLData(XMLStreamWriter xmlw, OutlierResult outlierResult, Database database) throws XMLStreamException {
     Relation<Double> scores = outlierResult.getScores();
     Relation<PolygonsObject> polys = database.getRelation(TypeUtil.POLYGON_TYPE);
     Relation<String> labels = DatabaseUtil.guessObjectLabelRepresentation(database);
@@ -177,56 +177,56 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
 
     scaling.prepare(outlierResult);
 
-    out.writeStartDocument();
-    out.writeCharacters("\n");
-    out.writeStartElement("kml");
-    out.writeDefaultNamespace("http://earth.google.com/kml/2.2");
-    out.writeStartElement("Document");
+    xmlw.writeStartDocument();
+    xmlw.writeCharacters("\n");
+    xmlw.writeStartElement("kml");
+    xmlw.writeDefaultNamespace("http://earth.google.com/kml/2.2");
+    xmlw.writeStartElement("Document");
     {
       // TODO: can we automatically generate more helpful data here?
-      out.writeStartElement("name");
-      out.writeCharacters("ELKI KML output for " + outlierResult.getLongName());
-      out.writeEndElement(); // name
-      writeNewlineOnDebug(out);
+      xmlw.writeStartElement("name");
+      xmlw.writeCharacters("ELKI KML output for " + outlierResult.getLongName());
+      xmlw.writeEndElement(); // name
+      writeNewlineOnDebug(xmlw);
       // TODO: e.g. list the settings in the description?
-      out.writeStartElement("description");
-      out.writeCharacters("ELKI KML output for " + outlierResult.getLongName());
-      out.writeEndElement(); // description
-      writeNewlineOnDebug(out);
+      xmlw.writeStartElement("description");
+      xmlw.writeCharacters("ELKI KML output for " + outlierResult.getLongName());
+      xmlw.writeEndElement(); // description
+      writeNewlineOnDebug(xmlw);
     }
     {
       // TODO: generate styles from color scheme
       for(int i = 0; i < NUMSTYLES; i++) {
         Color col = getColorForValue(i / (NUMSTYLES - 1.0));
-        out.writeStartElement("Style");
-        out.writeAttribute("id", "s" + i);
-        writeNewlineOnDebug(out);
+        xmlw.writeStartElement("Style");
+        xmlw.writeAttribute("id", "s" + i);
+        writeNewlineOnDebug(xmlw);
         {
-          out.writeStartElement("LineStyle");
-          out.writeStartElement("width");
-          out.writeCharacters("0");
-          out.writeEndElement(); // width
+          xmlw.writeStartElement("LineStyle");
+          xmlw.writeStartElement("width");
+          xmlw.writeCharacters("0");
+          xmlw.writeEndElement(); // width
 
-          out.writeEndElement(); // LineStyle
+          xmlw.writeEndElement(); // LineStyle
         }
-        writeNewlineOnDebug(out);
+        writeNewlineOnDebug(xmlw);
         {
-          out.writeStartElement("PolyStyle");
-          out.writeStartElement("color");
+          xmlw.writeStartElement("PolyStyle");
+          xmlw.writeStartElement("color");
           // KML uses AABBGGRR format!
-          out.writeCharacters(String.format("%02x%02x%02x%02x", col.getAlpha(), col.getBlue(), col.getGreen(), col.getRed()));
-          out.writeEndElement(); // color
+          xmlw.writeCharacters(String.format("%02x%02x%02x%02x", col.getAlpha(), col.getBlue(), col.getGreen(), col.getRed()));
+          xmlw.writeEndElement(); // color
           // out.writeStartElement("fill");
           // out.writeCharacters("1"); // Default 1
           // out.writeEndElement(); // fill
-          out.writeStartElement("outline");
-          out.writeCharacters("0");
-          out.writeEndElement(); // outline
-          out.writeEndElement(); // PolyStyle
+          xmlw.writeStartElement("outline");
+          xmlw.writeCharacters("0");
+          xmlw.writeEndElement(); // outline
+          xmlw.writeEndElement(); // PolyStyle
         }
-        writeNewlineOnDebug(out);
-        out.writeEndElement(); // Style
-        writeNewlineOnDebug(out);
+        writeNewlineOnDebug(xmlw);
+        xmlw.writeEndElement(); // Style
+        writeNewlineOnDebug(xmlw);
       }
     }
     for (DBIDIter iter = outlierResult.getOrdering().iter(ids).iter(); iter.valid(); iter.advance()) {
@@ -240,67 +240,67 @@ public class KMLOutputHandler implements ResultHandler, Parameterizable {
         LOG.warning("No polygon for object " + DBIDUtil.toString(iter) + " - skipping.");
         continue;
       }
-      out.writeStartElement("Placemark");
+      xmlw.writeStartElement("Placemark");
       {
-        out.writeStartElement("name");
-        out.writeCharacters(score + " " + label);
-        out.writeEndElement(); // name
+        xmlw.writeStartElement("name");
+        xmlw.writeCharacters(score + " " + label);
+        xmlw.writeEndElement(); // name
         StringBuilder buf = makeDescription(otherrel, iter);
-        out.writeStartElement("description");
-        out.writeCData("<div>" + buf.toString() + "</div>");
-        out.writeEndElement(); // description
-        out.writeStartElement("styleUrl");
+        xmlw.writeStartElement("description");
+        xmlw.writeCData("<div>" + buf.toString() + "</div>");
+        xmlw.writeEndElement(); // description
+        xmlw.writeStartElement("styleUrl");
         int style = (int) (scaling.getScaled(score) * NUMSTYLES);
         style = Math.max(0, Math.min(style, NUMSTYLES - 1));
-        out.writeCharacters("#s" + style);
-        out.writeEndElement(); // styleUrl
+        xmlw.writeCharacters("#s" + style);
+        xmlw.writeEndElement(); // styleUrl
       }
       {
-        out.writeStartElement("Polygon");
-        writeNewlineOnDebug(out);
+        xmlw.writeStartElement("Polygon");
+        writeNewlineOnDebug(xmlw);
         if(compat) {
-          out.writeStartElement("altitudeMode");
-          out.writeCharacters("relativeToGround");
-          out.writeEndElement(); // close altitude mode
-          writeNewlineOnDebug(out);
+          xmlw.writeStartElement("altitudeMode");
+          xmlw.writeCharacters("relativeToGround");
+          xmlw.writeEndElement(); // close altitude mode
+          writeNewlineOnDebug(xmlw);
         }
         // First polygon clockwise?
         boolean first = true;
         for(Polygon p : poly.getPolygons()) {
           if(first) {
-            out.writeStartElement("outerBoundaryIs");
+            xmlw.writeStartElement("outerBoundaryIs");
           }
           else {
-            out.writeStartElement("innerBoundaryIs");
+            xmlw.writeStartElement("innerBoundaryIs");
           }
-          out.writeStartElement("LinearRing");
-          out.writeStartElement("coordinates");
+          xmlw.writeStartElement("LinearRing");
+          xmlw.writeStartElement("coordinates");
 
           // Reverse anti-clockwise polygons.
           boolean reverse = (p.testClockwise() >= 0);
           Iterator<Vector> it = reverse ? p.descendingIterator() : p.iterator();
           while(it.hasNext()) {
             Vector v = it.next();
-            out.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
+            xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
             if(compat && (v.getDimensionality() == 2)) {
-              out.writeCharacters(",500");
+              xmlw.writeCharacters(",500");
             }
-            out.writeCharacters(" ");
+            xmlw.writeCharacters(" ");
           }
-          out.writeEndElement(); // close coordinates
-          out.writeEndElement(); // close LinearRing
-          out.writeEndElement(); // close *BoundaryIs
+          xmlw.writeEndElement(); // close coordinates
+          xmlw.writeEndElement(); // close LinearRing
+          xmlw.writeEndElement(); // close *BoundaryIs
           first = false;
         }
-        writeNewlineOnDebug(out);
-        out.writeEndElement(); // Polygon
+        writeNewlineOnDebug(xmlw);
+        xmlw.writeEndElement(); // Polygon
       }
-      out.writeEndElement(); // Placemark
-      writeNewlineOnDebug(out);
+      xmlw.writeEndElement(); // Placemark
+      writeNewlineOnDebug(xmlw);
     }
-    out.writeEndElement(); // Document
-    out.writeEndElement(); // kml
-    out.writeEndDocument();
+    xmlw.writeEndElement(); // Document
+    xmlw.writeEndElement(); // kml
+    xmlw.writeEndDocument();
   }
 
   /**
