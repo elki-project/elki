@@ -63,22 +63,6 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
   private static final Logging LOG = Logging.getLogger(CacheDoubleDistanceInOnDiskMatrix.class);
 
   /**
-   * Parameter that specifies the name of the directory to be re-parsed.
-   * <p>
-   * Key: {@code -loader.diskcache}
-   * </p>
-   */
-  public static final OptionID CACHE_ID = new OptionID("loader.diskcache", "File name of the disk cache to create.");
-
-  /**
-   * Parameter that specifies the name of the directory to be re-parsed.
-   * <p>
-   * Key: {@code -loader.distance}
-   * </p>
-   */
-  public static final OptionID DISTANCE_ID = new OptionID("loader.distance", "Distance function to cache.");
-
-  /**
    * Debug flag, to double-check all write operations.
    */
   private static final boolean debugExtraCheckSymmetry = false;
@@ -164,6 +148,22 @@ public class CacheDoubleDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>
    * @apiviz.exclude
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
+    /**
+     * Parameter that specifies the name of the directory to be re-parsed.
+     * <p>
+     * Key: {@code -loader.diskcache}
+     * </p>
+     */
+    public static final OptionID CACHE_ID = new OptionID("loader.diskcache", "File name of the disk cache to create.");
+
+    /**
+     * Parameter that specifies the name of the directory to be re-parsed.
+     * <p>
+     * Key: {@code -loader.distance}
+     * </p>
+     */
+    public static final OptionID DISTANCE_ID = new OptionID("loader.distance", "Distance function to cache.");
+
     /**
      * Holds the database connection to have the algorithm run with.
      */

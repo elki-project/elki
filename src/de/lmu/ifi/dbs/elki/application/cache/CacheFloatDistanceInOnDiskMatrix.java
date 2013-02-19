@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -60,22 +59,6 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(CacheFloatDistanceInOnDiskMatrix.class);
-
-  /**
-   * Parameter that specifies the name of the directory to be re-parsed.
-   * <p>
-   * Key: {@code -loader.diskcache}
-   * </p>
-   */
-  public static final OptionID CACHE_ID = new OptionID("loader.diskcache", "File name of the disk cache to create.");
-
-  /**
-   * Parameter that specifies the name of the directory to be re-parsed.
-   * <p>
-   * Key: {@code -loader.distance}
-   * </p>
-   */
-  public static final OptionID DISTANCE_ID = new OptionID("loader.distance", "Distance function to cache.");
 
   /**
    * Debug flag, to double-check all write operations.
@@ -192,16 +175,15 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
         database = dbpar.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
       // Output file parameter
-      final FileParameter cpar = new FileParameter(CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
+      final FileParameter cpar = new FileParameter(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
       if(config.grab(cpar)) {
         out = cpar.getValue();
       }
-
     }
 
     @Override
