@@ -28,7 +28,6 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -42,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Precompute an on-disk distance matrix, using double precision.
@@ -71,9 +71,9 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
   private static final int FLOAT_SIZE = 4;
 
   /**
-   * Holds the database connection to have the algorithm run with.
+   * Data source to process.
    */
-  private Database database;
+  private InputStep input;
 
   /**
    * Distance function that is to be cached.
@@ -88,28 +88,28 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
   /**
    * Constructor.
    * 
-   * @param database Database
+   * @param input Data source
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheFloatDistanceInOnDiskMatrix(Database database, DistanceFunction<O, D> distance, File out) {
+  public CacheFloatDistanceInOnDiskMatrix(InputStep input, DistanceFunction<O, D> distance, File out) {
     super();
-    this.database = database;
+    this.input = input;
     this.distance = distance;
     this.out = out;
   }
 
   @Override
   public void run() {
-    database.initialize();
+    Database database = input.getDatabase();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O, D> distanceQuery = database.getDistanceQuery(relation, distance);
 
     int matrixsize = 0;
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final int intid = DBIDUtil.asInteger(iditer);
       matrixsize = Math.max(matrixsize, intid + 1);
-      if(intid < 0) {
+      if (intid < 0) {
         throw new AbortException("OnDiskMatrixCache does not allow negative DBIDs.");
       }
     }
@@ -117,25 +117,23 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
     OnDiskUpperTriangleMatrix matrix;
     try {
       matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedFloatDistanceFunction.FLOAT_CACHE_MAGIC, 0, FLOAT_SIZE, matrixsize);
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new AbortException("Error creating output matrix.", e);
     }
 
-    for(DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
-      for(DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
-        if(DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
+    for (DBIDIter id1 = relation.iterDBIDs(); id1.valid(); id1.advance()) {
+      for (DBIDIter id2 = relation.iterDBIDs(); id2.valid(); id2.advance()) {
+        if (DBIDUtil.asInteger(id2) >= DBIDUtil.asInteger(id1)) {
           float d = distanceQuery.distance(id1, id2).floatValue();
-          if(debugExtraCheckSymmetry) {
+          if (debugExtraCheckSymmetry) {
             float d2 = distanceQuery.distance(id2, id1).floatValue();
-            if(Math.abs(d - d2) > 0.0000001) {
+            if (Math.abs(d - d2) > 0.0000001) {
               LOG.warning("Distance function doesn't appear to be symmetric!");
             }
           }
           try {
             matrix.getRecordBuffer(DBIDUtil.asInteger(id1), DBIDUtil.asInteger(id2)).putFloat(d);
-          }
-          catch(IOException e) {
+          } catch (IOException e) {
             throw new AbortException("Error writing distance record " + id1 + "," + id2 + " to matrix.", e);
           }
         }
@@ -152,9 +150,9 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
    */
   public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractApplication.Parameterizer {
     /**
-     * Holds the database connection to have the algorithm run with.
+     * Data source to process.
      */
-    private Database database = null;
+    private InputStep input = null;
 
     /**
      * Distance function that is to be cached.
@@ -169,26 +167,22 @@ public class CacheFloatDistanceInOnDiskMatrix<O, D extends NumberDistance<D, ?>>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      // Database connection parameter
-      final ObjectParameter<Database> dbpar = new ObjectParameter<>(Database.DATABASE_CONNECTION_ID, Database.class, StaticArrayDatabase.class);
-      if(config.grab(dbpar)) {
-        database = dbpar.instantiateClass(config);
-      }
+      input = config.tryInstantiate(InputStep.class);
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O, D>> dpar = new ObjectParameter<>(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.DISTANCE_ID, DistanceFunction.class);
-      if(config.grab(dpar)) {
+      if (config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
       // Output file parameter
       final FileParameter cpar = new FileParameter(CacheDoubleDistanceInOnDiskMatrix.Parameterizer.CACHE_ID, FileParameter.FileType.OUTPUT_FILE);
-      if(config.grab(cpar)) {
+      if (config.grab(cpar)) {
         out = cpar.getValue();
       }
     }
 
     @Override
     protected CacheFloatDistanceInOnDiskMatrix<O, D> makeInstance() {
-      return new CacheFloatDistanceInOnDiskMatrix<>(database, distance, out);
+      return new CacheFloatDistanceInOnDiskMatrix<>(input, distance, out);
     }
   }
 
