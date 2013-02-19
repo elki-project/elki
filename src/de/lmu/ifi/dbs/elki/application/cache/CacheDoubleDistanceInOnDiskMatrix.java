@@ -46,8 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Wrapper to convert a traditional text-serialized result into a on-disk matrix
- * for random access.
+ * Precompute an on-disk distance matrix, using double precision.
  * 
  * @author Erich Schubert
  * 
