@@ -33,14 +33,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 public final class GaussianKernelDensityFunction implements KernelDensityFunction {
   /**
+   * Static instance.
+   */
+  public static final GaussianKernelDensityFunction KERNEL = new GaussianKernelDensityFunction();
+
+  /**
+   * Canonical bandwidth.
+   */
+  public static final double CANONICAL_BANDWIDTH = .5 / MathUtil.SQRTPI;
+
+  /**
    * Scaling constant for Gaussian kernel, to make it sum up to 1.
    */
-  public static final double GSCALE = 1.0 / MathUtil.SQRTTWOPI;
-
-  @Override
-  public double density(double delta) {
-    return GSCALE * Math.exp(-.5 * delta * delta);
-  }
+  private static final double GSCALE = 1.0 / MathUtil.SQRTTWOPI;
 
   /**
    * Private, empty constructor. Use the static instance!
@@ -49,10 +54,15 @@ public final class GaussianKernelDensityFunction implements KernelDensityFunctio
     // Nothing to do.
   }
 
-  /**
-   * Static instance.
-   */
-  public static final GaussianKernelDensityFunction KERNEL = new GaussianKernelDensityFunction();
+  @Override
+  public double density(double delta) {
+    return GSCALE * Math.exp(-.5 * delta * delta);
+  }
+
+  @Override
+  public double canonicalBandwidth() {
+    return CANONICAL_BANDWIDTH;
+  }
 
   /**
    * Parameterization stub.

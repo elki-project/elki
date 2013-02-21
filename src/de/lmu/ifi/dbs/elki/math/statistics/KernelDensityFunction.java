@@ -37,4 +37,11 @@ public interface KernelDensityFunction {
    * @return density contribution
    */
   public double density(double delta);
+  
+  /**
+   * Get the canonical bandwidth for this kernel.
+   * 
+   * @return Canonical bandwidth.
+   */
+  public double canonicalBandwidth();
 }

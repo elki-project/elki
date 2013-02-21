@@ -31,13 +31,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 public final class EpanechnikovKernelDensityFunction implements KernelDensityFunction {
-  @Override
-  public double density(double delta) {
-    if(delta < 1) {
-      return 0.75 * (1 - delta * delta);
-    }
-    return 0;
-  }
+  /**
+   * Static instance.
+   */
+  public static final EpanechnikovKernelDensityFunction KERNEL = new EpanechnikovKernelDensityFunction();
+
+  /**
+   * Canonical bandwidth.
+   */
+  public static final double CANONICAL_BANDWIDTH = 3. / (5. * Math.sqrt(5.));
 
   /**
    * Private, empty constructor. Use the static instance!
@@ -46,16 +48,24 @@ public final class EpanechnikovKernelDensityFunction implements KernelDensityFun
     // Nothing to do.
   }
 
-  /**
-   * Static instance.
-   */
-  public static final EpanechnikovKernelDensityFunction KERNEL = new EpanechnikovKernelDensityFunction();
+  @Override
+  public double density(double delta) {
+    if (delta < 1) {
+      return 0.75 * (1 - delta * delta);
+    }
+    return 0;
+  }
+
+  @Override
+  public double canonicalBandwidth() {
+    return CANONICAL_BANDWIDTH;
+  }
 
   /**
    * Parameterization stub.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

@@ -31,13 +31,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 public final class TriangularKernelDensityFunction implements KernelDensityFunction {
-  @Override
-  public double density(double delta) {
-    if(delta < 1) {
-      return 1 - delta;
-    }
-    return 0;
-  }
+  /**
+   * Static instance.
+   */
+  public static final TriangularKernelDensityFunction KERNEL = new TriangularKernelDensityFunction();
+
+  /**
+   * Canonical bandwidth.
+   */
+  public static final double CANONICAL_BANDWIDTH = Math.sqrt(6) / 9.;
 
   /**
    * Private, empty constructor. Use the static instance!
@@ -46,16 +48,24 @@ public final class TriangularKernelDensityFunction implements KernelDensityFunct
     // Nothing to do.
   }
 
-  /**
-   * Static instance.
-   */
-  public static final TriangularKernelDensityFunction KERNEL = new TriangularKernelDensityFunction();
+  @Override
+  public double density(double delta) {
+    if (delta < 1) {
+      return 1 - delta;
+    }
+    return 0;
+  }
+
+  @Override
+  public double canonicalBandwidth() {
+    return CANONICAL_BANDWIDTH;
+  }
 
   /**
    * Parameterization stub.
    * 
    * @author Erich Schubert
-   *
+   * 
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
