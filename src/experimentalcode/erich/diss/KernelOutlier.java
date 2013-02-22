@@ -45,13 +45,14 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.KernelDensityFunction;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -79,9 +80,11 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
 
   double scale;
 
-  double minBandwidth = 0.01;
+  double minBandwidth = 0.001;
 
-  final static double CUTOFF = 1e-8;
+  final static double CUTOFF = 1e-10;
+
+  boolean usemad = false;
 
   /**
    * Constructor.
@@ -101,7 +104,6 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
   }
 
   public OutlierResult run(Database database, Relation<O> rel) {
-    final int dim = RelationUtil.dimensionality(rel);
     DistanceQuery<O, D> dq = database.getDistanceQuery(rel, getDistanceFunction());
     DBIDs ids = rel.getDBIDs();
 
@@ -118,7 +120,7 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
 
     // Initialize store for densities
     WritableDataStore<double[]> densities = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, double[].class);
-    final int knum = kmax - kmin + 1;
+    final int knum = kmax + 1 - kmin;
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       densities.put(iter, new double[knum]);
     }
@@ -132,24 +134,24 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
           if (DBIDUtil.equal(kneighbor, iter)) {
             continue;
           }
+          ++k;
           if (k < kmin) {
-            ++k;
             continue;
           }
           final double bw = Math.max(minBandwidth, kneighbor.doubleDistance()) * scale;
-          final double powbw = .75 / Math.pow(bw, dim);
+          // final double powbw = .75 / Math.pow(bw, dim);
           for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-            double dens = kernel.density(neighbor.doubleDistance() / bw) * powbw;
-            densities.get(neighbor)[k - kmin] += dens;
+            double dens = kernel.density(neighbor.doubleDistance() / bw);
+            densities.get(neighbor)[k - kmin] += dens; // * powbw;
             if (dens < CUTOFF) {
               break;
             }
           }
-          ++k;
-          if (k >= kmax) {
+          if (k == kmax) {
             break;
           }
         }
+        assert (k == kmax) : "K is " + k + " size: " + neighbors.size();
       } else {
         throw new AbortException(ExceptionMessages.UNSUPPORTED_NOT_YET);
       }
@@ -169,31 +171,52 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
         scratch = new double[knum][neighbors.size() + 5];
       }
       if (neighbors instanceof DoubleDistanceKNNList) {
-        int i = 0;
-        for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance(), i++) {
-          double[] ndens = densities.get(neighbor);
-          for (int k = 0; k < ndens.length; k++) {
-            scratch[k][i] = ndens[k];
+        {
+          int i = 0;
+          for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance(), i++) {
+            double[] ndens = densities.get(neighbor);
+            for (int k = 0; k < knum; k++) {
+              scratch[k][i] = ndens[k];
+            }
           }
+          assert (i == neighbors.size());
         }
-        assert (i == neighbors.size());
         // Compute medians and MADs
-        for (int k = 0; k < knum; k++) {
-          meds[k] = QuickSelect.median(scratch[k], 0, i);
-          for (int j = 0; j < i; j++) {
-            scratch[k][j] = Math.abs(scratch[k][j] - meds[k]);
+        double score = 0.;
+        if (usemad) {
+          for (int k = 0; k < knum; k++) {
+            meds[k] = QuickSelect.median(scratch[k], 0, neighbors.size());
+            for (int j = 0; j < neighbors.size(); j++) {
+              scratch[k][j] = Math.abs(scratch[k][j] - meds[k]);
+            }
+            mads[k] = QuickSelect.median(scratch[k], 0, neighbors.size());
           }
-          mads[k] = QuickSelect.median(scratch[k], 0, i);
-        }
-        for (int k = 0; k < knum; k++) {
-          if (mads[k] > 0) {
-            meds[k] = -(dens[k] - meds[k]) / mads[k];
-          } else {
-            meds[k] = 0.;
+          for (int k = 0; k < knum; k++) {
+            if (mads[k] > 0) {
+              meds[k] = -(dens[k] - meds[k]) / mads[k];
+            } else {
+              meds[k] = 0.;
+            }
           }
+          score = QuickSelect.quantile(meds, .5);
+        } else {
+          MeanVariance mv = new MeanVariance();
+          for (int k = 0; k < knum; k++) {
+            for (int j = 0; j < neighbors.size(); j++) {
+              mv.put(scratch[k][j]);
+            }
+            meds[k] = mv.getMean();
+            mads[k] = mv.getSampleStddev();
+            mv.reset();
+          }
+          for (int k = 0; k < knum; k++) {
+            final double s = (mads[k] > 0) ? (-(dens[k] - meds[k]) / mads[k]) : 0;
+            score += s;
+          }
+          score /= knum;
         }
-        final double score = Math.max(0, Math.exp(QuickSelect.quantile(meds, 0.8)));
-        // final double score = NormalDistribution.standardNormalCDF(maxZ);
+        // score = Math.max(0, Math.exp(score));
+        score = NormalDistribution.standardNormalCDF(score);
         minmax.put(score);
         kofs.put(iter, score);
       } else {
