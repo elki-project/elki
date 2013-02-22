@@ -98,7 +98,7 @@ public class UniformDistribution implements DistributionWithRandom {
 
   @Override
   public double pdf(double val) {
-    if (val < min || val >= max) {
+    if (val < min || val >= max || !(len > 0)) {
       return 0.0;
     }
     return 1.0 / len;
@@ -106,13 +106,17 @@ public class UniformDistribution implements DistributionWithRandom {
 
   @Override
   public double cdf(double val) {
-    if (val < min) {
+    if (val <= min) {
       return 0.0;
     }
-    if (val > max) {
+    if (val >= max) {
       return 1.0;
     }
-    return (val - min) / len;
+    if (len > 0) {
+      return (val - min) / len;
+    } else {
+      return .5;
+    }
   }
 
   @Override
@@ -207,7 +211,7 @@ public class UniformDistribution implements DistributionWithRandom {
       for (int i = 0; i < len; i++) {
         mm.put(adapter.getDouble(data, i));
       }
-      double grow = 0.5 * mm.getDiff() / (len - 1);
+      double grow = (len > 1) ? 0.5 * mm.getDiff() / (len - 1) : 0.;
       return new UniformDistribution(mm.getMin() - grow, mm.getMax() + grow);
     }
 

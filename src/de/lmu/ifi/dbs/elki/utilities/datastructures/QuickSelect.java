@@ -124,7 +124,7 @@ public class QuickSelect {
     if (length % 2 == 1) {
       return data[left];
     } else {
-      quickSelect(data, begin, end, left + 1);
+      quickSelect(data, left + 1, end, left + 1);
       return data[left] + .5 * (data[left + 1] - data[left]);
     }
   }
@@ -165,7 +165,7 @@ public class QuickSelect {
     if (err <= Double.MIN_NORMAL) {
       return data[ileft];
     } else {
-      quickSelect(data, begin, end, ileft + 1);
+      quickSelect(data, ileft + 1, end, ileft + 1);
       // Mix:
       double mix = data[ileft] + (data[ileft + 1] - data[ileft]) * err;
       return mix;
