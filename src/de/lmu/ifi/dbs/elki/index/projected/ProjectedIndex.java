@@ -1,4 +1,4 @@
-package experimentalcode.shared.index.subspace.projection;
+package de.lmu.ifi.dbs.elki.index.projected;
 
 /*
  This file is part of ELKI:
@@ -52,7 +52,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Class to index data by projection.
+ * Class to index data in an arbitrary projection only.
+ * 
+ * Note: be <b>careful</b> when using this class, as it may/will yield incorrect
+ * distances, depending on your projection! It may be desirable to use a
+ * modified index that corrects for this error, or supports specific
+ * combiantions only.
+ * 
+ * See {@link LatLngAsECEFIndex} and {@link LngLatAsECEFIndex} for example
+ * indexes that support only a specific (good) combination.
  * 
  * @author Erich Schubert
  * 
@@ -202,7 +210,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     @Override
     public KNNList<D> getKNNForDBID(DBIDRef id, int k) {
-      return inner.getKNNForDBID(id, k);
+      // So we have to project the query point only once:
+      return getKNNForObject(relation.get(id), k);
     }
 
     @Override
@@ -242,7 +251,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     @Override
     public DistanceDBIDList<D> getRangeForDBID(DBIDRef id, D range) {
-      return inner.getRangeForDBID(id, range);
+      // So we have to project the query point only once:
+      return getRangeForObject(relation.get(id), range);
     }
 
     @Override
@@ -277,7 +287,8 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
     @Override
     public DistanceDBIDList<D> getRKNNForDBID(DBIDRef id, int k) {
-      return inner.getRKNNForDBID(id, k);
+      // So we have to project the query point only once:
+      return getRKNNForObject(relation.get(id), k);
     }
 
     @Override
