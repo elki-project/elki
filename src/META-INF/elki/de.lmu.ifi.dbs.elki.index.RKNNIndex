@@ -4,3 +4,6 @@ de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeInd
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeIndex
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeIndex
 # de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn.RdKNNTree
+de.lmu.ifi.dbs.elki.index.projected.LatLngAsECEFIndex
+de.lmu.ifi.dbs.elki.index.projected.LngLatAsECEFIndex
+de.lmu.ifi.dbs.elki.index.projected.ProjectedIndex

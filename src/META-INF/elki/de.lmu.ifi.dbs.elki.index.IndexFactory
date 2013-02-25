@@ -25,3 +25,6 @@ de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex$Fact
 de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.FourCSubspaceIndex$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex$Factory
+de.lmu.ifi.dbs.elki.index.projected.LatLngAsECEFIndex$Factory
+de.lmu.ifi.dbs.elki.index.projected.LngLatAsECEFIndex$Factory
+de.lmu.ifi.dbs.elki.index.projected.ProjectedIndex$Factory
