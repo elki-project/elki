@@ -40,6 +40,13 @@ public class LatLngToECEFProjection<V extends NumberVector<?>> implements Projec
    */
   private NumberVector.Factory<V, ?> factory;
 
+  /**
+   * Constructor.
+   */
+  public LatLngToECEFProjection() {
+    super();
+  }
+
   @Override
   public void initialize(SimpleTypeInformation<V> in) {
     final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;

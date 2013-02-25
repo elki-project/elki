@@ -30,10 +30,18 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
  * Projection class for number vectors.
+ * 
+ * FIXME: Use int[] instead of a BitSet, to allow reordering?
  * 
  * @author Erich Schubert
  * 
@@ -103,5 +111,38 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
   @Override
   public TypeInformation getInputDataTypeInformation() {
     return new VectorTypeInformation<>(factory.getRestrictionClass(), mindim, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends NumberVector<?>> extends AbstractParameterizer {
+    /**
+     * Dimensions to select.
+     */
+    BitSet dims = new BitSet();
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      
+      IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
+      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
+      if (config.grab(selectedAttributesP)) {
+        dims.clear();
+        for (int in : selectedAttributesP.getValue()) {
+          dims.set(in);
+        }
+      }
+    }
+
+    @Override
+    protected NumericalFeatureSelection<V> makeInstance() {
+      return new NumericalFeatureSelection<>(dims);
+    }
   }
 }

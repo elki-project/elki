@@ -83,7 +83,7 @@ public final class ArrayLikeUtil {
    * Use ArrayDBIDs as array.
    */
   public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
-  
+
   /**
    * Fake constructor. Do not instantiate!
    */
@@ -169,9 +169,9 @@ public final class ArrayLikeUtil {
     final int size = adapter.size(array);
     int index = 0;
     double max = adapter.getDouble(array, 0);
-    for(int i = 1; i < size; i++) {
+    for (int i = 1; i < size; i++) {
       double val = adapter.getDouble(array, i);
-      if(val > max) {
+      if (val > max) {
         max = val;
         index = i;
       }
@@ -200,7 +200,7 @@ public final class ArrayLikeUtil {
    */
   public static <A> double[] toPrimitiveDoubleArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
     double[] ret = new double[adapter.size(array)];
-    for(int i = 0; i < ret.length; i++) {
+    for (int i = 0; i < ret.length; i++) {
       ret[i] = adapter.getDouble(array, i);
     }
     return ret;
@@ -235,7 +235,7 @@ public final class ArrayLikeUtil {
    */
   public static <A> float[] toPrimitiveFloatArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
     float[] ret = new float[adapter.size(array)];
-    for(int i = 0; i < ret.length; i++) {
+    for (int i = 0; i < ret.length; i++) {
       ret[i] = adapter.getFloat(array, i);
     }
     return ret;
@@ -259,5 +259,40 @@ public final class ArrayLikeUtil {
    */
   public static <N extends Number> float[] toPrimitiveFloatArray(NumberVector<N> obj) {
     return toPrimitiveFloatArray(obj, numberVectorAdapter(obj));
+  }
+
+  /**
+   * Convert a numeric array-like to a <code>int[]</code>.
+   * 
+   * @param array Array-like
+   * @param adapter Adapter
+   * @return primitive double array
+   */
+  public static <A> int[] toPrimitiveIntegerArray(A array, NumberArrayAdapter<?, ? super A> adapter) {
+    int[] ret = new int[adapter.size(array)];
+    for (int i = 0; i < ret.length; i++) {
+      ret[i] = adapter.getInteger(array, i);
+    }
+    return ret;
+  }
+
+  /**
+   * Convert a list of numbers to <code>int[]</code>.
+   * 
+   * @param array List of numbers
+   * @return double array
+   */
+  public static int[] toPrimitiveIntegerArray(List<? extends Number> array) {
+    return toPrimitiveIntegerArray(array, NUMBERLISTADAPTER);
+  }
+
+  /**
+   * Convert a number vector to <code>int[]</code>.
+   * 
+   * @param obj Object to convert
+   * @return primitive double array
+   */
+  public static <N extends Number> int[] toPrimitiveIntegerArray(NumberVector<N> obj) {
+    return toPrimitiveIntegerArray(obj, numberVectorAdapter(obj));
   }
 }
