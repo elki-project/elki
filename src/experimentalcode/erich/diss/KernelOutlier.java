@@ -139,10 +139,11 @@ public class KernelOutlier<O extends FeatureVector<?>, D extends NumberDistance<
             continue;
           }
           final double bw = Math.max(minBandwidth, kneighbor.doubleDistance()) * scale;
-          // final double powbw = .75 / Math.pow(bw, dim);
+          // We should be using the bandwidth here, but results were better without?!
+          final double powbw = .75; // .75 / Math.pow(bw, dim);
           for (DoubleDistanceDBIDListIter neighbor = ((DoubleDistanceKNNList) neighbors).iter(); neighbor.valid(); neighbor.advance()) {
-            double dens = kernel.density(neighbor.doubleDistance() / bw);
-            densities.get(neighbor)[k - kmin] += dens; // * powbw;
+            double dens = kernel.density(neighbor.doubleDistance() / bw) * powbw;
+            densities.get(neighbor)[k - kmin] += dens;
             if (dens < CUTOFF) {
               break;
             }
