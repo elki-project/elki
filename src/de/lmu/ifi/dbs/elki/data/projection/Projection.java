@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.projection;
 
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,16 +22,26 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
 
 /**
  * Projection interface.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <IN> Input data type
  * @param <OUT> Output data type
  */
-public interface Projection<IN, OUT> {
+public interface Projection<IN, OUT> extends Parameterizable {
+  /**
+   * Initialize
+   * 
+   * @param in Data type to use for projecting.
+   */
+  public void initialize(SimpleTypeInformation<IN> in);
+  
   /**
    * Project a single instance.
    * 
@@ -42,13 +49,6 @@ public interface Projection<IN, OUT> {
    * @return Projected data
    */
   public OUT project(IN data);
-  
-  /**
-   * Output type restriction
-   * 
-   * @return Output type
-   */
-  public SimpleTypeInformation<OUT> getOutputDataTypeInformation();
 
   /**
    * Input type information.
@@ -56,4 +56,11 @@ public interface Projection<IN, OUT> {
    * @return Type restriction
    */
   public TypeInformation getInputDataTypeInformation();
+
+  /**
+   * Output type restriction
+   * 
+   * @return Output type
+   */
+  public SimpleTypeInformation<OUT> getOutputDataTypeInformation();
 }
