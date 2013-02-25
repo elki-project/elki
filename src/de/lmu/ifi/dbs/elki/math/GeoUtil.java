@@ -55,12 +55,17 @@ public final class GeoUtil {
   /**
    * Flattening of the WGS84 Ellipsoid.
    */
-  public static final double WGS84_FLATTENING = 0.00335281066474748;
+  public static final double WGS84_FLATTENING = 1 / 298.257223563;
+
+  /**
+   * Eccentricity of the WGS84 Ellipsoid
+   */
+  public static final double WGS84_ECCENTRICITY = 0.081819190842621;
 
   /**
    * Eccentricity squared of the WGS84 Ellipsoid
    */
-  public static final double WGS84_ECCENTRICITY_SQUARED = 2 * WGS84_FLATTENING - (WGS84_FLATTENING * WGS84_FLATTENING);
+  public static final double WGS84_ECCENTRICITY_SQUARED = 0.00669437999014;
 
   /**
    * Dummy constructor. Do not instantiate.
@@ -593,7 +598,7 @@ public final class GeoUtil {
    * @param lng Longitude in degree
    * @return Coordinate triple
    */
-  public static double[] latLngDegToXZYWGS84(double lat, double lng) {
+  public static double[] latLngDegWGS84ToECEF(double lat, double lng) {
     // Switch to radians:
     lat = Math.toRadians(lat);
     lng = Math.toRadians(lng);
@@ -602,42 +607,20 @@ public final class GeoUtil {
     final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
 
     // Eccentricity squared
-    final double v = WGS84_RADIUS / (Math.sqrt(1 - WGS84_ECCENTRICITY_SQUARED * slat * slat));
+    final double v = WGS84_RADIUS / Math.sqrt((1 + WGS84_ECCENTRICITY * slat) * (1 - WGS84_ECCENTRICITY * slat));
 
     return new double[] { v * clat * clng, v * clat * slng, (1 - WGS84_ECCENTRICITY_SQUARED) * v * slat };
   }
 
   /**
-   * Convert Latitude-Longitude pair to X-Y-Z coordinates using a spherical
-   * approximation of the earth.
-   * 
-   * The coordinate system is chosen such that the earth rotates around the Z
-   * axis.
-   * 
-   * @param lat Latitude in degree
-   * @param lng Longitude in degree
-   * @return Coordinate triple
-   */
-  public static double[] latLngDegToXZY(double lat, double lng) {
-    // Map to radians.
-    lat = MathUtil.rad2deg(lat);
-    lng = MathUtil.rad2deg(lng);
-    // Sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
-    return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
-  }
-
-  /**
    * Convert a 3D coordinate pair to the corresponding longitude.
-   * 
-   * Only x and y are required - z gives the latitude.
    * 
    * @param x X value
    * @param y Y value
+   * @param z Z value
    * @return Latitude
    */
-  public static double xyzToLatDegWGS84(double x, double y, double z) {
+  public static double ecefToLatDegWGS84(double x, double y, double z) {
     final double p = Math.sqrt(x * x + y * y);
     double lat = Math.atan2(z, p * (1 - WGS84_ECCENTRICITY_SQUARED));
 
@@ -645,35 +628,22 @@ public final class GeoUtil {
     // TODO: instead of a fixed number of iterations, check for convergence.
     for (int i = 0; i < 10; i++) {
       final double slat = Math.sin(lat);
-      final double v = WGS84_RADIUS / (Math.sqrt(1 - WGS84_ECCENTRICITY_SQUARED * slat * slat));
-      lat = Math.atan2(z + WGS84_ECCENTRICITY_SQUARED * v * slat, p);
+      final double v = WGS84_RADIUS / Math.sqrt((1 + WGS84_ECCENTRICITY * slat) * (1 - WGS84_ECCENTRICITY * slat));
+      final double h = p / MathUtil.sinToCos(lat, slat) - v;
+      lat = Math.atan2(z, p * (1 - WGS84_ECCENTRICITY_SQUARED * v / (v + h)));
     }
 
     return MathUtil.rad2deg(lat);
   }
 
   /**
-   * Convert a 3D coordinate pair to the corresponding latitude.
-   * 
-   * Only the z coordinate is required.
-   * 
-   * @param z Z value
-   * @return Latitude
-   */
-  public static double xyzToLatDeg(double z) {
-    return MathUtil.rad2deg(Math.asin(z / EARTH_RADIUS));
-  }
-
-  /**
    * Convert a 3D coordinate pair to the corresponding longitude.
-   * 
-   * Only x and y are required - z gives the latitude.
    * 
    * @param x X value
    * @param y Y value
-   * @return Latitude
+   * @return Longitude
    */
-  public static double xyzToLngDeg(double x, double y) {
+  public static double ecefToLngDegWGS84(double x, double y) {
     return MathUtil.rad2deg(Math.atan2(y, x));
   }
 }
