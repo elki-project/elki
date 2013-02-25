@@ -30,10 +30,16 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListEachConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 
 /**
  * Projection class for number vectors.
@@ -121,5 +127,35 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
     @SuppressWarnings("unchecked")
     final Class<V> cls = (Class<V>) factory.getRestrictionClass();
     return new VectorTypeInformation<>(cls, mindim, Integer.MAX_VALUE);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer<V extends FeatureVector<F>, F> extends AbstractParameterizer {
+    /**
+     * Dimensions to select.
+     */
+    int[] dims = null;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      
+      IntListParameter selectedAttributesP = new IntListParameter(NumberVectorFeatureSelectionFilter.Parameterizer.SELECTED_ATTRIBUTES_ID);
+      selectedAttributesP.addConstraint(new ListEachConstraint<Integer>(new GreaterEqualConstraint(0)));
+      if (config.grab(selectedAttributesP)) {
+        dims = ArrayLikeUtil.toPrimitiveIntegerArray(selectedAttributesP.getValue());
+      }
+    }
+
+    @Override
+    protected FeatureSelection<V, F> makeInstance() {
+      return new FeatureSelection<>(dims);
+    }
   }
 }

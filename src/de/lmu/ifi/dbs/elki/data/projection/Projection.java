@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.data.projection;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizable;
@@ -41,7 +42,7 @@ public interface Projection<IN, OUT> extends Parameterizable {
    * @param in Data type to use for projecting.
    */
   public void initialize(SimpleTypeInformation<IN> in);
-  
+
   /**
    * Project a single instance.
    * 
