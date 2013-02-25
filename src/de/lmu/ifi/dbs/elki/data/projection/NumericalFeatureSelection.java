@@ -110,7 +110,7 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
 
   @Override
   public TypeInformation getInputDataTypeInformation() {
-    return new VectorTypeInformation<>(factory.getRestrictionClass(), mindim, Integer.MAX_VALUE);
+    return new VectorTypeInformation<>(NumberVector.class, mindim, Integer.MAX_VALUE);
   }
 
   /**
