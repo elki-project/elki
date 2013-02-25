@@ -60,6 +60,7 @@ public class ProjectedView<IN, OUT> extends AbstractHierarchicalResult implement
     super();
     this.inner = inner;
     this.projection = projection;
+    projection.initialize(inner.getDataTypeInformation());
   }
 
   @Override

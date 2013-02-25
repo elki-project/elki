@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.projection.NumericalFeatureSelection;
-import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
@@ -172,7 +171,6 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
    */
   public OutlierResult run(Relation<V> relation) {
     final DBIDs ids = relation.getDBIDs();
-    final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
 
     ArrayList<ArrayDBIDs> subspaceIndex = buildOneDimIndexes(relation);
     Set<HiCSSubspace> subspaces = calculateSubspaces(relation, subspaceIndex, rnd.getRandom());
@@ -192,8 +190,7 @@ public class HiCS<V extends NumberVector<?>> extends AbstractAlgorithm<OutlierRe
       }
 
       ProxyDatabase pdb = new ProxyDatabase(ids);
-      Projection<V, V> proj = new NumericalFeatureSelection<>(dimset, factory);
-      pdb.addRelation(new ProjectedView<>(relation, proj));
+      pdb.addRelation(new ProjectedView<>(relation, new NumericalFeatureSelection<V>(dimset)));
 
       // run LOF and collect the result
       OutlierResult result = outlierAlgorithm.run(pdb);

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Projection class for number vectors.
@@ -63,25 +64,32 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
    * Constructor.
    * 
    * @param bits Dimensions
-   * @param factory Object factory
    */
-  public NumericalFeatureSelection(BitSet bits, NumberVector.Factory<V, ?> factory) {
+  public NumericalFeatureSelection(BitSet bits) {
     super();
     this.bits = bits;
-    this.factory = factory;
     this.dimensionality = bits.cardinality();
 
     int mind = 0;
-    for(int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
+    for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
       mind = Math.max(mind, i + 1);
     }
     this.mindim = mind;
   }
 
   @Override
+  public void initialize(SimpleTypeInformation<V> in) {
+    final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
+    factory = (NumberVector.Factory<V, ?>) vin.getFactory();
+    if (vin.getDimensionality() < mindim) {
+      throw new AbortException("Data does not have enough dimensions for this projection!");
+    }
+  }
+
+  @Override
   public V project(V data) {
     double[] dbl = new double[dimensionality];
-    for(int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
+    for (int i = bits.nextSetBit(0), j = 0; i >= 0; i = bits.nextSetBit(i + 1), j++) {
       dbl[j] = data.doubleValue(i);
     }
     return factory.newNumberVector(dbl);
@@ -94,8 +102,6 @@ public class NumericalFeatureSelection<V extends NumberVector<?>> implements Pro
 
   @Override
   public TypeInformation getInputDataTypeInformation() {
-    @SuppressWarnings("unchecked")
-    final Class<V> cls = (Class<V>) factory.getRestrictionClass();
-    return new VectorTypeInformation<>(cls, mindim, Integer.MAX_VALUE);
+    return new VectorTypeInformation<>(factory.getRestrictionClass(), mindim, Integer.MAX_VALUE);
   }
 }

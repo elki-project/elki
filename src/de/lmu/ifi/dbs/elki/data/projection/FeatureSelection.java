@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.projection;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.SubsetArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Projection class for number vectors.
@@ -61,30 +63,38 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    * Array adapter.
    */
   protected ArrayAdapter<F, V> adapter;
-  
+
   /**
    * Constructor.
    * 
    * @param dims Dimensions
-   * @param factory Object factory
    */
-  public FeatureSelection(int[] dims, FeatureVector.Factory<V, F> factory) {
+  public FeatureSelection(int[] dims) {
     this.adapter = new SubsetArrayAdapter<>(getAdapter(factory), dims);
-    this.factory = factory;
     this.dimensionality = dims.length;
 
     int mind = 0;
-    for(int dim : dims) {
+    for (int dim : dims) {
       mind = Math.max(mind, dim + 1);
     }
     this.mindim = mind;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void initialize(SimpleTypeInformation<V> in) {
+    final VectorFieldTypeInformation<V> vin = (VectorFieldTypeInformation<V>) in;
+    factory = (FeatureVector.Factory<V, F>) vin.getFactory();
+    if (vin.getDimensionality() < mindim) {
+      throw new AbortException("Data does not have enough dimensions for this projection!");
+    }
   }
 
   @Override
   public V project(V data) {
     return factory.newFeatureVector(data, adapter);
   }
-  
+
   /**
    * Choose the best adapter for this.
    * 
@@ -95,7 +105,7 @@ public class FeatureSelection<V extends FeatureVector<F>, F> implements Projecti
    */
   @SuppressWarnings("unchecked")
   private static <V extends FeatureVector<F>, F> ArrayAdapter<F, ? super V> getAdapter(Factory<V, F> factory) {
-    if(factory instanceof NumberVector.Factory) {
+    if (factory instanceof NumberVector.Factory) {
       return (ArrayAdapter<F, ? super V>) ArrayLikeUtil.NUMBERVECTORADAPTER;
     }
     return (ArrayAdapter<F, ? super V>) ArrayLikeUtil.FEATUREVECTORADAPTER;

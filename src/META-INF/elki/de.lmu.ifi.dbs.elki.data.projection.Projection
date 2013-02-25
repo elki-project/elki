@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.data.projection.FeatureSelection
+de.lmu.ifi.dbs.elki.data.projection.NumericalFeatureSelection
+de.lmu.ifi.dbs.elki.data.projection.LatLngToECEFProjection
+de.lmu.ifi.dbs.elki.data.projection.LngLatToECEFProjection
