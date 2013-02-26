@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -193,6 +194,20 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      */
     public Factory(IndexFactory<O, ?> inner) {
       super(new LngLatToECEFProjection<O>(), inner);
+    }
+
+    @Override
+    public ProjectedIndex<O, O> instantiate(Relation<O> relation) {
+      if (!proj.getInputDataTypeInformation().isAssignableFromType(relation.getDataTypeInformation())) {
+        return null;
+      }
+      proj.initialize(relation.getDataTypeInformation());
+      ProjectedView<O, O> view = new ProjectedView<>(relation, proj);
+      Index inneri = inner.instantiate(view);
+      if (inneri == null) {
+        return null;
+      }
+      return new LngLatAsECEFIndex<>(relation, proj, view, inneri);
     }
 
     /**
