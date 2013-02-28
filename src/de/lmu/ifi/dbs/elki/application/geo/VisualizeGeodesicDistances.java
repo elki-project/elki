@@ -36,15 +36,12 @@ import de.lmu.ifi.dbs.elki.math.GeoUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Visualization function for Cross-track distance function
- * 
- * TODO: make resolution configurable.
  * 
  * TODO: make origin point / rectangle configurable.
  * 
@@ -66,7 +63,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    */
   public static enum Mode {
     /** Cross track distance */
-    CTD,
+    XTD,
     /** Along track distance */
     ATD,
     /** Mindist */
@@ -81,7 +78,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Image size.
    */
-  final int width = 2000, height = 1000;
+  protected int width = 2000, height = 1000;
 
   /**
    * Number of steps for shades.
@@ -91,7 +88,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Visualization mode
    */
-  private Mode mode = Mode.CTD;
+  protected Mode mode = Mode.XTD;
 
   /**
    * Constructor.
@@ -100,8 +97,10 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
    * @param steps Number of steps in the color map
    * @param mode Visualization mode
    */
-  public VisualizeGeodesicDistances(File out, int steps, Mode mode) {
+  public VisualizeGeodesicDistances(File out, int resolution, int steps, Mode mode) {
     super();
+    this.width = resolution;
+    this.height = resolution >> 1;
     this.out = out;
     this.steps = steps;
     this.mode = mode;
@@ -131,7 +130,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
       // Currently half the circumference - we're missing the sign
       max = GeoUtil.EARTH_RADIUS * Math.PI;
       break;
-    case CTD:
+    case XTD:
       // Quarter (!) the circumference is the maximum CTD!
       max = .5 * GeoUtil.EARTH_RADIUS * Math.PI;
       break;
@@ -160,7 +159,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
           }
           break;
         }
-        case CTD: {
+        case XTD: {
           final double ctd = GeoUtil.crossTrackDistance(stap.doubleValue(0), stap.doubleValue(1), endp.doubleValue(0), endp.doubleValue(1), lat, lon);
           if (ctd < 0) {
             img.setRGB(x, y, colorMultiply(red, -ctd / max, false));
@@ -192,9 +191,23 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   private int colorMultiply(int col, double reldist, boolean ceil) {
     if (steps > 0) {
       if (!ceil) {
-        reldist = Math.round(reldist * steps) * 1. / steps;
+        reldist = Math.round(reldist * steps) / steps;
       } else {
         reldist = Math.ceil(reldist * steps) / steps;
+      }
+    } else if (steps < 0 && reldist > 0.) {
+      double s = reldist * -steps;
+      double off = Math.abs(s - Math.round(s));
+      double factor = -steps * 1. / 1000; //height;
+      if (off < factor) { // Blend with black:
+        factor = (off / factor);
+        int a = (col >> 24) & 0xFF;
+        a = (int) (a * Math.sqrt(reldist)) & 0xFF;
+        a = (int) ((1 - factor) * 0xFF  + factor * a); 
+        int r = (int) (factor * ((col >> 16) & 0xFF));
+        int g = (int) (factor * ((col >> 8) & 0xFF));
+        int b = (int) (factor * (col & 0xFF));
+        return a << 24 | r << 16 | g << 8 | b;
       }
     }
     int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = (col) & 0xFF;
@@ -222,12 +235,17 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     /**
      * Number of steps in the distance map.
      */
-    public static final OptionID STEPS_ID = new OptionID("ctdvis.steps", "Number of steps for the distance map.");
+    public static final OptionID STEPS_ID = new OptionID("geodistvis.steps", "Number of steps for the distance map. Use negative numbers to get contour lines.");
+
+    /**
+     * Image resolution.
+     */
+    public static final OptionID RESOLUTION_ID = new OptionID("geodistvis.resolution", "Horizontal resolution for the image map (vertical resolution is horizonal / 2).");
 
     /**
      * Visualization mode.
      */
-    public static final OptionID MODE_ID = new OptionID("ctdvis.mode", "Visualization mode.");
+    public static final OptionID MODE_ID = new OptionID("geodistvis.mode", "Visualization mode.");
 
     /**
      * Holds the file to print results to.
@@ -240,21 +258,29 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     protected int steps = 0;
 
     /**
+     * Horizontal resolution.
+     */
+    protected int resolution = 2000;
+
+    /**
      * Visualization mode
      */
-    protected Mode mode = Mode.CTD;
+    protected Mode mode = Mode.XTD;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      out = super.getParameterOutputFile(config, "Output image file");
+      out = super.getParameterOutputFile(config, "Output image file name.");
       IntParameter stepsP = new IntParameter(STEPS_ID);
       stepsP.setOptional(true);
-      stepsP.addConstraint(new GreaterEqualConstraint(0));
       if (config.grab(stepsP)) {
         steps = stepsP.intValue();
       }
-      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.CTD);
+      IntParameter resolutionP = new IntParameter(RESOLUTION_ID, 2000);
+      if (config.grab(resolutionP)) {
+        resolution = resolutionP.intValue();
+      }
+      EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.XTD);
       if (config.grab(modeP)) {
         mode = modeP.getValue();
       }
@@ -262,7 +288,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
     @Override
     protected VisualizeGeodesicDistances makeInstance() {
-      return new VisualizeGeodesicDistances(out, steps, mode);
+      return new VisualizeGeodesicDistances(out, resolution, steps, mode);
     }
   }
 }
