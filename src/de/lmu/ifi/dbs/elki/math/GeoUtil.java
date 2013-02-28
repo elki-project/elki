@@ -45,7 +45,12 @@ public final class GeoUtil {
   /**
    * Earth radius approximation in km.
    */
-  public static final double EARTH_RADIUS = 6371.009; // km.
+  public static final double EARTH_RADIUS = 6371.009; // km
+
+  /**
+   * Earth circumference across poles.
+   */
+  public static final double WGS84_CIRCUMFERENCE_POLES = 40007.863; // km
 
   /**
    * Radius of the WGS84 Ellipsoid in km.
@@ -442,8 +447,8 @@ public final class GeoUtil {
    * Complexity:
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
-   * <li>Cross-track case: 10+2 trig</li>
-   * <li>Corner case: 10+3 trig, 2 sqrt</li>
+   * <li>Corner case: 3/4 trig + (haversine:) 5 trig, 2 sqrt</li>
+   * <li>Cross-track case: 4+3 trig</li>
    * </ul>
    * 
    * @param plat Latitude of query point.
@@ -479,9 +484,114 @@ public final class GeoUtil {
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    lngE += (lngE < 0) ? MathUtil.TWOPI : 0;
-    double lngW = rmaxlng - plng;
-    lngW -= (lngW > 0) ? MathUtil.TWOPI : 0;
+    if (lngE < 0) {
+      lngE += MathUtil.TWOPI;
+    }
+    double lngW = rmaxlng - plng; // we keep this negative!
+    if (lngW > 0) {
+      lngW -= MathUtil.TWOPI;
+    }
+
+    // East, to min edge:
+    if (lngE <= -lngW) {
+      final double clngD = Math.cos(lngE);
+      final double tlatQ = Math.tan(plat);
+      if (lngE > MathUtil.HALFPI) {
+        final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
+        if (tlatQ >= tlatm * clngD) {
+          return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
+        } else {
+          return haversineFormulaRad(plat, plng, rminlat, rminlng);
+        }
+      }
+      final double tlatN = Math.tan(rmaxlat);
+      if (tlatQ >= tlatN * clngD) { // North corner
+        return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
+      }
+      final double tlatS = Math.tan(rminlat);
+      if (tlatQ <= tlatS * clngD) { // South corner
+        return haversineFormulaRad(plat, plng, rminlat, rminlng);
+      }
+      // Cross-track-distance to longitude line.
+      final double slngD = MathUtil.cosToSin(lngE, clngD);
+      return EARTH_RADIUS * Math.asin(Math.cos(plat) * slngD);
+    } else { // West, to max edge:
+      final double clngD = Math.cos(lngW);
+      final double tlatQ = Math.tan(plat);
+      if (-lngW > MathUtil.HALFPI) {
+        final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
+        if (tlatQ >= tlatm * clngD) {
+          return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
+        } else {
+          return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
+        }
+      }
+      final double tlatN = Math.tan(rmaxlat);
+      if (tlatQ >= tlatN * clngD) { // North corner
+        return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
+      }
+      final double tlatS = Math.tan(rminlat);
+      if (tlatQ <= tlatS * clngD) { // South corner
+        return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
+      }
+      // Cross-track-distance to longitude line.
+      final double slngD = MathUtil.cosToSin(lngW, clngD);
+      return EARTH_RADIUS * Math.asin(-Math.cos(plat) * slngD);
+    }
+  }
+
+  /**
+   * Point to rectangle minimum distance.
+   * 
+   * Previous version, only around for reference.
+   * 
+   * Complexity:
+   * <ul>
+   * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
+   * <li>Cross-track case: 10+2 trig</li>
+   * <li>Corner case: 10+3 trig, 2 sqrt</li>
+   * </ul>
+   * 
+   * @param plat Latitude of query point.
+   * @param plng Longitude of query point.
+   * @param rminlat Min latitude of rectangle.
+   * @param rminlng Min longitude of rectangle.
+   * @param rmaxlat Max latitude of rectangle.
+   * @param rmaxlng Max longitude of rectangle.
+   * @return Distance
+   */
+  public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
+    // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
+
+    // Degenerate rectangles:
+    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+      return haversineFormulaRad(rminlat, rminlng, plat, plng);
+    }
+
+    // The simplest case is when the query point is in the same "slice":
+    if (rminlng <= plng && plng <= rmaxlng) {
+      // Inside rectangle:
+      if (rminlat <= plat && plat <= rmaxlat) {
+        return 0;
+      }
+      // South:
+      if (plat < rminlat) {
+        return EARTH_RADIUS * (rminlat - plat);
+      } else {
+        // plat > rmaxlat
+        return EARTH_RADIUS * (plat - rmaxlat);
+      }
+    }
+
+    // Determine whether going east or west is shorter.
+    double lngE = rminlng - plng;
+    if (lngE < 0) {
+      lngE += MathUtil.TWOPI;
+    }
+    double lngW = rmaxlng - plng; // we keep this negative!
+    if (lngW > 0) {
+      lngW -= MathUtil.TWOPI;
+    }
 
     // Compute sine and cosine values we will certainly need below:
     final double slatQ = Math.sin(plat);
