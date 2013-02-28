@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.GeoUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -124,23 +123,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
     BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-    final double max;
-    switch(mode) {
-    case ATD:
-      // Currently half the circumference - we're missing the sign
-      max = GeoUtil.EARTH_RADIUS * Math.PI;
-      break;
-    case XTD:
-      // Quarter (!) the circumference is the maximum CTD!
-      max = .5 * GeoUtil.EARTH_RADIUS * Math.PI;
-      break;
-    case MINDIST:
-      // Half the circumference
-      max = GeoUtil.EARTH_RADIUS * Math.PI;
-      break;
-    default:
-      throw new AbortException("Invalid mode: " + mode);
-    }
+    final double max = GeoUtil.EARTH_RADIUS * Math.PI;
     // Red: left off-course, green: right off-course
     int red = 0xffff0000;
     int green = 0xff00ff00;
