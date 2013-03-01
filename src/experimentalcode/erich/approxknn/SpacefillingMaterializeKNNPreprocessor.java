@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
@@ -69,7 +70,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
   private static final Logging LOG = Logging.getLogger(SpacefillingMaterializeKNNPreprocessor.class);
 
   static {
-    LOG.getWrappedLogger().setLevel(Level.INFO);
+    LoggingConfiguration.setLevelFor(SpacefillingMaterializeKNNPreprocessor.class.getName(), Level.INFO.getName());
   }
 
   /**

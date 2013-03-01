@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.AbstractSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.SpatialSorter;
@@ -76,8 +77,9 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
    */
   private static final Logging LOG = Logging.getLogger(SpacefillingKNNPreprocessor.class);
 
+  // Enable logging for debugging.
   static {
-    LOG.getWrappedLogger().setLevel(Level.INFO);
+    LoggingConfiguration.setLevelFor(SpacefillingKNNPreprocessor.class.getName(), Level.INFO.getName());
   }
 
   /**
@@ -127,12 +129,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
   @Override
   public void initialize() {
-    if(curves == null) {
-      if(relation.size() > 0) {
+    if (curves == null) {
+      if (relation.size() > 0) {
         preprocess();
       }
-    }
-    else {
+    } else {
       throw new UnsupportedOperationException("Preprocessor already ran.");
     }
   }
@@ -144,70 +145,66 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     final int numgen = curvegen.size();
     final int numcurves = numgen * variants;
     curves = new ArrayList<>(numcurves);
-    for(int i = 0; i < numcurves; i++) {
+    for (int i = 0; i < numcurves; i++) {
       curves.add(new ArrayList<SpatialRef>(size));
     }
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final NumberVector<?> v = relation.get(iditer);
       SpatialRef ref = new SpatialRef(DBIDUtil.deref(iditer), v);
-      for(List<SpatialRef> curve : curves) {
+      for (List<SpatialRef> curve : curves) {
         curve.add(ref);
       }
     }
 
     // Sort spatially
     double[] mms = AbstractSpatialSorter.computeMinMax(curves.get(0));
-    for(int j = 0; j < variants; j++) {
+    for (int j = 0; j < variants; j++) {
       final double[] mm;
-      if(j == 0) {
+      if (j == 0) {
         mm = mms;
-      }
-      else if(j == 1) {
+      } else if (j == 1) {
         // Hardcoded for publication CIKM12
         mm = new double[mms.length];
-        for(int i = 0; i < mms.length; i += 2) {
+        for (int i = 0; i < mms.length; i += 2) {
           double len = mms[i + 1] - mms[i];
           mm[i] = mms[i] - len * .1234;
           mm[i + 1] = mms[i + 1] + len * .3784123;
         }
-      }
-      else if(j == 2) {
+      } else if (j == 2) {
         // Hardcoded for publication CIKM12
         mm = new double[mms.length];
-        for(int i = 0; i < mms.length; i += 2) {
+        for (int i = 0; i < mms.length; i += 2) {
           double len = mms[i + 1] - mms[i];
           mm[i] = mms[i] - len * .321078;
           mm[i + 1] = mms[i + 1] + len * .51824172;
         }
-      }
-      else {
+      } else {
         throw new AbortException("Currently, only 1-3 variants may be used!");
       }
-      for(int i = 0; i < numgen; i++) {
+      for (int i = 0; i < numgen; i++) {
         curvegen.get(i).sort(curves.get(i + numgen * j), 0, size, mm);
       }
     }
 
     // Build position index, DBID -> position in the three curves
     positions = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, int[].class);
-    for(int cnum = 0; cnum < numcurves; cnum++) {
+    for (int cnum = 0; cnum < numcurves; cnum++) {
       Iterator<SpatialRef> it = curves.get(cnum).iterator();
-      for(int i = 0; it.hasNext(); i++) {
+      for (int i = 0; it.hasNext(); i++) {
         SpatialRef r = it.next();
         final int[] data;
-        if(cnum == 0) {
+        if (cnum == 0) {
           data = new int[numcurves];
           positions.put(r.id, data);
-        }
-        else {
+        } else {
           data = positions.get(r.id);
         }
         data[cnum] = i;
       }
     }
     final long end = System.nanoTime();
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("SFC preprocessor took " + ((end - start) / 1.E6) + " milliseconds.");
     }
   }
@@ -229,8 +226,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
 
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
-    for(Object hint : hints) {
-      if(DatabaseQuery.HINT_EXACT == hint) {
+    for (Object hint : hints) {
+      if (DatabaseQuery.HINT_EXACT == hint) {
         return null;
       }
     }
@@ -266,11 +263,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       // Build candidates
       ModifiableDBIDs cands = DBIDUtil.newHashSet(wsize * curves.size());
       final int[] posi = positions.get(id);
-      for(int i = 0; i < posi.length; i++) {
+      for (int i = 0; i < posi.length; i++) {
         List<SpatialRef> curve = curves.get(i);
         final int start = Math.max(0, posi[i] - wsize);
         final int end = Math.min(posi[i] + wsize + 1, curve.size());
-        for(int j = start; j < end; j++) {
+        for (int j = start; j < end; j++) {
           cands.add(curve.get(j).id);
         }
       }
@@ -278,7 +275,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       int distc = 0;
       KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
       final O vec = relation.get(id);
-      for(DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
+      for (DBIDIter iter = cands.iter(); iter.valid(); iter.advance()) {
         heap.add(distq.distance(vec, iter), iter);
         distc++;
       }
@@ -425,17 +422,17 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
         ObjectListParameter<SpatialSorter> curveP = new ObjectListParameter<>(CURVES_ID, SpatialSorter.class);
-        if(config.grab(curveP)) {
+        if (config.grab(curveP)) {
           curvegen = curveP.instantiateClasses(config);
         }
         DoubleParameter windowP = new DoubleParameter(WINDOW_ID, 10.0);
-        if(config.grab(windowP)) {
+        if (config.grab(windowP)) {
           window = windowP.getValue();
         }
         IntParameter variantsP = new IntParameter(VARIANTS_ID, 1);
         variantsP.addConstraint(new GreaterEqualConstraint(1));
         variantsP.addConstraint(new LessEqualConstraint(3));
-        if(config.grab(variantsP)) {
+        if (config.grab(variantsP)) {
           variants = variantsP.getValue();
         }
       }
