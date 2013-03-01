@@ -54,9 +54,13 @@ public class LoggingStep implements WorkflowStep {
    * @param verbose Verbose flag
    * @param levels Level settings array
    */
-  public LoggingStep(boolean verbose, String[][] levels) {
+  public LoggingStep(int verbose, String[][] levels) {
     super();
-    LoggingConfiguration.setVerbose(verbose);
+    LoggingConfiguration.setVerbose((verbose > 0));
+    // Extra verbosity - do not call with "false" to not undo!
+    if (verbose > 1) {
+      LoggingConfiguration.setVerbose(true);
+    }
     if (levels != null) {
       for (String[] pair : levels) {
         try {
@@ -89,9 +93,9 @@ public class LoggingStep implements WorkflowStep {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Verbose mode
+     * Verbose mode.
      */
-    protected boolean verbose = false;
+    protected int verbose = 0;
 
     /**
      * Enable logging levels manually
@@ -102,8 +106,12 @@ public class LoggingStep implements WorkflowStep {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final Flag verboseF = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
-      if (config.grab(verboseF)) {
-        verbose = verboseF.getValue();
+      if (config.grab(verboseF) && verboseF.isTrue()) {
+        verbose++;
+        final Flag verbose2F = new Flag(AbstractApplication.Parameterizer.VERBOSE_ID);
+        if (config.grab(verbose2F) && verbose2F.isTrue()) {
+          verbose++;
+        }
       }
       final StringParameter debugP = new StringParameter(AbstractApplication.Parameterizer.DEBUG_ID);
       debugP.setOptional(true);

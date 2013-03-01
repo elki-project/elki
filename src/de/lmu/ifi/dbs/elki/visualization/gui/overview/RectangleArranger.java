@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * This is a rather naive rectangle arrangement class. It will try to place
@@ -521,7 +522,7 @@ public class RectangleArranger<T> {
    * @param args
    */
   public static void main(String[] args) {
-    LOG.getWrappedLogger().setLevel(Level.FINEST);
+    LoggingConfiguration.setLevelFor(RectangleArranger.class.getName(), Level.FINEST.getName());
     RectangleArranger<String> r = new RectangleArranger<>(1.3);
     r.put(4., 1., "Histogram");
     r.put(4., 4., "3D view");

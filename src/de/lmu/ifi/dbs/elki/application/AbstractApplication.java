@@ -125,8 +125,13 @@ public abstract class AbstractApplication implements Parameterizable {
     }
     try {
       TrackParameters config = new TrackParameters(params);
-      if (params.grab(verboseF)) {
-        LoggingConfiguration.setVerbose(verboseF.isTrue());
+      if (config.grab(verboseF) && verboseF.isTrue()) {
+        LoggingConfiguration.setVerbose(true);
+        // Extra verbosity by repeating the flag:
+        final Flag verbose2F = new Flag(Parameterizer.VERBOSE_ID);
+        if (config.grab(verbose2F) && verbose2F.isTrue()) {
+          LoggingConfiguration.setVerbose(true);
+        }
       }
       AbstractApplication task = ClassGenericsUtil.tryInstantiate(AbstractApplication.class, cls, config);
 
