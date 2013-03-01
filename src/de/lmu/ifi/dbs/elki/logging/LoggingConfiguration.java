@@ -28,10 +28,10 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 
 /**
@@ -92,15 +92,14 @@ public final class LoggingConfiguration {
     LogManager logManager = LogManager.getLogManager();
     Logger logger = Logger.getLogger(LoggingConfiguration.class.getName());
     // allow null as package name.
-    if(pkg == null) {
+    if (pkg == null) {
       pkg = "";
     }
     // Load logging configuration from current directory
     String cfgfile = name;
-    if(new File(name).exists()) {
+    if (new File(name).exists()) {
       cfgfile = name;
-    }
-    else {
+    } else {
       // Fall back to full path / resources.
       cfgfile = pkg.replace('.', File.separatorChar) + File.separatorChar + name;
     }
@@ -115,11 +114,9 @@ public final class LoggingConfiguration {
       DEBUG = Boolean.parseBoolean(cfgprop.getProperty("debug"));
 
       logger.info("Logging configuration read.");
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       logger.log(Level.SEVERE, "Could not find logging configuration file: " + cfgfile, e);
-    }
-    catch(Exception e) {
+    } catch (Exception e) {
       logger.log(Level.SEVERE, "Failed to configure logging from file: " + cfgfile, e);
     }
   }
@@ -139,21 +136,29 @@ public final class LoggingConfiguration {
   public static void setVerbose(boolean verbose) {
     Logger logger1 = Logger.getLogger("");
     Logger logger2 = Logger.getLogger(TOPLEVEL_PACKAGE);
-    if(verbose) {
-      // decrease to INFO if it was higher
-      if(logger1.getLevel() == null || logger1.getLevel().intValue() > Level.INFO.intValue()) {
-        logger1.setLevel(Level.INFO);
+    if (verbose) {
+      // decrease to VERBOSE if it was higher, otherwise further to VERYVERBOSE
+      if (logger1.getLevel() == null || logger1.getLevel().intValue() > Level.VERBOSE.intValue()) {
+        logger1.setLevel(Level.VERBOSE);
+      } else if (logger1.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
+        logger1.setLevel(Level.VERYVERBOSE);
       }
-      if(logger2.getLevel() == null || logger2.getLevel().intValue() > Level.INFO.intValue()) {
-        logger2.setLevel(Level.INFO);
+      if (logger2.getLevel() == null || logger2.getLevel().intValue() > Level.VERBOSE.intValue()) {
+        logger2.setLevel(Level.VERBOSE);
+      } else if (logger2.getLevel().intValue() > Level.VERYVERBOSE.intValue()) {
+        logger2.setLevel(Level.VERYVERBOSE);
       }
-    }
-    else {
-      // increase to warning level if it was INFO.
-      if(logger1.getLevel() == null || Level.INFO.equals(logger1.getLevel())) {
+    } else {
+      // increase to warning level if it was verbose, and to verbose if it was
+      // "very verbose".
+      if (Level.VERYVERBOSE.equals(logger1.getLevel())) {
+        logger1.setLevel(Level.VERBOSE);
+      } else if (logger1.getLevel() == null || Level.VERBOSE.equals(logger1.getLevel())) {
         logger1.setLevel(Level.WARNING);
       }
-      if(logger2.getLevel() == null || Level.INFO.equals(logger2.getLevel())) {
+      if (Level.VERYVERBOSE.equals(logger2.getLevel())) {
+        logger2.setLevel(Level.VERBOSE);
+      } else if (logger2.getLevel() == null || Level.VERBOSE.equals(logger2.getLevel())) {
         logger2.setLevel(Level.WARNING);
       }
     }
@@ -166,15 +171,14 @@ public final class LoggingConfiguration {
    */
   public static void setTime(boolean time) {
     Logger logger1 = Logger.getLogger("de.lmu.ifi.dbs.elki.workflow.AlgorithmStep");
-    if(time) {
+    if (time) {
       // decrease to INFO if it was higher
-      if(logger1.getLevel() == null || logger1.getLevel().intValue() > Level.INFO.intValue()) {
+      if (logger1.getLevel() == null || logger1.getLevel().intValue() > Level.INFO.intValue()) {
         logger1.setLevel(Level.INFO);
       }
-    }
-    else {
+    } else {
       // increase to warning level if it was INFO.
-      if(logger1.getLevel() != null || logger1.getLevel() == Level.INFO) {
+      if (logger1.getLevel() != null || logger1.getLevel() == Level.INFO) {
         logger1.setLevel(Level.WARNING);
       }
     }
@@ -199,8 +203,8 @@ public final class LoggingConfiguration {
    */
   public static void replaceDefaultHandler(Handler handler) {
     Logger rootlogger = LogManager.getLogManager().getLogger("");
-    for(Handler h : rootlogger.getHandlers()) {
-      if(h instanceof CLISmartHandler) {
+    for (Handler h : rootlogger.getHandlers()) {
+      if (h instanceof CLISmartHandler) {
         rootlogger.removeHandler(h);
       }
     }
@@ -216,11 +220,11 @@ public final class LoggingConfiguration {
    */
   public static void setLevelFor(String pkg, String level) throws IllegalArgumentException {
     Logger logr = Logger.getLogger(pkg);
-    if(logr == null) {
+    if (logr == null) {
       throw new IllegalArgumentException("Logger not found.");
     }
     // Can also throw an IllegalArgumentException
-    Level lev = Level.parse(level);
+    java.util.logging.Level lev = Level.parse(level);
     logr.setLevel(lev);
   }
 
@@ -229,7 +233,7 @@ public final class LoggingConfiguration {
    * 
    * @param level level
    */
-  public static void setDefaultLevel(Level level) {
+  public static void setDefaultLevel(java.util.logging.Level level) {
     Logger.getLogger(TOPLEVEL_PACKAGE).setLevel(level);
   }
 }

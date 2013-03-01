@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.logging;
  */
 
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -33,17 +32,19 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
 
 /**
  * This class is a wrapper around {@link java.util.logging.Logger} and
- * {@link java.util.logging.LogManager} offering additional convenience functions.
+ * {@link java.util.logging.LogManager} offering additional convenience
+ * functions.
  * 
- * If a class keeps a static reference to the appropriate {@link Logging} object,
- * performance penalty compared to standard logging should be minimal.
+ * If a class keeps a static reference to the appropriate {@link Logging}
+ * object, performance penalty compared to standard logging should be minimal.
  * 
- * However when using {@link java.util.logging.LogRecord} directly instead of 
- * {@link ELKILogRecord}, the use of the {@link #log(LogRecord)} method will result in
- * incorrectly logged cause location. Therefore, use {@link ELKILogRecord}!
+ * However when using {@link java.util.logging.LogRecord} directly instead of
+ * {@link ELKILogRecord}, the use of the {@link #log(LogRecord)} method will
+ * result in incorrectly logged cause location. Therefore, use
+ * {@link ELKILogRecord}!
  * 
  * @author Erich Schubert
- *
+ * 
  * @apiviz.uses LoggingConfiguration
  * @apiviz.uses ELKILogRecord oneway - - «create»
  */
@@ -64,6 +65,47 @@ public class Logging {
    * Wrapped logger of this instance - not static!
    */
   private final Logger logger;
+
+  /**
+   * Logging Level class.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Level extends java.util.logging.Level {
+    /**
+     * Additional level for logging: statistics and timining information.
+     * 
+     * Inbetween of "verbose" and "warning".
+     */
+    public static final Level STATISTICS = new Level("STATISTICS", (INFO.intValue() + WARNING.intValue()) >> 1);
+    
+    /**
+     * Alias for the "INFO" logging level: "verbose".
+     */
+    public static final java.util.logging.Level VERBOSE = INFO;
+
+    /**
+     * Additional level for logging: additional verbose messages.
+     * 
+     * Inbetween of "verbose" and "config".
+     */
+    public static final Level VERYVERBOSE = new Level("VERYVERBOSE", (INFO.intValue() + CONFIG.intValue()) >> 1);
+
+    /**
+     * Serial version.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     * 
+     * @param name Name
+     * @param value Value
+     */
+    public Level(String name, int value) {
+      super(name, value);
+    }
+  }
 
   /**
    * Constructor, wrapping a logger.
@@ -87,12 +129,12 @@ public class Logging {
   /**
    * Retrieve logging utility for a particular class.
    * 
-   * @param name Class name 
+   * @param name Class name
    * @return Logger
    */
   public synchronized static Logging getLogger(final String name) {
     Logging logger = loggers.get(name);
-    if(logger == null) {
+    if (logger == null) {
       logger = new Logging(Logger.getLogger(name));
       loggers.put(name, logger);
     }
@@ -110,12 +152,21 @@ public class Logging {
   }
 
   /**
+   * Test whether to log 'statistics'.
+   * 
+   * @return true if logging statistics
+   */
+  public boolean isStatistics() {
+    return logger.isLoggable(Level.STATISTICS);
+  }
+
+  /**
    * Test whether to log 'verbose' aka 'info'.
    * 
    * @return true if verbose
    */
   public boolean isVerbose() {
-    return logger.isLoggable(Level.INFO);
+    return logger.isLoggable(Level.VERBOSE);
   }
 
   /**
@@ -125,6 +176,15 @@ public class Logging {
    */
   public boolean isInfo() {
     return logger.isLoggable(Level.INFO);
+  }
+
+  /**
+   * Test whether to log 'verbose' aka 'info'.
+   * 
+   * @return true if extra verbose
+   */
+  public boolean isVeryVerbose() {
+    return logger.isLoggable(Level.VERYVERBOSE);
   }
 
   /**
@@ -142,7 +202,7 @@ public class Logging {
    * Test whether to log 'debug' at 'FINE' level
    * 
    * This is the same as {@link #isDebugging}
-   *  
+   * 
    * @return true if debug logging enabled
    */
   public boolean isDebuggingFine() {
@@ -173,7 +233,7 @@ public class Logging {
    * @param level Level to log at.
    * @param message Message to log.
    */
-  public void log(Level level, CharSequence message) {
+  public void log(java.util.logging.Level level, CharSequence message) {
     LogRecord rec = new ELKILogRecord(level, message);
     logger.log(rec);
   }
@@ -185,7 +245,7 @@ public class Logging {
    * @param message Message to log.
    * @param e Exception
    */
-  public void log(Level level, CharSequence message, Throwable e) {
+  public void log(java.util.logging.Level level, CharSequence message, Throwable e) {
     LogRecord rec = new ELKILogRecord(level, message);
     rec.setThrown(e);
     logger.log(rec);
@@ -239,6 +299,29 @@ public class Logging {
   }
 
   /**
+   * Log a message at the 'STATISTICS' level.
+   * 
+   * You should check isTime() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void statistics(CharSequence message, Throwable e) {
+    log(Level.STATISTICS, message, e);
+  }
+
+  /**
+   * Log a message at the 'STATISTICS' level.
+   * 
+   * You should check isTime() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void statistics(CharSequence message) {
+    log(Level.STATISTICS, message);
+  }
+
+  /**
    * Log a message at the 'info' ('verbose') level.
    * 
    * You should check isVerbose() before building the message.
@@ -281,6 +364,29 @@ public class Logging {
    * @param message Informational log message.
    */
   public void info(CharSequence message) {
+    log(Level.INFO, message);
+  }
+
+  /**
+   * Log a message at the 'veryverbose' level.
+   * 
+   * You should check isVeryVerbose() before building the message.
+   * 
+   * @param message Informational log message.
+   * @param e Exception
+   */
+  public void veryverbose(CharSequence message, Throwable e) {
+    log(Level.INFO, message, e);
+  }
+
+  /**
+   * Log a message at the 'veryverbose' level.
+   * 
+   * You should check isVeryVerbose() before building the message.
+   * 
+   * @param message Informational log message.
+   */
+  public void veryverbose(CharSequence message) {
     log(Level.INFO, message);
   }
 
@@ -466,18 +572,11 @@ public class Logging {
   }
 
   /**
-   * Log a Progress object. 
+   * Log a Progress object.
    * 
    * @param pgr Progress to log.
    */
   public void progress(Progress pgr) {
     logger.log(new ProgressLogRecord(Level.INFO, pgr));
-  }
-
-  /**
-   * @return the wrapped {@link java.util.logging.Logger}
-   */
-  public Logger getWrappedLogger() {
-    return logger;
   }
 }
