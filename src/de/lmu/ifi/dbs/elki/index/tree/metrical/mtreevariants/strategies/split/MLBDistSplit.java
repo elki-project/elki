@@ -23,14 +23,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -97,20 +92,6 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
         }
       }
     }
-
-    // partition the entries
-    List<DistanceEntry<D, E>> list1 = new ArrayList<>();
-    List<DistanceEntry<D, E>> list2 = new ArrayList<>();
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      DBID id = node.getEntry(i).getRoutingObjectID();
-      D d1 = distanceFunction.distance(firstPromoted, id);
-      D d2 = distanceFunction.distance(secondPromoted, id);
-
-      list1.add(new DistanceEntry<>(node.getEntry(i), d1, i));
-      list2.add(new DistanceEntry<>(node.getEntry(i), d2, i));
-    }
-    Collections.sort(list1);
-    Collections.sort(list2);
 
     return balancedPartition(node, firstPromoted, secondPromoted, distanceFunction);
   }
