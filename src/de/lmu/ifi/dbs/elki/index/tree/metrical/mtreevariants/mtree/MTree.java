@@ -42,6 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure. Persistence is not yet ensured.
  * 
+ * Reference:
+ * <p>
+ * P. Ciaccia, M. Patella, P. Zezula<br />
+ * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br />
+ * In Proceedings of 23rd International Conference on Very Large Data Bases
+ * (VLDB'97), August 25-29, 1997, Athens, Greece
+ * </p>
+ * 
  * @author Elke Achtert
  * 
  * @apiviz.has MTreeNode oneway - - contains

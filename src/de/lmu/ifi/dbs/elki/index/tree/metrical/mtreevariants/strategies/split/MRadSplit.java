@@ -28,17 +28,28 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree. The
  * routing objects are chosen according to the M_rad strategy.
  * 
+ * Reference:
+ * <p>
+ * P. Ciaccia, M. Patella, P. Zezula<br />
+ * M-tree: An Efficient Access Method for Similarity Search in Metric Spaces<br />
+ * In Proceedings of 23rd International Conference on Very Large Data Bases
+ * (VLDB'97), August 25-29, 1997, Athens, Greece
+ * </p>
+ * 
  * @author Elke Achtert
+ * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
  * @param <D> the type of Distance used in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
   /**
    * Creates a new split object.

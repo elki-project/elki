@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MLBDistSplit;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MMRadSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -127,7 +127,7 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
       if (config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
-      ObjectParameter<MTreeSplit<O, D, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class);
+      ObjectParameter<MTreeSplit<O, D, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MMRadSplit.class);
       if (config.grab(splitStrategyP)) {
         splitStrategy = splitStrategyP.instantiateClass(config);
       }
