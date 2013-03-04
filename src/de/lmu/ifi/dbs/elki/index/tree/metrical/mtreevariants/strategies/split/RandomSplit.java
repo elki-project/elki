@@ -32,10 +32,17 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree. The
  * routing objects are chosen according to the RANDOM strategy.
+ * 
+ * Note: only the routing objects are chosen at random, this is not a random
+ * assignment!
  * 
  * Reference:
  * <p>
@@ -87,5 +94,38 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
     DBID id2 = node.getEntry(pos2).getRoutingObjectID();
 
     return balancedPartition(node, id1, id2, distanceFunction);
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Option ID for the random generator.
+     */
+    public static final OptionID RANDOM_ID = new OptionID("mtree.randomsplit.random", "Random generator / seed for the randomized split.");
+
+    /**
+     * Random generator
+     */
+    RandomFactory rnd = RandomFactory.DEFAULT;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      RandomParameter rndP = new RandomParameter(RANDOM_ID);
+      if (config.grab(rndP)) {
+        rnd = rndP.getValue();
+      }
+    }
+
+    @Override
+    protected RandomSplit<?, ?, ?, ?> makeInstance() {
+      return new RandomSplit<>(rnd);
+    }
   }
 }
