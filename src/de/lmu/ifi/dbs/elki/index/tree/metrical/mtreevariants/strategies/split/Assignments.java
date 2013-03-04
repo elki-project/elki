@@ -23,13 +23,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Encapsulates the attributes of an assignment during a split.
@@ -79,13 +77,13 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * @param firstAssignments the assignments to the first routing object
    * @param secondAssignments the assignments to the second routing object
    */
-  public Assignments(DBID id1, DBID id2, D firstCoveringRadius, D secondCoveringRadius, Set<E> firstAssignments, Set<E> secondAssignments) {
+  public Assignments(DBID id1, DBID id2, D firstCoveringRadius, D secondCoveringRadius, List<E> firstAssignments, List<E> secondAssignments) {
     this.id1 = id1;
     this.id2 = id2;
     this.firstCoveringRadius = firstCoveringRadius;
     this.secondCoveringRadius = secondCoveringRadius;
-    this.firstAssignments = new ArrayList<>(firstAssignments);
-    this.secondAssignments = new ArrayList<>(secondAssignments);
+    this.firstAssignments = firstAssignments;
+    this.secondAssignments = secondAssignments;
   }
 
   /**
