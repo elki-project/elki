@@ -24,10 +24,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  */
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -61,8 +60,9 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    *         specified node
    */
   Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceQuery<O, D> distanceFunction) {
-    HashSet<E> assigned1 = new HashSet<>();
-    HashSet<E> assigned2 = new HashSet<>();
+    BitSet assigned = new BitSet(node.getNumEntries());
+    List<E> assigned1 = new ArrayList<>(node.getCapacity());
+    List<E> assigned2 = new ArrayList<>(node.getCapacity());
 
     D currentCR1 = distanceFunction.nullDistance();
     D currentCR2 = distanceFunction.nullDistance();
@@ -79,14 +79,14 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
       list1.add(new DistanceEntry<>(node.getEntry(i), d1, i));
       list2.add(new DistanceEntry<>(node.getEntry(i), d2, i));
     }
-    Collections.sort(list1);
-    Collections.sort(list2);
+    Collections.sort(list1, Collections.reverseOrder());
+    Collections.sort(list2, Collections.reverseOrder());
 
     for (int i = 0; i < node.getNumEntries(); i++) {
-      if (i % 2 == 0) {
-        currentCR1 = assignNN(assigned1, assigned2, list1, currentCR1, node.isLeaf());
-      } else {
-        currentCR2 = assignNN(assigned2, assigned1, list2, currentCR2, node.isLeaf());
+      currentCR1 = assignNN(assigned, assigned1, assigned2, list1, currentCR1, node.isLeaf());
+      i++;
+      if (i < node.getNumEntries()) {
+        currentCR2 = assignNN(assigned, assigned2, assigned1, list2, currentCR2, node.isLeaf());
       }
     }
     return new Assignments<>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
@@ -96,6 +96,7 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * Assigns the first object of the specified list to the first assignment that
    * it is not yet assigned to the second assignment.
    * 
+   * @param assigned List of already assigned objects
    * @param assigned1 the first assignment
    * @param assigned2 the second assignment
    * @param list the list, the first object should be assigned
@@ -104,14 +105,15 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    *        false otherwise
    * @return the new covering radius
    */
-  private D assignNN(Set<E> assigned1, Set<E> assigned2, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
-    DistanceEntry<D, E> distEntry = list.remove(0);
-    while (assigned2.contains(distEntry.getEntry())) {
-      distEntry = list.remove(0);
+  private D assignNN(BitSet assigned, List<E> assigned1, List<E> assigned2, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
+    DistanceEntry<D, E> distEntry = list.remove(list.size() - 1);
+    while (assigned.get(distEntry.getIndex())) {
+      distEntry = list.remove(list.size() - 1);
     }
     // Update the parent distance.
     distEntry.getEntry().setParentDistance(distEntry.getDistance());
     assigned1.add(distEntry.getEntry());
+    assigned.set(distEntry.getIndex());
 
     if (isLeaf) {
       return DistanceUtil.max(currentCR, distEntry.getDistance());
