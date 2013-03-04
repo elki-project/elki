@@ -128,6 +128,11 @@ public class RandomSampleKNNPreprocessor<O, D extends Distance<D>> extends Abstr
     return "random-sample-knn";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * The parameterizable factory.
    * 

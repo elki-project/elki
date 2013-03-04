@@ -146,10 +146,4 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
     this.pageSize = header.getPageSize();
     return false;
   }
-
-  @Override
-  public PageFileStatistics getInnerStatistics() {
-    // Default: no nested page file.
-    return null;
-  }
 }

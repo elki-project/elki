@@ -190,6 +190,11 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     return "hisc-pref";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * Factory class.
    * 

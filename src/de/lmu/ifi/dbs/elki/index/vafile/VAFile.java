@@ -211,24 +211,10 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
     return new VectorApproximation(id, approximation);
   }
 
-  @Override
-  public long getReadOperations() {
-    return getRandomReadOnly() + getScannedPages();
-  }
-
-  /**
-   * Get the number of random read operations only.
-   * 
-   * @return Random read operations.
-   */
-  public long getRandomReadOnly() {
-    return super.getReadOperations();
-  }
-
   /**
    * Get the number of scanned bytes.
    * 
-   * @return Numebr of scanned bytes.
+   * @return Number of scanned bytes.
    */
   public long getScannedPages() {
     int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
@@ -237,15 +223,15 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
   }
 
   @Override
-  public long getWriteOperations() {
-    return -1;
+  public Logging getLogger() {
+    return LOG;
   }
 
   @Override
-  public void resetPageAccess() {
-    super.resetPageAccess();
-    scans = 0;
-    // FIXME: writes
+  public void logStatistics() {
+    super.logStatistics();
+    // FIXME:
+    LOG.statistics("scanned pages:" + getScannedPages());
   }
 
   @Override

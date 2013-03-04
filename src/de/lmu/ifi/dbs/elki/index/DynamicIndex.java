@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,11 +22,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 
-public interface DynamicIndex {
-
+/**
+ * Index that supports dynamic insertions and removals.
+ * 
+ * @author Erich Schubert
+ */
+public interface DynamicIndex extends Index {
   /**
    * Deletes the specified object from this index.
    * 
@@ -51,18 +55,10 @@ public interface DynamicIndex {
   public void deleteAll(DBIDs ids);
 
   /**
-   * Get the underlying page file (or a proxy), for access counts.
-   * 
-   * @return page file
-   */
-  public PageFileStatistics getPageFileStatistics();
-
-  /**
    * Inserts the specified objects into this index. If a bulk load mode is
    * implemented, the objects are inserted in one bulk.
    * 
    * @param ids the objects to be inserted
    */
   public void insertAll(DBIDs ids);
-
 }

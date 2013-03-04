@@ -80,6 +80,11 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector<?>, D exte
     return "knn-join";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * The parameterizable factory.
    * 

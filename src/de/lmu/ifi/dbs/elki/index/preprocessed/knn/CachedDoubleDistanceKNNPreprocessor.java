@@ -127,6 +127,11 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
     return "cached-knn";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * The parameterizable factory.
    * 

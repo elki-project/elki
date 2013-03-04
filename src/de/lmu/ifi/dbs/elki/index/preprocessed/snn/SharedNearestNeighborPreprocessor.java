@@ -157,6 +157,11 @@ public class SharedNearestNeighborPreprocessor<O, D extends Distance<D>> extends
     return "SNN-index";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * Get the number of neighbors
    * 

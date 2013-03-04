@@ -189,6 +189,11 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     return LOG;
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * The parameterizable factory.
    * 

@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.index;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,7 +30,8 @@ import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 
 /**
  * Abstract base class for Filter-refinement indexes.
@@ -43,11 +45,11 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
  * 
  * @param <O> Object type
  */
-public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implements PageFileStatistics {
+public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> {
   /**
    * Refinement counter.
    */
-  private int refinements;
+  private Counter refinements;
 
   /**
    * Constructor.
@@ -56,6 +58,33 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
    */
   public AbstractRefiningIndex(Relation<O> relation) {
     super(relation);
+    Logging log = getLogger();
+    refinements = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".refinements") : null;
+  }
+
+  /**
+   * Get the class logger.
+   * 
+   * @return Logger
+   */
+  abstract public Logging getLogger();
+
+  /**
+   * Increment the refinement counter, if in use.
+   * 
+   * @param i Increment.
+   */
+  protected void countRefinements(int i) {
+    if (refinements != null) {
+      refinements.increment(i);
+    }
+  }
+  
+  @Override
+  public void logStatistics() {
+    if (refinements != null) {
+      getLogger().statistics(refinements);
+    }
   }
 
   /**
@@ -65,33 +94,8 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
    * @return refined object
    */
   protected O refine(DBID id) {
-    refinements++;
+    countRefinements(1);
     return relation.get(id);
-  }
-
-  //@Override
-  public PageFileStatistics getPageFileStatistics() {
-    return this;
-  }
-
-  @Override
-  public long getReadOperations() {
-    return refinements;
-  }
-
-  @Override
-  public long getWriteOperations() {
-    return 0;
-  }
-
-  @Override
-  public void resetPageAccess() {
-    refinements = 0;
-  }
-
-  @Override
-  public PageFileStatistics getInnerStatistics() {
-    return null;
   }
 
   /**
@@ -123,7 +127,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
      * @return Distance
      */
     protected D refine(DBIDRef id, O q) {
-      AbstractRefiningIndex.this.refinements++;
+      AbstractRefiningIndex.this.countRefinements(1);
       return distanceQuery.distance(q, id);
     }
 
@@ -133,7 +137,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
      * @param c Refinements
      */
     protected void incRefinements(int c) {
-      AbstractRefiningIndex.this.refinements += c;
+      AbstractRefiningIndex.this.countRefinements(c);
     }
   }
 
@@ -160,7 +164,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
      * @return Distance
      */
     protected D refine(DBID id, O q) {
-      AbstractRefiningIndex.this.refinements++;
+      AbstractRefiningIndex.this.countRefinements(1);
       return distanceQuery.distance(q, id);
     }
 
@@ -170,7 +174,7 @@ public abstract class AbstractRefiningIndex<O> extends AbstractIndex<O> implemen
      * @param c Refinements
      */
     protected void incRefinements(int c) {
-      AbstractRefiningIndex.this.refinements += c;
+      AbstractRefiningIndex.this.countRefinements(c);
     }
   }
 }

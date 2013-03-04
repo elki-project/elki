@@ -1,5 +1,4 @@
-package de.lmu.ifi.dbs.elki.index;
-
+/** Classes for logging various statistics. */
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,29 +21,4 @@ package de.lmu.ifi.dbs.elki.index;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.result.Result;
-
-/**
- * Interface defining the minimum requirements for all index classes.
- * 
- * See also: {@link IndexFactory}, {@link DynamicIndex}
- * 
- * @author Elke Achtert
- */
-public interface Index extends Result {
-  /**
-   * Initialize the index. For static indexes, this is the moment the index is
-   * bulk loaded.
-   */
-  public void initialize();
-
-  /**
-   * Send statistics to the logger, if enabled.
-   * 
-   * Note: you must have set the logging level appropriately before initializing
-   * the index! Otherwise, the index might not have collected the desired
-   * statistics.
-   */
-  public void logStatistics();
-}
+package de.lmu.ifi.dbs.elki.logging.statistics;

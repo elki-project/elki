@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -365,12 +364,6 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   }
 
   @Override
-  public PageFileStatistics getPageFileStatistics() {
-    // FIXME: move this method into a separate DiskIndex interface.
-    return null;
-  }
-
-  @Override
   public String getLongName() {
     return "kNN Preprocessor";
   }
@@ -378,6 +371,11 @@ public class MaterializeKNNPreprocessor<O, D extends Distance<D>> extends Abstra
   @Override
   public String getShortName() {
     return "knn preprocessor";
+  }
+
+  @Override
+  public void logStatistics() {
+    // TODO: can we log some sensible statistics?
   }
 
   @Override

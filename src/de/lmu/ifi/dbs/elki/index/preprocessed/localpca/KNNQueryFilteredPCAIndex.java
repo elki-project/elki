@@ -105,6 +105,11 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
     return LOG;
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * Factory class.
    * 

@@ -42,6 +42,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 
@@ -158,7 +160,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     result.append(leafNodes).append(" Leaf Nodes \n");
     result.append(objects).append(" Objects \n");
 
-    PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
+    // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     return result.toString();
   }
 
@@ -602,5 +604,14 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       }
     }
     return levels;
+  }
+
+  @Override
+  public void logStatistics() {
+    super.logStatistics();
+    Logging log = getLogger();
+    if (log.isStatistics()) {
+      log.statistics(new LongStatistic(this.getClass().getName() + ".height", getHeight()));
+    }
   }
 }

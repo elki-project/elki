@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   /**
-   * Our logger
+   * Our class logger.
    */
   private static final Logging LOG = Logging.getLogger(LRUCache.class);
 
@@ -93,7 +93,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
    */
   @Override
   public synchronized P readPage(int pageID) {
-    readAccess++;
+    countRead();
     P page = map.get(pageID);
     if(page != null) {
       if(LOG.isDebuggingFine()) {
@@ -112,7 +112,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
 
   @Override
   public synchronized void writePage(int pageID, P page) {
-    writeAccess++;
+    countWrite();
     page.setDirty(true);
     map.put(pageID, page);
     if(LOG.isDebuggingFine()) {
@@ -122,7 +122,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
 
   @Override
   public void deletePage(int pageID) {
-    writeAccess++;
+    countWrite();
     map.remove(pageID);
     file.deletePage(pageID);
   }
@@ -251,7 +251,12 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   }
 
   @Override
-  public PageFileStatistics getInnerStatistics() {
-    return file;
+  public void logStatistics() {
+    file.logStatistics();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

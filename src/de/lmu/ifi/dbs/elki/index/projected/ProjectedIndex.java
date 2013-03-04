@@ -116,6 +116,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   }
 
   @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
+  @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {
     if (!(inner instanceof KNNIndex)) {
       return null;

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index;
+package de.lmu.ifi.dbs.elki.logging.statistics;
 
 /*
  This file is part of ELKI:
@@ -23,28 +23,49 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
- * Interface defining the minimum requirements for all index classes.
+ * Class to count events in a thread-safe counter.
  * 
- * See also: {@link IndexFactory}, {@link DynamicIndex}
- * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
-public interface Index extends Result {
+public class UnsynchronizedLongCounter extends AbstractStatistic implements Counter {
   /**
-   * Initialize the index. For static indexes, this is the moment the index is
-   * bulk loaded.
+   * The counter to use.
    */
-  public void initialize();
+  long counter = 0;
 
   /**
-   * Send statistics to the logger, if enabled.
+   * Constructor.
    * 
-   * Note: you must have set the logging level appropriately before initializing
-   * the index! Otherwise, the index might not have collected the desired
-   * statistics.
+   * @param key Key to report.
    */
-  public void logStatistics();
+  public UnsynchronizedLongCounter(String key) {
+    super(key);
+  }
+
+  @Override
+  public long increment() {
+    return ++counter;
+  }
+
+  @Override
+  public long decrement() {
+    return --counter;
+  }
+
+  @Override
+  public long increment(long i) {
+    counter += i;
+    return counter;
+  }
+
+  @Override
+  public long getValue() {
+    return counter;
+  }
+
+  @Override
+  public String formatValue() {
+    return Long.toString(getValue());
+  }
 }

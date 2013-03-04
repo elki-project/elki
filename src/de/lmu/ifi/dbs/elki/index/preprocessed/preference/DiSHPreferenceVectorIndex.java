@@ -429,6 +429,11 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector<?>> extends Abstra
     return "dish-pref";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * Factory class.
    * 

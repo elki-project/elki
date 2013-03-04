@@ -124,6 +124,11 @@ public class FourCSubspaceIndex<V extends NumberVector<?>, D extends Distance<D>
     return "4C-subspaces";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * Factory class for 4C preprocessors.
    * 

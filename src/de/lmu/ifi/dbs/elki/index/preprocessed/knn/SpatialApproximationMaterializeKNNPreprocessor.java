@@ -173,6 +173,11 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     return "spatial-approximate-knn";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * The actual preprocessor instance.
    * 

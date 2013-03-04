@@ -29,6 +29,11 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.progress.Progress;
 import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.logging.statistics.MillisTimeDuration;
+import de.lmu.ifi.dbs.elki.logging.statistics.Statistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.UnsynchronizedLongCounter;
 
 /**
  * This class is a wrapper around {@link java.util.logging.Logger} and
@@ -78,7 +83,7 @@ public class Logging {
      * Inbetween of "verbose" and "warning".
      */
     public static final Level STATISTICS = new Level("STATISTICS", (INFO.intValue() + WARNING.intValue()) >> 1);
-    
+
     /**
      * Alias for the "INFO" logging level: "verbose".
      */
@@ -578,5 +583,39 @@ public class Logging {
    */
   public void progress(Progress pgr) {
     logger.log(new ProgressLogRecord(Level.INFO, pgr));
+  }
+
+  /**
+   * Generate a new counter.
+   * 
+   * @param key Key to use
+   * @return Counter.
+   */
+  public Counter newCounter(String key) {
+    return new UnsynchronizedLongCounter(key);
+  }
+
+  /**
+   * Generate a new duration statistic.
+   * 
+   * @param key Key to use
+   * @return Duration statistic.
+   */
+  public Duration newDuration(String key) {
+    return new MillisTimeDuration(key);
+  }
+
+  /**
+   * Log a statistics object.
+   * 
+   * @param stats Statistics object to report.
+   */
+  public void statistics(Statistic stats) {
+    log(Level.STATISTICS, stats.getKey() + ": " + stats.formatValue());
+  }
+
+  @Override
+  public String toString() {
+    return logger.toString();
   }
 }
