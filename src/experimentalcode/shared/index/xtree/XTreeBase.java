@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.persistent.PageFileUtil;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import experimentalcode.shared.index.xtree.util.SplitHistory;
@@ -250,8 +249,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
   }
 
   @Override
-  protected void createEmptyRoot(@SuppressWarnings("unused")
-  E exampleLeaf) {
+  protected void createEmptyRoot(E exampleLeaf) {
     N root = createNewLeafNode();
     writeNode(root);
     setHeight(1);
@@ -1185,7 +1183,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       }
     }
 
-    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<N, E>(this, getRootPath());
+    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while (enumeration.hasMoreElements()) {
       IndexTreePath<E> indexPath = enumeration.nextElement();
       E entry = indexPath.getLastPathComponent().getEntry();
@@ -1218,7 +1216,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     result.append(leafNodes).append(" Data Nodes (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
     result.append(objects).append(" ").append(dimensionality).append("-dim. points in the tree \n");
     result.append("min_fanout = ").append(min_fanout).append(", max_overlap = ").append(max_overlap).append((this.overlap_type == Overlap.DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n");
-    PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
+    // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     result.append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n");
 
     return result.toString();
