@@ -23,21 +23,17 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Encapsulates the required methods for a split of a node in an M-Tree. The
- * routing objects are chosen according to the M_LB_DIST strategy.
+ * routing objects are chosen according to the mM_rad strategy.
  * 
  * Reference:
  * <p>
@@ -55,63 +51,43 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
+public class MMRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
   /**
    * Creates a new split object.
-   * 
-   * @param node the node to be split
-   * @param distanceFunction the distance function
    */
-  public MLBDistSplit() {
+  public MMRadSplit() {
     super();
   }
 
   /**
-   * Selects the second object of the specified node to be promoted and stored
-   * into the parent node and partitions the entries according to the M_LB_DIST
-   * strategy.
-   * <p/>
-   * This strategy considers all possible pairs of objects and chooses the pair
-   * of objects for which the distance is maximum.
+   * Selects two objects of the specified node to be promoted and stored into
+   * the parent node. The mM-RAD strategy considers all possible pairs of
+   * objects and, after partitioning the set of entries, promotes the pair of
+   * objects for which the larger of the two covering radiuses is minimum.
    * 
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
   @Override
   public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction) {
-    DBID firstPromoted = null;
-    DBID secondPromoted = null;
+    D miSumCR = distanceFunction.infiniteDistance();
 
-    // choose first and second routing object
-    D currentMaxDist = distanceFunction.nullDistance();
+    Assignments<D, E> bestAssignment = null;
     for (int i = 0; i < node.getNumEntries(); i++) {
       DBID id1 = node.getEntry(i).getRoutingObjectID();
-      for (int j = i + 1; j < node.getNumEntries(); j++) {
-        DBID id2 = node.getEntry(j).getRoutingObjectID();
 
-        D distance = distanceFunction.distance(id1, id2);
-        if (distance.compareTo(currentMaxDist) >= 0) {
-          firstPromoted = id1;
-          secondPromoted = id2;
-          currentMaxDist = distance;
+      for (int j = i + 1; j < node.getNumEntries(); j++) {
+        DBID id2 = node.getEntry(i).getRoutingObjectID();
+        // ... for each pair do testPartition...
+        Assignments<D, E> currentAssignments = balancedPartition(node, id1, id2, distanceFunction);
+
+        D maxCR = DistanceUtil.max(currentAssignments.getFirstCoveringRadius(), currentAssignments.getSecondCoveringRadius());
+        if (maxCR.compareTo(miSumCR) < 0) {
+          miSumCR = maxCR;
+          bestAssignment = currentAssignments;
         }
       }
     }
-
-    // partition the entries
-    List<DistanceEntry<D, E>> list1 = new ArrayList<>();
-    List<DistanceEntry<D, E>> list2 = new ArrayList<>();
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      DBID id = node.getEntry(i).getRoutingObjectID();
-      D d1 = distanceFunction.distance(firstPromoted, id);
-      D d2 = distanceFunction.distance(secondPromoted, id);
-
-      list1.add(new DistanceEntry<>(node.getEntry(i), d1, i));
-      list2.add(new DistanceEntry<>(node.getEntry(i), d2, i));
-    }
-    Collections.sort(list1);
-    Collections.sort(list2);
-
-    return balancedPartition(node, firstPromoted, secondPromoted, distanceFunction);
+    return bestAssignment;
   }
 }
