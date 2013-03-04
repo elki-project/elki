@@ -234,6 +234,11 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector<?>> extends Abst
     return new SpaceFillingKNNQuery<>(distanceQuery);
   }
 
+  @Override
+  public void logStatistics() {
+    // Nothing to do, yet.
+  }
+
   /**
    * KNN Query processor for space filling curves
    * 

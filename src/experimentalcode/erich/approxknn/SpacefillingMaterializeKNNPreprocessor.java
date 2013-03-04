@@ -269,6 +269,11 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector<?>, D
     return LOG;
   }
 
+  @Override
+  public void logStatistics() {
+    // Nothing to do, yet.
+  }
+
   /**
    * Object used in spatial sorting, combining the spatial object and the object
    * ID.
