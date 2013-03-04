@@ -241,7 +241,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       int size = (int) Math.min(sampling, sids.size());
       sample = DBIDUtil.randomSample(sids, size, random);
     }
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
     int hash = 0;
     MeanVariance mv = new MeanVariance();
     double[] buf = new double[dim];
