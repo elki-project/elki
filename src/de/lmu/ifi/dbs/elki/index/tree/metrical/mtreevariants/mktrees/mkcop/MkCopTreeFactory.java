@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,17 +64,18 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param pageSize
    * @param cacheSize
    * @param distanceFunction
+   * @param splitStrategy
    * @param k_max
    */
-  public MkCopTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceFunction);
+  public MkCopTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> splitStrategy, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
     this.k_max = k_max;
   }
 
   @Override
   public MkCoPTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkCoPTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkCoPTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, k_max);
+    return new MkCoPTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, splitStrategy, k_max);
   }
 
   protected Class<MkCoPTreeNode<O, D>> getNodeClass() {
@@ -87,7 +89,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
     protected int k_max = 0;
     
     @Override
@@ -102,7 +104,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
 
     @Override
     protected MkCopTreeFactory<O, D> makeInstance() {
-      return new MkCopTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, k_max);
+      return new MkCopTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, k_max);
     }
   }
 }

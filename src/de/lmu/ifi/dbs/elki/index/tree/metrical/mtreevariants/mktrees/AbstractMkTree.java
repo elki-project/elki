@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -66,9 +67,10 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
    * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
    */
-  public AbstractMkTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(pagefile, distanceQuery, distanceFunction);
+  public AbstractMkTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy) {
+    super(pagefile, distanceQuery, distanceFunction, splitStrategy);
     this.knnq = MTreeQueryUtil.getKNNQuery(this, distanceQuery);
   }
 

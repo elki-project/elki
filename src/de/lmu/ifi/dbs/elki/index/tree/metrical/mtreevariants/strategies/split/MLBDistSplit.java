@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 
 /*
  This file is part of ELKI:
@@ -51,9 +51,8 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  public MLBDistSplit(N node, DistanceQuery<O, D> distanceFunction) {
+  public MLBDistSplit() {
     super();
-    promote(node, distanceFunction);
   }
 
   /**
@@ -67,19 +66,20 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  private void promote(N node, DistanceQuery<O, D> distanceFunction) {
+  @Override
+  public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction) {
     DBID firstPromoted = null;
     DBID secondPromoted = null;
 
     // choose first and second routing object
     D currentMaxDist = distanceFunction.nullDistance();
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    for (int i = 0; i < node.getNumEntries(); i++) {
       DBID id1 = node.getEntry(i).getRoutingObjectID();
-      for(int j = i + 1; j < node.getNumEntries(); j++) {
+      for (int j = i + 1; j < node.getNumEntries(); j++) {
         DBID id2 = node.getEntry(j).getRoutingObjectID();
 
         D distance = distanceFunction.distance(id1, id2);
-        if(distance.compareTo(currentMaxDist) >= 0) {
+        if (distance.compareTo(currentMaxDist) >= 0) {
           firstPromoted = id1;
           secondPromoted = id2;
           currentMaxDist = distance;
@@ -90,7 +90,7 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
     // partition the entries
     List<DistanceEntry<D, E>> list1 = new ArrayList<>();
     List<DistanceEntry<D, E>> list2 = new ArrayList<>();
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    for (int i = 0; i < node.getNumEntries(); i++) {
       DBID id = node.getEntry(i).getRoutingObjectID();
       D d1 = distanceFunction.distance(firstPromoted, id);
       D d2 = distanceFunction.distance(secondPromoted, id);
@@ -101,6 +101,6 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
     Collections.sort(list1);
     Collections.sort(list2);
 
-    assignments = balancedPartition(node, firstPromoted, secondPromoted, distanceFunction);
+    return balancedPartition(node, firstPromoted, secondPromoted, distanceFunction);
   }
 }

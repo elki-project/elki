@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 
 /*
  This file is part of ELKI:
@@ -42,13 +42,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
   /**
    * Creates a new split object.
-   * 
-   * @param node the node to be split
-   * @param distanceFunction the distance function
    */
-  public MRadSplit(N node, DistanceQuery<O, D> distanceFunction) {
+  public MRadSplit() {
     super();
-    promote(node, distanceFunction);
   }
 
   /**
@@ -60,23 +56,26 @@ public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, 
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
-  private void promote(N node, DistanceQuery<O, D> distanceFunction) {
+  @Override
+  public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction) {
     D miSumCR = distanceFunction.infiniteDistance();
 
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    Assignments<D, E> bestAssignment = null;
+    for (int i = 0; i < node.getNumEntries(); i++) {
       DBID id1 = node.getEntry(i).getRoutingObjectID();
 
-      for(int j = i + 1; j < node.getNumEntries(); j++) {
+      for (int j = i + 1; j < node.getNumEntries(); j++) {
         DBID id2 = node.getEntry(i).getRoutingObjectID();
         // ... for each pair do testPartition...
         Assignments<D, E> currentAssignments = balancedPartition(node, id1, id2, distanceFunction);
 
         D sumCR = currentAssignments.getFirstCoveringRadius().plus(currentAssignments.getSecondCoveringRadius());
-        if(sumCR.compareTo(miSumCR) < 0) {
+        if (sumCR.compareTo(miSumCR) < 0) {
           miSumCR = sumCR;
-          assignments = currentAssignments;
+          bestAssignment = currentAssignments;
         }
       }
     }
+    return bestAssignment;
   }
 }

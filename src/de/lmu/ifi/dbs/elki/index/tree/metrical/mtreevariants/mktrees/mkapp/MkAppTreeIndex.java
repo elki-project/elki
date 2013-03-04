@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -68,12 +69,13 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * @param pageFile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
    * @param k_max Maximum value of k supported
    * @param p Parameter p
    * @param log Logspace flag
    */
-  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
-    super(pageFile, distanceQuery, distanceFunction, k_max, p, log);
+  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, int k_max, int p, boolean log) {
+    super(pageFile, distanceQuery, distanceFunction, splitStrategy, k_max, p, log);
     this.relation = relation;
   }
 

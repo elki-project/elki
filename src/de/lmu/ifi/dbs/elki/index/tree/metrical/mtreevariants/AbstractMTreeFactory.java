@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MLBDistSplit;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -49,36 +51,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMTree<O, D, N, E> & Index> extends TreeIndexFactory<O, I> {
   /**
-   * Parameter to specify the distance function to determine the distance
-   * between database objects, must extend
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
-   * <p>
-   * Key: {@code -mtree.distancefunction}
-   * </p>
-   * <p>
-   * Default value:
-   * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
-   * </p>
-   */
-  public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
-
-  /**
-   * Holds the instance of the distance function specified by
-   * {@link #DISTANCE_FUNCTION_ID}.
+   * Holds the instance of the distance function we are building the index for.
    */
   protected DistanceFunction<O, D> distanceFunction;
 
   /**
+   * Split strategy
+   */
+  protected MTreeSplit<O, D, N, E> splitStrategy;
+
+  /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
-   * @param distanceFunction
+   * @param fileName File name
+   * @param pageSize Page size
+   * @param cacheSize Cache size
+   * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
    */
-  public AbstractMTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction) {
+  public AbstractMTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy) {
     super(fileName, pageSize, cacheSize);
     this.distanceFunction = distanceFunction;
+    this.splitStrategy = splitStrategy;
   }
 
   @Override
@@ -93,19 +87,53 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>> extends TreeIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends TreeIndexFactory.Parameterizer<O> {
+    /**
+     * Parameter to specify the distance function to determine the distance
+     * between database objects, must extend
+     * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction}.
+     * <p>
+     * Key: {@code -mtree.distancefunction}
+     * </p>
+     * <p>
+     * Default value:
+     * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
+     * </p>
+     */
+    public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("mtree.distancefunction", "Distance function to determine the distance between database objects.");
+
+    /**
+     * Parameter to specify the splitting strategy to construct the tree.
+     * <p>
+     * Key: {@code -mtree.split}
+     * </p>
+     */
+    public static final OptionID SPLIT_STRATEGY_ID = new OptionID("mtree.split", "Split strategy to use for constructing the M-tree.");
+
+    /**
+     * Distance function to use for the index.
+     */
     protected DistanceFunction<O, D> distanceFunction = null;
+
+    /**
+     * Splitting strategy.
+     */
+    protected MTreeSplit<O, D, N, E> splitStrategy = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
-      if(config.grab(distanceFunctionP)) {
+      if (config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
+      }
+      ObjectParameter<MTreeSplit<O, D, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MLBDistSplit.class);
+      if (config.grab(splitStrategyP)) {
+        splitStrategy = splitStrategyP.instantiateClass(config);
       }
     }
 
     @Override
-    protected abstract AbstractMTreeFactory<O, D, ?, ?, ?> makeInstance();
+    protected abstract AbstractMTreeFactory<O, D, N, E, ?> makeInstance();
   }
 }
