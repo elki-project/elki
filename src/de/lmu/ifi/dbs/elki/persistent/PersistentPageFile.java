@@ -114,7 +114,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   @Override
   public P readPage(int pageID) {
     try {
-      readAccess++;
+      countRead();
       long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
       byte[] buffer = new byte[pageSize];
       file.seek(offset);
@@ -138,7 +138,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
       super.deletePage(pageID);
 
       // delete from file
-      writeAccess++;
+      countWrite();
       byte[] array = pageToByteArray(null);
       long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
       file.seek(offset);
@@ -158,7 +158,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
   @Override
   public void writePage(int pageID, P page) {
     try {
-      writeAccess++;
+      countWrite();
       byte[] array = pageToByteArray(page);
       long offset = ((long) (header.getReservedPages() + pageID)) * (long) pageSize;
       assert offset >= 0 : header.getReservedPages() + " " + pageID + " " + pageSize + " " + offset;
@@ -308,16 +308,18 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
    * Increases the {@link AbstractStoringPageFile#readAccess readAccess} counter by
    * one.
    */
+  @Deprecated
   public void increaseReadAccess() {
-    readAccess++;
+    countRead();
   }
 
   /**
    * Increases the {@link AbstractStoringPageFile#writeAccess writeAccess} counter by
    * one.
    */
+  @Deprecated
   public void increaseWriteAccess() {
-    writeAccess++;
+    countWrite();
   }
 
   /**
@@ -397,5 +399,10 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
 
     // Return "new file" status
     return existed;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

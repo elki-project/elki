@@ -169,17 +169,31 @@ public final class LoggingConfiguration {
    * 
    * @param time Flag
    */
-  public static void setTime(boolean time) {
-    Logger logger1 = Logger.getLogger("de.lmu.ifi.dbs.elki.workflow.AlgorithmStep");
+  public static void setStatistics(boolean time) {
+    Logger logger1 = Logger.getLogger("");
+    Logger logger2 = Logger.getLogger(TOPLEVEL_PACKAGE);
+    Logger logger3 = Logger.getLogger(TOPLEVEL_PACKAGE + ".workflow.AlgorithmStep");
     if (time) {
       // decrease to INFO if it was higher
       if (logger1.getLevel() == null || logger1.getLevel().intValue() > Level.STATISTICS.intValue()) {
         logger1.setLevel(Level.STATISTICS);
       }
+      if (logger2.getLevel() == null || logger2.getLevel().intValue() > Level.STATISTICS.intValue()) {
+        logger2.setLevel(Level.STATISTICS);
+      }
+      if (logger3.getLevel() == null || logger3.getLevel().intValue() > Level.STATISTICS.intValue()) {
+        logger3.setLevel(Level.STATISTICS);
+      }
     } else {
       // increase to warning level if it was INFO.
       if (logger1.getLevel() != null || logger1.getLevel() == Level.STATISTICS) {
         logger1.setLevel(Level.WARNING);
+      }
+      if (logger2.getLevel() != null || logger2.getLevel() == Level.STATISTICS) {
+        logger2.setLevel(Level.WARNING);
+      }
+      if (logger3.getLevel() != null || logger3.getLevel() == Level.STATISTICS) {
+        logger3.setLevel(Level.WARNING);
       }
     }
   }

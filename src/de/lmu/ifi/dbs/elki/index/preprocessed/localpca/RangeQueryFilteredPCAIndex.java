@@ -99,8 +99,13 @@ public class RangeQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abst
   }
 
   @Override
-  public Logging getLogger() {
+  protected Logging getLogger() {
     return LOG;
+  }
+
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
   }
 
   /**

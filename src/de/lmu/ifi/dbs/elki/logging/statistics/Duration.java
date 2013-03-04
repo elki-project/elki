@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index;
+package de.lmu.ifi.dbs.elki.logging.statistics;
 
 /*
  This file is part of ELKI:
@@ -23,28 +23,42 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
- * Interface defining the minimum requirements for all index classes.
+ * Class that tracks the duration of a task.
  * 
- * See also: {@link IndexFactory}, {@link DynamicIndex}
+ * TODO: add support for different time units?
  * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
-public interface Index extends Result {
+public interface Duration extends Statistic {
   /**
-   * Initialize the index. For static indexes, this is the moment the index is
-   * bulk loaded.
+   * Start the timer.
    */
-  public void initialize();
+  void begin();
 
   /**
-   * Send statistics to the logger, if enabled.
-   * 
-   * Note: you must have set the logging level appropriately before initializing
-   * the index! Otherwise, the index might not have collected the desired
-   * statistics.
+   * Finish the timer.
    */
-  public void logStatistics();
+  void end();
+
+  /**
+   * Get the begin of the interval.
+   * 
+   * @return Begin
+   */
+  long getBegin();
+
+  /**
+   * Get the end of the interval.
+   * 
+   * @return End
+   */
+  long getEnd();
+  
+  /**
+   * Get the duration of the interval.
+   * 
+   * @return Duration
+   */
+  long getDuration();
 }

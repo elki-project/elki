@@ -170,6 +170,11 @@ public class PreDeConSubspaceIndex<V extends NumberVector<?>, D extends Distance
     return LOG;
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * Factory.
    * 

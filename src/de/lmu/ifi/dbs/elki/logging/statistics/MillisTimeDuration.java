@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index;
+package de.lmu.ifi.dbs.elki.logging.statistics;
 
 /*
  This file is part of ELKI:
@@ -23,28 +23,53 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
- * Interface defining the minimum requirements for all index classes.
+ * Class that tracks the runtime of a task with {@code System.nanoTime()}
  * 
- * See also: {@link IndexFactory}, {@link DynamicIndex}
- * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
-public interface Index extends Result {
+public class MillisTimeDuration extends AbstractStatistic implements Duration {
   /**
-   * Initialize the index. For static indexes, this is the moment the index is
-   * bulk loaded.
+   * Tracking variables.
    */
-  public void initialize();
+  long begin = -1, end = -2;
 
   /**
-   * Send statistics to the logger, if enabled.
+   * Constructor.
    * 
-   * Note: you must have set the logging level appropriately before initializing
-   * the index! Otherwise, the index might not have collected the desired
-   * statistics.
+   * @param key Key
    */
-  public void logStatistics();
+  public MillisTimeDuration(String key) {
+    super(key);
+  }
+
+  @Override
+  public void begin() {
+    begin = System.currentTimeMillis();
+  }
+
+  @Override
+  public void end() {
+    end = System.currentTimeMillis();
+  }
+
+  @Override
+  public long getBegin() {
+    return begin;
+  }
+
+  @Override
+  public long getEnd() {
+    return end;
+  }
+
+  @Override
+  public long getDuration() {
+    return (end - begin);
+  }
+
+  @Override
+  public String formatValue() {
+    return getDuration() + " ms";
+  }
 }

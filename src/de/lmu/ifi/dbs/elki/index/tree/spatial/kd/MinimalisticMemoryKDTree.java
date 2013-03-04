@@ -132,6 +132,11 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
     return "kd-tree";
   }
 
+  @Override
+  public void logStatistics() {
+    // TODO: anything sensible to log?
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <D extends Distance<D>> KNNQuery<O, D> getKNNQuery(DistanceQuery<O, D> distanceQuery, Object... hints) {

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index;
+package de.lmu.ifi.dbs.elki.logging.statistics;
 
 /*
  This file is part of ELKI:
@@ -23,28 +23,37 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
- * Interface defining the minimum requirements for all index classes.
+ * Trivial string based statistic.
  * 
- * See also: {@link IndexFactory}, {@link DynamicIndex}
- * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
-public interface Index extends Result {
+public class StringStatistic extends AbstractStatistic {
   /**
-   * Initialize the index. For static indexes, this is the moment the index is
-   * bulk loaded.
+   * Storage
    */
-  public void initialize();
+  private String val;
 
   /**
-   * Send statistics to the logger, if enabled.
+   * Constructor.
    * 
-   * Note: you must have set the logging level appropriately before initializing
-   * the index! Otherwise, the index might not have collected the desired
-   * statistics.
+   * @param key Key
    */
-  public void logStatistics();
+  public StringStatistic(String key) {
+    super(key);
+  }
+
+  /**
+   * Set the value.
+   * 
+   * @param val Value
+   */
+  public void setString(String val) {
+    this.val = val;
+  }
+
+  @Override
+  public String formatValue() {
+    return val;
+  }
 }

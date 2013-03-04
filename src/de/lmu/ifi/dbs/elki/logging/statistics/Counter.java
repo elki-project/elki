@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index;
+package de.lmu.ifi.dbs.elki.logging.statistics;
 
 /*
  This file is part of ELKI:
@@ -23,28 +23,40 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.Result;
-
 /**
- * Interface defining the minimum requirements for all index classes.
+ * Simple statistic by counting. For example: invocations of a method.
  * 
- * See also: {@link IndexFactory}, {@link DynamicIndex}
- * 
- * @author Elke Achtert
+ * @author Erich Schubert
  */
-public interface Index extends Result {
+public interface Counter extends Statistic {
   /**
-   * Initialize the index. For static indexes, this is the moment the index is
-   * bulk loaded.
+   * Increment the counter.
+   * 
+   * @return Current value.
    */
-  public void initialize();
+  long increment();
 
   /**
-   * Send statistics to the logger, if enabled.
+   * Decrement the counter.
    * 
-   * Note: you must have set the logging level appropriately before initializing
-   * the index! Otherwise, the index might not have collected the desired
-   * statistics.
+   * @return Current value.
    */
-  public void logStatistics();
+  long decrement();
+
+  /**
+   * Get the current count.
+   * 
+   * @return Current count.
+   */
+  long getValue();
+
+  /**
+   * Increment the counter by i.
+   * 
+   * Note: the increment may be negative!
+   * 
+   * @param i increment.
+   * @return Current count.
+   */
+  long increment(long i);
 }

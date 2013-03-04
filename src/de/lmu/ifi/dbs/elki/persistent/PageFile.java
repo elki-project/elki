@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Page file interface.
  * 
@@ -31,7 +30,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * 
  * @param <P> Page file
  */
-public interface PageFile<P extends Page> extends PageFileStatistics {
+public interface PageFile<P extends Page> {
   /**
    * Sets the id of the given page.
    * 
@@ -103,4 +102,9 @@ public interface PageFile<P extends Page> extends PageFileStatistics {
    * @return true when the file already existed.
    */
   public boolean initialize(PageHeader header);
+
+  /**
+   * Log some statistics to the appropriate logger.
+   */
+  public void logStatistics();
 }

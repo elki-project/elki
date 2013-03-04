@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.persistent;
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,7 +26,6 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Abstract base class for the page file API for both caches and true page files
  * (in-memory and on-disk).
@@ -36,21 +38,29 @@ public abstract class AbstractPageFile<P extends Page> implements PageFile<P> {
   /**
    * The read I/O-Access of this file.
    */
-  protected long readAccess;
+  private Counter readAccess;
 
   /**
    * The write I/O-Access of this file.
    */
-  protected long writeAccess;
+  private Counter writeAccess;
 
   /**
    * Constructor.
    */
   public AbstractPageFile() {
     super();
-    this.readAccess = 0;
-    this.writeAccess = 0;
+    Logging log = getLogger();
+    this.readAccess = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".reads") : null;
+    this.writeAccess = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".writes") : null;
   }
+
+  /**
+   * Get the class logger.
+   * 
+   * @return Logger
+   */
+  abstract protected Logging getLogger();
 
   /**
    * Writes a page into this file. The method tests if the page has already an
@@ -78,20 +88,32 @@ public abstract class AbstractPageFile<P extends Page> implements PageFile<P> {
   public void close() {
     clear();
   }
-
+  
   @Override
-  public final long getReadOperations() {
-    return readAccess;
+  public void logStatistics() {
+    if (readAccess != null) {
+      getLogger().statistics(readAccess);
+    }
+    if (writeAccess != null) {
+      getLogger().statistics(writeAccess);
+    }
+  }
+  
+  /**
+   * Count a page read access.
+   */
+  protected void countRead() {
+    if (readAccess != null) {
+      readAccess.increment();
+    }
   }
 
-  @Override
-  public final long getWriteOperations() {
-    return writeAccess;
-  }
-
-  @Override
-  public final void resetPageAccess() {
-    this.readAccess = 0;
-    this.writeAccess = 0;
+  /**
+   * Count a page write access.
+   */
+  protected void countWrite() {
+    if (writeAccess != null) {
+      writeAccess.increment();
+    }
   }
 }

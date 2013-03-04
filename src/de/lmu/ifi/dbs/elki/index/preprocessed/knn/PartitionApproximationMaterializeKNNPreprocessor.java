@@ -178,6 +178,11 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O, D extends Dista
     return "random-partition-knn";
   }
 
+  @Override
+  public void logStatistics() {
+    // No statistics to log.
+  }
+
   /**
    * The parameterizable factory.
    * 

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -35,6 +36,11 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * @param <P> Page type
  */
 public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(MemoryPageFile.class);
+
   /**
    * Holds the pages.
    */
@@ -53,13 +59,13 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
 
   @Override
   public synchronized P readPage(int pageID) {
-    readAccess++;
+    countRead();
     return file.get(pageID);
   }
-  
+
   @Override
   protected void writePage(int pageID, P page) {
-    writeAccess++;
+    countWrite();
     file.put(pageID, page);
     page.setDirty(false);
   }
@@ -71,12 +77,17 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
     super.deletePage(pageID);
 
     // delete from file
-    writeAccess++;
+    countWrite();
     file.remove(pageID);
   }
 
   @Override
   public void clear() {
     file.clear();
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

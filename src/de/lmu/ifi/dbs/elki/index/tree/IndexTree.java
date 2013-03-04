@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.index.tree;
  */
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.persistent.PageFileStatistics;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -93,7 +93,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    */
   public void initialize() {
     TreeIndexHeader header = createHeader();
-    if(this.file.initialize(header)) {
+    if (this.file.initialize(header)) {
       initializeFromFile(header, file);
     }
     rootEntry = createRootEntry();
@@ -114,7 +114,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public final E getRootEntry() {
     return rootEntry;
   }
-  
+
   /**
    * Page ID of the root entry.
    * 
@@ -123,7 +123,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public final int getRootID() {
     return getPageID(rootEntry);
   }
-  
+
   /**
    * Reads the root node of this index from the file.
    * 
@@ -132,7 +132,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public N getRoot() {
     return file.readPage(getPageID(rootEntry));
   }
-  
+
   /**
    * Test if a given ID is the root.
    * 
@@ -153,7 +153,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
     if (entry.isLeafEntry()) {
       throw new AbortException("Leafs do not have page ids!");
     }
-    return ((DirectoryEntry)entry).getPageID();
+    return ((DirectoryEntry) entry).getPageID();
   }
 
   /**
@@ -163,10 +163,9 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * @return the node with the specified id
    */
   public N getNode(int nodeID) {
-    if(nodeID == getPageID(rootEntry)) {
+    if (nodeID == getPageID(rootEntry)) {
       return getRoot();
-    }
-    else {
+    } else {
       return file.readPage(nodeID);
     }
   }
@@ -180,7 +179,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   public final N getNode(E entry) {
     return getNode(getPageID(entry));
   }
-  
+
   /**
    * Write a node to the backing storage.
    * 
@@ -222,7 +221,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
     this.dirMinimum = header.getDirMinimum();
     this.leafMinimum = header.getLeafMinimum();
 
-    if(getLogger().isDebugging()) {
+    if (getLogger().isDebugging()) {
       StringBuilder msg = new StringBuilder();
       msg.append(getClass());
       msg.append("\n file = ").append(file.getClass());
@@ -243,16 +242,13 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
     // create empty root
     createEmptyRoot(exampleLeaf);
 
-    if(getLogger().isDebugging()) {
-      StringBuilder msg = new StringBuilder();
-      msg.append(getClass()).append("\n");
-      msg.append(" file    = ").append(file.getClass()).append("\n");
-      msg.append(" maximum number of dir entries = ").append((dirCapacity - 1)).append("\n");
-      msg.append(" minimum number of dir entries = ").append(dirMinimum).append("\n");
-      msg.append(" maximum number of leaf entries = ").append((leafCapacity - 1)).append("\n");
-      msg.append(" minimum number of leaf entries = ").append(leafMinimum).append("\n");
-      msg.append(" root    = ").append(getRoot());
-      getLogger().debugFine(msg.toString());
+    final Logging log = getLogger();
+    if (log.isStatistics()) {
+      String cls = this.getClass().getName();
+      log.statistics(new LongStatistic(cls + ".directory.capacity", (dirCapacity - 1)));
+      log.statistics(new LongStatistic(cls + ".directory.minfill", dirMinimum));
+      log.statistics(new LongStatistic(cls + ".leaf.capacity", (leafCapacity - 1)));
+      log.statistics(new LongStatistic(cls + ".leaf.minfill", leafMinimum));
     }
 
     initialized = true;
@@ -321,14 +317,12 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   }
 
   /**
-   * Get the index file page access statistics.
-   * 
-   * @return access statistics
+   * Log some statistics, if enabled.
    */
-  public PageFileStatistics getPageFileStatistics() {
-    return file;
+  public void logStatistics() {
+    file.logStatistics();
   }
-  
+
   /**
    * Get the page size of the backing storage.
    * 
