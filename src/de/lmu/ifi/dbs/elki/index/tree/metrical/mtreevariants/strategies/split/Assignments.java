@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 
 /*
  This file is part of ELKI:

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -65,14 +66,15 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
   /**
    * Constructor.
    *
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
-   * @param distanceFunction
-   * @param k_max
+   * @param fileName File name
+   * @param pageSize Page size
+   * @param cacheSize Cache size
+   * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
+   * @param k_max Maximum k
    */
-  public AbstractMkTreeUnifiedFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceFunction);
+  public AbstractMkTreeUnifiedFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
     this.k_max = k_max;
   }
 
@@ -83,7 +85,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTreeFactory.Parameterizer<O, D, N, E> {
     protected int k_max;
 
     @Override
@@ -98,6 +100,6 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
     }
 
     @Override
-    protected abstract AbstractMkTreeUnifiedFactory<O, D, ?, ?, ?> makeInstance();
+    protected abstract AbstractMkTreeUnifiedFactory<O, D, N, E, ?> makeInstance();
   }
 }

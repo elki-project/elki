@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
@@ -51,14 +52,14 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
    * @param cacheSize cache size
    * @param distanceFunction Distance function
    */
-  public MTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction) {
-    super(fileName, pageSize, cacheSize, distanceFunction);
+  public MTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy) {
+    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
   }
 
   @Override
   public MTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction);
+    return new MTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, splitStrategy);
   }
 
   protected Class<MTreeNode<O, D>> getNodeClass() {
@@ -72,10 +73,10 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
     @Override
     protected MTreeFactory<O, D> makeInstance() {
-      return new MTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction);
+      return new MTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
     }
   }
 }

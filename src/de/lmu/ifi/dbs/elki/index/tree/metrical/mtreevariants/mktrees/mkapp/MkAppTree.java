@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
@@ -89,12 +90,13 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param pageFile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
    * @param k_max Maximum value of k supported
    * @param p Parameter p
    * @param log Logspace flag
    */
-  public MkAppTree(PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, int k_max, int p, boolean log) {
-    super(pageFile, distanceQuery, distanceFunction);
+  public MkAppTree(PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, int k_max, int p, boolean log) {
+    super(pageFile, distanceQuery, distanceFunction, splitStrategy);
     this.k_max = k_max;
     this.p = p;
     this.log = log;

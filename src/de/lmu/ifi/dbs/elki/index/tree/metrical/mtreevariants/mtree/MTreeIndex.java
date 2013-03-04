@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
@@ -69,9 +70,10 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
    * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
    */
-  public MTreeIndex(Relation<O> relation, PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
-    super(pagefile, distanceQuery, distanceFunction);
+  public MTreeIndex(Relation<O> relation, PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy) {
+    super(pagefile, distanceQuery, distanceFunction, splitStrategy);
     this.relation = relation;
   }
 

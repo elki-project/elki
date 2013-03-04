@@ -39,9 +39,8 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.Assignments;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MLBDistSplit;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split.MTreeSplit;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -76,16 +75,23 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   protected DistanceQuery<O, D> distanceQuery;
 
   /**
+   * Splitting strategy.
+   */
+  protected MTreeSplit<O, D, N, E> splitStrategy;
+
+  /**
    * Constructor.
    * 
    * @param pagefile Page file
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
    */
-  public AbstractMTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction) {
+  public AbstractMTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy) {
     super(pagefile);
     this.distanceQuery = distanceQuery;
     this.distanceFunction = distanceFunction;
+    this.splitStrategy = splitStrategy;
   }
 
   @Override
@@ -375,8 +381,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   private SplitResult split(N node) {
     // do the split
     // todo split stratgey
-    MTreeSplit<O, D, N, E> split = new MLBDistSplit<>(node, distanceQuery);
-    Assignments<D, E> assignments = split.getAssignments();
+    Assignments<D, E> assignments = splitStrategy.split(node, distanceQuery);
     final N newNode;
     if (node.isLeaf()) {
       newNode = createNewLeafNode();
@@ -394,7 +399,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       getLogger().debugFine(msg);
     }
 
-    return new SplitResult(split, newNode);
+    return new SplitResult(assignments, newNode);
   }
 
   /**
@@ -415,7 +420,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     if (hasOverflow(node)) {
       SplitResult splitResult = split(node);
       N splitNode = splitResult.newNode;
-      Assignments<D, E> assignments = splitResult.split.getAssignments();
+      Assignments<D, E> assignments = splitResult.assignments;
 
       // if root was split: create a new root that points the two split
       // nodes
@@ -549,7 +554,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     /**
      * Split used
      */
-    protected MTreeSplit<O, D, N, E> split;
+    protected Assignments<D, E> assignments;
 
     /**
      * New sibling
@@ -559,11 +564,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     /**
      * Constructor.
      * 
-     * @param split Split that was used
+     * @param assignments Split that was used
      * @param newNode New sibling
      */
-    public SplitResult(MTreeSplit<O, D, N, E> split, N newNode) {
-      this.split = split;
+    public SplitResult(Assignments<D, E> assignments, N newNode) {
+      this.assignments = assignments;
       this.newNode = newNode;
     }
   }

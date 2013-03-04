@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.split;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 
 /*
  This file is part of ELKI:
@@ -51,11 +51,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  */
 public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> {
   /**
-   * Encapsulates the two promotion objects and their assignments.
-   */
-  Assignments<D, E> assignments;
-
-  /**
    * Creates a balanced partition of the entries of the specified node.
    * 
    * @param node the node to be split
@@ -75,7 +70,7 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
     // determine the nearest neighbors
     List<DistanceEntry<D, E>> list1 = new ArrayList<>();
     List<DistanceEntry<D, E>> list2 = new ArrayList<>();
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    for (int i = 0; i < node.getNumEntries(); i++) {
       DBID id = node.getEntry(i).getRoutingObjectID();
       // determine the distance of o to o1 / o2
       D d1 = distanceFunction.distance(routingObject1, id);
@@ -87,11 +82,10 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
     Collections.sort(list1);
     Collections.sort(list2);
 
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      if(i % 2 == 0) {
+    for (int i = 0; i < node.getNumEntries(); i++) {
+      if (i % 2 == 0) {
         currentCR1 = assignNN(assigned1, assigned2, list1, currentCR1, node.isLeaf());
-      }
-      else {
+      } else {
         currentCR2 = assignNN(assigned2, assigned1, list2, currentCR2, node.isLeaf());
       }
     }
@@ -112,17 +106,16 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    */
   private D assignNN(Set<E> assigned1, Set<E> assigned2, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
     DistanceEntry<D, E> distEntry = list.remove(0);
-    while(assigned2.contains(distEntry.getEntry())) {
+    while (assigned2.contains(distEntry.getEntry())) {
       distEntry = list.remove(0);
     }
     // Update the parent distance.
     distEntry.getEntry().setParentDistance(distEntry.getDistance());
     assigned1.add(distEntry.getEntry());
 
-    if(isLeaf) {
+    if (isLeaf) {
       return DistanceUtil.max(currentCR, distEntry.getDistance());
-    }
-    else {
+    } else {
       return DistanceUtil.max(currentCR, distEntry.getDistance().plus((distEntry.getEntry()).getCoveringRadius()));
     }
   }
@@ -132,7 +125,5 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * 
    * @return the assignments of this split
    */
-  public Assignments<D, E> getAssignments() {
-    return assignments;
-  }
+  abstract public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction);
 }
