@@ -76,7 +76,7 @@ public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, 
       DBID id1 = node.getEntry(i).getRoutingObjectID();
 
       for (int j = i + 1; j < node.getNumEntries(); j++) {
-        DBID id2 = node.getEntry(i).getRoutingObjectID();
+        DBID id2 = node.getEntry(j).getRoutingObjectID();
         // ... for each pair do testPartition...
         Assignments<D, E> currentAssignments = balancedPartition(node, id1, id2, distanceFunction);
 
