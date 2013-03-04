@@ -102,8 +102,13 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> the type of DatabaseObject to be stored in the M-Tree
+   * @param <D> the type of Distance used in the M-Tree
+   * @param <N> the type of AbstractMTreeNode used in the M-Tree
+   * @param <E> the type of MetricalEntry used in the M-Tree
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractParameterizer {
     /**
      * Option ID for the random generator.
      */
@@ -124,7 +129,7 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
     }
 
     @Override
-    protected RandomSplit<?, ?, ?, ?> makeInstance() {
+    protected RandomSplit<O, D, N, E> makeInstance() {
       return new RandomSplit<>(rnd);
     }
   }
