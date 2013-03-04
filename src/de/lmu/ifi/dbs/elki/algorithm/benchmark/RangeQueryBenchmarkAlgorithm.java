@@ -160,7 +160,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector<?>, D extends N
       int size = (int) Math.min(sampling, relation.size());
       sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
     }
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
     int hash = 0;
     MeanVariance mv = new MeanVariance();
     for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {

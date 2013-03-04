@@ -132,7 +132,7 @@ public class KNNBenchmarkAlgorithm<O, D extends Distance<D>> extends AbstractDis
         int size = (int) Math.min(sampling, relation.size());
         sample = DBIDUtil.randomSample(relation.getDBIDs(), size, random);
       }
-      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
+      FiniteProgress prog = LOG.isVeryVerbose() ? new FiniteProgress("kNN queries", sample.size(), LOG) : null;
       int hash = 0;
       MeanVariance mv = new MeanVariance(), mvdist = new MeanVariance();
       for (DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance()) {
