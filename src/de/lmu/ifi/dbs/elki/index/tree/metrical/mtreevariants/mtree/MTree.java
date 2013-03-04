@@ -120,10 +120,6 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
     if(leafCapacity < 10) {
       LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
-
-    if(LOG.isVerbose()) {
-      LOG.verbose("Directory Capacity: " + (dirCapacity - 1) + "\nLeaf Capacity:    " + (leafCapacity - 1));
-    }
   }
 
   /**
