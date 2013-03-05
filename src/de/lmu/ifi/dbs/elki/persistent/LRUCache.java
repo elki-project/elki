@@ -252,6 +252,7 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
 
   @Override
   public void logStatistics() {
+    super.logStatistics();
     file.logStatistics();
   }
 

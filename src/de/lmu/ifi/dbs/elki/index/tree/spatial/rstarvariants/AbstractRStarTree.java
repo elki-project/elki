@@ -943,9 +943,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     public Statistics() {
       super();
       Logging log = getLogger();
-      distanceCalcs = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".distancecalcs") : null;
-      knnQueries = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".knnqueries") : null;
-      rangeQueries = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".rangequeries") : null;
+      final String prefix = AbstractRStarTree.this.getClass().getName();
+      distanceCalcs = log.isStatistics() ? log.newCounter(prefix + ".distancecalcs") : null;
+      knnQueries = log.isStatistics() ? log.newCounter(prefix + ".knnqueries") : null;
+      rangeQueries = log.isStatistics() ? log.newCounter(prefix + ".rangequeries") : null;
     }
 
     /**
