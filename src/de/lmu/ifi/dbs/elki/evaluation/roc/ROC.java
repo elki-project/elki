@@ -98,7 +98,7 @@ public class ROC {
    * (comparable, ID)s, where the comparable object is used to decided when two
    * objects are interchangeable.
    * 
-   * @param <C> Reference type
+   * @param <I> Iterator type
    * @param predicate Predicate to test for positive objects
    * @param iter Iterator over results, with ties.
    * @return area under curve

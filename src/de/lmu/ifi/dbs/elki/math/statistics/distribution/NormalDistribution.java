@@ -337,8 +337,6 @@ public class NormalDistribution implements DistributionWithRandom {
    * Cumulative probability density function (CDF) of a normal distribution.
    * 
    * @param x value to evaluate CDF at
-   * @param mu Mean value
-   * @param sigma Standard deviation.
    * @return The CDF of the given normal distribution at x.
    */
   public static double standardNormalCDF(double x) {

@@ -61,8 +61,7 @@ public interface DoubleDistanceKNNHeap extends KNNHeap<DoubleDistance> {
    * 
    * Use for existing pairs.
    * 
-   * @param distance Distance value
-   * @param id ID number
+   * @param e Existing distance pair
    */
   void add(DoubleDistanceDBIDPair e);
 

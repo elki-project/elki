@@ -64,8 +64,6 @@ public class DoubleDistanceIntegerDBIDKNNList implements ModifiableDoubleDistanc
 
   /**
    * Constructor.
-   * 
-   * @param k K parameter
    */
   public DoubleDistanceIntegerDBIDKNNList() {
     super();

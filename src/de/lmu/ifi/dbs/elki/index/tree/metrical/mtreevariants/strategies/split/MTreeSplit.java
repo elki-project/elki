@@ -53,10 +53,10 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
   /**
    * Creates a balanced partition of the entries of the specified node.
    * 
+   * @param tree the tree to perform the split in
    * @param node the node to be split
    * @param routingObject1 the id of the first routing object
    * @param routingObject2 the id of the second routing object
-   * @param distanceFunction the distance function to compute the distances
    * @return an assignment that holds a balanced partition of the entries of the
    *         specified node
    */
