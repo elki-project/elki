@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -71,10 +72,11 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
    * @param cacheSize Cache size
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insertion strategy
    * @param k_max Maximum k
    */
-  public AbstractMkTreeUnifiedFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
+  public AbstractMkTreeUnifiedFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy, int k_max) {
+    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
     this.k_max = k_max;
   }
 

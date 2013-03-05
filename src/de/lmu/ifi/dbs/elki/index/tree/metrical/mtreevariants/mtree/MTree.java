@@ -25,11 +25,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -71,11 +71,11 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
    * 
    * @param pagefile Page file
    * @param distanceQuery Distance query
-   * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insertion strategy
    */
-  public MTree(PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy) {
-    super(pagefile, distanceQuery, distanceFunction, splitStrategy);
+  public MTree(PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy, MTreeInsert<O, D, MTreeNode<O, D>, MTreeEntry<D>> insertStrategy) {
+    super(pagefile, distanceQuery, splitStrategy, insertStrategy);
   }
 
   /**

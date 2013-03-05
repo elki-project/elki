@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -86,12 +87,13 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param cacheSize
    * @param distanceFunction
    * @param splitStrategy
+   * @param insertStrategy
    * @param k_max
    * @param p
    * @param log
    */
-  public MkAppTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, int k_max, int p, boolean log) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
+  public MkAppTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, MTreeInsert<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> insertStrategy, int k_max, int p, boolean log) {
+    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
     this.k_max = k_max;
     this.p = p;
     this.log = log;
@@ -100,7 +102,7 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
   @Override
   public MkAppTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkAppTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkAppTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, splitStrategy, k_max, p, log);
+    return new MkAppTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), splitStrategy, insertStrategy, k_max, p, log);
   }
 
   protected Class<MkAppTreeNode<O, D>> getNodeClass() {
@@ -135,25 +137,25 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(kP)) {
+      if (config.grab(kP)) {
         k_max = kP.getValue();
       }
 
       IntParameter pP = new IntParameter(P_ID);
       pP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(pP)) {
+      if (config.grab(pP)) {
         p = pP.getValue();
       }
 
       Flag nologF = new Flag(NOLOG_ID);
-      if(config.grab(nologF)) {
+      if (config.grab(nologF)) {
         log = !nologF.getValue();
       }
     }
 
     @Override
     protected MkAppTreeFactory<O, D> makeInstance() {
-      return new MkAppTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, k_max, p, log);
+      return new MkAppTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy, k_max, p, log);
     }
   }
 }
