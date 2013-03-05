@@ -38,7 +38,7 @@ public class DoubleDistanceSearchCandidate implements Comparable<DoubleDistanceS
   /**
    * Page id
    */
-  public Integer nodeID;
+  public int nodeID;
 
   /**
    * Constructor.
@@ -46,7 +46,7 @@ public class DoubleDistanceSearchCandidate implements Comparable<DoubleDistanceS
    * @param mindist The minimum distance to this candidate
    * @param pagenr The page number of this candidate
    */
-  public DoubleDistanceSearchCandidate(final double mindist, final Integer pagenr) {
+  public DoubleDistanceSearchCandidate(final double mindist, final int pagenr) {
     super();
     this.mindist = mindist;
     this.nodeID = pagenr;

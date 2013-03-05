@@ -70,6 +70,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     if (k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
+    index.statistics.countKNNQuery();
 
     final D nullDistance = index.getDistanceFactory().nullDistance();
     KNNHeap<D> knnList = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
@@ -106,6 +107,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
           if (diff.compareTo(sum) <= 0) {
             D d3 = distanceQuery.distance(o_r, q);
+            index.statistics.countDistanceCalculation();
             D d_min = DistanceUtil.max(d3.minus(r_or), index.getDistanceFactory().nullDistance());
             if (d_min.compareTo(d_k) <= 0) {
               pq.add(new GenericMTreeDistanceSearchCandidate<>(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
@@ -125,6 +127,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
 
           if (diff.compareTo(d_k) <= 0) {
             D d3 = distanceQuery.distance(o_j, q);
+            index.statistics.countDistanceCalculation();
             if (d3.compareTo(d_k) <= 0) {
               knnList.add(d3, o_j);
               d_k = knnList.getKNNDistance();

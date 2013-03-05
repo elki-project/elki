@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.Spl
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -90,10 +91,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * For counting the number of distance computations.
-   * 
-   * FIXME: use statistics logging.
    */
-  public int distanceCalcs = 0;
+  public Statistics statistics = new Statistics();
 
   /**
    * The last inserted entry.
@@ -378,11 +377,11 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
     final Logging log = getLogger();
     if (dirCapacity < 10) {
-      log.warning("Page size is choosen very small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
+      log.warning("Page size is choosen very small! Maximum number of entries in a directory node = " + dirCapacity);
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.round((dirCapacity - 1) * relativeMinFill);
+    dirMinimum = (int) Math.round(dirCapacity * relativeMinFill);
     if (dirMinimum < 2) {
       dirMinimum = 2;
     }
@@ -392,20 +391,20 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     if (leafCapacity < 10) {
-      log.warning("Page size is choosen very small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
+      log.warning("Page size is choosen very small! Maximum number of entries in a leaf node = " + leafCapacity);
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.round((leafCapacity - 1) * relativeMinFill);
+    leafMinimum = (int) Math.round(leafCapacity * relativeMinFill);
     if (leafMinimum < 2) {
       leafMinimum = 2;
     }
 
     if (log.isStatistics()) {
       String cls = this.getClass().getName();
-      log.statistics(new LongStatistic(cls + ".directory.capacity", (dirCapacity - 1)));
+      log.statistics(new LongStatistic(cls + ".directory.capacity", dirCapacity));
       log.statistics(new LongStatistic(cls + ".directory.minfill", dirMinimum));
-      log.statistics(new LongStatistic(cls + ".leaf.capacity", (leafCapacity - 1)));
+      log.statistics(new LongStatistic(cls + ".leaf.capacity", leafCapacity));
       log.statistics(new LongStatistic(cls + ".leaf.minfill", leafMinimum));
     }
   }
@@ -427,7 +426,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    */
   protected List<E> createBulkLeafNodes(List<E> objects) {
     int minEntries = leafMinimum;
-    int maxEntries = leafCapacity - 1;
+    int maxEntries = leafCapacity;
 
     ArrayList<E> result = new ArrayList<>();
     List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
@@ -921,6 +920,83 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     Logging log = getLogger();
     if (log.isStatistics()) {
       log.statistics(new LongStatistic(this.getClass().getName() + ".height", height));
+      statistics.logStatistics();
+    }
+  }
+
+  /**
+   * Class for tracking some statistics.
+   * 
+   * @author Erich Schubert
+   */
+  public class Statistics {
+    /**
+     * For counting the number of distance computations.
+     */
+    protected final Counter distanceCalcs;
+
+    /**
+     * For counting the number of knn queries answered.
+     */
+    protected final Counter knnQueries;
+
+    /**
+     * For counting the number of range queries answered.
+     */
+    protected final Counter rangeQueries;
+
+    /**
+     * Constructor.
+     */
+    public Statistics() {
+      super();
+      Logging log = getLogger();
+      distanceCalcs = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".distancecalcs") : null;
+      knnQueries = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".knnqueries") : null;
+      rangeQueries = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".rangequeries") : null;
+    }
+
+    /**
+     * Count a distance computation.
+     */
+    public void countDistanceCalculation() {
+      if (distanceCalcs != null) {
+        distanceCalcs.increment();
+      }
+    }
+
+    /**
+     * Count a knn query invocation.
+     */
+    public void countKNNQuery() {
+      if (knnQueries != null) {
+        knnQueries.increment();
+      }
+    }
+
+    /**
+     * Count a range query invocation.
+     */
+    public void countRangeQuery() {
+      if (rangeQueries != null) {
+        rangeQueries.increment();
+      }
+    }
+
+    /**
+     * Log the statistics.
+     */
+    public void logStatistics() {
+      Logging log = getLogger();
+      if (statistics.distanceCalcs != null) {
+        log.statistics(statistics.distanceCalcs);
+      }
+      if (statistics.knnQueries != null) {
+        log.statistics(statistics.knnQueries);
+      }
+      if (statistics.rangeQueries != null) {
+        log.statistics(statistics.rangeQueries);
+      }
     }
   }
 
@@ -965,8 +1041,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
         }
       }
       result.append(getClass().getName()).append(" has ").append((levels + 1)).append(" levels.\n");
-      result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity - 1).append(", min = ").append(dirMinimum).append(")\n");
-      result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
+      result.append(dirNodes).append(" Directory Knoten (max = ").append(dirCapacity).append(", min = ").append(dirMinimum).append(")\n");
+      result.append(leafNodes).append(" Daten Knoten (max = ").append(leafCapacity).append(", min = ").append(leafMinimum).append(")\n");
       result.append(objects).append(' ').append(dim).append("-dim. Punkte im Baum \n");
       // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     } else {

@@ -75,6 +75,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
     if (k < 1) {
       throw new IllegalArgumentException("At least one object has to be requested!");
     }
+    index.statistics.countKNNQuery();
 
     DoubleDistanceDBIDPairKNNHeap knnList = new DoubleDistanceDBIDPairKNNHeap(k);
     double d_k = Double.POSITIVE_INFINITY;
@@ -108,6 +109,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
           if (diff <= d_k + or_i) {
             final O ob_i = relation.get(id_i);
             double d3 = distf.doubleDistance(ob_i, q);
+            index.statistics.countDistanceCalculation();
             double d_min = Math.max(d3 - or_i, 0);
             if (d_min <= d_k) {
               pq.add(new DoubleMTreeDistanceSearchCandidate(d_min, ((DirectoryEntry) entry).getPageID(), id_i, d3));
@@ -126,6 +128,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
           if (diff <= d_k) {
             final O o_i = relation.get(id_i);
             double d3 = distf.doubleDistance(o_i, q);
+            index.statistics.countDistanceCalculation();
             if (d3 <= d_k) {
               knnList.add(d3, id_i);
               d_k = knnList.doubleKNNDistance();

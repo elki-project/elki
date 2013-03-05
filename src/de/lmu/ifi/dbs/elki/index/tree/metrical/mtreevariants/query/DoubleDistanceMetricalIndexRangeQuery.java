@@ -80,7 +80,11 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
    */
   private void doRangeQuery(DBID id_p, AbstractMTreeNode<O, DoubleDistance, ?, ?> node, O q, double r_q, ModifiableDoubleDistanceDBIDList result) {
     final O o_p = id_p != null ? relation.get(id_p) : null;
-    double d1 = id_p != null ? distf.doubleDistance(o_p, q) : 0;
+    double d1 = 0.;
+    if (id_p != null) {
+      d1 = distf.doubleDistance(o_p, q);
+      index.statistics.countDistanceCalculation();
+    }
     if (!node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<DoubleDistance> entry = node.getEntry(i);
@@ -94,6 +98,7 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
         if (diff <= sum) {
           DBID id_r = entry.getRoutingObjectID();
           double d3 = distf.doubleDistance(relation.get(id_r), q);
+          index.statistics.countDistanceCalculation();
           if (d3 <= sum) {
             AbstractMTreeNode<O, DoubleDistance, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
             doRangeQuery(id_r, child, q, r_q, result);
@@ -111,6 +116,7 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
           DBID id_j = entry.getRoutingObjectID();
           O o_j = relation.get(id_j);
           double d3 = distf.doubleDistance(o_j, q);
+          index.statistics.countDistanceCalculation();
           if (d3 <= r_q) {
             result.add(d3, id_j);
           }
@@ -124,6 +130,7 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
     final DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
 
     doRangeQuery(null, index.getRoot(), obj, range.doubleValue(), result);
+    index.statistics.countRangeQuery();
     result.sort();
     return result;
   }

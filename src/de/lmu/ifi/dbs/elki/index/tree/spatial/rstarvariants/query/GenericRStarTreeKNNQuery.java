@@ -103,6 +103,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
    */
   protected void doKNNQuery(O object, KNNHeap<D> knnList) {
     final ComparableMinHeap<GenericDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 20));
+    tree.statistics.countKNNQuery();
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
@@ -126,7 +127,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry entry = node.getEntry(i);
         D distance = distanceFunction.minDist(entry, object);
-        tree.distanceCalcs++;
+        tree.statistics.countDistanceCalculation();
         if(distance.compareTo(maxDist) <= 0) {
           knnList.add(distance, ((LeafEntry) entry).getDBID());
           maxDist = knnList.getKNNDistance();
@@ -138,7 +139,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry entry = node.getEntry(i);
         D distance = distanceFunction.minDist(entry, object);
-        tree.distanceCalcs++;
+        tree.statistics.countDistanceCalculation();
         // Greedy expand, bypassing the queue
         if(distance.isNullDistance()) {
           expandNode(object, knnList, pq, maxDist, ((DirectoryEntry) entry).getPageID());
@@ -171,6 +172,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
           DBID pid = ((LeafEntry) p).getDBID();
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
           D dist_pq = distanceQuery.distance(pid, q);
+          tree.statistics.countDistanceCalculation();
           if(dist_pq.compareTo(knn_q_maxDist) <= 0) {
             knns_q.add(dist_pq, pid);
           }
@@ -216,6 +218,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
       D minMinDist = distanceQuery.getDistanceFactory().infiniteDistance();
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         D minDist = distanceFunction.minDist(entry, relation.get(iter));
+        tree.statistics.countDistanceCalculation();
         minMinDist = DistanceUtil.min(minDist, minMinDist);
       }
       result.add(new DistanceEntry<>(entry, minMinDist, i));
@@ -244,6 +247,7 @@ public class GenericRStarTreeKNNQuery<O extends SpatialComparable, D extends Dis
 
     List<KNNList<D>> result = new ArrayList<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      tree.statistics.countKNNQuery();
       result.add(knnLists.get(DBIDUtil.deref(iter)).toKNNList());
     }
     return result;

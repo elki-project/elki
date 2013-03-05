@@ -88,6 +88,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   protected DistanceDBIDList<D> doRangeQuery(O object, D epsilon) {
     final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
     final ComparableMinHeap<GenericDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
+    tree.statistics.countRangeQuery();
 
     // push root
     pq.add(new GenericDistanceSearchCandidate<>(distanceFunction.getDistanceFactory().nullDistance(), tree.getRootID()));
@@ -104,6 +105,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
 
       for(int i = 0; i < numEntries; i++) {
         D distance = distanceFunction.minDist(node.getEntry(i), object);
+        tree.statistics.countDistanceCalculation();
         if(distance.compareTo(epsilon) <= 0) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);

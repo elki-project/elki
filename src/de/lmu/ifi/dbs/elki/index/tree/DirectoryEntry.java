@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Directory Entry
  * 
