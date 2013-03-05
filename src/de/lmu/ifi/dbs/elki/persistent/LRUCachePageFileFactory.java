@@ -1,0 +1,130 @@
+package de.lmu.ifi.dbs.elki.persistent;
+
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Page file factory for memory page files.
+ * 
+ * @author Erich Schubert
+ * 
+ * @param <P> Page type
+ */
+public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<P> {
+  /**
+   * Inner page file factory.
+   */
+  private PageFileFactory<P> pageFileFactory;
+
+  /**
+   * Cache size.
+   */
+  private long cacheSize;
+
+  /**
+   * Constructor.
+   * 
+   * @param pageFileFactory Inner page file
+   * @param cacheSize Size of cache.
+   */
+  public LRUCachePageFileFactory(PageFileFactory<P> pageFileFactory, long cacheSize) {
+    super();
+    this.cacheSize = cacheSize;
+    this.pageFileFactory = pageFileFactory;
+  }
+
+  @Override
+  public PageFile<P> newPageFile(Class<P> cls) {
+    PageFile<P> inner = pageFileFactory.newPageFile(cls);
+    return new LRUCache<>(cacheSize, inner);
+  }
+
+  @Override
+  public int getPageSize() {
+    return pageFileFactory.getPageSize();
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the size of the cache in bytes, must be an integer
+     * equal to or greater than 0.
+     * <p>
+     * Default value: {@link Integer#MAX_VALUE}
+     * </p>
+     * <p>
+     * Key: {@code -pagefile.cachesize}
+     * </p>
+     */
+    public static final OptionID CACHE_SIZE_ID = new OptionID("pagefile.cachesize", "The size of the cache in bytes.");
+
+    /**
+     * Parameter to specify the inner pagefile.
+     * <p>
+     * Key: {@code -pagefile.pagefile}
+     * </p>
+     */
+    public static final OptionID PAGEFILE_ID = new OptionID("pagefile.pagefile", "The backing pagefile for the cache.");
+
+    /**
+     * Inner page file factory.
+     */
+    PageFileFactory<Page> pageFileFactory;
+
+    /**
+     * Cache size
+     */
+    protected long cacheSize;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<PageFileFactory<Page>> pffP = new ObjectParameter<>(PAGEFILE_ID, PageFileFactory.class, PersistentPageFileFactory.class);
+      if (config.grab(pffP)) {
+        pageFileFactory = pffP.instantiateClass(config);
+      }
+
+      LongParameter cacheSizeP = new LongParameter(CACHE_SIZE_ID, Long.MAX_VALUE);
+      cacheSizeP.addConstraint(new GreaterEqualConstraint(0));
+      if (config.grab(cacheSizeP)) {
+        cacheSize = cacheSizeP.getValue();
+      }
+    }
+
+    @Override
+    protected LRUCachePageFileFactory<Page> makeInstance() {
+      return new LRUCachePageFileFactory<>(pageFileFactory, cacheSize);
+    }
+  }
+}

@@ -1,2 +1,4 @@
 de.lmu.ifi.dbs.elki.persistent.MemoryPageFileFactory
+de.lmu.ifi.dbs.elki.persistent.LRUCachePageFileFactory
 de.lmu.ifi.dbs.elki.persistent.PersistentPageFileFactory
+de.lmu.ifi.dbs.elki.persistent.OnDiskArrayPageFileFactory

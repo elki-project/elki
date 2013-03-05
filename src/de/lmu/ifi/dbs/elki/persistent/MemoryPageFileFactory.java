@@ -33,9 +33,11 @@ package de.lmu.ifi.dbs.elki.persistent;
 public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFactory<P> {
   /**
    * Constructor.
+   * 
+   * @param pageSize Size of a page
    */
-  public MemoryPageFileFactory(int pageSize, long cacheSize) {
-    super(pageSize, cacheSize);
+  public MemoryPageFileFactory(int pageSize) {
+    super(pageSize);
   }
 
   @Override
@@ -51,7 +53,7 @@ public class MemoryPageFileFactory<P extends Page> extends AbstractPageFileFacto
   public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
     @Override
     protected MemoryPageFileFactory<Page> makeInstance() {
-      return new MemoryPageFileFactory<>(pageSize, cacheSize);
+      return new MemoryPageFileFactory<>(pageSize);
     }    
   }
 }
