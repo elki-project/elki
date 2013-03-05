@@ -258,17 +258,19 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       return subtree;
     }
 
-    DistanceEntry<D, E> bestCandidate;
+    D bestDistance;
+    int bestIdx;
+    E bestEntry;
     D enlarge; // Track best enlargement - null for no enlargement needed.
     // Initialize from first:
     {
-      E entry = node.getEntry(0);
-      D distance = distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
-      bestCandidate = new DistanceEntry<>(entry, distance, 0);
-      if (distance.compareTo(entry.getCoveringRadius()) <= 0) {
+      bestIdx = 0;
+      bestEntry = node.getEntry(0);
+      bestDistance = distance(object.getRoutingObjectID(), bestEntry.getRoutingObjectID());
+      if (bestDistance.compareTo(bestEntry.getCoveringRadius()) <= 0) {
         enlarge = null;
       } else {
-        enlarge = distance.minus(entry.getCoveringRadius());
+        enlarge = bestDistance.minus(bestEntry.getCoveringRadius());
       }
     }
 
@@ -278,14 +280,18 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       D distance = distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
 
       if (distance.compareTo(entry.getCoveringRadius()) <= 0) {
-        if (enlarge != null || distance.compareTo(bestCandidate.getDistance()) < 0) {
-          bestCandidate = new DistanceEntry<>(entry, distance, i);
+        if (enlarge != null || distance.compareTo(bestDistance) < 0) {
+          bestIdx = i;
+          bestEntry = entry;
+          bestDistance = distance;
           enlarge = null;
         }
       } else if (enlarge != null) {
         D enlrg = distance.minus(entry.getCoveringRadius());
         if (enlrg.compareTo(enlarge) < 0) {
-          bestCandidate = new DistanceEntry<>(entry, distance, i);
+          bestIdx = i;
+          bestEntry = entry;
+          bestDistance = distance;
           enlarge = enlrg;
         }
       }
@@ -293,10 +299,10 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     // Apply enlargement
     if (enlarge != null) {
-      bestCandidate.getEntry().setCoveringRadius(enlarge);
+      bestEntry.setCoveringRadius(bestEntry.getCoveringRadius().plus(enlarge));
     }
 
-    return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<>(bestCandidate.getEntry(), bestCandidate.getIndex())));
+    return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<>(bestEntry, bestIdx)));
   }
 
   /**
