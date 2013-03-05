@@ -33,9 +33,18 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceDBIDPairList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DoubleDistanceKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDoubleDistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.DoubleDistanceDBIDPairKNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -45,7 +54,9 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
@@ -67,6 +78,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * See {@link LatLngAsECEFIndex} and {@link LngLatAsECEFIndex} for example
  * indexes that support only a specific (good) combination.
+ * 
+ * FIXME: add refinement to bulk queries!
  * 
  * @author Erich Schubert
  * 
@@ -95,16 +108,26 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   Relation<I> view;
 
   /**
+   * Refinement disable flag.
+   */
+  boolean norefine;
+
+  /**
    * Constructor.
    * 
+   * @param relation Relation to index.
+   * @param proj Projection to use.
+   * @param view View to use.
    * @param inner Index to wrap.
+   * @param norefine Refinement disable flag.
    */
-  public ProjectedIndex(Relation<O> relation, Projection<O, I> proj, Relation<I> view, Index inner) {
+  public ProjectedIndex(Relation<O> relation, Projection<O, I> proj, Relation<I> view, Index inner, boolean norefine) {
     super();
     this.relation = relation;
     this.view = view;
     this.inner = inner;
     this.proj = proj;
+    this.norefine = norefine;
   }
 
   @Override
@@ -147,7 +170,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     if (innerq == null) {
       return null;
     }
-    return new ProjectedKNNQuery<>(innerq);
+    return new ProjectedKNNQuery<>(distanceQuery, innerq);
   }
 
   @Override
@@ -170,7 +193,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     if (innerq == null) {
       return null;
     }
-    return new ProjectedRangeQuery<>(innerq);
+    return new ProjectedRangeQuery<>(distanceQuery, innerq);
   }
 
   @Override
@@ -193,7 +216,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     if (innerq == null) {
       return null;
     }
-    return new ProjectedRKNNQuery<>(innerq);
+    return new ProjectedRKNNQuery<>(distanceQuery, innerq);
   }
 
   /**
@@ -210,13 +233,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     KNNQuery<I, D> inner;
 
     /**
+     * Distance query for refinement.
+     */
+    DistanceQuery<O, D> distq;
+
+    /**
      * Constructor.
      * 
      * @param inner Inner kNN query.
      */
-    public ProjectedKNNQuery(KNNQuery<I, D> inner) {
+    public ProjectedKNNQuery(DistanceQuery<O, D> distanceQuery, KNNQuery<I, D> inner) {
       super();
       this.inner = inner;
+      this.distq = distanceQuery;
     }
 
     @Override
@@ -230,10 +259,28 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       return inner.getKNNForBulkDBIDs(ids, k);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public KNNList<D> getKNNForObject(O obj, int k) {
       final I pobj = proj.project(obj);
-      return inner.getKNNForObject(pobj, k);
+      KNNList<D> ilist = inner.getKNNForObject(pobj, k);
+      if (norefine) {
+        return ilist;
+      }
+      if (distq.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+        PrimitiveDoubleDistanceFunction<? super O> df = (PrimitiveDoubleDistanceFunction<? super O>) distq.getDistanceFunction();
+        DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
+        for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
+          heap.add(df.doubleDistance(obj, distq.getRelation().get(iter)), iter);
+        }
+        return (KNNList<D>) heap.toKNNList();
+      } else {
+        KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
+        for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
+          heap.add(distq.distance(obj, iter), iter);
+        }
+        return heap.toKNNList();
+      }
     }
   }
 
@@ -251,13 +298,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     RangeQuery<I, D> inner;
 
     /**
+     * Distance query for refinement.
+     */
+    DistanceQuery<O, D> distq;
+
+    /**
      * Constructor.
      * 
      * @param inner Inner range query.
      */
-    public ProjectedRangeQuery(RangeQuery<I, D> inner) {
+    public ProjectedRangeQuery(DistanceQuery<O, D> distanceQuery, RangeQuery<I, D> inner) {
       super();
       this.inner = inner;
+      this.distq = distanceQuery;
     }
 
     @Override
@@ -266,10 +319,35 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       return getRangeForObject(relation.get(id), range);
     }
 
+    @SuppressWarnings({ "unchecked" })
     @Override
     public DistanceDBIDList<D> getRangeForObject(O obj, D range) {
       final I pobj = proj.project(obj);
-      return inner.getRangeForObject(pobj, range);
+      DistanceDBIDList<D> ilist = inner.getRangeForObject(pobj, range);
+      if (norefine) {
+        return ilist;
+      }
+      if (distq.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+        PrimitiveDoubleDistanceFunction<? super O> df = (PrimitiveDoubleDistanceFunction<? super O>) distq.getDistanceFunction();
+        double drange = ((DoubleDistance) range).doubleValue();
+        ModifiableDoubleDistanceDBIDList olist = new DoubleDistanceDBIDPairList(ilist.size());
+        for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
+          final double dist = df.doubleDistance(obj, distq.getRelation().get(iter));
+          if (dist <= drange) {
+            olist.add(dist, iter);
+          }
+        }
+        return (DistanceDBIDList<D>) olist;
+      } else {
+        ModifiableDistanceDBIDList<D> olist = new GenericDistanceDBIDList<>(ilist.size());
+        for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
+          D dist = distq.distance(obj, iter);
+          if (range.compareTo(dist) <= 0) {
+            olist.add(dist, iter);
+          }
+        }
+        return olist;
+      }
     }
   }
 
@@ -287,13 +365,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     RKNNQuery<I, D> inner;
 
     /**
+     * Distance query for refinement.
+     */
+    DistanceQuery<O, D> distq;
+
+    /**
      * Constructor.
      * 
      * @param inner Inner RkNN query.
      */
-    public ProjectedRKNNQuery(RKNNQuery<I, D> inner) {
+    public ProjectedRKNNQuery(DistanceQuery<O, D> distanceQuery, RKNNQuery<I, D> inner) {
       super();
       this.inner = inner;
+      this.distq = distanceQuery;
     }
 
     @Override
@@ -302,10 +386,30 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       return getRKNNForObject(relation.get(id), k);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public DistanceDBIDList<D> getRKNNForObject(O obj, int k) {
       final I pobj = proj.project(obj);
-      return inner.getRKNNForObject(pobj, k);
+      DistanceDBIDList<D> ilist = inner.getRKNNForObject(pobj, k);
+      if (norefine) {
+        return ilist;
+      }
+      if (distq.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
+        PrimitiveDoubleDistanceFunction<? super O> df = (PrimitiveDoubleDistanceFunction<? super O>) distq.getDistanceFunction();
+        ModifiableDoubleDistanceDBIDList olist = new DoubleDistanceDBIDPairList(ilist.size());
+        for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
+          final double dist = df.doubleDistance(obj, distq.getRelation().get(iter));
+          olist.add(dist, iter);
+        }
+        return (DistanceDBIDList<D>) olist;
+      } else {
+        ModifiableDistanceDBIDList<D> olist = new GenericDistanceDBIDList<>(ilist.size());
+        for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
+          D dist = distq.distance(obj, iter);
+          olist.add(dist, iter);
+        }
+        return olist;
+      }
     }
 
     @Override
@@ -339,13 +443,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     boolean materialize = false;
 
     /**
+     * Disable refinement of distances.
+     */
+    boolean norefine = false;
+
+    /**
      * Constructor.
      * 
      * @param proj Projection
      * @param inner Inner index
      * @param materialize Flag for materializing
+     * @param norefine Disable refinement of distances
      */
-    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner, boolean materialize) {
+    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner, boolean materialize, boolean norefine) {
       super();
       this.proj = proj;
       this.inner = inner;
@@ -375,7 +485,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       if (inneri == null) {
         return null;
       }
-      return new ProjectedIndex<>(relation, proj, view, inneri);
+      return new ProjectedIndex<>(relation, proj, view, inneri, norefine);
     }
 
     @Override
@@ -408,6 +518,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       public static final OptionID MATERIALIZE_FLAG = new OptionID("projindex.materialize", "Flag to materialize the projected data.");
 
       /**
+       * Option ID for disabling refinement.
+       */
+      public static final OptionID DISABLE_REFINE_FLAG = new OptionID("projindex.disable-refine", "Flag to disable refinement of distances.");
+
+      /**
        * Projection to use.
        */
       Projection<O, I> proj;
@@ -421,6 +536,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
        * Whether to use a materialized view, or a virtual view.
        */
       boolean materialize = false;
+
+      /**
+       * Disable refinement of distances.
+       */
+      boolean norefine = false;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -437,11 +557,15 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         if (config.grab(materializeF)) {
           materialize = materializeF.isTrue();
         }
+        Flag norefineF = new Flag(DISABLE_REFINE_FLAG);
+        if (config.grab(norefineF)) {
+          norefine = norefineF.isTrue();
+        }
       }
 
       @Override
       protected Factory<O, I> makeInstance() {
-        return new Factory<>(proj, inner, materialize);
+        return new Factory<>(proj, inner, materialize, norefine);
       }
     }
   }

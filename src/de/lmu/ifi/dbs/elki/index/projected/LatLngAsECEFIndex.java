@@ -95,10 +95,14 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
   /**
    * Constructor.
    * 
+   * @param relation Relation to index.
+   * @param proj Projection to use.
+   * @param view View to use.
    * @param inner Index to wrap.
+   * @param norefine Refinement disable flag.
    */
-  public LatLngAsECEFIndex(Relation<O> relation, Projection<O, O> proj, Relation<O> view, Index inner) {
-    super(relation, proj, view, inner);
+  public LatLngAsECEFIndex(Relation<O> relation, Projection<O, O> proj, Relation<O> view, Index inner, boolean norefine) {
+    super(relation, proj, view, inner, norefine);
   }
 
   @Override
@@ -133,7 +137,7 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
     if (innerq == null) {
       return null;
     }
-    return (KNNQuery<O, D>) new ProjectedKNNQuery<DoubleDistance>(innerq);
+    return (KNNQuery<O, D>) new ProjectedKNNQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
   }
 
   @SuppressWarnings("unchecked")
@@ -158,7 +162,7 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
     if (innerq == null) {
       return null;
     }
-    return (RangeQuery<O, D>) new ProjectedRangeQuery<DoubleDistance>(innerq);
+    return (RangeQuery<O, D>) new ProjectedRangeQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
   }
 
   @SuppressWarnings("unchecked")
@@ -183,7 +187,7 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
     if (innerq == null) {
       return null;
     }
-    return (RKNNQuery<O, D>) new ProjectedRKNNQuery<DoubleDistance>(innerq);
+    return (RKNNQuery<O, D>) new ProjectedRKNNQuery<DoubleDistance>((DistanceQuery<O, DoubleDistance>) distanceQuery, innerq);
   }
 
   /**
@@ -195,13 +199,19 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
    */
   public static class Factory<O extends NumberVector<?>> extends ProjectedIndex.Factory<O, O> {
     /**
+     * Disable refinement of distances.
+     */
+    boolean norefine = false;
+
+    /**
      * Constructor.
      * 
      * @param inner Inner index
      * @param materialize Flag to materialize the projection
+     * @param norefine Flag to disable refinement of distances
      */
-    public Factory(IndexFactory<O, ?> inner, boolean materialize) {
-      super(new LatLngToECEFProjection<O>(), inner, materialize);
+    public Factory(IndexFactory<O, ?> inner, boolean materialize, boolean norefine) {
+      super(new LatLngToECEFProjection<O>(), inner, materialize, norefine);
     }
 
     @Override
@@ -225,7 +235,7 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
       if (inneri == null) {
         return null;
       }
-      return new LatLngAsECEFIndex<>(relation, proj, view, inneri);
+      return new LatLngAsECEFIndex<>(relation, proj, view, inneri, norefine);
     }
 
     /**
@@ -247,6 +257,11 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
        */
       boolean materialize = false;
 
+      /**
+       * Disable refinement of distances.
+       */
+      boolean norefine = false;
+
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
@@ -254,15 +269,21 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         if (config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }
+
         Flag materializeF = new Flag(ProjectedIndex.Factory.Parameterizer.MATERIALIZE_FLAG);
         if (config.grab(materializeF)) {
           materialize = materializeF.isTrue();
+        }
+
+        Flag norefineF = new Flag(ProjectedIndex.Factory.Parameterizer.DISABLE_REFINE_FLAG);
+        if (config.grab(norefineF)) {
+          norefine = norefineF.isTrue();
         }
       }
 
       @Override
       protected Factory<O> makeInstance() {
-        return new Factory<>(inner, materialize);
+        return new Factory<>(inner, materialize, norefine);
       }
     }
   }
