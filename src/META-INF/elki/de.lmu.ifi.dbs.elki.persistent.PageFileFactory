@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.persistent.MemoryPageFileFactory
+de.lmu.ifi.dbs.elki.persistent.PersistentPageFileFactory
