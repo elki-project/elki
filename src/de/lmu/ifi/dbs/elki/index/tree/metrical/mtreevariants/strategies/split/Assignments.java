@@ -27,6 +27,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**
@@ -60,12 +61,12 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
   /**
    * The assignments to the first routing object.
    */
-  private List<E> firstAssignments;
+  private List<DistanceEntry<D, E>> firstAssignments;
 
   /**
    * The assignments to the second routing object.
    */
-  private List<E> secondAssignments;
+  private List<DistanceEntry<D, E>> secondAssignments;
 
   /**
    * Provides an assignment during a split of an MTree node.
@@ -77,7 +78,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * @param firstAssignments the assignments to the first routing object
    * @param secondAssignments the assignments to the second routing object
    */
-  public Assignments(DBID id1, DBID id2, D firstCoveringRadius, D secondCoveringRadius, List<E> firstAssignments, List<E> secondAssignments) {
+  public Assignments(DBID id1, DBID id2, D firstCoveringRadius, D secondCoveringRadius, List<DistanceEntry<D, E>> firstAssignments, List<DistanceEntry<D, E>> secondAssignments) {
     this.id1 = id1;
     this.id2 = id2;
     this.firstCoveringRadius = firstCoveringRadius;
@@ -127,7 +128,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * 
    * @return the assignments to the first routing object
    */
-  public List<E> getFirstAssignments() {
+  public List<DistanceEntry<D, E>> getFirstAssignments() {
     return firstAssignments;
   }
 
@@ -136,7 +137,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * 
    * @return the assignments to the second routing object
    */
-  public List<E> getSecondAssignments() {
+  public List<DistanceEntry<D, E>> getSecondAssignments() {
     return secondAssignments;
   }
 }
