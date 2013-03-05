@@ -350,36 +350,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   protected abstract E createNewDirectoryEntry(N node, DBID routingObjectID, D parentDistance);
 
   /**
-   * Splits the specified node and returns the split result.
-   * 
-   * @param node the node to be split
-   * @return the split result
-   */
-  private SplitResult split(N node) {
-    // do the split
-    // todo split stratgey
-    Assignments<D, E> assignments = splitStrategy.split(this, node);
-    final N newNode;
-    if (node.isLeaf()) {
-      newNode = createNewLeafNode();
-    } else {
-      newNode = createNewDirectoryNode();
-    }
-    node.splitTo(newNode, assignments.getFirstAssignments(), assignments.getSecondAssignments());
-
-    // write changes to file
-    writeNode(node);
-    writeNode(newNode);
-
-    if (getLogger().isDebugging()) {
-      String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
-      getLogger().debugFine(msg);
-    }
-
-    return new SplitResult(assignments, newNode);
-  }
-
-  /**
    * Adjusts the tree after insertion of some nodes.
    * 
    * @param subtree the subtree to be adjusted
@@ -395,15 +365,39 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     // overflow in node; split the node
     if (hasOverflow(node)) {
-      SplitResult splitResult = split(node);
-      N splitNode = splitResult.newNode;
-      Assignments<D, E> assignments = splitResult.assignments;
+      // do the split
+      Assignments<D, E> assignments = splitStrategy.split(this, node);
+      final N newNode = node.isLeaf() ? createNewLeafNode() : createNewDirectoryNode();
+
+      List<E> entries1 = new ArrayList<>(assignments.getFirstAssignments().size());
+      List<E> entries2 = new ArrayList<>(assignments.getSecondAssignments().size());
+      // Store final parent distances:
+      for (DistanceEntry<D, E> ent : assignments.getFirstAssignments()) {
+        final E e = ent.getEntry();
+        e.setParentDistance(ent.getDistance());
+        entries1.add(e);
+      }
+      for (DistanceEntry<D, E> ent : assignments.getSecondAssignments()) {
+        final E e = ent.getEntry();
+        e.setParentDistance(ent.getDistance());
+        entries2.add(e);
+      }
+      node.splitTo(newNode, entries1, entries2);
+
+      // write changes to file
+      writeNode(node);
+      writeNode(newNode);
+
+      if (getLogger().isDebugging()) {
+        String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
+        getLogger().debugFine(msg);
+      }
 
       // if root was split: create a new root that points the two split
       // nodes
       if (isRoot(node)) {
         // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
-        IndexTreePath<E> newRootPath = createNewRoot(node, splitNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
+        IndexTreePath<E> newRootPath = createNewRoot(node, newNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
         adjustTree(newRootPath);
       }
       // node is not root
@@ -417,7 +411,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
         // logger.warning("parent: "+parent.toString()+" split: " +
         // splitNode.toString()+ " dist:"+parentDistance2);
-        parent.addDirectoryEntry(createNewDirectoryEntry(splitNode, assignments.getSecondRoutingObject(), parentDistance2));
+        parent.addDirectoryEntry(createNewDirectoryEntry(newNode, assignments.getSecondRoutingObject(), parentDistance2));
 
         // adjust the entry representing the (old) node, that has been split
         D parentDistance1 = distance(parentEntry.getRoutingObjectID(), assignments.getFirstRoutingObject());
@@ -522,34 +516,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     return new IndexTreePath<>(new TreeIndexPathComponent<>(getRootEntry(), null));
   }
 
-  /**
-   * Encapsulates a split object and the newly created node.
-   * 
-   * @apiviz.composedOf MTreeSplit
-   */
-  private class SplitResult {
-    /**
-     * Split used
-     */
-    protected Assignments<D, E> assignments;
-
-    /**
-     * New sibling
-     */
-    protected N newNode;
-
-    /**
-     * Constructor.
-     * 
-     * @param assignments Split that was used
-     * @param newNode New sibling
-     */
-    public SplitResult(Assignments<D, E> assignments, N newNode) {
-      this.assignments = assignments;
-      this.newNode = newNode;
-    }
-  }
-
   @Override
   public List<E> getLeaves() {
     List<E> result = new ArrayList<>();
@@ -596,7 +562,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       statistics.logStatistics();
     }
   }
-  
+
   /**
    * Class for tracking some statistics.
    * 

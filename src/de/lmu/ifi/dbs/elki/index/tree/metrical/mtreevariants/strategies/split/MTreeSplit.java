@@ -62,26 +62,25 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    */
   Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E> tree, N node, DBID routingObject1, DBID routingObject2) {
     BitSet assigned = new BitSet(node.getNumEntries());
-    List<E> assigned1 = new ArrayList<>(node.getCapacity());
-    List<E> assigned2 = new ArrayList<>(node.getCapacity());
+    List<DistanceEntry<D, E>> assigned1 = new ArrayList<>(node.getCapacity());
+    List<DistanceEntry<D, E>> assigned2 = new ArrayList<>(node.getCapacity());
 
     D currentCR1 = tree.getDistanceFactory().nullDistance();
     D currentCR2 = tree.getDistanceFactory().nullDistance();
 
-    // determine the nearest neighbors
     List<DistanceEntry<D, E>> list1 = new ArrayList<>();
     List<DistanceEntry<D, E>> list2 = new ArrayList<>();
+
+    // determine the nearest neighbors
     for (int i = 0; i < node.getNumEntries(); i++) {
       final E ent = node.getEntry(i);
       DBID id = ent.getRoutingObjectID();
       if (DBIDUtil.equal(id, routingObject1)) {
-        ent.setParentDistance(tree.getDistanceFactory().nullDistance());
-        assigned1.add(ent);
+        assigned1.add(new DistanceEntry<>(ent, tree.getDistanceFactory().nullDistance(), i));
         continue;
       }
       if (DBIDUtil.equal(id, routingObject2)) {
-        ent.setParentDistance(tree.getDistanceFactory().nullDistance());
-        assigned2.add(ent);
+        assigned2.add(new DistanceEntry<>(ent, tree.getDistanceFactory().nullDistance(), i));
         continue;
       }
       // determine the distance of o to o1 / o2
@@ -94,11 +93,11 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
     Collections.sort(list1, Collections.reverseOrder());
     Collections.sort(list2, Collections.reverseOrder());
 
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      currentCR1 = assignNN(assigned, assigned1, assigned2, list1, currentCR1, node.isLeaf());
+    for (int i = 2; i < node.getNumEntries(); i++) {
+      currentCR1 = assignNN(assigned, assigned1, list1, currentCR1, node.isLeaf());
       i++;
       if (i < node.getNumEntries()) {
-        currentCR2 = assignNN(assigned, assigned2, assigned1, list2, currentCR2, node.isLeaf());
+        currentCR2 = assignNN(assigned, assigned2, list2, currentCR2, node.isLeaf());
       }
     }
     return new Assignments<>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
@@ -110,21 +109,19 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * 
    * @param assigned List of already assigned objects
    * @param assigned1 the first assignment
-   * @param assigned2 the second assignment
    * @param list the list, the first object should be assigned
    * @param currentCR the current covering radius
    * @param isLeaf true, if the node of the entries to be assigned is a leaf,
    *        false otherwise
    * @return the new covering radius
    */
-  private D assignNN(BitSet assigned, List<E> assigned1, List<E> assigned2, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
+  private D assignNN(BitSet assigned, List<DistanceEntry<D, E>> assigned1, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
+    // Remove last unassigned:
     DistanceEntry<D, E> distEntry = list.remove(list.size() - 1);
     while (assigned.get(distEntry.getIndex())) {
       distEntry = list.remove(list.size() - 1);
     }
-    // Update the parent distance.
-    distEntry.getEntry().setParentDistance(distEntry.getDistance());
-    assigned1.add(distEntry.getEntry());
+    assigned1.add(distEntry);
     assigned.set(distEntry.getIndex());
 
     if (isLeaf) {
