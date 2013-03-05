@@ -100,7 +100,7 @@ public final class GeoUtil {
    */
   @Reference(authors = "Sinnott, R. W.", title = "Virtues of the Haversine", booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    // Convert to radians:
+    // Convert to radians
     lat1 = MathUtil.deg2rad(lat1);
     lat2 = MathUtil.deg2rad(lat2);
     lon1 = MathUtil.deg2rad(lon1);
@@ -465,20 +465,21 @@ public final class GeoUtil {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
     // Degenerate rectangles:
-    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+    if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormulaRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
-    if (rminlng <= plng && plng <= rmaxlng) {
+    if(rminlng <= plng && plng <= rmaxlng) {
       // Inside rectangle:
-      if (rminlat <= plat && plat <= rmaxlat) {
+      if(rminlat <= plat && plat <= rmaxlat) {
         return 0;
       }
       // South:
-      if (plat < rminlat) {
+      if(plat < rminlat) {
         return EARTH_RADIUS * (rminlat - plat);
-      } else {
+      }
+      else {
         // plat > rmaxlat
         return EARTH_RADIUS * (plat - rmaxlat);
       }
@@ -486,54 +487,57 @@ public final class GeoUtil {
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if (lngE < 0) {
+    if(lngE < 0) {
       lngE += MathUtil.TWOPI;
     }
     double lngW = rmaxlng - plng; // we keep this negative!
-    if (lngW > 0) {
+    if(lngW > 0) {
       lngW -= MathUtil.TWOPI;
     }
 
     // East, to min edge:
-    if (lngE <= -lngW) {
+    if(lngE <= -lngW) {
       final double clngD = Math.cos(lngE);
       final double tlatQ = Math.tan(plat);
-      if (lngE > MathUtil.HALFPI) {
+      if(lngE > MathUtil.HALFPI) {
         final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
-        if (tlatQ >= tlatm * clngD) {
+        if(tlatQ >= tlatm * clngD) {
           return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
-        } else {
+        }
+        else {
           return haversineFormulaRad(plat, plng, rminlat, rminlng);
         }
       }
       final double tlatN = Math.tan(rmaxlat);
-      if (tlatQ >= tlatN * clngD) { // North corner
+      if(tlatQ >= tlatN * clngD) { // North corner
         return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
       }
       final double tlatS = Math.tan(rminlat);
-      if (tlatQ <= tlatS * clngD) { // South corner
+      if(tlatQ <= tlatS * clngD) { // South corner
         return haversineFormulaRad(plat, plng, rminlat, rminlng);
       }
       // Cross-track-distance to longitude line.
       final double slngD = MathUtil.cosToSin(lngE, clngD);
       return EARTH_RADIUS * Math.asin(Math.cos(plat) * slngD);
-    } else { // West, to max edge:
+    }
+    else { // West, to max edge:
       final double clngD = Math.cos(lngW);
       final double tlatQ = Math.tan(plat);
-      if (-lngW > MathUtil.HALFPI) {
+      if(-lngW > MathUtil.HALFPI) {
         final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
-        if (tlatQ >= tlatm * clngD) {
+        if(tlatQ >= tlatm * clngD) {
           return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
-        } else {
+        }
+        else {
           return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
         }
       }
       final double tlatN = Math.tan(rmaxlat);
-      if (tlatQ >= tlatN * clngD) { // North corner
+      if(tlatQ >= tlatN * clngD) { // North corner
         return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
       }
       final double tlatS = Math.tan(rminlat);
-      if (tlatQ <= tlatS * clngD) { // South corner
+      if(tlatQ <= tlatS * clngD) { // South corner
         return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
       }
       // Cross-track-distance to longitude line.
@@ -566,20 +570,21 @@ public final class GeoUtil {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
     // Degenerate rectangles:
-    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+    if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormulaRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
-    if (rminlng <= plng && plng <= rmaxlng) {
+    if(rminlng <= plng && plng <= rmaxlng) {
       // Inside rectangle:
-      if (rminlat <= plat && plat <= rmaxlat) {
+      if(rminlat <= plat && plat <= rmaxlat) {
         return 0;
       }
       // South:
-      if (plat < rminlat) {
+      if(plat < rminlat) {
         return EARTH_RADIUS * (rminlat - plat);
-      } else {
+      }
+      else {
         // plat > rmaxlat
         return EARTH_RADIUS * (plat - rmaxlat);
       }
@@ -587,11 +592,11 @@ public final class GeoUtil {
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if (lngE < 0) {
+    if(lngE < 0) {
       lngE += MathUtil.TWOPI;
     }
     double lngW = rmaxlng - plng; // we keep this negative!
-    if (lngW > 0) {
+    if(lngW > 0) {
       lngW -= MathUtil.TWOPI;
     }
 
@@ -604,7 +609,7 @@ public final class GeoUtil {
     final double clatS = MathUtil.sinToCos(rminlat, slatS);
 
     // East, to min edge:
-    if (lngE <= -lngW) {
+    if(lngE <= -lngW) {
       final double slngD = Math.sin(lngE);
       final double clngD = MathUtil.sinToCos(lngE, slngD);
 
@@ -616,8 +621,8 @@ public final class GeoUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if (bs < MathUtil.HALFPI) {
-        if (bn > MathUtil.HALFPI) {
+      if(bs < MathUtil.HALFPI) {
+        if(bn > MathUtil.HALFPI) {
           // Radians from south pole = abs(ATD)
           final double radFromS = -MathUtil.HALFPI - plat;
 
@@ -625,14 +630,15 @@ public final class GeoUtil {
           return EARTH_RADIUS * Math.asin(Math.sin(radFromS) * -slngD);
         }
       }
-      if (bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
+      if(bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
         // Haversine to north corner.
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngE * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
         final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
         return EARTH_RADIUS * distN;
-      } else {
+      }
+      else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngE * .5);
@@ -640,7 +646,8 @@ public final class GeoUtil {
         final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
         return EARTH_RADIUS * distS;
       }
-    } else { // West, to max edge
+    }
+    else { // West, to max edge
       final double slngD = Math.sin(lngW);
       final double clngD = MathUtil.sinToCos(lngW, slngD);
 
@@ -652,22 +659,23 @@ public final class GeoUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if (bs > -MathUtil.HALFPI) {
-        if (bn < -MathUtil.HALFPI) {
+      if(bs > -MathUtil.HALFPI) {
+        if(bn < -MathUtil.HALFPI) {
           // Radians from south = abs(ATD) = distance from pole
           final double radFromS = -MathUtil.HALFPI - plat;
           // Cross-track-distance to longitude line.
           return EARTH_RADIUS * Math.asin(Math.sin(radFromS) * slngD);
         }
       }
-      if (-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
+      if(-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
         // Haversine to north corner.
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngW * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
         final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
         return EARTH_RADIUS * distN;
-      } else {
+      }
+      else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngW * .5);
@@ -700,8 +708,8 @@ public final class GeoUtil {
   }
 
   /**
-   * Map a latitude,longitude pair to 3D X-Y-Z coordinates, using athe WGS84
-   * ellipsoid.
+   * Map a latitude,longitude pair to 3D X-Y-Z coordinates, using the WGS84
+   * ellipsoid as reference.
    * 
    * The coordinate system is chosen such that the earth rotates around the Z
    * axis.
@@ -725,6 +733,28 @@ public final class GeoUtil {
   }
 
   /**
+   * Map a latitude,longitude pair to 3D X-Y-Z coordinates, using a spherical
+   * earth model.
+   * 
+   * The coordinate system is chosen such that the earth rotates around the Z
+   * axis.
+   * 
+   * @param lat Latitude in degree
+   * @param lng Longitude in degree
+   * @return Coordinate triple
+   */
+  public static double[] latLngDegSphericalToECEF(double lat, double lng) {
+    // Switch to radians:
+    lat = Math.toRadians(lat);
+    lng = Math.toRadians(lng);
+    // Sine and cosines:
+    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+
+    return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
+  }
+
+  /**
    * Convert a 3D coordinate pair to the corresponding longitude.
    * 
    * @param x X value
@@ -738,7 +768,7 @@ public final class GeoUtil {
 
     // Iteratively improving the lat value
     // TODO: instead of a fixed number of iterations, check for convergence.
-    for (int i = 0; i < 10; i++) {
+    for(int i = 0; i < 10; i++) {
       final double slat = Math.sin(lat);
       final double v = WGS84_RADIUS / Math.sqrt((1 + WGS84_ECCENTRICITY * slat) * (1 - WGS84_ECCENTRICITY * slat));
       final double h = p / MathUtil.sinToCos(lat, slat) - v;
