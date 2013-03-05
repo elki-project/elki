@@ -54,7 +54,7 @@ public class DoubleMTreeDistanceSearchCandidate extends DoubleDistanceSearchCand
    * @param routingDistance the distance from the query object to the query
    *        object
    */
-  public DoubleMTreeDistanceSearchCandidate(final double mindist, final Integer nodeID, final DBID routingObjectID, double routingDistance) {
+  public DoubleMTreeDistanceSearchCandidate(final double mindist, final int nodeID, final DBID routingObjectID, double routingDistance) {
     super(mindist, nodeID);
     this.routingObjectID = routingObjectID;
     this.routingDistance = routingDistance;

@@ -88,6 +88,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    * @return Objects contained in query range.
    */
   protected DoubleDistanceDBIDList doRangeQuery(O object, double epsilon) {
+    tree.statistics.countRangeQuery();
     final DoubleDistanceDBIDPairList result = new DoubleDistanceDBIDPairList();
     final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
@@ -101,12 +102,12 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
         break;
       }
 
-      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID.intValue());
+      AbstractRStarTreeNode<?, ?> node = tree.getNode(pqNode.nodeID);
       final int numEntries = node.getNumEntries();
 
       for(int i = 0; i < numEntries; i++) {
         double distance = distanceFunction.doubleMinDist(object, node.getEntry(i));
-        tree.distanceCalcs++;
+        tree.statistics.countDistanceCalculation();
         if(distance <= epsilon) {
           if(node.isLeaf()) {
             LeafEntry entry = (LeafEntry) node.getEntry(i);

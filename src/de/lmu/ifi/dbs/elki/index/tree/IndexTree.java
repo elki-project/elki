@@ -245,9 +245,9 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
     final Logging log = getLogger();
     if (log.isStatistics()) {
       String cls = this.getClass().getName();
-      log.statistics(new LongStatistic(cls + ".directory.capacity", (dirCapacity - 1)));
+      log.statistics(new LongStatistic(cls + ".directory.capacity", dirCapacity));
       log.statistics(new LongStatistic(cls + ".directory.minfill", dirMinimum));
-      log.statistics(new LongStatistic(cls + ".leaf.capacity", (leafCapacity - 1)));
+      log.statistics(new LongStatistic(cls + ".leaf.capacity", leafCapacity));
       log.statistics(new LongStatistic(cls + ".leaf.minfill", leafMinimum));
     }
 

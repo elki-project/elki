@@ -102,7 +102,8 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param knnList the knn list containing the result
    */
   protected void doKNNQuery(O object, DoubleDistanceDBIDPairKNNHeap knnList) {
-    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 20));
+    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 21));
+    tree.statistics.countKNNQuery();
 
     // push root
     pq.add(new DoubleDistanceSearchCandidate(0.0, tree.getRootID()));
@@ -126,7 +127,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry entry = node.getEntry(i);
         double distance = distanceFunction.doubleMinDist(entry, object);
-        tree.distanceCalcs++;
+        tree.statistics.countDistanceCalculation();
         if(distance <= maxDist) {
           knnList.add(distance, ((LeafEntry) entry).getDBID());
           maxDist = knnList.doubleKNNDistance();
@@ -138,7 +139,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       for(int i = 0; i < node.getNumEntries(); i++) {
         SpatialEntry entry = node.getEntry(i);
         double distance = distanceFunction.doubleMinDist(entry, object);
-        tree.distanceCalcs++;
+        tree.statistics.countDistanceCalculation();
         // Greedy expand, bypassing the queue
         if(distance <= 0) {
           expandNode(object, knnList, pq, maxDist, ((DirectoryEntry) entry).getPageID());
@@ -171,7 +172,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
           DBID pid = ((LeafEntry) p).getDBID();
           // FIXME: objects are NOT accessible by DBID in a plain rtree context!
           double dist_pq = distanceFunction.doubleDistance(relation.get(pid), relation.get(q));
-          tree.distanceCalcs++;
+          tree.statistics.countDistanceCalculation();
           if(dist_pq <= knn_q_maxDist) {
             knns_q.add(dist_pq, pid);
           }
@@ -217,7 +218,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
       double minMinDist = Double.MAX_VALUE;
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double minDist = distanceFunction.doubleMinDist(entry, relation.get(iter));
-        tree.distanceCalcs++;
+        tree.statistics.countDistanceCalculation();
         minMinDist = Math.min(minDist, minMinDist);
       }
       result.add(new DoubleDistanceEntry(entry, minMinDist));
@@ -291,6 +292,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
     List<DoubleDistanceDBIDPairKNNList> result = new ArrayList<>();
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
+      tree.statistics.countKNNQuery();
       result.add(knnLists.get(id).toKNNList());
     }
     return result;

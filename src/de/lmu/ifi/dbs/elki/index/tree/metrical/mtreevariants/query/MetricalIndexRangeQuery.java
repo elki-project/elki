@@ -71,7 +71,11 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
    */
   private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, O q, D r_q, GenericDistanceDBIDList<D> result) {
     final D nullDistance = distanceQuery.nullDistance();
-    D d1 = o_p != null ? distanceQuery.distance(o_p, q) : nullDistance;
+    D d1 = nullDistance;
+    if (o_p != null) {
+      d1 = distanceQuery.distance(o_p, q);
+      index.statistics.countDistanceCalculation();
+    }
     if (!node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MTreeEntry<D> entry = node.getEntry(i);
@@ -85,6 +89,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
 
         if (diff.compareTo(sum) <= 0) {
           D d3 = distanceQuery.distance(o_r, q);
+          index.statistics.countDistanceCalculation();
           if (d3.compareTo(sum) <= 0) {
             AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
@@ -102,6 +107,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
 
         if (diff.compareTo(r_q) <= 0) {
           D d3 = distanceQuery.distance(o_j, q);
+          index.statistics.countDistanceCalculation();
           if (d3.compareTo(r_q) <= 0) {
             result.add(d3, o_j);
           }
@@ -115,6 +121,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
     final GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
 
     doRangeQuery(null, index.getRoot(), obj, range, result);
+    index.statistics.countRangeQuery();
 
     // sort the result according to the distances
     result.sort();

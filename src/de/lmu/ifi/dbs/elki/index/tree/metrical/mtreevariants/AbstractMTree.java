@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -78,6 +79,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * Splitting strategy.
    */
   protected MTreeSplit<O, D, N, E> splitStrategy;
+
+  /**
+   * For counting the number of distance computations.
+   */
+  public Statistics statistics = new Statistics();
 
   /**
    * Constructor.
@@ -616,6 +622,84 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     Logging log = getLogger();
     if (log.isStatistics()) {
       log.statistics(new LongStatistic(this.getClass().getName() + ".height", getHeight()));
+      statistics.logStatistics();
     }
   }
+  
+  /**
+   * Class for tracking some statistics.
+   * 
+   * @author Erich Schubert
+   */
+  public class Statistics {
+    /**
+     * For counting the number of distance computations.
+     */
+    protected final Counter distanceCalcs;
+
+    /**
+     * For counting the number of knn queries answered.
+     */
+    protected final Counter knnQueries;
+
+    /**
+     * For counting the number of range queries answered.
+     */
+    protected final Counter rangeQueries;
+
+    /**
+     * Constructor.
+     */
+    public Statistics() {
+      super();
+      Logging log = getLogger();
+      distanceCalcs = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".distancecalcs") : null;
+      knnQueries = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".knnqueries") : null;
+      rangeQueries = log.isStatistics() ? log.newCounter(this.getClass().getName() + ".rangequeries") : null;
+    }
+
+    /**
+     * Count a distance computation.
+     */
+    public void countDistanceCalculation() {
+      if (distanceCalcs != null) {
+        distanceCalcs.increment();
+      }
+    }
+
+    /**
+     * Count a knn query invocation.
+     */
+    public void countKNNQuery() {
+      if (knnQueries != null) {
+        knnQueries.increment();
+      }
+    }
+
+    /**
+     * Count a range query invocation.
+     */
+    public void countRangeQuery() {
+      if (rangeQueries != null) {
+        rangeQueries.increment();
+      }
+    }
+
+    /**
+     * Log the statistics.
+     */
+    public void logStatistics() {
+      Logging log = getLogger();
+      if (statistics.distanceCalcs != null) {
+        log.statistics(statistics.distanceCalcs);
+      }
+      if (statistics.knnQueries != null) {
+        log.statistics(statistics.knnQueries);
+      }
+      if (statistics.rangeQueries != null) {
+        log.statistics(statistics.rangeQueries);
+      }
+    }
+  }
+
 }
