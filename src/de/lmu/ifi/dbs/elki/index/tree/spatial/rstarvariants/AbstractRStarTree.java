@@ -371,8 +371,8 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       throw new AbortException("Error determining page sizes.", e);
     }
 
-    if (dirCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + getPageSize() + " Bytes is chosen too small!");
+    if (dirCapacity <= 3) {
+      throw new IllegalArgumentException("Node size of " + getPageSize() + " bytes is chosen too small!");
     }
 
     final Logging log = getLogger();
@@ -381,13 +381,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.round(dirCapacity * relativeMinFill);
+    dirMinimum = (int) Math.floor(dirCapacity * relativeMinFill);
     if (dirMinimum < 2) {
       dirMinimum = 2;
     }
 
-    if (leafCapacity <= 1) {
-      throw new IllegalArgumentException("Node size of " + getPageSize() + " Bytes is chosen too small!");
+    if (leafCapacity <= 3) {
+      throw new IllegalArgumentException("Node size of " + getPageSize() + " bytes is chosen too small!");
     }
 
     if (leafCapacity < 10) {
@@ -395,7 +395,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.round(leafCapacity * relativeMinFill);
+    leafMinimum = (int) Math.floor(leafCapacity * relativeMinFill);
     if (leafMinimum < 2) {
       leafMinimum = 2;
     }
