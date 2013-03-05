@@ -26,13 +26,11 @@ package de.lmu.ifi.dbs.elki.persistent;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 
 /**
- * Page file factory for memory page files.
+ * Abstract page file factory.
  * 
  * @author Erich Schubert
  * 
@@ -45,20 +43,13 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
   protected int pageSize;
 
   /**
-   * Holds the value of {@link Parameterizer#CACHE_SIZE_ID}.
-   */
-  protected long cacheSize;
-
-  /**
    * Constructor.
    * 
    * @param pageSize Page size
-   * @param cacheSize Cache size
    */
-  public AbstractPageFileFactory(int pageSize, long cacheSize) {
+  public AbstractPageFileFactory(int pageSize) {
     super();
     this.pageSize = pageSize;
-    this.cacheSize = cacheSize;
   }
 
   @Override
@@ -89,26 +80,9 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
     public static final OptionID PAGE_SIZE_ID = new OptionID("pagefile.pagesize", "The size of a page in bytes.");
 
     /**
-     * Parameter to specify the size of the cache in bytes, must be an integer
-     * equal to or greater than 0.
-     * <p>
-     * Default value: {@link Integer#MAX_VALUE}
-     * </p>
-     * <p>
-     * Key: {@code -pagefile.cachesize}
-     * </p>
-     */
-    public static final OptionID CACHE_SIZE_ID = new OptionID("pagefile.cachesize", "The size of the cache in bytes.");
-
-    /**
      * Page size
      */
     protected int pageSize;
-
-    /**
-     * Cache size
-     */
-    protected long cacheSize;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -117,12 +91,6 @@ public abstract class AbstractPageFileFactory<P extends Page> implements PageFil
       pageSizeP.addConstraint(new GreaterConstraint(0));
       if (config.grab(pageSizeP)) {
         pageSize = pageSizeP.getValue();
-      }
-
-      LongParameter cacheSizeP = new LongParameter(CACHE_SIZE_ID, Long.MAX_VALUE);
-      cacheSizeP.addConstraint(new GreaterEqualConstraint(0));
-      if (config.grab(cacheSizeP)) {
-        cacheSize = cacheSizeP.getValue();
       }
     }
 

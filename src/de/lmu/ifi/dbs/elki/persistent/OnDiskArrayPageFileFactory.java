@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @param <P> Page type
  */
-public class PersistentPageFileFactory<P extends ExternalizablePage> extends AbstractPageFileFactory<P> {
+public class OnDiskArrayPageFileFactory<P extends ExternalizablePage> extends AbstractPageFileFactory<P> {
   /**
    * File name.
    */
@@ -46,7 +46,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
    * 
    * @param pageSize Page size
    */
-  public PersistentPageFileFactory(int pageSize, String fileName) {
+  public OnDiskArrayPageFileFactory(int pageSize, String fileName) {
     super(pageSize);
     this.fileName = fileName;
   }
@@ -56,7 +56,7 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
     if (fileName == null) {
       throw new AbortException("Disk-backed page file may only be instantiated once!");
     }
-    PersistentPageFile<P> pfile = new PersistentPageFile<>(pageSize, fileName, cls);
+    OnDiskArrayPageFile<P> pfile = new OnDiskArrayPageFile<>(pageSize, fileName);
     fileName = null; // To avoid double instantiation.
     return pfile;
   }
@@ -92,8 +92,8 @@ public class PersistentPageFileFactory<P extends ExternalizablePage> extends Abs
     }
 
     @Override
-    protected PersistentPageFileFactory<ExternalizablePage> makeInstance() {
-      return new PersistentPageFileFactory<>(pageSize, fileName);
+    protected OnDiskArrayPageFileFactory<ExternalizablePage> makeInstance() {
+      return new OnDiskArrayPageFileFactory<>(pageSize, fileName);
     }
   }
 }
