@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+<link href="stylesheet.css" rel="stylesheet" type="text/css"/>
+<title>Example calls of ELKI.</title>
+</head>
+<body>
+<h1>GUI invocation</h1>
+<p>ELKI comes with a simple GUI that helps with parameterization by offering input assistance.</p>
+<p>Since release 0.3, the GUI is the default operation when launching the .jar file:</p>
+<pre>java -jar mypath/elki.jar</pre>
+
+<h1>Some examples for completely parameterized calls of ELKI</h1>
+<p>Here, we provide just some examples of usage of ELKI for some algorithms. Hopefully, from here you can easily extend to other algorithms and data sets.
+Throughout all examples, we assume you have the executable jar-archive <code>elki.jar</code> in some directory locally reachable from your console as <code>mypath</code>,
+and downloaded the example data file from (<a href="http://www.dbs.ifi.lmu.de/research/KDD/ELKI/datasets/example/exampledata.txt">http://www.dbs.ifi.lmu.de/research/KDD/ELKI/datasets/example/exampledata.txt</a>)
+to a location reachable from your console as <code>mydata/exampledata.txt</code>.
+</p>
+
+<h2>Example: DBSCAN</h2>
+<h3>Basic Call:</h3>
+<p>
+<pre>
+java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10
+</pre>
+This requests the algorithm DBSCAN to cluster the data set using DBSCAN parameters <code>epsilon=20</code> and <code>minpts=10</code>. The clustering result is just printed to the console.
+</p>
+
+<h3>Call with specified output file/directory:</h3>
+<p>
+<pre>
+java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbscan.epsilon 20 -dbscan.minpts 10 -out myresults/DBSCANeps20min10
+</pre>
+Same as before but, this time, a directory for collecting the output is explicitly specified.
+This results in one file per cluster as found by DBSCAN within the specified directory <code>myresults/DBSCANeps20min10</code>.
+Each file starts with providing metadata information and information concerning the used parameters before listing the data points contained in the cluster.
+For example, in this case, the file for cluster 0 starts like:
+<pre>
+###############################################################
+# Settings:
+# de.lmu.ifi.dbs.elki.workflow.InputStep
+# -db StaticArrayDatabase
+#·
+# de.lmu.ifi.dbs.elki.database.StaticArrayDatabase
+# -dbc FileBasedDatabaseConnection
+#·
+# de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection
+# -dbc.in mydata/exampledata.txt
+# -dbc.parser DoubleVectorLabelParser
+#·
+# de.lmu.ifi.dbs.elki.datasource.parser.DoubleVectorLabelParser
+# -parser.colsep \s+
+# -parser.quote "
+# -parser.labelIndices [unset]
+#·
+# de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection
+# -dbc.filter [unset]
+#·
+# de.lmu.ifi.dbs.elki.database.StaticArrayDatabase
+# -db.index [unset]
+#·
+# de.lmu.ifi.dbs.elki.workflow.AlgorithmStep
+# -algorithm clustering.DBSCAN
+#·
+# de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
+# -algorithm.distancefunction EuclideanDistanceFunction
+# -dbscan.epsilon 20.0
+# -dbscan.minpts 10
+#·
+# de.lmu.ifi.dbs.elki.workflow.EvaluationStep
+# -evaluator [unset]
+###############################################################
+# Cluster: Cluster 0
+</pre>
+<p>Most of the parameters shown here are set implicitly with default values or not used
+(<code>[unset]</code> or <code>false</code>).</p>
+
+<p>To get a list of additional parameters, add <code>-help</code> to the command line. Here you will also
+options not affecting the algorithm result such as <code>-verbose</code> which often gives progress information.</p>
+
+<p>Unused was also the possibility of normalizing the data. Normalization is available as a filter for the input step,
+using the <code>-dbc.filter</code> option and is done during loading the data set.
+As option value, a comma separated list of filter classes is expected. ELKI provides for example the
+<a href="de/lmu/ifi/dbs/elki/datasource/filter/AttributeWiseMinMaxNormalization.html">AttributeWiseMinMaxNormalization</a> as a possibility.
+Other normalization procedures could easily be provided by any user by implementing the interface
+<a href="de/lmu/ifi/dbs/elki/datasource/filter/ObjectFilter.html">de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter</a>.
+Note that the resulting files will contain the normalized data vectors, since
+ELKI by default doesn't keep a copy of the denormalized data.
+</p>
+
+<h3>Example call requesting time and verbose messages and using a normalization:</h3>
+<p>
+<pre>
+java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -algorithm clustering.DBSCAN -dbc.in mydata/exampledata.txt -dbc.filter AttributeWiseMinMaxNormalization -dbscan.epsilon 0.02 -dbscan.minpts 10 -out myresults/DBSCANeps20min10 -evaluator paircounting.EvaluatePairCountingFMeasure -verbose -enableDebug de.lmu.ifi.dbs.elki.workflow.AlgorithmStep
+</pre>
+Note that the value for <code>dbscan.epsilon</code> is decreased considerably to suit the normalized data
+(the AttributeWiseMinMaxNormalization normalizes all attribute values to the range <code>[0:1]</code>).
+<br />
+We also added an evaluation module for the clustering, which will output the pair counting F-Measure to the file <code>pair-fmeasure.txt</code>
+</p>
+
+<p>For notes about fair benchmarking with ELKI, please read the comments on
+<a href="http://elki.dbs.ifi.lmu.de/wiki/Benchmarking">Benchmarking in the
+Wiki</a>.  Do not benchmark ELKI against other software, since there is an
+obvious cost in the generality of the implementation, and you for example do
+not want to benchmark Java versus C. To benchmark the performance of actual
+algorithms, you <em>must</em> implement them within the ELKI framework to get
+sound results.</p>
+
+<h2>Different algorithms</h2>
+To become acquainted with an unknown algorithm, try the option <code>-description</code>. For example, here, we request a description of how to use
+the algorithm <a href="de/lmu/ifi/dbs/elki/algorithm/clustering/correlation/FourC.html">clustering.correlation.FourC</a>:
+<pre>
+java -cp mypath/elki.jar de.lmu.ifi.dbs.elki.application.KDDCLIApplication -description de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC
+</pre>
+The output describes the parameters available for FourC with default values. Setting for example a different distance function may in turn produce addtional parameters.</p>
+
+<p>Note that we here gave the full name of the class <code>FourC</code> (i.e., including the complete package name),
+while we ommitted the prefix <code>de.lmu.ifi.dbs.elki.algorithm.</code> for <code>clustering.DBSCAN</code> above.
+The reason for this difference is as follows:</p>
+<p>If as a parameter value a class name is expected, usually also a restriction class is known,
+i.e., an interface or a class which must be implemented or extended by the specified parameter value.
+For example,
+<ul>
+	<li>the restriction class for the parameter value of <code>-algorithm</code> is
+<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.algorithm.Algorithm</a>.</li>
+	<li>the restriction class for the parameter value of <code>-algorithm.distancefunction</code> is
+<a href="de/lmu/ifi/dbs/elki/algorithm/Algorithm.html">de.lmu.ifi.dbs.elki.distance.distancefunction</a>.</li>
+    <li>the restriction class for the parameter value of <code>-description</code> is <code>java.lang.Object</code>.</li>
+</ul>
+If the specified class cannot be initialized by the given name, the initialization tries the same class name using as prefix the
+package of the restriction class. Thus,
+<ul>
+	<li>the value for parameter <code>-algorithm</code>, <code>clustering.DBSCAN</code>
+		(which is not a valid class name per se),
+		will be automatically completed with the prefix
+		<code>de.lmu.ifi.dbs.elki.algorithm.</code>,</li>
+	<li>the corresponding incomplete value for parameter <code>-description</code>,
+		<code>clustering.correlation.FourC</code>,
+		however, would be automatically completed with the prefix
+		<code>java.lang.</code>, which does not result in a valid class name.</li>
+</ul>
+Hence, here
+(i.e., for parameter <code>-description</code>), we are
+to specify the complete class name in the first place.
+On the other hand, would we like to use FourC as algorithm, as parameter value for <code>-algorithm</code> the specification
+<code>clustering.correlation.FourC</code> would suffice.
+</p>
+<p>The restriction class and already available implementations (suitable as possible values for the parameter)
+are listed in the parameter description. See, e.g., the description of <code>-algorithm</code> (as provided after using <code>-description</code> as above or using <code>-help</code>):
+<pre>
+-algorithm &lt;object_1|class_1,...,object_n|class_n&gt;
+   Algorithm to run.
+   Implementing de.lmu.ifi.dbs.elki.algorithm.Algorithm
+   Known classes (default package de.lmu.ifi.dbs.elki.algorithm.):
+   -&gt; NullAlgorithm
+   -&gt; clustering.DBSCAN
+   -&gt; clustering.DeLiClu
+   -&gt; clustering.EM
+   -&gt; clustering.KMeans
+   -&gt; clustering.OPTICSXi
+   -&gt; clustering.OPTICS
+   -&gt; clustering.SLINK
+   -&gt; clustering.SNNClustering
+   -&gt; clustering.correlation.CASH
+   -&gt; clustering.correlation.COPAC
+   -&gt; clustering.correlation.ERiC
+   -&gt; clustering.correlation.FourC
+   -&gt; clustering.correlation.HiCO
+   -&gt; clustering.correlation.ORCLUS
+   -&gt; clustering.subspace.CLIQUE
+   -&gt; clustering.subspace.DiSH
+   -&gt; clustering.subspace.HiSC
+   -&gt; clustering.subspace.PreDeCon
+   -&gt; clustering.subspace.PROCLUS
+   -&gt; clustering.subspace.SUBCLU
+   -&gt; clustering.trivial.ByLabelClustering
+   -&gt; clustering.trivial.ByLabelHierarchicalClustering
+   -&gt; clustering.trivial.TrivialAllInOne
+   -&gt; clustering.trivial.TrivialAllNoise
+   -&gt; outlier.ABOD
+   -&gt; outlier.AggarwalYuEvolutionary
+   -&gt; outlier.AggarwalYuNaive
+   -&gt; outlier.DBOutlierDetection
+   -&gt; outlier.DBOutlierScore
+   -&gt; outlier.EMOutlier
+   -&gt; outlier.GaussianModel
+   -&gt; outlier.GaussianUniformMixture
+   -&gt; outlier.INFLO
+   -&gt; outlier.KNNOutlier
+   -&gt; outlier.KNNWeightOutlier
+   -&gt; outlier.LDOF
+   -&gt; outlier.LOCI
+   -&gt; outlier.LOF
+   -&gt; outlier.LoOP
+   -&gt; outlier.OPTICSOF
+   -&gt; outlier.ReferenceBasedOutlierDetection
+   -&gt; outlier.SOD
+   -&gt; outlier.OnlineLOF
+   -&gt; outlier.spatial.CTLuGLSBackwardSearchAlgorithm
+   -&gt; outlier.spatial.CTLuMeanMultipleAttributes
+   -&gt; outlier.spatial.CTLuMedianAlgorithm
+   -&gt; outlier.spatial.CTLuMedianMultipleAttributes
+   -&gt; outlier.spatial.CTLuMoranScatterplotOutlier
+   -&gt; outlier.spatial.CTLuRandomWalkEC
+   -&gt; outlier.spatial.CTLuScatterplotOutlier
+   -&gt; outlier.spatial.CTLuZTestOutlier
+   -&gt; outlier.spatial.SLOM
+   -&gt; outlier.spatial.SOF
+   -&gt; outlier.spatial.TrimmedMeanApproach
+   -&gt; outlier.meta.ExternalDoubleOutlierScore
+   -&gt; outlier.meta.FeatureBagging
+   -&gt; outlier.meta.RescaleMetaOutlierAlgorithm
+   -&gt; outlier.trivial.ByLabelOutlier
+   -&gt; outlier.trivial.TrivialAllOutlier
+   -&gt; outlier.trivial.TrivialNoOutlier
+   -&gt; statistics.EvaluateRankingQuality
+   -&gt; statistics.RankingQualityHistogram
+   -&gt; statistics.DistanceStatisticsWithClasses
+   -&gt; APRIORI
+   -&gt; DependencyDerivator
+   -&gt; KNNDistanceOrder
+   -&gt; KNNJoin
+   -&gt; MaterializeDistances
+</pre>
+</body>
+</html>
