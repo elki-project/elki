@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -48,15 +49,13 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
   /**
    * Constructor.
    * 
-   * @param fileName file name
-   * @param pageSize page size
-   * @param cacheSize cache size
+   * @param pageFileFactory Data storage
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
    * @param insertStrategy Insertion strategy
    */
-  public MTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy, MTreeInsert<O, D, MTreeNode<O, D>, MTreeEntry<D>> insertStrategy) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
+  public MTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy, MTreeInsert<O, D, MTreeNode<O, D>, MTreeEntry<D>> insertStrategy) {
+    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy);
   }
 
   @Override
@@ -79,7 +78,7 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
     @Override
     protected MTreeFactory<O, D> makeInstance() {
-      return new MTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
+      return new MTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy);
     }
   }
 }

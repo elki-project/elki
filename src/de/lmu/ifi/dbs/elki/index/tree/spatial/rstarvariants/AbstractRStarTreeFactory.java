@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
@@ -110,17 +111,15 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
   /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
+   * @param pageFileFactory data storage
    * @param bulkSplitter the strategy to use for bulk splitting
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy to use for splitting nodes
    * @param overflowTreatment the strategy to use for overflow treatment
    * @param minimumFill the relative minimum fill
    */
-  public AbstractRStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
-    super(fileName, pageSize, cacheSize);
+  public AbstractRStarTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(pageFileFactory);
     this.insertionStrategy = insertionStrategy;
     this.bulkSplitter = bulkSplitter;
     this.nodeSplitter = nodeSplitter;

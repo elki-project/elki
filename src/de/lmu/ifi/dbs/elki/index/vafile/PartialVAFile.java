@@ -56,11 +56,11 @@ import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -874,7 +874,7 @@ public class PartialVAFile<V extends NumberVector<?>> extends AbstractRefiningIn
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        IntParameter pagesizeP = new IntParameter(TreeIndexFactory.PAGE_SIZE_ID, 1024);
+        IntParameter pagesizeP = new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024);
         pagesizeP.addConstraint(new GreaterConstraint(0));
         if (config.grab(pagesizeP)) {
           pagesize = pagesizeP.getValue();

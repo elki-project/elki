@@ -51,8 +51,8 @@ import de.lmu.ifi.dbs.elki.index.AbstractRefiningIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -497,7 +497,7 @@ public class VAFile<V extends NumberVector<?>> extends AbstractRefiningIndex<V> 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        IntParameter pagesizeP = new IntParameter(TreeIndexFactory.PAGE_SIZE_ID, 1024);
+        IntParameter pagesizeP = new IntParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1024);
         pagesizeP.addConstraint(new GreaterConstraint(0));
         if (config.grab(pagesizeP)) {
           pagesize = pagesizeP.getValue();

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -47,15 +48,13 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   /**
    * Constructor.
    * 
-   * @param fileName Filename
-   * @param pageSize Page size
-   * @param cacheSize Cache size
+   * @param pageFileFactory Data storage
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
    * @param k_max Maximum k
    */
-  public MkTabTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> splitStrategy, MTreeInsert<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> insertStrategy, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy, k_max);
+  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> splitStrategy, MTreeInsert<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> insertStrategy, int k_max) {
+    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
   }
 
   @Override
@@ -78,7 +77,7 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
     @Override
     protected MkTabTreeFactory<O, D> makeInstance() {
-      return new MkTabTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy, k_max);
+      return new MkTabTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
     }
   }
 }

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.In
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
 /**
  * Factory for DeLiClu R*-Trees.
@@ -46,17 +47,15 @@ public class DeLiCluTreeFactory<O extends NumberVector<?>> extends AbstractRStar
   /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
+   * @param pageFileFactory Page file factory
    * @param bulkSplitter Bulk loading strategy
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy for splitting nodes.
    * @param overflowTreatment the strategy to use for overflow treatment
    * @param minimumFill the relative minimum fill
    */
-  public DeLiCluTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+  public DeLiCluTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
   }
 
   @Override
@@ -85,7 +84,7 @@ public class DeLiCluTreeFactory<O extends NumberVector<?>> extends AbstractRStar
   public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected DeLiCluTreeFactory<O> makeInstance() {
-      return new DeLiCluTreeFactory<>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+      return new DeLiCluTreeFactory<>(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

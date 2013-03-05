@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTreeFactory;
@@ -54,6 +53,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -131,7 +131,7 @@ public class TestKNNJoin implements JUnit4Test {
   public void testKNNJoinRtreeMini() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 200);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
 
     doKNNJoin(spatparams);
   }
@@ -145,7 +145,7 @@ public class TestKNNJoin implements JUnit4Test {
   public void testKNNJoinRtreeMaxi() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 2000);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 2000);
 
     doKNNJoin(spatparams);
   }
@@ -159,7 +159,7 @@ public class TestKNNJoin implements JUnit4Test {
   public void testKNNJoinDeLiCluTreeMini() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, DeLiCluTreeFactory.class);
-    spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 200);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 200);
 
     doKNNJoin(spatparams);
   }

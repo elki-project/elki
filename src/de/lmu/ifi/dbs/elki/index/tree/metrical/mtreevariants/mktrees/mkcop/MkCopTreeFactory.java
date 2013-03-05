@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactor
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -61,16 +62,14 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
   /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
-   * @param distanceFunction
-   * @param splitStrategy
-   * @param insertStrategy
-   * @param k_max
+   * @param pageFileFactory Data storage
+   * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
+   * @param insertStrategy Insert strategy
+   * @param k_max Maximum k supported
    */
-  public MkCopTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> splitStrategy, MTreeInsert<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> insertStrategy, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
+  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> splitStrategy, MTreeInsert<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> insertStrategy, int k_max) {
+    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy);
     this.k_max = k_max;
   }
 
@@ -106,7 +105,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
 
     @Override
     protected MkCopTreeFactory<O, D> makeInstance() {
-      return new MkCopTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy, k_max);
+      return new MkCopTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
     }
   }
 }
