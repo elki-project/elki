@@ -26,8 +26,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.RandomFactory;
@@ -80,11 +80,12 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
    * and, after partitioning the set of entries, promotes the pair of objects
    * for which the sum of covering radiuses is minimum.
    * 
+   * @param tree Tree to use
    * @param node the node to be split
    * @param distanceFunction the distance function
    */
   @Override
-  public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction) {
+  public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {
     int pos1 = random.nextInt(node.getNumEntries());
     int pos2 = random.nextInt(node.getNumEntries() - 1);
     if (pos2 >= pos1) {
@@ -93,7 +94,7 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
     DBID id1 = node.getEntry(pos1).getRoutingObjectID();
     DBID id2 = node.getEntry(pos2).getRoutingObjectID();
 
-    return balancedPartition(node, id1, id2, distanceFunction);
+    return balancedPartition(tree, node, id1, id2);
   }
 
   /**
