@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.DoubleDistanceMetricalIndexKNNQuery;
@@ -58,6 +57,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFacto
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.ApproximativeLeastOverlapInsertionStrategy;
 import de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile;
 import de.lmu.ifi.dbs.elki.index.vafile.VAFile;
+import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -108,7 +108,7 @@ public class TestIndexStructures implements JUnit4Test {
   public void testMetrical() {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(StaticArrayDatabase.INDEX_ID, MTreeFactory.class);
-    metparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 100);
+    metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 100);
     testFileBasedDatabaseConnection(metparams, DoubleDistanceMetricalIndexKNNQuery.class, DoubleDistanceMetricalIndexRangeQuery.class);
   }
 
@@ -119,7 +119,7 @@ public class TestIndexStructures implements JUnit4Test {
   public void testRStarTree() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
   }
 
@@ -156,7 +156,7 @@ public class TestIndexStructures implements JUnit4Test {
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
     spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
     spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
-    spatparams.addParameter(TreeIndexFactory.PAGE_SIZE_ID, 300);
+    spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);
   }
 
@@ -201,7 +201,7 @@ public class TestIndexStructures implements JUnit4Test {
 
       // verify that the neighbors match.
       int i = 0;
-      for(DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
+      for (DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector
@@ -220,7 +220,7 @@ public class TestIndexStructures implements JUnit4Test {
 
       // verify that the neighbors match.
       int i = 0;
-      for(DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
+      for (DistanceDBIDListIter<DoubleDistance> res = ids.iter(); res.valid(); res.advance(), i++) {
         // Verify distance
         assertEquals("Expected distance doesn't match.", shouldd[i], res.getDistance().doubleValue());
         // verify vector

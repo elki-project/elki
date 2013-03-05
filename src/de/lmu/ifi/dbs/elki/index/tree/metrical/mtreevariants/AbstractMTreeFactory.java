@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.M
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MinimumEnlargementInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MMRadSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -70,14 +71,12 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
   /**
    * Constructor.
    * 
-   * @param fileName File name
-   * @param pageSize Page size
-   * @param cacheSize Cache size
+   * @param pageFileFactory Data storage
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
    */
-  public AbstractMTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
-    super(fileName, pageSize, cacheSize);
+  public AbstractMTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
+    super(pageFileFactory);
     this.distanceFunction = distanceFunction;
     this.splitStrategy = splitStrategy;
     this.insertStrategy = insertStrategy;

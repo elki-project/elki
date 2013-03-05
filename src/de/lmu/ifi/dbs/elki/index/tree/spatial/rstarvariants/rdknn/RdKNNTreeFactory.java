@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.In
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -80,9 +81,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
   /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
+   * @param pageFileFactory Data storage
    * @param bulkSplitter Bulk loading strategy
    * @param insertionStrategy the strategy to find the insertion child
    * @param k_max
@@ -91,8 +90,8 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
    * @param overflowTreatment the strategy to use for overflow treatment
    * @param minimumFill the relative minimum fill
    */
-  public RdKNNTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
   }
@@ -148,7 +147,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
 
     @Override
     protected RdKNNTreeFactory<O, D> makeInstance() {
-      return new RdKNNTreeFactory<>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment, minimumFill);
+      return new RdKNNTreeFactory<>(pageFileFactory, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }

@@ -27,8 +27,10 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 
 /**
@@ -38,29 +40,28 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses MkMaxTreeIndex oneway - - «create»
- *
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  */
 public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, MkMaxTreeIndex<O, D>> {
   /**
    * Constructor.
-   *
-   * @param fileName Filename
-   * @param pageSize Page size
-   * @param cacheSize Cache size
+   * 
+   * @param pageFileFactory Data storage
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insert strategy
    * @param k_max Maximum k
    */
-  public MkMaxTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> splitStrategy, int k_max) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, k_max);
+  public MkMaxTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> splitStrategy, MTreeInsert<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> insertStrategy, int k_max) {
+    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
   }
 
   @Override
   public MkMaxTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkMaxTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkMaxTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, splitStrategy, k_max);
+    return new MkMaxTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), splitStrategy, insertStrategy, k_max);
   }
 
   protected Class<MkMaxTreeNode<O, D>> getNodeClass() {
@@ -77,7 +78,7 @@ public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
     @Override
     protected MkMaxTreeFactory<O, D> makeInstance() {
-      return new MkMaxTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, k_max);
+      return new MkMaxTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
     }
   }
 }

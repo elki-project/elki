@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.In
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
 /**
  * Factory for regular R*-Trees.
@@ -47,17 +48,15 @@ public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTr
   /**
    * Constructor.
    * 
-   * @param fileName
-   * @param pageSize
-   * @param cacheSize
+   * @param pageFileFactory Data storage
    * @param bulkSplitter Bulk loading strategy
    * @param insertionStrategy the strategy to find the insertion child
    * @param nodeSplitter the strategy for splitting nodes.
    * @param overflowTreatment the strategy to use for overflow treatment
    * @param minimumFill the relative minimum fill
    */
-  public RStarTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+  public RStarTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+    super(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
   }
 
   @Override
@@ -86,7 +85,7 @@ public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTr
   public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
     @Override
     protected RStarTreeFactory<O> makeInstance() {
-      return new RStarTreeFactory<>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+      return new RStarTreeFactory<>(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
     }
   }
 }
