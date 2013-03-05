@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -56,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * MkMax tree
  * 
  * @author Elke Achtert
- *
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  */
@@ -65,19 +66,19 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * Relation indexed.
    */
   private Relation<O> relation;
-  
+
   /**
    * Constructor.
    * 
    * @param relation Relation
    * @param pagefile Page file
    * @param distanceQuery Distance query
-   * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insertion strategy
    * @param k_max Maximum value for k
    */
-  public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> splitStrategy, int k_max) {
-    super(pagefile, distanceQuery, distanceFunction, splitStrategy, k_max);
+  public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> splitStrategy, MTreeInsert<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> insertStrategy, int k_max) {
+    super(pagefile, distanceQuery, splitStrategy, insertStrategy, k_max);
     this.relation = relation;
   }
 
@@ -89,7 +90,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
     D knnDistance = knns.getKNNDistance();
     return new MkMaxLeafEntry<>(id, parentDistance, knnDistance);
   }
-  
+
   @Override
   public void initialize() {
     super.initialize();
@@ -140,19 +141,19 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.distanceFunction.equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -165,19 +166,19 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   @Override
   public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.distanceFunction.equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -190,15 +191,15 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }

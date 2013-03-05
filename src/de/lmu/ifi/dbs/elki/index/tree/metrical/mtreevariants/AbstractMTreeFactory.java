@@ -29,6 +29,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MinimumEnlargementInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MMRadSplit;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -61,6 +63,11 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
   protected MTreeSplit<O, D, N, E> splitStrategy;
 
   /**
+   * Insertion strategy
+   */
+  protected MTreeInsert<O, D, N, E> insertStrategy;
+
+  /**
    * Constructor.
    * 
    * @param fileName File name
@@ -69,10 +76,11 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
    */
-  public AbstractMTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy) {
+  public AbstractMTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
     super(fileName, pageSize, cacheSize);
     this.distanceFunction = distanceFunction;
     this.splitStrategy = splitStrategy;
+    this.insertStrategy = insertStrategy;
   }
 
   @Override
@@ -111,6 +119,14 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
     public static final OptionID SPLIT_STRATEGY_ID = new OptionID("mtree.split", "Split strategy to use for constructing the M-tree.");
 
     /**
+     * Parameter to specify the insertion strategy to construct the tree.
+     * <p>
+     * Key: {@code -mtree.insert}
+     * </p>
+     */
+    public static final OptionID INSERT_STRATEGY_ID = new OptionID("mtree.insert", "Insertion strategy to use for constructing the M-tree.");
+
+    /**
      * Distance function to use for the index.
      */
     protected DistanceFunction<O, D> distanceFunction = null;
@@ -119,6 +135,11 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
      * Splitting strategy.
      */
     protected MTreeSplit<O, D, N, E> splitStrategy = null;
+
+    /**
+     * Insertion strategy
+     */
+    protected MTreeInsert<O, D, N, E> insertStrategy;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -130,6 +151,10 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
       ObjectParameter<MTreeSplit<O, D, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MMRadSplit.class);
       if (config.grab(splitStrategyP)) {
         splitStrategy = splitStrategyP.instantiateClass(config);
+      }
+      ObjectParameter<MTreeInsert<O, D, N, E>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
+      if (config.grab(insertStrategyP)) {
+        insertStrategy = insertStrategyP.instantiateClass(config);
       }
     }
 

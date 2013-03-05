@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -68,14 +69,14 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * @param relation Relation to index
    * @param pageFile Page file
    * @param distanceQuery Distance query
-   * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insert strategy
    * @param k_max Maximum value of k supported
    * @param p Parameter p
    * @param log Logspace flag
    */
-  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, int k_max, int p, boolean log) {
-    super(pageFile, distanceQuery, distanceFunction, splitStrategy, k_max, p, log);
+  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, MTreeInsert<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> insertStrategy, int k_max, int p, boolean log) {
+    super(pageFile, distanceQuery, splitStrategy, insertStrategy, k_max, p, log);
     this.relation = relation;
   }
 
@@ -107,19 +108,19 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.distanceFunction.equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -132,19 +133,19 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
   @Override
   public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.distanceFunction.equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.distanceFunction.equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -157,15 +158,15 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
   @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }

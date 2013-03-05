@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -66,7 +67,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Holds the instance of the trees distance function.
    */
-  protected DistanceFunction<O, D> distanceFunction;
+  protected DistanceFunction<? super O, D> distanceFunction;
 
   /**
    * The distance query.
@@ -77,6 +78,11 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * Splitting strategy.
    */
   protected MTreeSplit<O, D, N, E> splitStrategy;
+
+  /**
+   * Insertion strategy.
+   */
+  protected MTreeInsert<O, D, N, E> insertStrategy;
 
   /**
    * For counting the number of distance computations.
@@ -90,16 +96,18 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param distanceQuery Distance query
    * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insertion strategy
    */
-  public AbstractMTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy) {
+  public AbstractMTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
     super(pagefile);
     this.distanceQuery = distanceQuery;
-    this.distanceFunction = distanceFunction;
+    this.distanceFunction = distanceQuery.getDistanceFunction();
     this.splitStrategy = splitStrategy;
+    this.insertStrategy = insertStrategy;
   }
 
   @Override
-  public final DistanceFunction<O, D> getDistanceFunction() {
+  public final DistanceFunction<? super O, D> getDistanceFunction() {
     return distanceFunction;
   }
 
@@ -191,7 +199,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     }
 
     // choose subtree for insertion
-    IndexTreePath<E> subtree = choosePath(entry, getRootPath());
+    IndexTreePath<E> subtree = insertStrategy.choosePath(this, entry);
     if (getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
@@ -240,69 +248,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   protected final void createEmptyRoot(E exampleLeaf) {
     N root = createNewLeafNode();
     writeNode(root);
-  }
-
-  /**
-   * Chooses the best path of the specified subtree for insertion of the given
-   * object.
-   * 
-   * @param object the entry to search
-   * @param subtree the subtree to be tested for insertion
-   * @return the path of the appropriate subtree to insert the given object
-   */
-  private IndexTreePath<E> choosePath(E object, IndexTreePath<E> subtree) {
-    N node = getNode(subtree.getLastPathComponent().getEntry());
-
-    // leaf
-    if (node.isLeaf()) {
-      return subtree;
-    }
-
-    D bestDistance;
-    int bestIdx;
-    E bestEntry;
-    D enlarge; // Track best enlargement - null for no enlargement needed.
-    // Initialize from first:
-    {
-      bestIdx = 0;
-      bestEntry = node.getEntry(0);
-      bestDistance = distance(object.getRoutingObjectID(), bestEntry.getRoutingObjectID());
-      if (bestDistance.compareTo(bestEntry.getCoveringRadius()) <= 0) {
-        enlarge = null;
-      } else {
-        enlarge = bestDistance.minus(bestEntry.getCoveringRadius());
-      }
-    }
-
-    // Iterate over remaining
-    for (int i = 1; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      D distance = distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
-
-      if (distance.compareTo(entry.getCoveringRadius()) <= 0) {
-        if (enlarge != null || distance.compareTo(bestDistance) < 0) {
-          bestIdx = i;
-          bestEntry = entry;
-          bestDistance = distance;
-          enlarge = null;
-        }
-      } else if (enlarge != null) {
-        D enlrg = distance.minus(entry.getCoveringRadius());
-        if (enlrg.compareTo(enlarge) < 0) {
-          bestIdx = i;
-          bestEntry = entry;
-          bestDistance = distance;
-          enlarge = enlrg;
-        }
-      }
-    }
-
-    // Apply enlargement
-    if (enlarge != null) {
-      bestEntry.setCoveringRadius(bestEntry.getCoveringRadius().plus(enlarge));
-    }
-
-    return choosePath(object, subtree.pathByAddingChild(new TreeIndexPathComponent<>(bestEntry, bestIdx)));
   }
 
   /**

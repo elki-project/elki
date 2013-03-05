@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -51,15 +52,17 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
    * @param pageSize page size
    * @param cacheSize cache size
    * @param distanceFunction Distance function
+   * @param splitStrategy Split strategy
+   * @param insertStrategy Insertion strategy
    */
-  public MTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy) {
-    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
+  public MTreeFactory(String fileName, int pageSize, long cacheSize, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy, MTreeInsert<O, D, MTreeNode<O, D>, MTreeEntry<D>> insertStrategy) {
+    super(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
   }
 
   @Override
   public MTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), distanceFunction, splitStrategy);
+    return new MTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), splitStrategy, insertStrategy);
   }
 
   protected Class<MTreeNode<O, D>> getNodeClass() {
@@ -76,7 +79,7 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
   public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
     @Override
     protected MTreeFactory<O, D> makeInstance() {
-      return new MTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy);
+      return new MTreeFactory<>(fileName, pageSize, cacheSize, distanceFunction, splitStrategy, insertStrategy);
     }
   }
 }

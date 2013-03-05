@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -74,12 +75,12 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    * @param relation Relation indexed
    * @param pagefile Page file
    * @param distanceQuery Distance query
-   * @param distanceFunction Distance function
    * @param splitStrategy Split strategy
+   * @param insertStrategy Insertion strategy
    * @param k_max Maximum value for k
    */
-  public MkTabTreeIndex(Relation<O> relation, PageFile<MkTabTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> splitStrategy, int k_max) {
-    super(pagefile, distanceQuery, distanceFunction, splitStrategy, k_max);
+  public MkTabTreeIndex(Relation<O> relation, PageFile<MkTabTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> splitStrategy, MTreeInsert<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> insertStrategy, int k_max) {
+    super(pagefile, distanceQuery, splitStrategy, insertStrategy, k_max);
     this.relation = relation;
     this.knnQuery = this.getKNNQuery(getDistanceQuery());
   }
