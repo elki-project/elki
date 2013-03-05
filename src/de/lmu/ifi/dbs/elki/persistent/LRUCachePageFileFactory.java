@@ -4,7 +4,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /*
@@ -44,17 +44,17 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
   private PageFileFactory<P> pageFileFactory;
 
   /**
-   * Cache size.
+   * Cache size, in bytes.
    */
-  private long cacheSize;
+  private int cacheSize;
 
   /**
    * Constructor.
    * 
    * @param pageFileFactory Inner page file
-   * @param cacheSize Size of cache.
+   * @param cacheSize Size of cache, in bytes.
    */
-  public LRUCachePageFileFactory(PageFileFactory<P> pageFileFactory, long cacheSize) {
+  public LRUCachePageFileFactory(PageFileFactory<P> pageFileFactory, int cacheSize) {
     super();
     this.cacheSize = cacheSize;
     this.pageFileFactory = pageFileFactory;
@@ -103,9 +103,9 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
     PageFileFactory<Page> pageFileFactory;
 
     /**
-     * Cache size
+     * Cache size, in bytes.
      */
-    protected long cacheSize;
+    protected int cacheSize;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -115,7 +115,7 @@ public class LRUCachePageFileFactory<P extends Page> implements PageFileFactory<
         pageFileFactory = pffP.instantiateClass(config);
       }
 
-      LongParameter cacheSizeP = new LongParameter(CACHE_SIZE_ID, Long.MAX_VALUE);
+      IntParameter cacheSizeP = new IntParameter(CACHE_SIZE_ID);
       cacheSizeP.addConstraint(new GreaterEqualConstraint(0));
       if (config.grab(cacheSizeP)) {
         cacheSize = cacheSizeP.getValue();
