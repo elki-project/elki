@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 /**
  * Interface for kNN heaps.
  * 
- * To instantiate, use: {@link DBIDUtil#newHeap}!
+ * To instantiate, use: {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap}!
  * 
  * @author Erich Schubert
  * 

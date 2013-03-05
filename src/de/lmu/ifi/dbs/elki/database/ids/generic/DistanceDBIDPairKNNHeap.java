@@ -29,11 +29,11 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDPair;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
- * Heap for collecting kNN candiates with arbitrary distance types.
+ * Heap for collecting kNN candidates with arbitrary distance types.
  * 
  * For double distances, see {@link DoubleDistanceDBIDPairKNNHeap}
  * 
- * <b>To instantiate, use {@link DBIDUtil#newHeap} instead!</b>
+ * <b>To instantiate, use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap} instead!</b>
  * 
  * @author Erich Schubert
  * 
@@ -49,7 +49,7 @@ public class DistanceDBIDPairKNNHeap<D extends Distance<D>> extends AbstractKNNH
   /**
    * Constructor.
    * 
-   * <b>To instantiate, use {@link KNNUtil#newHeap} instead!</b>
+   * <b>To instantiate, use {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap} instead!</b>
    * 
    * @param k Heap size
    */

@@ -239,7 +239,6 @@ public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      * @author Erich Schubert
      * 
      * @param <O> Outer object type.
-     * @param <I> Inner object type.
      */
     public static class Parameterizer<O extends NumberVector<?>> extends AbstractParameterizer {
       /**

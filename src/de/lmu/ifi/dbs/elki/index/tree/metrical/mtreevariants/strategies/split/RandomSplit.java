@@ -82,7 +82,6 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
    * 
    * @param tree Tree to use
    * @param node the node to be split
-   * @param distanceFunction the distance function
    */
   @Override
   public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {

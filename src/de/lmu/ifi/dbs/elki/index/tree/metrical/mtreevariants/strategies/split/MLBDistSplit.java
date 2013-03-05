@@ -53,9 +53,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
   /**
    * Creates a new split object.
-   * 
-   * @param node the node to be split
-   * @param distanceFunction the distance function
    */
   public MLBDistSplit() {
     super();

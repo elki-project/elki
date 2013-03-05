@@ -103,7 +103,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
    * 
    * @param input Data source
    * @param distance Distance function
-   * @param k Number of nearest neighbors
+   * @param radius Query radius
    * @param out Matrix output file
    */
   public CacheDoubleDistanceRangeQueries(InputStep input, DistanceFunction<O, DoubleDistance> distance, double radius, File out) {

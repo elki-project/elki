@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 /**
  * Heap for collecting double-valued KNN instances.
  * 
- * See also: {@link DBIDUtil#newHeap}!
+ * See also: {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap}!
  * 
  * Experiments have shown that it <em>can</em> be much more performant to track the
  * knndistance <em>outside</em> of the heap, and do comparisons on the stack:
@@ -78,7 +78,7 @@ public class DoubleDistanceDBIDPairKNNHeap extends AbstractKNNHeap<DoubleDistanc
   /**
    * Constructor.
    * 
-   * See also: {@link KNNUtil#newHeap}!
+   * See also: {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap}!
    * 
    * @param k Heap size
    */
