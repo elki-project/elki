@@ -23,9 +23,15 @@ package de.lmu.ifi.dbs.elki.data.projection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.projection.LngLatToECEFProjection.EarthModel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.math.GeoUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 
 /**
  * Project (Latitude, Longitude) vectors to (X, Y, Z), from WGS84 to ECEF.
@@ -41,10 +47,18 @@ public class LatLngToECEFProjection<V extends NumberVector<?>> implements Projec
   private NumberVector.Factory<V, ?> factory;
 
   /**
-   * Constructor.
+   * Earth model to use.
    */
-  public LatLngToECEFProjection() {
+  private EarthModel model;
+
+  /**
+   * Constructor.
+   * 
+   * @param model Earth model to use.
+   */
+  public LatLngToECEFProjection(EarthModel model) {
     super();
+    this.model = model;
   }
 
   @Override
@@ -55,7 +69,14 @@ public class LatLngToECEFProjection<V extends NumberVector<?>> implements Projec
 
   @Override
   public V project(V data) {
-    return factory.newNumberVector(GeoUtil.latLngDegWGS84ToECEF(data.doubleValue(0), data.doubleValue(1)));
+    switch(model){
+    case SPHERICAL:
+      return factory.newNumberVector(GeoUtil.latLngDegSphericalToECEF(data.doubleValue(0), data.doubleValue(1)));
+    case WGS84:
+      return factory.newNumberVector(GeoUtil.latLngDegWGS84ToECEF(data.doubleValue(0), data.doubleValue(1)));
+    default:
+      throw new AbortException("Unsupported Model");
+    }
   }
 
   @Override
@@ -66,5 +87,33 @@ public class LatLngToECEFProjection<V extends NumberVector<?>> implements Projec
   @Override
   public SimpleTypeInformation<V> getOutputDataTypeInformation() {
     return new VectorFieldTypeInformation<>(factory, 3, 3, factory.getDefaultSerializer());
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @apiviz.exclude
+   * 
+   * @author Erich Schubert
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Earth model to use.
+     */
+    EarthModel model;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      EnumParameter<EarthModel> modelP = new EnumParameter<>(LngLatToECEFProjection.Parameterizer.MODEL_ID, EarthModel.class, EarthModel.WGS84);
+      if(config.grab(modelP)) {
+        model = modelP.getValue();
+      }
+    }
+
+    @Override
+    protected LatLngToECEFProjection<NumberVector<?>> makeInstance() {
+      return new LatLngToECEFProjection<>(model);
+    }
   }
 }
