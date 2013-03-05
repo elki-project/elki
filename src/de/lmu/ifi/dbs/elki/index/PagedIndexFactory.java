@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree;
+package de.lmu.ifi.dbs.elki.index;
 
 /*
  This file is part of ELKI:
@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.persistent.ExternalizablePage;
 import de.lmu.ifi.dbs.elki.persistent.MemoryPageFileFactory;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -42,13 +39,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.stereotype factory,interface
  * @apiviz.has Index oneway - - «create»
+ * @apiviz.composedOf PageFileFactory
  * 
  * @param <O> Object type
  * @param <I> Index type
  */
-// TODO: actually, this class should be called PagedIndexFactory?
 @Deprecated
-public abstract class TreeIndexFactory<O, I extends Index> implements IndexFactory<O, I> {
+public abstract class PagedIndexFactory<O, I extends Index> implements IndexFactory<O, I> {
   /**
    * Page file factory.
    */
@@ -59,7 +56,7 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
    * 
    * @param pageFileFactory Page file factory
    */
-  public TreeIndexFactory(PageFileFactory<?> pageFileFactory) {
+  public PagedIndexFactory(PageFileFactory<?> pageFileFactory) {
     super();
     this.pageFileFactory = pageFileFactory;
   }
@@ -74,9 +71,6 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
   protected <N extends ExternalizablePage> PageFile<N> makePageFile(Class<N> cls) {
     return ((PageFileFactory<N>) pageFileFactory).newPageFile(cls);
   }
-
-  @Override
-  abstract public I instantiate(Relation<O> relation);
 
   /**
    * Parameterization class.
@@ -110,6 +104,6 @@ public abstract class TreeIndexFactory<O, I extends Index> implements IndexFacto
     }
 
     @Override
-    protected abstract TreeIndexFactory<O, ?> makeInstance();
+    protected abstract PagedIndexFactory<O, ?> makeInstance();
   }
 }

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.index.Index;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexFactory;
+import de.lmu.ifi.dbs.elki.index.PagedIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.CombinedInsertionStrategy;
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E> & Index> extends TreeIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E> & Index> extends PagedIndexFactory<O, I> {
   /**
    * Fast-insertion parameter. Optional.
    */
@@ -139,7 +139,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O extends NumberVector<?>> extends TreeIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O extends NumberVector<?>> extends PagedIndexFactory.Parameterizer<O> {
     /**
      * Insertion strategy
      */
