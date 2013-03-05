@@ -53,12 +53,12 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   /**
    * Cache size in bytes.
    */
-  protected long cacheSizeBytes;
+  protected int cacheSizeBytes;
 
   /**
    * The maximum number of objects in this cache.
    */
-  protected long cacheSize;
+  protected int cacheSize;
 
   /**
    * The map holding the objects of this cache.
@@ -74,11 +74,11 @@ public class LRUCache<P extends Page> extends AbstractPageFile<P> {
   /**
    * Initializes this cache with the specified parameters.
    * 
-   * @param cacheSizeBytes the maximum number of pages in this cache
+   * @param cacheSizeBytes the maximum number of bytes for this cache
    * @param file the underlying file of this cache, if a page is dropped it is
    *        written to the file
    */
-  public LRUCache(long cacheSizeBytes, PageFile<P> file) {
+  public LRUCache(int cacheSizeBytes, PageFile<P> file) {
     this.file = file;
     this.cacheSizeBytes = cacheSizeBytes;
   }
