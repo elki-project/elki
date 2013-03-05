@@ -31,10 +31,11 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.In
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
 public class XTreeFactory<O extends NumberVector<?>> extends XTreeBaseFactory<O, XTreeNode, SpatialEntry, XTreeIndex<O>> {
-  public XTreeFactory(String fileName, int pageSize, long cacheSize, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
-    super(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+  public XTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
+    super(pageFileFactory, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
   }
 
   @Override
@@ -54,7 +55,7 @@ public class XTreeFactory<O extends NumberVector<?>> extends XTreeBaseFactory<O,
   public static class Parameterizer<O extends NumberVector<?>> extends XTreeBaseFactory.Parameterizer<O> {
     @Override
     protected XTreeFactory<O> makeInstance() {
-      return new XTreeFactory<O>(fileName, pageSize, cacheSize, bulkSplitter, insertionStrategy, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+      return new XTreeFactory<O>(pageFileFactory, bulkSplitter, insertionStrategy, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
     }
   }
 }
