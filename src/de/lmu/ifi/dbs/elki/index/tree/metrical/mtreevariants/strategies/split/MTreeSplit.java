@@ -29,10 +29,11 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
@@ -59,25 +60,36 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * @return an assignment that holds a balanced partition of the entries of the
    *         specified node
    */
-  Assignments<D, E> balancedPartition(N node, DBID routingObject1, DBID routingObject2, DistanceQuery<O, D> distanceFunction) {
+  Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E> tree, N node, DBID routingObject1, DBID routingObject2) {
     BitSet assigned = new BitSet(node.getNumEntries());
     List<E> assigned1 = new ArrayList<>(node.getCapacity());
     List<E> assigned2 = new ArrayList<>(node.getCapacity());
 
-    D currentCR1 = distanceFunction.nullDistance();
-    D currentCR2 = distanceFunction.nullDistance();
+    D currentCR1 = tree.getDistanceFactory().nullDistance();
+    D currentCR2 = tree.getDistanceFactory().nullDistance();
 
     // determine the nearest neighbors
     List<DistanceEntry<D, E>> list1 = new ArrayList<>();
     List<DistanceEntry<D, E>> list2 = new ArrayList<>();
     for (int i = 0; i < node.getNumEntries(); i++) {
-      DBID id = node.getEntry(i).getRoutingObjectID();
+      final E ent = node.getEntry(i);
+      DBID id = ent.getRoutingObjectID();
+      if (DBIDUtil.equal(id, routingObject1)) {
+        ent.setParentDistance(tree.getDistanceFactory().nullDistance());
+        assigned1.add(ent);
+        continue;
+      }
+      if (DBIDUtil.equal(id, routingObject2)) {
+        ent.setParentDistance(tree.getDistanceFactory().nullDistance());
+        assigned2.add(ent);
+        continue;
+      }
       // determine the distance of o to o1 / o2
-      D d1 = distanceFunction.distance(routingObject1, id);
-      D d2 = distanceFunction.distance(routingObject2, id);
+      D d1 = tree.distance(routingObject1, id);
+      D d2 = tree.distance(routingObject2, id);
 
-      list1.add(new DistanceEntry<>(node.getEntry(i), d1, i));
-      list2.add(new DistanceEntry<>(node.getEntry(i), d2, i));
+      list1.add(new DistanceEntry<>(ent, d1, i));
+      list2.add(new DistanceEntry<>(ent, d2, i));
     }
     Collections.sort(list1, Collections.reverseOrder());
     Collections.sort(list2, Collections.reverseOrder());
@@ -125,7 +137,9 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
   /**
    * Returns the assignments of this split.
    * 
+   * @param tree Tree to use
+   * @param node Node to split
    * @return the assignments of this split
    */
-  abstract public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction);
+  abstract public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node);
 }

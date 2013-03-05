@@ -28,10 +28,8 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
@@ -326,44 +324,17 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   }
 
   /**
-   * Sorts the entries of the specified node according to their minimum distance
-   * to the specified objects.
-   * 
-   * @param node the node
-   * @param ids the ids of the objects
-   * @return a list of the sorted entries
-   */
-  protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBIDs ids) {
-    List<DistanceEntry<D, E>> result = new ArrayList<>();
-
-    for (int i = 0; i < node.getNumEntries(); i++) {
-      E entry = node.getEntry(i);
-      D radius = entry.getCoveringRadius();
-
-      D minMinDist = getDistanceFactory().infiniteDistance();
-      for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        D distance = distanceQuery.distance(entry.getRoutingObjectID(), iter);
-        D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
-        minMinDist = DistanceUtil.min(minMinDist, minDist);
-      }
-      result.add(new DistanceEntry<>(entry, minMinDist, i));
-    }
-
-    Collections.sort(result);
-    return result;
-  }
-
-  /**
    * Returns the distance between the two specified ids.
    * 
    * @param id1 the first id
    * @param id2 the second id
    * @return the distance between the two specified ids
    */
-  protected final D distance(DBID id1, DBID id2) {
+  public final D distance(DBIDRef id1, DBIDRef id2) {
     if (id1 == null || id2 == null) {
       return getDistanceFactory().undefinedDistance();
     }
+    statistics.countDistanceCalculation();
     return distanceQuery.distance(id1, id2);
   }
 
@@ -387,7 +358,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   private SplitResult split(N node) {
     // do the split
     // todo split stratgey
-    Assignments<D, E> assignments = splitStrategy.split(node, distanceQuery);
+    Assignments<D, E> assignments = splitStrategy.split(this, node);
     final N newNode;
     if (node.isLeaf()) {
       newNode = createNewLeafNode();

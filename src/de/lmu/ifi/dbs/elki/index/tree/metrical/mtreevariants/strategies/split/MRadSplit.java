@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -64,12 +64,12 @@ public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, 
    * and, after partitioning the set of entries, promotes the pair of objects
    * for which the sum of covering radiuses is minimum.
    * 
+   * @param tree Tree to use
    * @param node the node to be split
-   * @param distanceFunction the distance function
    */
   @Override
-  public Assignments<D, E> split(N node, DistanceQuery<O, D> distanceFunction) {
-    D miSumCR = distanceFunction.infiniteDistance();
+  public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {
+    D miSumCR = tree.getDistanceFactory().infiniteDistance();
 
     Assignments<D, E> bestAssignment = null;
     for (int i = 0; i < node.getNumEntries(); i++) {
@@ -78,7 +78,7 @@ public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, 
       for (int j = i + 1; j < node.getNumEntries(); j++) {
         DBID id2 = node.getEntry(j).getRoutingObjectID();
         // ... for each pair do testPartition...
-        Assignments<D, E> currentAssignments = balancedPartition(node, id1, id2, distanceFunction);
+        Assignments<D, E> currentAssignments = balancedPartition(tree, node, id1, id2);
 
         D sumCR = currentAssignments.getFirstCoveringRadius().plus(currentAssignments.getSecondCoveringRadius());
         if (sumCR.compareTo(miSumCR) < 0) {
