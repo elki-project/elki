@@ -26,12 +26,18 @@ package de.lmu.ifi.dbs.elki.index.projected;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.projection.LatLngToECEFProjection;
 import de.lmu.ifi.dbs.elki.data.projection.Projection;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.SpatialPrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction;
@@ -46,6 +52,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -191,9 +198,10 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      * Constructor.
      * 
      * @param inner Inner index
+     * @param materialize Flag to materialize the projection
      */
-    public Factory(IndexFactory<O, ?> inner) {
-      super(new LatLngToECEFProjection<O>(), inner);
+    public Factory(IndexFactory<O, ?> inner, boolean materialize) {
+      super(new LatLngToECEFProjection<O>(), inner, materialize);
     }
 
     @Override
@@ -202,7 +210,17 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         return null;
       }
       proj.initialize(relation.getDataTypeInformation());
-      ProjectedView<O, O> view = new ProjectedView<>(relation, proj);
+      final Relation<O> view;
+      if (materialize) {
+        DBIDs ids = relation.getDBIDs();
+        WritableDataStore<O> content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, proj.getOutputDataTypeInformation().getRestrictionClass());
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          content.put(iter, proj.project(relation.get(iter)));
+        }
+        view = new MaterializedRelation<>(relation.getDatabase(), proj.getOutputDataTypeInformation(), ids, "projected data", content);
+      } else {
+        view = new ProjectedView<>(relation, proj);
+      }
       Index inneri = inner.instantiate(view);
       if (inneri == null) {
         return null;
@@ -224,6 +242,11 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
        */
       IndexFactory<O, ?> inner;
 
+      /**
+       * Whether to use a materialized view, or a virtual view.
+       */
+      boolean materialize = false;
+
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
@@ -231,11 +254,15 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
         if (config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }
+        Flag materializeF = new Flag(ProjectedIndex.Factory.Parameterizer.MATERIALIZE_FLAG);
+        if (config.grab(materializeF)) {
+          materialize = materializeF.isTrue();
+        }
       }
 
       @Override
       protected Factory<O> makeInstance() {
-        return new Factory<>(inner);
+        return new Factory<>(inner, materialize);
       }
     }
   }

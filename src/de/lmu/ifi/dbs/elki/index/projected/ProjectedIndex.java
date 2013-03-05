@@ -27,8 +27,13 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
@@ -36,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.ProjectedView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -48,6 +54,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -327,15 +334,22 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     IndexFactory<I, ?> inner;
 
     /**
+     * Whether to use a materialized view, or a virtual view.
+     */
+    boolean materialize = false;
+
+    /**
      * Constructor.
      * 
      * @param proj Projection
      * @param inner Inner index
+     * @param materialize Flag for materializing
      */
-    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner) {
+    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner, boolean materialize) {
       super();
       this.proj = proj;
       this.inner = inner;
+      this.materialize = materialize;
     }
 
     @Override
@@ -345,8 +359,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       }
       // FIXME: non re-entrant!
       proj.initialize(relation.getDataTypeInformation());
-      ProjectedView<O, I> view = new ProjectedView<>(relation, proj);
-      Index inneri = inner.instantiate(view);
+      Index inneri = null;
+      Relation<I> view = null;
+      if (materialize) {
+        DBIDs ids = relation.getDBIDs();
+        WritableDataStore<I> content = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, proj.getOutputDataTypeInformation().getRestrictionClass());
+        for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          content.put(iter, proj.project(relation.get(iter)));
+        }
+        view = new MaterializedRelation<>(relation.getDatabase(), proj.getOutputDataTypeInformation(), ids, "projected data", content);
+      } else {
+        view = new ProjectedView<>(relation, proj);
+      }
+      inneri = inner.instantiate(view);
       if (inneri == null) {
         return null;
       }
@@ -378,6 +403,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       public static final OptionID INDEX_ID = new OptionID("projindex.inner", "Index to use on the projected data.");
 
       /**
+       * Option ID for materialization.
+       */
+      public static final OptionID MATERIALIZE_FLAG = new OptionID("projindex.materialize", "Flag to materialize the projected data.");
+
+      /**
        * Projection to use.
        */
       Projection<O, I> proj;
@@ -386,6 +416,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
        * Inner index factory.
        */
       IndexFactory<I, ?> inner;
+
+      /**
+       * Whether to use a materialized view, or a virtual view.
+       */
+      boolean materialize = false;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -398,11 +433,15 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         if (config.grab(innerP)) {
           inner = innerP.instantiateClass(config);
         }
+        Flag materializeF = new Flag(MATERIALIZE_FLAG);
+        if (config.grab(materializeF)) {
+          materialize = materializeF.isTrue();
+        }
       }
 
       @Override
       protected Factory<O, I> makeInstance() {
-        return new Factory<>(proj, inner);
+        return new Factory<>(proj, inner, materialize);
       }
     }
   }
