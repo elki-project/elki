@@ -54,6 +54,8 @@ import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -72,6 +74,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "J. L. Bentley", title = "Multidimensional binary search trees used for associative searching", booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", url = "http://dx.doi.org/10.1145/361002.361007")
 public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
   /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(MinimalisticMemoryKDTree.class);
+
+  /**
    * The actual "tree" as a sorted array.
    */
   ArrayModifiableDBIDs sorted = null;
@@ -82,12 +89,30 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
   int dims = -1;
 
   /**
+   * Counter for comparisons.
+   */
+  final Counter objaccess;
+
+  /**
+   * Counter for distance computations.
+   */
+  final Counter distcalc;
+
+  /**
    * Constructor.
    * 
    * @param relation Relation to index
    */
   public MinimalisticMemoryKDTree(Relation<O> relation) {
     super(relation);
+    if (LOG.isStatistics()) {
+      String prefix = this.getClass().getName();
+      this.objaccess = LOG.newCounter(prefix + ".objaccess");
+      this.distcalc = LOG.newCounter(prefix + ".distancecalcs");
+    } else {
+      this.objaccess = null;
+      this.distcalc = null;
+    }
   }
 
   @Override
@@ -134,7 +159,30 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
 
   @Override
   public void logStatistics() {
-    // TODO: anything sensible to log?
+    if (objaccess != null) {
+      LOG.statistics(objaccess);
+    }
+    if (distcalc != null) {
+      LOG.statistics(distcalc);
+    }
+  }
+
+  /**
+   * Count a single object access.
+   */
+  protected void countObjectAccess() {
+    if (objaccess != null) {
+      objaccess.increment();
+    }
+  }
+
+  /**
+   * Count a distance computation.
+   */
+  protected void countDistanceComputation() {
+    if (distcalc != null) {
+      distcalc.increment();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -217,6 +265,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
       final int middle = (left + right) >>> 1;
       iter.seek(middle);
       O split = relation.get(iter);
+      countObjectAccess();
 
       // Distance to axis:
       final double delta = split.doubleValue(axis) - query.doubleValue(axis);
@@ -230,6 +279,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
       // process first, then descend both sides.
       if (onleft && onright) {
         double dist = norm.doubleDistance(query, split);
+        countDistanceComputation();
         if (dist <= maxdist) {
           iter.seek(middle);
           knns.add(dist, iter);
@@ -249,6 +299,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
           // Look at splitting element (unless already above):
           if (Math.abs(delta) <= maxdist) {
             double dist = norm.doubleDistance(query, split);
+            countDistanceComputation();
             if (dist <= maxdist) {
               iter.seek(middle);
               knns.add(dist, iter);
@@ -265,6 +316,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
           // Look at splitting element (unless already above):
           if (Math.abs(delta) <= maxdist) {
             double dist = norm.doubleDistance(query, split);
+            countDistanceComputation();
             if (dist <= maxdist) {
               iter.seek(middle);
               knns.add(dist, iter);
@@ -326,6 +378,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
       final int middle = (left + right) >>> 1;
       iter.seek(middle);
       O split = relation.get(iter);
+      countObjectAccess();
 
       // Distance to axis:
       final double delta = split.doubleValue(axis) - query.doubleValue(axis);
@@ -339,6 +392,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector<?>> extends Abstrac
       // Current object:
       if (close) {
         double dist = norm.doubleDistance(query, split);
+        countDistanceComputation();
         if (dist <= radius) {
           iter.seek(middle);
           res.add(dist, iter);
