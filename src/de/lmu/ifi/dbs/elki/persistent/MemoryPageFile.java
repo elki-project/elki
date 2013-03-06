@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  */
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -89,5 +90,13 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+
+  @Override
+  public void logStatistics() {
+    super.logStatistics();
+    if (LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(this.getClass().getName() + ".numpages", file.size()));
+    }
   }
 }
