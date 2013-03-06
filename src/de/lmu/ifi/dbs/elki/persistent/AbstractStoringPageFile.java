@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.persistent;
 
 import java.util.Stack;
 
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+
 /**
  * Abstract class implementing general methods of a PageFile. A PageFile stores
  * objects that implement the <code>Page</code> interface.
@@ -145,5 +147,13 @@ public abstract class AbstractStoringPageFile<P extends Page> extends AbstractPa
   public boolean initialize(PageHeader header) {
     this.pageSize = header.getPageSize();
     return false;
+  }
+
+  @Override
+  public void logStatistics() {
+    super.logStatistics();
+    if (getLogger().isStatistics()) {
+      getLogger().statistics(new LongStatistic(this.getClass().getName() + ".numpages", nextPageID - emptyPages.size()));
+    }
   }
 }
