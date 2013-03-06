@@ -62,6 +62,8 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -88,6 +90,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeIndex<O> {
   /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(ProjectedIndex.class);
+
+  /**
    * Inner index.
    */
   Index inner;
@@ -113,6 +120,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   boolean norefine;
 
   /**
+   * Count the number of distance refinements computed.
+   */
+  final Counter refinements;
+
+  /**
    * Constructor.
    * 
    * @param relation Relation to index.
@@ -128,6 +140,16 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     this.inner = inner;
     this.proj = proj;
     this.norefine = norefine;
+    this.refinements = LOG.isStatistics() ? LOG.newCounter(this.getClass().getName()+".refinements") : null;
+  }
+  
+  /**
+   * Count a single distance refinement.
+   */
+  private void countRefinement() {
+    if (refinements != null) {
+      refinements.increment();
+    }
   }
 
   @Override
@@ -147,7 +169,10 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
 
   @Override
   public void logStatistics() {
-    // No statistics to log.
+    if (refinements != null) {
+      LOG.statistics(refinements);
+    }
+    inner.logStatistics();
   }
 
   @Override
@@ -272,12 +297,14 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           heap.add(df.doubleDistance(obj, distq.getRelation().get(iter)), iter);
+          countRefinement();
         }
         return (KNNList<D>) heap.toKNNList();
       } else {
         KNNHeap<D> heap = DBIDUtil.newHeap(distq.getDistanceFactory(), k);
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           heap.add(distq.distance(obj, iter), iter);
+          countRefinement();
         }
         return heap.toKNNList();
       }
@@ -333,6 +360,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         ModifiableDoubleDistanceDBIDList olist = new DoubleDistanceDBIDPairList(ilist.size());
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           final double dist = df.doubleDistance(obj, distq.getRelation().get(iter));
+          countRefinement();
           if (dist <= drange) {
             olist.add(dist, iter);
           }
@@ -342,6 +370,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         ModifiableDistanceDBIDList<D> olist = new GenericDistanceDBIDList<>(ilist.size());
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           D dist = distq.distance(obj, iter);
+          countRefinement();
           if (range.compareTo(dist) <= 0) {
             olist.add(dist, iter);
           }
@@ -399,6 +428,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         ModifiableDoubleDistanceDBIDList olist = new DoubleDistanceDBIDPairList(ilist.size());
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           final double dist = df.doubleDistance(obj, distq.getRelation().get(iter));
+          countRefinement();
           olist.add(dist, iter);
         }
         return (DistanceDBIDList<D>) olist;
@@ -406,6 +436,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         ModifiableDistanceDBIDList<D> olist = new GenericDistanceDBIDList<>(ilist.size());
         for (DistanceDBIDListIter<D> iter = ilist.iter(); iter.valid(); iter.advance()) {
           D dist = distq.distance(obj, iter);
+          countRefinement();
           olist.add(dist, iter);
         }
         return olist;
