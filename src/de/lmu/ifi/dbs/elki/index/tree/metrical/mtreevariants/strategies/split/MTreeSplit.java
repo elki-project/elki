@@ -51,6 +51,35 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  */
 public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> {
   /**
+   * Compute the pairwise distances in the given node.
+   * 
+   * @param tree Tree
+   * @param node Node
+   * @return Distance matrix
+   */
+  protected ArrayList<D> computeDistanceMatrix(AbstractMTree<O, D, N, E> tree, N node) {
+    final int n = node.getNumEntries();
+    final D df = tree.getDistanceFactory();
+    ArrayList<D> distancematrix = new ArrayList<>(n * n);
+    // Build distance matrix
+    for(int i = 0; i < n; i++) {
+      E ei = node.getEntry(i);
+      for(int j = 0; j < n; j++) {
+        if(i == j) {
+          distancematrix.add(df.nullDistance());
+        }
+        else if(i < j) {
+          distancematrix.add(tree.distance(ei, node.getEntry(j)));
+        }
+        else { // i > j
+          distancematrix.add(distancematrix.get(j * n + i));
+        }
+      }
+    }
+    return distancematrix;
+  }
+
+  /**
    * Creates a balanced partition of the entries of the specified node.
    * 
    * @param tree the tree to perform the split in
@@ -72,14 +101,14 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
     List<DistanceEntry<D, E>> list2 = new ArrayList<>();
 
     // determine the nearest neighbors
-    for (int i = 0; i < node.getNumEntries(); i++) {
+    for(int i = 0; i < node.getNumEntries(); i++) {
       final E ent = node.getEntry(i);
       DBID id = ent.getRoutingObjectID();
-      if (DBIDUtil.equal(id, routingObject1)) {
+      if(DBIDUtil.equal(id, routingObject1)) {
         assigned1.add(new DistanceEntry<>(ent, tree.getDistanceFactory().nullDistance(), i));
         continue;
       }
-      if (DBIDUtil.equal(id, routingObject2)) {
+      if(DBIDUtil.equal(id, routingObject2)) {
         assigned2.add(new DistanceEntry<>(ent, tree.getDistanceFactory().nullDistance(), i));
         continue;
       }
@@ -93,10 +122,10 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
     Collections.sort(list1, Collections.reverseOrder());
     Collections.sort(list2, Collections.reverseOrder());
 
-    for (int i = 2; i < node.getNumEntries(); i++) {
+    for(int i = 2; i < node.getNumEntries(); i++) {
       currentCR1 = assignNN(assigned, assigned1, list1, currentCR1, node.isLeaf());
       i++;
-      if (i < node.getNumEntries()) {
+      if(i < node.getNumEntries()) {
         currentCR2 = assignNN(assigned, assigned2, list2, currentCR2, node.isLeaf());
       }
     }
@@ -118,15 +147,16 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
   private D assignNN(BitSet assigned, List<DistanceEntry<D, E>> assigned1, List<DistanceEntry<D, E>> list, D currentCR, boolean isLeaf) {
     // Remove last unassigned:
     DistanceEntry<D, E> distEntry = list.remove(list.size() - 1);
-    while (assigned.get(distEntry.getIndex())) {
+    while(assigned.get(distEntry.getIndex())) {
       distEntry = list.remove(list.size() - 1);
     }
     assigned1.add(distEntry);
     assigned.set(distEntry.getIndex());
 
-    if (isLeaf) {
+    if(isLeaf) {
       return DistanceUtil.max(currentCR, distEntry.getDistance());
-    } else {
+    }
+    else {
       return DistanceUtil.max(currentCR, distEntry.getDistance().plus((distEntry.getEntry()).getCoveringRadius()));
     }
   }
