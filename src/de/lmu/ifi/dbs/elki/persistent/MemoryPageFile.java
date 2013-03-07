@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * A memory based implementation of a PageFile that simulates I/O-access.<br>
