@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -70,15 +71,12 @@ public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, 
   @Override
   public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {
     D miSumCR = tree.getDistanceFactory().infiniteDistance();
+    ArrayList<D> distanceMatrix = computeDistanceMatrix(tree, node);
 
     Assignments<D, E> bestAssignment = null;
     for (int i = 0; i < node.getNumEntries(); i++) {
-      DBID id1 = node.getEntry(i).getRoutingObjectID();
-
       for (int j = i + 1; j < node.getNumEntries(); j++) {
-        DBID id2 = node.getEntry(j).getRoutingObjectID();
-        // ... for each pair do testPartition...
-        Assignments<D, E> currentAssignments = balancedPartition(tree, node, id1, id2);
+        Assignments<D, E> currentAssignments = balancedPartition(tree, node, i, j, distanceMatrix);
 
         D sumCR = currentAssignments.getFirstCoveringRadius().plus(currentAssignments.getSecondCoveringRadius());
         if (sumCR.compareTo(miSumCR) < 0) {

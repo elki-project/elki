@@ -133,6 +133,63 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
   }
 
   /**
+   * Creates a balanced partition of the entries of the specified node.
+   * 
+   * @param tree the tree to perform the split in
+   * @param node the node to be split
+   * @param routingEntNum1 the entry number of the first routing object
+   * @param routingEntNum2 the entry number of the second routing object
+   * @param distanceMatrix precomputed distance matrix to use
+   * @return an assignment that holds a balanced partition of the entries of the
+   *         specified node
+   */
+  Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E> tree, N node, int routingEntNum1, int routingEntNum2, ArrayList<D> distanceMatrix) {
+    final int n = node.getNumEntries();
+    BitSet assigned = new BitSet(node.getNumEntries());
+    List<DistanceEntry<D, E>> assigned1 = new ArrayList<>(node.getCapacity());
+    List<DistanceEntry<D, E>> assigned2 = new ArrayList<>(node.getCapacity());
+
+    D currentCR1 = tree.getDistanceFactory().nullDistance();
+    D currentCR2 = tree.getDistanceFactory().nullDistance();
+
+    List<DistanceEntry<D, E>> list1 = new ArrayList<>();
+    List<DistanceEntry<D, E>> list2 = new ArrayList<>();
+
+    DBID routingObject1 = null, routingObject2 = null;
+    // determine the nearest neighbors
+    for(int i = 0; i < node.getNumEntries(); i++) {
+      final E ent = node.getEntry(i);
+      if(i == routingEntNum1) {
+        routingObject1 = ent.getRoutingObjectID();
+        assigned1.add(new DistanceEntry<>(ent, tree.getDistanceFactory().nullDistance(), i));
+        continue;
+      }
+      if(i == routingEntNum2) {
+        routingObject2 = ent.getRoutingObjectID();
+        assigned2.add(new DistanceEntry<>(ent, tree.getDistanceFactory().nullDistance(), i));
+        continue;
+      }
+      // Look up the distances of o to o1 / o2
+      D d1 = distanceMatrix.get(i * n + routingEntNum1);
+      D d2 = distanceMatrix.get(i * n + routingEntNum2);
+
+      list1.add(new DistanceEntry<>(ent, d1, i));
+      list2.add(new DistanceEntry<>(ent, d2, i));
+    }
+    Collections.sort(list1, Collections.reverseOrder());
+    Collections.sort(list2, Collections.reverseOrder());
+
+    for(int i = 2; i < node.getNumEntries(); i++) {
+      currentCR1 = assignNN(assigned, assigned1, list1, currentCR1, node.isLeaf());
+      i++;
+      if(i < node.getNumEntries()) {
+        currentCR2 = assignNN(assigned, assigned2, list2, currentCR2, node.isLeaf());
+      }
+    }
+    return new Assignments<>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
+  }
+
+  /**
    * Assigns the first object of the specified list to the first assignment that
    * it is not yet assigned to the second assignment.
    * 
