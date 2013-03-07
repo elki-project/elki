@@ -91,12 +91,4 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   protected Logging getLogger() {
     return LOG;
   }
-
-  @Override
-  public void logStatistics() {
-    super.logStatistics();
-    if (LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(this.getClass().getName() + ".numpages", file.size()));
-    }
-  }
 }
