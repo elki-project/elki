@@ -84,7 +84,7 @@ public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnec
       }
     }
 
-    return first;
+    return invokeFilters(first);
   }
 
   @Override
