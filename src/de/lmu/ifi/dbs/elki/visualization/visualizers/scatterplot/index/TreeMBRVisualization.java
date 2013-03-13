@@ -96,8 +96,8 @@ public class TreeMBRVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
-    for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
+    Collection<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+    for(AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree : trees) {
       if(tree instanceof Result) {
         Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
@@ -126,7 +126,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
     /**
      * The tree we visualize
      */
-    protected AbstractRStarTree<N, E> tree;
+    protected AbstractRStarTree<N, E, ?> tree;
 
     /**
      * Constructor.
@@ -182,7 +182,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
      * @param entry Current entry
      * @param depth Current depth
      */
-    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth) {
+    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractRStarTree<? extends N, E, ?> rtree, E entry, int depth) {
       SpatialComparable mbr = entry;
 
       if(settings.fill) {

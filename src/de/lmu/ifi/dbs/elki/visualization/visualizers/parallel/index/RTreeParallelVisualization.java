@@ -96,8 +96,8 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
-    ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
-    for(AbstractRStarTree<RStarTreeNode, SpatialEntry> tree : trees) {
+    ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+    for(AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree : trees) {
       if(tree instanceof Result) {
         Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
         for(ParallelPlotProjector<?> p : ps) {
@@ -125,7 +125,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
     /**
      * The tree we visualize
      */
-    protected AbstractRStarTree<N, E> tree;
+    protected AbstractRStarTree<N, E, ?> tree;
 
     /**
      * Constructor.
@@ -201,7 +201,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      * @param entry Current entry
      * @param depth Current depth
      */
-    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E> rtree, E entry, int depth, int step) {
+    private void visualizeRTreeEntry(SVGPlot svgp, Element layer, ProjectionParallel proj, AbstractRStarTree<? extends N, E, ?> rtree, E entry, int depth, int step) {
       final int dim = proj.getVisibleDimensions();
       double[] min = proj.fastProjectDataToRenderSpace(SpatialUtil.getMin(entry));
       double[] max = proj.fastProjectDataToRenderSpace(SpatialUtil.getMax(entry));

@@ -27,10 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
@@ -44,31 +41,21 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * 
  * @param <O> Object type
  */
-public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>> {
+public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, AbstractRTreeSettings> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
-   * @param bulkSplitter Bulk loading strategy
-   * @param insertionStrategy the strategy to find the insertion child
-   * @param nodeSplitter the strategy for splitting nodes.
-   * @param overflowTreatment the strategy to use for overflow treatment
-   * @param minimumFill the relative minimum fill
+   * @param settings Tree settings
    */
-  public RStarTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
-    super(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+  public RStarTreeFactory(PageFileFactory<?> pageFileFactory, AbstractRTreeSettings settings) {
+    super(pageFileFactory, settings);
   }
 
   @Override
   public RStarTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<RStarTreeNode> pagefile = makePageFile(getNodeClass());
-    RStarTreeIndex<O> index = new RStarTreeIndex<>(relation, pagefile);
-    index.setBulkStrategy(bulkSplitter);
-    index.setInsertionStrategy(insertionStrategy);
-    index.setNodeSplitStrategy(nodeSplitter);
-    index.setOverflowTreatment(overflowTreatment);
-    index.setMinimumFill(minimumFill);
-    return index;
+    return new RStarTreeIndex<>(relation, pagefile, settings);
   }
 
   protected Class<RStarTreeNode> getNodeClass() {
@@ -81,11 +68,18 @@ public class RStarTreeFactory<O extends NumberVector<?>> extends AbstractRStarTr
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector<?>> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
     @Override
     protected RStarTreeFactory<O> makeInstance() {
-      return new RStarTreeFactory<>(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+      return new RStarTreeFactory<>(pageFileFactory, settings);
+    }
+
+    @Override
+    protected AbstractRTreeSettings createSettings() {
+      return new AbstractRTreeSettings();
     }
   }
 }

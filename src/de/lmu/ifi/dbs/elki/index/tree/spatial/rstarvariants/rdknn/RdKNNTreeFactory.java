@@ -29,10 +29,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -52,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNNode<D>, RdKNNEntry<D>, RdKNNTree<O, D>> {
+public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNNode<D>, RdKNNEntry<D>, RdKNNTree<O, D>, AbstractRTreeSettings> {
   /**
    * Parameter for k
    */
@@ -90,8 +87,8 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
    * @param overflowTreatment the strategy to use for overflow treatment
    * @param minimumFill the relative minimum fill
    */
-  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
-    super(pageFileFactory, bulkSplitter, insertionStrategy, nodeSplitter, overflowTreatment, minimumFill);
+  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, AbstractRTreeSettings settings, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+    super(pageFileFactory, settings);
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;
   }
@@ -99,12 +96,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
   @Override
   public RdKNNTree<O, D> instantiate(Relation<O> relation) {
     PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
-    RdKNNTree<O, D> index = new RdKNNTree<>(relation, pagefile, k_max, distanceFunction, distanceFunction.instantiate(relation));
-    index.setBulkStrategy(bulkSplitter);
-    index.setInsertionStrategy(insertionStrategy);
-    index.setNodeSplitStrategy(nodeSplitter);
-    index.setOverflowTreatment(overflowTreatment);
-    index.setMinimumFill(minimumFill);
+    RdKNNTree<O, D> index = new RdKNNTree<>(relation, pagefile, settings, k_max, distanceFunction, distanceFunction.instantiate(relation));
     return index;
   }
 
@@ -119,7 +111,7 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory.Parameterizer<O> {
+  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
     /**
      * Parameter k.
      */
@@ -135,19 +127,24 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
       super.makeOptions(config);
       IntParameter k_maxP = new IntParameter(K_ID);
       k_maxP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(k_maxP)) {
+      if (config.grab(k_maxP)) {
         k_max = k_maxP.intValue();
       }
 
       ObjectParameter<SpatialPrimitiveDistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
-      if(config.grab(distanceFunctionP)) {
+      if (config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
     }
 
     @Override
     protected RdKNNTreeFactory<O, D> makeInstance() {
-      return new RdKNNTreeFactory<>(pageFileFactory, bulkSplitter, insertionStrategy, k_max, distanceFunction, nodeSplitter, overflowTreatment, minimumFill);
+      return new RdKNNTreeFactory<>(pageFileFactory, settings, k_max, distanceFunction);
+    }
+
+    @Override
+    protected AbstractRTreeSettings createSettings() {
+      return new AbstractRTreeSettings();
     }
   }
 }

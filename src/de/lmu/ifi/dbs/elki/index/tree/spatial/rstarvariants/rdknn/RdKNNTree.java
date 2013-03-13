@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -85,7 +86,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> Distance type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
-public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
+public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>, AbstractRTreeSettings> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * The logger for this class.
    */
@@ -112,19 +113,22 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   protected KNNQuery<O, D> knnQuery;
 
   /**
-   * The realtion we query.
+   * The relation we query.
    */
   private Relation<O> relation;
 
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
+   * @param pagefile Data storage
+   * @param settings Tree settings
    * @param k_max max k
    * @param distanceFunction distance function
    * @param distanceQuery distance query
    */
-  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery) {
-    super(pagefile);
+  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, AbstractRTreeSettings settings, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery) {
+    super(pagefile, settings);
     this.relation = relation;
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;

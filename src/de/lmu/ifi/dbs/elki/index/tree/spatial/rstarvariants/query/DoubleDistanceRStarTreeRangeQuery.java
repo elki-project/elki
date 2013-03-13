@@ -60,7 +60,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<?, ?> tree;
+  protected final AbstractRStarTree<?, ?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -74,7 +74,7 @@ public class DoubleDistanceRStarTreeRangeQuery<O extends SpatialComparable> exte
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public DoubleDistanceRStarTreeRangeQuery(AbstractRStarTree<?, ?> tree, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
+  public DoubleDistanceRStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
     super(distanceQuery);
     this.tree = tree;
     this.distanceFunction = distanceFunction;

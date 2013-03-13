@@ -59,7 +59,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<?, ?> tree;
+  protected final AbstractRStarTree<?, ?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -72,7 +72,7 @@ public class GenericRStarTreeRangeQuery<O extends SpatialComparable, D extends D
    * @param tree Index to use
    * @param distanceQuery Distance query to use
    */
-  public GenericRStarTreeRangeQuery(AbstractRStarTree<?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
+  public GenericRStarTreeRangeQuery(AbstractRStarTree<?, ?, ?> tree, SpatialDistanceQuery<O, D> distanceQuery) {
     super(distanceQuery);
     this.tree = tree;
     this.distanceFunction = distanceQuery.getDistanceFunction();

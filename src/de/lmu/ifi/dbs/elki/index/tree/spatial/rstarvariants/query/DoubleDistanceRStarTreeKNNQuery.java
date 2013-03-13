@@ -73,7 +73,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
   /**
    * The index to use
    */
-  protected final AbstractRStarTree<?, ?> tree;
+  protected final AbstractRStarTree<?, ?, ?> tree;
 
   /**
    * Spatial primitive distance function
@@ -87,7 +87,7 @@ public class DoubleDistanceRStarTreeKNNQuery<O extends SpatialComparable> extend
    * @param distanceQuery Distance query to use
    * @param distanceFunction Distance function
    */
-  public DoubleDistanceRStarTreeKNNQuery(AbstractRStarTree<?, ?> tree, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
+  public DoubleDistanceRStarTreeKNNQuery(AbstractRStarTree<?, ?, ?> tree, DistanceQuery<O, DoubleDistance> distanceQuery, SpatialPrimitiveDoubleDistanceFunction<? super O> distanceFunction) {
     super(distanceQuery);
     this.tree = tree;
     this.distanceFunction = distanceFunction;

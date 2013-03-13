@@ -49,5 +49,5 @@ public interface OverflowTreatment {
    * @param path Path
    * @return true when already handled (e.g. by reinserting)
    */
-  <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E> tree, N node, IndexTreePath<E> path);
+  <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E, ?> tree, N node, IndexTreePath<E> path);
 }

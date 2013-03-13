@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -42,7 +43,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @apiviz.has FlatRStarTreeNode oneway - - contains
  */
-public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialEntry> {
+public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialEntry, AbstractRTreeSettings> {
   /**
    * The logger for this class.
    */
@@ -57,9 +58,10 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
    * Constructor.
    * 
    * @param pagefile Page file
+   * @param settings Tree settings
    */
-  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile) {
-    super(pagefile);
+  public FlatRStarTree(PageFile<FlatRStarTreeNode> pagefile, AbstractRTreeSettings settings) {
+    super(pagefile, settings);
   }
 
   /**

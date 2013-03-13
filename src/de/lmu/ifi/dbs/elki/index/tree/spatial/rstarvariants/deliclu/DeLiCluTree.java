@@ -29,6 +29,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -43,7 +44,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * 
  * @apiviz.has DeLiCluNode oneway - - contains
  */
-public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
+public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, AbstractRTreeSettings> {
   /**
    * The logger for this class.
    */
@@ -58,9 +59,10 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry> {
    * Constructor.
    * 
    * @param pagefile Page file
+   * @param settings Settings
    */
-  public DeLiCluTree(PageFile<DeLiCluNode> pagefile) {
-    super(pagefile);
+  public DeLiCluTree(PageFile<DeLiCluNode> pagefile, AbstractRTreeSettings settings) {
+    super(pagefile, settings);
   }
 
   /**
