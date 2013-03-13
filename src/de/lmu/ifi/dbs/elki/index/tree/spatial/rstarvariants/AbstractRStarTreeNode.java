@@ -133,7 +133,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
    * Tests this node (for debugging purposes).
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(AbstractRStarTree<N, E> tree) {
+  public final void integrityCheck(AbstractRStarTree<N, E, ?> tree) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {

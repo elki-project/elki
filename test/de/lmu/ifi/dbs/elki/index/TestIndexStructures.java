@@ -154,7 +154,7 @@ public class TestIndexStructures implements JUnit4Test {
   public void testRStarTreeFast() {
     ListParameterization spatparams = new ListParameterization();
     spatparams.addParameter(StaticArrayDatabase.INDEX_ID, RStarTreeFactory.class);
-    spatparams.addParameter(AbstractRStarTreeFactory.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
+    spatparams.addParameter(AbstractRStarTreeFactory.Parameterizer.INSERTION_STRATEGY_ID, ApproximativeLeastOverlapInsertionStrategy.class);
     spatparams.addParameter(ApproximativeLeastOverlapInsertionStrategy.Parameterizer.INSERTION_CANDIDATES_ID, 1);
     spatparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(spatparams, DoubleDistanceRStarTreeKNNQuery.class, DoubleDistanceRStarTreeRangeQuery.class);

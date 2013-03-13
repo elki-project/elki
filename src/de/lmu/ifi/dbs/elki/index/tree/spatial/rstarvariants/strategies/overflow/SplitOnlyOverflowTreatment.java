@@ -48,7 +48,7 @@ public class SplitOnlyOverflowTreatment implements OverflowTreatment {
   }
 
   @Override
-  public <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E> tree, N node, IndexTreePath<E> path) {
+  public <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E, ?> tree, N node, IndexTreePath<E> path) {
     return false;
   }
 

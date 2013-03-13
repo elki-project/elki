@@ -748,8 +748,8 @@ public final class GeoUtil {
     lat = Math.toRadians(lat);
     lng = Math.toRadians(lng);
     // Sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final double clat = Math.cos(lat), slat = Math.sin(lat); //, clat);
+    final double clng = Math.cos(lng), slng = Math.sin(lng); //, clng);
 
     return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
   }

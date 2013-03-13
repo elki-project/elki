@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar;
 
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -44,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("R*-Tree")
 @Description("Balanced index structure based on bounding rectangles.")
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
-public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
+public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, AbstractRTreeSettings> {
   /**
    * The logger for this class.
    */
@@ -54,9 +55,10 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry> {
    * Constructor.
    * 
    * @param pagefile Page file
+   * @param settings Settings class
    */
-  public RStarTree(PageFile<RStarTreeNode> pagefile) {
-    super(pagefile);
+  public RStarTree(PageFile<RStarTreeNode> pagefile, AbstractRTreeSettings settings) {
+    super(pagefile, settings);
   }
 
   @Override

@@ -46,13 +46,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
@@ -70,15 +63,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.landmark
  * @apiviz.has AbstractRStarTreeNode oneway - - contains
- * @apiviz.composedOf BulkSplit
- * @apiviz.composedOf SplitStrategy
- * @apiviz.composedOf InsertionStrategy
- * @apiviz.composedOf OverflowTreatment
+ * @apiviz.composedOf RTreeSettings
  * 
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends SpatialIndexTree<N, E> {
+public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends AbstractRTreeSettings> extends SpatialIndexTree<N, E> {
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */
@@ -100,90 +90,19 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   E lastInsertedEntry = null;
 
   /**
-   * The strategy for bulk load.
+   * Settings class.
    */
-  protected BulkSplit bulkSplitter;
-
-  /**
-   * The split strategy.
-   */
-  protected SplitStrategy nodeSplitter = TopologicalSplitter.STATIC;
-
-  /**
-   * The insertion strategy to use.
-   */
-  protected InsertionStrategy insertionStrategy = LeastOverlapInsertionStrategy.STATIC;
-
-  /**
-   * Overflow treatment.
-   */
-  protected OverflowTreatment overflowTreatment = LimitedReinsertOverflowTreatment.RSTAR_OVERFLOW;
-
-  /**
-   * Relative minimum fill.
-   */
-  protected double relativeMinFill = 0.4;
+  protected S settings;
 
   /**
    * Constructor.
    * 
    * @param pagefile Page file
+   * @param settings Settings
    */
-  public AbstractRStarTree(PageFile<N> pagefile) {
+  public AbstractRStarTree(PageFile<N> pagefile, S settings) {
     super(pagefile);
-  }
-
-  /**
-   * Set the bulk loading strategy.
-   * 
-   * @param bulkSplitter Bulk loading strategy
-   */
-  public void setBulkStrategy(BulkSplit bulkSplitter) {
-    this.bulkSplitter = bulkSplitter;
-  }
-
-  /**
-   * Set the node splitting strategy.
-   * 
-   * @param nodeSplitter the split strategy to set
-   */
-  public void setNodeSplitStrategy(SplitStrategy nodeSplitter) {
-    if (nodeSplitter != null) {
-      this.nodeSplitter = nodeSplitter;
-    } else {
-      getLogger().warning("Ignoring setNodeSplitStrategy(null)");
-    }
-  }
-
-  /**
-   * Set insertion strategy.
-   * 
-   * @param insertionStrategy the insertion strategy to set
-   */
-  public void setInsertionStrategy(InsertionStrategy insertionStrategy) {
-    if (insertionStrategy != null) {
-      this.insertionStrategy = insertionStrategy;
-    } else {
-      getLogger().warning("Ignoring setInsertionStrategy(null)");
-    }
-  }
-
-  /**
-   * Set the overflow treatment strategy.
-   * 
-   * @param overflowTreatment overflow treatment strategy
-   */
-  public void setOverflowTreatment(OverflowTreatment overflowTreatment) {
-    this.overflowTreatment = overflowTreatment;
-  }
-
-  /**
-   * Set the relative minimum fill. (Only supported before the tree was used!)
-   * 
-   * @param relative Relative minimum fill
-   */
-  public void setMinimumFill(double relative) {
-    this.relativeMinFill = relative;
+    this.settings = settings;
   }
 
   /**
@@ -225,7 +144,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     if (!initialized) {
       initialize(leaf);
     }
-    overflowTreatment.reinitialize();
+    settings.overflowTreatment.reinitialize();
 
     preInsert(leaf);
     insertLeafEntry(leaf);
@@ -301,7 +220,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       N node = stack.pop();
       if (node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          overflowTreatment.reinitialize(); // Intended?
+          settings.overflowTreatment.reinitialize(); // Intended?
           this.insertLeafEntry(node.getEntry(i));
         }
       } else {
@@ -381,7 +300,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.floor(dirCapacity * relativeMinFill);
+    dirMinimum = (int) Math.floor(dirCapacity * settings.relativeMinFill);
     if (dirMinimum < 1) {
       dirMinimum = 1;
     }
@@ -395,7 +314,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.floor(leafCapacity * relativeMinFill);
+    leafMinimum = (int) Math.floor(leafCapacity * settings.relativeMinFill);
     if (leafMinimum < 1) {
       leafMinimum = 1;
     }
@@ -407,7 +326,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @return Success code
    */
   public boolean canBulkLoad() {
-    return (bulkSplitter != null && !initialized);
+    return (settings.bulkSplitter != null && !initialized);
   }
 
   /**
@@ -421,7 +340,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     int maxEntries = leafCapacity;
 
     ArrayList<E> result = new ArrayList<>();
-    List<List<E>> partitions = bulkSplitter.partition(objects, minEntries, maxEntries);
+    List<List<E>> partitions = settings.bulkSplitter.partition(objects, minEntries, maxEntries);
 
     for (List<E> partition : partitions) {
       // create leaf node
@@ -622,7 +541,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     }
 
     N childNode = getNode(node.getEntry(0));
-    int num = insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, subtree.getPathCount());
+    int num = settings.insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, subtree.getPathCount());
     TreeIndexPathComponent<E> comp = new TreeIndexPathComponent<>(node.getEntry(num), num);
     // children are leafs
     if (childNode.isLeaf()) {
@@ -656,7 +575,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    *         reinsertion
    */
   private N overflowTreatment(N node, IndexTreePath<E> path) {
-    if (overflowTreatment.handleOverflow(this, node, path)) {
+    if (settings.overflowTreatment.handleOverflow(this, node, path)) {
       return null;
     }
     return split(node);
@@ -671,7 +590,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   private N split(N node) {
     // choose the split dimension and the split point
     int minimum = node.isLeaf() ? leafMinimum : dirMinimum;
-    BitSet split = nodeSplitter.split(node, NodeArrayAdapter.STATIC, minimum);
+    BitSet split = settings.nodeSplitter.split(node, NodeArrayAdapter.STATIC, minimum);
 
     // New node
     final N newNode;

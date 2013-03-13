@@ -57,74 +57,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E> & Index> extends PagedIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E, S> & Index, S extends AbstractRTreeSettings> extends PagedIndexFactory<O, I> {
   /**
-   * Fast-insertion parameter. Optional.
+   * Tree settings
    */
-  public static OptionID INSERTION_STRATEGY_ID = new OptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
-
-  /**
-   * Split strategy parameter. Optional.
-   */
-  public static OptionID SPLIT_STRATEGY_ID = new OptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
-
-  /**
-   * Parameter for bulk strategy
-   */
-  public static final OptionID BULK_SPLIT_ID = new OptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
-
-  /**
-   * Parameter for the relative minimum fill.
-   */
-  public static final OptionID MINIMUM_FILL_ID = new OptionID("rtree.minimum-fill", "Minimum relative fill required for data pages.");
-
-  /**
-   * Overflow treatment.
-   */
-  public static OptionID OVERFLOW_STRATEGY_ID = new OptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
-
-  /**
-   * Strategy to find the insertion node with.
-   */
-  protected InsertionStrategy insertionStrategy;
-
-  /**
-   * The strategy for bulk load.
-   */
-  protected BulkSplit bulkSplitter;
-
-  /**
-   * The strategy for splitting nodes
-   */
-  protected SplitStrategy nodeSplitter;
-
-  /**
-   * Overflow treatment strategy
-   */
-  protected OverflowTreatment overflowTreatment;
-
-  /**
-   * Relative minimum fill
-   */
-  protected double minimumFill;
+  protected S settings;
 
   /**
    * Constructor.
    * 
-   * @param pageFileFactory data storage
-   * @param bulkSplitter the strategy to use for bulk splitting
-   * @param insertionStrategy the strategy to find the insertion child
-   * @param nodeSplitter the strategy to use for splitting nodes
-   * @param overflowTreatment the strategy to use for overflow treatment
-   * @param minimumFill the relative minimum fill
+   * @param pageFileFactory Page file factory
+   * @param settings Tree settings
    */
-  public AbstractRStarTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, SplitStrategy nodeSplitter, OverflowTreatment overflowTreatment, double minimumFill) {
+  public AbstractRStarTreeFactory(PageFileFactory<?> pageFileFactory, S settings) {
     super(pageFileFactory);
-    this.insertionStrategy = insertionStrategy;
-    this.bulkSplitter = bulkSplitter;
-    this.nodeSplitter = nodeSplitter;
-    this.overflowTreatment = overflowTreatment;
-    this.minimumFill = minimumFill;
+    this.settings = settings;
   }
 
   @Override
@@ -138,53 +85,69 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
    * @author Erich Schubert
    * 
    * @apiviz.exclude
+   * 
+   * @param <O> Object type
+   * @param <S> Settings class
    */
-  public abstract static class Parameterizer<O extends NumberVector<?>> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O extends NumberVector<?>, S extends AbstractRTreeSettings> extends PagedIndexFactory.Parameterizer<O> {
     /**
-     * Insertion strategy
+     * Fast-insertion parameter. Optional.
      */
-    protected InsertionStrategy insertionStrategy = null;
+    public static OptionID INSERTION_STRATEGY_ID = new OptionID("rtree.insertionstrategy", "The strategy to use for object insertion.");
 
     /**
-     * The strategy for splitting nodes
+     * Split strategy parameter. Optional.
      */
-    protected SplitStrategy nodeSplitter = null;
+    public static OptionID SPLIT_STRATEGY_ID = new OptionID("rtree.splitstrategy", "The strategy to use for node splitting.");
 
     /**
-     * Bulk loading strategy
+     * Parameter for bulk strategy
      */
-    protected BulkSplit bulkSplitter = null;
+    public static final OptionID BULK_SPLIT_ID = new OptionID("spatial.bulkstrategy", "The class to perform the bulk split with.");
 
     /**
-     * Overflow treatment strategy
+     * Parameter for the relative minimum fill.
      */
-    protected OverflowTreatment overflowTreatment = null;
+    public static final OptionID MINIMUM_FILL_ID = new OptionID("rtree.minimum-fill", "Minimum relative fill required for data pages.");
 
     /**
-     * Relative minimum fill
+     * Overflow treatment.
      */
-    protected double minimumFill;
+    public static OptionID OVERFLOW_STRATEGY_ID = new OptionID("rtree.overflowtreatment", "The strategy to use for handling overflows.");
+
+    /**
+     * Tree settings
+     */
+    protected S settings;
+    
+    /**
+     * Create the settings object 
+     * 
+     * @return Settings instance.
+     */
+    abstract protected S createSettings();
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      settings = createSettings();
       ObjectParameter<InsertionStrategy> insertionStrategyP = new ObjectParameter<>(INSERTION_STRATEGY_ID, InsertionStrategy.class, CombinedInsertionStrategy.class);
       if (config.grab(insertionStrategyP)) {
-        insertionStrategy = insertionStrategyP.instantiateClass(config);
+        settings.insertionStrategy = insertionStrategyP.instantiateClass(config);
       }
       ObjectParameter<SplitStrategy> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, SplitStrategy.class, TopologicalSplitter.class);
       if (config.grab(splitStrategyP)) {
-        nodeSplitter = splitStrategyP.instantiateClass(config);
+        settings.nodeSplitter = splitStrategyP.instantiateClass(config);
       }
       DoubleParameter minimumFillP = new DoubleParameter(MINIMUM_FILL_ID, 0.4);
       minimumFillP.addConstraint(new GreaterConstraint(0.0));
       minimumFillP.addConstraint(new LessConstraint(0.5));
       if (config.grab(minimumFillP)) {
-        minimumFill = minimumFillP.getValue();
+        settings.relativeMinFill = minimumFillP.getValue();
       }
       ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
       if (config.grab(overflowP)) {
-        overflowTreatment = overflowP.instantiateClass(config);
+        settings.overflowTreatment = overflowP.instantiateClass(config);
       }
       configBulkLoad(config);
     }
@@ -197,11 +160,11 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
     protected void configBulkLoad(Parameterization config) {
       ObjectParameter<BulkSplit> bulkSplitP = new ObjectParameter<>(BULK_SPLIT_ID, BulkSplit.class, true);
       if (config.grab(bulkSplitP)) {
-        bulkSplitter = bulkSplitP.instantiateClass(config);
+        settings.bulkSplitter = bulkSplitP.instantiateClass(config);
       }
     }
 
     @Override
-    protected abstract AbstractRStarTreeFactory<O, ?, ?, ?> makeInstance();
+    protected abstract AbstractRStarTreeFactory<O, ?, ?, ?, ?> makeInstance();
   }
 }

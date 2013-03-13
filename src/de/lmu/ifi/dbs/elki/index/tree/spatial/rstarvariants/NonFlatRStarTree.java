@@ -38,14 +38,15 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractRStarTree<N, E> {
+public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends AbstractRTreeSettings> extends AbstractRStarTree<N, E, S> {
   /**
    * Constructor.
    * 
    * @param pagefile Page file
+   * @param settings Settings
    */
-  public NonFlatRStarTree(PageFile<N> pagefile) {
-    super(pagefile);
+  public NonFlatRStarTree(PageFile<N> pagefile, S settings) {
+    super(pagefile, settings);
   }
 
   /**
@@ -181,7 +182,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
     int maxEntries = dirCapacity - 1;
 
     ArrayList<E> result = new ArrayList<>();
-    List<List<E>> partitions = bulkSplitter.partition(nodes, minEntries, maxEntries);
+    List<List<E>> partitions = settings.bulkSplitter.partition(nodes, minEntries, maxEntries);
 
     for(List<E> partition : partitions) {
       // create node

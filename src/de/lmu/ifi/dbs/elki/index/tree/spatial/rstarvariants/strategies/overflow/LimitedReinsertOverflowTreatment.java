@@ -73,7 +73,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
   }
 
   @Override
-  public <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E> tree, N node, IndexTreePath<E> path) {
+  public <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E, ?> tree, N node, IndexTreePath<E> path) {
     final int level = /* tree.getHeight() - */(path.getPathCount() - 1);
     // No reinsertions at root level
     if(path.getPathCount() == 1) {
