@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -74,15 +75,20 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
   /**
    * Constructor.
    * 
-   * @param database Database to use
+   * @param relation Database to use
    * @param pca PCA Runner to use
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Relation<NV> database, PCAFilteredRunner<NV> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
-    super(database, pca);
+  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner<NV> pca, KNNQuery<NV, DoubleDistance> knnQuery, int k) {
+    super(relation, pca);
     this.knnQuery = knnQuery;
     this.k = k;
+    // Sanity check:
+    int dim = RelationUtil.dimensionality(relation);
+    if (dim > 0 && k <= dim) {
+      LOG.warning("PCA results with k < dim are meaningless. Choose k much larger than the dimensionality.");
+    }
   }
 
   @Override
@@ -173,8 +179,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector<?>> extends Abstra
         super.makeOptions(config);
         final IntParameter kP = new IntParameter(K_ID);
         kP.addConstraint(new GreaterConstraint(0));
-        kP.setOptional(true);
-        if(config.grab(kP)) {
+        if (config.grab(kP)) {
           k = kP.getValue();
         }
       }
