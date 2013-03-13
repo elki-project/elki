@@ -144,7 +144,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     if (!initialized) {
       initialize(leaf);
     }
-    settings.overflowTreatment.reinitialize();
+    settings.getOverflowTreatment().reinitialize();
 
     preInsert(leaf);
     insertLeafEntry(leaf);
@@ -220,7 +220,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       N node = stack.pop();
       if (node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          settings.overflowTreatment.reinitialize(); // Intended?
+          settings.getOverflowTreatment().reinitialize(); // Intended?
           this.insertLeafEntry(node.getEntry(i));
         }
       } else {
@@ -575,7 +575,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    *         reinsertion
    */
   private N overflowTreatment(N node, IndexTreePath<E> path) {
-    if (settings.overflowTreatment.handleOverflow(this, node, path)) {
+    if (settings.getOverflowTreatment().handleOverflow(this, node, path)) {
       return null;
     }
     return split(node);

@@ -60,7 +60,7 @@ public class AbstractRTreeSettings {
   /**
    * Overflow treatment.
    */
-  protected OverflowTreatment overflowTreatment = LimitedReinsertOverflowTreatment.RSTAR_OVERFLOW;
+  private OverflowTreatment overflowTreatment = LimitedReinsertOverflowTreatment.RSTAR_OVERFLOW;
 
   /**
    * Relative minimum fill.
@@ -110,5 +110,12 @@ public class AbstractRTreeSettings {
    */
   public void setMinimumFill(double relative) {
     this.relativeMinFill = relative;
+  }
+
+  /**
+   * @return the overflowTreatment
+   */
+  public OverflowTreatment getOverflowTreatment() {
+    return overflowTreatment;
   }
 }
