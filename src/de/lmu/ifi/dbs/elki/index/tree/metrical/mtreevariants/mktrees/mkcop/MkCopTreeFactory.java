@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkCoPTreeIndex<O, D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>>> {
+public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, MkCoPTreeIndex<O, D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry>> {
   /**
    * Parameter for k
    */
@@ -58,7 +58,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> settings) {
+  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry> settings) {
     super(pageFileFactory, settings);
   }
 
@@ -79,7 +79,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>>> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -96,7 +96,7 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
     }
 
     @Override
-    protected MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> makeSettings() {
+    protected MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry> makeSettings() {
       return new MkTreeSettings<>();
     }
   }

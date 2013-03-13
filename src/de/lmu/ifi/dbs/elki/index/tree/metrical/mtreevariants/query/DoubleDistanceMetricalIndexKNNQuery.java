@@ -100,10 +100,10 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
       // directory node
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          final MTreeEntry<DoubleDistance> entry = node.getEntry(i);
+          final MTreeEntry entry = node.getEntry(i);
           final DBID id_i = entry.getRoutingObjectID();
-          double or_i = entry.getCoveringRadius().doubleValue();
-          double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
+          double or_i = entry.getCoveringRadius();
+          double d2 = id_p != null ? entry.getParentDistance() : 0;
           double diff = Math.abs(d1 - d2);
 
           if (diff <= d_k + or_i) {
@@ -120,9 +120,9 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
       // data node
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          final MTreeEntry<DoubleDistance> entry = node.getEntry(i);
+          final MTreeEntry entry = node.getEntry(i);
           final DBID id_i = entry.getRoutingObjectID();
-          double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
+          double d2 = id_p != null ? entry.getParentDistance() : 0;
           double diff = Math.abs(d1 - d2);
 
           if (diff <= d_k) {

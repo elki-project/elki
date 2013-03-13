@@ -40,13 +40,12 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -60,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
+public class MkMaxTreeIndex<O, D extends NumberDistance<D, ?>> extends MkMaxTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * Relation indexed.
    */
@@ -73,7 +72,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> settings) {
+  public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry> settings) {
     super(relation, pagefile, settings);
     this.relation = relation;
   }
@@ -81,10 +80,10 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
   /**
    * @return a new MkMaxLeafEntry representing the specified data object
    */
-  protected MkMaxLeafEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
+  protected MkMaxLeafEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
     KNNList<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
-    D knnDistance = knns.getKNNDistance();
-    return new MkMaxLeafEntry<>(id, parentDistance, knnDistance);
+    double knnDistance = knns.getKNNDistance().doubleValue();
+    return new MkMaxLeafEntry(id, parentDistance, knnDistance);
   }
 
   @Override
@@ -95,16 +94,16 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
 
   @Override
   public void insert(DBIDRef id) {
-    insert(createNewLeafEntry(DBIDUtil.deref(id), relation.get(id), getDistanceFactory().undefinedDistance()), false);
+    insert(createNewLeafEntry(DBIDUtil.deref(id), relation.get(id), Double.NaN), false);
   }
 
   @Override
   public void insertAll(DBIDs ids) {
-    List<MkMaxEntry<D>> objs = new ArrayList<>(ids.size());
+    List<MkMaxEntry> objs = new ArrayList<>(ids.size());
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       final O object = relation.get(id);
-      objs.add(createNewLeafEntry(id, object, getDistanceFactory().undefinedDistance()));
+      objs.add(createNewLeafEntry(id, object, Double.NaN));
     }
     insertAll(objs);
   }
@@ -140,7 +139,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
     if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -153,9 +152,8 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return MTreeQueryUtil.getKNNQuery(idx, dq, hints);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return (KNNQuery<O, S>) MTreeQueryUtil.getKNNQuery(this, dq, hints);
   }
 
   @SuppressWarnings("unchecked")
@@ -165,7 +163,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
     if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -178,15 +176,14 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return MTreeQueryUtil.getRangeQuery(idx, dq);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return (RangeQuery<O, S>) MTreeQueryUtil.getRangeQuery(this, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -199,9 +196,8 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
         return null;
       }
     }
-    AbstractMkTreeUnified<O, S, ?, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<>(idx, dq);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return (RKNNQuery<O, S>) new MkTreeRKNNQuery<>(this, dq);
   }
 
   @Override

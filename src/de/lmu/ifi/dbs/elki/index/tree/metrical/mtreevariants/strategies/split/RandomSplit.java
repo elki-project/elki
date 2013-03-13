@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
+public class RandomSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends MTreeSplit<O, D, N, E> {
   /**
    * Random generator.
    */
@@ -84,7 +84,7 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
    * @param node the node to be split
    */
   @Override
-  public Assignments<D, E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
+  public Assignments<E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
     int pos1 = random.nextInt(node.getNumEntries());
     int pos2 = random.nextInt(node.getNumEntries() - 1);
     if (pos2 >= pos1) {
@@ -108,7 +108,7 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
    * @param <N> the type of AbstractMTreeNode used in the M-Tree
    * @param <E> the type of MetricalEntry used in the M-Tree
    */
-  public static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractParameterizer {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends AbstractParameterizer {
     /**
      * Option ID for the random generator.
      */

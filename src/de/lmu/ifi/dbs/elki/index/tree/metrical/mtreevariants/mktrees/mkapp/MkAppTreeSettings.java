@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSetti
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkAppTreeSettings<O, D extends NumberDistance<D, ?>> extends MkTreeSettings<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
+public class MkAppTreeSettings<O, D extends NumberDistance<D, ?>> extends MkTreeSettings<O, D, MkAppTreeNode<O, D>, MkAppEntry> {
   /**
    * Parameter p.
    */

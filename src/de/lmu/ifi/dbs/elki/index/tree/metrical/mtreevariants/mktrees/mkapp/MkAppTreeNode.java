@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * @param <O> object type
  * @param <D> distance type
  */
-class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
-  private static final long serialVersionUID = 1;
+class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkAppTreeNode<O, D>, MkAppEntry> {
+  private static final long serialVersionUID = 2;
 
   /**
    * Empty constructor for Externalizable interface.
@@ -75,7 +75,7 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
     int p_max = 0;
     double[] b = null;
     for(int i = 0; i < getNumEntries(); i++) {
-      MkAppEntry<D> entry = getEntry(i);
+      MkAppEntry entry = getEntry(i);
       PolynomialApproximation approximation = entry.getKnnDistanceApproximation();
       if(b == null) {
         p_max = approximation.getPolynomialOrder();
@@ -109,16 +109,16 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    * @param mTree the M-Tree object holding this node
    */
   @Override
-  public void adjustEntry(MkAppEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, ?> mTree) {
+  public void adjustEntry(MkAppEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // entry.setKnnDistanceApproximation(knnDistanceApproximation());
   }
 
   @Override
-  protected void integrityCheckParameters(MkAppEntry<D> parentEntry, MkAppTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, ?> mTree) {
+  protected void integrityCheckParameters(MkAppEntry parentEntry, MkAppTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
 
-    MkAppEntry<D> entry = parent.getEntry(index);
+    MkAppEntry entry = parent.getEntry(index);
     PolynomialApproximation approximation_soll = knnDistanceApproximation();
     PolynomialApproximation approximation_ist = entry.getKnnDistanceApproximation();
 

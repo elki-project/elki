@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
@@ -37,9 +36,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * the underlying data object.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used in the MkMaxTree
  */
-class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements MkMaxEntry<D> {
+class MkMaxLeafEntry extends MTreeLeafEntry implements MkMaxEntry {
   /**
    * Serial version number
    */
@@ -48,7 +46,7 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
   /**
    * The k-nearest neighbor distance of the underlying data object.
    */
-  private D knnDistance;
+  private double knnDistance;
 
   /**
    * Empty constructor for serialization purposes.
@@ -65,18 +63,18 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *        parent's routing object
    * @param knnDistance the knn distance of the underlying data object
    */
-  public MkMaxLeafEntry(DBID objectID, D parentDistance, D knnDistance) {
+  public MkMaxLeafEntry(DBID objectID, double parentDistance, double knnDistance) {
     super(objectID, parentDistance);
     this.knnDistance = knnDistance;
   }
 
   @Override
-  public D getKnnDistance() {
+  public double getKnnDistance() {
     return knnDistance;
   }
 
   @Override
-  public void setKnnDistance(D knnDistance) {
+  public void setKnnDistance(double knnDistance) {
     this.knnDistance = knnDistance;
   }
 
@@ -95,10 +93,9 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    * specified input stream.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.knnDistance = (D) in.readObject();
+    this.knnDistance = in.readDouble();
   }
 
   /**
@@ -109,20 +106,19 @@ class MkMaxLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *         and has the same knnDistance as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
-    final MkMaxLeafEntry<D> that = (MkMaxLeafEntry<D>) o;
+    final MkMaxLeafEntry that = (MkMaxLeafEntry) o;
 
-    return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
+    return Double.compare(knnDistance, that.knnDistance) == 0;
   }
 }

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.query;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 
 /**
  * Encapsulates the attributes for a object that can be stored in a heap. The
@@ -33,20 +32,25 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * holds the id of the routing object of the underlying M-Tree node and its
  * covering radius.
  * 
- * @author Elke Achtert
+ * FIXME: Class naming in this package is inconsistent.
  * 
- * @param <D> the type of Distance used in the M-Tree
+ * @author Elke Achtert
  */
-public class GenericMTreeDistanceSearchCandidate<D extends Distance<D>> extends GenericDistanceSearchCandidate<D> {
+public class GenericMTreeDistanceSearchCandidate implements Comparable<GenericMTreeDistanceSearchCandidate> {
   /**
    * The id of the routing object.
    */
   public DBID routingObjectID;
-  
+
   /**
-   * The distance from the query to the routing object.
+   * Minimum distance.
    */
-  public D routingDistance;
+  public double mindist;
+
+  /**
+   * Node ID.
+   */
+  public int nodeID;
 
   /**
    * Creates a new heap node with the specified parameters.
@@ -54,11 +58,35 @@ public class GenericMTreeDistanceSearchCandidate<D extends Distance<D>> extends 
    * @param mindist the minimum distance of the node
    * @param nodeID the id of the node
    * @param routingObjectID the id of the routing object of the node
-   * @param routingDistance the distance from query to routing object
    */
-  public GenericMTreeDistanceSearchCandidate(final D mindist, final Integer nodeID, final DBID routingObjectID, final D routingDistance) {
-    super(mindist, nodeID);
+  public GenericMTreeDistanceSearchCandidate(final double mindist, final int nodeID, final DBID routingObjectID) {
+    this.mindist = mindist;
+    this.nodeID = nodeID;
     this.routingObjectID = routingObjectID;
-    this.routingDistance = routingDistance;
+  }
+
+  @Override
+  public int hashCode() {
+    return nodeID;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    GenericMTreeDistanceSearchCandidate other = (GenericMTreeDistanceSearchCandidate) obj;
+    return nodeID == other.nodeID;
+  }
+
+  @Override
+  public int compareTo(GenericMTreeDistanceSearchCandidate o) {
+    return Double.compare(this.mindist, o.mindist);
   }
 }

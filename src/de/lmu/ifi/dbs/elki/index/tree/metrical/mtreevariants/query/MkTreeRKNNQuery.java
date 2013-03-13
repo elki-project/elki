@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.AbstractRKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * 
  * @apiviz.uses AbstractMkTree
  */
-public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery<O, D> {
+public class MkTreeRKNNQuery<O, D extends NumberDistance<D, ?>> extends AbstractRKNNQuery<O, D> {
   /**
    * The index to use
    */

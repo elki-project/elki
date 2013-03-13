@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
@@ -38,11 +37,11 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * 
  * @author Elke Achtert
  */
-class MkAppLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> implements MkAppEntry<D> {
+class MkAppLeafEntry extends MTreeLeafEntry implements MkAppEntry {
   /**
    * Serial Version UID
    */
-  private static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 2;
 
   /**
    * The polynomial approximation.
@@ -64,7 +63,7 @@ class MkAppLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    *        parent's routing object
    * @param approximation the polynomial approximation of the knn distances
    */
-  public MkAppLeafEntry(DBID objectID, D parentDistance, PolynomialApproximation approximation) {
+  public MkAppLeafEntry(DBID objectID, double parentDistance, PolynomialApproximation approximation) {
     super(objectID, parentDistance);
     this.approximation = approximation;
   }

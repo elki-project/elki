@@ -26,8 +26,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -44,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractNode<E> {
+public abstract class AbstractMTreeNode<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends AbstractNode<E> {
   /**
    * Empty constructor for Externalizable interface.
    */
@@ -74,14 +72,14 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    *        the routing object of the parent node
    * @param mTree the M-Tree object holding this node
    */
-  public void adjustEntry(E entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, N, E, ?> mTree) {
+  public void adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, N, E, ?> mTree) {
     entry.setRoutingObjectID(routingObjectID);
     entry.setParentDistance(parentDistance);
     entry.setCoveringRadius(coveringRadius(entry.getRoutingObjectID(), mTree));
 
-    for(int i = 0; i < getNumEntries(); i++) {
+    for (int i = 0; i < getNumEntries(); i++) {
       E childEntry = getEntry(i);
-      D dist = mTree.distance(routingObjectID, childEntry.getRoutingObjectID());
+      double dist = mTree.distance(routingObjectID, childEntry.getRoutingObjectID()).doubleValue();
       childEntry.setParentDistance(dist);
     }
   }
@@ -93,17 +91,12 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    * @param mTree the M-Tree
    * @return the covering radius of this node
    */
-  public D coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E, ?> mTree) {
-    D coveringRadius = mTree.getDistanceFactory().nullDistance();
-    for(int i = 0; i < getNumEntries(); i++) {
+  public double coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E, ?> mTree) {
+    double coveringRadius = 0.;
+    for (int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
-      D distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID);
-      // extend by the other objects covering radius, if non-null
-      D d2 = entry.getCoveringRadius();
-      if(d2 != null) {
-        distance = distance.plus(d2);
-      }
-      coveringRadius = DistanceUtil.max(coveringRadius, distance);
+      double distance = mTree.distance(entry.getRoutingObjectID(), routingObjectID).doubleValue() + entry.getCoveringRadius();
+      coveringRadius = Math.max(coveringRadius, distance);
     }
     return coveringRadius;
   }
@@ -117,46 +110,45 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
   @SuppressWarnings("unchecked")
   public final void integrityCheck(AbstractMTree<O, D, N, E, ?> mTree, E entry) {
     // leaf node
-    if(isLeaf()) {
-      for(int i = 0; i < getCapacity(); i++) {
+    if (isLeaf()) {
+      for (int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
-        if(i < getNumEntries() && e == null) {
+        if (i < getNumEntries() && e == null) {
           throw new RuntimeException("i < numEntries && entry == null");
         }
-        if(i >= getNumEntries() && e != null) {
+        if (i >= getNumEntries() && e != null) {
           throw new RuntimeException("i >= numEntries && entry != null");
         }
       }
     }
-
     // dir node
     else {
       N tmp = mTree.getNode(getEntry(0));
       boolean childIsLeaf = tmp.isLeaf();
 
-      for(int i = 0; i < getCapacity(); i++) {
+      for (int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
 
-        if(i < getNumEntries() && e == null) {
+        if (i < getNumEntries() && e == null) {
           throw new RuntimeException("i < numEntries && entry == null");
         }
 
-        if(i >= getNumEntries() && e != null) {
+        if (i >= getNumEntries() && e != null) {
           throw new RuntimeException("i >= numEntries && entry != null");
         }
 
-        if(e != null) {
+        if (e != null) {
           N node = mTree.getNode(e);
 
-          if(childIsLeaf && !node.isLeaf()) {
-            for(int k = 0; k < getNumEntries(); k++) {
+          if (childIsLeaf && !node.isLeaf()) {
+            for (int k = 0; k < getNumEntries(); k++) {
               mTree.getNode(getEntry(k));
             }
 
             throw new RuntimeException("Wrong Child in " + this + " at " + i);
           }
 
-          if(!childIsLeaf && node.isLeaf()) {
+          if (!childIsLeaf && node.isLeaf()) {
             throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
           }
 
@@ -166,7 +158,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
         }
       }
 
-      if(LoggingConfiguration.DEBUG) {
+      if (LoggingConfiguration.DEBUG) {
         Logger.getLogger(this.getClass().getName()).fine("DirNode " + getPageID() + " ok!");
       }
     }
@@ -184,27 +176,16 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
   protected void integrityCheckParameters(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E, ?> mTree) {
     // test if parent distance is correctly set
     E entry = parent.getEntry(index);
-    D parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());
-    if(!entry.getParentDistance().equals(parentDistance)) {
-      String soll = parentDistance.toString();
-      String ist = entry.getParentDistance().toString();
-      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+    double parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID()).doubleValue();
+    if (Math.abs(entry.getParentDistance() - parentDistance) > 1E-10) {
+      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + parentDistance + ",\n ist: " + entry.getParentDistance());
     }
 
     // test if covering radius is correctly set
-    D mincover = parentDistance.plus(entry.getCoveringRadius());
-    if(parentEntry.getCoveringRadius().compareTo(mincover) < 0) {
-      String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
-
-      // throw new RuntimeException(msg);
-      if(parentDistance instanceof NumberDistance<?, ?>) {
-        double d1 = Double.parseDouble(parentDistance.toString());
-        double d2 = Double.parseDouble(entry.getCoveringRadius().toString());
-        if(Math.abs(d1 - d2) > 0.000000001) {
-          throw new RuntimeException(msg);
-        }
-      }
-      else {
+    double mincover = parentDistance + entry.getCoveringRadius();
+    if (parentEntry.getCoveringRadius() < mincover) {
+      if (Math.abs(parentDistance - entry.getCoveringRadius()) > 1e-10) {
+        String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
         throw new RuntimeException(msg);
       }
     }

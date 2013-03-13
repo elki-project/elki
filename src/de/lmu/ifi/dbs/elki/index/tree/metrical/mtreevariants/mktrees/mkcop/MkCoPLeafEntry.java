@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
@@ -38,8 +37,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * 
  * @author Elke Achtert
  */
-class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> implements MkCoPEntry<D> {
-  private static final long serialVersionUID = 1;
+class MkCoPLeafEntry extends MTreeLeafEntry implements MkCoPEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The conservative approximation.
@@ -69,7 +68,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    * @param progressiveApproximation the progressive approximation of the knn
    *        distances
    */
-  public MkCoPLeafEntry(DBID objectID, D parentDistance, ApproximationLine conservativeApproximation, ApproximationLine progressiveApproximation) {
+  public MkCoPLeafEntry(DBID objectID, double parentDistance, ApproximationLine conservativeApproximation, ApproximationLine progressiveApproximation) {
     super(objectID, parentDistance);
     this.conservativeApproximation = conservativeApproximation;
     this.progressiveApproximation = progressiveApproximation;
@@ -83,8 +82,8 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    * @return the conservative approximated knn distance of the entry
    */
   @Override
-  public <O> D approximateConservativeKnnDistance(int k, D distanceFactory) {
-    return conservativeApproximation.getApproximatedKnnDistance(k, distanceFactory);
+  public double approximateConservativeKnnDistance(int k) {
+    return conservativeApproximation.getApproximatedKnnDistance(k);
   }
 
   /**
@@ -95,8 +94,8 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    * @param distanceFactory the distance function
    * @return the progressive approximated knn distance of the entry
    */
-  public <O> D approximateProgressiveKnnDistance(int k, D distanceFactory) {
-    return progressiveApproximation.getApproximatedKnnDistance(k, distanceFactory);
+  public double approximateProgressiveKnnDistance(int k) {
+    return progressiveApproximation.getApproximatedKnnDistance(k);
   }
 
   /**
@@ -179,7 +178,6 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    *         entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -191,7 +189,7 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
       return false;
     }
 
-    final MkCoPLeafEntry<D> that = (MkCoPLeafEntry<D>) o;
+    final MkCoPLeafEntry that = (MkCoPLeafEntry) o;
 
     if (conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null) {
       return false;

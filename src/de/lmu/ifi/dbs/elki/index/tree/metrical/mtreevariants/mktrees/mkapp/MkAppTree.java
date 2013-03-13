@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
@@ -61,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of NumberDistance used in the metrical index
  */
-public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, MkAppTreeSettings<O, D>> {
+public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkAppTreeNode<O, D>, MkAppEntry, MkAppTreeSettings<O, D>> {
   /**
    * The logger for this class.
    */
@@ -82,7 +83,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @throws UnsupportedOperationException since this operation is not supported
    */
   @Override
-  public void insert(MkAppEntry<D> id, boolean withPreInsert) {
+  public void insert(MkAppEntry id, boolean withPreInsert) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -90,7 +91,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @throws UnsupportedOperationException since this operation is not supported
    */
   @Override
-  protected void preInsert(MkAppEntry<D> entry) {
+  protected void preInsert(MkAppEntry entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -100,7 +101,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param entries the entries to be inserted
    */
   @Override
-  public void insertAll(List<MkAppEntry<D>> entries) {
+  public void insertAll(List<MkAppEntry> entries) {
     if (entries.isEmpty()) {
       return;
     }
@@ -116,7 +117,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert
-    for (MkAppEntry<D> entry : entries) {
+    for (MkAppEntry entry : entries) {
       ids.add(entry.getRoutingObjectID());
       // insert the object
       super.insert(entry, false);
@@ -144,14 +145,14 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   @Override
   public DistanceDBIDList<D> reverseKNNQuery(DBIDRef id, int k) {
     GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
-    final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<>();
+    final Heap<GenericMTreeDistanceSearchCandidate> pq = new UpdatableHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceFactory().nullDistance(), getRootID(), null, null));
+    pq.add(new GenericMTreeDistanceSearchCandidate(0., getRootID(), null));
 
     // search in tree
     while (!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
+      GenericMTreeDistanceSearchCandidate pqNode = pq.poll();
       // FIXME: cache the distance to the routing object in the queue node!
 
       MkAppTreeNode<O, D> node = getNode(pqNode.nodeID);
@@ -159,25 +160,24 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       // directory node
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MkAppEntry<D> entry = node.getEntry(i);
-          D distance = distance(entry.getRoutingObjectID(), id);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
+          MkAppEntry entry = node.getEntry(i);
+          double distance = distance(entry.getRoutingObjectID(), id).doubleValue();
+          double minDist = (entry.getCoveringRadius() > distance) ? 0. : distance - entry.getCoveringRadius();
 
           double approxValue = settings.log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if (approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceFactory().fromDouble(approxValue);
 
-          if (minDist.compareTo(approximatedKnnDist) <= 0) {
-            pq.add(new GenericMTreeDistanceSearchCandidate<>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
+          if (minDist <= approxValue) {
+            pq.add(new GenericMTreeDistanceSearchCandidate(minDist, getPageID(entry), entry.getRoutingObjectID()));
           }
         }
       }
       // data node
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MkAppLeafEntry<D> entry = (MkAppLeafEntry<D>) node.getEntry(i);
+          MkAppLeafEntry entry = (MkAppLeafEntry) node.getEntry(i);
           D distance = distance(entry.getRoutingObjectID(), id);
           double approxValue = settings.log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if (approxValue < 0) {
@@ -207,8 +207,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * Determines the maximum and minimum number of entries in a node.
    */
   @Override
-  protected void initializeCapacities(MkAppEntry<D> exampleLeaf) {
-    int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
+  protected void initializeCapacities(MkAppEntry exampleLeaf) {
+    int distanceSize = ByteArrayUtil.SIZE_DOUBLE; // exampleLeaf.getParentDistance().externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
@@ -274,12 +274,12 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkAppEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkAppEntry entry, Map<DBID, KNNList<D>> knnLists) {
     MkAppTreeNode<O, D> node = getNode(entry);
 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkAppLeafEntry<D> leafEntry = (MkAppLeafEntry<D>) node.getEntry(i);
+        MkAppLeafEntry leafEntry = (MkAppLeafEntry) node.getEntry(i);
         // approximateKnnDistances(leafEntry,
         // getKNNList(leafEntry.getRoutingObjectID(), knnLists));
         PolynomialApproximation approx = approximateKnnDistances(getMeanKNNList(leafEntry.getDBID(), knnLists));
@@ -287,7 +287,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       }
     } else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkAppEntry<D> dirEntry = node.getEntry(i);
+        MkAppEntry dirEntry = node.getEntry(i);
         adjustApproximatedKNNDistances(dirEntry, knnLists);
       }
     }
@@ -309,7 +309,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   private void leafEntryIDs(MkAppTreeNode<O, D> node, ModifiableDBIDs result) {
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkAppEntry<D> entry = node.getEntry(i);
+        MkAppEntry entry = node.getEntry(i);
         result.add(((LeafEntry) entry).getDBID());
       }
     } else {
@@ -395,8 +395,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        the routing object of the parent node
    */
   @Override
-  protected MkAppEntry<D> createNewDirectoryEntry(MkAppTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkAppDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
+  protected MkAppEntry createNewDirectoryEntry(MkAppTreeNode<O, D> node, DBID routingObjectID, double parentDistance) {
+    return new MkAppDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
   }
 
   /**
@@ -405,8 +405,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return an entry representing the root node
    */
   @Override
-  protected MkAppEntry<D> createRootEntry() {
-    return new MkAppDirectoryEntry<>(null, null, 0, null, null);
+  protected MkAppEntry createRootEntry() {
+    return new MkAppDirectoryEntry(null, 0., 0, 0., null);
   }
 
   @Override

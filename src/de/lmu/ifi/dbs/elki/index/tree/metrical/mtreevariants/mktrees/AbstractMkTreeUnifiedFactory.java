@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMkTree<O, D, N, E, S> & Index, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory<O, D, N, E, I, S> {
+public abstract class AbstractMkTreeUnifiedFactory<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, I extends AbstractMkTree<O, D, N, E, S> & Index, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory<O, D, N, E, I, S> {
   /**
    * Constructor.
    * 
@@ -66,7 +66,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory.Parameterizer<O, D, N, E, S> {
+  public abstract static class Parameterizer<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory.Parameterizer<O, D, N, E, S> {
     /**
      * Parameter specifying the maximal number k of reverse k nearest neighbors
      * to be supported, must be an integer greater than 0.

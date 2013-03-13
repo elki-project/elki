@@ -87,10 +87,10 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
     }
     if (!node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<DoubleDistance> entry = node.getEntry(i);
+        MTreeEntry entry = node.getEntry(i);
 
-        double r_or = entry.getCoveringRadius().doubleValue();
-        double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
+        double r_or = entry.getCoveringRadius();
+        double d2 = id_p != null ? entry.getParentDistance() : 0;
         double diff = Math.abs(d1 - d2);
 
         double sum = r_q + r_or;
@@ -107,9 +107,9 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
       }
     } else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<DoubleDistance> entry = node.getEntry(i);
+        MTreeEntry entry = node.getEntry(i);
 
-        double d2 = id_p != null ? entry.getParentDistance().doubleValue() : 0;
+        double d2 = id_p != null ? entry.getParentDistance() : 0;
         double diff = Math.abs(d1 - d2);
 
         if (diff <= r_q) {

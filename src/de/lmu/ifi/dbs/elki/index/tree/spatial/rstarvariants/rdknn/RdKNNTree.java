@@ -59,7 +59,6 @@ import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
@@ -68,6 +67,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.pairs.FCPair;
 
 /**
  * RDkNNTree is a spatial index structure based on the concepts of the R*-Tree
@@ -333,14 +333,14 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    * @return a list of the sorted entries
    */
   // TODO: move somewhere else?
-  protected List<DistanceEntry<D, RdKNNEntry<D>>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
-    List<DistanceEntry<D, RdKNNEntry<D>>> result = new ArrayList<>();
+  protected List<FCPair<D, RdKNNEntry<D>>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
+    List<FCPair<D, RdKNNEntry<D>>> result = new ArrayList<>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       @SuppressWarnings("unchecked")
       RdKNNEntry<D> entry = (RdKNNEntry<D>) node.getEntry(i);
       D minDist = distanceFunction.minDist(entry, q);
-      result.add(new DistanceEntry<>(entry, minDist, i));
+      result.add(new FCPair<>(minDist, entry));
     }
 
     Collections.sort(result);
@@ -394,12 +394,12 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // directory node
     else {
       O obj = relation.get(((LeafEntry) q).getDBID());
-      List<DistanceEntry<D, RdKNNEntry<D>>> entries = getSortedEntries(node, obj, settings.distanceFunction);
-      for (DistanceEntry<D, RdKNNEntry<D>> distEntry : entries) {
-        RdKNNEntry<D> entry = distEntry.getEntry();
+      List<FCPair<D, RdKNNEntry<D>>> entries = getSortedEntries(node, obj, settings.distanceFunction);
+      for (FCPair<D, RdKNNEntry<D>> distEntry : entries) {
+        RdKNNEntry<D> entry = distEntry.second;
         D entry_knnDist = entry.getKnnDistance();
 
-        if (distEntry.getDistance().compareTo(entry_knnDist) < 0 || distEntry.getDistance().compareTo(knnDist_q) < 0) {
+        if (distEntry.first.compareTo(entry_knnDist) < 0 || distEntry.first.compareTo(knnDist_q) < 0) {
           preInsert(q, entry, knns_q);
           knnDist_q = knns_q.getKNNDistance();
         }

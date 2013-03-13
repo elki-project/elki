@@ -24,11 +24,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -49,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, MkAppTreeIndex<O, D>> {
+public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkAppTreeNode<O, D>, MkAppEntry, MkAppTreeIndex<O, D>, MkAppTreeSettings<O, D>> {
   /**
    * Parameter for nolog
    */
@@ -66,42 +63,19 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
   public static final OptionID P_ID = new OptionID("mkapp.p", "positive integer specifying the order of the polynomial approximation.");
 
   /**
-   * Parameter k.
-   */
-  private int k_max;
-
-  /**
-   * Parameter p.
-   */
-  private int p;
-
-  /**
-   * Flag log.
-   */
-  private boolean log;
-
-  /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
-   * @param distanceFunction Distance function
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insert strategy
-   * @param k_max Maximum k
-   * @param p Parameter p
-   * @param log Log mode flag
+   * @param settings Tree settings
    */
-  public MkAppTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, MTreeInsert<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> insertStrategy, int k_max, int p, boolean log) {
-    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy);
-    this.k_max = k_max;
-    this.p = p;
-    this.log = log;
+  public MkAppTreeFactory(PageFileFactory<?> pageFileFactory, MkAppTreeSettings<O, D> settings) {
+    super(pageFileFactory, settings);
   }
 
   @Override
   public MkAppTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkAppTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkAppTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), splitStrategy, insertStrategy, k_max, p, log);
+    return new MkAppTreeIndex<>(relation, pagefile, settings);
   }
 
   protected Class<MkAppTreeNode<O, D>> getNodeClass() {
@@ -115,46 +89,36 @@ public class MkAppTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
-    /**
-     * Parameter k.
-     */
-    protected int k_max;
-
-    /**
-     * Parameter p.
-     */
-    protected int p;
-
-    /**
-     * Flag log.
-     */
-    protected boolean log;
-
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkAppTreeNode<O, D>, MkAppEntry, MkAppTreeSettings<O, D>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter kP = new IntParameter(K_ID);
       kP.addConstraint(new GreaterConstraint(0));
       if (config.grab(kP)) {
-        k_max = kP.getValue();
+        settings.k_max = kP.getValue();
       }
 
       IntParameter pP = new IntParameter(P_ID);
       pP.addConstraint(new GreaterConstraint(0));
       if (config.grab(pP)) {
-        p = pP.getValue();
+        settings.p = pP.getValue();
       }
 
       Flag nologF = new Flag(NOLOG_ID);
       if (config.grab(nologF)) {
-        log = !nologF.getValue();
+        settings.log = !nologF.getValue();
       }
     }
 
     @Override
     protected MkAppTreeFactory<O, D> makeInstance() {
-      return new MkAppTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max, p, log);
+      return new MkAppTreeFactory<>(pageFileFactory, settings);
+    }
+
+    @Override
+    protected MkAppTreeSettings<O, D> makeSettings() {
+      return new MkAppTreeSettings<>();
     }
   }
 }

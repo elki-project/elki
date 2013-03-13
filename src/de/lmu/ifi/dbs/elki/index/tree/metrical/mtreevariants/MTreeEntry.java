@@ -24,16 +24,14 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
 
 /**
  * Defines the requirements for an entry in an M-Tree node.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used in the M-Tree
  */
-public interface MTreeEntry<D extends Distance<D>> extends Entry {
+public interface MTreeEntry extends Entry {
   /**
    * Returns the id of the underlying database object of this entry, if this
    * entry is a leaf entry, the id of the routing object, otherwise.
@@ -57,14 +55,14 @@ public interface MTreeEntry<D extends Distance<D>> extends Entry {
    * 
    * @return the distance from the object to its parent object
    */
-  D getParentDistance();
+  double getParentDistance();
 
   /**
    * Sets the distance from the routing object to routing object of its parent.
    * 
    * @param parentDistance the distance to be set
    */
-  void setParentDistance(D parentDistance);
+  void setParentDistance(double parentDistance);
 
   /**
    * Returns the covering radius if this entry is a directory entry, null
@@ -72,7 +70,7 @@ public interface MTreeEntry<D extends Distance<D>> extends Entry {
    * 
    * @return the covering radius of this entry
    */
-  D getCoveringRadius();
+  double getCoveringRadius();
 
   /**
    * Sets the covering radius of this entry if this entry is a directory entry,
@@ -80,5 +78,5 @@ public interface MTreeEntry<D extends Distance<D>> extends Entry {
    * 
    * @param coveringRadius the covering radius to be set
    */
-  void setCoveringRadius(D coveringRadius);
+  void setCoveringRadius(double coveringRadius);
 }

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**
@@ -35,8 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @apiviz.composedOf ApproximationLine
  */
-interface MkCoPEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
-
+interface MkCoPEntry extends MTreeEntry {
   /**
    * Returns the conservative approximated knn distance of the entry.
    * 
@@ -45,7 +43,7 @@ interface MkCoPEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
    * @param distanceFactory the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O> D approximateConservativeKnnDistance(int k, D distanceFactory);
+  public <O> double approximateConservativeKnnDistance(int k);
 
   /**
    * Returns the conservative approximation line.

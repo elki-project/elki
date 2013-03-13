@@ -23,12 +23,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 
@@ -42,8 +38,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @param <O> object type
  * @param <D> distance type
  */
-class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
-  private static final long serialVersionUID = 1;
+class MkTabTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkTabTreeNode<O, D>, MkTabEntry> {
+  private static final long serialVersionUID = 2;
 
   /**
    * Empty constructor for Externalizable interface.
@@ -70,19 +66,15 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * @param distanceFactory the distance function
    * @return the knn distance of this node
    */
-  protected List<D> kNNDistances(D distanceFactory) {
-    int k = getEntry(0).getK_max();
+  protected double[] kNNDistances() {
+    int k = getEntry(0).getKnnDistances().length;
 
-    List<D> result = new ArrayList<>();
-    for (int i = 0; i < k; i++) {
-      result.add(distanceFactory.nullDistance());
-    }
+    double[] result = new double[k];
 
     for (int i = 0; i < getNumEntries(); i++) {
       for (int j = 0; j < k; j++) {
-        MkTabEntry<D> entry = getEntry(i);
-        D kDist = result.remove(j);
-        result.add(j, DistanceUtil.max(kDist, entry.getKnnDistance(j + 1)));
+        MkTabEntry entry = getEntry(i);
+        result[j] = Math.max(result[j], entry.getKnnDistance(j + 1));
       }
     }
 
@@ -90,10 +82,10 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   }
 
   @Override
-  public void adjustEntry(MkTabEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, ?> mTree) {
+  public void adjustEntry(MkTabEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distances
-    entry.setKnnDistances(kNNDistances(mTree.getDistanceFactory()));
+    entry.setKnnDistances(kNNDistances());
   }
 
   /**
@@ -105,11 +97,11 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * @param mTree the underlying M-Tree
    */
   @Override
-  protected void integrityCheckParameters(MkTabEntry<D> parentEntry, MkTabTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, ?> mTree) {
+  protected void integrityCheckParameters(MkTabEntry parentEntry, MkTabTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test knn distances
-    MkTabEntry<D> entry = parent.getEntry(index);
-    List<D> knnDistances = kNNDistances(mTree.getDistanceFactory());
+    MkTabEntry entry = parent.getEntry(index);
+    double[] knnDistances = kNNDistances();
     if (!entry.getKnnDistances().equals(knnDistances)) {
       String soll = knnDistances.toString();
       String ist = entry.getKnnDistances().toString();

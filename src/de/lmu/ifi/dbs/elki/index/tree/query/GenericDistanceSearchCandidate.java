@@ -41,7 +41,7 @@ public class GenericDistanceSearchCandidate<D extends Distance<D>> implements Co
   /**
    * Page id
    */
-  public Integer nodeID;
+  public int nodeID;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ public class GenericDistanceSearchCandidate<D extends Distance<D>> implements Co
    * @param mindist The minimum distance to this candidate
    * @param pagenr The page number of this candidate
    */
-  public GenericDistanceSearchCandidate(final D mindist, final Integer pagenr) {
+  public GenericDistanceSearchCandidate(final D mindist, final int pagenr) {
     super();
     this.mindist = mindist;
     this.nodeID = pagenr;

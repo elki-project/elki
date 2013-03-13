@@ -26,11 +26,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
 /**
@@ -40,18 +37,13 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * 
  * @author Elke Achtert
  */
-class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements MkTabEntry<D> {
-  private static final long serialVersionUID = 1;
-
-  /**
-   * The maximal number of knn distances to be stored.
-   */
-  private int k_max;
+class MkTabLeafEntry extends MTreeLeafEntry implements MkTabEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The knn distances of the underlying data object.
    */
-  private List<D> knnDistances;
+  private double[] knnDistances;
 
   /**
    * Empty constructor for serialization purposes.
@@ -68,38 +60,32 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
    *        parent's routing object
    * @param knnDistances the knn distances of the underlying data object
    */
-  public MkTabLeafEntry(DBID objectID, D parentDistance, List<D> knnDistances) {
+  public MkTabLeafEntry(DBID objectID, double parentDistance, double[] knnDistances) {
     super(objectID, parentDistance);
     this.knnDistances = knnDistances;
-    this.k_max = knnDistances.size();
   }
 
   @Override
-  public List<D> getKnnDistances() {
+  public double[] getKnnDistances() {
     return knnDistances;
   }
 
   @Override
-  public void setKnnDistances(List<D> knnDistances) {
-    if(knnDistances.size() != this.k_max) {
-      throw new IllegalArgumentException("Wrong length of knn distances: " + knnDistances.size());
+  public void setKnnDistances(double[] knnDistances) {
+    if (knnDistances.length != this.knnDistances.length) {
+      throw new IllegalArgumentException("Wrong length of knn distances: " + knnDistances.length);
     }
 
     this.knnDistances = knnDistances;
   }
 
   @Override
-  public D getKnnDistance(int k) {
-    if(k > this.k_max) {
+  public double getKnnDistance(int k) {
+    if (k >= this.knnDistances.length) {
       throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
     }
 
-    return knnDistances.get(k - 1);
-  }
-
-  @Override
-  public int getK_max() {
-    return k_max;
+    return knnDistances[k - 1];
   }
 
   /**
@@ -112,9 +98,10 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
+    int k_max = knnDistances.length;
     out.writeInt(k_max);
-    for(int i = 0; i < k_max; i++) {
-      out.writeObject(knnDistances.get(i));
+    for (int i = 0; i < k_max; i++) {
+      out.writeDouble(knnDistances[i]);
     }
   }
 
@@ -131,10 +118,10 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
   @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    k_max = in.readInt();
-    knnDistances = new ArrayList<>();
-    for(int i = 0; i < k_max; i++) {
-      knnDistances.add((D) in.readObject());
+    int k_max = in.readInt();
+    knnDistances = new double[k_max];
+    for (int i = 0; i < k_max; i++) {
+      knnDistances[i] = in.readDouble();
     }
   }
 
@@ -148,19 +135,19 @@ class MkTabLeafEntry<D extends Distance<D>> extends MTreeLeafEntry<D> implements
   @Override
   @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
-    final MkTabLeafEntry<D> that = (MkTabLeafEntry<D>) o;
+    final MkTabLeafEntry that = (MkTabLeafEntry) o;
 
-    if(k_max != that.k_max) {
+    if (knnDistances.length != that.knnDistances.length) {
       return false;
     }
     return !(knnDistances != null ? !knnDistances.equals(that.knnDistances) : that.knnDistances != null);
