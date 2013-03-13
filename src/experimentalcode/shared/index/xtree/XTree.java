@@ -57,13 +57,10 @@ public class XTree extends XTreeBase<XTreeNode, SpatialEntry> {
    * Constructor.
    * 
    * @param pagefile Page file
-   * @param relativeMinEntries
-   * @param relativeMinFanout
-   * @param max_overlap
-   * @param overlap_type
+   * @param settings Settings
    */
-  public XTree(PageFile<XTreeNode> pagefile, double relativeMinEntries, double relativeMinFanout, float max_overlap, XTreeBase.Overlap overlap_type) {
-    super(pagefile, relativeMinEntries, relativeMinFanout, max_overlap, overlap_type);
+  public XTree(PageFile<XTreeNode> pagefile, XTreeSettings settings) {
+    super(pagefile, settings);
   }
 
   /**

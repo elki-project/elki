@@ -24,27 +24,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
 public class XTreeFactory<O extends NumberVector<?>> extends XTreeBaseFactory<O, XTreeNode, SpatialEntry, XTreeIndex<O>> {
-  public XTreeFactory(PageFileFactory<?> pageFileFactory, BulkSplit bulkSplitter, InsertionStrategy insertionStrategy, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
-    super(pageFileFactory, bulkSplitter, insertionStrategy, relativeMinEntries, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+  public XTreeFactory(PageFileFactory<?> pageFileFactory, XTreeSettings settings) {
+    super(pageFileFactory, settings);
   }
 
   @Override
   public XTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<XTreeNode> pagefile = makePageFile(getNodeClass());
-    XTreeIndex<O> index = new XTreeIndex<O>(relation, pagefile, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
-    index.setBulkStrategy(bulkSplitter);
-    index.setInsertionStrategy(insertionStrategy);
-    index.setOverflowTreatment(new LimitedReinsertOverflowTreatment(new CloseReinsert(reinsert_fraction, SquaredEuclideanDistanceFunction.STATIC)));
+    XTreeIndex<O> index = new XTreeIndex<>(relation, pagefile, settings);
     return index;
   }
 
@@ -55,7 +47,7 @@ public class XTreeFactory<O extends NumberVector<?>> extends XTreeBaseFactory<O,
   public static class Parameterizer<O extends NumberVector<?>> extends XTreeBaseFactory.Parameterizer<O> {
     @Override
     protected XTreeFactory<O> makeInstance() {
-      return new XTreeFactory<O>(pageFileFactory, bulkSplitter, insertionStrategy, minimumFill, relativeMinFanout, reinsert_fraction, max_overlap, overlap_type);
+      return new XTreeFactory<>(pageFileFactory, settings);
     }
   }
 }

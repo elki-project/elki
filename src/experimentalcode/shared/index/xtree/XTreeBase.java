@@ -49,10 +49,10 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PersistentPageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import experimentalcode.shared.index.xtree.XTreeSettings.Overlap;
 import experimentalcode.shared.index.xtree.util.SplitHistory;
 import experimentalcode.shared.index.xtree.util.XSplitter;
 
@@ -66,7 +66,7 @@ import experimentalcode.shared.index.xtree.util.XSplitter;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<N, E> {
+public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<N, E, XTreeSettings> {
   /**
    * If <code>true</code>, the expensive call of
    * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
@@ -82,52 +82,11 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    */
   protected Map<Long, N> supernodes = new HashMap<>();
 
-  /**
-   * Relative min entries value.
-   */
-  private double relativeMinEntries;
-
-  /**
-   * Relative minimum fanout.
-   */
-  private double relativeMinFanout;
-
-  /**
-   * Minimum size to be allowed for page sizes after a split in case of a
-   * minimum overlap split.
-   */
-  protected int min_fanout;
-
-  /** Maximum overlap for a split partition. */
-  protected float max_overlap = .2f;
-
   /** Dimensionality of the {@link NumberVector}s stored in this tree. */
   protected int dimensionality;
 
   /** Number of elements (of type <O>) currently contained in this tree. */
   protected long num_elements = 0;
-
-  /** Overlap computation method. */
-  public static enum Overlap {
-    /**
-     * The maximum overlap is calculated as the ratio of total data objects in
-     * the overlapping region.
-     */
-    DATA_OVERLAP,
-
-    /**
-     * The maximum overlap is calculated as the fraction of the overlapping
-     * region of the two original mbrs:
-     * <code>(overlap volume of mbr 1 and mbr 2) / (volume of mbr 1 + volume of mbr 2)</code>
-     */
-    VOLUME_OVERLAP
-  }
-
-  /**
-   * Type of overlap to be used for testing on maximum overlap. Must be one of
-   * {@link #DATA_OVERLAP} and {@link #VOLUME_OVERLAP}.
-   */
-  protected Overlap overlap_type = Overlap.DATA_OVERLAP;
 
   public static final int QUEUE_INIT = 50;
 
@@ -135,22 +94,10 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    * Constructor.
    * 
    * @param pagefile the page file
-   * @param relativeMinEntries
-   * @param relativeMinFanout
-   * @param max_overlap
-   * @param overlap_type
+   * @param settings tree parameter
    */
-  public XTreeBase(PageFile<N> pagefile, double relativeMinEntries, double relativeMinFanout, float max_overlap, Overlap overlap_type) {
-    super(pagefile);
-    this.relativeMinEntries = relativeMinEntries;
-    this.relativeMinFanout = relativeMinFanout;
-    this.max_overlap = max_overlap;
-    this.overlap_type = overlap_type;
-  }
-
-  @Override
-  public void setNodeSplitStrategy(SplitStrategy nodeSplitter) {
-    throw new UnsupportedOperationException("XTree split strategy cannot be set this way.");
+  public XTreeBase(PageFile<N> pagefile, XTreeSettings settings) {
+    super(pagefile, settings);
   }
 
   /**
@@ -165,8 +112,10 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     if (node.isLeaf()) {
       return node.getNumEntries() == leafCapacity;
     } else {
-      if (node.isSuperNode()) // supernode capacity differs from normal capacity
+      if (node.isSuperNode()) {// supernode capacity differs from normal
+                               // capacity
         return node.getNumEntries() == node.getCapacity();
+      }
       return node.getNumEntries() == dirCapacity;
     }
   }
@@ -297,17 +246,17 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
    *         </dl>
    */
   public Overlap get_overlap_type() {
-    return overlap_type;
+    return settings.overlap_type;
   }
 
   /** @return the maximally allowed overlap for this XTree. */
   public float get_max_overlap() {
-    return max_overlap;
+    return settings.max_overlap;
   }
 
   /** @return the minimum directory capacity after a minimum overlap split */
   public int get_min_fanout() {
-    return min_fanout;
+    return settings.min_fanout;
   }
 
   /** @return the minimum directory capacity */
@@ -386,7 +335,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
 
   @Override
   protected TreeIndexHeader createHeader() {
-    return new XTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafMinimum, min_fanout, num_elements, dimensionality, max_overlap);
+    return new XTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafMinimum, settings.min_fanout, num_elements, dimensionality, settings.max_overlap);
   }
 
   /**
@@ -409,10 +358,10 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     super.leafCapacity = header.getLeafCapacity();
     super.dirMinimum = header.getDirMinimum();
     super.leafMinimum = header.getLeafMinimum();
-    this.min_fanout = header.getMin_fanout();
+    settings.min_fanout = header.getMin_fanout();
     this.num_elements = header.getNumberOfElements();
     this.dimensionality = header.getDimensionality();
-    this.max_overlap = header.getMaxOverlap();
+    settings.max_overlap = header.getMaxOverlap();
     long superNodeOffset = header.getSupernode_offset();
 
     if (getLogger().isDebugging()) {
@@ -542,15 +491,15 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     }
 
     // minimum entries per directory node
-    dirMinimum = (int) Math.round((dirCapacity - 1) * relativeMinEntries);
+    dirMinimum = (int) Math.round((dirCapacity - 1) * settings.relativeMinEntries);
     if (dirMinimum < 2) {
       dirMinimum = 2;
     }
 
     // minimum entries per directory node
-    min_fanout = (int) Math.round((dirCapacity - 1) * relativeMinFanout);
-    if (min_fanout < 2) {
-      min_fanout = 2;
+    settings.min_fanout = (int) Math.round((dirCapacity - 1) * settings.relativeMinFanout);
+    if (settings.min_fanout < 2) {
+      settings.min_fanout = 2;
     }
 
     if (leafCapacity <= 1) {
@@ -562,7 +511,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     }
 
     // minimum entries per leaf node
-    leafMinimum = (int) Math.round((leafCapacity - 1) * relativeMinEntries);
+    leafMinimum = (int) Math.round((leafCapacity - 1) * settings.relativeMinEntries);
     if (leafMinimum < 2) {
       leafMinimum = 2;
     }
@@ -570,7 +519,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     dimensionality = exampleLeaf.getDimensionality();
 
     if (getLogger().isVerbose()) {
-      getLogger().verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum + "\nminimum fanout: " + min_fanout);
+      getLogger().verbose("Directory Capacity:  " + (dirCapacity - 1) + "\nDirectory minimum: " + dirMinimum + "\nLeaf Capacity:     " + (leafCapacity - 1) + "\nLeaf Minimum:      " + leafMinimum + "\nminimum fanout: " + settings.min_fanout);
     }
   }
 
@@ -874,7 +823,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
       return null;
     }
     // Handled by reinsertion?
-    if (overflowTreatment.handleOverflow(this, node, path)) {
+    if (settings.getOverflowTreatment().handleOverflow(this, node, path)) {
       return null;
     }
     return split(node, splitAxis);
@@ -1215,7 +1164,7 @@ public abstract class XTreeBase<N extends XNode<E, N>, E extends SpatialEntry> e
     result.append(superNodes).append(" Supernodes (max = ").append(maxSuperCapacity - 1).append(", min = ").append(minSuperCapacity - 1).append(")\n");
     result.append(leafNodes).append(" Data Nodes (max = ").append(leafCapacity - 1).append(", min = ").append(leafMinimum).append(")\n");
     result.append(objects).append(" ").append(dimensionality).append("-dim. points in the tree \n");
-    result.append("min_fanout = ").append(min_fanout).append(", max_overlap = ").append(max_overlap).append((this.overlap_type == Overlap.DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n");
+    result.append("min_fanout = ").append(settings.min_fanout).append(", max_overlap = ").append(settings.max_overlap).append((settings.overlap_type == Overlap.DATA_OVERLAP ? " data overlap" : " volume overlap")).append(", \n");
     // PageFileUtil.appendPageFileStatistics(result, getPageFileStatistics());
     result.append("Storage Quota ").append(BigInteger.valueOf(objects + dirNodes + superNodes + leafNodes).multiply(BigInteger.valueOf(100)).divide(totalCapacity).toString()).append("%\n");
 

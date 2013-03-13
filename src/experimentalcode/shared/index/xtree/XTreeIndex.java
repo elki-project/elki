@@ -51,8 +51,8 @@ public class XTreeIndex<O extends NumberVector<?>> extends XTree implements Rang
 
   private Relation<O> relation;
 
-  public XTreeIndex(Relation<O> relation, PageFile<XTreeNode> pagefile, double relativeMinEntries, double relativeMinFanout, float reinsert_fraction, float max_overlap, XTreeBase.Overlap overlap_type) {
-    super(pagefile, relativeMinEntries, relativeMinFanout, max_overlap, overlap_type);
+  public XTreeIndex(Relation<O> relation, PageFile<XTreeNode> pagefile, XTreeSettings settings) {
+    super(pagefile, settings);
     this.relation = relation;
   }
 

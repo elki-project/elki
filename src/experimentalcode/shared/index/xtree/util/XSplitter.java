@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import experimentalcode.shared.index.xtree.XDirectoryEntry;
 import experimentalcode.shared.index.xtree.XNode;
 import experimentalcode.shared.index.xtree.XTreeBase;
+import experimentalcode.shared.index.xtree.XTreeSettings;
 
 /**
  * Provides methods for splitting X-tree nodes.
@@ -64,7 +65,7 @@ public class XSplitter<E extends SpatialEntry, ET extends E, N extends XNode<E, 
   private List<ET> entries = null;
 
   /** Selected maximum overlap strategy. */
-  private XTreeBase.Overlap maxOverlapStrategy = XTreeBase.Overlap.VOLUME_OVERLAP;
+  private XTreeSettings.Overlap maxOverlapStrategy = XTreeSettings.Overlap.VOLUME_OVERLAP;
 
   /** The tree calling this splitter. */
   private T tree;

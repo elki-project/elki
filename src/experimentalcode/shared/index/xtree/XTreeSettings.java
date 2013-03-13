@@ -1,0 +1,78 @@
+package experimentalcode.shared.index.xtree;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2013
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
+
+/**
+ * XTree settings.
+ * 
+ * @author Erich Schubert
+ */
+public class XTreeSettings extends AbstractRTreeSettings {
+  /**
+   * Relative min entries value.
+   */
+  public double relativeMinEntries;
+
+  /**
+   * Relative minimum fanout.
+   */
+  public double relativeMinFanout;
+
+  /**
+   * Minimum size to be allowed for page sizes after a split in case of a
+   * minimum overlap split.
+   */
+  public int min_fanout;
+
+  /**
+   * Maximum overlap for a split partition.
+   */
+  public float max_overlap = .2f;
+
+  /**
+   * Overlap computation method.
+   */
+  public static enum Overlap {
+    /**
+     * The maximum overlap is calculated as the ratio of total data objects in
+     * the overlapping region.
+     */
+    DATA_OVERLAP,
+
+    /**
+     * The maximum overlap is calculated as the fraction of the overlapping
+     * region of the two original mbrs:
+     * <code>(overlap volume of mbr 1 and mbr 2) / (volume of mbr 1 + volume of mbr 2)</code>
+     */
+    VOLUME_OVERLAP
+  }
+
+  /**
+   * Type of overlap to be used for testing on maximum overlap. Must be one of
+   * {@link #DATA_OVERLAP} and {@link #VOLUME_OVERLAP}.
+   */
+  protected Overlap overlap_type = Overlap.DATA_OVERLAP;
+}
