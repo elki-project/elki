@@ -29,13 +29,12 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.AbstractDistanceKNNQuery;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.index.tree.query.DoubleMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 
 /**
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDistanceKNNQuery<O, D> {
+public class MetricalIndexKNNQuery<O, D extends NumberDistance<D, ?>> extends AbstractDistanceKNNQuery<O, D> {
   /**
    * The index to use
    */
@@ -72,45 +71,44 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
     }
     index.statistics.countKNNQuery();
 
-    final D nullDistance = index.getDistanceFactory().nullDistance();
     KNNHeap<D> knnList = DBIDUtil.newHeap(distanceQuery.getDistanceFactory(), k);
     D d_k = knnList.getKNNDistance();
 
-    final ComparableMinHeap<GenericMTreeDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
+    final ComparableMinHeap<DoubleMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<>(nullDistance, index.getRootID(), null, nullDistance));
+    pq.add(new DoubleMTreeDistanceSearchCandidate(0., index.getRootID(), null, 0.));
 
     // search in tree
     while (!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
+      DoubleMTreeDistanceSearchCandidate pqNode = pq.poll();
 
-      if (knnList.size() >= k && pqNode.mindist.compareTo(d_k) > 0) {
+      if (knnList.size() >= k && pqNode.mindist > d_k.doubleValue()) {
         break;
       }
 
       AbstractMTreeNode<?, D, ?, ?> node = index.getNode(pqNode.nodeID);
       DBID id_p = pqNode.routingObjectID;
-      D d1 = pqNode.routingDistance;
+      double d1 = pqNode.routingDistance;
 
       // directory node
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MTreeEntry<D> entry = node.getEntry(i);
+          MTreeEntry entry = node.getEntry(i);
           DBID o_r = entry.getRoutingObjectID();
-          D r_or = entry.getCoveringRadius();
-          D d2 = id_p != null ? entry.getParentDistance() : nullDistance;
+          double r_or = entry.getCoveringRadius();
+          double d2 = id_p != null ? entry.getParentDistance() : 0.;
 
-          D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+          double diff = Math.abs(d1 - d2);
 
-          D sum = d_k.plus(r_or);
+          double sum = d_k.doubleValue() + r_or;
 
-          if (diff.compareTo(sum) <= 0) {
-            D d3 = distanceQuery.distance(o_r, q);
+          if (diff <= sum) {
+            double d3 = distanceQuery.distance(o_r, q).doubleValue();
             index.statistics.countDistanceCalculation();
-            D d_min = DistanceUtil.max(d3.minus(r_or), index.getDistanceFactory().nullDistance());
-            if (d_min.compareTo(d_k) <= 0) {
-              pq.add(new GenericMTreeDistanceSearchCandidate<>(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
+            double d_min = Math.max(d3 - r_or, 0.);
+            if (d_min <= d_k.doubleValue()) {
+              pq.add(new DoubleMTreeDistanceSearchCandidate(d_min, ((DirectoryEntry) entry).getPageID(), o_r, d3));
             }
           }
         }
@@ -118,14 +116,14 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
       // data node
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MTreeEntry<D> entry = node.getEntry(i);
+          MTreeEntry entry = node.getEntry(i);
           DBID o_j = entry.getRoutingObjectID();
 
-          D d2 = id_p != null ? entry.getParentDistance() : nullDistance;
+          double d2 = id_p != null ? entry.getParentDistance() : 0.;
 
-          D diff = (d1.compareTo(d2) > 0) ? d1.minus(d2) : d2.minus(d1);
+          double diff = Math.abs(d1 - d2);
 
-          if (diff.compareTo(d_k) <= 0) {
+          if (diff <= d_k.doubleValue()) {
             D d3 = distanceQuery.distance(o_j, q);
             index.statistics.countDistanceCalculation();
             if (d3.compareTo(d_k) <= 0) {

@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
-
 /**
  * Provides an approximation for knn-distances line consisting of incline m,
  * axes intercept t and a start value for k.
@@ -119,17 +117,15 @@ public class ApproximationLine implements Externalizable {
   /**
    * Returns the approximated knn-distance at the specified k.
    * 
-   * @param <O> Object type
-   * @param <D> Distance type
    * @param k the value for which the knn-distance should be returned
    * @param distanceFactory the distance function
    * @return the approximated knn-distance at the specified k
    */
-  public <O, D extends NumberDistance<D, ?>> D getApproximatedKnnDistance(int k, D distanceFactory) {
+  public double getApproximatedKnnDistance(int k) {
     if (k < k_0) {
-      return distanceFactory.nullDistance();
+      return 0.;
     }
-    return distanceFactory.fromDouble(StrictMath.exp(getValueAt(k)));
+    return Math.exp(getValueAt(k));
   }
 
   /**

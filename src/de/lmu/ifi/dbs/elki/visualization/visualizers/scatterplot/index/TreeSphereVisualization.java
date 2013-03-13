@@ -121,7 +121,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleDistance, MTreeNode<Object, DoubleDistance>, MTreeEntry<DoubleDistance>>(task);
+    return new Instance<DoubleDistance, MTreeNode<Object, DoubleDistance>, MTreeEntry>(task);
   }
 
   /**
@@ -162,7 +162,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
    * @param <E> Tree entry type
    */
   // TODO: listen for tree changes!
-  public class Instance<D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<?, D, N, E>, E extends MTreeEntry<D>> extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance<D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<?, D, N, E>, E extends MTreeEntry> extends AbstractScatterplotVisualization implements DataStoreListener {
     protected double p;
 
     /**
@@ -244,7 +244,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
       DBID roid = entry.getRoutingObjectID();
       if (roid != null) {
         NumberVector<?> ro = rel.get(roid);
-        D rad = entry.getCoveringRadius();
+        double rad = entry.getCoveringRadius();
 
         final Element r;
         if (dist == Modus.MANHATTAN) {

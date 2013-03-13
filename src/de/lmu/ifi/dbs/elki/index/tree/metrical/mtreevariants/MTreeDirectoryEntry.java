@@ -29,7 +29,6 @@ import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
 
 /**
@@ -39,10 +38,9 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
  * the routing object of the entry to its parent's routing object in the M-Tree.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used in the M-Tree
  */
-public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirectoryEntry implements MTreeEntry<D> {
-  private static final long serialVersionUID = 1;
+public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTreeEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The id of routing object of this entry.
@@ -53,12 +51,12 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * The distance from the routing object of this entry to its parent's routing
    * object.
    */
-  private D parentDistance;
+  private double parentDistance;
 
   /**
    * The covering radius of the entry.
    */
-  private D coveringRadius;
+  private double coveringRadius;
 
   /**
    * Empty constructor for serialization purposes.
@@ -76,7 +74,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * @param nodeID the id of the underlying node
    * @param coveringRadius the covering radius of the entry
    */
-  public MTreeDirectoryEntry(DBID objectID, D parentDistance, Integer nodeID, D coveringRadius) {
+  public MTreeDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius) {
     super(nodeID);
     this.routingObjectID = objectID;
     this.parentDistance = parentDistance;
@@ -89,7 +87,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * @return the covering radius of this entry
    */
   @Override
-  public final D getCoveringRadius() {
+  public final double getCoveringRadius() {
     return coveringRadius;
   }
 
@@ -99,7 +97,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * @param coveringRadius the covering radius to be set
    */
   @Override
-  public final void setCoveringRadius(D coveringRadius) {
+  public final void setCoveringRadius(double coveringRadius) {
     this.coveringRadius = coveringRadius;
   }
 
@@ -131,7 +129,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    *         routing object.
    */
   @Override
-  public final D getParentDistance() {
+  public final double getParentDistance() {
     return parentDistance;
   }
 
@@ -141,7 +139,7 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * @param parentDistance the distance to be set
    */
   @Override
-  public final void setParentDistance(D parentDistance) {
+  public final void setParentDistance(double parentDistance) {
     this.parentDistance = parentDistance;
   }
 
@@ -153,8 +151,8 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
     out.writeInt(DBIDUtil.asInteger(routingObjectID));
-    out.writeObject(parentDistance);
-    out.writeObject(coveringRadius);
+    out.writeDouble(parentDistance);
+    out.writeDouble(coveringRadius);
   }
 
   /**
@@ -162,12 +160,11 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    * and the coveringRadius of this entry from the specified input stream.
    */
   @Override
-  @SuppressWarnings( { "unchecked" })
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     this.routingObjectID = DBIDUtil.importInteger(in.readInt());
-    this.parentDistance = (D) in.readObject();
-    this.coveringRadius = (D) in.readObject();
+    this.parentDistance = in.readDouble();
+    this.coveringRadius = in.readDouble();
   }
 
   /**
@@ -189,24 +186,23 @@ public class MTreeDirectoryEntry<D extends Distance<D>> extends AbstractDirector
    *         and routingObjectID as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
-    final MTreeDirectoryEntry<D> that = (MTreeDirectoryEntry<D>) o;
+    final MTreeDirectoryEntry that = (MTreeDirectoryEntry) o;
 
-    if(coveringRadius != null ? !coveringRadius.equals(that.coveringRadius) : that.coveringRadius != null) {
+    if (Math.abs(coveringRadius - that.coveringRadius) < Double.MIN_NORMAL) {
       return false;
     }
-    if(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null) {
+    if (Math.abs(parentDistance - that.parentDistance) < Double.MIN_NORMAL) {
       return false;
     }
     return !(routingObjectID != null ? !DBIDUtil.equal(routingObjectID, that.routingObjectID) : that.routingObjectID != null);

@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
@@ -43,14 +43,14 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory<O, D, MTreeNode<O, D>, MTreeEntry<D>, MTreeIndex<O, D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>>> {
+public class MTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MTreeNode<O, D>, MTreeEntry, MTreeIndex<O, D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MTreeFactory(PageFileFactory<?> pageFileFactory, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>> settings) {
+  public MTreeFactory(PageFileFactory<?> pageFileFactory, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry> settings) {
     super(pageFileFactory, settings);
   }
 
@@ -71,14 +71,14 @@ public class MTreeFactory<O, D extends Distance<D>> extends AbstractMTreeFactory
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMTreeFactory.Parameterizer<O, D, MTreeNode<O, D>, MTreeEntry<D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>>> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MTreeNode<O, D>, MTreeEntry, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
     @Override
     protected MTreeFactory<O, D> makeInstance() {
       return new MTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>> makeSettings() {
+    protected MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry> makeSettings() {
       return new MTreeSettings<>();
     }
   }

@@ -299,13 +299,13 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
           {
             final Element dist;
             if(p == 1.0) {
-              dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), last.getDistance());
+              dist = SVGHyperSphere.drawManhattan(svgp, proj, rel.get(i), last.getDistance().doubleValue());
             }
             else if(p == 2.0) {
-              dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), last.getDistance());
+              dist = SVGHyperSphere.drawEuclidean(svgp, proj, rel.get(i), last.getDistance().doubleValue());
             }
             else if(!Double.isNaN(p)) {
-              dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), last.getDistance(), p);
+              dist = SVGHyperSphere.drawLp(svgp, proj, rel.get(i), last.getDistance().doubleValue(), p);
             }
             else if(angular) {
               final NumberVector<?> refvec = rel.get(i);

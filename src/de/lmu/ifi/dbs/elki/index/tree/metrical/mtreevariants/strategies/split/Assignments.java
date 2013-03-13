@@ -26,18 +26,15 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**
  * Encapsulates the attributes of an assignment during a split.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
+public class Assignments<E extends MTreeEntry> {
   /**
    * The id of the first routing object.
    */
@@ -51,22 +48,22 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
   /**
    * The first covering radius.
    */
-  private D firstCoveringRadius;
+  private double firstCoveringRadius;
 
   /**
    * The second covering radius.
    */
-  private D secondCoveringRadius;
+  private double secondCoveringRadius;
 
   /**
    * The assignments to the first routing object.
    */
-  private List<DistanceEntry<D, E>> firstAssignments;
+  private List<DistanceEntry<E>> firstAssignments;
 
   /**
    * The assignments to the second routing object.
    */
-  private List<DistanceEntry<D, E>> secondAssignments;
+  private List<DistanceEntry<E>> secondAssignments;
 
   /**
    * Provides an assignment during a split of an MTree node.
@@ -78,7 +75,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * @param firstAssignments the assignments to the first routing object
    * @param secondAssignments the assignments to the second routing object
    */
-  public Assignments(DBID id1, DBID id2, D firstCoveringRadius, D secondCoveringRadius, List<DistanceEntry<D, E>> firstAssignments, List<DistanceEntry<D, E>> secondAssignments) {
+  public Assignments(DBID id1, DBID id2, double firstCoveringRadius, double secondCoveringRadius, List<DistanceEntry<E>> firstAssignments, List<DistanceEntry<E>> secondAssignments) {
     this.id1 = id1;
     this.id2 = id2;
     this.firstCoveringRadius = firstCoveringRadius;
@@ -110,7 +107,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * 
    * @return the first covering radius
    */
-  public D getFirstCoveringRadius() {
+  public double getFirstCoveringRadius() {
     return firstCoveringRadius;
   }
 
@@ -119,7 +116,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * 
    * @return the second covering radius
    */
-  public D getSecondCoveringRadius() {
+  public double getSecondCoveringRadius() {
     return secondCoveringRadius;
   }
 
@@ -128,7 +125,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * 
    * @return the assignments to the first routing object
    */
-  public List<DistanceEntry<D, E>> getFirstAssignments() {
+  public List<DistanceEntry<E>> getFirstAssignments() {
     return firstAssignments;
   }
 
@@ -137,7 +134,7 @@ public class Assignments<D extends Distance<D>, E extends MTreeEntry<D>> {
    * 
    * @return the assignments to the second routing object
    */
-  public List<DistanceEntry<D, E>> getSecondAssignments() {
+  public List<DistanceEntry<E>> getSecondAssignments() {
     return secondAssignments;
   }
 }

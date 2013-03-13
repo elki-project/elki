@@ -24,8 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  * @param <D> the type of Distance used in the MkMaxTree
  */
-class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
+class MkMaxTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode<O, D, MkMaxTreeNode<O, D>, MkMaxEntry> {
   /**
    * Serial version
    */
@@ -70,11 +69,11 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * @param distanceFactory the distance function
    * @return the knn distance of this node
    */
-  protected D kNNDistance(D distanceFactory) {
-    D knnDist = distanceFactory.nullDistance();
+  protected double kNNDistance() {
+    double knnDist = 0.;
     for (int i = 0; i < getNumEntries(); i++) {
-      MkMaxEntry<D> entry = getEntry(i);
-      knnDist = DistanceUtil.max(knnDist, entry.getKnnDistance());
+      MkMaxEntry entry = getEntry(i);
+      knnDist = Math.max(knnDist, entry.getKnnDistance());
     }
     return knnDist;
   }
@@ -85,10 +84,10 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * all its entries.
    */
   @Override
-  public void adjustEntry(MkMaxEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, ?> mTree) {
+  public void adjustEntry(MkMaxEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distance
-    entry.setKnnDistance(kNNDistance(mTree.getDistanceFactory()));
+    entry.setKnnDistance(kNNDistance());
   }
 
   /**
@@ -96,15 +95,13 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * node is correctly set.
    */
   @Override
-  protected void integrityCheckParameters(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, ?> mTree) {
+  protected void integrityCheckParameters(MkMaxEntry parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test if knn distance is correctly set
-    MkMaxEntry<D> entry = parent.getEntry(index);
-    D knnDistance = kNNDistance(mTree.getDistanceFactory());
-    if (!entry.getKnnDistance().equals(knnDistance)) {
-      String soll = knnDistance.toString();
-      String ist = entry.getKnnDistance().toString();
-      throw new RuntimeException("Wrong knnDistance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);
+    MkMaxEntry entry = parent.getEntry(index);
+    double knnDistance = kNNDistance();
+    if (Math.abs(entry.getKnnDistance() - knnDistance) > 0) {
+      throw new RuntimeException("Wrong knnDistance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + knnDistance + ",\n ist: " + entry.getKnnDistance());
     }
   }
 }

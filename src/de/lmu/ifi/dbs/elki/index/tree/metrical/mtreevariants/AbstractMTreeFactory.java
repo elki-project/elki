@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.PagedIndexFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMTree<O, D, N, E, S> & Index, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, I extends AbstractMTree<O, D, N, E, S> & Index, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory<O, I> {
   /**
    * Tree settings.
    */
@@ -81,7 +81,7 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory.Parameterizer<O> {
     /**
      * Parameter to specify the distance function to determine the distance
      * between database objects, must extend

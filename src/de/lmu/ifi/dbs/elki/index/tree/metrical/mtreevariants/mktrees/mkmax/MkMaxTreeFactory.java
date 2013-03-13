@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -42,14 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, MkMaxTreeIndex<O, D>, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>>> {
+public class MkMaxTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMkTreeUnifiedFactory<O, D, MkMaxTreeNode<O, D>, MkMaxEntry, MkMaxTreeIndex<O, D>, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry>> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MkMaxTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> settings) {
+  public MkMaxTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry> settings) {
     super(pageFileFactory, settings);
   }
 
@@ -70,14 +70,14 @@ public class MkMaxTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>>> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkMaxTreeNode<O, D>, MkMaxEntry, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry>> {
     @Override
     protected MkMaxTreeFactory<O, D> makeInstance() {
       return new MkMaxTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> makeSettings() {
+    protected MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry> makeSettings() {
       return new MkTreeSettings<>();
     }
   }

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <E> the type of MetricalEntry used in the metrical index
  * @param <S> the type of Settings used.
  */
-public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MkTreeSettings<O, D, N, E>> extends AbstractMkTree<O, D, N, E, S> {
+public abstract class AbstractMkTreeUnified<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MkTreeSettings<O, D, N, E>> extends AbstractMkTree<O, D, N, E, S> {
   /**
    * Constructor.
    * 

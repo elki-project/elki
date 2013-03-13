@@ -30,17 +30,18 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.DistanceEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 
 /**
  * Abstract super class for all M-Tree variants.
@@ -55,7 +56,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MTreeSettings<O, D, N, E>> extends MetricalIndexTree<O, D, N, E> {
+public abstract class AbstractMTree<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, D, N, E>> extends MetricalIndexTree<O, D, N, E> {
   /**
    * Debugging flag: do extra integrity checks.
    */
@@ -177,7 +178,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     // determine parent distance
     E parentEntry = subtree.getLastPathComponent().getEntry();
-    D parentDistance = distance(parentEntry.getRoutingObjectID(), entry.getRoutingObjectID());
+    double parentDistance = distance(parentEntry.getRoutingObjectID(), entry.getRoutingObjectID()).doubleValue();
     entry.setParentDistance(parentDistance);
 
     // create leaf entry and do pre insert
@@ -229,16 +230,16 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param q the id of the object
    * @return a list of the sorted entries
    */
-  protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q) {
-    List<DistanceEntry<D, E>> result = new ArrayList<>();
+  protected final List<DoubleIntPair> getSortedEntries(N node, DBID q) {
+    List<DoubleIntPair> result = new ArrayList<>();
 
     for (int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
-      D distance = distance(entry.getRoutingObjectID(), q);
-      D radius = entry.getCoveringRadius();
-      D minDist = radius.compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(radius);
+      double distance = distance(entry.getRoutingObjectID(), q).doubleValue();
+      double radius = entry.getCoveringRadius();
+      double minDist = (radius > distance) ? 0.0 : distance - radius;
 
-      result.add(new DistanceEntry<>(entry, minDist, i));
+      result.add(new DoubleIntPair(minDist, i));
     }
 
     Collections.sort(result);
@@ -274,7 +275,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    *        the routing object of the parent node
    * @return the newly created directory entry
    */
-  protected abstract E createNewDirectoryEntry(N node, DBID routingObjectID, D parentDistance);
+  protected abstract E createNewDirectoryEntry(N node, DBID routingObjectID, double parentDistance);
 
   /**
    * Adjusts the tree after insertion of some nodes.
@@ -293,18 +294,18 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // overflow in node; split the node
     if (hasOverflow(node)) {
       // do the split
-      Assignments<D, E> assignments = settings.splitStrategy.split(this, node);
+      Assignments<E> assignments = settings.splitStrategy.split(this, node);
       final N newNode = node.isLeaf() ? createNewLeafNode() : createNewDirectoryNode();
 
       List<E> entries1 = new ArrayList<>(assignments.getFirstAssignments().size());
       List<E> entries2 = new ArrayList<>(assignments.getSecondAssignments().size());
       // Store final parent distances:
-      for (DistanceEntry<D, E> ent : assignments.getFirstAssignments()) {
+      for (DistanceEntry<E> ent : assignments.getFirstAssignments()) {
         final E e = ent.getEntry();
         e.setParentDistance(ent.getDistance());
         entries1.add(e);
       }
-      for (DistanceEntry<D, E> ent : assignments.getSecondAssignments()) {
+      for (DistanceEntry<E> ent : assignments.getSecondAssignments()) {
         final E e = ent.getEntry();
         e.setParentDistance(ent.getDistance());
         entries2.add(e);
@@ -335,13 +336,13 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         if (getLogger().isDebugging()) {
           getLogger().debugFine("parent " + parent);
         }
-        D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
+        double parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject()).doubleValue();
         // logger.warning("parent: "+parent.toString()+" split: " +
         // splitNode.toString()+ " dist:"+parentDistance2);
         parent.addDirectoryEntry(createNewDirectoryEntry(newNode, assignments.getSecondRoutingObject(), parentDistance2));
 
         // adjust the entry representing the (old) node, that has been split
-        D parentDistance1 = distance(parentEntry.getRoutingObjectID(), assignments.getFirstRoutingObject());
+        double parentDistance1 = distance(parentEntry.getRoutingObjectID(), assignments.getFirstRoutingObject()).doubleValue();
         // logger.warning("parent: "+parent.toString()+" node: " +
         // node.toString()+ " dist:"+parentDistance1);
         node.adjustEntry(parent.getEntry(nodeIndex), assignments.getFirstRoutingObject(), parentDistance1, this);
@@ -421,8 +422,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // firstRoutingObjectID);
     // D parentDistance2 = distance(getRootEntry().getRoutingObjectID(),
     // secondRoutingObjectID);
-    E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, null);
-    E newRootEntry = createNewDirectoryEntry(newNode, secondRoutingObjectID, null);
+    E oldRootEntry = createNewDirectoryEntry(oldRoot, firstRoutingObjectID, 0.);
+    E newRootEntry = createNewDirectoryEntry(newNode, secondRoutingObjectID, 0.);
     root.addDirectoryEntry(oldRootEntry);
     root.addDirectoryEntry(newRootEntry);
 

@@ -50,28 +50,26 @@ public class SVGHyperSphere {
   /**
    * Wireframe "manhattan" hypersphere
    * 
-   * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param mid mean vector
-   * @param rad radius
+   * @param radius radius
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad) {
-    final double radius = rad.doubleValue();
+  public static Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double radius) {
     final double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
     final BitSet dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
-    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
+    for (int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       v_mid[dim] += radius;
       double[] p1 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] -= radius;
       v_mid[dim] -= radius;
       double[] p2 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] += radius;
-      for(int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
-        if(dim < dim2) {
+      for (int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
+        if (dim < dim2) {
           v_mid[dim2] += radius;
           double[] p3 = proj.fastProjectDataToRenderSpace(v_mid);
           v_mid[dim2] -= radius;
@@ -97,20 +95,18 @@ public class SVGHyperSphere {
   /**
    * Wireframe "euclidean" hypersphere
    * 
-   * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param mid mean vector
-   * @param rad radius
+   * @param radius radius
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad) {
-    final double radius = rad.doubleValue();
+  public static Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double radius) {
     double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
     BitSet dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
-    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
+    for (int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       v_mid[dim] += radius;
       double[] p1 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] -= radius;
@@ -121,8 +117,8 @@ public class SVGHyperSphere {
       double[] dt1 = new double[v_mid.length];
       dt1[dim] = radius;
       double[] d1 = proj.fastProjectRelativeDataToRenderSpace(dt1);
-      for(int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
-        if(dim < dim2) {
+      for (int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
+        if (dim < dim2) {
           v_mid[dim2] += radius;
           double[] p3 = proj.fastProjectDataToRenderSpace(v_mid);
           v_mid[dim2] -= radius;
@@ -149,38 +145,34 @@ public class SVGHyperSphere {
   /**
    * Wireframe "Lp" hypersphere
    * 
-   * @param <D> radius
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param mid mean vector
-   * @param rad radius
+   * @param radius radius
    * @param p L_p value
    * @return path element
    */
-  public static <D extends NumberDistance<?, ?>> Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, D rad, double p) {
-    final double radius = rad.doubleValue();
+  public static Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector<?> mid, double radius, double p) {
     final double[] v_mid = mid.getColumnVector().getArrayRef();
     final BitSet dims = proj.getVisibleDimensions2D();
 
     final double kappax, kappay;
-    if(p > 1.) {
+    if (p > 1.) {
       final double kappal = Math.pow(0.5, 1. / p);
       kappax = Math.min(1.3, 4. * (2 * kappal - 1) / 3.);
       kappay = 0;
-    }
-    else if(p < 1.) {
+    } else if (p < 1.) {
       final double kappal = 1 - Math.pow(0.5, 1. / p);
       kappax = 0;
       kappay = Math.min(1.3, 4. * (2 * kappal - 1) / 3.);
-    }
-    else {
+    } else {
       kappax = 0;
       kappay = 0;
     }
     // LoggingUtil.warning("kappax: " + kappax + " kappay: " + kappay);
 
     SVGPath path = new SVGPath();
-    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
+    for (int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       v_mid[dim] += radius;
       double[] pvp0 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] -= radius;
@@ -191,8 +183,8 @@ public class SVGHyperSphere {
       double[] tvd0 = new double[v_mid.length];
       tvd0[dim] = radius;
       double[] vd0 = proj.fastProjectRelativeDataToRenderSpace(tvd0);
-      for(int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
-        if(dim < dim2) {
+      for (int dim2 = dims.nextSetBit(0); dim2 >= 0; dim2 = dims.nextSetBit(dim2 + 1)) {
+        if (dim < dim2) {
           v_mid[dim2] += radius;
           double[] pv0p = proj.fastProjectDataToRenderSpace(v_mid);
           v_mid[dim2] -= radius;
@@ -204,7 +196,7 @@ public class SVGHyperSphere {
           tv0d[dim2] = radius;
           double[] v0d = proj.fastProjectRelativeDataToRenderSpace(tv0d);
 
-          if(p > 1) {
+          if (p > 1) {
             // p > 1
             path.moveTo(pvp0[0], pvp0[1]);
             // support points, p0 to 0p
@@ -232,8 +224,7 @@ public class SVGHyperSphere {
             final double s_pm2_y = pvp0[1] - v0d[1] * kappax;
             path.cubicTo(s_pm1_x, s_pm1_y, s_pm2_x, s_pm2_y, pvp0[0], pvp0[1]);
             path.close();
-          }
-          else if(p < 1) {
+          } else if (p < 1) {
             // p < 1
             // support points, p0 to 0p
             final double s_vp0_x = pvp0[0] - vd0[0] * kappay;
@@ -251,8 +242,7 @@ public class SVGHyperSphere {
             path.cubicTo(s_vm0_x, s_vm0_y, s_v0m_x, s_v0m_y, pv0m[0], pv0m[1]);
             path.cubicTo(s_v0m_x, s_v0m_y, s_vp0_x, s_vp0_y, pvp0[0], pvp0[1]);
             path.close();
-          }
-          else {
+          } else {
             // p == 1 - Manhattan
             path.moveTo(pvp0[0], pvp0[1]);
             path.lineTo(pv0p[0], pv0p[1]);
@@ -283,7 +273,7 @@ public class SVGHyperSphere {
     final BitSet dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
-    for(int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
+    for (int dim = dims.nextSetBit(0); dim >= 0; dim = dims.nextSetBit(dim + 1)) {
       v_mid[dim] += radius;
       double[] p1 = proj.fastProjectDataToRenderSpace(v_mid);
       v_mid[dim] -= radius;

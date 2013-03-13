@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <E> the type of MetricalEntry used in the metrical index
  * @param <S> the type of Settings kept.
  */
-public abstract class AbstractMkTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MTreeSettings<O, D, N, E>> extends AbstractMTree<O, D, N, E, S> {
+public abstract class AbstractMkTree<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry, S extends MTreeSettings<O, D, N, E>> extends AbstractMTree<O, D, N, E, S> {
   /**
    * Internal class for performing knn queries
    */

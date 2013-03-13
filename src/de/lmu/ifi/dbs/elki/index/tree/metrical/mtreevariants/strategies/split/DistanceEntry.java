@@ -1,4 +1,6 @@
-package de.lmu.ifi.dbs.elki.index.tree;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
+
+import de.lmu.ifi.dbs.elki.index.tree.Entry;
 
 /*
  This file is part of ELKI:
@@ -23,8 +25,6 @@ package de.lmu.ifi.dbs.elki.index.tree;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-
 /**
  * Helper class: encapsulates an entry in an Index and a distance value
  * belonging to this entry.
@@ -35,9 +35,8 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
  * @apiviz.uses Entry
  * 
  * @param <E> the type of Entry used in the index
- * @param <D> the type of Distance used
  */
-public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Comparable<DistanceEntry<D, E>> {
+public class DistanceEntry<E extends Entry> implements Comparable<DistanceEntry<E>> {
   /**
    * The entry of the Index.
    */
@@ -46,7 +45,7 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
   /**
    * The distance value belonging to the entry.
    */
-  private D distance;
+  private double distance;
 
   /**
    * The index of the entry in its parent's child array.
@@ -60,7 +59,7 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
    * @param distance the distance value belonging to the entry
    * @param index the index of the entry in its parent' child array
    */
-  public DistanceEntry(E entry, D distance, int index) {
+  public DistanceEntry(E entry, double distance, int index) {
     this.entry = entry;
     this.distance = distance;
     this.index = index;
@@ -80,7 +79,7 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
    * 
    * @return the distance value belonging to the entry
    */
-  public D getDistance() {
+  public double getDistance() {
     return distance;
   }
 
@@ -103,13 +102,13 @@ public class DistanceEntry<D extends Distance<D>, E extends Entry> implements Co
    *         being compared to this Object.
    */
   @Override
-  public int compareTo(DistanceEntry<D, E> o) {
-    int comp = distance.compareTo(o.distance);
-    if(comp != 0) {
+  public int compareTo(DistanceEntry<E> o) {
+    int comp = Double.compare(distance, o.distance);
+    if (comp != 0) {
       return comp;
     }
 
-    //return entry.getEntryID().compareTo(o.entry.getEntryID());
+    // return entry.getEntryID().compareTo(o.entry.getEntryID());
     return 0;
   }
 

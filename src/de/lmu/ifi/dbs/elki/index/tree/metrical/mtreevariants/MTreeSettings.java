@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
  */
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MT
  * @param <N> Node type
  * @param <E> Entry type
  */
-public class MTreeSettings<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> {
+public class MTreeSettings<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> {
   /**
    * Holds the instance of the trees distance function.
    */

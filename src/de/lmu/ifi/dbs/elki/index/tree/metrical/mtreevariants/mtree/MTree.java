@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("M-Tree")
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-abstract public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>>> {
+abstract public class MTree<O, D extends NumberDistance<D, ?>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry>> {
   /**
    * The logger for this class.
    */
@@ -71,7 +71,7 @@ abstract public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public MTree(PageFile<MTreeNode<O, D>> pagefile, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>> settings) {
+  public MTree(PageFile<MTreeNode<O, D>> pagefile, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry> settings) {
     super(pagefile, settings);
   }
 
@@ -79,62 +79,16 @@ abstract public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D
    * Does nothing because no operations are necessary before inserting an entry.
    */
   @Override
-  protected void preInsert(MTreeEntry<D> entry) {
+  protected void preInsert(MTreeEntry entry) {
     // do nothing
-  }
-
-  @Override
-  protected void initializeCapacities(MTreeEntry<D> exampleLeaf) {
-    int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
-
-    // FIXME: simulate a proper feature size!
-    int featuresize = 0; // RelationUtil.dimensionality(relation);
-
-    // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
-    double overhead = 12.125;
-    if (getPageSize() - overhead < 0) {
-      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
-    }
-
-    // dirCapacity = (pageSize - overhead) / (nodeID + objectID +
-    // coveringRadius + parentDistance) + 1
-    // dirCapacity = (int) (pageSize - overhead) / (4 + 4 + distanceSize +
-    // distanceSize) + 1;
-
-    // dirCapacity = (pageSize - overhead) / (nodeID + **object feature size** +
-    // coveringRadius + parentDistance) + 1
-    dirCapacity = (int) (getPageSize() - overhead) / (4 + featuresize + distanceSize + distanceSize) + 1;
-
-    if (dirCapacity <= 2) {
-      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
-    }
-
-    if (dirCapacity < 10) {
-      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
-    }
-    // leafCapacity = (pageSize - overhead) / (objectID + parentDistance) +
-    // 1
-    // leafCapacity = (int) (pageSize - overhead) / (4 + distanceSize) + 1;
-    // leafCapacity = (pageSize - overhead) / (objectID + ** object size ** +
-    // parentDistance) +
-    // 1
-    leafCapacity = (int) (getPageSize() - overhead) / (4 + featuresize + distanceSize) + 1;
-
-    if (leafCapacity <= 1) {
-      throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
-    }
-
-    if (leafCapacity < 10) {
-      LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
-    }
   }
 
   /**
    * @return a new MTreeDirectoryEntry representing the specified node
    */
   @Override
-  protected MTreeEntry<D> createNewDirectoryEntry(MTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MTreeDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
+  protected MTreeEntry createNewDirectoryEntry(MTreeNode<O, D> node, DBID routingObjectID, double parentDistance) {
+    return new MTreeDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
   }
 
   /**
@@ -142,8 +96,8 @@ abstract public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D
    *         <code>new MTreeDirectoryEntry<D>(null, null, 0, null)</code>
    */
   @Override
-  protected MTreeEntry<D> createRootEntry() {
-    return new MTreeDirectoryEntry<>(null, null, 0, null);
+  protected MTreeEntry createRootEntry() {
+    return new MTreeDirectoryEntry(null, 0., 0, 0.);
   }
 
   /**

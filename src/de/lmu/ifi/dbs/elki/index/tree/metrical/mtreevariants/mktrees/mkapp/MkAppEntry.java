@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
 /**
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @apiviz.composedOf PolynomialApproximation
  */
-interface MkAppEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
+interface MkAppEntry extends MTreeEntry {
   /**
    * Returns the approximated value at the specified k.
    * 

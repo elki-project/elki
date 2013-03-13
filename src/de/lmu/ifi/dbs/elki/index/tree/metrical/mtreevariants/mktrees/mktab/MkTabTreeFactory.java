@@ -24,9 +24,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -42,14 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTabTreeIndex<O, D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>>> {
+public class MkTabTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeNode<O, D>, MkTabEntry, MkTabTreeIndex<O, D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry>> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> settings) {
+  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry> settings) {
     super(pageFileFactory, settings);
   }
 
@@ -70,14 +70,14 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>>> {
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkTabTreeNode<O, D>, MkTabEntry, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry>> {
     @Override
     protected MkTabTreeFactory<O, D> makeInstance() {
       return new MkTabTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> makeSettings() {
+    protected MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry> makeSettings() {
       return new MkTreeSettings<>();
     }
   }

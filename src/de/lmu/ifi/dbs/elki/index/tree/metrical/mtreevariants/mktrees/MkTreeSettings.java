@@ -23,10 +23,10 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 
 /**
  * Class with settings for MkTrees.
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public class MkTreeSettings<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSettings<O, D, N, E> {
+public class MkTreeSettings<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends MTreeSettings<O, D, N, E> {
   /**
    * Holds the maximum value of k to support.
    */

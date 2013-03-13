@@ -28,8 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 
 /**
@@ -39,8 +37,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry
  * 
  * @author Elke Achtert
  */
-class MkCoPDirectoryEntry<D extends NumberDistance<D, ?>> extends MTreeDirectoryEntry<D> implements MkCoPEntry<D> {
-  private static final long serialVersionUID = 1;
+class MkCoPDirectoryEntry extends MTreeDirectoryEntry implements MkCoPEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The conservative approximation.
@@ -64,7 +62,7 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, ?>> extends MTreeDirectory
    * @param conservativeApproximation the conservative approximation of the knn
    *        distances
    */
-  public MkCoPDirectoryEntry(DBID objectID, D parentDistance, Integer nodeID, D coveringRadius, ApproximationLine conservativeApproximation) {
+  public MkCoPDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius, ApproximationLine conservativeApproximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.conservativeApproximation = conservativeApproximation;
   }
@@ -77,8 +75,8 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, ?>> extends MTreeDirectory
    * @return the conservative approximated knn distance of the entry
    */
   @Override
-  public <O> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
-    return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
+  public double approximateConservativeKnnDistance(int k) {
+    return conservativeApproximation.getApproximatedKnnDistance(k);
   }
 
   /**
@@ -138,19 +136,18 @@ class MkCoPDirectoryEntry<D extends NumberDistance<D, ?>> extends MTreeDirectory
    *         and has the same conservative approximation as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
-    final MkCoPDirectoryEntry<D> that = (MkCoPDirectoryEntry<D>) o;
+    final MkCoPDirectoryEntry that = (MkCoPDirectoryEntry) o;
 
     return !(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null);
   }

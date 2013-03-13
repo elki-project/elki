@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.AbstractDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * 
  * @apiviz.uses AbstractMTree
  */
-public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractDistanceRangeQuery<O, D> {
+public class MetricalIndexRangeQuery<O, D extends NumberDistance<D, ?>> extends AbstractDistanceRangeQuery<O, D> {
   /**
    * The index to use
    */
@@ -70,27 +70,26 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
    * @param result the list holding the query results
    */
   private void doRangeQuery(DBID o_p, AbstractMTreeNode<O, D, ?, ?> node, O q, D r_q, GenericDistanceDBIDList<D> result) {
-    final D nullDistance = distanceQuery.nullDistance();
-    D d1 = nullDistance;
+    double d1 = 0.;
     if (o_p != null) {
-      d1 = distanceQuery.distance(o_p, q);
+      d1 = distanceQuery.distance(o_p, q).doubleValue();
       index.statistics.countDistanceCalculation();
     }
     if (!node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<D> entry = node.getEntry(i);
+        MTreeEntry entry = node.getEntry(i);
         DBID o_r = entry.getRoutingObjectID();
 
-        D r_or = entry.getCoveringRadius();
-        D d2 = o_p != null ? entry.getParentDistance() : nullDistance;
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+        double r_or = entry.getCoveringRadius();
+        double d2 = o_p != null ? entry.getParentDistance() : 0.;
+        double diff = Math.abs(d1 - d2);
 
-        D sum = r_q.plus(r_or);
+        double sum = r_q.doubleValue() + r_or;
 
-        if (diff.compareTo(sum) <= 0) {
+        if (diff <= sum) {
           D d3 = distanceQuery.distance(o_r, q);
           index.statistics.countDistanceCalculation();
-          if (d3.compareTo(sum) <= 0) {
+          if (d3.doubleValue() <= sum) {
             AbstractMTreeNode<O, D, ?, ?> child = index.getNode(((DirectoryEntry) entry).getPageID());
             doRangeQuery(o_r, child, q, r_q, result);
           }
@@ -98,14 +97,14 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
       }
     } else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MTreeEntry<D> entry = node.getEntry(i);
+        MTreeEntry entry = node.getEntry(i);
         DBID o_j = entry.getRoutingObjectID();
 
-        D d2 = o_p != null ? entry.getParentDistance() : nullDistance;
+        double d2 = o_p != null ? entry.getParentDistance() : 0.;
 
-        D diff = d1.compareTo(d2) > 0 ? d1.minus(d2) : d2.minus(d1);
+        double diff = Math.abs(d1 - d2);
 
-        if (diff.compareTo(r_q) <= 0) {
+        if (diff <= r_q.doubleValue()) {
           D d3 = distanceQuery.distance(o_j, q);
           index.statistics.countDistanceCalculation();
           if (d3.compareTo(r_q) <= 0) {

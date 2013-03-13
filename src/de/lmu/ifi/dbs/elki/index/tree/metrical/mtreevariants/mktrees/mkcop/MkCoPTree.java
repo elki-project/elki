@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkT
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
@@ -59,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>>> {
+public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry>> {
   /**
    * The logger for this class.
    */
@@ -77,7 +78,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public MkCoPTree(Relation<O> relation, PageFile<MkCoPTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> settings) {
+  public MkCoPTree(Relation<O> relation, PageFile<MkCoPTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry> settings) {
     super(relation, pagefile, settings);
     // init log k
     log_k = new double[settings.k_max];
@@ -90,7 +91,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @throws UnsupportedOperationException since this operation is not supported
    */
   @Override
-  protected void preInsert(MkCoPEntry<D> entry) {
+  protected void preInsert(MkCoPEntry entry) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
@@ -98,12 +99,12 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @throws UnsupportedOperationException since this operation is not supported
    */
   @Override
-  public void insert(MkCoPEntry<D> entry, boolean withPreInsert) {
+  public void insert(MkCoPEntry entry, boolean withPreInsert) {
     throw new UnsupportedOperationException("Insertion of single objects is not supported!");
   }
 
   @Override
-  public void insertAll(List<MkCoPEntry<D>> entries) {
+  public void insertAll(List<MkCoPEntry> entries) {
     if (entries.isEmpty()) {
       return;
     }
@@ -119,7 +120,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     ModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
 
     // insert
-    for (MkCoPEntry<D> entry : entries) {
+    for (MkCoPEntry entry : entries) {
       ids.add(entry.getRoutingObjectID());
       // insert the object
       super.insert(entry, false);
@@ -194,8 +195,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * Determines the maximum and minimum number of entries in a node.
    */
   @Override
-  protected void initializeCapacities(MkCoPEntry<D> exampleLeaf) {
-    int distanceSize = exampleLeaf.getParentDistance().externalizableSize();
+  protected void initializeCapacities(MkCoPEntry exampleLeaf) {
+    int distanceSize = ByteArrayUtil.SIZE_DOUBLE; // exampleLeaf.getParentDistance().externalizableSize();
 
     // overhead = index(4), numEntries(4), id(4), isLeaf(0.125)
     double overhead = 12.125;
@@ -245,14 +246,14 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        refinement)
    */
   private void doReverseKNNQuery(int k, DBIDRef q, GenericDistanceDBIDList<D> result, ModifiableDBIDs candidates) {
-    final ComparableMinHeap<GenericMTreeDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
+    final ComparableMinHeap<GenericMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceFactory().nullDistance(), getRootID(), null, null));
+    pq.add(new GenericMTreeDistanceSearchCandidate(0., getRootID(), null));
 
     // search in tree
     while (!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate<D> pqNode = pq.poll();
+      GenericMTreeDistanceSearchCandidate pqNode = pq.poll();
       // FIXME: cache the distance to the routing object in the queue node!
 
       MkCoPTreeNode<O, D> node = getNode(pqNode.nodeID);
@@ -260,29 +261,29 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       // directory node
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MkCoPEntry<D> entry = node.getEntry(i);
-          D distance = distance(entry.getRoutingObjectID(), q);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
-          D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFactory());
+          MkCoPEntry entry = node.getEntry(i);
+          double distance = distance(entry.getRoutingObjectID(), q).doubleValue();
+          double minDist = entry.getCoveringRadius() > distance ? 0. : distance - entry.getCoveringRadius();
+          double approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k);
 
-          if (minDist.compareTo(approximatedKnnDist_cons) <= 0) {
-            pq.add(new GenericMTreeDistanceSearchCandidate<>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
+          if (minDist <= approximatedKnnDist_cons) {
+            pq.add(new GenericMTreeDistanceSearchCandidate(minDist, getPageID(entry), entry.getRoutingObjectID()));
           }
         }
       }
       // data node
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
-          MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node.getEntry(i);
+          MkCoPLeafEntry entry = (MkCoPLeafEntry) node.getEntry(i);
           D distance = distance(entry.getRoutingObjectID(), q);
-          D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceFactory());
+          double approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k);
 
-          if (distance.compareTo(approximatedKnnDist_prog) <= 0) {
+          if (distance.doubleValue() <= approximatedKnnDist_prog) {
             result.add(distance, entry.getRoutingObjectID());
           } else {
-            D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFactory());
-            double diff = distance.doubleValue() - approximatedKnnDist_cons.doubleValue();
-            if (diff <= 0.0000000001) {
+            double approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k);
+            double diff = distance.doubleValue() - approximatedKnnDist_cons;
+            if (diff <= 1E-10) {
               candidates.add(entry.getRoutingObjectID());
             }
           }
@@ -297,17 +298,17 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
-  private void adjustApproximatedKNNDistances(MkCoPEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
+  private void adjustApproximatedKNNDistances(MkCoPEntry entry, Map<DBID, KNNList<D>> knnLists) {
     MkCoPTreeNode<O, D> node = getNode(entry);
 
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkCoPLeafEntry<D> leafEntry = (MkCoPLeafEntry<D>) node.getEntry(i);
+        MkCoPLeafEntry leafEntry = (MkCoPLeafEntry) node.getEntry(i);
         approximateKnnDistances(leafEntry, knnLists.get(leafEntry.getRoutingObjectID()));
       }
     } else {
       for (int i = 0; i < node.getNumEntries(); i++) {
-        MkCoPEntry<D> dirEntry = node.getEntry(i);
+        MkCoPEntry dirEntry = node.getEntry(i);
         adjustApproximatedKNNDistances(dirEntry, knnLists);
       }
     }
@@ -348,7 +349,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB
    *        (insbes. Distanz 0)
    */
-  private void approximateKnnDistances(MkCoPLeafEntry<D> entry, KNNList<D> knnDistances) {
+  private void approximateKnnDistances(MkCoPLeafEntry entry, KNNList<D> knnDistances) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
     if (msg != null) {
       msg.append("\nknnDistances ").append(knnDistances);
@@ -725,8 +726,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    *        the routing object of the parent node
    */
   @Override
-  protected MkCoPEntry<D> createNewDirectoryEntry(MkCoPTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkCoPDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
+  protected MkCoPEntry createNewDirectoryEntry(MkCoPTreeNode<O, D> node, DBID routingObjectID, double parentDistance) {
+    return new MkCoPDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
     // node.conservativeKnnDistanceApproximation(k_max));
   }
 
@@ -736,8 +737,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return an entry representing the root node
    */
   @Override
-  protected MkCoPEntry<D> createRootEntry() {
-    return new MkCoPDirectoryEntry<>(null, null, 0, null, null);
+  protected MkCoPEntry createRootEntry() {
+    return new MkCoPDirectoryEntry(null, 0., 0, 0., null);
   }
 
   @Override

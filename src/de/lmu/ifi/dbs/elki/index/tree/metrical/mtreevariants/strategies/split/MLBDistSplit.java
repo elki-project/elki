@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MTreeSplit<O, D, N, E> {
+public class MLBDistSplit<O, D extends NumberDistance<D, ?>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry> extends MTreeSplit<O, D, N, E> {
   /**
    * Creates a new split object.
    */
@@ -70,19 +70,19 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
    * @param node the node to be split
    */
   @Override
-  public Assignments<D, E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
+  public Assignments<E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
     DBID firstPromoted = null;
     DBID secondPromoted = null;
 
     // choose first and second routing object
-    D currentMaxDist = tree.getDistanceFactory().nullDistance();
+    double currentMaxDist = 0.;
     for (int i = 0; i < node.getNumEntries(); i++) {
       DBID id1 = node.getEntry(i).getRoutingObjectID();
       for (int j = i + 1; j < node.getNumEntries(); j++) {
         DBID id2 = node.getEntry(j).getRoutingObjectID();
 
-        D distance = tree.distance(id1, id2);
-        if (distance.compareTo(currentMaxDist) >= 0) {
+        double distance = tree.distance(id1, id2).doubleValue();
+        if (distance >= currentMaxDist) {
           firstPromoted = id1;
           secondPromoted = id2;
           currentMaxDist = distance;

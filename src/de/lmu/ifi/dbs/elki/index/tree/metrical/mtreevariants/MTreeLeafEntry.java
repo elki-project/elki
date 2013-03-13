@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
 
 /**
@@ -40,14 +39,14 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * @author Elke Achtert
  * @param <D> the type of Distance used in the M-Tree
  */
-public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry implements MTreeEntry<D> {
-  private static final long serialVersionUID = 1;
+public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
+  private static final long serialVersionUID = 2;
 
   /**
    * The distance from the underlying data object to its parent's routing
    * object.
    */
-  private D parentDistance;
+  private double parentDistance;
 
   /**
    * Empty constructor for serialization purposes.
@@ -63,7 +62,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * @param parentDistance the distance from the underlying data object to its
    *        parent's routing object
    */
-  public MTreeLeafEntry(DBID objectID, D parentDistance) {
+  public MTreeLeafEntry(DBID objectID, double parentDistance) {
     super(objectID);
     this.parentDistance = parentDistance;
   }
@@ -87,7 +86,6 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
   @Override
   public final void setRoutingObjectID(DBID objectID) {
     throw new UnsupportedOperationException("Leaf entries should not be assigned a routing object.");
-    // super.setEntryID(objectID.getIntegerID());
   }
 
   /**
@@ -98,7 +96,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    *         routing object
    */
   @Override
-  public final D getParentDistance() {
+  public final double getParentDistance() {
     return parentDistance;
   }
 
@@ -109,18 +107,18 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    * @param parentDistance the distance to be set
    */
   @Override
-  public final void setParentDistance(D parentDistance) {
+  public final void setParentDistance(double parentDistance) {
     this.parentDistance = parentDistance;
   }
 
   /**
-   * Returns null, since a leaf entry has no covering radius.
+   * Returns zero, since a leaf entry has no covering radius.
    * 
-   * @return null
+   * @return Zero
    */
   @Override
-  public D getCoveringRadius() {
-    return null;
+  public double getCoveringRadius() {
+    return 0.0;
   }
 
   /**
@@ -131,7 +129,7 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    *         radius
    */
   @Override
-  public void setCoveringRadius(D coveringRadius) {
+  public void setCoveringRadius(double coveringRadius) {
     throw new UnsupportedOperationException("This entry is not a directory entry!");
   }
 
@@ -142,18 +140,17 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(parentDistance);
+    out.writeDouble(parentDistance);
   }
 
   /**
    * Calls the super method and reads the parentDistance of this entry from the
    * specified input stream.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.parentDistance = (D) in.readObject();
+    this.parentDistance = in.readDouble();
   }
 
   /**
@@ -164,20 +161,19 @@ public class MTreeLeafEntry<D extends Distance<D>> extends AbstractLeafEntry imp
    *         and has the same parentDistance as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
-    final MTreeLeafEntry<D> that = (MTreeLeafEntry<D>) o;
+    final MTreeLeafEntry that = (MTreeLeafEntry) o;
 
-    return !(parentDistance != null ? !parentDistance.equals(that.parentDistance) : that.parentDistance != null);
+    return Math.abs(parentDistance - that.parentDistance) < Double.MIN_NORMAL;
   }
 }

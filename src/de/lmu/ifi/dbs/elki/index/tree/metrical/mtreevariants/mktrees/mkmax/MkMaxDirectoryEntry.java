@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 
 /**
@@ -37,19 +36,18 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry
  * the underlying MkMax-Tree node.
  * 
  * @author Elke Achtert
- * @param <D> the type of Distance used in the MkMaxTree
  */
-class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> implements MkMaxEntry<D> {
+class MkMaxDirectoryEntry extends MTreeDirectoryEntry implements MkMaxEntry {
   /**
    * Serial version UID
    */
-  private static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 2;
 
   /**
    * The aggregated k-nearest neighbor distance of the underlying MkMax-Tree
    * node.
    */
-  private D knnDistance;
+  private double knnDistance;
 
   /**
    * Empty constructor for serialization purposes.
@@ -69,18 +67,18 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
    * @param knnDistance the aggregated knn distance of the underlying MkMax-Tree
    *        node
    */
-  public MkMaxDirectoryEntry(DBID objectID, D parentDistance, Integer nodeID, D coveringRadius, D knnDistance) {
+  public MkMaxDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius, double knnDistance) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistance = knnDistance;
   }
 
   @Override
-  public D getKnnDistance() {
+  public double getKnnDistance() {
     return knnDistance;
   }
 
   @Override
-  public void setKnnDistance(D knnDistance) {
+  public void setKnnDistance(double knnDistance) {
     this.knnDistance = knnDistance;
   }
 
@@ -91,7 +89,7 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
-    out.writeObject(knnDistance);
+    out.writeDouble(knnDistance);
   }
 
   /**
@@ -99,10 +97,9 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
    * specified input stream.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
-    this.knnDistance = (D) in.readObject();
+    this.knnDistance = in.readDouble();
   }
 
   /**
@@ -113,20 +110,19 @@ class MkMaxDirectoryEntry<D extends Distance<D>> extends MTreeDirectoryEntry<D> 
    *         MkMaxDirectoryEntry and has the same knnDistance as this entry.
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
-    final MkMaxDirectoryEntry<D> that = (MkMaxDirectoryEntry<D>) o;
+    final MkMaxDirectoryEntry that = (MkMaxDirectoryEntry) o;
 
-    return !(knnDistance != null ? !knnDistance.equals(that.knnDistance) : that.knnDistance != null);
+    return Double.compare(knnDistance, that.knnDistance) == 0;
   }
 }

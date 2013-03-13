@@ -39,12 +39,11 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -57,7 +56,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
+public class MkTabTreeIndex<O, D extends NumberDistance<D, ?>> extends MkTabTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
   /**
    * The relation indexed.
    */
@@ -70,7 +69,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public MkTabTreeIndex(Relation<O> relation, PageFile<MkTabTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> settings) {
+  public MkTabTreeIndex(Relation<O> relation, PageFile<MkTabTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry> settings) {
     super(relation, pagefile, settings);
     this.relation = relation;
   }
@@ -83,8 +82,8 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    * @param parentDistance the distance from the object to the routing object of
    *        the parent node
    */
-  protected MkTabEntry<D> createNewLeafEntry(DBID id, O object, D parentDistance) {
-    return new MkTabLeafEntry<>(id, parentDistance, knnDistances(object));
+  protected MkTabEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
+    return new MkTabLeafEntry(id, parentDistance, knnDistances(object));
   }
 
   /**
@@ -93,11 +92,12 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    * @param object the query object
    * @return the knn distance of the object with the specified id
    */
-  private List<D> knnDistances(O object) {
+  private double[] knnDistances(O object) {
     KNNList<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
-    List<D> distances = new ArrayList<>(knns.size());
-    for (DistanceDBIDListIter<D> iter = knns.iter(); iter.valid(); iter.advance()) {
-      distances.add(iter.getDistance());
+    double[] distances = new double[getKmax()];
+    int i = 0;
+    for (DistanceDBIDListIter<D> iter = knns.iter(); iter.valid() && i < getKmax(); iter.advance(), i++) {
+      distances[i] = iter.getDistance().doubleValue();
     }
     return distances;
   }
@@ -105,11 +105,11 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
   @Override
   public void initialize() {
     super.initialize();
-    List<MkTabEntry<D>> objs = new ArrayList<>(relation.size());
+    List<MkTabEntry> objs = new ArrayList<>(relation.size());
     for (DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter); // FIXME: expensive
       final O object = relation.get(id);
-      objs.add(createNewLeafEntry(id, object, getDistanceFactory().undefinedDistance()));
+      objs.add(createNewLeafEntry(id, object, Double.NaN));
     }
     insertAll(objs);
   }
@@ -121,7 +121,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
     if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -134,9 +134,8 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return MTreeQueryUtil.getKNNQuery(idx, dq, hints);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return (KNNQuery<O, S>) MTreeQueryUtil.getKNNQuery(this, dq, hints);
   }
 
   @SuppressWarnings("unchecked")
@@ -146,7 +145,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
     if (distanceQuery.getRelation() != relation) {
       return null;
     }
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -159,15 +158,14 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return MTreeQueryUtil.getRangeQuery(idx, dq);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return (RangeQuery<O, S>) MTreeQueryUtil.getRangeQuery(this, dq);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <S extends Distance<S>> RKNNQuery<O, S> getRKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
-    DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
+    DistanceFunction<? super O, D> distanceFunction = (DistanceFunction<? super O, D>) distanceQuery.getDistanceFunction();
     if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
@@ -180,9 +178,8 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
         return null;
       }
     }
-    AbstractMkTreeUnified<O, S, ?, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?, ?>) this;
-    DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
-    return new MkTreeRKNNQuery<>(idx, dq);
+    DistanceQuery<O, D> dq = distanceFunction.instantiate(relation);
+    return (RKNNQuery<O, S>) new MkTreeRKNNQuery<>(this, dq);
   }
 
   @Override
