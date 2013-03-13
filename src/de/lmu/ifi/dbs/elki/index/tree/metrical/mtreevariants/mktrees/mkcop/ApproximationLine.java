@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 
 /**
@@ -111,7 +110,7 @@ public class ApproximationLine implements Externalizable {
    * @return the function value of the approximation line at the specified k
    */
   public double getValueAt(int k) {
-    if(k < k_0) {
+    if (k < k_0) {
       return Double.POSITIVE_INFINITY;
     }
     return m * StrictMath.log(k) + t;
@@ -123,14 +122,14 @@ public class ApproximationLine implements Externalizable {
    * @param <O> Object type
    * @param <D> Distance type
    * @param k the value for which the knn-distance should be returned
-   * @param distanceFunction the distance function
+   * @param distanceFactory the distance function
    * @return the approximated knn-distance at the specified k
    */
-  public <O, D extends NumberDistance<D, ?>> D getApproximatedKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
-    if(k < k_0) {
-      return distanceFunction.nullDistance();
+  public <O, D extends NumberDistance<D, ?>> D getApproximatedKnnDistance(int k, D distanceFactory) {
+    if (k < k_0) {
+      return distanceFactory.nullDistance();
     }
-    return distanceFunction.getDistanceFactory().parseString("" + StrictMath.exp(getValueAt(k)));
+    return distanceFactory.fromDouble(StrictMath.exp(getValueAt(k)));
   }
 
   /**
@@ -171,10 +170,10 @@ public class ApproximationLine implements Externalizable {
    */
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
 

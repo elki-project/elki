@@ -59,11 +59,6 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  */
 public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O> {
   /**
-   * The knn query we use internally.
-   */
-  private final KNNQuery<O, D> knnQuery;
-
-  /**
    * The relation indexed.
    */
   private Relation<O> relation;
@@ -78,7 +73,6 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
   public MkTabTreeIndex(Relation<O> relation, PageFile<MkTabTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> settings) {
     super(relation, pagefile, settings);
     this.relation = relation;
-    this.knnQuery = this.getKNNQuery(getDistanceQuery());
   }
 
   /**
@@ -100,7 +94,7 @@ public class MkTabTreeIndex<O, D extends Distance<D>> extends MkTabTree<O, D> im
    * @return the knn distance of the object with the specified id
    */
   private List<D> knnDistances(O object) {
-    KNNList<D> knns = knnQuery.getKNNForObject(object, getKmax() - 1);
+    KNNList<D> knns = knnq.getKNNForObject(object, getKmax() - 1);
     List<D> distances = new ArrayList<>(knns.size());
     for (DistanceDBIDListIter<D> iter = knns.iter(); iter.valid(); iter.advance()) {
       distances.add(iter.getDistance());
