@@ -108,7 +108,7 @@ public class TestIndexStructures implements JUnit4Test {
   public void testMetrical() {
     ListParameterization metparams = new ListParameterization();
     metparams.addParameter(StaticArrayDatabase.INDEX_ID, MTreeFactory.class);
-    metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 100);
+    metparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 300);
     testFileBasedDatabaseConnection(metparams, DoubleDistanceMetricalIndexKNNQuery.class, DoubleDistanceMetricalIndexRangeQuery.class);
   }
 
