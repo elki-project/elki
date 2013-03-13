@@ -41,23 +41,6 @@ import java.io.Externalizable;
  */
 public interface Distance<D extends Distance<D>> extends Comparable<D>, Externalizable {
   /**
-   * Returns a new distance as sum of this distance and the given distance.
-   * 
-   * @param distance the distance to be added to this distance
-   * @return a new distance as sum of this distance and the given distance
-   */
-  D plus(D distance);
-
-  /**
-   * Returns a new Distance by subtracting the given distance from this
-   * distance.
-   * 
-   * @param distance the distance to be subtracted from this distance
-   * @return a new Distance by subtracting the given distance from this distance
-   */
-  D minus(D distance);
-
-  /**
    * Any implementing class should implement a proper toString-method for
    * printing the result-values.
    * 

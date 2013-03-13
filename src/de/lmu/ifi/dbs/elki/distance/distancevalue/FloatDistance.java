@@ -88,40 +88,6 @@ public class FloatDistance extends NumberDistance<FloatDistance, Float> {
     return new FloatDistance((float) val);
   }
 
-  @Override
-  public FloatDistance plus(FloatDistance distance) {
-    return new FloatDistance(value + distance.value);
-  }
-
-  @Override
-  public FloatDistance minus(FloatDistance distance) {
-    return new FloatDistance(value - distance.value);
-  }
-
-  /**
-   * Returns a new distance as the product of this distance and the given
-   * distance.
-   * 
-   * @param distance the distance to be multiplied with this distance
-   * @return a new distance as the product of this distance and the given
-   *         distance
-   */
-  public FloatDistance times(FloatDistance distance) {
-    return new FloatDistance(value * distance.value);
-  }
-
-  /**
-   * Returns a new distance as the product of this distance and the given float
-   * value.
-   * 
-   * @param lambda the float value this distance should be multiplied with
-   * @return a new distance as the product of this distance and the given double
-   *         value
-   */
-  public FloatDistance times(float lambda) {
-    return new FloatDistance(value * lambda);
-  }
-
   /**
    * Writes the float value of this FloatDistance to the specified stream.
    */

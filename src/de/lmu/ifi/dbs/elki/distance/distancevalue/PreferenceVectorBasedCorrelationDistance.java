@@ -105,42 +105,6 @@ public class PreferenceVectorBasedCorrelationDistance extends CorrelationDistanc
   }
 
   /**
-   * @throws IllegalArgumentException if the dimensionality values and common
-   *         preference vectors of this distance and the specified distance are
-   *         not equal
-   */
-  @Override
-  public PreferenceVectorBasedCorrelationDistance plus(PreferenceVectorBasedCorrelationDistance distance) {
-    if(this.dimensionality != distance.dimensionality) {
-      throw new IllegalArgumentException("The dimensionality values of this distance " + "and the specified distance need to be equal.\n" + "this.dimensionality     " + this.dimensionality + "\n" + "distance.dimensionality " + distance.dimensionality + "\n");
-    }
-
-    if(!this.commonPreferenceVector.equals(distance.commonPreferenceVector)) {
-      throw new IllegalArgumentException("The common preference vectors of this distance " + "and the specified distance need to be equal.\n" + "this.commonPreferenceVector     " + this.commonPreferenceVector + "\n" + "distance.commonPreferenceVector " + distance.commonPreferenceVector + "\n");
-    }
-
-    return new PreferenceVectorBasedCorrelationDistance(dimensionality, getCorrelationValue() + distance.getCorrelationValue(), getEuclideanValue() + distance.getEuclideanValue(), (BitSet) commonPreferenceVector.clone());
-  }
-
-  /**
-   * @throws IllegalArgumentException if the dimensionality values and common
-   *         preference vectors of this distance and the specified distance are
-   *         not equal
-   */
-  @Override
-  public PreferenceVectorBasedCorrelationDistance minus(PreferenceVectorBasedCorrelationDistance distance) {
-    if(this.dimensionality != distance.dimensionality) {
-      throw new IllegalArgumentException("The dimensionality values of this distance " + "and the specified distance need to be equal.\n" + "this.dimensionality     " + this.dimensionality + "\n" + "distance.dimensionality " + distance.dimensionality + "\n");
-    }
-
-    if(!this.commonPreferenceVector.equals(distance.commonPreferenceVector)) {
-      throw new IllegalArgumentException("The common preference vectors of this distance " + "and the specified distance need to be equal.\n" + "this.commonPreferenceVector     " + this.commonPreferenceVector + "\n" + "distance.commonPreferenceVector " + distance.commonPreferenceVector + "\n");
-    }
-
-    return new PreferenceVectorBasedCorrelationDistance(dimensionality, getCorrelationValue() - distance.getCorrelationValue(), getEuclideanValue() - distance.getEuclideanValue(), (BitSet) commonPreferenceVector.clone());
-  }
-
-  /**
    * Checks if the dimensionality values of this distance and the specified
    * distance are equal. If the check fails an IllegalArgumentException is
    * thrown, otherwise

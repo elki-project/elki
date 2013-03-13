@@ -73,16 +73,6 @@ public class IntegerDistance extends NumberDistance<IntegerDistance, Integer> {
     return new IntegerDistance((int) val);
   }
 
-  @Override
-  public IntegerDistance minus(IntegerDistance distance) {
-    return new IntegerDistance(this.value - distance.value);
-  }
-
-  @Override
-  public IntegerDistance plus(IntegerDistance distance) {
-    return new IntegerDistance(this.value + distance.value);
-  }
-
   /**
    * Writes the integer value of this IntegerDistance to the specified stream.
    */
