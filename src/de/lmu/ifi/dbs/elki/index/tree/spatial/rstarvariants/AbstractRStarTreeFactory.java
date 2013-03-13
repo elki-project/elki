@@ -147,7 +147,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector<?>, N exte
       }
       ObjectParameter<OverflowTreatment> overflowP = new ObjectParameter<>(OVERFLOW_STRATEGY_ID, OverflowTreatment.class, LimitedReinsertOverflowTreatment.class);
       if (config.grab(overflowP)) {
-        settings.overflowTreatment = overflowP.instantiateClass(config);
+        settings.setOverflowTreatment(overflowP.instantiateClass(config));
       }
       configBulkLoad(config);
     }
