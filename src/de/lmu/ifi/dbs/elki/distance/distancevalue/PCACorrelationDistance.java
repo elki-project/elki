@@ -126,16 +126,6 @@ public class PCACorrelationDistance extends CorrelationDistance<PCACorrelationDi
   }
   
   @Override
-  public PCACorrelationDistance plus(PCACorrelationDistance distance) {
-    return new PCACorrelationDistance(this.correlationValue + distance.getCorrelationValue(), this.euclideanValue + distance.getEuclideanValue());
-  }
-
-  @Override
-  public PCACorrelationDistance minus(PCACorrelationDistance distance) {
-    return new PCACorrelationDistance(this.correlationValue - distance.getCorrelationValue(), this.euclideanValue - distance.getEuclideanValue());
-  }
-
-  @Override
   public boolean isInfiniteDistance() {
     return correlationValue == Integer.MAX_VALUE || euclideanValue == Double.POSITIVE_INFINITY;
   }

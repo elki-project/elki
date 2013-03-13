@@ -387,16 +387,16 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
     ORCLUSCluster c_ij = union(database, distFunc, c_i, c_j, dim);
     NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(database);
 
-    DoubleDistance sum = getDistanceFunction().getDistanceFactory().nullDistance();
+    double sum = 0.;
     V c_proj = projection(c_ij, c_ij.centroid, factory);
     for (DBIDIter iter = c_ij.objectIDs.iter(); iter.valid(); iter.advance()) {
       V o_proj = projection(c_ij, database.get(iter), factory);
-      DoubleDistance dist = distFunc.distance(o_proj, c_proj);
-      sum = sum.plus(dist.times(dist));
+      double dist = distFunc.distance(o_proj, c_proj).doubleValue();
+      sum += dist * dist;
     }
-    DoubleDistance projectedEnergy = sum.times(1.0 / c_ij.objectIDs.size());
+    sum /= c_ij.objectIDs.size();
 
-    return new ProjectedEnergy(i, j, c_ij, projectedEnergy);
+    return new ProjectedEnergy(i, j, c_ij, sum);
   }
 
   /**
@@ -520,9 +520,9 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
 
     ORCLUSCluster cluster;
 
-    DoubleDistance projectedEnergy;
+    double projectedEnergy;
 
-    ProjectedEnergy(int i, int j, ORCLUSCluster cluster, DoubleDistance projectedEnergy) {
+    ProjectedEnergy(int i, int j, ORCLUSCluster cluster, double projectedEnergy) {
       this.i = i;
       this.j = j;
       this.cluster = cluster;
@@ -538,7 +538,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
      */
     @Override
     public int compareTo(ProjectedEnergy o) {
-      return this.projectedEnergy.compareTo(o.projectedEnergy);
+      return Double.compare(projectedEnergy, o.projectedEnergy);
     }
   }
 

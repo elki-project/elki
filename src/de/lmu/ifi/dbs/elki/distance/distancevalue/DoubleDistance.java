@@ -88,40 +88,6 @@ public class DoubleDistance extends NumberDistance<DoubleDistance, Double> {
     return new DoubleDistance(val);
   }
 
-  @Override
-  public DoubleDistance plus(DoubleDistance distance) {
-    return new DoubleDistance(this.value + distance.value);
-  }
-
-  @Override
-  public DoubleDistance minus(DoubleDistance distance) {
-    return new DoubleDistance(this.value - distance.value);
-  }
-
-  /**
-   * Returns a new distance as the product of this distance and the given
-   * distance.
-   * 
-   * @param distance the distance to be multiplied with this distance
-   * @return a new distance as the product of this distance and the given
-   *         distance
-   */
-  public DoubleDistance times(DoubleDistance distance) {
-    return new DoubleDistance(this.value * distance.value);
-  }
-
-  /**
-   * Returns a new distance as the product of this distance and the given double
-   * value.
-   * 
-   * @param lambda the double value this distance should be multiplied with
-   * @return a new distance as the product of this distance and the given double
-   *         value
-   */
-  public DoubleDistance times(double lambda) {
-    return new DoubleDistance(this.value * lambda);
-  }
-
   /**
    * Writes the double value of this DoubleDistance to the specified stream.
    */

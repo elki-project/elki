@@ -84,16 +84,6 @@ public class BitDistance extends NumberDistance<BitDistance, Bit> {
     return new BitDistance(val > 0);
   }
 
-  @Override
-  public BitDistance plus(BitDistance distance) {
-    return new BitDistance(this.bitValue() || distance.bitValue());
-  }
-
-  @Override
-  public BitDistance minus(BitDistance distance) {
-    return new BitDistance(this.bitValue() ^ distance.bitValue());
-  }
-
   /**
    * Returns the value of this BitDistance as a boolean.
    * 

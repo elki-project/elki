@@ -88,16 +88,6 @@ public class SubspaceDistance extends AbstractDistance<SubspaceDistance> {
     this.affineDistance = affineDistance;
   }
 
-  @Override
-  public SubspaceDistance plus(SubspaceDistance distance) {
-    return new SubspaceDistance(this.subspaceDistance + distance.subspaceDistance, this.affineDistance + distance.affineDistance);
-  }
-
-  @Override
-  public SubspaceDistance minus(SubspaceDistance distance) {
-    return new SubspaceDistance(this.subspaceDistance - distance.subspaceDistance, this.affineDistance - distance.affineDistance);
-  }
-
   /**
    * Returns a string representation of this SubspaceDistance.
    * 
