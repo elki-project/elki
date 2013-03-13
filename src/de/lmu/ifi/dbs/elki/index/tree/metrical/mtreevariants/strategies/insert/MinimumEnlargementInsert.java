@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MinimumEnlargementInsert<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> implements MTreeInsert<O, D, N, E> {
   @Override
-  public IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E> tree, E object) {
+  public IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object) {
     return choosePath(tree, object, tree.getRootPath());
   }
 
@@ -59,7 +59,7 @@ public class MinimumEnlargementInsert<O, D extends Distance<D>, N extends Abstra
    * @param subtree the subtree to be tested for insertion
    * @return the path of the appropriate subtree to insert the given object
    */
-  private IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E> tree, E object, IndexTreePath<E> subtree) {
+  private IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
     N node = tree.getNode(subtree.getLastPathComponent().getEntry());
 
     // leaf

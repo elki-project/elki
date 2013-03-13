@@ -50,7 +50,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
   /**
    * The index to use
    */
-  protected final AbstractMTree<O, DoubleDistance, ?, ?> index;
+  protected final AbstractMTree<O, DoubleDistance, ?, ?, ?> index;
 
   /**
    * Distance function
@@ -64,7 +64,7 @@ public class DoubleDistanceMetricalIndexKNNQuery<O> extends AbstractDistanceKNNQ
    * @param distanceQuery Distance query used
    * @param distf Distance function
    */
-  public DoubleDistanceMetricalIndexKNNQuery(AbstractMTree<O, DoubleDistance, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, PrimitiveDoubleDistanceFunction<? super O> distf) {
+  public DoubleDistanceMetricalIndexKNNQuery(AbstractMTree<O, DoubleDistance, ?, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, PrimitiveDoubleDistanceFunction<? super O> distf) {
     super(distanceQuery);
     this.index = index;
     this.distf = distf;

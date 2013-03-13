@@ -36,11 +36,10 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -61,16 +60,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
+public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(MkCoPTree.class);
-
-  /**
-   * Parameter k.
-   */
-  int k_max;
 
   /**
    * The values of log(1),..,log(k_max)
@@ -85,18 +79,15 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insert strategy
-   * @param k_max Maximum value of k supported
+   * @param settings Tree settings
    */
-  public MkCoPTree(PageFile<MkCoPTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> splitStrategy, MTreeInsert<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> insertStrategy, int k_max) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy);
-    this.k_max = k_max;
+  public MkCoPTree(Relation<O> relation, PageFile<MkCoPTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> settings) {
+    super(relation, pagefile, settings);
     // init log k
-    log_k = new double[k_max];
-    for (int k = 1; k <= k_max; k++) {
+    log_k = new double[settings.k_max];
+    for (int k = 1; k <= settings.k_max; k++) {
       log_k[k - 1] = Math.log(k);
     }
   }
@@ -141,7 +132,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     // perform nearest neighbor queries
-    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, k_max);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, settings.k_max);
 
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -161,7 +152,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    */
   @Override
   public DistanceDBIDList<D> reverseKNNQuery(DBIDRef id, int k) {
-    if (k > this.k_max) {
+    if (k > settings.k_max) {
       throw new IllegalArgumentException("Parameter k has to be less or equal than " + "parameter kmax of the MCop-Tree!");
     }
 
@@ -216,7 +207,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return the value of the k_max parameter
    */
   public int getK_max() {
-    return k_max;
+    return settings.k_max;
   }
 
   /**
@@ -341,7 +332,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       }
     }
 
-    ApproximationLine approx = node.conservativeKnnDistanceApproximation(k_max);
+    ApproximationLine approx = node.conservativeKnnDistanceApproximation(settings.k_max);
     entry.setConservativeKnnDistanceApproximation(approx);
   }
 
@@ -385,7 +376,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // count the zero distances
     int k_0 = 0;
-    for (int i = 0; i < k_max; i++) {
+    for (int i = 0; i < settings.k_max; i++) {
       double dist = knnDistances.get(i).getDistance().doubleValue();
       if (dist == 0) {
         k_0++;
@@ -395,14 +386,14 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     // init variables
-    double[] log_k = new double[k_max - k_0];
-    System.arraycopy(this.log_k, k_0, log_k, 0, k_max - k_0);
+    double[] log_k = new double[settings.k_max - k_0];
+    System.arraycopy(this.log_k, k_0, log_k, 0, settings.k_max - k_0);
 
     double sum_log_kDist = 0;
     double sum_log_k_kDist = 0;
-    double[] log_kDist = new double[k_max - k_0];
+    double[] log_kDist = new double[settings.k_max - k_0];
 
-    for (int i = 0; i < k_max - k_0; i++) {
+    for (int i = 0; i < settings.k_max - k_0; i++) {
       double dist = knnDistances.get(i + k_0).getDistance().doubleValue();
       log_kDist[i] = Math.log(dist);
       sum_log_kDist += log_kDist[i];
@@ -419,7 +410,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     if (msg != null) {
       msg.append("\nk_0 ").append(k_0);
-      msg.append("\nk_max ").append(k_max);
+      msg.append("\nk_max ").append(settings.k_max);
       msg.append("\nlog_k(").append(log_k.length).append(") ").append(FormatUtil.format(log_k));
       msg.append("\nsum_log_k ").append(sum_log_k);
       msg.append("\nsum_log_k^2 ").append(sum_log_k2);
@@ -437,8 +428,8 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     ApproximationLine c2 = approximateUpperHull_PAPER(convexHull, log_k, sum_log_k, sum_log_k2, log_kDist, sum_log_kDist, sum_log_k_kDist);
 
-    double err1 = ssqerr(k_0, k_max, log_k, log_kDist, conservative.getM(), conservative.getT());
-    double err2 = ssqerr(k_0, k_max, log_k, log_kDist, c2.getM(), c2.getT());
+    double err1 = ssqerr(k_0, settings.k_max, log_k, log_kDist, conservative.getM(), conservative.getT());
+    double err2 = ssqerr(k_0, settings.k_max, log_k, log_kDist, c2.getM(), c2.getT());
 
     if (msg != null) {
       msg.append("err1 ").append(err1);
@@ -490,7 +481,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     StringBuilder msg = new StringBuilder();
     int[] lowerHull = convexHull.getLowerHull();
     int l = convexHull.getNumberOfPointsInLowerHull();
-    int k_0 = k_max - lowerHull.length + 1;
+    int k_0 = settings.k_max - lowerHull.length + 1;
 
     // linear search on all line segments on the lower convex hull
     msg.append("lower hull l = ").append(l).append("\n");
@@ -501,7 +492,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     for (int i = 1; i < l; i++) {
       double cur_m = (log_kDist[lowerHull[i]] - log_kDist[lowerHull[i - 1]]) / (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]]);
       double cur_t = log_kDist[lowerHull[i]] - cur_m * log_k[lowerHull[i]];
-      double cur_error = ssqerr(k_0, k_max, log_k, log_kDist, cur_m, cur_t);
+      double cur_error = ssqerr(k_0, settings.k_max, log_k, log_kDist, cur_m, cur_t);
       msg.append("  Segment = ").append(i).append(" m = ").append(cur_m).append(" t = ").append(cur_t).append(" lowerror = ").append(cur_error).append("\n");
       if (cur_error < low_error) {
         low_error = cur_error;
@@ -513,11 +504,11 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     // linear search on all points of the lower convex hull
     boolean is_right = true; // NEEDED FOR PROOF CHECK
     for (int i = 0; i < l; i++) {
-      double cur_m = optimize(k_0, k_max, sum_log_k, sum_log_k2, log_k[lowerHull[i]], log_kDist[lowerHull[i]], sum_log_k_kDist, sum_log_kDist);
+      double cur_m = optimize(k_0, settings.k_max, sum_log_k, sum_log_k2, log_k[lowerHull[i]], log_kDist[lowerHull[i]], sum_log_k_kDist, sum_log_kDist);
       double cur_t = log_kDist[lowerHull[i]] - cur_m * log_k[lowerHull[i]];
       // only valid if both neighboring points are underneath y=mx+t
       if ((i == 0 || log_kDist[lowerHull[i - 1]] >= log_kDist[lowerHull[i]] - cur_m * (log_k[lowerHull[i]] - log_k[lowerHull[i - 1]])) && (i == l - 1 || log_kDist[lowerHull[i + 1]] >= log_kDist[lowerHull[i]] + cur_m * (log_k[lowerHull[i + 1]] - log_k[lowerHull[i]]))) {
-        double cur_error = ssqerr(k_0, k_max, log_k, log_kDist, cur_m, cur_t);
+        double cur_error = ssqerr(k_0, settings.k_max, log_k, log_kDist, cur_m, cur_t);
         if (cur_error < low_error) {
           low_error = cur_error;
           low_m = cur_m;
@@ -543,7 +534,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
-    int k_0 = k_max - upperHull.length + 1;
+    int k_0 = settings.k_max - upperHull.length + 1;
 
     ApproximationLine approx = null;
     double error = Double.POSITIVE_INFINITY;
@@ -565,7 +556,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
       boolean ok = true;
       double currentError = 0;
-      for (int k = k_0; k <= k_max; k++) {
+      for (int k = k_0; k <= settings.k_max; k++) {
         double appDist = current_approx.getValueAt(k);
         if (appDist < log_kDist[k - k_0] && log_kDist[k - k_0] - appDist > 0.000000001) {
           ok = false;
@@ -595,7 +586,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     List<Integer> marked = new ArrayList<>();
 
-    int k_0 = k_max - upperHull.length + 1;
+    int k_0 = settings.k_max - upperHull.length + 1;
 
     int a = u / 2;
     while (marked.size() != u) {
@@ -603,12 +594,12 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       double x_a = log_k[upperHull[a]];
       double y_a = log_kDist[upperHull[a]];
 
-      double m_a = optimize(k_0, k_max, sum_log_k, sum_log_k2, x_a, y_a, sum_log_k_kDist, sum_log_kDist);
+      double m_a = optimize(k_0, settings.k_max, sum_log_k, sum_log_k2, x_a, y_a, sum_log_k_kDist, sum_log_kDist);
       double t_a = y_a - m_a * x_a;
 
       if (msg != null) {
         msg.append("\na=").append(a).append(" m_a=").append(m_a).append(", t_a=").append(t_a);
-        msg.append("\n err ").append(ssqerr(k_0, k_max, log_k, log_kDist, m_a, m_a));
+        msg.append("\n err ").append(ssqerr(k_0, settings.k_max, log_k, log_kDist, m_a, m_a));
       }
 
       double x_p = a == 0 ? Double.NaN : log_k[upperHull[a - 1]];
@@ -678,7 +669,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     StringBuilder msg = new StringBuilder();
     int[] upperHull = convexHull.getUpperHull();
     int u = convexHull.getNumberOfPointsInUpperHull();
-    int k_0 = k_max - upperHull.length + 1;
+    int k_0 = settings.k_max - upperHull.length + 1;
 
     // linear search on all line segments on the upper convex hull
     msg.append("upper hull:").append(u);
@@ -688,7 +679,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     for (int i = 1; i < u; i++) {
       double cur_m = (log_kDist[upperHull[i]] - log_kDist[upperHull[i - 1]]) / (log_k[upperHull[i]] - log_k[upperHull[i - 1]]);
       double cur_t = log_kDist[upperHull[i]] - cur_m * log_k[upperHull[i]];
-      double cur_error = ssqerr(k_0, k_max, log_k, log_kDist, cur_m, cur_t);
+      double cur_error = ssqerr(k_0, settings.k_max, log_k, log_kDist, cur_m, cur_t);
       if (cur_error < upp_error) {
         upp_error = cur_error;
         upp_m = cur_m;
@@ -698,11 +689,11 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     // linear search on all points of the upper convex hull
     boolean is_left = true; // NEEDED FOR PROOF CHECK
     for (int i = 0; i < u; i++) {
-      double cur_m = optimize(k_0, k_max, sum_log_k, sum_log_k2, log_k[upperHull[i]], log_kDist[upperHull[i]], sum_log_k_kDist, sum_log_kDist);
+      double cur_m = optimize(k_0, settings.k_max, sum_log_k, sum_log_k2, log_k[upperHull[i]], log_kDist[upperHull[i]], sum_log_k_kDist, sum_log_kDist);
       double cur_t = log_kDist[upperHull[i]] - cur_m * log_k[upperHull[i]];
       // only valid if both neighboring points are underneath y=mx+t
       if ((i == 0 || log_kDist[upperHull[i - 1]] <= log_kDist[upperHull[i]] - cur_m * (log_k[upperHull[i]] - log_k[upperHull[i - 1]])) && (i == u - 1 || log_kDist[upperHull[i + 1]] <= log_kDist[upperHull[i]] + cur_m * (log_k[upperHull[i + 1]] - log_k[upperHull[i]]))) {
-        double cur_error = ssqerr(k_0, k_max, log_k, log_kDist, cur_m, cur_t);
+        double cur_error = ssqerr(k_0, settings.k_max, log_k, log_kDist, cur_m, cur_t);
         if (cur_error < upp_error) {
           upp_error = cur_error;
           upp_m = cur_m;

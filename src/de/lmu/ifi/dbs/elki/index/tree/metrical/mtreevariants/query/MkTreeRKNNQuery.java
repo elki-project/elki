@@ -46,7 +46,7 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
   /**
    * The index to use
    */
-  protected final AbstractMkTree<O, D, ?, ?> index;
+  protected final AbstractMkTree<O, D, ?, ?, ?> index;
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ public class MkTreeRKNNQuery<O, D extends Distance<D>> extends AbstractRKNNQuery
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MkTreeRKNNQuery(AbstractMkTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MkTreeRKNNQuery(AbstractMkTree<O, D, ?, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }

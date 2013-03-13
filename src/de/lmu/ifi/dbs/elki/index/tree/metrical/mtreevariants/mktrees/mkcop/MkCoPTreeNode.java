@@ -142,7 +142,7 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   }
 
   @Override
-  public void adjustEntry(MkCoPEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> mTree) {
+  public void adjustEntry(MkCoPEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust conservative distance approximation
     // int k_max = ((MkCoPTree<O,D>) mTree).getK_max();
@@ -150,7 +150,7 @@ class MkCoPTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
   }
 
   @Override
-  protected void integrityCheckParameters(MkCoPEntry<D> parentEntry, MkCoPTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> mTree) {
+  protected void integrityCheckParameters(MkCoPEntry<D> parentEntry, MkCoPTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test conservative approximation
     MkCoPEntry<D> entry = parent.getEntry(index);

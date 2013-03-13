@@ -33,15 +33,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -54,8 +53,9 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
+ * @param <S> the type of Settings kept.
  */
-public abstract class AbstractMkTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTree<O, D, N, E> {
+public abstract class AbstractMkTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MTreeSettings<O, D, N, E>> extends AbstractMTree<O, D, N, E, S> {
   /**
    * Internal class for performing knn queries
    */
@@ -64,13 +64,12 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
+   * @param settings Settings class
    */
-  public AbstractMkTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy);
+  public AbstractMkTree(Relation<O> relation, PageFile<N> pagefile, S settings) {
+    super(relation, pagefile, settings);
     this.knnq = MTreeQueryUtil.getKNNQuery(this, distanceQuery);
   }
 

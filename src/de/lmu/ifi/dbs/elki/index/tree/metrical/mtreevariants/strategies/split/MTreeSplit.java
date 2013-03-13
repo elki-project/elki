@@ -57,7 +57,7 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * @param node Node
    * @return Distance matrix
    */
-  protected ArrayList<D> computeDistanceMatrix(AbstractMTree<O, D, N, E> tree, N node) {
+  protected ArrayList<D> computeDistanceMatrix(AbstractMTree<O, D, N, E, ?> tree, N node) {
     final int n = node.getNumEntries();
     final D df = tree.getDistanceFactory();
     ArrayList<D> distancematrix = new ArrayList<>(n * n);
@@ -89,7 +89,7 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * @return an assignment that holds a balanced partition of the entries of the
    *         specified node
    */
-  Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E> tree, N node, DBID routingObject1, DBID routingObject2) {
+  Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E, ?> tree, N node, DBID routingObject1, DBID routingObject2) {
     BitSet assigned = new BitSet(node.getNumEntries());
     List<DistanceEntry<D, E>> assigned1 = new ArrayList<>(node.getCapacity());
     List<DistanceEntry<D, E>> assigned2 = new ArrayList<>(node.getCapacity());
@@ -143,7 +143,7 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * @return an assignment that holds a balanced partition of the entries of the
    *         specified node
    */
-  Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E> tree, N node, int routingEntNum1, int routingEntNum2, ArrayList<D> distanceMatrix) {
+  Assignments<D, E> balancedPartition(AbstractMTree<O, D, N, E, ?> tree, N node, int routingEntNum1, int routingEntNum2, ArrayList<D> distanceMatrix) {
     final int n = node.getNumEntries();
     BitSet assigned = new BitSet(node.getNumEntries());
     List<DistanceEntry<D, E>> assigned1 = new ArrayList<>(node.getCapacity());
@@ -225,5 +225,5 @@ public abstract class MTreeSplit<O, D extends Distance<D>, N extends AbstractMTr
    * @param node Node to split
    * @return the assignments of this split
    */
-  abstract public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node);
+  abstract public Assignments<D, E> split(AbstractMTree<O, D, N, E, ?> tree, N node);
 }

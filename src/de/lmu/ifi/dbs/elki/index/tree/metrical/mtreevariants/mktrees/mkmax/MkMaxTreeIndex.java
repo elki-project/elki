@@ -45,11 +45,10 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
@@ -72,13 +71,10 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
    * 
    * @param relation Relation
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
-   * @param k_max Maximum value for k
+   * @param settings Tree settings
    */
-  public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> splitStrategy, MTreeInsert<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> insertStrategy, int k_max) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy, k_max);
+  public MkMaxTreeIndex(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> settings) {
+    super(relation, pagefile, settings);
     this.relation = relation;
   }
 
@@ -145,7 +141,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if (!this.distanceFunction.equals(distanceFunction)) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -157,7 +153,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return MTreeQueryUtil.getKNNQuery(idx, dq, hints);
   }
@@ -170,7 +166,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if (!this.distanceFunction.equals(distanceFunction)) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -182,7 +178,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return MTreeQueryUtil.getRangeQuery(idx, dq);
   }
@@ -203,7 +199,7 @@ public class MkMaxTreeIndex<O, D extends Distance<D>> extends MkMaxTree<O, D> im
         return null;
       }
     }
-    AbstractMkTreeUnified<O, S, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?>) this;
+    AbstractMkTreeUnified<O, S, ?, ?, ?> idx = (AbstractMkTreeUnified<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return new MkTreeRKNNQuery<>(idx, dq);
   }

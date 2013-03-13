@@ -23,14 +23,11 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstraint;
@@ -39,44 +36,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract factory for various Mk-Trees
+ * 
  * @author Erich Schubert
  * 
  * @apiviz.stereotype factory
- * @apiviz.uses AbstractMkTree oneway - - «create»
- *
+ * @apiviz.uses AbstractMkTreeUnified oneway - - «create»
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  * @param <N> Node type
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMkTree<O, D, N, E> & Index> extends AbstractMTreeFactory<O, D, N, E, I> {
-  /**
-   * Parameter specifying the maximal number k of reverse k nearest neighbors to
-   * be supported, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -mktree.kmax}
-   * </p>
-   */
-  public static final OptionID K_MAX_ID = new OptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
-
-  /**
-   * Holds the value of parameter {@link #K_MAX_ID}.
-   */
-  protected int k_max;
-
+public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMkTree<O, D, N, E, S> & Index, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory<O, D, N, E, I, S> {
   /**
    * Constructor.
-   *
+   * 
    * @param pageFileFactory Data storage
-   * @param distanceFunction Distance function
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
-   * @param k_max Maximum k
+   * @param settings Tree settings
    */
-  public AbstractMkTreeUnifiedFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy, int k_max) {
-    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy);
-    this.k_max = k_max;
+  public AbstractMkTreeUnifiedFactory(PageFileFactory<?> pageFileFactory, S settings) {
+    super(pageFileFactory, settings);
   }
 
   /**
@@ -86,8 +66,15 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMTreeFactory.Parameterizer<O, D, N, E> {
-    protected int k_max;
+  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MkTreeSettings<O, D, N, E>> extends AbstractMTreeFactory.Parameterizer<O, D, N, E, S> {
+    /**
+     * Parameter specifying the maximal number k of reverse k nearest neighbors
+     * to be supported, must be an integer greater than 0.
+     * <p>
+     * Key: {@code -mktree.kmax}
+     * </p>
+     */
+    public static final OptionID K_MAX_ID = new OptionID("mktree.kmax", "Specifies the maximal number k of reverse k nearest neighbors to be supported.");
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -96,11 +83,11 @@ public abstract class AbstractMkTreeUnifiedFactory<O, D extends Distance<D>, N e
       k_maxP.addConstraint(new GreaterConstraint(0));
 
       if (config.grab(k_maxP)) {
-        k_max = k_maxP.getValue();
+        settings.k_max = k_maxP.getValue();
       }
     }
 
     @Override
-    protected abstract AbstractMkTreeUnifiedFactory<O, D, N, E, ?> makeInstance();
+    protected abstract AbstractMkTreeUnifiedFactory<O, D, N, E, ?, S> makeInstance();
   }
 }

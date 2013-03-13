@@ -64,7 +64,6 @@ import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -86,21 +85,11 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> Distance type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
-public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>, AbstractRTreeSettings> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
+public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends NonFlatRStarTree<RdKNNNode<D>, RdKNNEntry<D>, RdkNNSettings<O, D>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(RdKNNTree.class);
-
-  /**
-   * Parameter k.
-   */
-  private int k_max;
-
-  /**
-   * The distance function.
-   */
-  private SpatialPrimitiveDistanceFunction<O, D> distanceFunction;
 
   /**
    * The distance function.
@@ -123,16 +112,12 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    * @param relation Relation to index
    * @param pagefile Data storage
    * @param settings Tree settings
-   * @param k_max max k
-   * @param distanceFunction distance function
-   * @param distanceQuery distance query
    */
-  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, AbstractRTreeSettings settings, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction, SpatialDistanceQuery<O, D> distanceQuery) {
+  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode<D>> pagefile, RdkNNSettings<O, D> settings) {
     super(pagefile, settings);
     this.relation = relation;
-    this.k_max = k_max;
-    this.distanceFunction = distanceFunction;
-    this.distanceQuery = distanceQuery;
+    this.distanceQuery = settings.distanceFunction.instantiate(relation);
+    this.knnQuery = relation.getDatabase().getKNNQuery(distanceQuery);
   }
 
   /**
@@ -142,7 +127,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   protected void preInsert(RdKNNEntry<D> entry) {
-    KNNHeap<D> knns_o = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), k_max);
+    KNNHeap<D> knns_o = DBIDUtil.newHeap(settings.distanceFunction.getDistanceFactory(), settings.k_max);
     preInsert(entry, getRootEntry(), knns_o);
   }
 
@@ -158,7 +143,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // knn of rnn
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rnns);
     ids.sort();
-    List<? extends KNNList<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, k_max);
+    List<? extends KNNList<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, settings.k_max);
 
     // adjust knn distances
     adjustKNNDistance(getRootEntry(), ids, knnLists);
@@ -174,12 +159,12 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
     // adjust all knn distances
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(entries.size());
-    for(RdKNNEntry<D> entry : entries) {
+    for (RdKNNEntry<D> entry : entries) {
       DBID id = ((RdKNNLeafEntry<D>) entry).getDBID();
       ids.add(id);
     }
     ids.sort();
-    List<? extends KNNList<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, k_max);
+    List<? extends KNNList<D>> knnLists = knnQuery.getKNNForBulkDBIDs(ids, settings.k_max);
     adjustKNNDistance(getRootEntry(), ids, knnLists);
 
     // test
@@ -188,22 +173,22 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
   public DistanceDBIDList<D> reverseKNNQuery(DBID oid, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNQuery<O, D> knnQuery) {
     checkDistanceFunction(distanceFunction);
-    if(k > k_max) {
-      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
+    if (k > settings.k_max) {
+      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
     }
 
     // get candidates
     GenericDistanceDBIDList<D> candidates = new GenericDistanceDBIDList<>();
     doReverseKNN(getRoot(), oid, candidates);
 
-    if(k == k_max) {
+    if (k == settings.k_max) {
       candidates.sort();
       return candidates;
     }
 
     // refinement of candidates, if k < k_max
     ArrayModifiableDBIDs candidateIDs = DBIDUtil.newArray(candidates);
-    for(int i = 0; i < candidates.size(); i++) {
+    for (int i = 0; i < candidates.size(); i++) {
       DistanceDBIDPair<D> candidate = (DistanceDBIDPair<D>) candidates.get(i);
       candidateIDs.add(candidate);
     }
@@ -214,7 +199,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     int i = 0;
     for (DBIDIter iter = candidateIDs.iter(); iter.valid(); iter.advance(), i++) {
       for (DistanceDBIDListIter<D> qr = knnLists.get(i).iter(); qr.valid(); qr.advance()) {
-        if(DBIDUtil.equal(oid, qr)) {
+        if (DBIDUtil.equal(oid, qr)) {
           result.add(qr.getDistance(), iter);
           break;
         }
@@ -227,8 +212,8 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
   public List<GenericDistanceDBIDList<D>> bulkReverseKNNQueryForID(DBIDs ids, int k, SpatialPrimitiveDistanceFunction<? super O, D> distanceFunction, KNNQuery<O, D> knnQuery) {
     checkDistanceFunction(distanceFunction);
-    if(k > k_max) {
-      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + k_max);
+    if (k > settings.k_max) {
+      throw new IllegalArgumentException("Parameter k is not supported, k > k_max: " + k + " > " + settings.k_max);
     }
 
     // get candidates
@@ -239,9 +224,9 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     }
     doBulkReverseKNN(getRoot(), ids, candidateMap);
 
-    if(k == k_max) {
+    if (k == settings.k_max) {
       List<GenericDistanceDBIDList<D>> resultList = new ArrayList<>();
-      for(GenericDistanceDBIDList<D> candidates : candidateMap.values()) {
+      for (GenericDistanceDBIDList<D> candidates : candidateMap.values()) {
         candidates.sort();
         resultList.add(candidates);
       }
@@ -251,8 +236,8 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // refinement of candidates, if k < k_max
     // perform a knn query for the candidates
     ArrayModifiableDBIDs candidateIDs = DBIDUtil.newArray();
-    for(GenericDistanceDBIDList<D> candidates : candidateMap.values()) {
-      for(int i = 0; i < candidates.size(); i++) {
+    for (GenericDistanceDBIDList<D> candidates : candidateMap.values()) {
+      for (int i = 0; i < candidates.size(); i++) {
         DistanceDBIDPair<D> candidate = (DistanceDBIDPair<D>) candidates.get(i);
         candidateIDs.add(candidate);
       }
@@ -262,18 +247,18 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
     // and add candidate c to the result if o is a knn of c
     List<GenericDistanceDBIDList<D>> resultList = new ArrayList<>();
-    for(DBID id : candidateMap.keySet()) {
+    for (DBID id : candidateMap.keySet()) {
       GenericDistanceDBIDList<D> candidates = candidateMap.get(id);
       GenericDistanceDBIDList<D> result = new GenericDistanceDBIDList<>();
       for (DistanceDBIDListIter<D> candidate = candidates.iter(); candidate.valid(); candidate.advance()) {
         int pos = candidateIDs.binarySearch(candidate);
-        assert(pos >= 0);
+        assert (pos >= 0);
         for (DistanceDBIDListIter<D> qr = knnLists.get(pos).iter(); qr.valid(); qr.advance()) {
-          if(DBIDUtil.equal(id, qr)) {
+          if (DBIDUtil.equal(id, qr)) {
             result.add(qr.getDistance(), candidate);
             break;
           }
-        }        
+        }
       }
       resultList.add(result);
     }
@@ -282,7 +267,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
   @Override
   protected TreeIndexHeader createHeader() {
-    return new RdKNNTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafCapacity, k_max);
+    return new RdKNNTreeHeader(getPageSize(), dirCapacity, leafCapacity, dirMinimum, leafCapacity, settings.k_max);
   }
 
   @Override
@@ -293,7 +278,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
 
     // overhead = index(4), numEntries(4), parentID(4), id(4), isLeaf(0.125)
     double overhead = 16.125;
-    if(getPageSize() - overhead < 0) {
+    if (getPageSize() - overhead < 0) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
@@ -301,17 +286,17 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // + 1
     dirCapacity = (int) ((getPageSize() - overhead) / (4 + 16 * dimensionality + distanceSize)) + 1;
 
-    if(dirCapacity <= 1) {
+    if (dirCapacity <= 1) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
-    if(dirCapacity < 10) {
+    if (dirCapacity < 10) {
       LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a directory node = " + (dirCapacity - 1));
     }
 
     // minimum entries per directory node
     dirMinimum = (int) Math.round((dirCapacity - 1) * 0.5);
-    if(dirMinimum < 2) {
+    if (dirMinimum < 2) {
       dirMinimum = 2;
     }
 
@@ -319,21 +304,21 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // knnDistance) + 1
     leafCapacity = (int) ((getPageSize() - overhead) / (4 + 8 * dimensionality + distanceSize)) + 1;
 
-    if(leafCapacity <= 1) {
+    if (leafCapacity <= 1) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
     }
 
-    if(leafCapacity < 10) {
+    if (leafCapacity < 10) {
       LOG.warning("Page size is choosen too small! Maximum number of entries " + "in a leaf node = " + (leafCapacity - 1));
     }
 
     // minimum entries per leaf node
     leafMinimum = (int) Math.round((leafCapacity - 1) * 0.5);
-    if(leafMinimum < 2) {
+    if (leafMinimum < 2) {
       leafMinimum = 2;
     }
 
-    if(LOG.isVerbose()) {
+    if (LOG.isVerbose()) {
       LOG.verbose("Directory Capacity: " + dirCapacity + "\nLeaf Capacity: " + leafCapacity);
     }
   }
@@ -351,7 +336,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   protected List<DistanceEntry<D, RdKNNEntry<D>>> getSortedEntries(AbstractRStarTreeNode<?, ?> node, SpatialComparable q, SpatialPrimitiveDistanceFunction<?, D> distanceFunction) {
     List<DistanceEntry<D, RdKNNEntry<D>>> result = new ArrayList<>();
 
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    for (int i = 0; i < node.getNumEntries(); i++) {
       @SuppressWarnings("unchecked")
       RdKNNEntry<D> entry = (RdKNNEntry<D>) node.getEntry(i);
       D minDist = distanceFunction.minDist(entry, q);
@@ -375,16 +360,16 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
 
     // leaf node
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry<D> p = (RdKNNLeafEntry<D>) node.getEntry(i);
         D dist_pq = distanceQuery.distance(p.getDBID(), ((LeafEntry) q).getDBID());
 
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
-        if(dist_pq.compareTo(knnDist_q) <= 0) {
+        if (dist_pq.compareTo(knnDist_q) <= 0) {
           knns_q.add(dist_pq, p.getDBID());
-          if(knns_q.size() >= k_max) {
+          if (knns_q.size() >= settings.k_max) {
             knnDist_q = knns_q.getKNNDistance();
             q.setKnnDistance(knnDist_q);
           }
@@ -392,14 +377,13 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
         }
         // p is nearer to q than to its farthest knn-candidate
         // q becomes knn of p
-        if(dist_pq.compareTo(p.getKnnDistance()) <= 0) {
+        if (dist_pq.compareTo(p.getKnnDistance()) <= 0) {
           O obj = relation.get(p.getDBID());
-          KNNList<D> knns_without_q = knnQuery.getKNNForObject(obj, k_max);
+          KNNList<D> knns_without_q = knnQuery.getKNNForObject(obj, settings.k_max);
 
-          if(knns_without_q.size() + 1 < k_max) {
+          if (knns_without_q.size() + 1 < settings.k_max) {
             p.setKnnDistance(distanceQuery.getDistanceFactory().undefinedDistance());
-          }
-          else {
+          } else {
             D knnDist_p = DistanceUtil.min(knns_without_q.get(knns_without_q.size() - 1).getDistance(), dist_pq);
             p.setKnnDistance(knnDist_p);
           }
@@ -410,12 +394,12 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // directory node
     else {
       O obj = relation.get(((LeafEntry) q).getDBID());
-      List<DistanceEntry<D, RdKNNEntry<D>>> entries = getSortedEntries(node, obj, distanceFunction);
-      for(DistanceEntry<D, RdKNNEntry<D>> distEntry : entries) {
+      List<DistanceEntry<D, RdKNNEntry<D>>> entries = getSortedEntries(node, obj, settings.distanceFunction);
+      for (DistanceEntry<D, RdKNNEntry<D>> distEntry : entries) {
         RdKNNEntry<D> entry = distEntry.getEntry();
         D entry_knnDist = entry.getKnnDistance();
 
-        if(distEntry.getDistance().compareTo(entry_knnDist) < 0 || distEntry.getDistance().compareTo(knnDist_q) < 0) {
+        if (distEntry.getDistance().compareTo(entry_knnDist) < 0 || distEntry.getDistance().compareTo(knnDist_q) < 0) {
           preInsert(q, entry, knns_q);
           knnDist_q = knns_q.getKNNDistance();
         }
@@ -433,21 +417,21 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    * @param result the list containing the query results
    */
   private void doReverseKNN(RdKNNNode<D> node, DBID oid, GenericDistanceDBIDList<D> result) {
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry<D> entry = (RdKNNLeafEntry<D>) node.getEntry(i);
         D distance = distanceQuery.distance(entry.getDBID(), oid);
-        if(distance.compareTo(entry.getKnnDistance()) <= 0) {
+        if (distance.compareTo(entry.getKnnDistance()) <= 0) {
           result.add(distance, entry.getDBID());
         }
       }
     }
     // node is a inner node
     else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNDirectoryEntry<D> entry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
         D minDist = distanceQuery.minDist(entry, oid);
-        if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
+        if (minDist.compareTo(entry.getKnnDistance()) <= 0) {
           doReverseKNN(getNode(entry), oid, result);
         }
       }
@@ -462,13 +446,13 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    * @param result the map containing the query results for each object
    */
   private void doBulkReverseKNN(RdKNNNode<D> node, DBIDs ids, Map<DBID, GenericDistanceDBIDList<D>> result) {
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNLeafEntry<D> entry = (RdKNNLeafEntry<D>) node.getEntry(i);
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           DBID id = DBIDUtil.deref(iter);
           D distance = distanceQuery.distance(entry.getDBID(), id);
-          if(distance.compareTo(entry.getKnnDistance()) <= 0) {
+          if (distance.compareTo(entry.getKnnDistance()) <= 0) {
             result.get(id).add(distance, entry.getDBID());
           }
         }
@@ -476,16 +460,16 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     }
     // node is a inner node
     else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNDirectoryEntry<D> entry = (RdKNNDirectoryEntry<D>) node.getEntry(i);
         ModifiableDBIDs candidates = DBIDUtil.newArray();
         for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           DBID id = DBIDUtil.deref(iter);
           D minDist = distanceQuery.minDist(entry, id);
-          if(minDist.compareTo(entry.getKnnDistance()) <= 0) {
+          if (minDist.compareTo(entry.getKnnDistance()) <= 0) {
             candidates.add(id);
           }
-          if(!candidates.isEmpty()) {
+          if (!candidates.isEmpty()) {
             doBulkReverseKNN(getNode(entry), candidates, result);
           }
         }
@@ -503,8 +487,8 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   private void adjustKNNDistance(RdKNNEntry<D> entry, ArrayDBIDs ids, List<? extends KNNList<D>> knnLists) {
     RdKNNNode<D> node = getNode(entry);
     D knnDist_node = distanceQuery.getDistanceFactory().nullDistance();
-    if(node.isLeaf()) {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    if (node.isLeaf()) {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNEntry<D> leafEntry = node.getEntry(i);
         DBID id = ((LeafEntry) leafEntry).getDBID();
         int pos = ids.binarySearch(id);
@@ -513,9 +497,8 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
         }
         knnDist_node = DistanceUtil.max(knnDist_node, leafEntry.getKnnDistance());
       }
-    }
-    else {
-      for(int i = 0; i < node.getNumEntries(); i++) {
+    } else {
+      for (int i = 0; i < node.getNumEntries(); i++) {
         RdKNNEntry<D> dirEntry = node.getEntry(i);
         adjustKNNDistance(dirEntry, ids, knnLists);
         knnDist_node = DistanceUtil.max(knnDist_node, dirEntry.getKnnDistance());
@@ -575,7 +558,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   private <T extends Distance<T>> void checkDistanceFunction(SpatialPrimitiveDistanceFunction<? super O, T> distanceFunction) {
     // todo: the same class does not necessarily indicate the same
     // distancefunction!!! (e.g.dim selecting df!)
-    if(!distanceFunction.getClass().equals(this.distanceFunction.getClass())) {
+    if (!distanceFunction.getClass().equals(settings.distanceFunction.getClass())) {
       throw new IllegalArgumentException("Parameter distanceFunction must be an instance of " + this.distanceQuery.getClass() + ", but is " + distanceFunction.getClass());
     }
   }
@@ -608,19 +591,18 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
    */
   @Override
   public final void insertAll(DBIDs ids) {
-    if(ids.isEmpty() || (ids.size() == 1)) {
+    if (ids.isEmpty() || (ids.size() == 1)) {
       return;
     }
 
     // Make an example leaf
-    if(canBulkLoad()) {
+    if (canBulkLoad()) {
       List<RdKNNEntry<D>> leafs = new ArrayList<>(ids.size());
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         leafs.add(createNewLeafEntry(DBIDUtil.deref(iter)));
       }
       bulkLoad(leafs);
-    }
-    else {
+    } else {
       for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         insert(iter);
       }
@@ -640,7 +622,7 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
     // find the leaf node containing o
     O obj = relation.get(id);
     IndexTreePath<RdKNNEntry<D>> deletionPath = findPathToObject(getRootPath(), obj, id);
-    if(deletionPath == null) {
+    if (deletionPath == null) {
       return false;
     }
     deletePath(deletionPath);
@@ -657,11 +639,11 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   @Override
   public <T extends Distance<T>> RangeQuery<O, T> getRangeQuery(DistanceQuery<O, T> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
+    if (!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
     SpatialDistanceQuery<O, T> dq = (SpatialDistanceQuery<O, T>) distanceQuery;
@@ -671,11 +653,11 @@ public class RdKNNTree<O extends NumberVector<?>, D extends NumberDistance<D, ?>
   @Override
   public <T extends Distance<T>> KNNQuery<O, T> getKNNQuery(DistanceQuery<O, T> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     // Can we support this distance function - spatial distances only!
-    if(!(distanceQuery instanceof SpatialDistanceQuery)) {
+    if (!(distanceQuery instanceof SpatialDistanceQuery)) {
       return null;
     }
     SpatialDistanceQuery<O, T> dq = (SpatialDistanceQuery<O, T>) distanceQuery;

@@ -24,11 +24,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnifiedFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -44,23 +42,21 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTabTreeIndex<O, D>> {
+public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTabTreeIndex<O, D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>>> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
-   * @param distanceFunction Distance function
-   * @param splitStrategy Split strategy
-   * @param k_max Maximum k
+   * @param settings Tree settings
    */
-  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> splitStrategy, MTreeInsert<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> insertStrategy, int k_max) {
-    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
+  public MkTabTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> settings) {
+    super(pageFileFactory, settings);
   }
 
   @Override
   public MkTabTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkTabTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkTabTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), splitStrategy, insertStrategy, k_max);
+    return new MkTabTreeIndex<>(relation, pagefile, settings);
   }
 
   protected Class<MkTabTreeNode<O, D>> getNodeClass() {
@@ -74,10 +70,15 @@ public class MkTabTreeFactory<O, D extends Distance<D>> extends AbstractMkTreeUn
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+  public static class Parameterizer<O, D extends Distance<D>> extends AbstractMkTreeUnifiedFactory.Parameterizer<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>>> {
     @Override
     protected MkTabTreeFactory<O, D> makeInstance() {
-      return new MkTabTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
+      return new MkTabTreeFactory<>(pageFileFactory, settings);
+    }
+
+    @Override
+    protected MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> makeSettings() {
+      return new MkTreeSettings<>();
     }
   }
 }

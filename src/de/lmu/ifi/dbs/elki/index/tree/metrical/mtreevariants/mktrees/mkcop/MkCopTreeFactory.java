@@ -24,11 +24,9 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  */
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -48,35 +46,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkCoPTreeIndex<O, D>> {
+public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkCoPTreeIndex<O, D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>>> {
   /**
    * Parameter for k
    */
   public static final OptionID K_ID = new OptionID("mkcop.k", "positive integer specifying the maximum number k of reverse k nearest neighbors to be supported.");
 
   /**
-   * Parameter k.
-   */
-  int k_max;
-
-  /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
-   * @param distanceFunction Distance function
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insert strategy
-   * @param k_max Maximum k supported
+   * @param settings Tree settings
    */
-  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> splitStrategy, MTreeInsert<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> insertStrategy, int k_max) {
-    super(pageFileFactory, distanceFunction, splitStrategy, insertStrategy);
-    this.k_max = k_max;
+  public MkCopTreeFactory(PageFileFactory<?> pageFileFactory, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> settings) {
+    super(pageFileFactory, settings);
   }
 
   @Override
   public MkCoPTreeIndex<O, D> instantiate(Relation<O> relation) {
     PageFile<MkCoPTreeNode<O, D>> pagefile = makePageFile(getNodeClass());
-    return new MkCoPTreeIndex<>(relation, pagefile, distanceFunction.instantiate(relation), splitStrategy, insertStrategy, k_max);
+    return new MkCoPTreeIndex<>(relation, pagefile, settings);
   }
 
   protected Class<MkCoPTreeNode<O, D>> getNodeClass() {
@@ -90,22 +79,25 @@ public class MkCopTreeFactory<O, D extends NumberDistance<D, ?>> extends Abstrac
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> {
-    protected int k_max = 0;
-
+  public static class Parameterizer<O, D extends NumberDistance<D, ?>> extends AbstractMTreeFactory.Parameterizer<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter k_maxP = new IntParameter(K_ID);
       k_maxP.addConstraint(new GreaterConstraint(0));
       if (config.grab(k_maxP)) {
-        k_max = k_maxP.intValue();
+        settings.k_max = k_maxP.intValue();
       }
     }
 
     @Override
     protected MkCopTreeFactory<O, D> makeInstance() {
-      return new MkCopTreeFactory<>(pageFileFactory, distanceFunction, splitStrategy, insertStrategy, k_max);
+      return new MkCopTreeFactory<>(pageFileFactory, settings);
+    }
+
+    @Override
+    protected MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> makeSettings() {
+      return new MkTreeSettings<>();
     }
   }
 }

@@ -38,12 +38,10 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
@@ -63,43 +61,21 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <D> the type of NumberDistance used in the metrical index
  */
-public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> {
+public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, MkAppTreeSettings<O, D>> {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(MkAppTree.class);
 
   /**
-   * Parameter k.
-   */
-  private int k_max;
-
-  /**
-   * Parameter p.
-   */
-  private int p;
-
-  /**
-   * Flag log.
-   */
-  private boolean log;
-
-  /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param pageFile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insert strategy
-   * @param k_max Maximum value of k supported
-   * @param p Parameter p
-   * @param log Logspace flag
+   * @param settings Tree settings
    */
-  public MkAppTree(PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, MTreeInsert<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> insertStrategy, int k_max, int p, boolean log) {
-    super(pageFile, distanceQuery, splitStrategy, insertStrategy);
-    this.k_max = k_max;
-    this.p = p;
-    this.log = log;
+  public MkAppTree(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, MkAppTreeSettings<O, D> settings) {
+    super(relation, pageFile, settings);
   }
 
   /**
@@ -147,7 +123,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
 
     // do batch nn
-    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, k_max + 1);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, settings.k_max + 1);
 
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -187,7 +163,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
           D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), id);
           D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
 
-          double approxValue = log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
+          double approxValue = settings.log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if (approxValue < 0) {
             approxValue = 0;
           }
@@ -203,7 +179,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkAppLeafEntry<D> entry = (MkAppLeafEntry<D>) node.getEntry(i);
           D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), id);
-          double approxValue = log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
+          double approxValue = settings.log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if (approxValue < 0) {
             approxValue = 0;
           }
@@ -224,7 +200,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * @return the value of the k_max parameter
    */
   public int getK_max() {
-    return k_max;
+    return settings.k_max;
   }
 
   /**
@@ -242,7 +218,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // dirCapacity = (file.getPageSize() - overhead) / (nodeID + objectID +
     // coveringRadius + parentDistance + approx) + 1
-    dirCapacity = (int) (getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + (p + 1) * 4 + 2) + 1;
+    dirCapacity = (int) (getPageSize() - overhead) / (4 + 4 + distanceSize + distanceSize + (settings.p + 1) * 4 + 2) + 1;
 
     if (dirCapacity <= 1) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
@@ -255,7 +231,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     // leafCapacity = (file.getPageSize() - overhead) / (objectID +
     // parentDistance +
     // approx) + 1
-    leafCapacity = (int) (getPageSize() - overhead) / (4 + distanceSize + (p + 1) * 4 + 2) + 1;
+    leafCapacity = (int) (getPageSize() - overhead) / (4 + distanceSize + (settings.p + 1) * 4 + 2) + 1;
 
     if (leafCapacity <= 1) {
       throw new RuntimeException("Node size of " + getPageSize() + " Bytes is chosen too small!");
@@ -273,18 +249,18 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
   }
 
   private List<D> getMeanKNNList(DBIDs ids, Map<DBID, KNNList<D>> knnLists) {
-    double[] means = new double[k_max];
+    double[] means = new double[settings.k_max];
     for (DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       KNNList<D> knns = knnLists.get(id);
       int k = 0;
-      for (DistanceDBIDListIter<D> it = knns.iter(); k < k_max && it.valid(); it.advance(), k++) {
+      for (DistanceDBIDListIter<D> it = knns.iter(); k < settings.k_max && it.valid(); it.advance(), k++) {
         means[k] += it.getDistance().doubleValue();
       }
     }
 
     List<D> result = new ArrayList<>();
-    for (int k = 0; k < k_max; k++) {
+    for (int k = 0; k < settings.k_max; k++) {
       means[k] /= ids.size();
       result.add(getDistanceQuery().getDistanceFactory().fromDouble(means[k]));
     }
@@ -355,8 +331,8 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
 
     // count the zero distances (necessary of log-log space is used)
     int k_0 = 0;
-    if (log) {
-      for (int i = 0; i < k_max; i++) {
+    if (settings.log) {
+      for (int i = 0; i < settings.k_max; i++) {
         double dist = knnDistances.get(i).doubleValue();
         if (dist == 0) {
           k_0++;
@@ -366,11 +342,11 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       }
     }
 
-    de.lmu.ifi.dbs.elki.math.linearalgebra.Vector x = new de.lmu.ifi.dbs.elki.math.linearalgebra.Vector(k_max - k_0);
-    de.lmu.ifi.dbs.elki.math.linearalgebra.Vector y = new de.lmu.ifi.dbs.elki.math.linearalgebra.Vector(k_max - k_0);
+    de.lmu.ifi.dbs.elki.math.linearalgebra.Vector x = new de.lmu.ifi.dbs.elki.math.linearalgebra.Vector(settings.k_max - k_0);
+    de.lmu.ifi.dbs.elki.math.linearalgebra.Vector y = new de.lmu.ifi.dbs.elki.math.linearalgebra.Vector(settings.k_max - k_0);
 
-    for (int k = 0; k < k_max - k_0; k++) {
-      if (log) {
+    for (int k = 0; k < settings.k_max - k_0; k++) {
+      if (settings.log) {
         x.set(k, Math.log(k + k_0));
         y.set(k, Math.log(knnDistances.get(k + k_0).doubleValue()));
       } else {
@@ -379,7 +355,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       }
     }
 
-    PolynomialRegression regression = new PolynomialRegression(y, x, p);
+    PolynomialRegression regression = new PolynomialRegression(y, x, settings.p);
     PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getArrayCopy());
 
     if (LOG.isDebugging()) {

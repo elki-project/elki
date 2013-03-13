@@ -52,39 +52,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMTree<O, D, N, E> & Index> extends PagedIndexFactory<O, I> {
+public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, I extends AbstractMTree<O, D, N, E, S> & Index, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory<O, I> {
   /**
-   * Holds the instance of the distance function we are building the index for.
+   * Tree settings.
    */
-  protected DistanceFunction<O, D> distanceFunction;
-
-  /**
-   * Split strategy
-   */
-  protected MTreeSplit<O, D, N, E> splitStrategy;
-
-  /**
-   * Insertion strategy
-   */
-  protected MTreeInsert<O, D, N, E> insertStrategy;
+  protected S settings;
 
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
-   * @param distanceFunction Distance function
-   * @param splitStrategy Split strategy
+   * @param settings Tree settings
    */
-  public AbstractMTreeFactory(PageFileFactory<?> pageFileFactory, DistanceFunction<O, D> distanceFunction, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
+  public AbstractMTreeFactory(PageFileFactory<?> pageFileFactory, S settings) {
     super(pageFileFactory);
-    this.distanceFunction = distanceFunction;
-    this.splitStrategy = splitStrategy;
-    this.insertStrategy = insertStrategy;
+    this.settings = settings;
   }
 
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return distanceFunction.getInputTypeRestriction();
+    return settings.distanceFunction.getInputTypeRestriction();
   }
 
   /**
@@ -94,7 +81,7 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
    * 
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MTreeSettings<O, D, N, E>> extends PagedIndexFactory.Parameterizer<O> {
     /**
      * Parameter to specify the distance function to determine the distance
      * between database objects, must extend
@@ -126,38 +113,31 @@ public abstract class AbstractMTreeFactory<O, D extends Distance<D>, N extends A
     public static final OptionID INSERT_STRATEGY_ID = new OptionID("mtree.insert", "Insertion strategy to use for constructing the M-tree.");
 
     /**
-     * Distance function to use for the index.
+     * Tree settings.
      */
-    protected DistanceFunction<O, D> distanceFunction = null;
-
-    /**
-     * Splitting strategy.
-     */
-    protected MTreeSplit<O, D, N, E> splitStrategy = null;
-
-    /**
-     * Insertion strategy
-     */
-    protected MTreeInsert<O, D, N, E> insertStrategy;
+    protected S settings;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      settings = makeSettings();
       ObjectParameter<DistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if (config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
+        settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
       ObjectParameter<MTreeSplit<O, D, N, E>> splitStrategyP = new ObjectParameter<>(SPLIT_STRATEGY_ID, MTreeSplit.class, MMRadSplit.class);
       if (config.grab(splitStrategyP)) {
-        splitStrategy = splitStrategyP.instantiateClass(config);
+        settings.splitStrategy = splitStrategyP.instantiateClass(config);
       }
       ObjectParameter<MTreeInsert<O, D, N, E>> insertStrategyP = new ObjectParameter<>(INSERT_STRATEGY_ID, MTreeInsert.class, MinimumEnlargementInsert.class);
       if (config.grab(insertStrategyP)) {
-        insertStrategy = insertStrategyP.instantiateClass(config);
+        settings.insertStrategy = insertStrategyP.instantiateClass(config);
       }
     }
 
+    abstract protected S makeSettings();
+
     @Override
-    protected abstract AbstractMTreeFactory<O, D, N, E, ?> makeInstance();
+    protected abstract AbstractMTreeFactory<O, D, N, E, ?, ?> makeInstance();
   }
 }

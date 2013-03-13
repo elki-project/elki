@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNNode<D>, RdKNNEntry<D>, RdKNNTree<O, D>, AbstractRTreeSettings> {
+public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory<O, RdKNNNode<D>, RdKNNEntry<D>, RdKNNTree<O, D>, RdkNNSettings<O, D>> {
   /**
    * Parameter for k
    */
@@ -66,37 +65,19 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
   public static final OptionID DISTANCE_FUNCTION_ID = new OptionID("rdknn.distancefunction", "Distance function to determine the distance between database objects.");
 
   /**
-   * Parameter k.
-   */
-  private int k_max;
-
-  /**
-   * The distance function.
-   */
-  private SpatialPrimitiveDistanceFunction<O, D> distanceFunction;
-
-  /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
-   * @param bulkSplitter Bulk loading strategy
-   * @param insertionStrategy the strategy to find the insertion child
-   * @param k_max
-   * @param distanceFunction
-   * @param nodeSplitter the strategy for splitting nodes.
-   * @param overflowTreatment the strategy to use for overflow treatment
-   * @param minimumFill the relative minimum fill
+   * @param settings Settings class
    */
-  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, AbstractRTreeSettings settings, int k_max, SpatialPrimitiveDistanceFunction<O, D> distanceFunction) {
+  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, RdkNNSettings<O, D> settings) {
     super(pageFileFactory, settings);
-    this.k_max = k_max;
-    this.distanceFunction = distanceFunction;
   }
 
   @Override
   public RdKNNTree<O, D> instantiate(Relation<O> relation) {
     PageFile<RdKNNNode<D>> pagefile = makePageFile(getNodeClass());
-    RdKNNTree<O, D> index = new RdKNNTree<>(relation, pagefile, settings, k_max, distanceFunction, distanceFunction.instantiate(relation));
+    RdKNNTree<O, D> index = new RdKNNTree<>(relation, pagefile, settings);
     return index;
   }
 
@@ -111,40 +92,30 @@ public class RdKNNTreeFactory<O extends NumberVector<?>, D extends NumberDistanc
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
-    /**
-     * Parameter k.
-     */
-    protected int k_max = 0;
-
-    /**
-     * The distance function.
-     */
-    protected SpatialPrimitiveDistanceFunction<O, D> distanceFunction = null;
-
+  public static class Parameterizer<O extends NumberVector<?>, D extends NumberDistance<D, ?>> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings<O, D>> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter k_maxP = new IntParameter(K_ID);
       k_maxP.addConstraint(new GreaterConstraint(0));
       if (config.grab(k_maxP)) {
-        k_max = k_maxP.intValue();
+        settings.k_max = k_maxP.intValue();
       }
 
       ObjectParameter<SpatialPrimitiveDistanceFunction<O, D>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       if (config.grab(distanceFunctionP)) {
-        distanceFunction = distanceFunctionP.instantiateClass(config);
+        settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
     }
 
     @Override
     protected RdKNNTreeFactory<O, D> makeInstance() {
-      return new RdKNNTreeFactory<>(pageFileFactory, settings, k_max, distanceFunction);
+      return new RdKNNTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected AbstractRTreeSettings createSettings() {
-      return new AbstractRTreeSettings();
+    protected RdkNNSettings<O, D> createSettings() {
+      return new RdkNNSettings<>();
     }
   }
 }

@@ -70,7 +70,7 @@ public class MLBDistSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<
    * @param node the node to be split
    */
   @Override
-  public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {
+  public Assignments<D, E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
     DBID firstPromoted = null;
     DBID secondPromoted = null;
 

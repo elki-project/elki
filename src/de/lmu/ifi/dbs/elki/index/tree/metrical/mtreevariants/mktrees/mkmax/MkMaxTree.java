@@ -37,13 +37,12 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.ModifiableDistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
@@ -61,7 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  * @param <D> the type of Distance used in the MkMaxTree
  */
-public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> {
+public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>>> {
   /**
    * The logger for this class.
    */
@@ -75,14 +74,12 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
-   * @param k_max Maximum value for k
+   * @param settings Tree settings
    */
-  public MkMaxTree(PageFile<MkMaxTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> splitStrategy, MTreeInsert<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> insertStrategy, int k_max) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy, k_max);
+  public MkMaxTree(Relation<O> relation, PageFile<MkMaxTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> settings) {
+    super(relation, pagefile, settings);
   }
 
   /**
@@ -155,7 +152,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected void preInsert(MkMaxEntry<D> entry) {
-    KNNHeap<D> knns_o = DBIDUtil.newHeap(distanceFunction.getDistanceFactory(), getKmax());
+    KNNHeap<D> knns_o = DBIDUtil.newHeap(getDistanceFactory(), getKmax());
     preInsert(entry, getRootEntry(), knns_o);
   }
 

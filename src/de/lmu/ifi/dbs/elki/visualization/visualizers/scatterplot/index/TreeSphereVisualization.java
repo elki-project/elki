@@ -107,8 +107,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
     for (ScatterPlotProjector<?> p : ps) {
-      Collection<AbstractMTree<?, DoubleDistance, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
-      for (AbstractMTree<?, DoubleDistance, ?, ?> tree : trees) {
+      Collection<AbstractMTree<?, DoubleDistance, ?, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
+      for (AbstractMTree<?, DoubleDistance, ?, ?, ?> tree : trees) {
         if (canVisualize(tree) && tree instanceof Result) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
           task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
@@ -130,7 +130,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
    * @param tree Tree to visualize
    * @return p value
    */
-  public static double getLPNormP(AbstractMTree<?, ?, ?, ?> tree) {
+  public static double getLPNormP(AbstractMTree<?, ?, ?, ?, ?> tree) {
     // Note: we deliberately lose generics here, so the compilers complain
     // less on the next typecheck and cast!
     DistanceFunction<?, ?> distanceFunction = tree.getDistanceQuery().getDistanceFunction();
@@ -146,7 +146,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
    * @param tree Tree to visualize
    * @return whether the tree is visualizable
    */
-  public static boolean canVisualize(AbstractMTree<?, ?, ?, ?> tree) {
+  public static boolean canVisualize(AbstractMTree<?, ?, ?, ?, ?> tree) {
     return getLPNormP(tree) > 0;
   }
 
@@ -173,7 +173,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
     /**
      * The tree we visualize
      */
-    protected AbstractMTree<?, D, N, E> tree;
+    protected AbstractMTree<?, D, N, E, ?> tree;
 
     /**
      * Constructor
@@ -240,7 +240,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
      * @param entry Current entry
      * @param depth Current depth
      */
-    private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<?, D, N, E> mtree, E entry, int depth) {
+    private void visualizeMTreeEntry(SVGPlot svgp, Element layer, Projection2D proj, AbstractMTree<?, D, N, E, ?> mtree, E entry, int depth) {
       DBID roid = entry.getRoutingObjectID();
       if (roid != null) {
         NumberVector<?> ro = rel.get(roid);
