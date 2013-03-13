@@ -84,7 +84,7 @@ public class RandomSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O
    * @param node the node to be split
    */
   @Override
-  public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {
+  public Assignments<D, E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
     int pos1 = random.nextInt(node.getNumEntries());
     int pos2 = random.nextInt(node.getNumEntries() - 1);
     if (pos2 >= pos1) {

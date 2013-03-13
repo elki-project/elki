@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
 
 /*
  This file is part of ELKI:
@@ -22,28 +22,35 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 
 /**
- * Default insertion strategy for the M-tree.
- * 
- * <b>Warning:</b> as of now, insertion strategies <b>will already modify the tree</b>, i.e. adjust cover radiuses.
- * 
- * FIXME: move this to the actual insert.
+ * Class to store the MTree settings.
  * 
  * @author Erich Schubert
+ * 
+ * @param <O> Object type
+ * @param <D> Distance type
+ * @param <N> Node type
+ * @param <E> Entry type
  */
-public interface MTreeInsert<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> {
+public class MTreeSettings<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> {
   /**
-   * Choose the subpath to insert into.
-   * 
-   * @param tree Tree to process
-   * @param object Object to insert
-   * @return Path to insertion node
+   * Holds the instance of the trees distance function.
    */
-  IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object);
+  protected DistanceFunction<? super O, D> distanceFunction;
+
+  /**
+   * Splitting strategy.
+   */
+  protected MTreeSplit<O, D, N, E> splitStrategy;
+
+  /**
+   * Insertion strategy.
+   */
+  protected MTreeInsert<O, D, N, E> insertStrategy;
 }

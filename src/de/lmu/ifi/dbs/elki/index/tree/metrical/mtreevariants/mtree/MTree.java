@@ -24,13 +24,12 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -60,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Title("M-Tree")
 @Description("Efficient Access Method for Similarity Search in Metric Spaces")
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
-public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>> {
+public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNode<O, D>, MTreeEntry<D>, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>>> {
   /**
    * The logger for this class.
    */
@@ -69,13 +68,12 @@ public class MTree<O, D extends Distance<D>> extends AbstractMTree<O, D, MTreeNo
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
+   * @param settings Tree settings
    */
-  public MTree(PageFile<MTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MTreeNode<O, D>, MTreeEntry<D>> splitStrategy, MTreeInsert<O, D, MTreeNode<O, D>, MTreeEntry<D>> insertStrategy) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy);
+  public MTree(Relation<O> relation, PageFile<MTreeNode<O, D>> pagefile, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>> settings) {
+    super(relation, pagefile, settings);
   }
 
   /**

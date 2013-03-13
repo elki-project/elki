@@ -30,6 +30,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
@@ -37,9 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -58,31 +57,21 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
  */
-public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends MetricalIndexTree<O, D, N, E> {
+public abstract class AbstractMTree<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MTreeSettings<O, D, N, E>> extends MetricalIndexTree<O, D, N, E> {
   /**
    * Debugging flag: do extra integrity checks.
    */
   protected static final boolean EXTRA_INTEGRITY_CHECKS = false;
 
   /**
-   * Holds the instance of the trees distance function.
+   * Tree settings.
    */
-  protected DistanceFunction<? super O, D> distanceFunction;
+  protected S settings;
 
   /**
    * The distance query.
    */
   protected DistanceQuery<O, D> distanceQuery;
-
-  /**
-   * Splitting strategy.
-   */
-  protected MTreeSplit<O, D, N, E> splitStrategy;
-
-  /**
-   * Insertion strategy.
-   */
-  protected MTreeInsert<O, D, N, E> insertStrategy;
 
   /**
    * For counting the number of distance computations.
@@ -92,23 +81,19 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Constructor.
    * 
+   * @param relation Relation that is indexed.
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param distanceFunction Distance function
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
+   * @param settings Tree settings
    */
-  public AbstractMTree(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy) {
+  public AbstractMTree(Relation<O> relation, PageFile<N> pagefile, S settings) {
     super(pagefile);
-    this.distanceQuery = distanceQuery;
-    this.distanceFunction = distanceQuery.getDistanceFunction();
-    this.splitStrategy = splitStrategy;
-    this.insertStrategy = insertStrategy;
+    this.settings = settings;
+    this.distanceQuery = settings.distanceFunction.instantiate(relation);
   }
 
   @Override
   public final DistanceFunction<? super O, D> getDistanceFunction() {
-    return distanceFunction;
+    return settings.distanceFunction;
   }
 
   @Override
@@ -122,7 +107,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @return the distance factory used
    */
   public final D getDistanceFactory() {
-    return distanceFunction.getDistanceFactory();
+    return settings.distanceFunction.getDistanceFactory();
   }
 
   /**
@@ -142,8 +127,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     N node = getRoot();
 
-    while(!node.isLeaf()) {
-      if(node.getNumEntries() > 0) {
+    while (!node.isLeaf()) {
+      if (node.getNumEntries() > 0) {
         E entry = node.getEntry(0);
         node = getNode(entry);
         levels++;
@@ -151,22 +136,20 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     }
 
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-    while(enumeration.hasMoreElements()) {
+    while (enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();
-      if(entry.isLeafEntry()) {
+      if (entry.isLeafEntry()) {
         objects++;
         result.append("\n    ").append(entry.toString());
-      }
-      else {
+      } else {
         node = getNode(entry);
         result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries());
         result.append("\n").append(entry.toString());
 
-        if(node.isLeaf()) {
+        if (node.isLeaf()) {
           leafNodes++;
-        }
-        else {
+        } else {
           dirNodes++;
         }
       }
@@ -192,17 +175,17 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    */
   // todo: implement a bulk load for M-Tree and remove this method
   public void insert(E entry, boolean withPreInsert) {
-    if(getLogger().isDebugging()) {
+    if (getLogger().isDebugging()) {
       getLogger().debugFine("insert " + entry.getRoutingObjectID() + "\n");
     }
 
-    if(!initialized) {
+    if (!initialized) {
       initialize(entry);
     }
 
     // choose subtree for insertion
-    IndexTreePath<E> subtree = insertStrategy.choosePath(this, entry);
-    if(getLogger().isDebugging()) {
+    IndexTreePath<E> subtree = settings.insertStrategy.choosePath(this, entry);
+    if (getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
 
@@ -212,7 +195,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     entry.setParentDistance(parentDistance);
 
     // create leaf entry and do pre insert
-    if(withPreInsert) {
+    if (withPreInsert) {
       preInsert(entry);
     }
 
@@ -225,8 +208,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     adjustTree(subtree);
 
     // test
-    if(EXTRA_INTEGRITY_CHECKS) {
-      if(withPreInsert) {
+    if (EXTRA_INTEGRITY_CHECKS) {
+      if (withPreInsert) {
         getRoot().integrityCheck(this, getRootEntry());
       }
     }
@@ -238,10 +221,10 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param entries Entries to insert
    */
   public void insertAll(List<E> entries) {
-    if(!initialized && entries.size() > 0) {
+    if (!initialized && entries.size() > 0) {
       initialize(entries.get(0));
     }
-    for(E entry : entries) {
+    for (E entry : entries) {
       insert(entry, false);
     }
   }
@@ -263,7 +246,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   protected final List<DistanceEntry<D, E>> getSortedEntries(N node, DBID q) {
     List<DistanceEntry<D, E>> result = new ArrayList<>();
 
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    for (int i = 0; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       D distance = distance(entry.getRoutingObjectID(), q);
       D radius = entry.getCoveringRadius();
@@ -284,7 +267,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @return the distance between the two specified ids
    */
   public final D distance(DBIDRef id1, DBIDRef id2) {
-    if(id1 == null || id2 == null) {
+    if (id1 == null || id2 == null) {
       return getDistanceFactory().undefinedDistance();
     }
     statistics.countDistanceCalculation();
@@ -319,7 +302,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param subtree the subtree to be adjusted
    */
   private void adjustTree(IndexTreePath<E> subtree) {
-    if(getLogger().isDebugging()) {
+    if (getLogger().isDebugging()) {
       getLogger().debugFine("Adjust tree " + subtree + "\n");
     }
 
@@ -328,20 +311,20 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     N node = getNode(subtree.getLastPathComponent().getEntry());
 
     // overflow in node; split the node
-    if(hasOverflow(node)) {
+    if (hasOverflow(node)) {
       // do the split
-      Assignments<D, E> assignments = splitStrategy.split(this, node);
+      Assignments<D, E> assignments = settings.splitStrategy.split(this, node);
       final N newNode = node.isLeaf() ? createNewLeafNode() : createNewDirectoryNode();
 
       List<E> entries1 = new ArrayList<>(assignments.getFirstAssignments().size());
       List<E> entries2 = new ArrayList<>(assignments.getSecondAssignments().size());
       // Store final parent distances:
-      for(DistanceEntry<D, E> ent : assignments.getFirstAssignments()) {
+      for (DistanceEntry<D, E> ent : assignments.getFirstAssignments()) {
         final E e = ent.getEntry();
         e.setParentDistance(ent.getDistance());
         entries1.add(e);
       }
-      for(DistanceEntry<D, E> ent : assignments.getSecondAssignments()) {
+      for (DistanceEntry<D, E> ent : assignments.getSecondAssignments()) {
         final E e = ent.getEntry();
         e.setParentDistance(ent.getDistance());
         entries2.add(e);
@@ -352,14 +335,14 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
       writeNode(node);
       writeNode(newNode);
 
-      if(getLogger().isDebugging()) {
+      if (getLogger().isDebugging()) {
         String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
         getLogger().debugFine(msg);
       }
 
       // if root was split: create a new root that points the two split
       // nodes
-      if(isRoot(node)) {
+      if (isRoot(node)) {
         // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
         IndexTreePath<E> newRootPath = createNewRoot(node, newNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());
         adjustTree(newRootPath);
@@ -369,7 +352,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
         // get the parent and add the new split node
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
-        if(getLogger().isDebugging()) {
+        if (getLogger().isDebugging()) {
           getLogger().debugFine("parent " + parent);
         }
         D parentDistance2 = distance(parentEntry.getRoutingObjectID(), assignments.getSecondRoutingObject());
@@ -391,7 +374,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     // no overflow, only adjust parameters of the entry representing the
     // node
     else {
-      if(!isRoot(node)) {
+      if (!isRoot(node)) {
         E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
         N parent = getNode(parentEntry);
         int index = subtree.getLastPathComponent().getIndex();
@@ -418,7 +401,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    *         otherwise
    */
   private boolean hasOverflow(N node) {
-    if(node.isLeaf()) {
+    if (node.isLeaf()) {
       return node.getNumEntries() == leafCapacity;
     }
 
@@ -444,9 +427,9 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
 
     // switch the ids
     oldRoot.setPageID(root.getPageID());
-    if(!oldRoot.isLeaf()) {
+    if (!oldRoot.isLeaf()) {
       // FIXME: what is happening here?
-      for(int i = 0; i < oldRoot.getNumEntries(); i++) {
+      for (int i = 0; i < oldRoot.getNumEntries(); i++) {
         N node = getNode(oldRoot.getEntry(i));
         writeNode(node);
       }
@@ -470,7 +453,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     writeNode(root);
     writeNode(oldRoot);
     writeNode(newNode);
-    if(getLogger().isDebugging()) {
+    if (getLogger().isDebugging()) {
       String msg = "Create new Root: ID=" + root.getPageID();
       msg += "\nchild1 " + oldRoot;
       msg += "\nchild2 " + newNode;
@@ -484,13 +467,13 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   public List<E> getLeaves() {
     List<E> result = new ArrayList<>();
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-    while(enumeration.hasMoreElements()) {
+    while (enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
       E entry = path.getLastPathComponent().getEntry();
-      if(!entry.isLeafEntry()) {
+      if (!entry.isLeafEntry()) {
         // TODO: any way to skip unnecessary reads?
         N node = getNode(entry);
-        if(node.isLeaf()) {
+        if (node.isLeaf()) {
           result.add(entry);
         }
       }
@@ -507,8 +490,8 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
     int levels = 0;
     N node = getRoot();
 
-    while(!node.isLeaf()) {
-      if(node.getNumEntries() > 0) {
+    while (!node.isLeaf()) {
+      if (node.getNumEntries() > 0) {
         E entry = node.getEntry(0);
         node = getNode(entry);
         levels++;
@@ -521,7 +504,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   public void logStatistics() {
     super.logStatistics();
     Logging log = getLogger();
-    if(log.isStatistics()) {
+    if (log.isStatistics()) {
       log.statistics(new LongStatistic(this.getClass().getName() + ".height", getHeight()));
       statistics.logStatistics();
     }
@@ -563,7 +546,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
      * Count a distance computation.
      */
     public void countDistanceCalculation() {
-      if(distanceCalcs != null) {
+      if (distanceCalcs != null) {
         distanceCalcs.increment();
       }
     }
@@ -572,7 +555,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
      * Count a knn query invocation.
      */
     public void countKNNQuery() {
-      if(knnQueries != null) {
+      if (knnQueries != null) {
         knnQueries.increment();
       }
     }
@@ -581,7 +564,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
      * Count a range query invocation.
      */
     public void countRangeQuery() {
-      if(rangeQueries != null) {
+      if (rangeQueries != null) {
         rangeQueries.increment();
       }
     }
@@ -591,13 +574,13 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
      */
     public void logStatistics() {
       Logging log = getLogger();
-      if(statistics.distanceCalcs != null) {
+      if (statistics.distanceCalcs != null) {
         log.statistics(statistics.distanceCalcs);
       }
-      if(statistics.knnQueries != null) {
+      if (statistics.knnQueries != null) {
         log.statistics(statistics.knnQueries);
       }
-      if(statistics.rangeQueries != null) {
+      if (statistics.rangeQueries != null) {
         log.statistics(statistics.rangeQueries);
       }
     }

@@ -74,7 +74,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    *        the routing object of the parent node
    * @param mTree the M-Tree object holding this node
    */
-  public void adjustEntry(E entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, N, E> mTree) {
+  public void adjustEntry(E entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, N, E, ?> mTree) {
     entry.setRoutingObjectID(routingObjectID);
     entry.setParentDistance(parentDistance);
     entry.setCoveringRadius(coveringRadius(entry.getRoutingObjectID(), mTree));
@@ -93,7 +93,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    * @param mTree the M-Tree
    * @return the covering radius of this node
    */
-  public D coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E> mTree) {
+  public D coveringRadius(DBID routingObjectID, AbstractMTree<O, D, N, E, ?> mTree) {
     D coveringRadius = mTree.getDistanceFactory().nullDistance();
     for(int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
@@ -115,7 +115,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    * @param entry the entry representing this node
    */
   @SuppressWarnings("unchecked")
-  public final void integrityCheck(AbstractMTree<O, D, N, E> mTree, E entry) {
+  public final void integrityCheck(AbstractMTree<O, D, N, E, ?> mTree, E entry) {
     // leaf node
     if(isLeaf()) {
       for(int i = 0; i < getCapacity(); i++) {
@@ -181,7 +181,7 @@ public abstract class AbstractMTreeNode<O, D extends Distance<D>, N extends Abst
    * @param index the index of the entry in the parents child arry
    * @param mTree the M-Tree holding this node
    */
-  protected void integrityCheckParameters(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E> mTree) {
+  protected void integrityCheckParameters(E parentEntry, N parent, int index, AbstractMTree<O, D, N, E, ?> mTree) {
     // test if parent distance is correctly set
     E entry = parent.getEntry(index);
     D parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());

@@ -109,13 +109,13 @@ class MkAppTreeNode<O, D extends NumberDistance<D, ?>> extends AbstractMTreeNode
    * @param mTree the M-Tree object holding this node
    */
   @Override
-  public void adjustEntry(MkAppEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> mTree) {
+  public void adjustEntry(MkAppEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // entry.setKnnDistanceApproximation(knnDistanceApproximation());
   }
 
   @Override
-  protected void integrityCheckParameters(MkAppEntry<D> parentEntry, MkAppTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> mTree) {
+  protected void integrityCheckParameters(MkAppEntry<D> parentEntry, MkAppTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
 
     MkAppEntry<D> entry = parent.getEntry(index);

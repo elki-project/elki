@@ -68,15 +68,10 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
    * 
    * @param relation Relation to index
    * @param pageFile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insert strategy
-   * @param k_max Maximum value of k supported
-   * @param p Parameter p
-   * @param log Logspace flag
+   * @param settings Tree settings
    */
-  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> splitStrategy, MTreeInsert<O, D, MkAppTreeNode<O, D>, MkAppEntry<D>> insertStrategy, int k_max, int p, boolean log) {
-    super(pageFile, distanceQuery, splitStrategy, insertStrategy, k_max, p, log);
+  public MkAppTreeIndex(Relation<O> relation, PageFile<MkAppTreeNode<O, D>> pageFile, MkAppTreeSettings<O, D> settings) {
+    super(relation, pageFile, settings);
     this.relation = relation;
   }
 
@@ -112,7 +107,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if (!this.distanceFunction.equals(distanceFunction)) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -124,7 +119,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return MTreeQueryUtil.getKNNQuery(idx, dq, hints);
   }
@@ -137,7 +132,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if (!this.distanceFunction.equals(distanceFunction)) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -149,7 +144,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return MTreeQueryUtil.getRangeQuery(idx, dq, hints);
   }
@@ -170,7 +165,7 @@ public class MkAppTreeIndex<O, D extends NumberDistance<D, ?>> extends MkAppTree
         return null;
       }
     }
-    AbstractMkTree<O, S, ?, ?> idx = (AbstractMkTree<O, S, ?, ?>) this;
+    AbstractMkTree<O, S, ?, ?, ?> idx = (AbstractMkTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return new MkTreeRKNNQuery<>(idx, dq);
   }

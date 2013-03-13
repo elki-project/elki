@@ -30,13 +30,11 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -52,25 +50,18 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <D> the type of Distance used in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index
+ * @param <S> the type of Settings used.
  */
-public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> extends AbstractMkTree<O, D, N, E> {
-  /**
-   * Holds the maximum value of k to support.
-   */
-  private int k_max;
-
+public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>, S extends MkTreeSettings<O, D, N, E>> extends AbstractMkTree<O, D, N, E, S> {
   /**
    * Constructor.
    * 
+   * @param relation Relation to index
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insertion strategy
-   * @param k_max Maximum value for k
+   * @param settings Settings file
    */
-  public AbstractMkTreeUnified(PageFile<N> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, N, E> splitStrategy, MTreeInsert<O, D, N, E> insertStrategy, int k_max) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy);
-    this.k_max = k_max;
+  public AbstractMkTreeUnified(Relation<O> relation, PageFile<N> pagefile, S settings) {
+    super(relation, pagefile, settings);
   }
 
   /**
@@ -78,7 +69,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    */
   @Override
   protected TreeIndexHeader createHeader() {
-    return new MkTreeHeader(getPageSize(), dirCapacity, leafCapacity, k_max);
+    return new MkTreeHeader(getPageSize(), dirCapacity, leafCapacity, settings.k_max);
   }
 
   @Override
@@ -100,7 +91,7 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
     }
 
     // do batch nn
-    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, k_max);
+    Map<DBID, KNNList<D>> knnLists = batchNN(getRoot(), ids, settings.k_max);
 
     // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
@@ -124,6 +115,6 @@ public abstract class AbstractMkTreeUnified<O, D extends Distance<D>, N extends 
    * @return k_max value.
    */
   public int getKmax() {
-    return k_max;
+    return settings.k_max;
   }
 }

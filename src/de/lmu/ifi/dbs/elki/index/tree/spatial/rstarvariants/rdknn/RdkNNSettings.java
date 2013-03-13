@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
 
 /*
  This file is part of ELKI:
@@ -22,28 +22,27 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
-import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 
 /**
- * Default insertion strategy for the M-tree.
- * 
- * <b>Warning:</b> as of now, insertion strategies <b>will already modify the tree</b>, i.e. adjust cover radiuses.
- * 
- * FIXME: move this to the actual insert.
+ * Settings for the RdKNN Tree.
  * 
  * @author Erich Schubert
+ * 
+ * @param <O> Object type
+ * @param <D> Distance type
  */
-public interface MTreeInsert<O, D extends Distance<D>, N extends AbstractMTreeNode<O, D, N, E>, E extends MTreeEntry<D>> {
+public class RdkNNSettings<O extends NumberVector<?>, D extends Distance<D>> extends AbstractRTreeSettings {
   /**
-   * Choose the subpath to insert into.
-   * 
-   * @param tree Tree to process
-   * @param object Object to insert
-   * @return Path to insertion node
+   * Parameter k.
    */
-  IndexTreePath<E> choosePath(AbstractMTree<O, D, N, E, ?> tree, E object);
+  int k_max;
+
+  /**
+   * The distance function.
+   */
+  SpatialPrimitiveDistanceFunction<O, D> distanceFunction;
 }

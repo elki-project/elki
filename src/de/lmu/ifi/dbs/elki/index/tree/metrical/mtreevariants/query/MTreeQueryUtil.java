@@ -50,12 +50,12 @@ public final class MTreeQueryUtil {
    * @return Query object
    */
   @SuppressWarnings({ "cast", "unchecked" })
-  public static <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(AbstractMTree<O, D, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public static <O, D extends Distance<D>> KNNQuery<O, D> getKNNQuery(AbstractMTree<O, D, ?, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
     DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
     // Can we use an optimized query?
     if(df instanceof PrimitiveDoubleDistanceFunction) {
       PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
-      AbstractMTree<O, DoubleDistance, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?>) tree;
+      AbstractMTree<O, DoubleDistance, ?, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?, ?>) tree;
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
       KNNQuery<O, ?> q = new DoubleDistanceMetricalIndexKNNQuery<>(treec, dqc, dfc);
       return (KNNQuery<O, D>) q;
@@ -75,12 +75,12 @@ public final class MTreeQueryUtil {
    * @return Query object
    */
   @SuppressWarnings({ "cast", "unchecked" })
-  public static <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(AbstractMTree<O, D, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
+  public static <O, D extends Distance<D>> RangeQuery<O, D> getRangeQuery(AbstractMTree<O, D, ?, ?, ?> tree, DistanceQuery<O, D> distanceQuery, Object... hints) {
     DistanceFunction<? super O, D> df = distanceQuery.getDistanceFunction();
     // Can we use an optimized query?
     if(df instanceof PrimitiveDoubleDistanceFunction) {
       PrimitiveDoubleDistanceFunction<? super O> dfc = (PrimitiveDoubleDistanceFunction<? super O>) df;
-      AbstractMTree<O, DoubleDistance, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?>) tree;
+      AbstractMTree<O, DoubleDistance, ?, ?, ?> treec = (AbstractMTree<O, DoubleDistance, ?, ?, ?>) tree;
       DistanceQuery<O, DoubleDistance> dqc = (DistanceQuery<O, DoubleDistance>) distanceQuery;
       RangeQuery<O, ?> q = new DoubleDistanceMetricalIndexRangeQuery<>(treec, dqc, dfc);
       return (RangeQuery<O, D>) q;

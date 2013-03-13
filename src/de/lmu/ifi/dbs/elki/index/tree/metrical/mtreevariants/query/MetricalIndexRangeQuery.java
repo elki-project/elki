@@ -45,7 +45,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
   /**
    * The index to use
    */
-  protected final AbstractMTree<O, D, ?, ?> index;
+  protected final AbstractMTree<O, D, ?, ?, ?> index;
 
   /**
    * Constructor.
@@ -53,7 +53,7 @@ public class MetricalIndexRangeQuery<O, D extends Distance<D>> extends AbstractD
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexRangeQuery(AbstractMTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MetricalIndexRangeQuery(AbstractMTree<O, D, ?, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }

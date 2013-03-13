@@ -69,7 +69,7 @@ public class MRadSplit<O, D extends Distance<D>, N extends AbstractMTreeNode<O, 
    * @param node the node to be split
    */
   @Override
-  public Assignments<D, E> split(AbstractMTree<O, D, N, E> tree, N node) {
+  public Assignments<D, E> split(AbstractMTree<O, D, N, E, ?> tree, N node) {
     D miSumCR = tree.getDistanceFactory().infiniteDistance();
     ArrayList<D> distanceMatrix = computeDistanceMatrix(tree, node);
 

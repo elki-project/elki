@@ -52,7 +52,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
   /**
    * The index to use
    */
-  protected final AbstractMTree<O, D, ?, ?> index;
+  protected final AbstractMTree<O, D, ?, ?, ?> index;
 
   /**
    * Constructor.
@@ -60,7 +60,7 @@ public class MetricalIndexKNNQuery<O, D extends Distance<D>> extends AbstractDis
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
-  public MetricalIndexKNNQuery(AbstractMTree<O, D, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
+  public MetricalIndexKNNQuery(AbstractMTree<O, D, ?, ?, ?> index, DistanceQuery<O, D> distanceQuery) {
     super(distanceQuery);
     this.index = index;
   }

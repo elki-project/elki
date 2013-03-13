@@ -91,7 +91,7 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   }
 
   @Override
-  public void adjustEntry(MkTabEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
+  public void adjustEntry(MkTabEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distances
     entry.setKnnDistances(kNNDistances(mTree.getDistanceQuery()));
@@ -106,7 +106,7 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * @param mTree the underlying M-Tree
    */
   @Override
-  protected void integrityCheckParameters(MkTabEntry<D> parentEntry, MkTabTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> mTree) {
+  protected void integrityCheckParameters(MkTabEntry<D> parentEntry, MkTabTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test knn distances
     MkTabEntry<D> entry = parent.getEntry(index);

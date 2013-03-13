@@ -33,12 +33,11 @@ import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.generic.GenericDistanceDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -55,7 +54,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <O> Object type
  * @param <D> Distance type
  */
-public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> {
+public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>>> {
   /**
    * The logger for this class.
    */
@@ -64,14 +63,12 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   /**
    * Constructor.
    * 
+   * @param relation Relation
    * @param pagefile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Splitting strategy
-   * @param insertStrategy Insertion strategy
-   * @param k_max Maximum value for k
+   * @param settings Settings
    */
-  public MkTabTree(PageFile<MkTabTreeNode<O, D>> pagefile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> splitStrategy, MTreeInsert<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> insertStrategy, int k_max) {
-    super(pagefile, distanceQuery, splitStrategy, insertStrategy, k_max);
+  public MkTabTree(Relation<O> relation, PageFile<MkTabTreeNode<O, D>> pagefile, MkTreeSettings<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>> settings) {
+    super(relation, pagefile, settings);
   }
 
   /**

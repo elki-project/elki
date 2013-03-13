@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  * @param <I> Index type
  */
-@Deprecated
 public abstract class PagedIndexFactory<O, I extends Index> implements IndexFactory<O, I> {
   /**
    * Page file factory.

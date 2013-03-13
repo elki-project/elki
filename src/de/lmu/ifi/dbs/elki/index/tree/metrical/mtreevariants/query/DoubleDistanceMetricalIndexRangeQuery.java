@@ -47,7 +47,7 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
   /**
    * The index to use
    */
-  protected final AbstractMTree<O, DoubleDistance, ?, ?> index;
+  protected final AbstractMTree<O, DoubleDistance, ?, ?, ?> index;
 
   /**
    * Distance function
@@ -61,7 +61,7 @@ public class DoubleDistanceMetricalIndexRangeQuery<O> extends AbstractDistanceRa
    * @param distanceQuery Distance query used
    * @param distf Distance function
    */
-  public DoubleDistanceMetricalIndexRangeQuery(AbstractMTree<O, DoubleDistance, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, PrimitiveDoubleDistanceFunction<? super O> distf) {
+  public DoubleDistanceMetricalIndexRangeQuery(AbstractMTree<O, DoubleDistance, ?, ?, ?> index, DistanceQuery<O, DoubleDistance> distanceQuery, PrimitiveDoubleDistanceFunction<? super O> distf) {
     super(distanceQuery);
     this.index = index;
     this.distf = distf;

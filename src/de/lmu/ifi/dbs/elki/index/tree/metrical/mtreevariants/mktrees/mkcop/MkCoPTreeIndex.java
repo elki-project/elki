@@ -43,10 +43,9 @@ import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
@@ -68,13 +67,10 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
    * 
    * @param relation Relation to index.
    * @param pageFile Page file
-   * @param distanceQuery Distance query
-   * @param splitStrategy Split strategy
-   * @param insertStrategy Insert strategy
-   * @param k_max Maximum value of k supported
+   * @param settings Tree settings
    */
-  public MkCoPTreeIndex(Relation<O> relation, PageFile<MkCoPTreeNode<O, D>> pageFile, DistanceQuery<O, D> distanceQuery, MTreeSplit<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> splitStrategy, MTreeInsert<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> insertStrategy, int k_max) {
-    super(pageFile, distanceQuery, splitStrategy, insertStrategy, k_max);
+  public MkCoPTreeIndex(Relation<O> relation, PageFile<MkCoPTreeNode<O, D>> pageFile, MkTreeSettings<O, D, MkCoPTreeNode<O, D>, MkCoPEntry<D>> settings) {
+    super(relation, pageFile, settings);
     this.relation = relation;
   }
 
@@ -111,7 +107,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if (!this.distanceFunction.equals(distanceFunction)) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -123,7 +119,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return MTreeQueryUtil.getKNNQuery(idx, dq, hints);
   }
@@ -136,7 +132,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if (!this.distanceFunction.equals(distanceFunction)) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
       if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
@@ -148,7 +144,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
         return null;
       }
     }
-    AbstractMTree<O, S, ?, ?> idx = (AbstractMTree<O, S, ?, ?>) this;
+    AbstractMTree<O, S, ?, ?, ?> idx = (AbstractMTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return MTreeQueryUtil.getRangeQuery(idx, dq, hints);
   }
@@ -169,7 +165,7 @@ public class MkCoPTreeIndex<O, D extends NumberDistance<D, ?>> extends MkCoPTree
         return null;
       }
     }
-    AbstractMkTree<O, S, ?, ?> idx = (AbstractMkTree<O, S, ?, ?>) this;
+    AbstractMkTree<O, S, ?, ?, ?> idx = (AbstractMkTree<O, S, ?, ?, ?>) this;
     DistanceQuery<O, S> dq = distanceFunction.instantiate(relation);
     return new MkTreeRKNNQuery<>(idx, dq);
   }
