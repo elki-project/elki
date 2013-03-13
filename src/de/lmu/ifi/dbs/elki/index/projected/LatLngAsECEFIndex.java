@@ -93,7 +93,7 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
    * @param norefine Refinement disable flag.
    */
   public LatLngAsECEFIndex(Relation<O> relation, Projection<O, O> proj, Relation<O> view, Index inner, boolean norefine) {
-    super(relation, proj, view, inner, norefine);
+    super(relation, proj, view, inner, norefine, 1.0);
   }
 
   @Override
@@ -203,7 +203,7 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
      * @param model Earth model
      */
     public Factory(IndexFactory<O, ?> inner, boolean materialize, boolean norefine, EarthModel model) {
-      super(new LatLngToECEFProjection<O>(model), inner, materialize, norefine);
+      super(new LatLngToECEFProjection<O>(model), inner, materialize, norefine, 1.0);
     }
 
     @Override

@@ -66,7 +66,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
@@ -120,6 +122,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
   boolean norefine;
 
   /**
+   * Multiplier for k.
+   */
+  double kmulti = 1.0;
+
+  /**
    * Count the number of distance refinements computed.
    */
   final Counter refinements;
@@ -132,17 +139,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
    * @param view View to use.
    * @param inner Index to wrap.
    * @param norefine Refinement disable flag.
+   * @param kmulti Multiplicator for k
    */
-  public ProjectedIndex(Relation<O> relation, Projection<O, I> proj, Relation<I> view, Index inner, boolean norefine) {
+  public ProjectedIndex(Relation<O> relation, Projection<O, I> proj, Relation<I> view, Index inner, boolean norefine, double kmulti) {
     super();
     this.relation = relation;
     this.view = view;
     this.inner = inner;
     this.proj = proj;
     this.norefine = norefine;
-    this.refinements = LOG.isStatistics() ? LOG.newCounter(this.getClass().getName()+".refinements") : null;
+    this.kmulti = kmulti;
+    this.refinements = LOG.isStatistics() ? LOG.newCounter(this.getClass().getName() + ".refinements") : null;
   }
-  
+
   /**
    * Count a single distance refinement.
    */
@@ -288,10 +297,10 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     @Override
     public KNNList<D> getKNNForObject(O obj, int k) {
       final I pobj = proj.project(obj);
-      KNNList<D> ilist = inner.getKNNForObject(pobj, k);
       if (norefine) {
-        return ilist;
+        return inner.getKNNForObject(pobj, k);
       }
+      KNNList<D> ilist = inner.getKNNForObject(pobj, (int) Math.ceil(k * kmulti));
       if (distq.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         PrimitiveDoubleDistanceFunction<? super O> df = (PrimitiveDoubleDistanceFunction<? super O>) distq.getDistanceFunction();
         DoubleDistanceKNNHeap heap = new DoubleDistanceDBIDPairKNNHeap(k);
@@ -419,10 +428,10 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     @Override
     public DistanceDBIDList<D> getRKNNForObject(O obj, int k) {
       final I pobj = proj.project(obj);
-      DistanceDBIDList<D> ilist = inner.getRKNNForObject(pobj, k);
       if (norefine) {
-        return ilist;
+        return inner.getRKNNForObject(pobj, k);
       }
+      DistanceDBIDList<D> ilist = inner.getRKNNForObject(pobj, (int) Math.ceil(k * kmulti));
       if (distq.getDistanceFunction() instanceof PrimitiveDoubleDistanceFunction) {
         PrimitiveDoubleDistanceFunction<? super O> df = (PrimitiveDoubleDistanceFunction<? super O>) distq.getDistanceFunction();
         ModifiableDoubleDistanceDBIDList olist = new DoubleDistanceDBIDPairList(ilist.size());
@@ -479,18 +488,25 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
     boolean norefine = false;
 
     /**
+     * Multiplier for k.
+     */
+    double kmulti = 1.0;
+
+    /**
      * Constructor.
      * 
      * @param proj Projection
      * @param inner Inner index
      * @param materialize Flag for materializing
      * @param norefine Disable refinement of distances
+     * @param kmulti Multiplicator for k.
      */
-    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner, boolean materialize, boolean norefine) {
+    public Factory(Projection<O, I> proj, IndexFactory<I, ?> inner, boolean materialize, boolean norefine, double kmulti) {
       super();
       this.proj = proj;
       this.inner = inner;
       this.materialize = materialize;
+      this.kmulti = kmulti;
     }
 
     @Override
@@ -516,7 +532,7 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       if (inneri == null) {
         return null;
       }
-      return new ProjectedIndex<>(relation, proj, view, inneri, norefine);
+      return new ProjectedIndex<>(relation, proj, view, inneri, norefine, kmulti);
     }
 
     @Override
@@ -554,6 +570,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
       public static final OptionID DISABLE_REFINE_FLAG = new OptionID("projindex.disable-refine", "Flag to disable refinement of distances.");
 
       /**
+       * Option ID for querying a larger k.
+       */
+      public static final OptionID K_MULTIPLIER_ID = new OptionID("projindex.kmulti", "Multiplier for k.");
+
+      /**
        * Projection to use.
        */
       Projection<O, I> proj;
@@ -572,6 +593,11 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
        * Disable refinement of distances.
        */
       boolean norefine = false;
+
+      /**
+       * Multiplier for k.
+       */
+      double kmulti = 1.0;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -592,11 +618,19 @@ public class ProjectedIndex<O, I> implements KNNIndex<O>, RKNNIndex<O>, RangeInd
         if (config.grab(norefineF)) {
           norefine = norefineF.isTrue();
         }
+        if (!norefine) {
+          DoubleParameter kmultP = new DoubleParameter(K_MULTIPLIER_ID);
+          kmultP.setDefaultValue(1.0);
+          kmultP.addConstraint(new GreaterEqualConstraint(1.0));
+          if (config.grab(kmultP)) {
+            kmulti = kmultP.doubleValue();
+          }
+        }
       }
 
       @Override
       protected Factory<O, I> makeInstance() {
-        return new Factory<>(proj, inner, materialize, norefine);
+        return new Factory<>(proj, inner, materialize, norefine, kmulti);
       }
     }
   }
