@@ -147,7 +147,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     final Heap<GenericMTreeDistanceSearchCandidate<D>> pq = new UpdatableHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceQuery().nullDistance(), getRootID(), null, null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceFactory().nullDistance(), getRootID(), null, null));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -160,14 +160,14 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkAppEntry<D> entry = node.getEntry(i);
-          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), id);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
+          D distance = distance(entry.getRoutingObjectID(), id);
+          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
 
           double approxValue = settings.log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if (approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
+          D approximatedKnnDist = getDistanceFactory().fromDouble(approxValue);
 
           if (minDist.compareTo(approximatedKnnDist) <= 0) {
             pq.add(new GenericMTreeDistanceSearchCandidate<>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
@@ -178,12 +178,12 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkAppLeafEntry<D> entry = (MkAppLeafEntry<D>) node.getEntry(i);
-          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), id);
+          D distance = distance(entry.getRoutingObjectID(), id);
           double approxValue = settings.log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if (approxValue < 0) {
             approxValue = 0;
           }
-          D approximatedKnnDist = getDistanceQuery().getDistanceFactory().fromDouble(approxValue);
+          D approximatedKnnDist = getDistanceFactory().fromDouble(approxValue);
 
           if (distance.compareTo(approximatedKnnDist) <= 0) {
             result.add(distance, entry.getRoutingObjectID());
@@ -262,7 +262,7 @@ public class MkAppTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     List<D> result = new ArrayList<>();
     for (int k = 0; k < settings.k_max; k++) {
       means[k] /= ids.size();
-      result.add(getDistanceQuery().getDistanceFactory().fromDouble(means[k]));
+      result.add(getDistanceFactory().fromDouble(means[k]));
     }
 
     return result;

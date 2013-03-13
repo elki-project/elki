@@ -33,13 +33,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.distance.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
@@ -62,6 +63,11 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
   protected KNNQuery<O, D> knnq;
 
   /**
+   * Distance query to use.
+   */
+  private DistanceQuery<O, D> distanceQuery;
+
+  /**
    * Constructor.
    * 
    * @param relation Relation to index
@@ -69,8 +75,19 @@ public abstract class AbstractMkTree<O, D extends Distance<D>, N extends Abstrac
    * @param settings Settings class
    */
   public AbstractMkTree(Relation<O> relation, PageFile<N> pagefile, S settings) {
-    super(relation, pagefile, settings);
+    super(pagefile, settings);
+    // TODO: any way to un-tie MkTrees from relations?
+    this.distanceQuery = getDistanceFunction().instantiate(relation);
     this.knnq = MTreeQueryUtil.getKNNQuery(this, distanceQuery);
+  }
+
+  @Override
+  public D distance(DBIDRef id1, DBIDRef id2) {
+    if (id1 == null || id2 == null) {
+      return getDistanceFactory().undefinedDistance();
+    }
+    statistics.countDistanceCalculation();
+    return distanceQuery.distance(id1, id2);
   }
 
   /**

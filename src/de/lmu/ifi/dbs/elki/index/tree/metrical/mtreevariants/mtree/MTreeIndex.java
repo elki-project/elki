@@ -42,12 +42,10 @@ import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert.MTreeInsert;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MTreeSplit;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
@@ -55,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * Class for using an m-tree as database index.
  * 
  * @author Erich Schubert
- *
+ * 
  * @param <O> Object type
  * @param <D> Distance type
  */
@@ -66,15 +64,30 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
   private Relation<O> relation;
 
   /**
+   * The distance query.
+   */
+  protected DistanceQuery<O, D> distanceQuery;
+
+  /**
    * Constructor.
-   *
+   * 
    * @param relation Relation indexed
    * @param pagefile Page file
    * @param settings Tree settings
    */
   public MTreeIndex(Relation<O> relation, PageFile<MTreeNode<O, D>> pagefile, MTreeSettings<O, D, MTreeNode<O, D>, MTreeEntry<D>> settings) {
-    super(relation, pagefile, settings);
+    super(pagefile, settings);
     this.relation = relation;
+    this.distanceQuery = getDistanceFunction().instantiate(relation);
+  }
+
+  @Override
+  public D distance(DBIDRef id1, DBIDRef id2) {
+    if (id1 == null || id2 == null) {
+      return getDistanceFactory().undefinedDistance();
+    }
+    statistics.countDistanceCalculation();
+    return distanceQuery.distance(id1, id2);
   }
 
   /**
@@ -134,19 +147,19 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
   @Override
   public <S extends Distance<S>> KNNQuery<O, S> getKNNQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }
@@ -159,19 +172,19 @@ public class MTreeIndex<O, D extends Distance<D>> extends MTree<O, D> implements
   @Override
   public <S extends Distance<S>> RangeQuery<O, S> getRangeQuery(DistanceQuery<O, S> distanceQuery, Object... hints) {
     // Query on the relation we index
-    if(distanceQuery.getRelation() != relation) {
+    if (distanceQuery.getRelation() != relation) {
       return null;
     }
     DistanceFunction<? super O, S> distanceFunction = distanceQuery.getDistanceFunction();
-    if(!this.getDistanceFunction().equals(distanceFunction)) {
-      if(getLogger().isDebugging()) {
+    if (!this.getDistanceFunction().equals(distanceFunction)) {
+      if (getLogger().isDebugging()) {
         getLogger().debug("Distance function not supported by index - or 'equals' not implemented right!");
       }
       return null;
     }
     // Bulk is not yet supported
-    for(Object hint : hints) {
-      if(hint == DatabaseQuery.HINT_BULK) {
+    for (Object hint : hints) {
+      if (hint == DatabaseQuery.HINT_BULK) {
         return null;
       }
     }

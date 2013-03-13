@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -68,19 +67,19 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * Determines and returns the knn distance of this node as the maximum knn
    * distance of all entries.
    * 
-   * @param distanceFunction the distance function
+   * @param distanceFactory the distance function
    * @return the knn distance of this node
    */
-  protected List<D> kNNDistances(DistanceQuery<O, D> distanceFunction) {
+  protected List<D> kNNDistances(D distanceFactory) {
     int k = getEntry(0).getK_max();
 
     List<D> result = new ArrayList<>();
-    for(int i = 0; i < k; i++) {
-      result.add(distanceFunction.nullDistance());
+    for (int i = 0; i < k; i++) {
+      result.add(distanceFactory.nullDistance());
     }
 
-    for(int i = 0; i < getNumEntries(); i++) {
-      for(int j = 0; j < k; j++) {
+    for (int i = 0; i < getNumEntries(); i++) {
+      for (int j = 0; j < k; j++) {
         MkTabEntry<D> entry = getEntry(i);
         D kDist = result.remove(j);
         result.add(j, DistanceUtil.max(kDist, entry.getKnnDistance(j + 1)));
@@ -94,7 +93,7 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
   public void adjustEntry(MkTabEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkTabTreeNode<O, D>, MkTabEntry<D>, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distances
-    entry.setKnnDistances(kNNDistances(mTree.getDistanceQuery()));
+    entry.setKnnDistances(kNNDistances(mTree.getDistanceFactory()));
   }
 
   /**
@@ -110,8 +109,8 @@ class MkTabTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test knn distances
     MkTabEntry<D> entry = parent.getEntry(index);
-    List<D> knnDistances = kNNDistances(mTree.getDistanceQuery());
-    if(!entry.getKnnDistances().equals(knnDistances)) {
+    List<D> knnDistances = kNNDistances(mTree.getDistanceFactory());
+    if (!entry.getKnnDistances().equals(knnDistances)) {
       String soll = knnDistances.toString();
       String ist = entry.getKnnDistances().toString();
       throw new RuntimeException("Wrong knnDistances in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);

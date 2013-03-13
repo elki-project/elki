@@ -187,7 +187,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkTabEntry<D> createNewDirectoryEntry(MkTabTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkTabDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceQuery()));
+    return new MkTabDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances(getDistanceFactory()));
   }
 
   /**
@@ -217,7 +217,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
-        D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
+        D distance = distance(entry.getRoutingObjectID(), q);
         if (distance.compareTo(entry.getKnnDistance(k)) <= 0) {
           result.add(distance, entry.getRoutingObjectID());
         }
@@ -228,10 +228,10 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkTabEntry<D> entry = node.getEntry(i);
-        D node_knnDist = node_entry != null ? node_entry.getKnnDistance(k) : getDistanceQuery().infiniteDistance();
+        D node_knnDist = node_entry != null ? node_entry.getKnnDistance(k) : getDistanceFactory().infiniteDistance();
 
-        D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
+        D distance = distance(entry.getRoutingObjectID(), q);
+        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if (minDist.compareTo(node_knnDist) <= 0) {
           MkTabTreeNode<O, D> childNode = getNode(entry);
@@ -273,7 +273,7 @@ public class MkTabTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   private List<D> initKnnDistanceList() {
     List<D> knnDistances = new ArrayList<>(getKmax());
     for (int i = 0; i < getKmax(); i++) {
-      knnDistances.add(getDistanceQuery().nullDistance());
+      knnDistances.add(getDistanceFactory().nullDistance());
     }
     return knnDistances;
   }

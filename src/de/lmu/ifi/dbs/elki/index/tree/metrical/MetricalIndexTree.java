@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.Entry;
@@ -59,13 +58,6 @@ public abstract class MetricalIndexTree<O, D extends Distance<D>, N extends Node
    * @return the distance function of this metrical index
    */
   public abstract DistanceFunction<? super O, D> getDistanceFunction();
-
-  /**
-   * Returns the distance function of this metrical index.
-   * 
-   * @return the distance function of this metrical index
-   */
-  public abstract DistanceQuery<O, D> getDistanceQuery();
 
   /**
    * Returns a list of entries pointing to the leaf nodes of this spatial index.

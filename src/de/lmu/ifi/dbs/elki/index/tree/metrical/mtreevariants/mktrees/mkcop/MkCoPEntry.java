@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 
@@ -43,10 +42,10 @@ interface MkCoPEntry<D extends NumberDistance<D, ?>> extends MTreeEntry<D> {
    * 
    * @param <O> Object type
    * @param k the parameter k of the knn distance
-   * @param distanceFunction the distance function
+   * @param distanceFactory the distance function
    * @return the conservative approximated knn distance of the entry
    */
-  public <O> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction);
+  public <O> D approximateConservativeKnnDistance(int k, D distanceFactory);
 
   /**
    * Returns the conservative approximation line.

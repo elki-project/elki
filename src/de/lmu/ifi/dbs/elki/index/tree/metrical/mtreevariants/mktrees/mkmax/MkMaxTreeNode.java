@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
@@ -68,12 +67,12 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * Determines and returns the k-nearest neighbor distance of this node as the
    * maximum of the k-nearest neighbor distances of all entries.
    * 
-   * @param distanceFunction the distance function
+   * @param distanceFactory the distance function
    * @return the knn distance of this node
    */
-  protected D kNNDistance(DistanceQuery<O, D> distanceFunction) {
-    D knnDist = distanceFunction.nullDistance();
-    for(int i = 0; i < getNumEntries(); i++) {
+  protected D kNNDistance(D distanceFactory) {
+    D knnDist = distanceFactory.nullDistance();
+    for (int i = 0; i < getNumEntries(); i++) {
       MkMaxEntry<D> entry = getEntry(i);
       knnDist = DistanceUtil.max(knnDist, entry.getKnnDistance());
     }
@@ -86,10 +85,10 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * all its entries.
    */
   @Override
-  public void adjustEntry(MkMaxEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
+  public void adjustEntry(MkMaxEntry<D> entry, DBID routingObjectID, D parentDistance, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distance
-    entry.setKnnDistance(kNNDistance(mTree.getDistanceQuery()));
+    entry.setKnnDistance(kNNDistance(mTree.getDistanceFactory()));
   }
 
   /**
@@ -97,12 +96,12 @@ class MkMaxTreeNode<O, D extends Distance<D>> extends AbstractMTreeNode<O, D, Mk
    * node is correctly set.
    */
   @Override
-  protected void integrityCheckParameters(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>> mTree) {
+  protected void integrityCheckParameters(MkMaxEntry<D> parentEntry, MkMaxTreeNode<O, D> parent, int index, AbstractMTree<O, D, MkMaxTreeNode<O, D>, MkMaxEntry<D>, ?> mTree) {
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test if knn distance is correctly set
     MkMaxEntry<D> entry = parent.getEntry(index);
-    D knnDistance = kNNDistance(mTree.getDistanceQuery());
-    if(!entry.getKnnDistance().equals(knnDistance)) {
+    D knnDistance = kNNDistance(mTree.getDistanceFactory());
+    if (!entry.getKnnDistance().equals(knnDistance)) {
       String soll = knnDistance.toString();
       String ist = entry.getKnnDistance().toString();
       throw new RuntimeException("Wrong knnDistance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);

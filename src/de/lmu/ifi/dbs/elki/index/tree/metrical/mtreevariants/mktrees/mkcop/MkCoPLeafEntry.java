@@ -28,7 +28,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 
@@ -80,12 +79,12 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    * Returns the conservative approximated knn distance of the entry.
    * 
    * @param k the parameter k of the knn distance
-   * @param distanceFunction the distance function
+   * @param distanceFactory the distance function
    * @return the conservative approximated knn distance of the entry
    */
   @Override
-  public <O> D approximateConservativeKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
-    return conservativeApproximation.getApproximatedKnnDistance(k, distanceFunction);
+  public <O> D approximateConservativeKnnDistance(int k, D distanceFactory) {
+    return conservativeApproximation.getApproximatedKnnDistance(k, distanceFactory);
   }
 
   /**
@@ -93,11 +92,11 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
    * 
    * @param <O> Object type
    * @param k the parameter k of the knn distance
-   * @param distanceFunction the distance function
+   * @param distanceFactory the distance function
    * @return the progressive approximated knn distance of the entry
    */
-  public <O> D approximateProgressiveKnnDistance(int k, DistanceQuery<O, D> distanceFunction) {
-    return progressiveApproximation.getApproximatedKnnDistance(k, distanceFunction);
+  public <O> D approximateProgressiveKnnDistance(int k, D distanceFactory) {
+    return progressiveApproximation.getApproximatedKnnDistance(k, distanceFactory);
   }
 
   /**
@@ -182,19 +181,19 @@ class MkCoPLeafEntry<D extends NumberDistance<D, ?>> extends MTreeLeafEntry<D> i
   @Override
   @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
-    if(this == o) {
+    if (this == o) {
       return true;
     }
-    if(o == null || getClass() != o.getClass()) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    if(!super.equals(o)) {
+    if (!super.equals(o)) {
       return false;
     }
 
     final MkCoPLeafEntry<D> that = (MkCoPLeafEntry<D>) o;
 
-    if(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null) {
+    if (conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null) {
       return false;
     }
 

@@ -29,8 +29,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
@@ -69,11 +67,6 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   protected S settings;
 
   /**
-   * The distance query.
-   */
-  protected DistanceQuery<O, D> distanceQuery;
-
-  /**
    * For counting the number of distance computations.
    */
   public Statistics statistics = new Statistics();
@@ -81,24 +74,17 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
   /**
    * Constructor.
    * 
-   * @param relation Relation that is indexed.
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public AbstractMTree(Relation<O> relation, PageFile<N> pagefile, S settings) {
+  public AbstractMTree(PageFile<N> pagefile, S settings) {
     super(pagefile);
     this.settings = settings;
-    this.distanceQuery = settings.distanceFunction.instantiate(relation);
   }
 
   @Override
   public final DistanceFunction<? super O, D> getDistanceFunction() {
     return settings.distanceFunction;
-  }
-
-  @Override
-  public final DistanceQuery<O, D> getDistanceQuery() {
-    return distanceQuery;
   }
 
   /**
@@ -266,13 +252,7 @@ public abstract class AbstractMTree<O, D extends Distance<D>, N extends Abstract
    * @param id2 the second id
    * @return the distance between the two specified ids
    */
-  public final D distance(DBIDRef id1, DBIDRef id2) {
-    if (id1 == null || id2 == null) {
-      return getDistanceFactory().undefinedDistance();
-    }
-    statistics.countDistanceCalculation();
-    return distanceQuery.distance(id1, id2);
-  }
+  public abstract D distance(DBIDRef id1, DBIDRef id2);
 
   /**
    * Returns the distance between the routing object of two entries.

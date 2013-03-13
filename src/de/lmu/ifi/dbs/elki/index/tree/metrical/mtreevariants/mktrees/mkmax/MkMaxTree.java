@@ -41,11 +41,10 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.DistanceUtil;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.Distance;
 import de.lmu.ifi.dbs.elki.index.tree.DistanceEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTreeUnified;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 
 /**
  * MkMaxTree is a metrical index structure based on the concepts of the M-Tree
@@ -65,11 +64,6 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(MkMaxTree.class);
-
-  /**
-   * Provides some statistics about performed reverse knn-queries.
-   */
-  private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
    * Constructor.
@@ -100,8 +94,9 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     if (k == this.getKmax()) {
       candidates.sort();
-      rkNNStatistics.addTrueHits(candidates.size());
-      rkNNStatistics.addResults(candidates.size());
+      // FIXME: re-add statistics.
+      // rkNNStatistics.addTrueHits(candidates.size());
+      // rkNNStatistics.addResults(candidates.size());
       return candidates;
     }
 
@@ -124,26 +119,11 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
       }
     }
 
-    rkNNStatistics.addResults(result.size());
-    rkNNStatistics.addCandidates(candidates.size());
+    // FIXME: re-add statistics.
+    // rkNNStatistics.addResults(result.size());
+    // rkNNStatistics.addCandidates(candidates.size());
     result.sort();
     return result;
-  }
-
-  /**
-   * Returns the statistic for performed rknn queries.
-   * 
-   * @return the statistic for performed rknn queries
-   */
-  public QueryStatistic getRkNNStatistics() {
-    return rkNNStatistics;
-  }
-
-  /**
-   * Clears the values of the statistic for performed rknn queries
-   */
-  public void clearRkNNStatistics() {
-    rkNNStatistics.clear();
   }
 
   /**
@@ -162,7 +142,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
   @Override
   protected void kNNdistanceAdjustment(MkMaxEntry<D> entry, Map<DBID, KNNList<D>> knnLists) {
     MkMaxTreeNode<O, D> node = getNode(entry);
-    D knnDist_node = getDistanceQuery().nullDistance();
+    D knnDist_node = getDistanceFactory().nullDistance();
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> leafEntry = node.getEntry(i);
@@ -195,7 +175,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> entry = node.getEntry(i);
-        D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
+        D distance = distance(entry.getRoutingObjectID(), q);
         if (distance.compareTo(entry.getKnnDistance()) <= 0) {
           result.add(distance, entry.getRoutingObjectID());
         }
@@ -206,10 +186,10 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
     else {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> entry = node.getEntry(i);
-        D node_knnDist = node_entry != null ? node_entry.getKnnDistance() : getDistanceQuery().infiniteDistance();
+        D node_knnDist = node_entry != null ? node_entry.getKnnDistance() : getDistanceFactory().infiniteDistance();
 
-        D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
+        D distance = distance(entry.getRoutingObjectID(), q);
+        D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
 
         if (minDist.compareTo(node_knnDist) <= 0) {
           MkMaxTreeNode<O, D> childNode = getNode(entry);
@@ -233,13 +213,13 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
 
     D knnDist_q = knns_q.getKNNDistance();
     MkMaxTreeNode<O, D> node = getNode(nodeEntry);
-    D knnDist_node = getDistanceQuery().nullDistance();
+    D knnDist_node = getDistanceFactory().nullDistance();
 
     // leaf node
     if (node.isLeaf()) {
       for (int i = 0; i < node.getNumEntries(); i++) {
         MkMaxEntry<D> p = node.getEntry(i);
-        D dist_pq = getDistanceQuery().distance(p.getRoutingObjectID(), q.getRoutingObjectID());
+        D dist_pq = distance(p.getRoutingObjectID(), q.getRoutingObjectID());
 
         // p is nearer to q than the farthest kNN-candidate of q
         // ==> p becomes a knn-candidate
@@ -257,7 +237,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
           KNNList<D> knns_p = knnq.getKNNForDBID(p.getRoutingObjectID(), getKmax() - 1);
 
           if (knns_p.size() + 1 < getKmax()) {
-            p.setKnnDistance(getDistanceQuery().undefinedDistance());
+            p.setKnnDistance(getDistanceFactory().undefinedDistance());
           } else {
             D knnDist_p = DistanceUtil.max(dist_pq, knns_p.getKNNDistance());
             p.setKnnDistance(knnDist_p);
@@ -343,7 +323,7 @@ public class MkMaxTree<O, D extends Distance<D>> extends AbstractMkTreeUnified<O
    */
   @Override
   protected MkMaxEntry<D> createNewDirectoryEntry(MkMaxTreeNode<O, D> node, DBID routingObjectID, D parentDistance) {
-    return new MkMaxDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistance(getDistanceQuery()));
+    return new MkMaxDirectoryEntry<>(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistance(getDistanceFactory()));
   }
 
   /**

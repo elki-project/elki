@@ -133,7 +133,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   public static double getLPNormP(AbstractMTree<?, ?, ?, ?, ?> tree) {
     // Note: we deliberately lose generics here, so the compilers complain
     // less on the next typecheck and cast!
-    DistanceFunction<?, ?> distanceFunction = tree.getDistanceQuery().getDistanceFunction();
+    DistanceFunction<?, ?> distanceFunction = tree.getDistanceFunction();
     if (LPNormDistanceFunction.class.isInstance(distanceFunction)) {
       return ((LPNormDistanceFunction) distanceFunction).getP();
     }
@@ -197,9 +197,9 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
       p = getLPNormP(tree);
       if (tree != null) {
-        if (ManhattanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
+        if (ManhattanDistanceFunction.class.isInstance(tree.getDistanceFunction())) {
           dist = Modus.MANHATTAN;
-        } else if (EuclideanDistanceFunction.class.isInstance(tree.getDistanceQuery())) {
+        } else if (EuclideanDistanceFunction.class.isInstance(tree.getDistanceFunction())) {
           dist = Modus.EUCLIDEAN;
         } else {
           dist = Modus.LPCROSS;

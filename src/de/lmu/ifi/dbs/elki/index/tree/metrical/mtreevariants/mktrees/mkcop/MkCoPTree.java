@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.QueryStatistic;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 
 /**
@@ -70,11 +69,6 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
    * The values of log(1),..,log(k_max)
    */
   private double[] log_k;
-
-  /**
-   * Provides some statistics about performed reverse knn-queries.
-   */
-  private QueryStatistic rkNNStatistics = new QueryStatistic();
 
   /**
    * Constructor.
@@ -166,8 +160,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     result.sort();
     // Collections.sort(candidates);
 
-    rkNNStatistics.addCandidates(candidates.size());
-    rkNNStatistics.addTrueHits(result.size());
+    // FIXME: re-add statistics.
+    // rkNNStatistics.addCandidates(candidates.size());
+    // rkNNStatistics.addTrueHits(result.size());
 
     for (DBIDIter iter = candidates.iter(); iter.valid(); iter.advance()) {
       DBID cid = DBIDUtil.deref(iter);
@@ -181,24 +176,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     }
     result.sort();
 
-    rkNNStatistics.addResults(result.size());
+    // FIXME: re-add statistics.
+    // rkNNStatistics.addResults(result.size());
     return result;
-  }
-
-  /**
-   * Returns the statistic for performed rknn queries.
-   * 
-   * @return the statistic for performed rknn queries
-   */
-  public QueryStatistic getRkNNStatistics() {
-    return rkNNStatistics;
-  }
-
-  /**
-   * Clears the values of the statistic for performed rknn queries
-   */
-  public void clearRkNNStatistics() {
-    rkNNStatistics.clear();
   }
 
   /**
@@ -268,7 +248,7 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
     final ComparableMinHeap<GenericMTreeDistanceSearchCandidate<D>> pq = new ComparableMinHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceQuery().nullDistance(), getRootID(), null, null));
+    pq.add(new GenericMTreeDistanceSearchCandidate<>(getDistanceFactory().nullDistance(), getRootID(), null, null));
 
     // search in tree
     while (!pq.isEmpty()) {
@@ -281,9 +261,9 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       if (!node.isLeaf()) {
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkCoPEntry<D> entry = node.getEntry(i);
-          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceQuery().nullDistance() : distance.minus(entry.getCoveringRadius());
-          D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());
+          D distance = distance(entry.getRoutingObjectID(), q);
+          D minDist = entry.getCoveringRadius().compareTo(distance) > 0 ? getDistanceFactory().nullDistance() : distance.minus(entry.getCoveringRadius());
+          D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFactory());
 
           if (minDist.compareTo(approximatedKnnDist_cons) <= 0) {
             pq.add(new GenericMTreeDistanceSearchCandidate<>(minDist, getPageID(entry), entry.getRoutingObjectID(), null));
@@ -294,13 +274,13 @@ public class MkCoPTree<O, D extends NumberDistance<D, ?>> extends AbstractMkTree
       else {
         for (int i = 0; i < node.getNumEntries(); i++) {
           MkCoPLeafEntry<D> entry = (MkCoPLeafEntry<D>) node.getEntry(i);
-          D distance = getDistanceQuery().distance(entry.getRoutingObjectID(), q);
-          D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceQuery());
+          D distance = distance(entry.getRoutingObjectID(), q);
+          D approximatedKnnDist_prog = entry.approximateProgressiveKnnDistance(k, getDistanceFactory());
 
           if (distance.compareTo(approximatedKnnDist_prog) <= 0) {
             result.add(distance, entry.getRoutingObjectID());
           } else {
-            D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceQuery());
+            D approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k, getDistanceFactory());
             double diff = distance.doubleValue() - approximatedKnnDist_cons.doubleValue();
             if (diff <= 0.0000000001) {
               candidates.add(entry.getRoutingObjectID());
