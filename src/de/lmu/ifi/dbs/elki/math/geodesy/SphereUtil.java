@@ -68,7 +68,58 @@ public final class SphereUtil {
   }
 
   /**
-   * Compute the approximate on-earth-surface distance of two points using the
+   * Compute the approximate great-circle distance of two points using the
+   * Haversine formula
+   * 
+   * Complexity: 6 (2 of which emulated) trigonometric functions.
+   * 
+   * Reference:
+   * <p>
+   * R. W. Sinnott,<br/>
+   * Virtues of the Haversine<br />
+   * Sky and telescope, 68-2, 1984
+   * </p>
+   * 
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance on unit sphere
+   */
+  public static double cosineFormulaDeg(double lat1, double lng1, double lat2, double lng2) {
+    return cosineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lng1),//
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lng2));
+  }
+
+  /**
+   * Compute the approximate great-circle distance of two points using the
+   * Haversine formula
+   * 
+   * Complexity: 6 (2 of which emulated) trigonometric functions.
+   * 
+   * Reference:
+   * <p>
+   * R. W. Sinnott,<br/>
+   * Virtues of the Haversine<br />
+   * Sky and telescope, 68-2, 1984
+   * </p>
+   * 
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance on unit sphere
+   */
+  public static double cosineFormulaRad(double lat1, double lng1, double lat2, double lng2) {
+    final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
+    final double slat2 = Math.sin(lat2), clat2 = MathUtil.sinToCos(lat2, slat2);
+    final double a = slat1 * slat2;
+    final double b = clat1 * clat2 * Math.cos(lng2 - lng1);
+    return Math.acos(a + b);
+  }
+
+  /**
+   * Compute the approximate great-circle distance of two points using the
    * Haversine formula
    * 
    * Complexity: 5 trigonometric functions, 2 sqrt.
@@ -88,16 +139,12 @@ public final class SphereUtil {
    */
   @Reference(authors = "Sinnott, R. W.", title = "Virtues of the Haversine", booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    // Convert to radians
-    lat1 = MathUtil.deg2rad(lat1);
-    lat2 = MathUtil.deg2rad(lat2);
-    lon1 = MathUtil.deg2rad(lon1);
-    lon2 = MathUtil.deg2rad(lon2);
-    return haversineFormulaRad(lat1, lon1, lat2, lon2);
+    return haversineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
-   * Compute the approximate on-earth-surface distance of two points using the
+   * Compute the approximate great-circle distance of two points using the
    * Haversine formula
    * 
    * Complexity: 5 trigonometric functions, 2 sqrt.
@@ -129,7 +176,7 @@ public final class SphereUtil {
   }
 
   /**
-   * Compute the approximate on-earth-surface distance of two points.
+   * Compute the approximate great-circle distance of two points.
    * 
    * Uses Vincenty's Formula for the spherical case, which does not require
    * iterations.
@@ -152,11 +199,12 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return sphericalVincentyFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return sphericalVincentyFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
-   * Compute the approximate on-earth-surface distance of two points.
+   * Compute the approximate great-circle distance of two points.
    * 
    * Uses Vincenty's Formula for the spherical case, which does not require
    * iterations.
@@ -192,7 +240,7 @@ public final class SphereUtil {
   }
 
   /**
-   * Compute the approximate on-earth-surface distance of two points.
+   * Compute the approximate great-circle distance of two points.
    * 
    * Reference:
    * <p>
@@ -216,7 +264,7 @@ public final class SphereUtil {
   }
 
   /**
-   * Compute the approximate on-earth-surface distance of two points.
+   * Compute the approximate great-circle distance of two points.
    * 
    * Reference:
    * <p>

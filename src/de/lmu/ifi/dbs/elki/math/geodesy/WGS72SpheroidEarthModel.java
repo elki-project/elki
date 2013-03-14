@@ -27,45 +27,42 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * The WGS84 spheroid earth model, without height model (so not a geoid, just a
- * spheroid!)
+ * The WGS72 spheroid earth model, without height model.
  * 
- * Note that EGM96 uses the same spheroid, but what really makes the difference
- * is it's geoid expansion.
  * 
- * Radius: 6378137.0 m
+ * Radius: 6378135.0 m
  * 
- * Flattening: 1 / 298.257223563
+ * Flattening: 1 / 298.26
  * 
  * @author Erich Schubert
  */
-@Alias({ "wgs84", "WGS-84", "WGS84" })
-public class WGS84SpheroidEarthModel extends AbstractEarthModel {
+@Alias({ "WGS72", "WGS-72", "WGS72" })
+public class WGS72SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
    */
-  public static final WGS84SpheroidEarthModel STATIC = new WGS84SpheroidEarthModel();
+  public static final WGS72SpheroidEarthModel STATIC = new WGS72SpheroidEarthModel();
 
   /**
-   * Radius of the WGS84 Ellipsoid in m (a).
+   * Radius of the WGS72 Ellipsoid in m (a).
    */
-  public static final double WGS84_RADIUS = 6378137.0; // m
+  public static final double WGS72_RADIUS = 6378135.0; // m
 
   /**
-   * Inverse flattening 1/f of the WGS84 Ellipsoid.
+   * Inverse flattening 1/f of the WGS72 Ellipsoid.
    */
-  public static final double WGS84_INV_FLATTENING = 298.257223563;
+  public static final double WGS72_INV_FLATTENING = 298.26;
 
   /**
-   * Flattening f of the WGS84 Ellipsoid.
+   * Flattening f of the WGS72 Ellipsoid.
    */
-  public static final double WGS84_FLATTENING = 1 / WGS84_INV_FLATTENING;
+  public static final double WGS72_FLATTENING = 1 / WGS72_INV_FLATTENING;
 
   /**
    * Constructor.
    */
-  protected WGS84SpheroidEarthModel() {
-    super(WGS84_RADIUS, WGS84_RADIUS * (1 - WGS84_FLATTENING), WGS84_FLATTENING, WGS84_INV_FLATTENING);
+  protected WGS72SpheroidEarthModel() {
+    super(WGS72_RADIUS, WGS72_RADIUS * (1 - WGS72_FLATTENING), WGS72_FLATTENING, WGS72_INV_FLATTENING);
   }
 
   /**
@@ -77,7 +74,7 @@ public class WGS84SpheroidEarthModel extends AbstractEarthModel {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WGS84SpheroidEarthModel makeInstance() {
+    protected WGS72SpheroidEarthModel makeInstance() {
       return STATIC;
     }
   }
