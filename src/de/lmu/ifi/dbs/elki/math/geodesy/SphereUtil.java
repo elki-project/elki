@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math;
+package de.lmu.ifi.dbs.elki.math.geodesy;
 
 /*
  This file is part of ELKI:
@@ -23,10 +23,13 @@ package de.lmu.ifi.dbs.elki.math;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Class with utility functions for geographic computations.
+ * Class with utility functions for distance computations on the sphere.
+ * 
+ * Note: the formulas are usually implemented for the unit sphere.
  * 
  * The majority of formulas are adapted from:
  * <p>
@@ -41,41 +44,26 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Niels Dörre
  */
 @Reference(authors = "Ed Williams", title = "Aviation Formulary", booktitle = "", url = "http://williams.best.vwh.net/avform.htm")
-public final class GeoUtil {
+public final class SphereUtil {
   /**
-   * Earth radius approximation in km.
+   * Maximum number of iterations.
    */
-  public static final double EARTH_RADIUS = 6371.009; // km
+  private static final int MAX_ITER = 20;
 
   /**
-   * Earth circumference across poles.
+   * Maximum desired precision.
    */
-  public static final double WGS84_CIRCUMFERENCE_POLES = 40007.863; // km
+  private static final double PRECISION = 1e-10;
 
   /**
-   * Radius of the WGS84 Ellipsoid in km.
+   * Constant to divide by 6 via multiplication.
    */
-  public static final double WGS84_RADIUS = 6378.137; // km
-
-  /**
-   * Flattening of the WGS84 Ellipsoid.
-   */
-  public static final double WGS84_FLATTENING = 1 / 298.257223563;
-
-  /**
-   * Eccentricity of the WGS84 Ellipsoid
-   */
-  public static final double WGS84_ECCENTRICITY = 0.081819190842621;
-
-  /**
-   * Eccentricity squared of the WGS84 Ellipsoid
-   */
-  public static final double WGS84_ECCENTRICITY_SQUARED = 0.00669437999014;
+  private static final double ONE_SIXTH = 1. / 6;
 
   /**
    * Dummy constructor. Do not instantiate.
    */
-  private GeoUtil() {
+  private SphereUtil() {
     // Use static methods. Do not intantiate
   }
 
@@ -96,7 +84,7 @@ public final class GeoUtil {
    * @param lon1 Longitude of first point in degree
    * @param lat2 Latitude of second point in degree
    * @param lon2 Longitude of second point in degree
-   * @return Distance in km (approximately)
+   * @return Distance on unit sphere
    */
   @Reference(authors = "Sinnott, R. W.", title = "Virtues of the Haversine", booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
@@ -125,7 +113,7 @@ public final class GeoUtil {
    * @param lon1 Longitude of first point in degree
    * @param lat2 Latitude of second point in degree
    * @param lon2 Longitude of second point in degree
-   * @return Distance in km (approximately)
+   * @return Distance on unit sphere
    */
   @Reference(authors = "Sinnott, R. W.", title = "Virtues of the Haversine", booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaRad(double lat1, double lon1, double lat2, double lon2) {
@@ -137,7 +125,7 @@ public final class GeoUtil {
     final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     // Alternate version - TODO: which one is faster, more precise?
     // final double c = 2 * Math.asin(Math.sqrt(a));
-    return EARTH_RADIUS * c;
+    return c;
   }
 
   /**
@@ -160,16 +148,11 @@ public final class GeoUtil {
    * @param lon1 Longitude of first point in degree
    * @param lat2 Latitude of second point in degree
    * @param lon2 Longitude of second point in degree
-   * @return Distance in km (approximately)
+   * @return Distance in radians / on unit sphere.
    */
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    // Work in radians
-    lat1 = MathUtil.deg2rad(lat1);
-    lat2 = MathUtil.deg2rad(lat2);
-    lon1 = MathUtil.deg2rad(lon1);
-    lon2 = MathUtil.deg2rad(lon2);
-    return sphericalVincentyFormulaRad(lat1, lon1, lat2, lon2);
+    return sphericalVincentyFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
@@ -192,95 +175,119 @@ public final class GeoUtil {
    * @param lon1 Longitude of first point in degree
    * @param lat2 Latitude of second point in degree
    * @param lon2 Longitude of second point in degree
-   * @return Distance in km (approximately)
+   * @return Distance on unit sphere
    */
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaRad(double lat1, double lon1, double lat2, double lon2) {
-    // Delta
-    final double dlon = lon1 - lon2;
+    // Half delta longitude.
+    final double dlnh = (lon1 - lon2) * .5;
 
     // Spherical special case of Vincenty's formula - no iterations needed
-    final double slat1 = Math.sin(lat1);
-    final double slat2 = Math.sin(lat2);
-    final double slond = Math.sin(dlon * .5);
-    final double clat1 = MathUtil.sinToCos(lat1, slat1);
-    final double clat2 = MathUtil.sinToCos(lat2, slat2);
-    final double clond = MathUtil.sinToCos(dlon * .5, slond);
+    final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
+    final double slat2 = Math.sin(lat2), clat2 = MathUtil.sinToCos(lat2, slat2);
+    final double slond = Math.sin(dlnh), clond = MathUtil.sinToCos(dlnh, slond);
     final double a = clat2 * slond;
     final double b = (clat1 * slat2) - (slat1 * clat2 * clond);
-    final double d = Math.atan2(Math.sqrt(a * a + b * b), slat1 * slat2 + clat1 * clat2 * clond);
-    return EARTH_RADIUS * d;
+    return Math.atan2(Math.sqrt(a * a + b * b), slat1 * slat2 + clat1 * clat2 * clond);
   }
 
   /**
-   * Compute the cross-track distance.
+   * Compute the approximate on-earth-surface distance of two points.
    * 
-   * @param lat1 Latitude of starting point.
-   * @param lon1 Longitude of starting point.
-   * @param lat2 Latitude of destination point.
-   * @param lon2 Longitude of destination point.
-   * @param latQ Latitude of query point.
-   * @param lonQ Longitude of query point.
-   * @param dist1Q Distance from starting point to query point in km.
-   * @return Cross-track distance in km. May be negative - this gives the side.
+   * Reference:
+   * <p>
+   * T. Vincenty<br />
+   * Direct and inverse solutions of geodesics on the ellipsoid with application
+   * of nested equations<br />
+   * Survey review 23 176, 1975
+   * </p>
+   * 
+   * @param f Ellipsoid flattening
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance for a minor axis of 1.
    */
-  public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
-    // Convert to radians.
-    lat1 = MathUtil.deg2rad(lat1);
-    latQ = MathUtil.deg2rad(latQ);
-    lat2 = MathUtil.deg2rad(lat2);
-    lon1 = MathUtil.deg2rad(lon1);
-    lonQ = MathUtil.deg2rad(lonQ);
-    lon2 = MathUtil.deg2rad(lon2);
-    return crossTrackDistanceRad(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q);
+  @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+  public static double ellipsoidVincentyFormulaDeg(double f, double lat1, double lon1, double lat2, double lon2) {
+    return ellipsoidVincentyFormulaRad(f, MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
-   * Compute the cross-track distance.
+   * Compute the approximate on-earth-surface distance of two points.
    * 
-   * @param lat1 Latitude of starting point.
-   * @param lon1 Longitude of starting point.
-   * @param lat2 Latitude of destination point.
-   * @param lon2 Longitude of destination point.
-   * @param latQ Latitude of query point.
-   * @param lonQ Longitude of query point.
-   * @param dist1Q Distance from starting point to query point in km.
-   * @return Cross-track distance in km. May be negative - this gives the side.
+   * Reference:
+   * <p>
+   * T. Vincenty<br />
+   * Direct and inverse solutions of geodesics on the ellipsoid with application
+   * of nested equations<br />
+   * Survey review 23 176, 1975
+   * </p>
+   * 
+   * @param f Ellipsoid flattening
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance for a minor axis of 1.
    */
-  public static double crossTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
-    final double dlon12 = lon2 - lon1;
-    final double dlon1Q = lonQ - lon1;
+  @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+  public static double ellipsoidVincentyFormulaRad(double f, double lat1, double lon1, double lat2, double lon2) {
+    final double dlon = lon2 - lon1;
 
-    // Compute trigonometric functions only once.
-    final double slat1 = Math.sin(lat1);
-    final double slatQ = Math.sin(latQ);
-    final double slat2 = Math.sin(lat2);
-    final double clat1 = MathUtil.sinToCos(lat1, slat1);
-    final double clatQ = MathUtil.sinToCos(latQ, slatQ);
-    final double clat2 = MathUtil.sinToCos(lat2, slat2);
+    // Second eccentricity squared
+    final double ab = 1. / (1 - f); // = a/b
+    final double ecc2 = ab * ab - 1;
 
-    // Compute the course
-    final double crs12, crs1Q;
-    {
-      // y = sin(dlon) * cos(lat2)
-      final double sdlon12 = Math.sin(dlon12);
-      final double cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
-      final double sdlon1Q = Math.sin(dlon1Q);
-      final double cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+    // Reduced latitudes:
+    final double u1 = Math.atan((1 - f) * Math.tan(lat1));
+    final double u2 = Math.atan((1 - f) * Math.tan(lat2));
+    // Trigonometric values
+    final double su1 = Math.sin(u1), cu1 = MathUtil.sinToCos(u1, su1);
+    final double su2 = Math.sin(u2), cu2 = MathUtil.sinToCos(u2, su2);
 
-      double yE = sdlon12 * clat2;
-      double yQ = sdlon1Q * clatQ;
+    // Eqn (13) - initial value
+    double lambda = dlon;
 
-      // x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
-      double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
-      double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
+    for (int i = 0;; i++) {
+      final double slon = Math.sin(lambda), clon = MathUtil.sinToCos(lambda, slon);
 
-      crs12 = Math.atan2(yE, xE);
-      crs1Q = Math.atan2(yQ, xQ);
+      // Eqn (14) - \sin \sigma
+      final double ssig = Math.sqrt((cu2 * slon) * (cu2 * slon) + (cu1 * su2 - su1 * cu2 * clon) * (cu1 * su2 - su1 * cu2 * clon));
+      // Eqn (15) - \cos \sigma
+      final double csig = su1 * su2 + cu1 * cu2 * clon;
+      // Eqn (16) - \sigma from \tan \sigma
+      final double sigma = Math.atan2(ssig, csig);
+
+      // Eqn (17) - \sin \alpha, and this way \cos^2 \alpha
+      final double salp = cu1 * cu2 * slon / ssig;
+      final double c2alp = 1. - salp * salp;
+      // Eqn (18) - \cos 2 \sigma_m
+      final double ctwosigm = csig - 2.0 * su1 * su2 / c2alp;
+      final double c2twosigm = ctwosigm * ctwosigm;
+
+      // Eqn (10) - C
+      final double cc = f * .0625 * c2alp * (4.0 + f * (4.0 - 3.0 * c2alp));
+      // Eqn (11) - new \lambda
+      final double lambda_new = dlon + (1.0 - cc) * f * salp * //
+      (sigma + cc * ssig * (ctwosigm + cc * csig * (-1.0 + 2.0 * c2twosigm)));
+      // Check for convergence:
+      if (Math.abs(lambda_new - lambda) < PRECISION || i >= MAX_ITER) {
+        // Definition of u^2, rewritten to use second eccentricity.
+        final double usq = c2alp * ecc2;
+        // Eqn (3) - A
+        final double aa = 1.0 + usq / 16384.0 * (4096.0 + usq * (-768.0 + usq * (320.0 - 175.0 * usq)));
+        // Eqn (4) - B
+        final double bb = usq / 1024.0 * (256.0 + usq * (-128.0 + usq * (74.0 - 47.0 * usq)));
+        // Eqn (6) - \Delta \sigma
+        final double dsig = bb * ssig * (ctwosigm + .25 * bb * (csig * (-1.0 + 2.0 * c2twosigm) //
+        - ONE_SIXTH * bb * ctwosigm * (-3.0 + 4.0 * ssig * ssig) * (-3.0 + 4.0 * c2twosigm)));
+        // Eqn (19) - s
+        return aa * (sigma - dsig);
+      }
     }
-
-    // Calculate cross-track distance
-    return EARTH_RADIUS * Math.asin(Math.sin(dist1Q / EARTH_RADIUS) * Math.sin(crs1Q - crs12));
   }
 
   /**
@@ -296,15 +303,72 @@ public final class GeoUtil {
    * @param lonQ Longitude of query point.
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
-  public static double crossTrackDistance(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
-    // Convert to radians.
-    lat1 = MathUtil.deg2rad(lat1);
-    latQ = MathUtil.deg2rad(latQ);
-    lat2 = MathUtil.deg2rad(lat2);
-    lon1 = MathUtil.deg2rad(lon1);
-    lonQ = MathUtil.deg2rad(lonQ);
-    lon2 = MathUtil.deg2rad(lon2);
-    return crossTrackDistanceRad(lat1, lon1, lat2, lon2, latQ, lonQ);
+  public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
+    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2),//
+        MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ));
+  }
+
+  /**
+   * Compute the cross-track distance.
+   * 
+   * @param lat1 Latitude of starting point.
+   * @param lon1 Longitude of starting point.
+   * @param lat2 Latitude of destination point.
+   * @param lon2 Longitude of destination point.
+   * @param latQ Latitude of query point.
+   * @param lonQ Longitude of query point.
+   * @param dist1Q Distance from starting point to query point on unit sphere
+   * @return Cross-track distance on unit sphere. May be negative - this gives
+   *         the side.
+   */
+  public static double crossTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
+    final double dlon12 = lon2 - lon1;
+    final double dlon1Q = lonQ - lon1;
+
+    // Compute trigonometric functions only once.
+    final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
+    final double slatQ = Math.sin(latQ), clatQ = MathUtil.sinToCos(latQ, slatQ);
+    final double slat2 = Math.sin(lat2), clat2 = MathUtil.sinToCos(lat2, slat2);
+
+    // / Compute the course
+    // y = sin(dlon) * cos(lat2)
+    final double sdlon12 = Math.sin(dlon12), cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
+    final double sdlon1Q = Math.sin(dlon1Q), cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+
+    final double yE = sdlon12 * clat2;
+    final double yQ = sdlon1Q * clatQ;
+
+    // x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
+    final double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
+    final double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
+
+    final double crs12 = Math.atan2(yE, xE);
+    final double crs1Q = Math.atan2(yQ, xQ);
+
+    // / Calculate cross-track distance
+    return Math.asin(Math.sin(dist1Q) * Math.sin(crs1Q - crs12));
+  }
+
+  /**
+   * Compute the cross-track distance.
+   * 
+   * @param lat1 Latitude of starting point.
+   * @param lon1 Longitude of starting point.
+   * @param lat2 Latitude of destination point.
+   * @param lon2 Longitude of destination point.
+   * @param latQ Latitude of query point.
+   * @param lonQ Longitude of query point.
+   * @param dist1Q Distance from starting point to query point in radians (i.e.
+   *        on unit sphere).
+   * @return Cross-track distance on unit sphere. May be negative - this gives
+   *         the side.
+   */
+  public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
+    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
+        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2),//
+        MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ),//
+        dist1Q);
   }
 
   /**
@@ -323,46 +387,36 @@ public final class GeoUtil {
   public static double crossTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
     final double dlon12 = lon2 - lon1;
     final double dlon1Q = lonQ - lon1;
+    final double dlat1Q = latQ - lat1;
 
     // Compute trigonometric functions only once.
-    final double clat1 = Math.cos(lat1);
-    final double clatQ = Math.cos(latQ);
-    final double clat2 = Math.cos(lat2);
-    final double slat1 = MathUtil.cosToSin(lat1, clat1);
-    final double slatQ = MathUtil.cosToSin(latQ, clatQ);
-    final double slat2 = MathUtil.cosToSin(lat2, clat2);
+    final double clat1 = Math.cos(lat1), slat1 = MathUtil.cosToSin(lat1, clat1);
+    final double clatQ = Math.cos(latQ), slatQ = MathUtil.cosToSin(latQ, clatQ);
+    final double clat2 = Math.cos(lat2), slat2 = MathUtil.cosToSin(lat2, clat2);
 
     // Haversine formula, higher precision at < 1 meters but maybe issues at
     // antipodal points - we do not yet multiply with the radius!
-    double angDist1Q;
-    {
-      final double slat = Math.sin((latQ - lat1) * .5);
-      final double slon = Math.sin(dlon1Q * .5);
-      final double a = slat * slat + slon * slon * clat1 * clatQ;
-      angDist1Q = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    }
+    final double slat = Math.sin(dlat1Q * .5);
+    final double slon = Math.sin(dlon1Q * .5);
+    final double a = slat * slat + slon * slon * clat1 * clatQ;
+    final double angDist1Q = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     // Compute the course
-    final double crs12, crs1Q;
-    {
-      // y = sin(dlon) * cos(lat2)
-      final double sdlon12 = Math.sin(dlon12);
-      final double sdlon1Q = Math.sin(dlon1Q);
-      final double cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
-      final double cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
-      double yE = sdlon12 * clat2;
-      double yQ = sdlon1Q * clatQ;
+    // y = sin(dlon) * cos(lat2)
+    final double sdlon12 = Math.sin(dlon12), cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
+    final double sdlon1Q = Math.sin(dlon1Q), cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+    final double yE = sdlon12 * clat2;
+    final double yQ = sdlon1Q * clatQ;
 
-      // x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
-      double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
-      double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
+    // x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dlon)
+    final double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
+    final double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
 
-      crs12 = Math.atan2(yE, xE);
-      crs1Q = Math.atan2(yQ, xQ);
-    }
+    final double crs12 = Math.atan2(yE, xE);
+    final double crs1Q = Math.atan2(yQ, xQ);
 
     // Calculate cross-track distance
-    return EARTH_RADIUS * Math.asin(Math.sin(angDist1Q) * Math.sin(crs1Q - crs12));
+    return Math.asin(Math.sin(angDist1Q) * Math.sin(crs1Q - crs12));
   }
 
   /**
@@ -371,7 +425,7 @@ public final class GeoUtil {
    * 
    * ATD=acos(cos(dist_1Q)/cos(XTD))
    * 
-   * FIXME: can we get a proper sign into this?
+   * TODO: optimize.
    * 
    * @param lat1 Latitude of starting point.
    * @param lon1 Longitude of starting point.
@@ -379,12 +433,38 @@ public final class GeoUtil {
    * @param lon2 Longitude of destination point.
    * @param latQ Latitude of query point.
    * @param lonQ Longitude of query point.
-   * @return Along-track distance in km. May be negative - this gives the side.
+   * @return Along-track distance in radians. May be negative - this gives the
+   *         side.
    */
-  public static double alongTrackDistance(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
+  public static double alongTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
+    // TODO: inline and share some of the trigonometric computations!
     double dist1Q = haversineFormulaDeg(lat1, lon1, latQ, lonQ);
     double ctd = crossTrackDistanceDeg(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q);
-    return alongTrackDistance(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q, ctd);
+    return alongTrackDistanceDeg(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q, ctd);
+  }
+
+  /**
+   * The along track distance, is the distance from S to Q along the track S to
+   * E.
+   * 
+   * ATD=acos(cos(dist_1Q)/cos(XTD))
+   * 
+   * TODO: optimize.
+   * 
+   * @param lat1 Latitude of starting point in radians.
+   * @param lon1 Longitude of starting point in radians.
+   * @param lat2 Latitude of destination point in radians.
+   * @param lon2 Longitude of destination point in radians.
+   * @param latQ Latitude of query point in radians.
+   * @param lonQ Longitude of query point in radians.
+   * @return Along-track distance in radians. May be negative - this gives the
+   *         side.
+   */
+  public static double alongTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
+    // TODO: inline and share some of the trigonometric computations!
+    double dist1Q = haversineFormulaRad(lat1, lon1, latQ, lonQ);
+    double ctd = crossTrackDistanceRad(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q);
+    return alongTrackDistanceRad(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q, ctd);
   }
 
   /**
@@ -393,22 +473,44 @@ public final class GeoUtil {
    * 
    * ATD=acos(cos(dist_SQ)/cos(XTD))
    * 
-   * FIXME: can we get a proper sign into this?
-   * 
    * @param lat1 Latitude of starting point.
    * @param lon1 Longitude of starting point.
    * @param lat2 Latitude of destination point.
    * @param lon2 Longitude of destination point.
    * @param latQ Latitude of query point.
    * @param lonQ Longitude of query point.
-   * @param dist1Q Distance S to Q
-   * @param ctd Cross-track-distance
-   * @return Along-track distance in km. May be negative - this gives the side.
+   * @param dist1Q Distance S to Q in radians.
+   * @param ctd Cross-track-distance in radians.
+   * @return Along-track distance in radians. May be negative - this gives the
+   *         side.
    */
-  public static double alongTrackDistance(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q, double ctd) {
-    // TODO: optimize the sign computation!
-    int sign = Math.abs(bearing(lat1, lon1, lat2, lon2) - bearing(lat1, lon1, latQ, lonQ)) < MathUtil.HALFPI ? +1 : -1;
-    return sign * EARTH_RADIUS * Math.acos(Math.cos(dist1Q / EARTH_RADIUS) / Math.cos(ctd / EARTH_RADIUS));
+  public static double alongTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q, double ctd) {
+    return alongTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2), MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ), dist1Q, ctd);
+  }
+
+  /**
+   * The along track distance, is the distance from S to Q along the track S to
+   * E.
+   * 
+   * ATD=acos(cos(dist_SQ)/cos(XTD))
+   * 
+   * TODO: optimize: can we do a faster sign computation?
+   * 
+   * @param lat1 Latitude of starting point in radians.
+   * @param lon1 Longitude of starting point in radians.
+   * @param lat2 Latitude of destination point in radians.
+   * @param lon2 Longitude of destination point in radians.
+   * @param latQ Latitude of query point in radians.
+   * @param lonQ Longitude of query point in radians.
+   * @param dist1Q Distance S to Q in radians.
+   * @param ctd Cross-track-distance in radians.
+   * @return Along-track distance in radians. May be negative - this gives the
+   *         side.
+   */
+  public static double alongTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q, double ctd) {
+    // FIXME: optimize the sign computation!
+    int sign = Math.abs(bearingRad(lat1, lon1, lat2, lon2) - bearingRad(lat1, lon1, latQ, lonQ)) < MathUtil.HALFPI ? +1 : -1;
+    return sign * Math.acos(Math.cos(dist1Q) / Math.cos(ctd));
     // TODO: for short distances, use this instead?
     // asin(sqrt( (sin(dist_1Q))^2 - (sin(XTD))^2 )/cos(XTD))
   }
@@ -429,18 +531,12 @@ public final class GeoUtil {
    * @param rminlng Min longitude of rectangle.
    * @param rmaxlat Max latitude of rectangle.
    * @param rmaxlng Max longitude of rectangle.
-   * @return Distance
+   * @return Distance in radians.
    */
   public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
-    // Convert to radians.
-    plat = MathUtil.deg2rad(plat);
-    plng = MathUtil.deg2rad(plng);
-    rminlat = MathUtil.deg2rad(rminlat);
-    rminlng = MathUtil.deg2rad(rminlng);
-    rmaxlat = MathUtil.deg2rad(rmaxlat);
-    rmaxlng = MathUtil.deg2rad(rmaxlng);
-
-    return latlngMinDistRad(plat, plng, rminlat, rminlng, rmaxlat, rmaxlng);
+    return latlngMinDistRad(MathUtil.deg2rad(plat), MathUtil.deg2rad(plng),//
+        MathUtil.deg2rad(rminlat), MathUtil.deg2rad(rminlng), //
+        MathUtil.deg2rad(rmaxlat), MathUtil.deg2rad(rmaxlng));
   }
 
   /**
@@ -459,90 +555,86 @@ public final class GeoUtil {
    * @param rminlng Min longitude of rectangle.
    * @param rmaxlat Max latitude of rectangle.
    * @param rmaxlng Max longitude of rectangle.
-   * @return Distance
+   * @return Distance on unit sphere.
    */
   public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
     // Degenerate rectangles:
-    if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormulaRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
-    if(rminlng <= plng && plng <= rmaxlng) {
+    if (rminlng <= plng && plng <= rmaxlng) {
       // Inside rectangle:
-      if(rminlat <= plat && plat <= rmaxlat) {
+      if (rminlat <= plat && plat <= rmaxlat) {
         return 0;
       }
       // South:
-      if(plat < rminlat) {
-        return EARTH_RADIUS * (rminlat - plat);
-      }
-      else {
+      if (plat < rminlat) {
+        return rminlat - plat;
+      } else {
         // plat > rmaxlat
-        return EARTH_RADIUS * (plat - rmaxlat);
+        return plat - rmaxlat;
       }
     }
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if(lngE < 0) {
+    if (lngE < 0) {
       lngE += MathUtil.TWOPI;
     }
     double lngW = rmaxlng - plng; // we keep this negative!
-    if(lngW > 0) {
+    if (lngW > 0) {
       lngW -= MathUtil.TWOPI;
     }
 
     // East, to min edge:
-    if(lngE <= -lngW) {
+    if (lngE <= -lngW) {
       final double clngD = Math.cos(lngE);
       final double tlatQ = Math.tan(plat);
-      if(lngE > MathUtil.HALFPI) {
+      if (lngE > MathUtil.HALFPI) {
         final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
-        if(tlatQ >= tlatm * clngD) {
+        if (tlatQ >= tlatm * clngD) {
           return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
-        }
-        else {
+        } else {
           return haversineFormulaRad(plat, plng, rminlat, rminlng);
         }
       }
       final double tlatN = Math.tan(rmaxlat);
-      if(tlatQ >= tlatN * clngD) { // North corner
+      if (tlatQ >= tlatN * clngD) { // North corner
         return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
       }
       final double tlatS = Math.tan(rminlat);
-      if(tlatQ <= tlatS * clngD) { // South corner
+      if (tlatQ <= tlatS * clngD) { // South corner
         return haversineFormulaRad(plat, plng, rminlat, rminlng);
       }
       // Cross-track-distance to longitude line.
       final double slngD = MathUtil.cosToSin(lngE, clngD);
-      return EARTH_RADIUS * Math.asin(Math.cos(plat) * slngD);
-    }
-    else { // West, to max edge:
+      return Math.asin(Math.cos(plat) * slngD);
+    } else { // West, to max edge:
       final double clngD = Math.cos(lngW);
       final double tlatQ = Math.tan(plat);
-      if(-lngW > MathUtil.HALFPI) {
+      if (-lngW > MathUtil.HALFPI) {
         final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
-        if(tlatQ >= tlatm * clngD) {
+        if (tlatQ >= tlatm * clngD) {
           return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
-        }
-        else {
+        } else {
           return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
         }
       }
       final double tlatN = Math.tan(rmaxlat);
-      if(tlatQ >= tlatN * clngD) { // North corner
+      if (tlatQ >= tlatN * clngD) { // North corner
         return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
       }
       final double tlatS = Math.tan(rminlat);
-      if(tlatQ <= tlatS * clngD) { // South corner
+      if (tlatQ <= tlatS * clngD) { // South corner
         return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
       }
       // Cross-track-distance to longitude line.
       final double slngD = MathUtil.cosToSin(lngW, clngD);
-      return EARTH_RADIUS * Math.asin(-Math.cos(plat) * slngD);
+      return Math.asin(-Math.cos(plat) * slngD);
     }
   }
 
@@ -564,52 +656,48 @@ public final class GeoUtil {
    * @param rminlng Min longitude of rectangle.
    * @param rmaxlat Max latitude of rectangle.
    * @param rmaxlng Max longitude of rectangle.
-   * @return Distance
+   * @return Distance in radians
    */
   public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
     // Degenerate rectangles:
-    if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormulaRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
-    if(rminlng <= plng && plng <= rmaxlng) {
+    if (rminlng <= plng && plng <= rmaxlng) {
       // Inside rectangle:
-      if(rminlat <= plat && plat <= rmaxlat) {
+      if (rminlat <= plat && plat <= rmaxlat) {
         return 0;
       }
       // South:
-      if(plat < rminlat) {
-        return EARTH_RADIUS * (rminlat - plat);
-      }
-      else {
+      if (plat < rminlat) {
+        return rminlat - plat;
+      } else {
         // plat > rmaxlat
-        return EARTH_RADIUS * (plat - rmaxlat);
+        return plat - rmaxlat;
       }
     }
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if(lngE < 0) {
+    if (lngE < 0) {
       lngE += MathUtil.TWOPI;
     }
     double lngW = rmaxlng - plng; // we keep this negative!
-    if(lngW > 0) {
+    if (lngW > 0) {
       lngW -= MathUtil.TWOPI;
     }
 
     // Compute sine and cosine values we will certainly need below:
-    final double slatQ = Math.sin(plat);
-    final double clatQ = MathUtil.sinToCos(plat, slatQ);
-    final double slatN = Math.sin(rmaxlat);
-    final double clatN = MathUtil.sinToCos(rmaxlat, slatN);
-    final double slatS = Math.sin(rminlat);
-    final double clatS = MathUtil.sinToCos(rminlat, slatS);
+    final double slatQ = Math.sin(plat), clatQ = MathUtil.sinToCos(plat, slatQ);
+    final double slatN = Math.sin(rmaxlat), clatN = MathUtil.sinToCos(rmaxlat, slatN);
+    final double slatS = Math.sin(rminlat), clatS = MathUtil.sinToCos(rminlat, slatS);
 
     // East, to min edge:
-    if(lngE <= -lngW) {
+    if (lngE <= -lngW) {
       final double slngD = Math.sin(lngE);
       final double clngD = MathUtil.sinToCos(lngE, slngD);
 
@@ -621,33 +709,31 @@ public final class GeoUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if(bs < MathUtil.HALFPI) {
-        if(bn > MathUtil.HALFPI) {
+      if (bs < MathUtil.HALFPI) {
+        if (bn > MathUtil.HALFPI) {
           // Radians from south pole = abs(ATD)
           final double radFromS = -MathUtil.HALFPI - plat;
 
           // Cross-track-distance to longitude line.
-          return EARTH_RADIUS * Math.asin(Math.sin(radFromS) * -slngD);
+          return Math.asin(Math.sin(radFromS) * -slngD);
         }
       }
-      if(bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
+      if (bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
         // Haversine to north corner.
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngE * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
         final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
-        return EARTH_RADIUS * distN;
-      }
-      else {
+        return distN;
+      } else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngE * .5);
         final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatS;
         final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
-        return EARTH_RADIUS * distS;
+        return distS;
       }
-    }
-    else { // West, to max edge
+    } else { // West, to max edge
       final double slngD = Math.sin(lngW);
       final double clngD = MathUtil.sinToCos(lngW, slngD);
 
@@ -659,29 +745,28 @@ public final class GeoUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if(bs > -MathUtil.HALFPI) {
-        if(bn < -MathUtil.HALFPI) {
+      if (bs > -MathUtil.HALFPI) {
+        if (bn < -MathUtil.HALFPI) {
           // Radians from south = abs(ATD) = distance from pole
           final double radFromS = -MathUtil.HALFPI - plat;
           // Cross-track-distance to longitude line.
-          return EARTH_RADIUS * Math.asin(Math.sin(radFromS) * slngD);
+          return Math.asin(Math.sin(radFromS) * slngD);
         }
       }
-      if(-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
+      if (-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
         // Haversine to north corner.
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngW * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
         final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
-        return EARTH_RADIUS * distN;
-      }
-      else {
+        return distN;
+      } else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngW * .5);
         final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatS;
         final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
-        return EARTH_RADIUS * distS;
+        return distS;
       }
     }
   }
@@ -693,99 +778,24 @@ public final class GeoUtil {
    * @param lngS Start longitude, in degree
    * @param latE End latitude, in degree
    * @param lngE End longitude, in degree
-   * @return Bearing in radians
+   * @return Bearing in degree
    */
-  public static double bearing(double latS, double lngS, double latE, double lngE) {
-    latS = MathUtil.deg2rad(latS);
-    latE = MathUtil.deg2rad(latE);
-    lngS = MathUtil.deg2rad(lngS);
-    lngE = MathUtil.deg2rad(lngE);
-    final double slatS = Math.sin(latS);
-    final double clatS = MathUtil.sinToCos(latS, slatS);
-    final double slatE = Math.sin(latE);
-    final double clatE = MathUtil.sinToCos(latE, slatE);
+  public static double bearingDegDeg(double latS, double lngS, double latE, double lngE) {
+    return MathUtil.rad2deg(bearingRad(MathUtil.deg2rad(latS), MathUtil.deg2rad(lngS), MathUtil.deg2rad(latE), MathUtil.deg2rad(lngE)));
+  }
+
+  /**
+   * Compute the bearing from start to end.
+   * 
+   * @param latS Start latitude, in radians
+   * @param lngS Start longitude, in radians
+   * @param latE End latitude, in radians
+   * @param lngE End longitude, in radians
+   * @return Bearing in degree
+   */
+  public static double bearingRad(double latS, double lngS, double latE, double lngE) {
+    final double slatS = Math.sin(latS), clatS = MathUtil.sinToCos(latS, slatS);
+    final double slatE = Math.sin(latE), clatE = MathUtil.sinToCos(latE, slatE);
     return Math.atan2(-Math.sin(lngS - lngE) * clatE, clatS * slatE - slatS * clatE * Math.cos(lngS - lngE));
-  }
-
-  /**
-   * Map a latitude,longitude pair to 3D X-Y-Z coordinates, using the WGS84
-   * ellipsoid as reference.
-   * 
-   * The coordinate system is chosen such that the earth rotates around the Z
-   * axis.
-   * 
-   * @param lat Latitude in degree
-   * @param lng Longitude in degree
-   * @return Coordinate triple
-   */
-  public static double[] latLngDegWGS84ToECEF(double lat, double lng) {
-    // Switch to radians:
-    lat = Math.toRadians(lat);
-    lng = Math.toRadians(lng);
-    // Sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
-
-    // Eccentricity squared
-    final double v = WGS84_RADIUS / Math.sqrt((1 + WGS84_ECCENTRICITY * slat) * (1 - WGS84_ECCENTRICITY * slat));
-
-    return new double[] { v * clat * clng, v * clat * slng, (1 - WGS84_ECCENTRICITY_SQUARED) * v * slat };
-  }
-
-  /**
-   * Map a latitude,longitude pair to 3D X-Y-Z coordinates, using a spherical
-   * earth model.
-   * 
-   * The coordinate system is chosen such that the earth rotates around the Z
-   * axis.
-   * 
-   * @param lat Latitude in degree
-   * @param lng Longitude in degree
-   * @return Coordinate triple
-   */
-  public static double[] latLngDegSphericalToECEF(double lat, double lng) {
-    // Switch to radians:
-    lat = Math.toRadians(lat);
-    lng = Math.toRadians(lng);
-    // Sine and cosines:
-    final double clat = Math.cos(lat), slat = Math.sin(lat); //, clat);
-    final double clng = Math.cos(lng), slng = Math.sin(lng); //, clng);
-
-    return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
-  }
-
-  /**
-   * Convert a 3D coordinate pair to the corresponding longitude.
-   * 
-   * @param x X value
-   * @param y Y value
-   * @param z Z value
-   * @return Latitude
-   */
-  public static double ecefToLatDegWGS84(double x, double y, double z) {
-    final double p = Math.sqrt(x * x + y * y);
-    double lat = Math.atan2(z, p * (1 - WGS84_ECCENTRICITY_SQUARED));
-
-    // Iteratively improving the lat value
-    // TODO: instead of a fixed number of iterations, check for convergence.
-    for(int i = 0; i < 10; i++) {
-      final double slat = Math.sin(lat);
-      final double v = WGS84_RADIUS / Math.sqrt((1 + WGS84_ECCENTRICITY * slat) * (1 - WGS84_ECCENTRICITY * slat));
-      final double h = p / MathUtil.sinToCos(lat, slat) - v;
-      lat = Math.atan2(z, p * (1 - WGS84_ECCENTRICITY_SQUARED * v / (v + h)));
-    }
-
-    return MathUtil.rad2deg(lat);
-  }
-
-  /**
-   * Convert a 3D coordinate pair to the corresponding longitude.
-   * 
-   * @param x X value
-   * @param y Y value
-   * @return Longitude
-   */
-  public static double ecefToLngDegWGS84(double x, double y) {
-    return MathUtil.rad2deg(Math.atan2(y, x));
   }
 }

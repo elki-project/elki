@@ -24,16 +24,14 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.projection.LngLatToECEFProjection;
-import de.lmu.ifi.dbs.elki.data.projection.LngLatToECEFProjection.EarthModel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamConversionFilter;
-import de.lmu.ifi.dbs.elki.math.GeoUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Project a 2D data set (longitude, latitude) to a 3D coordinate system (X, Y,
@@ -52,7 +50,7 @@ public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStrea
   /**
    * Earth model to use.
    */
-  private EarthModel model = EarthModel.WGS84;
+  private EarthModel model;
 
   /**
    * Constructor.
@@ -66,14 +64,7 @@ public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStrea
 
   @Override
   protected V filterSingleObject(V obj) {
-    switch(model) {
-    case SPHERICAL:
-      return factory.newNumberVector(GeoUtil.latLngDegSphericalToECEF(obj.doubleValue(1), obj.doubleValue(0)));
-    case WGS84:
-      return factory.newNumberVector(GeoUtil.latLngDegWGS84ToECEF(obj.doubleValue(1), obj.doubleValue(0)));
-    default:
-      throw new AbortException("Unsupported Earth Model.");
-    }
+    return factory.newNumberVector(model.latLngDegToECEF(obj.doubleValue(1), obj.doubleValue(0)));
   }
 
   @Override
@@ -101,14 +92,14 @@ public class LngLatToECEFFilter<V extends NumberVector<?>> extends AbstractStrea
     /**
      * Earth model to use.
      */
-    private EarthModel model = EarthModel.WGS84;
+    private EarthModel model;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<EarthModel> modelP = new EnumParameter<>(LngLatToECEFProjection.Parameterizer.MODEL_ID, EarthModel.class, EarthModel.WGS84);
-      if(config.grab(modelP)) {
-        model = modelP.getValue();
+      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+      if (config.grab(modelP)) {
+        model = modelP.instantiateClass(config);
       }
     }
 

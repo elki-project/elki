@@ -23,19 +23,21 @@ package de.lmu.ifi.dbs.elki.data.projection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.projection.LngLatToECEFProjection.EarthModel;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.math.GeoUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Project (Latitude, Longitude) vectors to (X, Y, Z), from WGS84 to ECEF.
+ * Project (Latitude, Longitude) vectors to (X, Y, Z), from spherical
+ * coordinates to ECEF (earth-centered earth-fixed).
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf EarthModel
  * 
  * @param <V> Vector type
  */
@@ -68,14 +70,7 @@ public class LatLngToECEFProjection<V extends NumberVector<?>> implements Projec
 
   @Override
   public V project(V data) {
-    switch(model){
-    case SPHERICAL:
-      return factory.newNumberVector(GeoUtil.latLngDegSphericalToECEF(data.doubleValue(0), data.doubleValue(1)));
-    case WGS84:
-      return factory.newNumberVector(GeoUtil.latLngDegWGS84ToECEF(data.doubleValue(0), data.doubleValue(1)));
-    default:
-      throw new AbortException("Unsupported Model");
-    }
+    return factory.newNumberVector(model.latLngDegToECEF(data.doubleValue(0), data.doubleValue(1)));
   }
 
   @Override
@@ -104,9 +99,9 @@ public class LatLngToECEFProjection<V extends NumberVector<?>> implements Projec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<EarthModel> modelP = new EnumParameter<>(LngLatToECEFProjection.Parameterizer.MODEL_ID, EarthModel.class, EarthModel.WGS84);
-      if(config.grab(modelP)) {
-        model = modelP.getValue();
+      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+      if (config.grab(modelP)) {
+        model = modelP.instantiateClass(config);
       }
     }
 

@@ -32,8 +32,11 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.math.GeoUtil;
+import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Distance function for 2D vectors in Latitude, Longitude form.
@@ -42,21 +45,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 public class LatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction implements SpatialPrimitiveDoubleDistanceFunction<NumberVector<?>> {
   /**
-   * Static instance.
+   * Earth model to use.
    */
-  public static final LatLngDistanceFunction STATIC = new LatLngDistanceFunction();
+  private EarthModel model;
 
   /**
-   * Constructor. Use static instance instead!
+   * Constructor.
    */
-  @Deprecated
-  public LatLngDistanceFunction() {
+  public LatLngDistanceFunction(EarthModel model) {
     super();
+    this.model = model;
   }
 
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    return GeoUtil.haversineFormulaDeg(o1.doubleValue(0), o1.doubleValue(1), o2.doubleValue(0), o2.doubleValue(1));
+    return model.distanceDeg(o1.doubleValue(0), o1.doubleValue(1), o2.doubleValue(0), o2.doubleValue(1));
   }
 
   @Override
@@ -66,12 +69,12 @@ public class LatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       } else {
         NumberVector<?> o1 = (NumberVector<?>) mbr1;
-        return GeoUtil.latlngMinDistDeg(o1.doubleValue(0), o1.doubleValue(1), mbr2.getMin(0), mbr2.getMin(1), mbr2.getMax(0), mbr2.getMax(1));
+        return model.minDistDeg(o1.doubleValue(0), o1.doubleValue(1), mbr2.getMin(0), mbr2.getMin(1), mbr2.getMax(0), mbr2.getMax(1));
       }
     } else {
       if (mbr2 instanceof NumberVector) {
         NumberVector<?> o2 = (NumberVector<?>) mbr2;
-        return GeoUtil.latlngMinDistDeg(o2.doubleValue(0), o2.doubleValue(1), mbr1.getMin(0), mbr1.getMin(1), mbr1.getMax(0), mbr1.getMax(1));
+        return model.minDistDeg(o2.doubleValue(0), o2.doubleValue(1), mbr1.getMin(0), mbr1.getMin(1), mbr1.getMax(0), mbr1.getMax(1));
       } else {
         throw new UnsupportedOperationException("MBR to MBR mindist is not yet implemented.");
       }
@@ -89,24 +92,40 @@ public class LatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((model == null) ? 0 : model.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
     if (obj == null) {
       return false;
     }
-    if (obj == this) {
-      return true;
+    if (getClass() != obj.getClass()) {
+      return false;
     }
-    if (this.getClass().equals(obj.getClass())) {
-      return true;
+    LatLngDistanceFunction other = (LatLngDistanceFunction) obj;
+    if (model == null) {
+      if (other.model != null) {
+        return false;
+      }
+    } else if (!model.equals(other.model)) {
+      return false;
     }
-    return super.equals(obj);
+    return true;
   }
 
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
-  
+
   /**
    * Parameterization class.
    * 
@@ -115,9 +134,23 @@ public class LatLngDistanceFunction extends AbstractVectorDoubleDistanceFunction
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Earth model used.
+     */
+    EarthModel model;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+      if (config.grab(modelP)) {
+        model = modelP.instantiateClass(config);
+      }
+    }
+
     @Override
     protected LatLngDistanceFunction makeInstance() {
-      return LatLngDistanceFunction.STATIC;
+      return new LatLngDistanceFunction(model);
     }
   }
 }

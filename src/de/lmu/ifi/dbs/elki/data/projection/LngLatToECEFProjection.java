@@ -25,35 +25,27 @@ package de.lmu.ifi.dbs.elki.data.projection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.math.GeoUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Project (Latitude, Longitude) vectors to (X, Y, Z), from WGS84 to ECEF.
+ * Project (Longitude, Latitude) vectors to (X, Y, Z), from spherical
+ * coordinates to ECEF (earth-centered earth-fixed).
  * 
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf EarthModel
  * 
  * @param <V> Vector type
  */
 public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projection<V, V> {
   /**
-   * Earth model to use.
-   * 
-   * @author Erich Schubert
-   */
-  public static enum EarthModel { //
-    SPHERICAL, // Simple spherical model
-    WGS84 // WGS 84 standard ellipsoid
-  }
-
-  /**
    * Earth model to use
    */
-  EarthModel model = EarthModel.WGS84;
+  EarthModel model;
 
   /**
    * Vector factory to use.
@@ -78,14 +70,7 @@ public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projec
 
   @Override
   public V project(V data) {
-    switch(model){
-    case SPHERICAL:
-      return factory.newNumberVector(GeoUtil.latLngDegSphericalToECEF(data.doubleValue(1), data.doubleValue(0)));
-    case WGS84:
-      return factory.newNumberVector(GeoUtil.latLngDegWGS84ToECEF(data.doubleValue(1), data.doubleValue(0)));
-    default:
-      throw new AbortException("Unsupported Model");
-    }
+    return factory.newNumberVector(model.latLngDegToECEF(data.doubleValue(1), data.doubleValue(0)));
   }
 
   @Override
@@ -107,11 +92,6 @@ public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projec
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter to choose the earth model to use.
-     */
-    public static final OptionID MODEL_ID = new OptionID("ecef.model", "Earth model to use for projection. Default: WGS84 model.");
-
-    /**
      * Earth model to use.
      */
     EarthModel model;
@@ -119,9 +99,9 @@ public class LngLatToECEFProjection<V extends NumberVector<?>> implements Projec
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      EnumParameter<EarthModel> modelP = new EnumParameter<>(MODEL_ID, EarthModel.class, EarthModel.WGS84);
-      if(config.grab(modelP)) {
-        model = modelP.getValue();
+      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+      if (config.grab(modelP)) {
+        model = modelP.instantiateClass(config);
       }
     }
 
