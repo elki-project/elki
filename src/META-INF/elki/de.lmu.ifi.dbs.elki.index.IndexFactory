@@ -28,3 +28,4 @@ de.lmu.ifi.dbs.elki.index.preprocessed.subspaceproj.PreDeConSubspaceIndex$Factor
 de.lmu.ifi.dbs.elki.index.projected.LatLngAsECEFIndex$Factory
 de.lmu.ifi.dbs.elki.index.projected.LngLatAsECEFIndex$Factory
 de.lmu.ifi.dbs.elki.index.projected.ProjectedIndex$Factory
+de.lmu.ifi.dbs.elki.index.projected.PINN

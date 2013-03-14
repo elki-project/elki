@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -76,23 +75,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * according to this great circle distance. If the query hint
  * {@link DatabaseQuery#HINT_EXACT} is set, it will not be used.
  * 
- * TODO: add support for a flag "refine" that computes the correct distances,
- * but only for the candidates returned.
- * 
- * This way of indexing geo data in regular databases was discussed in:
- * 
- * Reference:
- * <p>
- * Geodetic point-in-polygon query processing in oracle spatial<br />
- * Hu, Ying and Ravada, Siva and Anderson, Richard<br />
- * Advances in Spatial and Temporal Databases, SSTD 2011
- * </p>
- * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
  */
-@Reference(title = "Geodetic point-in-polygon query processing in oracle spatial", authors = "Hu, Ying and Ravada, Siva and Anderson, Richard", booktitle = "Advances in Spatial and Temporal Databases, SSTD 2011")
 public class LngLatAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex<O, O> {
   /**
    * Constructor.

@@ -75,10 +75,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * according to this great circle distance. If the query hint
  * {@link DatabaseQuery#HINT_EXACT} is set, it will not be used.
  * 
- * This way of indexing geo data in regular databases was discussed in:
- * 
- * Reference:
- * 
  * @author Erich Schubert
  * 
  * @param <O> Object type
