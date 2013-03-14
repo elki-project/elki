@@ -133,7 +133,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Layou
     // Build children:
     List<N> children;
     if (c > 0) {
-      children = new ArrayList<N>(c);
+      children = new ArrayList<>(c);
     } else {
       children = Collections.emptyList();
     }
