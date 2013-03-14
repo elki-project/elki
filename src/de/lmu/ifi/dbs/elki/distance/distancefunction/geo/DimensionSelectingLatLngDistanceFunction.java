@@ -32,13 +32,15 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
-import de.lmu.ifi.dbs.elki.math.GeoUtil;
+import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.NoDuplicateValueGlobalConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Distance function for 2D vectors in Latitude, Longitude form.
@@ -57,20 +59,27 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
   final int dimlng;
 
   /**
+   * Earth model used.
+   */
+  final EarthModel model;
+
+  /**
    * Constructor.
    * 
    * @param dimlat Dimension storing the latitude
    * @param dimlng Dimension storing the longitude
+   * @param model Earth model
    */
-  public DimensionSelectingLatLngDistanceFunction(int dimlat, int dimlng) {
+  public DimensionSelectingLatLngDistanceFunction(int dimlat, int dimlng, EarthModel model) {
     super();
     this.dimlat = dimlat;
     this.dimlng = dimlng;
+    this.model = model;
   }
 
   @Override
   public double doubleDistance(NumberVector<?> o1, NumberVector<?> o2) {
-    return GeoUtil.haversineFormulaDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), o2.doubleValue(dimlat), o2.doubleValue(dimlng));
+    return model.distanceDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), o2.doubleValue(dimlat), o2.doubleValue(dimlng));
   }
 
   @Override
@@ -80,12 +89,12 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
         return doubleDistance((NumberVector<?>) mbr1, (NumberVector<?>) mbr2);
       } else {
         NumberVector<?> o1 = (NumberVector<?>) mbr1;
-        return GeoUtil.latlngMinDistDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), mbr2.getMin(dimlat), mbr2.getMin(dimlng), mbr2.getMax(dimlat), mbr2.getMax(dimlng));
+        return model.minDistDeg(o1.doubleValue(dimlat), o1.doubleValue(dimlng), mbr2.getMin(dimlat), mbr2.getMin(dimlng), mbr2.getMax(dimlat), mbr2.getMax(dimlng));
       }
     } else {
       if (mbr2 instanceof NumberVector) {
         NumberVector<?> o2 = (NumberVector<?>) mbr2;
-        return GeoUtil.latlngMinDistDeg(o2.doubleValue(dimlat), o2.doubleValue(dimlng), mbr1.getMin(dimlat), mbr1.getMin(dimlng), mbr1.getMax(dimlat), mbr1.getMax(dimlng));
+        return model.minDistDeg(o2.doubleValue(dimlat), o2.doubleValue(dimlng), mbr1.getMin(dimlat), mbr1.getMin(dimlng), mbr1.getMax(dimlat), mbr1.getMax(dimlng));
       } else {
         throw new UnsupportedOperationException("MBR to MBR mindist is not yet implemented.");
       }
@@ -105,6 +114,44 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
   @Override
   public <T extends NumberVector<?>> SpatialPrimitiveDistanceQuery<T, DoubleDistance> instantiate(Relation<T> relation) {
     return new SpatialPrimitiveDistanceQuery<>(relation, this);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + dimlat;
+    result = prime * result + dimlng;
+    result = prime * result + ((model == null) ? 0 : model.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DimensionSelectingLatLngDistanceFunction other = (DimensionSelectingLatLngDistanceFunction) obj;
+    if (dimlat != other.dimlat) {
+      return false;
+    }
+    if (dimlng != other.dimlng) {
+      return false;
+    }
+    if (model == null) {
+      if (other.model != null) {
+        return false;
+      }
+    } else if (!model.equals(other.model)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -135,6 +182,11 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
      */
     int dimlng;
 
+    /**
+     * Earth model used.
+     */
+    EarthModel model;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -149,11 +201,15 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
         dimlng = dimlngP.getValue();
       }
       config.checkConstraint(new NoDuplicateValueGlobalConstraint(dimlatP, dimlngP));
+      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+      if (config.grab(modelP)) {
+        model = modelP.instantiateClass(config);
+      }
     }
 
     @Override
     protected DimensionSelectingLatLngDistanceFunction makeInstance() {
-      return new DimensionSelectingLatLngDistanceFunction(dimlat, dimlng);
+      return new DimensionSelectingLatLngDistanceFunction(dimlat, dimlng, model);
     }
   }
 }

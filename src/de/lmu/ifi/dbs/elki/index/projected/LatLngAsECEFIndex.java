@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.index.projected;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.projection.LatLngToECEFProjection;
-import de.lmu.ifi.dbs.elki.data.projection.LngLatToECEFProjection.EarthModel;
 import de.lmu.ifi.dbs.elki.data.projection.Projection;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -50,6 +49,8 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -257,18 +258,15 @@ public class LatLngAsECEFIndex<O extends NumberVector<?>> extends ProjectedIndex
       /**
        * Earth model to use.
        */
-      EarthModel model = EarthModel.SPHERICAL;
+      EarthModel model;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        // When LngLatDistances fully support WGS84, enable this:
-        /*
-         * EnumParameter<EarthModel> modelP = new
-         * EnumParameter<>(LngLatToECEFProjection.Parameterizer.MODEL_ID,
-         * EarthModel.class, EarthModel.SPHERICAL); if(config.grab(modelP)) {
-         * model = modelP.getValue(); }
-         */
+        ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+        if (config.grab(modelP)) {
+          model = modelP.instantiateClass(config);
+        }
 
         ObjectParameter<IndexFactory<O, ?>> innerP = new ObjectParameter<>(ProjectedIndex.Factory.Parameterizer.INDEX_ID, IndexFactory.class);
         if(config.grab(innerP)) {
