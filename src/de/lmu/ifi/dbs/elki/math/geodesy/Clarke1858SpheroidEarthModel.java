@@ -27,45 +27,41 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * The WGS84 spheroid earth model, without height model (so not a geoid, just a
- * spheroid!)
+ * The Clarke 1858 spheroid earth model.
  * 
- * Note that EGM96 uses the same spheroid, but what really makes the difference
- * is it's geoid expansion.
+ * Radius: 6378293.645 m
  * 
- * Radius: 6378137.0 m
- * 
- * Flattening: 1 / 298.257223563
+ * Flattening: 1 / 294.26068
  * 
  * @author Erich Schubert
  */
-@Alias({ "wgs84", "WGS-84", "WGS84" })
-public class WGS84SpheroidEarthModel extends AbstractEarthModel {
+@Alias({ "Clarke 1858" })
+public class Clarke1858SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
    */
-  public static final WGS84SpheroidEarthModel STATIC = new WGS84SpheroidEarthModel();
+  public static final Clarke1858SpheroidEarthModel STATIC = new Clarke1858SpheroidEarthModel();
 
   /**
-   * Radius of the WGS84 Ellipsoid in m (a).
+   * Radius of the CLARKE1858 Ellipsoid in m (a).
    */
-  public static final double WGS84_RADIUS = 6378137.0; // m
+  public static final double CLARKE1858_RADIUS = 6378293.645; // m
 
   /**
-   * Inverse flattening 1/f of the WGS84 Ellipsoid.
+   * Inverse flattening 1/f of the CLARKE1858 Ellipsoid.
    */
-  public static final double WGS84_INV_FLATTENING = 298.257223563;
+  public static final double CLARKE1858_INV_FLATTENING = 294.26068;
 
   /**
-   * Flattening f of the WGS84 Ellipsoid.
+   * Flattening f of the CLARKE1858 Ellipsoid.
    */
-  public static final double WGS84_FLATTENING = 1 / WGS84_INV_FLATTENING;
+  public static final double CLARKE1858_FLATTENING = 1 / CLARKE1858_INV_FLATTENING;
 
   /**
    * Constructor.
    */
-  protected WGS84SpheroidEarthModel() {
-    super(WGS84_RADIUS, WGS84_RADIUS * (1 - WGS84_FLATTENING), WGS84_FLATTENING, WGS84_INV_FLATTENING);
+  protected Clarke1858SpheroidEarthModel() {
+    super(CLARKE1858_RADIUS, CLARKE1858_RADIUS * (1 - CLARKE1858_FLATTENING), CLARKE1858_FLATTENING, CLARKE1858_INV_FLATTENING);
   }
 
   /**
@@ -77,7 +73,7 @@ public class WGS84SpheroidEarthModel extends AbstractEarthModel {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WGS84SpheroidEarthModel makeInstance() {
+    protected Clarke1858SpheroidEarthModel makeInstance() {
       return STATIC;
     }
   }

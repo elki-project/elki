@@ -1,2 +1,9 @@
 de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.SphericalHaversineEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.SphericalCosineEarthModel
 de.lmu.ifi.dbs.elki.math.geodesy.WGS84SpheroidEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.GRS80SpheroidEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.WGS72SpheroidEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.GRS67SpheroidEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.Clarke1880SpheroidEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.Clarke1858SpheroidEarthModel
