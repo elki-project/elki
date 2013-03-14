@@ -326,9 +326,33 @@ public final class DBIDUtil {
    * @return size
    */
   public static int intersectionSize(DBIDs first, DBIDs second) {
-    if (first.size() > second.size()) {
+    // If exactly one is a Set, use it as second parameter.
+    if (second instanceof SetDBIDs) {
+      if (!(first instanceof SetDBIDs)) {
+        return internalIntersectionSize(first, second);
+      }
+    } else {
+      if (first instanceof SetDBIDs) {
+        return internalIntersectionSize(second, first);
+      }
+    }
+    // Both are the same type: both set or both non set.
+    // Smaller goes first.
+    if (first.size() <= second.size()) {
+      return intersectionSize(first, second);
+    } else {
       return intersectionSize(second, first);
     }
+  }
+
+  /**
+   * Compute the set intersection size of two sets.
+   * 
+   * @param first First set
+   * @param second Second set
+   * @return size
+   */
+  private static int internalIntersectionSize(DBIDs first, DBIDs second) {
     int c = 0;
     for (DBIDIter it = first.iter(); it.valid(); it.advance()) {
       if (second.contains(it)) {
@@ -535,7 +559,6 @@ public final class DBIDUtil {
     return DBIDFactory.FACTORY.newHeap(exist);
   }
 
-  
   /**
    * Produce a random sample of the given DBIDs.
    * 
