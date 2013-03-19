@@ -1,6 +1,7 @@
 package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
 
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /*
  This file is part of ELKI:
@@ -118,6 +119,26 @@ public abstract class DimensionSimilarityMatrix {
       return index(y, x);
     }
     return ((y * (y - 1)) >> 1) + x;
+  }
+
+  /**
+   * Transform linear triangle matrix into a full matrix.
+   * 
+   * @return New matrix
+   */
+  public Matrix copyToFullMatrix() {
+    final int dim = size();
+    Matrix m = new Matrix(dim, dim);
+    double[][] ref = m.getArrayRef();
+    int i = 0;
+    for (int y = 1; y < dim; y++) {
+      for (int x = 0; x < y; x++) {
+        ref[x][y] = sim[i];
+        ref[y][x] = sim[i];
+        ++i;
+      }
+    }
+    return m;
   }
 
   @Override
