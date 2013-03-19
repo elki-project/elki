@@ -113,9 +113,7 @@ public final class SphereUtil {
   public static double cosineFormulaRad(double lat1, double lng1, double lat2, double lng2) {
     final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
     final double slat2 = Math.sin(lat2), clat2 = MathUtil.sinToCos(lat2, slat2);
-    final double a = slat1 * slat2;
-    final double b = clat1 * clat2 * Math.cos(lng2 - lng1);
-    return Math.acos(a + b);
+    return Math.acos(slat1 * slat2 + clat1 * clat2 * Math.cos(Math.abs(lng2 - lng1)));
   }
 
   /**
@@ -228,7 +226,7 @@ public final class SphereUtil {
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaRad(double lat1, double lon1, double lat2, double lon2) {
     // Half delta longitude.
-    final double dlnh = (lon1 - lon2) * .5;
+    final double dlnh = Math.abs(lon1 - lon2);
 
     // Spherical special case of Vincenty's formula - no iterations needed
     final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
@@ -309,8 +307,9 @@ public final class SphereUtil {
       // Eqn (16) - \sigma from \tan \sigma
       final double sigma = Math.atan2(ssig, csig);
 
+      // TODO: is this the proper way of catching this corner case?
       // Eqn (17) - \sin \alpha, and this way \cos^2 \alpha
-      final double salp = cu1 * cu2 * slon / ssig;
+      final double salp = (Math.abs(ssig) > 0) ? cu1 * cu2 * slon / ssig : 0.0;
       final double c2alp = 1. - salp * salp;
       // Eqn (18) - \cos 2 \sigma_m
       final double ctwosigm = csig - 2.0 * su1 * su2 / c2alp;
