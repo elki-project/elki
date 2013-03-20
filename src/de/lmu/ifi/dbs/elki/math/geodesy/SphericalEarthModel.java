@@ -39,6 +39,8 @@ public class SphericalEarthModel extends AbstractEarthModel {
 
   /**
    * Earth radius approximation in m.
+   * 
+   * As per International Union of Geodesy and Geophysics (IUGG):
    */
   public static final double EARTH_RADIUS = 6371009; // m
 
