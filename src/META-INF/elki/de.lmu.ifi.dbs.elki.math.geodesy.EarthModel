@@ -1,5 +1,5 @@
-de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel
 de.lmu.ifi.dbs.elki.math.geodesy.SphericalHaversineEarthModel
+de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel
 de.lmu.ifi.dbs.elki.math.geodesy.SphericalCosineEarthModel
 de.lmu.ifi.dbs.elki.math.geodesy.WGS84SpheroidEarthModel
 de.lmu.ifi.dbs.elki.math.geodesy.GRS80SpheroidEarthModel

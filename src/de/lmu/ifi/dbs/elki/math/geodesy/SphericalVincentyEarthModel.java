@@ -31,11 +31,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-public class SphericalEarthModel extends AbstractEarthModel {
+public class SphericalVincentyEarthModel extends AbstractEarthModel {
   /**
    * Spherical earth model, static instance.
    */
-  public static final SphericalEarthModel STATIC = new SphericalEarthModel();
+  public static final SphericalVincentyEarthModel STATIC = new SphericalVincentyEarthModel();
 
   /**
    * Earth radius approximation in m.
@@ -47,7 +47,7 @@ public class SphericalEarthModel extends AbstractEarthModel {
   /**
    * Constructor.
    */
-  protected SphericalEarthModel() {
+  protected SphericalVincentyEarthModel() {
     super(EARTH_RADIUS, EARTH_RADIUS, 0., Double.POSITIVE_INFINITY);
   }
 
@@ -89,7 +89,7 @@ public class SphericalEarthModel extends AbstractEarthModel {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected SphericalEarthModel makeInstance() {
+    protected SphericalVincentyEarthModel makeInstance() {
       return STATIC;
     }
   }
