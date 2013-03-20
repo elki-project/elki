@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractVectorDoubleDistanc
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
-import de.lmu.ifi.dbs.elki.math.geodesy.SphericalEarthModel;
+import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -201,7 +201,7 @@ public class DimensionSelectingLatLngDistanceFunction extends AbstractVectorDoub
         dimlng = dimlngP.getValue();
       }
       config.checkConstraint(new NoDuplicateValueGlobalConstraint(dimlatP, dimlngP));
-      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalEarthModel.class);
+      ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
       if (config.grab(modelP)) {
         model = modelP.instantiateClass(config);
       }
