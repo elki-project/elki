@@ -184,6 +184,7 @@ public abstract class AbstractEarthModel implements EarthModel {
 
   @Override
   public double distanceRad(double lat1, double lng1, double lat2, double lng2) {
+    // Vincenty uses minor axis radius!
     return b * SphereUtil.ellipsoidVincentyFormulaRad(f, lat1, lng1, lat2, lng2);
   }
 

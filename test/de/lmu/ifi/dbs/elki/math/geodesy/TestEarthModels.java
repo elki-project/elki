@@ -32,7 +32,8 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 /**
  * Unit test that cross-validates some distance computations with different
  * implementations. Note that it is common to see some difference in these
- * computations, unfortunately.
+ * computations, unfortunately - even within R: "sp", "SDMTools" and "geosphere"
+ * give different values. But in the end, it's always just an approximation.
  * 
  * @author Erich Schubert
  */
@@ -64,6 +65,7 @@ public class TestEarthModels implements JUnit4Test {
   // The full data set
   final double[][] DATA = new double[][] { NEW_YORK, MUNICH, MUNICH_AIRPORT, BEIJING, SYDNEY, SOUTH, NORTH, NULL };
 
+  // Names, for reporting
   final String[] NAMES = new String[] { "New York", "Munich", "Munich Airport", "Beijing", "Sydney", "South Pole", "North Pole", "Null" };
 
   // Distance matrix, as computed by R "sp" package.
@@ -106,12 +108,190 @@ public class TestEarthModels implements JUnit4Test {
   1.51936337e+07, 1.00019657e+07, 1.00019657e+07, 0.00000000e+00, }, //
   };
 
+  // Distance matrix, cosine distance in "geosphere" package:
+  final double[][] GEOSPHERE_COSINE = new double[][] { //
+  { 0.000000000000000e+00, 6.486356338365966e+06, //
+  6.489535193201737e+06, 1.099371420315689e+07, //
+  1.599344217645813e+07, 1.452986159024009e+07, //
+  5.485253480114362e+06, 8.660734833379321e+06, //
+  }, //
+  { 6.486356338365966e+06, 0.000000000000000e+00, //
+  2.941993519886598e+04, 7.750900176348899e+06, //
+  1.632910711431917e+07, 1.535974752803661e+07, //
+  4.655367542317842e+06, 5.467217714777914e+06, //
+  }, //
+  { 6.489535193201737e+06, 2.941993519886598e+04, //
+  0.000000000000000e+00, 7.723050836613588e+06, //
+  1.630864631433774e+07, 1.538427227092249e+07, //
+  4.630842799431969e+06, 5.495190660363145e+06, //
+  }, //
+  { 1.099371420315689e+07, 7.750900176348899e+06, //
+  7.723050836613588e+06, 9.493543207645416e-02, //
+  8.948985711203361e+06, 1.444578576429031e+07, //
+  5.569329306064145e+06, 1.222413440358347e+07, //
+  }, //
+  { 1.599344217645813e+07, 1.632910711431917e+07, //
+  1.630864631433774e+07, 8.948985711203361e+06, //
+  0.000000000000000e+00, 6.242495113738451e+06, //
+  1.377261995661600e+07, 1.520028800598781e+07, //
+  }, //
+  { 1.452986159024009e+07, 1.535974752803661e+07, //
+  1.538427227092249e+07, 1.444578576429031e+07, //
+  6.242495113738451e+06, 0.000000000000000e+00, //
+  2.001511507035445e+07, 1.000755753517723e+07, //
+  }, //
+  { 5.485253480114362e+06, 4.655367542317842e+06, //
+  4.630842799431969e+06, 5.569329306064145e+06, //
+  1.377261995661600e+07, 2.001511507035445e+07, //
+  0.000000000000000e+00, 1.000755753517723e+07, //
+  }, //
+  { 8.660734833379321e+06, 5.467217714777914e+06, //
+  5.495190660363145e+06, 1.222413440358347e+07, //
+  1.520028800598781e+07, 1.000755753517723e+07, //
+  1.000755753517723e+07, 0.000000000000000e+00, //
+  }, //
+  };
+
+  // Distance matrix, cosine distance in "geosphere" package:
+  final double[][] GEOSPHERE_HAVERSINE = new double[][] { //
+  { 0.000000000000000e+00, 6.486356338365965e+06, //
+  6.489535193201736e+06, 1.099371420315688e+07, //
+  1.599344217645813e+07, 1.452986159024009e+07, //
+  5.485253480114363e+06, 8.660734833379321e+06, //
+  }, //
+  { 6.486356338365965e+06, 0.000000000000000e+00, //
+  2.941993519893691e+04, 7.750900176348901e+06, //
+  1.632910711431917e+07, 1.535974752803662e+07, //
+  4.655367542317841e+06, 5.467217714777914e+06, //
+  }, //
+  { 6.489535193201736e+06, 2.941993519893691e+04, //
+  0.000000000000000e+00, 7.723050836613588e+06, //
+  1.630864631433774e+07, 1.538427227092249e+07, //
+  4.630842799431968e+06, 5.495190660363145e+06, //
+  }, //
+  { 1.099371420315688e+07, 7.750900176348901e+06, //
+  7.723050836613588e+06, 0.000000000000000e+00, //
+  8.948985711203359e+06, 1.444578576429031e+07, //
+  5.569329306064145e+06, 1.222413440358347e+07, //
+  }, //
+  { 1.599344217645813e+07, 1.632910711431917e+07, //
+  1.630864631433774e+07, 8.948985711203359e+06, //
+  0.000000000000000e+00, 6.242495113738450e+06, //
+  1.377261995661600e+07, 1.520028800598781e+07, //
+  }, //
+  { 1.452986159024009e+07, 1.535974752803662e+07, //
+  1.538427227092249e+07, 1.444578576429031e+07, //
+  6.242495113738450e+06, 0.000000000000000e+00, //
+  2.001511507035445e+07, 1.000755753517723e+07, //
+  }, //
+  { 5.485253480114363e+06, 4.655367542317841e+06, //
+  4.630842799431968e+06, 5.569329306064145e+06, //
+  1.377261995661600e+07, 2.001511507035445e+07, //
+  0.000000000000000e+00, 1.000755753517723e+07, //
+  }, //
+  { 8.660734833379321e+06, 5.467217714777914e+06, //
+  5.495190660363145e+06, 1.222413440358347e+07, //
+  1.520028800598781e+07, 1.000755753517723e+07, //
+  1.000755753517723e+07, 0.000000000000000e+00, //
+  }, //
+  };
+
+  // Distance matrix, cosine distance in "geosphere" package:
+  final double[][] GEOSPHERE_VINCENTY_SPHERE = new double[][] { //
+  { 0.000000000000000e+00, 6.486356338365965e+06, //
+  6.489535193201737e+06, 1.099371420315689e+07, //
+  1.599344217645813e+07, 1.452986159024009e+07, //
+  5.485253480114362e+06, 8.660734833379321e+06, //
+  }, //
+  { 6.486356338365966e+06, 0.000000000000000e+00, //
+  2.941993519893652e+04, 7.750900176348899e+06, //
+  1.632910711431917e+07, 1.535974752803661e+07, //
+  4.655367542317842e+06, 5.467217714777914e+06, //
+  }, //
+  { 6.489535193201737e+06, 2.941993519893681e+04, //
+  0.000000000000000e+00, 7.723050836613588e+06, //
+  1.630864631433774e+07, 1.538427227092249e+07, //
+  4.630842799431969e+06, 5.495190660363145e+06, //
+  }, //
+  { 1.099371420315689e+07, 7.750900176348899e+06, //
+  7.723050836613588e+06, 0.000000000000000e+00, //
+  8.948985711203361e+06, 1.444578576429031e+07, //
+  5.569329306064145e+06, 1.222413440358347e+07, //
+  }, //
+  { 1.599344217645813e+07, 1.632910711431917e+07, //
+  1.630864631433774e+07, 8.948985711203361e+06, //
+  0.000000000000000e+00, 6.242495113738451e+06, //
+  1.377261995661600e+07, 1.520028800598781e+07, //
+  }, //
+  { 1.452986159024009e+07, 1.535974752803661e+07, //
+  1.538427227092249e+07, 1.444578576429031e+07, //
+  6.242495113738451e+06, 0.000000000000000e+00, //
+  2.001511507035445e+07, 1.000755753517723e+07, //
+  }, //
+  { 5.485253480114362e+06, 4.655367542317842e+06, //
+  4.630842799431969e+06, 5.569329306064145e+06, //
+  1.377261995661600e+07, 2.001511507035445e+07, //
+  0.000000000000000e+00, 1.000755753517723e+07, //
+  }, //
+  { 8.660734833379321e+06, 5.467217714777914e+06, //
+  5.495190660363145e+06, 1.222413440358347e+07, //
+  1.520028800598781e+07, 1.000755753517723e+07, //
+  1.000755753517723e+07, 0.000000000000000e+00, //
+  }, //
+  };
+
+  // Distance matrix, cosine distance in "geosphere" package:
+  final double[][] GEOSPHERE_VINCENTY_WGS84 = new double[][] { //
+  { 0.000000000000000e+00, 6.503767848090770e+06, //
+  6.506974602807214e+06, 1.101910369872154e+07, //
+  1.599270764104164e+07, 1.450589228275554e+07, //
+  5.498039175797141e+06, 8.661075093360968e+06, //
+  }, //
+  { 6.503767848090770e+06, 0.000000000000000e+00, //
+  2.944678565227988e+04, 7.771413604903577e+06, //
+  1.632562828361734e+07, 1.533521883690098e+07, //
+  4.668712621651703e+06, 5.449076622477260e+06, //
+  }, //
+  { 6.506974602807214e+06, 2.944678565227961e+04, //
+  0.000000000000000e+00, 7.743520548885130e+06, //
+  1.630501450760304e+07, 1.535974357438163e+07, //
+  4.644187884171052e+06, 5.477072159975932e+06, //
+  }, //
+  { 1.101910369872154e+07, 7.771413604903577e+06, //
+  7.743520548885130e+06, 0.000000000000000e+00, //
+  8.918923554119145e+06, 1.442193352759095e+07, //
+  5.581997930961725e+06, 1.223306246456788e+07, //
+  }, //
+  { 1.599270764104165e+07, 1.632562828361734e+07, //
+  1.630501450760304e+07, 8.918923554119145e+06, //
+  0.000000000000000e+00, 6.253836350029638e+06, //
+  1.375009510852304e+07, 1.521100587039189e+07, //
+  }, //
+  { 1.450589228275554e+07, 1.533521883690098e+07, //
+  1.535974357438163e+07, 1.442193352759095e+07, //
+  6.253836350029638e+06, 0.000000000000000e+00, //
+  2.000393145855268e+07, 1.000196572927634e+07, //
+  }, //
+  { 5.498039175797141e+06, 4.668712621651703e+06, //
+  4.644187884171051e+06, 5.581997930961725e+06, //
+  1.375009510852304e+07, 2.000393145855268e+07, //
+  0.000000000000000e+00, 1.000196572927634e+07, //
+  }, //
+  { 8.661075093360968e+06, 5.449076622477260e+06, //
+  5.477072159975932e+06, 1.223306246456788e+07, //
+  1.521100587039189e+07, 1.000196572927634e+07, //
+  1.000196572927634e+07, 0.000000000000000e+00, //
+  }, //
+  };
+
   @Test
   public void testWGS84SpheroidEarth() {
     // WGS84 Vincenty to WGS84 Haversine: .2% error on test set.
     testEarthModel(WGS84SpheroidEarthModel.STATIC, R_SP_WGS84, .00168, 0);
     // WGS84 Vincenty to WGS84 Vincenty: seems we only have 7 digits above!
-    testEarthModel(WGS84SpheroidEarthModel.STATIC, SDM_WGS84, .000000010106, 0);
+    testEarthModel(WGS84SpheroidEarthModel.STATIC, SDM_WGS84, .001927, 0);
+    // WGS84 Vincenty to WGS84 Vincenty: seems we only have 7 digits above!
+    testEarthModel(WGS84SpheroidEarthModel.STATIC, GEOSPHERE_VINCENTY_WGS84, 6.1763e-12, 1e-8);
   }
 
   @Test
@@ -120,6 +300,8 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalHaversineEarthModel.STATIC, R_SP_WGS84, .00481, 0);
     // Spherical Haversine to WGS84 Vincenty: .4% error on test set.
     testEarthModel(SphericalHaversineEarthModel.STATIC, SDM_WGS84, .00382, 0);
+    // WGS84 Vincenty to WGS84 Vincenty: seems we only have 7 digits above!
+    testEarthModel(SphericalHaversineEarthModel.STATIC, GEOSPHERE_HAVERSINE, 6.662e-16, 0);
   }
 
   @Test
@@ -128,6 +310,8 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalCosineEarthModel.STATIC, R_SP_WGS84, .00481, 0.1);
     // Spherical Cosine to WGS84 Vincenty: .3% error on test set.
     testEarthModel(SphericalCosineEarthModel.STATIC, SDM_WGS84, .00382, 0.1);
+    // Spherical Cosine to Cosine: .3% error on test set.
+    testEarthModel(SphericalCosineEarthModel.STATIC, GEOSPHERE_COSINE, 1.042e-11, 0.1);
   }
 
   @Test
@@ -136,16 +320,21 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalEarthModel.STATIC, R_SP_WGS84, .00481, 0);
     // Spherical Vincenty to WGS84 Vincenty: .3% error on test set.
     testEarthModel(SphericalEarthModel.STATIC, SDM_WGS84, .00382, 0);
+    // Spherical Vincenty to Spherical Vincenty: .3% error on test set.
+    testEarthModel(SphericalEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 1.9985e-14, 0);
   }
 
   protected void testEarthModel(EarthModel model, final double[][] ref, final double relerror, final double abserror) {
-    double maxrel = 0.0;
+    double maxrel = 0.0, maxabs = 0.0;
     for (int i = 0; i < DATA.length; i++) {
       for (int j = i; j < DATA.length; j++) {
         double d = model.distanceDeg(DATA[i][0], DATA[i][1], DATA[j][0], DATA[j][1]);
         double test = (d > 0) ? (ref[i][j] / d) : (ref[i][j] - d + 1.0);
         if (Math.abs(test - 1.0) > relerror) {
           assertEquals("Distances do not agree for " + NAMES[i] + " to " + NAMES[j] + " " + Math.abs(test - 1.0), ref[i][j], d, abserror);
+          if (Math.abs(ref[i][j] - d) > maxabs) {
+            maxabs = Math.abs(ref[i][j] - d);
+          }
         } else {
           if (Math.abs(test - 1.0) > maxrel) {
             maxrel = Math.abs(test - 1.0);
@@ -153,6 +342,7 @@ public class TestEarthModels implements JUnit4Test {
         }
       }
     }
-    assertEquals("Error bound not tight.", maxrel, relerror, 1e-3 * relerror);
+    assertEquals("Relative error bound not tight.", maxrel, relerror, 1e-3 * relerror);
+    assertEquals("Absolute error bound not tight.", maxrel, relerror, 1e-3 * relerror);
   }
 }

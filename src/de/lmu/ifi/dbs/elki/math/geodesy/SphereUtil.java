@@ -53,7 +53,7 @@ public final class SphereUtil {
   /**
    * Maximum desired precision.
    */
-  private static final double PRECISION = 1e-10;
+  private static final double PRECISION = 1e-12;
 
   /**
    * Constant to divide by 6 via multiplication.
@@ -281,15 +281,16 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double ellipsoidVincentyFormulaRad(double f, double lat1, double lon1, double lat2, double lon2) {
-    final double dlon = lon2 - lon1;
+    final double dlon = Math.abs(lon2 - lon1);
+    final double onemf = 1 - f; // = 1 - (a-b)/a = b/a
 
     // Second eccentricity squared
-    final double ab = 1. / (1 - f); // = a/b
-    final double ecc2 = ab * ab - 1;
+    final double a_b = 1. / onemf; // = a/b
+    final double ecc2 = (a_b + 1) * (a_b - 1); // (a^2-b^2)/(b^2)
 
     // Reduced latitudes:
-    final double u1 = Math.atan((1 - f) * Math.tan(lat1));
-    final double u2 = Math.atan((1 - f) * Math.tan(lat2));
+    final double u1 = Math.atan(onemf * Math.tan(lat1));
+    final double u2 = Math.atan(onemf * Math.tan(lat2));
     // Trigonometric values
     final double su1 = Math.sin(u1), cu1 = MathUtil.sinToCos(u1, su1);
     final double su2 = Math.sin(u2), cu2 = MathUtil.sinToCos(u2, su2);
@@ -301,27 +302,32 @@ public final class SphereUtil {
       final double slon = Math.sin(lambda), clon = MathUtil.sinToCos(lambda, slon);
 
       // Eqn (14) - \sin \sigma
-      final double ssig = Math.sqrt((cu2 * slon) * (cu2 * slon) + (cu1 * su2 - su1 * cu2 * clon) * (cu1 * su2 - su1 * cu2 * clon));
+      final double term1 = cu2 * slon, term2 = cu1 * su2 - su1 * cu2 * clon;
+      final double ssig = Math.sqrt(term1 * term1 + term2 * term2);
       // Eqn (15) - \cos \sigma
       final double csig = su1 * su2 + cu1 * cu2 * clon;
       // Eqn (16) - \sigma from \tan \sigma
       final double sigma = Math.atan2(ssig, csig);
 
-      // TODO: is this the proper way of catching this corner case?
+      // Two identical points?
+      if (!(ssig > 0)) {
+        return 0.;
+      }
       // Eqn (17) - \sin \alpha, and this way \cos^2 \alpha
-      final double salp = (Math.abs(ssig) > 0) ? cu1 * cu2 * slon / ssig : 0.0;
-      final double c2alp = 1. - salp * salp;
+      final double salp = cu1 * cu2 * slon / ssig;
+      final double c2alp = (1. + salp) * (1. - salp);
       // Eqn (18) - \cos 2 \sigma_m
-      final double ctwosigm = csig - 2.0 * su1 * su2 / c2alp;
+      final double ctwosigm = (Math.abs(c2alp) > 0) ? csig - 2.0 * su1 * su2 / c2alp : 0.;
       final double c2twosigm = ctwosigm * ctwosigm;
 
       // Eqn (10) - C
       final double cc = f * .0625 * c2alp * (4.0 + f * (4.0 - 3.0 * c2alp));
       // Eqn (11) - new \lambda
-      final double lambda_new = dlon + (1.0 - cc) * f * salp * //
+      final double prevlambda = lambda;
+      lambda = dlon + (1.0 - cc) * f * salp * //
       (sigma + cc * ssig * (ctwosigm + cc * csig * (-1.0 + 2.0 * c2twosigm)));
       // Check for convergence:
-      if (Math.abs(lambda_new - lambda) < PRECISION || i >= MAX_ITER) {
+      if (Math.abs(prevlambda - lambda) < PRECISION || i >= MAX_ITER) {
         // Definition of u^2, rewritten to use second eccentricity.
         final double usq = c2alp * ecc2;
         // Eqn (3) - A
