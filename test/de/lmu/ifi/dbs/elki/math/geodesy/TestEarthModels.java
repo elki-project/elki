@@ -288,9 +288,9 @@ public class TestEarthModels implements JUnit4Test {
   public void testWGS84SpheroidEarth() {
     // WGS84 Vincenty to WGS84 Haversine: .2% error on test set.
     testEarthModel(WGS84SpheroidEarthModel.STATIC, R_SP_WGS84, .00168, 0);
-    // WGS84 Vincenty to WGS84 Vincenty: seems we only have 7 digits above!
+    // WGS84 Vincenty to WGS84 Vincenty: also .2% error on test set.
     testEarthModel(WGS84SpheroidEarthModel.STATIC, SDM_WGS84, .001927, 0);
-    // WGS84 Vincenty to WGS84 Vincenty: seems we only have 7 digits above!
+    // WGS84 Vincenty to WGS84 Vincenty: with "geosphere" we have a high agreement.
     testEarthModel(WGS84SpheroidEarthModel.STATIC, GEOSPHERE_VINCENTY_WGS84, 6.1763e-12, 1e-8);
   }
 
@@ -300,7 +300,7 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalHaversineEarthModel.STATIC, R_SP_WGS84, .00481, 0);
     // Spherical Haversine to WGS84 Vincenty: .4% error on test set.
     testEarthModel(SphericalHaversineEarthModel.STATIC, SDM_WGS84, .00382, 0);
-    // WGS84 Vincenty to WGS84 Vincenty: seems we only have 7 digits above!
+    // WGS84 Vincenty to WGS84 Vincenty: with "geosphere" we have a high agreement.
     testEarthModel(SphericalHaversineEarthModel.STATIC, GEOSPHERE_HAVERSINE, 6.662e-16, 0);
   }
 
@@ -310,7 +310,7 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalCosineEarthModel.STATIC, R_SP_WGS84, .00481, 0.1);
     // Spherical Cosine to WGS84 Vincenty: .3% error on test set.
     testEarthModel(SphericalCosineEarthModel.STATIC, SDM_WGS84, .00382, 0.1);
-    // Spherical Cosine to Cosine: .3% error on test set.
+    // Spherical Cosine to Cosine: with "geosphere" we have a high agreement.
     testEarthModel(SphericalCosineEarthModel.STATIC, GEOSPHERE_COSINE, 1.042e-11, 0.1);
   }
 
@@ -320,7 +320,7 @@ public class TestEarthModels implements JUnit4Test {
     testEarthModel(SphericalEarthModel.STATIC, R_SP_WGS84, .00481, 0);
     // Spherical Vincenty to WGS84 Vincenty: .3% error on test set.
     testEarthModel(SphericalEarthModel.STATIC, SDM_WGS84, .00382, 0);
-    // Spherical Vincenty to Spherical Vincenty: .3% error on test set.
+    // Spherical Vincenty to Spherical Vincenty: with "geosphere" we have a high agreement.
     testEarthModel(SphericalEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 1.9985e-14, 0);
   }
 
