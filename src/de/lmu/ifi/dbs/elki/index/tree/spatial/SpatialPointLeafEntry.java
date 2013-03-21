@@ -30,6 +30,7 @@ import java.io.ObjectOutput;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Represents an entry in a leaf node of a spatial index. A SpatialLeafEntry
@@ -38,7 +39,7 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * 
  * @author Elke Achtert
  */
-public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry {
+public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry, NumberVector<Double> {
   /**
    * Serial version.
    */
@@ -69,7 +70,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
 
   /**
    * Constructor from number vector.
-   *
+   * 
    * @param id Object id
    * @param vector Number vector
    */
@@ -77,7 +78,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
     super(id);
     int dim = vector.getDimensionality();
     this.values = new double[dim];
-    for(int i = 0; i < dim; i++) {
+    for (int i = 0; i < dim; i++) {
       values[i] = vector.doubleValue(i);
     }
   }
@@ -117,7 +118,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   public void writeExternal(ObjectOutput out) throws IOException {
     super.writeExternal(out);
     out.writeInt(values.length);
-    for(double v : values) {
+    for (double v : values) {
       out.writeDouble(v);
     }
   }
@@ -135,8 +136,49 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     super.readExternal(in);
     values = new double[in.readInt()];
-    for(int d = 0; d < values.length; d++) {
+    for (int d = 0; d < values.length; d++) {
       values[d] = in.readDouble();
     }
+  }
+
+  @Override
+  @Deprecated
+  public Double getValue(int dimension) {
+    return values[dimension];
+  }
+
+  @Override
+  public double doubleValue(int dimension) {
+    return values[dimension];
+  }
+
+  @Override
+  public float floatValue(int dimension) {
+    return (float) values[dimension];
+  }
+
+  @Override
+  public int intValue(int dimension) {
+    return (int) values[dimension];
+  }
+
+  @Override
+  public long longValue(int dimension) {
+    return (long) values[dimension];
+  }
+
+  @Override
+  public short shortValue(int dimension) {
+    return (short) values[dimension];
+  }
+
+  @Override
+  public byte byteValue(int dimension) {
+    return (byte) values[dimension];
+  }
+
+  @Override
+  public Vector getColumnVector() {
+    return new Vector(values.clone());
   }
 }
