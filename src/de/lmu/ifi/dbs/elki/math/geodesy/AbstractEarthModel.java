@@ -199,4 +199,9 @@ public abstract class AbstractEarthModel implements EarthModel {
   public double minDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     return b * SphereUtil.latlngMinDistRad(plat, plng, rminlat, rminlng, rmaxlat, rmaxlng);
   }
+
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName()+" [a=" + a + ", b=" + b + ", f=" + f + ", invf=" + invf + ", e=" + e + ", esq=" + esq + "]";
+  }
 }
