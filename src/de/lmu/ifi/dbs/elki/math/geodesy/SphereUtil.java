@@ -95,7 +95,8 @@ public final class SphereUtil {
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
    * 
-   * Complexity: 6 (2 of which emulated) trigonometric functions.
+   * Complexity: 6 (2 of which emulated) trigonometric functions. Note that acos
+   * is rather expensive apparently - roughly atan + sqrt.
    * 
    * Reference:
    * <p>
@@ -113,7 +114,7 @@ public final class SphereUtil {
   public static double cosineFormulaRad(double lat1, double lng1, double lat2, double lng2) {
     final double slat1 = Math.sin(lat1), clat1 = MathUtil.sinToCos(lat1, slat1);
     final double slat2 = Math.sin(lat2), clat2 = MathUtil.sinToCos(lat2, slat2);
-    return Math.acos(slat1 * slat2 + clat1 * clat2 * Math.cos(Math.abs(lng2 - lng1)));
+    return Math.acos(Math.min(1.0, slat1 * slat2 + clat1 * clat2 * Math.cos(Math.abs(lng2 - lng1))));
   }
 
   /**
@@ -167,10 +168,7 @@ public final class SphereUtil {
     final double slat = Math.sin((lat1 - lat2) * .5);
     final double slon = Math.sin((lon1 - lon2) * .5);
     final double a = slat * slat + slon * slon * Math.cos(lat1) * Math.cos(lat2);
-    final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    // Alternate version - TODO: which one is faster, more precise?
-    // final double c = 2 * Math.asin(Math.sqrt(a));
-    return c;
+    return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
   /**
@@ -328,6 +326,8 @@ public final class SphereUtil {
       (sigma + cc * ssig * (ctwosigm + cc * csig * (-1.0 + 2.0 * c2twosigm)));
       // Check for convergence:
       if (Math.abs(prevlambda - lambda) < PRECISION || i >= MAX_ITER) {
+        // TODO: what is the proper result to return on MAX_ITER (antipodal
+        // points)?
         // Definition of u^2, rewritten to use second eccentricity.
         final double usq = c2alp * ecc2;
         // Eqn (3) - A

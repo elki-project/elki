@@ -126,6 +126,11 @@ public class LngLatDistanceFunction extends AbstractVectorDoubleDistanceFunction
     return new SpatialPrimitiveDistanceQuery<>(relation, this);
   }
 
+  @Override
+  public String toString() {
+    return "LngLatDistanceFunction [model=" + model + "]";
+  }
+
   /**
    * Parameterization class.
    * 
