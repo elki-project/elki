@@ -26,11 +26,12 @@ package de.lmu.ifi.dbs.elki.visualization.style;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.AnyMap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.colors.ListBasedColorLibrary;
@@ -99,7 +100,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
   /**
    * Cache
    */
-  private AnyMap<String> cache = new AnyMap<>();
+  private Map<String, Object> cache = new HashMap<>();
 
   /**
    * Line style library to use
@@ -167,7 +168,7 @@ public class PropertiesBasedStyleLibrary implements StyleLibrary {
    * @return Resulting value
    */
   private <T> T getCached(String prefix, String postfix, Class<T> cls) {
-    return cache.get(prefix + '.' + postfix, cls);
+    return cls.cast(cache.get(prefix + '.' + postfix));
   }
 
   /**
