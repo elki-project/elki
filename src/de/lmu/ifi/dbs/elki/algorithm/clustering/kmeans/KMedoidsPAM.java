@@ -207,7 +207,7 @@ public class KMedoidsPAM<V, D extends NumberDistance<D, ?>> extends AbstractDist
     Clustering<MedoidModel> result = new Clustering<>("k-Medoids Clustering", "kmedoids-clustering");
     for (int i = 0; i < clusters.size(); i++) {
       MedoidModel model = new MedoidModel(medoids.get(i));
-      result.addCluster(new Cluster<>(clusters.get(i), model));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
   }

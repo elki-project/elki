@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
-import java.util.Iterator;
 import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.Headers;
@@ -55,6 +54,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -111,8 +111,7 @@ public class JSONWebServer implements HttpHandler {
       server.start();
 
       LOG.verbose("Webserver started on port " + port + ".");
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       throw new AbortException("Could not start mini web server.", e);
     }
   }
@@ -142,25 +141,25 @@ public class JSONWebServer implements HttpHandler {
    */
   protected void bundleToJSON(JSONBuffer re, DBIDRef id) {
     SingleObjectBundle bundle = db.getBundle(id);
-    if(bundle != null) {
-      for(int j = 0; j < bundle.metaLength(); j++) {
+    if (bundle != null) {
+      for (int j = 0; j < bundle.metaLength(); j++) {
         final Object data = bundle.data(j);
         // TODO: refactor to JSONFormatters!
         // Format a NumberVector
-        if(data instanceof NumberVector) {
+        if (data instanceof NumberVector) {
           NumberVector<?> v = (NumberVector<?>) data;
           re.appendKeyArray(bundle.meta(j));
-          for(int i = 0; i < v.getDimensionality(); i++) {
+          for (int i = 0; i < v.getDimensionality(); i++) {
             re.append(v.doubleValue(i));
           }
           re.closeArray();
         }
         // Format a Polygon
-        else if(data instanceof PolygonsObject) {
+        else if (data instanceof PolygonsObject) {
           re.appendKeyArray(bundle.meta(j));
-          for(Polygon p : ((PolygonsObject) data).getPolygons()) {
+          for (Polygon p : ((PolygonsObject) data).getPolygons()) {
             re.startArray();
-            for(int i = 0; i < p.size(); i++) {
+            for (int i = 0; i < p.size(); i++) {
               Vector point = p.get(i);
               re.append(point.getArrayRef());
             }
@@ -172,12 +171,11 @@ public class JSONWebServer implements HttpHandler {
         else {
           re.appendKeyValue(bundle.meta(j), data);
         }
-        if(LOG.isDebuggingFiner()) {
+        if (LOG.isDebuggingFiner()) {
           re.appendNewline();
         }
       }
-    }
-    else {
+    } else {
       re.appendKeyValue("error", "Object not found.");
     }
   }
@@ -196,23 +194,24 @@ public class JSONWebServer implements HttpHandler {
     Result cur = result;
     int partpos = 0;
     {
-      for(; partpos < parts.length; partpos++) {
+      for (; partpos < parts.length; partpos++) {
         // FIXME: handle name collisions. E.g. type_123?
         boolean found = false;
-        for(Result child : hier.getChildren(cur)) {
+        for (Hierarchy.Iter<Result> iter = hier.iterChildren(cur); iter.valid(); iter.advance()) {
           // logger.debug("Testing result: " + child.getShortName() + " <-> " +
           // parts[partpos]);
-          if(child.getLongName().equals(parts[partpos]) || child.getShortName().equals(parts[partpos])) {
+          Result child = iter.get();
+          if (child.getLongName().equals(parts[partpos]) || child.getShortName().equals(parts[partpos])) {
             cur = child;
             found = true;
             break;
           }
         }
-        if(!found) {
+        if (!found) {
           break;
         }
       }
-      if(cur == null) {
+      if (cur == null) {
         re.appendKeyValue("error", "result not found.");
         return;
       }
@@ -220,12 +219,11 @@ public class JSONWebServer implements HttpHandler {
     // logger.debug(FormatUtil.format(parts, ",") + " " + partpos + " " + cur);
 
     // Result structure discovery via "children" parameter.
-    if(parts.length == partpos + 1) {
-      if("children".equals(parts[partpos])) {
+    if (parts.length == partpos + 1) {
+      if ("children".equals(parts[partpos])) {
         re.appendKeyArray("children");
-        Iterator<Result> iter = hier.getChildren(cur).iterator();
-        while(iter.hasNext()) {
-          Result child = iter.next();
+        for (Hierarchy.Iter<Result> iter = hier.iterChildren(cur); iter.valid(); iter.advance()) {
+          Result child = iter.get();
           re.startHash();
           re.appendKeyValue("name", child.getShortName());
           re.appendKeyValue("type", child.getClass().getSimpleName());
@@ -237,14 +235,13 @@ public class JSONWebServer implements HttpHandler {
     }
 
     // Database object access
-    if(cur instanceof Database) {
-      if(parts.length == partpos + 1) {
+    if (cur instanceof Database) {
+      if (parts.length == partpos + 1) {
         DBID id = stringToDBID(parts[partpos]);
-        if(id != null) {
+        if (id != null) {
           bundleToJSON(re, id);
           return;
-        }
-        else {
+        } else {
           re.appendKeyValue("error", "Object not found");
           return;
         }
@@ -252,15 +249,14 @@ public class JSONWebServer implements HttpHandler {
     }
 
     // Relation object access
-    if(cur instanceof Relation) {
-      if(parts.length == partpos + 1) {
+    if (cur instanceof Relation) {
+      if (parts.length == partpos + 1) {
         Relation<?> rel = (Relation<?>) cur;
         DBID id = stringToDBID(parts[partpos]);
-        if(id != null) {
+        if (id != null) {
           Object data = rel.get(id);
           re.appendKeyValue("data", data);
-        }
-        else {
+        } else {
           re.appendKeyValue("error", "Object not found");
           return;
         }
@@ -268,11 +264,11 @@ public class JSONWebServer implements HttpHandler {
     }
 
     // Neighbor access
-    if(cur instanceof NeighborSetPredicate) {
-      if(parts.length == partpos + 1) {
+    if (cur instanceof NeighborSetPredicate) {
+      if (parts.length == partpos + 1) {
         NeighborSetPredicate pred = (NeighborSetPredicate) cur;
         DBID id = stringToDBID(parts[partpos]);
-        if(id != null) {
+        if (id != null) {
           DBIDs neighbors = pred.getNeighborDBIDs(id);
           re.appendKeyValue("DBID", id);
           re.appendKeyArray("neighbors");
@@ -281,8 +277,7 @@ public class JSONWebServer implements HttpHandler {
           }
           re.closeArray();
           return;
-        }
-        else {
+        } else {
           re.appendKeyValue("error", "Object not found");
           return;
         }
@@ -290,25 +285,25 @@ public class JSONWebServer implements HttpHandler {
     }
 
     // Outlier Score access
-    if(cur instanceof OutlierResult) {
+    if (cur instanceof OutlierResult) {
       OutlierResult or = (OutlierResult) cur;
-      if(parts.length >= partpos + 1) {
-        if("table".equals(parts[partpos])) {
+      if (parts.length >= partpos + 1) {
+        if ("table".equals(parts[partpos])) {
           // Handle paging
           int offset = 0;
           int pagesize = 100;
 
-          if(parts.length >= partpos + 2) {
+          if (parts.length >= partpos + 2) {
             offset = Integer.valueOf(parts[partpos + 1]);
           }
-          if(parts.length >= partpos + 3) {
+          if (parts.length >= partpos + 3) {
             pagesize = Integer.valueOf(parts[partpos + 2]);
           }
           re.appendKeyHash("paging");
           re.appendKeyValue("offset", offset);
           re.appendKeyValue("pagesize", pagesize);
           re.closeHash();
-          if(LOG.isDebuggingFiner()) {
+          if (LOG.isDebuggingFiner()) {
             re.appendNewline();
           }
 
@@ -319,14 +314,14 @@ public class JSONWebServer implements HttpHandler {
           re.appendKeyArray("scores");
           Relation<Double> scores = or.getScores();
           DBIDIter iter = or.getOrdering().iter(scores.getDBIDs()).iter();
-          for(int i = 0; i < offset && iter.valid(); i++) {
+          for (int i = 0; i < offset && iter.valid(); i++) {
             iter.advance();
           }
-          for(int i = 0; i < pagesize && iter.valid(); i++, iter.advance()) {
+          for (int i = 0; i < pagesize && iter.valid(); i++, iter.advance()) {
             re.startHash();
             bundleToJSON(re, iter);
             final Double val = scores.get(iter);
-            if(val != null) {
+            if (val != null) {
               re.appendKeyValue("score", val);
             }
             re.closeHash();
@@ -354,7 +349,7 @@ public class JSONWebServer implements HttpHandler {
     re.appendKeyValue("base", meta.getTheoreticalBaseline());
     re.appendKeyValue("type", meta.getClass().getSimpleName());
     re.closeHash();
-    if(LOG.isDebuggingFiner()) {
+    if (LOG.isDebuggingFiner()) {
       re.appendNewline();
     }
   }
@@ -362,15 +357,14 @@ public class JSONWebServer implements HttpHandler {
   @Override
   public void handle(HttpExchange exchange) throws IOException {
     String requestMethod = exchange.getRequestMethod();
-    if(!requestMethod.equalsIgnoreCase("GET")) {
+    if (!requestMethod.equalsIgnoreCase("GET")) {
       return;
     }
     String path = exchange.getRequestURI().getPath();
     // logger.debug("Request for " + path);
-    if(path.startsWith(PATH_JSON)) {
+    if (path.startsWith(PATH_JSON)) {
       path = path.substring(PATH_JSON.length());
-    }
-    else {
+    } else {
       LOG.warning("Unexpected path in request handler: " + path);
       throw new AbortException("Unexpected path: " + path);
     }
@@ -379,13 +373,13 @@ public class JSONWebServer implements HttpHandler {
     String callback = null;
     {
       String query = exchange.getRequestURI().getQuery();
-      if(query != null) {
+      if (query != null) {
         String[] frags = query.split("&");
-        for(String frag : frags) {
-          if(frag.startsWith("jsonp=")) {
+        for (String frag : frags) {
+          if (frag.startsWith("jsonp=")) {
             callback = URLDecoder.decode(frag.substring("jsonp=".length()), "UTF-8");
           }
-          if(frag.startsWith("callback=")) {
+          if (frag.startsWith("callback=")) {
             callback = URLDecoder.decode(frag.substring("callback=".length()), "UTF-8");
           }
         }
@@ -398,7 +392,7 @@ public class JSONWebServer implements HttpHandler {
     // Prepare JSON response.
     StringBuilder response = new StringBuilder();
     {
-      if(callback != null) {
+      if (callback != null) {
         response.append(callback);
         response.append("(");
       }
@@ -409,13 +403,12 @@ public class JSONWebServer implements HttpHandler {
         jsonbuf.startHash();
         resultToJSON(jsonbuf, path);
         jsonbuf.closeHash();
-      }
-      catch(Throwable e) {
+      } catch (Throwable e) {
         LOG.exception("Exception occurred in embedded web server:", e);
         throw (new IOException(e));
       }
       // wrap up
-      if(callback != null) {
+      if (callback != null) {
         response.append(")");
       }
     }

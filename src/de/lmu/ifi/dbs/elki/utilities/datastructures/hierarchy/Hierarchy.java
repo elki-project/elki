@@ -23,16 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * This interface represents an (external) hierarchy of objects. It can contain
  * arbitrary objects, BUT the hierarchy has to be accessed using the hierarchy
- * object, i.e. {@code hierarchy.getChildren(object);}.
- * 
- * See {@link Hierarchical} for an interface for objects with an internal
- * hierarchy (where you can use {@code object.getChildren();})
+ * object, i.e. {@code hierarchy.iterChildren(object);}.
  * 
  * @author Erich Schubert
  * 
@@ -40,21 +34,27 @@ import java.util.List;
  */
 public interface Hierarchy<O> {
   /**
+   * Total size - number of objects contained.
+   * 
+   * @return Size
+   */
+  int size();
+
+  /**
    * Get number of children
    * 
    * @param self object to get number of children for
    * @return number of children
    */
-  public int numChildren(O self);
+  int numChildren(O self);
 
   /**
-   * Get children list. Resulting list MAY be modified. Result MAY be null, if
-   * the model is not hierarchical.
+   * Iterate over the (direct) children.
    * 
    * @param self object to get children for
-   * @return list of children
+   * @return iterator for children
    */
-  public List<O> getChildren(O self);
+  Iter<O> iterChildren(O self);
 
   /**
    * Iterate descendants (recursive children)
@@ -62,7 +62,7 @@ public interface Hierarchy<O> {
    * @param self object to get descendants for
    * @return iterator for descendants
    */
-  public Iterator<O> iterDescendants(O self);
+  Iter<O> iterDescendants(O self);
 
   /**
    * Get number of (direct) parents
@@ -70,16 +70,15 @@ public interface Hierarchy<O> {
    * @param self reference object
    * @return number of parents
    */
-  public int numParents(O self);
+  int numParents(O self);
 
   /**
-   * Get parents list. Resulting list MAY be modified. Result MAY be null, if
-   * the model is not hierarchical.
+   * Iterate over the (direct) parents.
    * 
    * @param self object to get parents for
-   * @return list of parents
+   * @return iterator of parents
    */
-  public List<O> getParents(O self);
+  Iter<O> iterParents(O self);
 
   /**
    * Iterate ancestors (recursive parents)
@@ -87,5 +86,30 @@ public interface Hierarchy<O> {
    * @param self object to get ancestors for
    * @return iterator for ancestors
    */
-  public Iterator<O> iterAncestors(O self);
+  Iter<O> iterAncestors(O self);
+
+  /**
+   * Iterate over all members.
+   * 
+   * @return Iterator over all members.
+   */
+  Iter<O> iterAll();
+
+  /**
+   * Iterator interface.
+   * 
+   * TODO: add a skipSubtree method?
+   * 
+   * @author Erich Schubert
+   * 
+   * @param <O> Object type.
+   */
+  static interface Iter<O> extends de.lmu.ifi.dbs.elki.utilities.iterator.Iter {
+    /**
+     * Access the current object.
+     * 
+     * @return Current object
+     */
+    O get();
+  }
 }

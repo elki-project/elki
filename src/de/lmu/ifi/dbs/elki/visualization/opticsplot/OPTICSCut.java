@@ -88,7 +88,7 @@ public class OPTICSCut {
         if(!current.isEmpty()) {
           // TODO: do we want a minpts restriction?
           // But we get have only core points guaranteed anyway.
-          clustering.addCluster(new Cluster<Model>(current, ClusterModel.CLUSTER));
+          clustering.addToplevelCluster(new Cluster<Model>(current, ClusterModel.CLUSTER));
           current = DBIDUtil.newHashSet();
         }
         // Add to noise
@@ -97,10 +97,10 @@ public class OPTICSCut {
     }
     // Any unfinished cluster will also be added
     if(!current.isEmpty()) {
-      clustering.addCluster(new Cluster<Model>(current, ClusterModel.CLUSTER));
+      clustering.addToplevelCluster(new Cluster<Model>(current, ClusterModel.CLUSTER));
     }
     // Add noise
-    clustering.addCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
+    clustering.addToplevelCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
     return clustering;
   }
 }

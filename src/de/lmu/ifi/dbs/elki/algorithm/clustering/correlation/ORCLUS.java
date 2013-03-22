@@ -180,7 +180,7 @@ public class ORCLUS<V extends NumberVector<?>> extends AbstractProjectedClusteri
       // get the result
       Clustering<Model> r = new Clustering<>("ORCLUS clustering", "orclus-clustering");
       for (ORCLUSCluster c : clusters) {
-        r.addCluster(new Cluster<Model>(c.objectIDs, ClusterModel.CLUSTER));
+        r.addToplevelCluster(new Cluster<Model>(c.objectIDs, ClusterModel.CLUSTER));
       }
       return r;
     } catch (Exception e) {

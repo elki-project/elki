@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  */
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -42,6 +41,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -59,7 +59,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult oneway - - visualizes
+ * @apiviz.has 
+ *             de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult
+ *             oneway - - visualizes
  */
 public class ClusterEvaluationVisualization extends AbstractVisFactory {
   /**
@@ -87,7 +89,7 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
     final ArrayList<EvaluateClustering.ScoreResult> srs = ResultUtil.filterResults(newResult, EvaluateClustering.ScoreResult.class);
-    for(EvaluateClustering.ScoreResult sr : srs) {
+    for (EvaluateClustering.ScoreResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = .5;
       task.height = 2.0;
@@ -118,17 +120,16 @@ public class ClusterEvaluationVisualization extends AbstractVisFactory {
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
     // TODO: make a utility class to wrap SVGPlot + parent layer + ypos.
-    
+
     double ypos = -.5; // Skip space before first header
     SVGPlot svgp = task.getPlot();
     Element parent = svgp.svgElement(SVGConstants.SVG_G_TAG);
     EvaluateClustering.ScoreResult sr = task.getResult();
     ClusterContingencyTable cont = sr.getContingencyTable();
 
-    List<Result> parents = task.getContext().getHierarchy().getParents(sr);
-
-    for(Result r : parents) {
-      if(r instanceof Clustering) {
+    for (Hierarchy.Iter<Result> parents = task.getContext().getHierarchy().iterParents(sr); parents.valid(); parents.advance()) {
+      Result r = parents.get();
+      if (r instanceof Clustering) {
         ypos = addHeader(svgp, parent, ypos, r.getLongName());
       }
     }

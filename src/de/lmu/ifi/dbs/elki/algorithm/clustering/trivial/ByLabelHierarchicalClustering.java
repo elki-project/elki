@@ -88,8 +88,7 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     try {
       Relation<ClassLabel> relation = database.getRelation(TypeUtil.CLASSLABEL);
       return run(relation);
-    }
-    catch(NoSupportedDataTypeException e) {
+    } catch (NoSupportedDataTypeException e) {
       // Otherwise, try any labellike.
       return run(database.getRelation(getInputTypeRestriction()[0]));
     }
@@ -103,10 +102,11 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
   public Clustering<Model> run(Relation<?> relation) {
     HashMap<String, DBIDs> labelmap = new HashMap<>();
     ModifiableDBIDs noiseids = DBIDUtil.newArray();
+    Clustering<Model> clustering = new Clustering<>("By Label Hierarchical Clustering", "bylabel-clustering");
 
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final Object val = relation.get(iditer);
-      if(val == null) {
+      if (val == null) {
         noiseids.add(iditer);
         continue;
       }
@@ -116,43 +116,40 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     }
 
     ArrayList<Cluster<Model>> clusters = new ArrayList<>(labelmap.size());
-    for(Entry<String, DBIDs> entry : labelmap.entrySet()) {
+    for (Entry<String, DBIDs> entry : labelmap.entrySet()) {
       DBIDs ids = entry.getValue();
-      if(ids instanceof DBID) {
+      if (ids instanceof DBID) {
         noiseids.add((DBID) ids);
         continue;
       }
-      Cluster<Model> clus = new Cluster<>(entry.getKey(), ids, ClusterModel.CLUSTER, new ArrayList<Cluster<Model>>(), new ArrayList<Cluster<Model>>());
+      Cluster<Model> clus = new Cluster<Model>(entry.getKey(), ids, ClusterModel.CLUSTER);
       clusters.add(clus);
     }
 
-    for(Cluster<Model> cur : clusters) {
-      for(Cluster<Model> oth : clusters) {
-        if(oth != cur) {
-          if(oth.getName().startsWith(cur.getName())) {
-            oth.getParents().add(cur);
-            cur.getChildren().add(oth);
-            // System.err.println(oth.getLabel() + " is a child of " +
-            // cur.getLabel());
+    for (Cluster<Model> cur : clusters) {
+      boolean isrootcluster = true;
+      for (Cluster<Model> oth : clusters) {
+        if (oth != cur) {
+          if (oth.getName().startsWith(cur.getName())) {
+            clustering.addChildCluster(oth, cur);
+            if (LOG.isDebuggingFiner()) {
+              LOG.debugFiner(oth.getName() + " is a child of " + cur.getName());
+            }
+            isrootcluster = false;
           }
         }
       }
-    }
-    ArrayList<Cluster<Model>> rootclusters = new ArrayList<>();
-    for(Cluster<Model> cur : clusters) {
-      if(cur.getParents().size() == 0) {
-        rootclusters.add(cur);
+      if (isrootcluster) {
+        clustering.addToplevelCluster(cur);
       }
     }
     // Collected noise IDs.
-    if(noiseids.size() > 0) {
+    if (noiseids.size() > 0) {
       Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
       c.setNoise(true);
-      rootclusters.add(c);
+      clustering.addToplevelCluster(c);
     }
-    assert (rootclusters.size() > 0) : "No clusters found by bylabel clustering. Empty database?";
-
-    return new Clustering<>("By Label Hierarchical Clustering", "bylabel-clustering", rootclusters);
+    return clustering;
   }
 
   /**
@@ -163,21 +160,19 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
    * @param id the id of the object to be assigned
    */
   private void assign(HashMap<String, DBIDs> labelMap, String label, DBIDRef id) {
-    if(labelMap.containsKey(label)) {
+    if (labelMap.containsKey(label)) {
       DBIDs exist = labelMap.get(label);
-      if(exist instanceof DBID) {
+      if (exist instanceof DBID) {
         ModifiableDBIDs n = DBIDUtil.newHashSet();
         n.add((DBID) exist);
         n.add(id);
         labelMap.put(label, n);
-      }
-      else {
+      } else {
         assert (exist instanceof HashSetModifiableDBIDs);
         assert (exist.size() > 1);
         ((ModifiableDBIDs) exist).add(id);
       }
-    }
-    else {
+    } else {
       labelMap.put(label, DBIDUtil.deref(id));
     }
   }

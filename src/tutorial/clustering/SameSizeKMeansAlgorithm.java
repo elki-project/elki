@@ -129,7 +129,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector<?>> extends Abstract
     final NumberVector.Factory<V, ?> factory = RelationUtil.getNumberVectorFactory(relation);
     for (int i = 0; i < clusters.size(); i++) {
       V mean = factory.newNumberVector(means.get(i).getColumnVector().getArrayRef());
-      result.addCluster(new Cluster<>(clusters.get(i), new MeanModel<>(mean)));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel<>(mean)));
     }
     return result;
   }

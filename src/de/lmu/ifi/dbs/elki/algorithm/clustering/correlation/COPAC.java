@@ -237,7 +237,7 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
       // noise partition
       if(pair.getKey() == RelationUtil.dimensionality(relation)) {
         // Make a Noise cluster
-        result.addCluster(new Cluster<Model>(pair.getValue(), true, ClusterModel.CLUSTER));
+        result.addToplevelCluster(new Cluster<Model>(pair.getValue(), true, ClusterModel.CLUSTER));
       }
       else {
         DBIDs partids = pair.getValue();
@@ -251,10 +251,10 @@ public class COPAC<V extends NumberVector<?>, D extends Distance<D>> extends Abs
         // Re-Wrap resulting Clusters as DimensionModel clusters.
         for(Cluster<Model> clus : p.getAllClusters()) {
           if(clus.isNoise()) {
-            result.addCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
+            result.addToplevelCluster(new Cluster<Model>(clus.getIDs(), true, ClusterModel.CLUSTER));
           }
           else {
-            result.addCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(pair.getKey())));
+            result.addToplevelCluster(new Cluster<Model>(clus.getIDs(), new DimensionModel(pair.getKey())));
           }
         }
       }

@@ -156,13 +156,13 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
       if(noisepattern != null && noisepattern.matcher(entry.getKey()).find()) {
         c.setNoise(true);
       }
-      result.addCluster(c);
+      result.addToplevelCluster(c);
     }
     // Collected noise IDs.
     if(noiseids.size() > 0) {
       Cluster<Model> c = new Cluster<Model>("Noise", noiseids, ClusterModel.CLUSTER);
       c.setNoise(true);
-      result.addCluster(c);
+      result.addToplevelCluster(c);
     }
     return result;
   }

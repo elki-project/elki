@@ -192,7 +192,7 @@ public abstract class AbstractBiclustering<V extends NumberVector<?>, M extends 
    * @param bicluster the bicluster to add to the result
    */
   protected void addBiclusterToResult(M bicluster) {
-    result.addCluster(new Cluster<>(bicluster.getDatabaseObjectGroup(), bicluster));
+    result.addToplevelCluster(new Cluster<>(bicluster.getDatabaseObjectGroup(), bicluster));
   }
 
   /**

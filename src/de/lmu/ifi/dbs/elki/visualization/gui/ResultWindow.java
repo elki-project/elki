@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
@@ -378,8 +379,8 @@ public class ResultWindow extends JFrame implements ResultListener {
   private void updateVisualizerMenus() {
     visualizersMenu.removeAll();
     ResultHierarchy hier = context.getHierarchy();
-    for(Result child : hier.getChildren(result)) {
-      recursiveBuildMenu(visualizersMenu, child);
+    for(Hierarchy.Iter<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
+      recursiveBuildMenu(visualizersMenu, iter.get());
     }
   }
 
@@ -388,7 +389,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     // Skip "adapter" results that do not have visualizers
     if(r instanceof ResultAdapter) {
-      if(hier.getChildren(r).size() <= 0) {
+      if(hier.numChildren(r) <= 0) {
         return false;
       }
     }
@@ -396,8 +397,8 @@ public class ResultWindow extends JFrame implements ResultListener {
     boolean nochildren = true;
     JMenu submenu = new JMenu((r.getLongName() != null) ? r.getLongName() : "unnamed");
     // Add menus for any children
-    for(Result child : hier.getChildren(r)) {
-      if(recursiveBuildMenu(submenu, child)) {
+    for(Hierarchy.Iter<Result> iter = hier.iterChildren(r); iter.valid(); iter.advance()) {
+      if(recursiveBuildMenu(submenu, iter.get())) {
         nochildren = false;
       }
     }

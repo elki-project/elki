@@ -119,7 +119,7 @@ public class KMediansLloyd<V extends NumberVector<?>, D extends Distance<D>> ext
     Clustering<MeanModel<V>> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for (int i = 0; i < clusters.size(); i++) {
       MeanModel<V> model = new MeanModel<>(factory.newNumberVector(medians.get(i).getColumnVector().getArrayRef()));
-      result.addCluster(new Cluster<>(clusters.get(i), model));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
   }

@@ -218,11 +218,11 @@ public abstract class AbstractProjectedDBSCAN<R extends Clustering<Model>, V ext
     Clustering<Model> result = new Clustering<>(getLongResultName(), getShortResultName());
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
       Cluster<Model> c = new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER);
-      result.addCluster(c);
+      result.addToplevelCluster(c);
     }
 
     Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
-    result.addCluster(n);
+    result.addToplevelCluster(n);
 
     if(objprog != null && clusprog != null) {
       objprog.setProcessed(processedIDs.size(), getLogger());

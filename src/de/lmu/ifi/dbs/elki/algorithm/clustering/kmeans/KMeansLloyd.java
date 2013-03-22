@@ -126,7 +126,7 @@ public class KMeansLloyd<V extends NumberVector<?>, D extends Distance<D>> exten
     Clustering<KMeansModel<V>> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for (int i = 0; i < clusters.size(); i++) {
       KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getColumnVector().getArrayRef()));
-      result.addCluster(new Cluster<>(clusters.get(i), model));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;
   }

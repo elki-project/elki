@@ -305,7 +305,7 @@ public class EM<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering<
       // SimpleClassLabel label = new SimpleClassLabel();
       // label.init(result.canonicalClusterLabel(i));
       Cluster<EMModel<V>> model = new Cluster<>(hardClusters.get(i), new EMModel<>(factory.newNumberVector(means.get(i).getArrayRef()), covarianceMatrices.get(i)));
-      result.addCluster(model);
+      result.addToplevelCluster(model);
     }
     return result;
   }

@@ -236,7 +236,7 @@ public class PROCLUS<V extends NumberVector<?>> extends AbstractProjectedCluster
       cluster.setModel(new SubspaceModel<>(new Subspace(c.getDimensions()), c.centroid));
       cluster.setName("cluster_" + numClusters++);
 
-      result.addCluster(cluster);
+      result.addToplevelCluster(cluster);
     }
     return result;
   }

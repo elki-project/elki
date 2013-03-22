@@ -173,11 +173,11 @@ public class DBSCAN<O, D extends Distance<D>> extends AbstractDistanceBasedAlgor
     Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
     for(ModifiableDBIDs res : resultList) {
       Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
-      result.addCluster(c);
+      result.addToplevelCluster(c);
     }
 
     Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
-    result.addCluster(n);
+    result.addToplevelCluster(n);
 
     return result;
   }

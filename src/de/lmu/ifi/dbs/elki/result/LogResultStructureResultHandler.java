@@ -51,10 +51,10 @@ public class LogResultStructureResultHandler implements ResultHandler {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    if(LOG.isVerbose()) {
-      if(newResult instanceof HierarchicalResult) {
+    if (LOG.isVerbose()) {
+      if (newResult instanceof HierarchicalResult) {
         Hierarchy<Result> hier = ((HierarchicalResult) newResult).getHierarchy();
-        if(hier != null) {
+        if (hier != null) {
           StringBuilder buf = new StringBuilder();
           recursiveLogResult(buf, hier, newResult, 0);
           LOG.verbose(buf.toString());
@@ -71,23 +71,23 @@ public class LogResultStructureResultHandler implements ResultHandler {
    * @param depth Depth
    */
   private void recursiveLogResult(StringBuilder buf, Hierarchy<Result> hier, Result result, int depth) {
-    if(result == null) {
+    if (result == null) {
       buf.append("null");
       LOG.warning("null result!");
       return;
     }
-    if(depth > 50) {
+    if (depth > 50) {
       LOG.warning("Probably infinitely nested results, aborting!");
       return;
     }
-    for(int i = 0; i < depth; i++) {
+    for (int i = 0; i < depth; i++) {
       buf.append(" ");
     }
     buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName());
     buf.append(" (").append(result.getShortName()).append(")\n");
-    if(hier.getChildren(result).size() > 0) {
-      for(Result r : hier.getChildren(result)) {
-        recursiveLogResult(buf, hier, r, depth + 1);
+    if (hier.numChildren(result) > 0) {
+      for (Hierarchy.Iter<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
+        recursiveLogResult(buf, hier, iter.get(), depth + 1);
       }
     }
   }

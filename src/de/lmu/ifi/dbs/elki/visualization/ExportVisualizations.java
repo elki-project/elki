@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -160,8 +161,8 @@ public class ExportVisualizations implements ResultHandler {
     ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(baseResult, VisualizationTask.class);
     for (VisualizationTask task : tasks) {
       boolean isprojected = false;
-      for (Result parent : hier.getParents(task)) {
-        if (parent instanceof Projector) {
+      for (Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
+        if (iter.get() instanceof Projector) {
           isprojected = true;
           break;
         }

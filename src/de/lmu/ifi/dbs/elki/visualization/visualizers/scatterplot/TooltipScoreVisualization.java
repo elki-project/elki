@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -113,8 +114,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
       }
       // Skip if we already considered it above
       boolean add = true;
-      for(Result p : baseResult.getHierarchy().getChildren(r)) {
-        if(p instanceof VisualizationTask && ((VisualizationTask) p).getFactory() instanceof TooltipScoreVisualization) {
+      for(Hierarchy.Iter<Result> p = baseResult.getHierarchy().iterChildren(r); p.valid(); p.advance()) {
+        if(p.get() instanceof VisualizationTask && ((VisualizationTask) p.get()).getFactory() instanceof TooltipScoreVisualization) {
           add = false;
           break;
         }

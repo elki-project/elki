@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 /**
  * Modifiable Hierarchy.
  * 
@@ -39,8 +37,14 @@ public interface ModifiableHierarchy<O> extends Hierarchy<O> {
    * @param parent Parent
    * @param child Child
    */
-  // TODO: return true when new?
-  public void add(O parent, O child);
+  void add(O parent, O child);
+
+  /**
+   * Add an entry (initializes data structures).
+   * 
+   * @param entry Entry
+   */
+  void add(O entry);
 
   /**
    * Remove a parent-child relationship.
@@ -48,6 +52,20 @@ public interface ModifiableHierarchy<O> extends Hierarchy<O> {
    * @param parent Parent
    * @param child Child
    */
-  // TODO: return true when found?
-  public void remove(O parent, O child);
+  void remove(O parent, O child);
+
+  /**
+   * Remove an entry and all its parent-child relationships.
+   * 
+   * @param entry Entry
+   */
+  void remove(O entry);
+
+  /**
+   * Remove an entry and it's whole subtree (unless the elements are reachable
+   * by a different path!)
+   * 
+   * @param entry Entry
+   */
+  void removeSubtree(O entry);
 }

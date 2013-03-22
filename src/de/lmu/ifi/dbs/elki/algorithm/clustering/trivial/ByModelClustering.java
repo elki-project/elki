@@ -121,7 +121,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
       if(noisepattern != null && noisepattern.matcher(name).find()) {
         c.setNoise(true);
       }
-      result.addCluster(c);
+      result.addToplevelCluster(c);
     }
     return result;
   }

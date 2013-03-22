@@ -210,7 +210,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     OutlierROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(OutlierROCCurve.class, params);
 
     // Ensure the result has been added to the hierarchy:
-    if(db.getHierarchy().getParents(result).size() < 1) {
+    if(db.getHierarchy().numParents(result) < 1) {
       db.getHierarchy().add(db, result);
     }
 

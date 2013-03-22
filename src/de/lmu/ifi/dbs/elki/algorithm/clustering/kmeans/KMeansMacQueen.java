@@ -129,7 +129,7 @@ public class KMeansMacQueen<V extends NumberVector<?>, D extends Distance<D>> ex
     for (int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
       KMeansModel<V> model = new KMeansModel<>(factory.newNumberVector(means.get(i).getArrayRef()));
-      result.addCluster(new Cluster<>(ids, model));
+      result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;
   }
