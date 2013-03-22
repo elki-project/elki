@@ -37,7 +37,6 @@ import java.util.List;
  * @param <K> Key type
  * @param <V> Value type
  */
-// TODO: use MultiValueMap from apache collections instead?
 public class HashMapList<K, V> extends HashMap<K, List<V>> {
   /**
    * Serial version
