@@ -339,7 +339,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
           // add result of dim-1 to this result
           Clustering<Model> res_dim_minus_1 = doRun(db, progress);
           for (Cluster<Model> cluster : res_dim_minus_1.getAllClusters()) {
-            res.addCluster(cluster);
+            res.addToplevelCluster(cluster);
             noiseIDs.removeDBIDs(cluster.getIDs());
             clusterIDs.addDBIDs(cluster.getIDs());
             processedIDs.addDBIDs(cluster.getIDs());
@@ -350,7 +350,7 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
       else {
         LinearEquationSystem les = runDerivator(relation, dim - 1, interval.getIDs());
         Cluster<Model> c = new Cluster<Model>(interval.getIDs(), new LinearEquationModel(les));
-        res.addCluster(c);
+        res.addToplevelCluster(c);
         noiseIDs.removeDBIDs(interval.getIDs());
         clusterIDs.addDBIDs(interval.getIDs());
         processedIDs.addDBIDs(interval.getIDs());
@@ -379,12 +379,12 @@ public class CASH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     if (!noiseIDs.isEmpty()) {
       if (dim == noiseDim) {
         Cluster<Model> c = new Cluster<Model>(noiseIDs, true, ClusterModel.CLUSTER);
-        res.addCluster(c);
+        res.addToplevelCluster(c);
         processedIDs.addDBIDs(noiseIDs);
       } else if (noiseIDs.size() >= minPts) {
         LinearEquationSystem les = runDerivator(fulldatabase, dim - 1, noiseIDs);
         Cluster<Model> c = new Cluster<Model>(noiseIDs, true, new LinearEquationModel(les));
-        res.addCluster(c);
+        res.addToplevelCluster(c);
         processedIDs.addDBIDs(noiseIDs);
       }
     }

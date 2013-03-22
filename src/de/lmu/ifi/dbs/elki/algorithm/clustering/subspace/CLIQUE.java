@@ -217,7 +217,7 @@ public class CLIQUE<V extends NumberVector<?>> extends AbstractAlgorithm<Cluster
         Cluster<SubspaceModel<V>> newCluster = new Cluster<>(modelAndCluster.second);
         newCluster.setModel(new SubspaceModel<>(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second).toVector(relation)));
         newCluster.setName("cluster_" + numClusters++);
-        result.addCluster(newCluster);
+        result.addToplevelCluster(newCluster);
       }
     }
 

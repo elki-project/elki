@@ -247,7 +247,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       for(ArrayModifiableDBIDs res : clusterlists) {
         boolean isNoise = (cid == 0);
         Cluster<Model> c = new Cluster<Model>(res, isNoise, ClusterModel.CLUSTER);
-        result.addCluster(c);
+        result.addToplevelCluster(c);
         cid++;
       }
       return result;

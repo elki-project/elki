@@ -46,8 +46,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapList;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -137,7 +135,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
     // visualization
     List<SteepArea> salist = new ArrayList<>();
     List<SteepDownArea> sdaset = new ArrayList<>();
-    ModifiableHierarchy<Cluster<OPTICSModel>> hier = new HierarchyHashmapList<>();
+    final Clustering<OPTICSModel> clustering = new Clustering<>("OPTICS Xi-Clusters", "optics");
     HashSet<Cluster<OPTICSModel>> curclusters = new HashSet<>();
     HashSetModifiableDBIDs unclaimedids = DBIDUtil.newHashSet(relation.getDBIDs());
 
@@ -285,7 +283,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
               LOG.debugFine("Found cluster with " + dbids.size() + " new objects, length " + (cstart - cend + 1));
             }
             OPTICSModel model = new OPTICSModel(cstart, cend);
-            Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model, hier);
+            Cluster<OPTICSModel> cluster = new Cluster<>("Cluster_" + cstart + "_" + cend, dbids, model);
             // Build the hierarchy
             {
               Iterator<Cluster<OPTICSModel>> iter = curclusters.iterator();
@@ -293,7 +291,7 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
                 Cluster<OPTICSModel> clus = iter.next();
                 OPTICSModel omodel = clus.getModel();
                 if(model.getStartIndex() <= omodel.getStartIndex() && omodel.getEndIndex() <= model.getEndIndex()) {
-                  hier.add(cluster, clus);
+                  clustering.addChildCluster(cluster, clus);
                   iter.remove();
                 }
               }
@@ -308,23 +306,22 @@ public class OPTICSXi<N extends NumberDistance<N, ?>> extends AbstractAlgorithm<
       }
     }
     if(curclusters.size() > 0 || unclaimedids.size() > 0) {
-      final Clustering<OPTICSModel> clustering = new Clustering<>("OPTICS Xi-Clusters", "optics");
       if(unclaimedids.size() > 0) {
         final Cluster<OPTICSModel> allcluster;
         if(clusterOrder.get(clusterOrder.size() - 1).getReachability().isInfiniteDistance()) {
-          allcluster = new Cluster<>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1), hier);
+          allcluster = new Cluster<>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1));
         }
         else {
-          allcluster = new Cluster<>("Cluster", unclaimedids, new OPTICSModel(0, clusterOrder.size() - 1), hier);
+          allcluster = new Cluster<>("Cluster", unclaimedids, new OPTICSModel(0, clusterOrder.size() - 1));
         }
         for(Cluster<OPTICSModel> cluster : curclusters) {
-          hier.add(allcluster, cluster);
+          clustering.addChildCluster(allcluster, cluster);
         }
-        clustering.addCluster(allcluster);
+        clustering.addToplevelCluster(allcluster);
       }
       else {
         for(Cluster<OPTICSModel> cluster : curclusters) {
-          clustering.addCluster(cluster);
+          clustering.addToplevelCluster(cluster);
         }
       }
       clustering.addChildResult(clusterOrderResult);

@@ -25,13 +25,15 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 
 /**
  * Result class for clusterings. Can be used for both hierarchical and
@@ -41,8 +43,9 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * instead they can be an arbitrary forest of directed graphs that COULD contain
  * cycles.
  * 
- * This class is NOT iterable for a simple reason: there is more than one method to do so.
- * You need to specify whether you want to use getToplevelClusters() or getAllClusters().
+ * This class is NOT iterable for a simple reason: there is more than one method
+ * to do so. You need to specify whether you want to use getToplevelClusters()
+ * or getAllClusters().
  * 
  * @author Erich Schubert
  * 
@@ -57,6 +60,11 @@ public class Clustering<M extends Model> extends BasicResult {
   private List<Cluster<M>> toplevelclusters;
 
   /**
+   * Cluster hierarchy.
+   */
+  private ModifiableHierarchy<Cluster<M>> hierarchy;
+
+  /**
    * Constructor with a list of top level clusters
    * 
    * @param name The long name (for pretty printing)
@@ -66,6 +74,7 @@ public class Clustering<M extends Model> extends BasicResult {
   public Clustering(String name, String shortname, List<Cluster<M>> toplevelclusters) {
     super(name, shortname);
     this.toplevelclusters = toplevelclusters;
+    this.hierarchy = new HashMapHierarchy<>();
   }
 
   /**
@@ -81,10 +90,21 @@ public class Clustering<M extends Model> extends BasicResult {
   /**
    * Add a cluster to the clustering.
    * 
-   * @param n new cluster
+   * @param clus new cluster
    */
-  public void addCluster(Cluster<M> n) {
-    toplevelclusters.add(n);
+  public void addToplevelCluster(Cluster<M> clus) {
+    toplevelclusters.add(clus);
+    hierarchy.add(clus);
+  }
+
+  /**
+   * Add a cluster to the clustering.
+   * 
+   * @param parent Parent cluster
+   * @param child Child cluster.
+   */
+  public void addChildCluster(Cluster<M> parent, Cluster<M> child) {
+    hierarchy.add(parent, child);
   }
 
   /**
@@ -97,24 +117,62 @@ public class Clustering<M extends Model> extends BasicResult {
   }
 
   /**
+   * Get the cluster hierarchy.
+   * 
+   * @return Cluster hierarchy.
+   */
+  public Hierarchy<Cluster<M>> getClusterHierarchy() {
+    return hierarchy;
+  }
+
+  /**
    * Collect all clusters (recursively) into a List.
    * 
    * @return List of all clusters.
    */
   public List<Cluster<M>> getAllClusters() {
-    Set<Cluster<M>> clu = new HashSet<>();
-    for(Cluster<M> rc : toplevelclusters) {
-      if(!clu.contains(rc)) {
-        clu.add(rc);
-        for (Iterator<Cluster<M>> iter = rc.iterDescendants(); iter.hasNext(); ) {
-          clu.add(iter.next());
+    ArrayList<Cluster<M>> res = new ArrayList<>(hierarchy.size());
+    for (Hierarchy.Iter<Cluster<M>> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
+      res.add(iter.get());
+    }
+    Collections.sort(res, Cluster.BY_NAME_SORTER);
+    return res;
+  }
+
+  /**
+   * Iterate over the top level clusters.
+   * 
+   * @return Iterator
+   */
+  public Iter<Cluster<M>> iterToplevelClusters() {
+    return new Hierarchy.Iter<Cluster<M>>() {
+      Iterator<Cluster<M>> iter;
+
+      Cluster<M> cur;
+
+      { // Constructor.
+        iter = toplevelclusters.iterator();
+        advance();
+      }
+
+      @Override
+      public boolean valid() {
+        return cur != null;
+      }
+
+      @Override
+      public void advance() {
+        if (iter.hasNext()) {
+          cur = iter.next();
+        } else {
+          cur = null;
         }
       }
-    }
-    // Note: we canNOT use TreeSet above, because this comparator is only
-    // partial!
-    ArrayList<Cluster<M>> res = new ArrayList<>(clu);
-    Collections.sort(res, new Cluster.PartialComparator());
-    return res;
+
+      @Override
+      public Cluster<M> get() {
+        return cur;
+      }
+    };
   }
 }

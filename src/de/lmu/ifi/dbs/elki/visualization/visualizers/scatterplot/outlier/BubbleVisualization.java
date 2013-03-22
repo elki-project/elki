@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -100,7 +101,7 @@ public class BubbleVisualization extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task) {
-    if(settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
+    if (settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
       final OutlierResult outlierResult = task.getResult();
       ((OutlierScalingFunction) settings.scaling).prepare(outlierResult);
     }
@@ -110,21 +111,21 @@ public class BubbleVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
     Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    for(OutlierResult o : ors) {
+    for (OutlierResult o : ors) {
       Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
       boolean vis = true;
       // Quick and dirty hack: hide if parent result is also an outlier result
       // Since that probably is already visible and we're redundant.
-      for(Result r : o.getHierarchy().getParents(o)) {
-        if(r instanceof OutlierResult) {
+      for (Hierarchy.Iter<Result> r = o.getHierarchy().iterParents(o); r.valid(); r.advance()) {
+        if (r.get() instanceof OutlierResult) {
           vis = false;
           break;
         }
       }
-      for(ScatterPlotProjector<?> p : ps) {
+      for (ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA;
-        if(!vis) {
+        if (!vis) {
           task.initDefaultVisibility(false);
         }
         baseResult.getHierarchy().add(o, task);
@@ -172,15 +173,15 @@ public class BubbleVisualization extends AbstractVisFactory {
       StylingPolicy stylepolicy = style.getStylingPolicy();
       // bubble size
       final double bubble_size = style.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
-      if(stylepolicy instanceof ClassStylingPolicy) {
+      if (stylepolicy instanceof ClassStylingPolicy) {
         ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
         setupCSS(svgp, colors);
         // draw data
-        for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
+        for (DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
           final double radius = getScaledForId(objId);
-          if(radius > 0.01 && !Double.isInfinite(radius)) {
+          if (radius > 0.01 && !Double.isInfinite(radius)) {
             final NumberVector<?> vec = rel.get(objId);
-            if(vec != null) {
+            if (vec != null) {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
               SVGUtil.addCSSClass(circle, BUBBLE + colors.getStyleForDBID(objId));
@@ -188,23 +189,21 @@ public class BubbleVisualization extends AbstractVisFactory {
             }
           }
         }
-      }
-      else {
+      } else {
         // draw data
-        for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
+        for (DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
           final double radius = getScaledForId(objId);
-          if(radius > 0.01 && !Double.isInfinite(radius)) {
+          if (radius > 0.01 && !Double.isInfinite(radius)) {
             final NumberVector<?> vec = rel.get(objId);
-            if(vec != null) {
+            if (vec != null) {
               double[] v = proj.fastProjectDataToRenderSpace(vec);
               Element circle = svgp.svgCircle(v[0], v[1], radius * bubble_size);
               int color = stylepolicy.getColorForDBID(objId);
               final StringBuilder cssstyle = new StringBuilder();
-              if(settings.fill) {
+              if (settings.fill) {
                 cssstyle.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGUtil.colorToString(color));
                 cssstyle.append(SVGConstants.CSS_FILL_OPACITY_PROPERTY).append(":0.5");
-              }
-              else {
+              } else {
                 cssstyle.append(SVGConstants.CSS_STROKE_VALUE).append(':').append(SVGUtil.colorToString(color));
                 cssstyle.append(SVGConstants.CSS_FILL_PROPERTY).append(':').append(SVGConstants.CSS_NONE_VALUE);
               }
@@ -219,7 +218,7 @@ public class BubbleVisualization extends AbstractVisFactory {
     @Override
     public void resultChanged(Result current) {
       super.resultChanged(current);
-      if(sample == current || context.getStyleResult() == current) {
+      if (sample == current || context.getStyleResult() == current) {
         synchronizedRedraw();
       }
     }
@@ -235,17 +234,16 @@ public class BubbleVisualization extends AbstractVisFactory {
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       // creating IDs manually because cluster often return a null-ID.
-      for(int clusterID = policy.getMinStyle(); clusterID < policy.getMaxStyle(); clusterID++) {
+      for (int clusterID = policy.getMinStyle(); clusterID < policy.getMaxStyle(); clusterID++) {
         CSSClass bubble = new CSSClass(svgp, BUBBLE + clusterID);
         bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
 
         String color = colors.getColor(clusterID);
 
-        if(settings.fill) {
+        if (settings.fill) {
           bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
           bubble.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.5);
-        }
-        else {
+        } else {
           // for diamond-shaped strokes, see bugs.sun.com, bug ID 6294396
           bubble.setStatement(SVGConstants.CSS_STROKE_VALUE, color);
           bubble.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
@@ -264,13 +262,12 @@ public class BubbleVisualization extends AbstractVisFactory {
      */
     protected double getScaledForId(DBIDRef id) {
       double d = result.getScores().get(id).doubleValue();
-      if(Double.isNaN(d) || Double.isInfinite(d)) {
+      if (Double.isNaN(d) || Double.isInfinite(d)) {
         return 0.0;
       }
-      if(settings.scaling == null) {
+      if (settings.scaling == null) {
         return result.getOutlierMeta().normalizeScore(d);
-      }
-      else {
+      } else {
         return settings.scaling.getScaled(d);
       }
     }
@@ -316,12 +313,12 @@ public class BubbleVisualization extends AbstractVisFactory {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       Flag fillF = new Flag(FILL_ID);
-      if(config.grab(fillF)) {
+      if (config.grab(fillF)) {
         fill = fillF.isTrue();
       }
 
       ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class, true);
-      if(config.grab(scalingP)) {
+      if (config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
     }

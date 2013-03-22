@@ -225,7 +225,7 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       }
       else {
         // Found a cluster, remember it, remove its points from the set.
-        result.addCluster(C);
+        result.addToplevelCluster(C);
 
         if(cprogress != null) {
           cprogress.setProcessed(result.getAllClusters().size(), logger);

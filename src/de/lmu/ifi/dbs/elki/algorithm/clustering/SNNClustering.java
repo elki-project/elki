@@ -185,9 +185,9 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
     Clustering<Model> result = new Clustering<>("Shared-Nearest-Neighbor Clustering", "snn-clustering");
     for(Iterator<ModifiableDBIDs> resultListIter = resultList.iterator(); resultListIter.hasNext();) {
-      result.addCluster(new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER));
+      result.addToplevelCluster(new Cluster<Model>(resultListIter.next(), ClusterModel.CLUSTER));
     }
-    result.addCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
+    result.addToplevelCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
 
     return result;
   }

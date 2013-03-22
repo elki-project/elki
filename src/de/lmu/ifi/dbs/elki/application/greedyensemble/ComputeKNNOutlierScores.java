@@ -56,8 +56,6 @@ import de.lmu.ifi.dbs.elki.distance.distancevalue.NumberDistance;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.Base64;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -168,7 +166,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
 
     // Test that we did get a proper index query
     KNNQuery<O, D> knnq = QueryUtil.getKNNQuery(relation, distf);
-    if(!(knnq instanceof PreprocessorKNNQuery)) {
+    if (!(knnq instanceof PreprocessorKNNQuery)) {
       LOG.warning("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
 
@@ -177,8 +175,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
     final PrintStream fout;
     try {
       fout = new PrintStream(outfile);
-    }
-    catch(FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       throw new AbortException("Cannot create output file.", e);
     }
     // Control: print the DBIDs in case we are seeing an odd iteration
@@ -192,8 +189,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         fout.append("# DBID-series MD5:");
         fout.append(Base64.encodeBase64(md.digest()));
         fout.append(FormatUtil.NEWLINE);
-      }
-      catch(NoSuchAlgorithmException e) {
+      } catch (NoSuchAlgorithmException e) {
         throw new AbortException("MD5 not found.");
       }
     }
@@ -222,7 +218,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         StandardDeviationScaling scaling = new StandardDeviationScaling();
         scaling.prepare(knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNN-" + kstr);
-        detachResult(database, knnresult);
+        database.getHierarchy().removeSubtree(knnresult);
       }
     });
     // KNN Weight
@@ -236,7 +232,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         StandardDeviationScaling scaling = new StandardDeviationScaling();
         scaling.prepare(knnresult);
         writeResult(fout, ids, knnresult, scaling, "KNNW-" + kstr);
-        detachResult(database, knnresult);
+        database.getHierarchy().removeSubtree(knnresult);
       }
     });
     // Run LOF
@@ -250,7 +246,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
         scaling.prepare(lofresult);
         writeResult(fout, ids, lofresult, scaling, "LOF-" + kstr);
-        detachResult(database, lofresult);
+        database.getHierarchy().removeSubtree(lofresult);
       }
     });
     // LoOP
@@ -261,7 +257,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         LoOP<O, D> loop = new LoOP<>(k, k, distf, distf, 1.0);
         OutlierResult loopresult = loop.run(database, relation);
         writeResult(fout, ids, loopresult, new IdentityScaling(), "LOOP-" + kstr);
-        detachResult(database, loopresult);
+        database.getHierarchy().removeSubtree(loopresult);
       }
     });
     // LDOF
@@ -275,11 +271,11 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
         StandardDeviationScaling scaling = new StandardDeviationScaling(1.0, 1.0);
         scaling.prepare(ldofresult);
         writeResult(fout, ids, ldofresult, scaling, "LDOF-" + kstr);
-        detachResult(database, ldofresult);
+        database.getHierarchy().removeSubtree(ldofresult);
       }
     });
     // ABOD
-    if(runabod && relation.size() < 10000) {
+    if (runabod && relation.size() < 10000) {
       try {
         final PolynomialKernelFunction poly = new PolynomialKernelFunction(PolynomialKernelFunction.DEFAULT_DEGREE);
         @SuppressWarnings("unchecked")
@@ -294,27 +290,13 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
             StandardDeviationScaling scaling = new MinusLogStandardDeviationScaling(null, 1.0);
             scaling.prepare(abodresult);
             writeResult(fout, ids, abodresult, scaling, "ABOD-" + kstr);
-            detachResult(database, abodresult);
+            database.getHierarchy().removeSubtree(abodresult);
           }
         });
-      }
-      catch(ClassCastException e) {
+      } catch (ClassCastException e) {
         // ABOD might just be not appropriate.
         LOG.warning("Running ABOD failed - probably not appropriate to this data type / distance?", e);
       }
-    }
-  }
-
-  /**
-   * Avoid that (future changes?) keep a reference to the result.
-   * 
-   * @param database Database
-   * @param discardresult Result to discard.
-   */
-  void detachResult(Database database, OutlierResult discardresult) {
-    final ResultHierarchy hier = database.getHierarchy();
-    for(Result parent : hier.getParents(discardresult)) {
-      hier.remove(parent, discardresult);
     }
   }
 
@@ -345,7 +327,7 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
   private void runForEachK(AlgRunner runner) {
     final int digits = (int) Math.ceil(Math.log10(maxk));
     final int startk = (this.startk > 0) ? this.startk : this.stepk;
-    for(int k = startk; k <= maxk; k += stepk) {
+    for (int k = startk; k <= maxk; k += stepk) {
       String kstr = String.format("%0" + digits + "d", k);
       runner.run(k, kstr);
     }
@@ -427,26 +409,25 @@ public class ComputeKNNOutlierScores<O, D extends NumberDistance<D, ?>> extends 
       inputstep = config.tryInstantiate(InputStep.class);
       // Distance function
       ObjectParameter<DistanceFunction<? super O, D>> distP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
-      if(config.grab(distP)) {
+      if (config.grab(distP)) {
         distf = distP.instantiateClass(config);
       }
       // k parameters
       IntParameter stepkP = new IntParameter(STEPK_ID);
       stepkP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(stepkP)) {
+      if (config.grab(stepkP)) {
         stepk = stepkP.getValue();
       }
       IntParameter startkP = new IntParameter(STARTK_ID);
       startkP.setOptional(true);
-      if(config.grab(startkP)) {
+      if (config.grab(startkP)) {
         startk = startkP.getValue();
-      }
-      else {
+      } else {
         startk = stepk;
       }
       IntParameter maxkP = new IntParameter(MAXK_ID);
       maxkP.addConstraint(new GreaterConstraint(0));
-      if(config.grab(maxkP)) {
+      if (config.grab(maxkP)) {
         maxk = maxkP.getValue();
       }
       bylabel = config.tryInstantiate(ByLabelOutlier.class);

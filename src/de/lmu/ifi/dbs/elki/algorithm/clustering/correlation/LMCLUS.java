@@ -207,7 +207,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       final Cluster<Model> cluster = new Cluster<>(current);
       cluster.setName("Cluster_" + lmDim + "d_" + cnum);
       cnum++;
-      ret.addCluster(cluster);
+      ret.addToplevelCluster(cluster);
       // Remove from main working set.
       unclustered.removeDBIDs(current);
       if (progress != null) {
@@ -219,7 +219,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     }
     // Remaining objects are noise
     if (unclustered.size() > 0) {
-      ret.addCluster(new Cluster<>(unclustered, true));
+      ret.addToplevelCluster(new Cluster<>(unclustered, true));
     }
     if (progress != null) {
       progress.setProcessed(relation.size(), LOG);

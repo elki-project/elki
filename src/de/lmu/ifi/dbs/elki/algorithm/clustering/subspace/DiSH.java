@@ -62,7 +62,8 @@ import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderEntry;
 import de.lmu.ifi.dbs.elki.result.optics.ClusterOrderResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyReferenceLists;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -238,29 +239,29 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
     }
 
     // build the hierarchy
-    buildHierarchy(database, distFunc, clusters, dimensionality);
+    Clustering<SubspaceModel<V>> clustering = new Clustering<>("DiSH clustering", "dish-clustering");
+    buildHierarchy(database, distFunc, clustering, clusters, dimensionality);
     if (LOG.isVerbose()) {
       StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
       for (Cluster<SubspaceModel<V>> c : clusters) {
         msg.append('\n').append(FormatUtil.format(dimensionality, c.getModel().getDimensions())).append(" ids ").append(c.size());
-        for (Cluster<SubspaceModel<V>> cluster : c.getParents()) {
-          msg.append("\n   parent ").append(cluster);
+        for (Iter<Cluster<SubspaceModel<V>>> iter = clustering.getClusterHierarchy().iterParents(c); iter.valid(); iter.advance()) {
+          msg.append("\n   parent ").append(iter.get());
         }
-        for (Cluster<SubspaceModel<V>> cluster : c.getChildren()) {
-          msg.append("\n   child ").append(cluster);
+        for (Iter<Cluster<SubspaceModel<V>>> iter = clustering.getClusterHierarchy().iterChildren(c); iter.valid(); iter.advance()) {
+          msg.append("\n   child ").append(iter.get());
         }
       }
       LOG.verbose(msg.toString());
     }
 
     // build result
-    Clustering<SubspaceModel<V>> result = new Clustering<>("DiSH clustering", "dish-clustering");
     for (Cluster<SubspaceModel<V>> c : clusters) {
-      if (c.getParents() == null || c.getParents().isEmpty()) {
-        result.addCluster(c);
+      if (clustering.getClusterHierarchy().numParents(c) == 0) {
+        clustering.addToplevelCluster(c);
       }
     }
-    return result;
+    return clustering;
   }
 
   /**
@@ -380,8 +381,6 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
         Pair<BitSet, ArrayModifiableDBIDs> c = parallelClusters.get(i);
         Cluster<SubspaceModel<V>> cluster = new Cluster<>(c.second);
         cluster.setModel(new SubspaceModel<>(new Subspace(c.first), Centroid.make(database, c.second).toVector(database)));
-        cluster.setHierarchy(new HierarchyReferenceLists<>(cluster, new ArrayList<Cluster<SubspaceModel<V>>>(), new ArrayList<Cluster<SubspaceModel<V>>>()));
-        // cluster.setName("Cluster_" + num++);
         String subspace = FormatUtil.format(cluster.getModel().getSubspace().getDimensions(), db_dim, "");
         if (parallelClusters.size() > 1) {
           cluster.setName("Cluster_" + subspace + "_" + i);
@@ -510,13 +509,15 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * Builds the cluster hierarchy.
    * 
    * @param distFunc the distance function
+   * @param clustering Clustering we process
    * @param clusters the sorted list of clusters
    * @param dimensionality the dimensionality of the data
    * @param database the database containing the data objects
    */
-  private void buildHierarchy(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
+  private void buildHierarchy(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Clustering<SubspaceModel<V>> clustering, List<Cluster<SubspaceModel<V>>> clusters, int dimensionality) {
     StringBuilder msg = new StringBuilder();
     final int db_dim = RelationUtil.dimensionality(database);
+    Hierarchy<Cluster<SubspaceModel<V>>> hier = clustering.getClusterHierarchy();
 
     for (int i = 0; i < clusters.size() - 1; i++) {
       Cluster<SubspaceModel<V>> c_i = clusters.get(i);
@@ -536,9 +537,8 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
           // noise level reached
           if (c_j.getModel().getSubspace().dimensionality() == 0) {
             // no parents exists -> parent is noise
-            if (c_i.getParents().isEmpty()) {
-              c_j.getChildren().add(c_i);
-              c_i.getParents().add(c_j);
+            if (hier.numParents(c_i) == 0) {
+              clustering.addChildCluster(c_j, c_i);
               if (LOG.isDebugging()) {
                 msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                 msg.append("] is parent of [").append(FormatUtil.format(db_dim, c_i.getModel().getSubspace().getDimensions()));
@@ -560,9 +560,8 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
               if (d <= 2 * epsilon) {
                 // no parent exists or c_j is not a parent of the already
                 // existing parents
-                if (c_i.getParents().isEmpty() || !isParent(database, distFunc, c_j, c_i.getParents())) {
-                  c_j.getChildren().add(c_i);
-                  c_i.getParents().add(c_j);
+                if (hier.numParents(c_i) == 0 || !isParent(database, distFunc, c_j, hier.iterParents(c_i))) {
+                  clustering.addChildCluster(c_j, c_i);
                   if (LOG.isDebugging()) {
                     msg.append("\n [").append(FormatUtil.format(db_dim, c_j.getModel().getSubspace().getDimensions()));
                     msg.append("] is parent of [");
@@ -591,16 +590,17 @@ public class DiSH<V extends NumberVector<?>> extends AbstractAlgorithm<Clusterin
    * @param distFunc the distance function for distance computation between the
    *        clusters
    * @param parent the parent to be tested
-   * @param children the list of children to be tested
+   * @param iter the list of children to be tested
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, List<Cluster<SubspaceModel<V>>> children) {
+  private boolean isParent(Relation<V> database, DiSHDistanceFunction.Instance<V> distFunc, Cluster<SubspaceModel<V>> parent, Iter<Cluster<SubspaceModel<V>>> iter) {
     V parent_centroid = ProjectedCentroid.make(parent.getModel().getDimensions(), database, parent.getIDs()).toVector(database);
     int dimensionality = RelationUtil.dimensionality(database);
     int subspaceDim_parent = dimensionality - parent.getModel().getSubspace().dimensionality();
 
-    for (Cluster<SubspaceModel<V>> child : children) {
+    for (; iter.valid(); iter.advance()) {
+      Cluster<SubspaceModel<V>> child = iter.get();
       V child_centroid = ProjectedCentroid.make(child.getModel().getDimensions(), database, child.getIDs()).toVector(database);
       PreferenceVectorBasedCorrelationDistance distance = distFunc.correlationDistance(parent_centroid, child_centroid, parent.getModel().getSubspace().getDimensions(), child.getModel().getSubspace().getDimensions());
       if (distance.getCorrelationValue() == subspaceDim_parent) {

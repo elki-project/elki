@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -209,8 +210,8 @@ public class OverviewPlot extends SVGPlot implements ResultListener {
     ResultHierarchy hier = context.getHierarchy();
     ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
     nextTask: for (VisualizationTask task : tasks) {
-      for (Result parent : hier.getParents(task)) {
-        if (parent instanceof Projector) {
+      for (Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
+        if (iter.get() instanceof Projector) {
           continue nextTask;
         }
       }

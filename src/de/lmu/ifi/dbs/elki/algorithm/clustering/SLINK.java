@@ -66,8 +66,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.OrderingFromDataStore;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HierarchyHashmapList;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -458,14 +456,14 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       }
     }
     // Build a hierarchy out of these clusters.
+    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Single-Link-Dendrogram", "slink-dendrogram");
     Cluster<DendrogramModel<D>> root = null;
-    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<>();
     ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<>(ids.size() + expcnum - split);
     // Convert initial clusters to cluster objects
     {
       int i = 0;
       for (DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
-        clusters.add(makeCluster(it2, cluster_dist.get(i), cluster_dbids.get(i), hier));
+        clusters.add(makeCluster(it2, cluster_dist.get(i), cluster_dbids.get(i)));
       }
       cluster_dist = null; // Invalidate
       cluster_dbids = null; // Invalidate
@@ -480,7 +478,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       } else {
         ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
         cids.add(it);
-        clus = makeCluster(it, nulldist, cids, hier);
+        clus = makeCluster(it, nulldist, cids);
         // No need to store in clusters: cannot have another incoming pi
         // pointer!
       }
@@ -495,9 +493,9 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
         D depth = lambda.get(it);
         // Parent cluster exists - merge as a new cluster:
         if (parentid >= 0) {
-          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS, hier);
-          hier.add(pclus, clusters.get(parentid));
-          hier.add(pclus, clus);
+          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+          dendrogram.addChildCluster(pclus, clusters.get(parentid));
+          dendrogram.addChildCluster(pclus, clus);
           clusters.set(parentid, pclus); // Replace existing parent cluster
         } else {
           // Create a new, one-element, parent cluster.
@@ -505,8 +503,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
           cnum++;
           ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
           cids.add(succ);
-          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids, hier);
-          hier.add(pclus, clus);
+          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids);
+          dendrogram.addChildCluster(pclus, clus);
           assert (clusters.size() == parentid);
           clusters.add(pclus); // Remember parent cluster
           cluster_map.putInt(succ, parentid); // Reference
@@ -523,8 +521,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       progress.ensureCompleted(LOG);
     }
     // build hierarchy
-    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Single-Link-Dendrogram", "slink-dendrogram");
-    dendrogram.addCluster(root);
+    dendrogram.addToplevelCluster(root);
 
     return dendrogram;
   }
@@ -612,8 +609,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       }
     }
     // Build a hierarchy out of these clusters.
+    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Single-Link-Dendrogram", "slink-dendrogram");
     Cluster<DendrogramModel<D>> root = null;
-    ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier = new HierarchyHashmapList<>();
     ArrayList<Cluster<DendrogramModel<D>>> clusters = new ArrayList<>(ids.size() + expcnum - split);
     // Convert initial clusters to cluster objects
     {
@@ -621,7 +618,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       for (DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
         @SuppressWarnings("unchecked")
         D depth = (D) new DoubleDistance(cluster_dist.get(i));
-        clusters.add(makeCluster(it2, depth, cluster_dbids.get(i), hier));
+        clusters.add(makeCluster(it2, depth, cluster_dbids.get(i)));
       }
       cluster_dist = null; // Invalidate
       cluster_dbids = null; // Invalidate
@@ -636,7 +633,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       } else {
         ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
         cids.add(it);
-        clus = makeCluster(it, nulldist, cids, hier);
+        clus = makeCluster(it, nulldist, cids);
         // No need to store in clusters: cannot have another incoming pi
         // pointer!
       }
@@ -652,9 +649,9 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
         D depth = (D) new DoubleDistance(lambda.doubleValue(it));
         // Parent cluster exists - merge as a new cluster:
         if (parentid >= 0) {
-          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS, hier);
-          hier.add(pclus, clusters.get(parentid));
-          hier.add(pclus, clus);
+          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+          dendrogram.addChildCluster(pclus, clusters.get(parentid));
+          dendrogram.addChildCluster(pclus, clus);
           clusters.set(parentid, pclus); // Replace existing parent cluster
         } else {
           // Create a new, one-element, parent cluster.
@@ -662,8 +659,8 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
           cnum++;
           ArrayModifiableDBIDs cids = DBIDUtil.newArray(1);
           cids.add(succ);
-          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids, hier);
-          hier.add(pclus, clus);
+          Cluster<DendrogramModel<D>> pclus = makeCluster(succ, depth, cids);
+          dendrogram.addChildCluster(pclus, clus);
           assert (clusters.size() == parentid);
           clusters.add(pclus); // Remember parent cluster
           cluster_map.putInt(succ, parentid); // Reference
@@ -680,8 +677,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
       progress.ensureCompleted(LOG);
     }
     // build hierarchy
-    final Clustering<DendrogramModel<D>> dendrogram = new Clustering<>("Single-Link-Dendrogram", "slink-dendrogram");
-    dendrogram.addCluster(root);
+    dendrogram.addToplevelCluster(root);
 
     return dendrogram;
   }
@@ -692,10 +688,9 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
    * @param lead Leading object
    * @param depth Linkage depth
    * @param members Member objects
-   * @param hier Cluster hierarchy
    * @return Cluster
    */
-  private Cluster<DendrogramModel<D>> makeCluster(DBIDRef lead, D depth, DBIDs members, ModifiableHierarchy<Cluster<DendrogramModel<D>>> hier) {
+  private Cluster<DendrogramModel<D>> makeCluster(DBIDRef lead, D depth, DBIDs members) {
     final String name;
     if (members.size() == 0) {
       name = "merge_" + lead + "_" + depth;
@@ -705,7 +700,7 @@ public class SLINK<O, D extends Distance<D>> extends AbstractDistanceBasedAlgori
     } else {
       name = "cluster_" + lead + "_" + depth;
     }
-    Cluster<DendrogramModel<D>> cluster = new Cluster<>(name, members, new DendrogramModel<>(depth), hier);
+    Cluster<DendrogramModel<D>> cluster = new Cluster<>(name, members, new DendrogramModel<>(depth));
     return cluster;
   }
 
