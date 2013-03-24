@@ -2,7 +2,6 @@ package experimentalcode.students.nuecke.algorithm.clustering.subspace;
 
 import java.util.BitSet;
 import java.util.Random;
-import java.util.Vector;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SubspaceClusteringAlgorithm;
@@ -15,17 +14,24 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.distance.DistanceDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancevalue.DoubleDistance;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -34,7 +40,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterConstrain
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -147,6 +152,11 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    */
   private int minClusterSize;
 
+  /**
+   * Whether to use a query for getting objects in bounds or do a linear scan.
+   */
+  private boolean useQuery;
+
   // ---------------------------------------------------------------------- //
 
   /**
@@ -180,9 +190,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * </p>
    */
   public Clustering<SubspaceModel<V>> run(Database database, Relation<V> relation) {
-
     // Dimensionality of our set.
-    d = DatabaseUtil.dimensionality(relation);
+    d = RelationUtil.dimensionality(relation);
 
     // Get available DBIDs as a set we can remove items from.
     S = DBIDUtil.newArray(relation.getDBIDs());
@@ -209,7 +218,6 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
     // To not only find a single cluster, we continue running until our set
     // of points is empty.
     while(S.size() > minClusterSize) {
-
       Cluster<SubspaceModel<V>> C;
       if(heuristics) {
         C = runFastDOC(relation);
@@ -236,6 +244,9 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       }
     }
 
+    // Add the remainder as noise.
+    result.addToplevelCluster(new Cluster<SubspaceModel<V>>(S, true, new SubspaceModel<V>(new Subspace(0), Centroid.make(relation, S).toVector(relation))));
+
     if(cprogress != null) {
       cprogress.setCompleted(logger);
     }
@@ -250,9 +261,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return a cluster, if one is found, else <code>null</code>.
    */
   private Cluster<SubspaceModel<V>> runDOC(Relation<V> relation) {
-
     // Best cluster for the current run.
-    ArrayModifiableDBIDs C = null;
+    DBIDs C = null;
     // Relevant attributes for the best cluster.
     BitSet D = null;
     // Quality of the best cluster.
@@ -271,42 +281,56 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         DBIDs randomSet = DBIDUtil.randomSample(S, Math.min(S.size(), (int) r), random.nextLong());
 
         // Initialize cluster info.
-        ArrayModifiableDBIDs nC = DBIDUtil.newArray();
         BitSet nD = new BitSet(d);
-
-        // Test each dimension and build bounding box while we're at
-        // it.
-        double[] min = new double[d];
-        double[] max = new double[d];
-        for(int k = 0; k < d; ++k) {
-          if(dimensionIsRelevant(k, relation, randomSet)) {
-            nD.set(k);
-            min[k] = pV.doubleValue(k) - w;
-            max[k] = pV.doubleValue(k) + w;
+        DBIDs objects;
+        if(useQuery) {
+          // Get all points in the box.
+          for(int k = 0; k < d; ++k) {
+            if(dimensionIsRelevant(k, relation, randomSet)) {
+              nD.set(k);
+            }
           }
-          else {
-            min[k] = Double.NEGATIVE_INFINITY;
-            max[k] = Double.POSITIVE_INFINITY;
-          }
+          RangeQuery<V, DoubleDistance> rangeQuery = QueryUtil.getRangeQuery(relation, new SubspaceManhattanDistanceFunction(nD));
+          // TODO at least with smaller data sets this is slower than a linear
+          // scan; possible to query a sub-set?
+          objects = DBIDUtil.intersection(S, rangeQuery.getRangeForDBID(p, new DoubleDistance(w)));
         }
-
-        // Bounds for our cluster.
-        HyperBoundingBox bounds = new HyperBoundingBox(min, max);
-
-        // Get all points in the box.
-        // TODO nicer way to do this?
-        for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-          if(isPointInBounds(relation.get(iter), bounds)) {
-            nC.add(iter);
+        else {
+          ArrayModifiableDBIDs nC = DBIDUtil.newArray();
+          // Test each dimension and build bounding box while we're at
+          // it.
+          double[] min = new double[d];
+          double[] max = new double[d];
+          for(int k = 0; k < d; ++k) {
+            if(dimensionIsRelevant(k, relation, randomSet)) {
+              nD.set(k);
+              min[k] = pV.doubleValue(k) - w;
+              max[k] = pV.doubleValue(k) + w;
+            }
+            else {
+              min[k] = Double.NEGATIVE_INFINITY;
+              max[k] = Double.POSITIVE_INFINITY;
+            }
           }
+
+          // Bounds for our cluster.
+          HyperBoundingBox bounds = new HyperBoundingBox(min, max);
+
+          // Get all points in the box.
+          for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
+            if(isPointInBounds(relation.get(iter), bounds)) {
+              nC.add(iter);
+            }
+          }
+          objects = nC;
         }
 
         if(logger.isDebuggingFiner()) {
-          logger.finer("Found a cluster, |C| = " + nC.size() + ", |D| = " + nD.cardinality());
+          logger.finer("Found a cluster, |C| = " + objects.size() + ", |D| = " + nD.cardinality());
         }
 
         // Is the cluster large enough?
-        if(nC.size() < minClusterSize) {
+        if(objects.size() < minClusterSize) {
           // Too small.
           if(logger.isDebuggingFiner()) {
             logger.finer("... but it's too small.");
@@ -321,13 +345,13 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           }
           else {
             // Better cluster than before?
-            double nQuality = computeClusterQuality(nC.size(), nD.cardinality());
+            double nQuality = computeClusterQuality(objects.size(), nD.cardinality());
             if(nQuality > quality) {
               if(logger.isDebuggingFiner()) {
                 logger.finer("... and it's the best so far: " + nQuality + " vs. " + quality);
               }
 
-              C = nC;
+              C = objects;
               D = nD;
               quality = nQuality;
             }
@@ -364,6 +388,8 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
    * @return a cluster, if one is found, else <code>null</code>.
    */
   private Cluster<SubspaceModel<V>> runFastDOC(Relation<V> relation) {
+    logger.warning("FastDOC implementation is known to be faulty.");
+
     // Relevant attributes of highest cardinality.
     BitSet D = null;
     // The seed point for the best dimensions.
@@ -396,7 +422,9 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           dV = pV;
 
           if(D.cardinality() >= d_zero) {
-            iprogress.setProcessed(iprogress.getTotal(), logger);
+            if (iprogress != null) {
+              iprogress.setProcessed(iprogress.getTotal(), logger);
+            }
             break outer;
           }
         }
@@ -429,22 +457,23 @@ public class DOC<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
         max[k] = Double.POSITIVE_INFINITY;
       }
     }
-    HyperBoundingBox bounds = new HyperBoundingBox(min, max);
 
-    // Accumulate points inside the bounds.
-    ArrayModifiableDBIDs C = DBIDUtil.newArray();
-
-    // Get all points in the box.
-    // TODO nicer way to do this?
-    for(DBIDIter iter = S.iter(); iter.valid(); iter.advance()) {
-      if(isPointInBounds(relation.get(iter), bounds)) {
-        C.add(iter);
-      }
+    // Get all points in the box. The index query is a weighted Manhattan-
+    // distance based query, where the weights correspond to the inverse of
+    // the size of the query along a particular axis, and the actual distance
+    // passed is one.
+    Centroid centroid = Centroid.make(relation, S);
+    double[] weights = new double[d];
+    for(int k = 0; k < d; ++k) {
+      weights[k] = 1.0 / ((max[k] - min[k]) / 2.0);
     }
+    DistanceQuery<V, DoubleDistance> distanceQuery = relation.getDatabase().getDistanceQuery(relation, new WeightedLPNormDistanceFunction(1.0, weights));
+    RangeQuery<V, DoubleDistance> rangeQuery = relation.getDatabase().getRangeQuery(distanceQuery);
+    DistanceDBIDList<DoubleDistance> objects = rangeQuery.getRangeForObject(centroid.toVector(relation), new DoubleDistance(1.0));
 
     // If we have a non-empty cluster, return it.
-    if(C.size() > 0) {
-      return makeCluster(relation, C, D);
+    if(objects.size() > 0) {
+      return makeCluster(relation, objects, D);
     }
     else {
       return null;
