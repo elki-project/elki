@@ -147,6 +147,8 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
           else {
             // Starting new interval at this bin.
             start = iter.getLeft();
+            end = iter.getRight();
+            inInterval = true;
           }
         }
         else {
@@ -573,7 +575,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
 
       // Skip the merge if the interval is already part of the signature.
       if(intervals.contains(other.intervals.get(0))) {
-        throw new IllegalArgumentException("Signature was already merged.");
+        return null;
       }
 
       // Create merged signature.
@@ -611,7 +613,7 @@ public class P3C<V extends NumberVector<?>> extends AbstractAlgorithm<Clustering
       // Definition 3, Condition 2:
       double v = merge.getSupport();
       double E = expectedSupport(other.intervals.get(0));
-      return v <= E && PoissonDistribution.rawProbability(v, E) >= POISSON_THRESHOLD;
+      return v <= E || PoissonDistribution.rawProbability(v, E) >= POISSON_THRESHOLD;
     }
 
     /**
