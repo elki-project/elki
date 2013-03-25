@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.iterator;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
 /*
  This file is part of ELKI:

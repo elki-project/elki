@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
-import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayIter;
-import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Compute ROC (Receiver Operating Characteristics) curves.

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.designpattern;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
 /*
  This file is part of ELKI:
@@ -23,19 +23,37 @@ package de.lmu.ifi.dbs.elki.utilities.designpattern;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * Simple Observer design pattern.
+ * Array iterators can also go backwards and seek.
  * 
  * @author Erich Schubert
- * 
- * @param T object type to observe
+ *
+ * @apiviz.landmark
  */
-public interface Observer<T> {
+public interface ArrayIter extends Iter {
   /**
-   * This method is called when an observed object was updated.
+   * Get current iterator offset.
    * 
-   * @param o Observable
+   * @return Iterator position
    */
-  public void update(T o);
+  public int getOffset();
+  
+  /**
+   * Moves the iterator forward or backward by the given offset.
+   * 
+   * @param count offset to move forward or backwards
+   */
+  public void advance(int count);
+
+  /**
+   * Moves the iterator backward to the previous entry.
+   */
+  public void retract();
+
+  /**
+   * Moves the iterator to the given position
+   * 
+   * @param off Seek offset
+   */
+  public void seek(int off);
 }

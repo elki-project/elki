@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Basic in-memory heap interface, for int keys and V values.

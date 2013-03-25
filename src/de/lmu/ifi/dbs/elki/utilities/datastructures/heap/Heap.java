@@ -423,7 +423,7 @@ public class Heap<E> {
    * 
    * @author Erich Schubert
    */
-  public class UnorderedIter implements de.lmu.ifi.dbs.elki.utilities.iterator.Iter {
+  public class UnorderedIter implements de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter {
     /**
      * Current iterator position.
      */

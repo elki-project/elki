@@ -104,7 +104,7 @@ public interface Hierarchy<O> {
    * 
    * @param <O> Object type.
    */
-  static interface Iter<O> extends de.lmu.ifi.dbs.elki.utilities.iterator.Iter {
+  static interface Iter<O> extends de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter {
     /**
      * Access the current object.
      * 

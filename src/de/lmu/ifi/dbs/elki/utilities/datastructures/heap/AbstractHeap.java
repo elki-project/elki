@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.ConcurrentModificationException;
 
-import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Abstract base class for heaps.

@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.iterator.MIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.MIter;
 
 /**
  * Modifiable DBID iterator.
