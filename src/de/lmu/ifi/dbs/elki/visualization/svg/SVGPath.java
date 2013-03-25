@@ -27,7 +27,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayListIter;
 
 /**
  * Element used for building an SVG path using a string buffer.
@@ -132,9 +134,10 @@ public class SVGPath {
    * 
    * @param vectors vectors
    */
-  public SVGPath(Iterable<Vector> vectors) {
+  public SVGPath(Polygon vectors) {
     this();
-    for(Vector vec : vectors) {
+    for (ArrayListIter<Vector> it = vectors.iter(); it.valid(); it.advance()) {
+      Vector vec = it.get();
       this.drawTo(vec.get(0), vec.get(1));
     }
     this.close();
@@ -151,10 +154,9 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath drawTo(double x, double y) {
-    if(!isStarted()) {
+    if (!isStarted()) {
       moveTo(x, y);
-    }
-    else {
+    } else {
       lineTo(x, y);
     }
     return this;
@@ -170,10 +172,9 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath drawTo(double[] xy) {
-    if(!isStarted()) {
+    if (!isStarted()) {
       moveTo(xy);
-    }
-    else {
+    } else {
       lineTo(xy);
     }
     return this;
@@ -189,10 +190,9 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath drawTo(Vector xy) {
-    if(!isStarted()) {
+    if (!isStarted()) {
       moveTo(xy);
-    }
-    else {
+    } else {
       lineTo(xy);
     }
     return this;
@@ -788,11 +788,11 @@ public class SVGPath {
    * @param ds coordinates.
    */
   private void append(String action, double... ds) {
-    if(lastaction != action) {
+    if (lastaction != action) {
       buf.append(action);
       lastaction = action;
     }
-    for(double d : ds) {
+    for (double d : ds) {
       buf.append(SVGUtil.FMT.format(d));
       buf.append(' ');
     }
@@ -804,7 +804,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath close() {
-    if(lastaction != SVGConstants.PATH_CLOSE) {
+    if (lastaction != SVGConstants.PATH_CLOSE) {
       buf.append(SVGConstants.PATH_CLOSE);
       lastaction = SVGConstants.PATH_CLOSE;
     }
