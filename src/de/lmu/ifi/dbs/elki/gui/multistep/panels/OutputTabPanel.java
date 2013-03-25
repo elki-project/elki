@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * 
  * @author Erich Schubert
  */
-public class OutputTabPanel extends ParameterTabPanel implements Observer<Object> {
+public class OutputTabPanel extends ParameterTabPanel {
   /**
    * Serial version.
    */
@@ -71,8 +70,8 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
     super();
     this.input = input;
     this.evals = evals;
-    input.addObserver(this);
-    evals.addObserver(this);
+    input.addPanelListener(this);
+    evals.addPanelListener(this);
   }
 
   @Override
@@ -121,7 +120,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
   }
 
   @Override
-  public void update(Object o) {
+  public void panelUpdated(ParameterTabPanel o) {
     if (o == input || o == evals) {
       checkDependencies();
       updateStatus();
@@ -136,7 +135,7 @@ public class OutputTabPanel extends ParameterTabPanel implements Observer<Object
       if (!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResult()) {
         // We've become invalidated, notify.
         basedOnResult = null;
-        observers.notifyObservers(this);
+        firePanelUpdated();
       }
     }
   }

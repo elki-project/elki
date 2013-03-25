@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * 
  * @author Erich Schubert
  */
-public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Object> {
+public class AlgorithmTabPanel extends ParameterTabPanel {
   /**
    * Serial version.
    */
@@ -65,13 +64,13 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
   public AlgorithmTabPanel(InputTabPanel input) {
     super();
     this.input = input;
-    input.addObserver(this);
+    input.addPanelListener(this);
   }
 
   @Override
   protected synchronized void configureStep(Parameterization config) {
     algorithms = config.tryInstantiate(AlgorithmStep.class);
-    if(config.getErrors().size() > 0) {
+    if (config.getErrors().size() > 0) {
       algorithms = null;
     }
     basedOnDatabase = null;
@@ -79,10 +78,10 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
 
   @Override
   protected void executeStep() {
-    if(input.canRun() && !input.isComplete()) {
+    if (input.canRun() && !input.isComplete()) {
       input.execute();
     }
-    if(!input.isComplete()) {
+    if (!input.isComplete()) {
       throw new AbortException("Input data not available.");
     }
     // Get the database and run the algorithms
@@ -93,18 +92,17 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
 
   @Override
   protected Status getStatus() {
-    if(algorithms == null) {
+    if (algorithms == null) {
       return Status.STATUS_UNCONFIGURED;
     }
-    if(!input.canRun()) {
+    if (!input.canRun()) {
       return Status.STATUS_CONFIGURED;
     }
     checkDependencies();
-    if(input.isComplete() && basedOnDatabase != null) {
-      if(algorithms.getResult() == null) {
+    if (input.isComplete() && basedOnDatabase != null) {
+      if (algorithms.getResult() == null) {
         return Status.STATUS_FAILED;
-      }
-      else {
+      } else {
         return Status.STATUS_COMPLETE;
       }
     }
@@ -117,15 +115,15 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
    * @return Algorithm step
    */
   public AlgorithmStep getAlgorithmStep() {
-    if(algorithms == null) {
+    if (algorithms == null) {
       throw new AbortException("Algorithms not configured.");
     }
     return algorithms;
   }
 
   @Override
-  public void update(Object o) {
-    if(o == input) {
+  public void panelUpdated(ParameterTabPanel o) {
+    if (o == input) {
       checkDependencies();
       updateStatus();
     }
@@ -135,11 +133,11 @@ public class AlgorithmTabPanel extends ParameterTabPanel implements Observer<Obj
    * Test if the dependencies are still valid.
    */
   private void checkDependencies() {
-    if(basedOnDatabase != null) {
-      if(!input.isComplete() || basedOnDatabase.get() != input.getInputStep().getDatabase()) {
+    if (basedOnDatabase != null) {
+      if (!input.isComplete() || basedOnDatabase.get() != input.getInputStep().getDatabase()) {
         // We've become invalidated, notify.
         basedOnDatabase = null;
-        observers.notifyObservers(this);
+        firePanelUpdated();
       }
     }
   }

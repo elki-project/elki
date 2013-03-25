@@ -40,8 +40,6 @@ import javax.swing.event.ChangeListener;
 import de.lmu.ifi.dbs.elki.gui.configurator.ConfiguratorPanel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.designpattern.Observer;
-import de.lmu.ifi.dbs.elki.utilities.designpattern.Observers;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -129,11 +127,6 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    * The status text field
    */
   private final JLabel statusText;
-
-  /**
-   * Observers of this panel
-   */
-  protected final Observers<ParameterTabPanel> observers = new Observers<>();
 
   /**
    * Input pane
@@ -237,7 +230,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
 
     // Update status and notify observers
     updateStatus();
-    observers.notifyObservers(this);
+    firePanelUpdated();
   }
 
   /**
@@ -291,7 +284,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       LOG.exception(e);
     }
     updateStatus();
-    observers.notifyObservers(this);
+    firePanelUpdated();
   }
 
   /**
@@ -347,12 +340,18 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
     runButton.setEnabled(canRun());
   }
 
-  public void addObserver(Observer<? super ParameterTabPanel> o) {
-    observers.add(o);
+  protected void firePanelUpdated() {
+    for (ParameterTabPanel p : listenerList.getListeners(ParameterTabPanel.class)) {
+      p.panelUpdated(this);
+    }
   }
 
-  public void removeObserver(Observer<? super ParameterTabPanel> o) {
-    observers.remove(o);
+  public void addPanelListener(ParameterTabPanel o) {
+    listenerList.add(ParameterTabPanel.class, o);
+  }
+
+  public void removePanelListener(ParameterTabPanel o) {
+    listenerList.remove(ParameterTabPanel.class, o);
   }
 
   @Override
@@ -362,4 +361,13 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
       updateParameterTable();
     }
   }
+
+  /**
+   * Called when an observed panel changes.
+   * 
+   * @param o Observed panel 
+   */
+  void panelUpdated(ParameterTabPanel o) {
+    // Do nothing by default.
+  };
 }
