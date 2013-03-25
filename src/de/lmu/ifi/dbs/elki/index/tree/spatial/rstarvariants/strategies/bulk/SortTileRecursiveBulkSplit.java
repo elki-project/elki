@@ -29,6 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Sort-Tile-Recursive aims at tiling the data space with a grid-like structure
@@ -45,6 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "Leutenegger, S.T. and Lopez, M.A. and Edgington, J.", title = "STR: A simple and efficient algorithm for R-tree packing", booktitle = "Proc. 13th International Conference on Data Engineering, 1997", url = "http://dx.doi.org/10.1109/ICDE.1997.582015")
 public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
+  /**
+   * Static instance.
+   */
+  public static final SortTileRecursiveBulkSplit STATIC = new SortTileRecursiveBulkSplit();
+
   @Override
   public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
     final int dims = spatialObjects.get(0).getDimensionality();
@@ -72,19 +78,18 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
     final int s = (int) Math.ceil(Math.pow(p, 1.0 / (dims - depth)));
 
     final double len = end - start; // double intentional!
-    for(int i = 0; i < s; i++) {
+    for (int i = 0; i < s; i++) {
       // We don't completely sort, but only ensure the quantile is invariant.
       int s2 = start + (int) ((i * len) / s);
       int e2 = start + (int) (((i + 1) * len) / s);
       // LoggingUtil.warning("STR " + dim + " s2:" + s2 + " e2:" + e2);
-      if(e2 < end) {
+      if (e2 < end) {
         c.dim = depth;
         QuickSelect.quickSelect(objs, c, s2, end, e2);
       }
-      if(depth + 1 == dims) {
+      if (depth + 1 == dims) {
         ret.add(objs.subList(s2, e2));
-      }
-      else {
+      } else {
         // Descend
         strPartition(objs, s2, e2, depth + 1, dims, maxEntries, c, ret);
       }
@@ -112,5 +117,20 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
       final double v2 = o2.getMin(dim) + o2.getMax(dim);
       return Double.compare(v1, v2);
     }
+  }
+
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   * 
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    @Override
+    protected SortTileRecursiveBulkSplit makeInstance() {
+      return STATIC;
+    }
+
   }
 }
