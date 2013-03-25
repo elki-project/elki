@@ -9,7 +9,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.utilities.iterator.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /*
  This file is part of ELKI:

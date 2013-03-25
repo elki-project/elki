@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayListIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 
 /**
  * Class representing a simple polygon. While you can obviously store non-simple

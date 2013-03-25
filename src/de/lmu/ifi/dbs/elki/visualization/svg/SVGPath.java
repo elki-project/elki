@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayListIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 
 /**
  * Element used for building an SVG path using a string buffer.

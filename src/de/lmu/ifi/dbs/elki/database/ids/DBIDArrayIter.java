@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.utilities.iterator.ArrayIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
 
 /**
  * Array iterators that can also go backwards and seek.
